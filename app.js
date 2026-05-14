@@ -26,7 +26,12 @@ let currentMainMenu='forecast';
 let imagePreloadSeq=0;
 let forecastLoadStates=[];
 let forecastImageCache=new Map();
-let forecastDisplayRequest=null;
+let forecastDisplayRequest=0;
+let displayedBlobUrls=new Set();
+
+const BLOB_MASK_IMAGES=true;
+const BLOB_MASK_FALLBACK_TO_DIRECT=true;
+const BLOB_FETCH_TIMEOUT_MS=9000;
 
 let auxAvailabilitySeq=0;
 let auxAvailabilityCache=new Map();
@@ -35,7 +40,7 @@ let auxAvailabilityLoading=false;
 
 const AUX_AVAILABILITY_CONCURRENCY=6;
 
-const IMAGE_PRELOAD_CONCURRENCY=2;
+const IMAGE_PRELOAD_CONCURRENCY=4;
 
 const modelGroups=[
 
@@ -2158,75 +2163,6 @@ p=>p.category===getCurrentCategory() && p.id===currentProduct
 }
 
 
-
-function getProxyBaseUrl(){
-
-let base=(window.CDS_PROXY_BASE_URL || '').trim();
-
-if(!base || base.includes('YOUR-WORKER')){
-return '';
-}
-
-return base.replace(/\/+$/,'');
-
-}
-
-function getModelImageCount(product,modelId=currentModel){
-
-let count=product?.imageCountByModel?.[modelId];
-
-if(Number.isFinite(Number(count)) && Number(count)>0){
-return Number(count);
-}
-
-let pattern=product?.patternByModel?.[modelId];
-
-if(Array.isArray(pattern)){
-return pattern.length;
-}
-
-return pattern ? 1 : 0;
-
-}
-
-function productRequiresDetail(product,modelId=currentModel){
-
-return !!product?.requiresDetailByModel?.[modelId];
-
-}
-
-function buildProxyChartUrl({
-run,
-fh='000',
-detail='',
-imageIndex=0
-}={}){
-
-let p=getCurrentProduct();
-let base=getProxyBaseUrl();
-
-if(!base || !p){
-return '';
-}
-
-let params=new URLSearchParams({
-menu:getCurrentCatalogKey(),
-category:getCurrentCategory(),
-product:p.id,
-model:currentModel,
-run:String(run || getUTCStamp()),
-fh:String(fh || '000').padStart(3,'0'),
-index:String(imageIndex || 0)
-});
-
-if(detail){
-params.set('detail',detail);
-}
-
-return `${base}/chart?${params.toString()}`;
-
-}
-
 function getCurrentPattern(){
 
 let p=getCurrentProduct();
@@ -2409,11 +2345,14 @@ message:''
 
 function productUsesForecastHour(){
 
-let p=getCurrentProduct();
+let patterns=getCurrentPatterns();
 
-return !!p?.usesForecastHourByModel?.[currentModel];
+return patterns.some(
+pattern=>pattern.includes('{fh}')
+);
 
 }
+
 
 function expandProductSteps(scheme,maxLead){
 
@@ -2466,70 +2405,69 @@ utcHour
 function buildImageUrlsForForecastIndex(index){
 
 let p=getCurrentProduct();
+let patterns=getCurrentPatterns();
 
-if(!p || !MODELS[currentModel]){
-return [];
-}
-
-let count=getModelImageCount(p,currentModel);
-
-if(!count){
+if(!p || !patterns.length || !MODELS[currentModel]){
 return [];
 }
 
 let run=getUTCStamp();
+let ym=run.slice(0,6);
+let day=run.slice(6,8);
+let folder=p.folderByModel?.[currentModel] || MODELS[currentModel].folder;
 let fhValue=currentForecastList[index] ?? currentForecastList[0] ?? 0;
 let fh=String(fhValue).padStart(3,'0');
 let detailToken=getCurrentAuxToken();
 
-if(productRequiresDetail(p,currentModel) && !detailToken){
-return [];
+return patterns.map(pattern=>{
+
+let file=pattern.replaceAll('{run}',run);
+
+if(file.includes('{fh}')){
+file=file.replaceAll('{fh}',fh);
 }
 
-let urls=[];
-
-for(let imageIndex=0;imageIndex<count;imageIndex++){
-urls.push(buildProxyChartUrl({
-run,
-fh,
-detail:detailToken || '',
-imageIndex
-}));
+if(file.includes('{detail}')){
+file=file.replaceAll('{detail}',detailToken || '');
 }
 
-return urls.filter(Boolean);
+return `https://data.kma.go.kr/CHT/${folder}/${ym}/${day}/${file}`;
+
+});
 
 }
 
 function buildImageUrlsForDetailValue(detailValue,index=Number(slider.value || 0)){
 
 let p=getCurrentProduct();
+let patterns=getCurrentPatterns();
 
-if(!p || !MODELS[currentModel]){
-return [];
-}
-
-let count=getModelImageCount(p,currentModel);
-
-if(!count){
+if(!p || !patterns.length || !MODELS[currentModel]){
 return [];
 }
 
 let run=getUTCStamp();
+let ym=run.slice(0,6);
+let day=run.slice(6,8);
+let folder=p.folderByModel?.[currentModel] || MODELS[currentModel].folder;
 let fhValue=currentForecastList[index] ?? currentForecastList[0] ?? 0;
 let fh=String(fhValue).padStart(3,'0');
-let urls=[];
 
-for(let imageIndex=0;imageIndex<count;imageIndex++){
-urls.push(buildProxyChartUrl({
-run,
-fh,
-detail:detailValue || '',
-imageIndex
-}));
+return patterns.map(pattern=>{
+
+let file=pattern.replaceAll('{run}',run);
+
+if(file.includes('{fh}')){
+file=file.replaceAll('{fh}',fh);
 }
 
-return urls.filter(Boolean);
+if(file.includes('{detail}')){
+file=file.replaceAll('{detail}',detailValue || '');
+}
+
+return `https://data.kma.go.kr/CHT/${folder}/${ym}/${day}/${file}`;
+
+});
 
 }
 
@@ -2701,17 +2639,42 @@ viewerWrap.classList.toggle('loading-active',!!isLoading);
 }
 
 
+function revokeDisplayedBlobUrls(){
+
+if(!displayedBlobUrls || displayedBlobUrls.size===0){
+return;
+}
+
+displayedBlobUrls.forEach(url=>{
+try{
+URL.revokeObjectURL(url);
+}
+catch(e){}
+});
+
+displayedBlobUrls=new Set();
+
+}
+
+
+function clearChartImages(){
+
+revokeDisplayedBlobUrls();
+chartImages.innerHTML='';
+
+}
+
+
 function showViewerMessage(message){
 
+forecastDisplayRequest++;
 setViewerLoading(false);
-chartImages.innerHTML='';
+clearChartImages();
 chartImages.classList.add('hidden');
 modelStatus.textContent=message;
 modelStatus.classList.remove('hidden');
 
 }
-
-
 
 
 function showViewerNotice(message){
@@ -2722,7 +2685,155 @@ modelStatus.classList.remove('hidden');
 }
 
 
-function showCharts(urls){
+function waitForImageLoad(img,timeoutMs=NOW_IMAGE_TIMEOUT_MS){
+
+return new Promise((resolve,reject)=>{
+
+let done=false;
+
+let timer=setTimeout(()=>{
+if(done){return;}
+done=true;
+reject(new Error('image load timeout'));
+},timeoutMs);
+
+img.onload=()=>{
+if(done){return;}
+done=true;
+clearTimeout(timer);
+resolve(img);
+};
+
+img.onerror=()=>{
+if(done){return;}
+done=true;
+clearTimeout(timer);
+reject(new Error('image load error'));
+};
+
+});
+
+}
+
+
+async function fetchBlobUrl(url,timeoutMs=BLOB_FETCH_TIMEOUT_MS){
+
+let controller=new AbortController();
+let timer=setTimeout(()=>{
+controller.abort();
+},timeoutMs);
+
+try{
+
+let response=await fetch(url,{
+method:'GET',
+signal:controller.signal,
+cache:'force-cache'
+});
+
+if(!response.ok){
+throw new Error('HTTP '+response.status);
+}
+
+let blob=await response.blob();
+
+if(!blob || blob.size===0){
+throw new Error('empty blob');
+}
+
+return URL.createObjectURL(blob);
+
+}
+finally{
+clearTimeout(timer);
+}
+
+}
+
+
+async function createDisplayImage(url){
+
+let img=document.createElement('img');
+img.alt='chart';
+img.decoding='async';
+img.loading='eager';
+img.dataset.originalUrl=url;
+img.src=url;
+
+try{
+await waitForImageLoad(img);
+return {ok:true,img,masked:false};
+}
+catch(error){
+return {ok:false,error};
+}
+
+}
+
+
+async function maskDisplayedImage(img,url,requestId){
+
+if(!BLOB_MASK_IMAGES || !img || !url){
+return;
+}
+
+try{
+let blobUrl=await fetchBlobUrl(url);
+
+if(requestId!==forecastDisplayRequest || !img.isConnected){
+try{URL.revokeObjectURL(blobUrl);}catch(e){}
+return;
+}
+
+let oldBlobUrl=img.dataset.blobUrl;
+img.dataset.blobUrl=blobUrl;
+displayedBlobUrls.add(blobUrl);
+img.src=blobUrl;
+
+if(oldBlobUrl && oldBlobUrl!==blobUrl){
+displayedBlobUrls.delete(oldBlobUrl);
+try{URL.revokeObjectURL(oldBlobUrl);}catch(e){}
+}
+
+}
+catch(error){
+/*
+원본 서버가 CORS를 허용하지 않으면 blob 변환은 실패한다.
+이 경우 표시 자체는 direct-origin img 로 유지한다.
+*/
+}
+
+}
+
+
+function replaceDisplayedImages(images){
+
+let oldBlobUrls=displayedBlobUrls;
+let nextBlobUrls=new Set();
+
+images.forEach(img=>{
+if(img.dataset.blobUrl){
+nextBlobUrls.add(img.dataset.blobUrl);
+}
+});
+
+displayedBlobUrls=nextBlobUrls;
+chartImages.replaceChildren(...images);
+chartImages.classList.remove('hidden');
+
+oldBlobUrls.forEach(url=>{
+if(!nextBlobUrls.has(url)){
+try{
+URL.revokeObjectURL(url);
+}
+catch(e){}
+}
+});
+
+}
+
+
+async function showCharts(urls){
 
 let requestId=++forecastDisplayRequest;
 
@@ -2734,110 +2845,61 @@ showViewerMessage('표출할 이미지 URL이 없습니다.');
 return;
 }
 
-let loadedImages=[];
-let finished=0;
-
-urls.forEach(url=>{
-
-let img=document.createElement('img');
-img.alt='chart';
-img.decoding='async';
-
-img.onload=()=>{
+let results=await Promise.all(
+urls.map(url=>createDisplayImage(url))
+);
 
 if(requestId!==forecastDisplayRequest){
+results.forEach(result=>{
+let blobUrl=result?.img?.dataset?.blobUrl;
+if(blobUrl){
+try{URL.revokeObjectURL(blobUrl);}catch(e){}
+}
+});
 return;
 }
 
-loadedImages.push(img);
-finished++;
+let loadedImages=results
+.filter(result=>result && result.ok && result.img)
+.map(result=>result.img);
 
-if(finished===urls.length){
-
-let enough=
-CURRENT_PRODUCT_EXISTENCE_MODE==='any'
+let enough=CURRENT_PRODUCT_EXISTENCE_MODE==='any'
 ?loadedImages.length>=1
 :loadedImages.length===urls.length;
 
 if(enough){
-
-chartImages.innerHTML='';
-chartImages.classList.remove('hidden');
-
-loadedImages.forEach(loadedImg=>{
-chartImages.appendChild(loadedImg);
-});
-
+replaceDisplayedImages(loadedImages);
 modelStatus.textContent='';
 modelStatus.classList.add('hidden');
 
-}
-else if(chartImages.querySelector('img')){
-
-showViewerNotice(
-'일부 이미지를 불러오지 못했습니다.\n기존 화면은 유지합니다.'
+loadedImages.forEach(img=>{
+maskDisplayedImage(
+img,
+img.dataset.originalUrl,
+requestId
 );
+});
 
-}
-else{
-
-showViewerMessage(
-'이미지를 찾을 수 없습니다.\n자료가 아직 생산되지 않았거나 해당 예측시간 자료가 없을 수 있습니다.'
-);
-
-}
-
-}
-
-};
-
-img.onerror=()=>{
-
-if(requestId!==forecastDisplayRequest){
 return;
 }
 
-finished++;
-
-if(finished===urls.length){
-
-let enough=
-CURRENT_PRODUCT_EXISTENCE_MODE==='any'
-?loadedImages.length>=1
-:loadedImages.length===urls.length;
-
-if(enough){
-
-chartImages.innerHTML='';
-chartImages.classList.remove('hidden');
-
-loadedImages.forEach(loadedImg=>{
-chartImages.appendChild(loadedImg);
+results.forEach(result=>{
+let blobUrl=result?.img?.dataset?.blobUrl;
+if(blobUrl){
+try{URL.revokeObjectURL(blobUrl);}catch(e){}
+}
 });
 
-}
-else if(chartImages.querySelector('img')){
-
+if(chartImages.querySelector('img')){
 showViewerNotice(
 '이미지를 불러오지 못했습니다.\n기존 화면은 유지합니다.'
 );
-
+return;
 }
-else{
 
 showViewerMessage(
 '이미지를 찾을 수 없습니다.\n자료가 아직 생산되지 않았거나 해당 예측시간 자료가 없을 수 있습니다.'
 );
-
-}
-
-}
-
-};
-
-img.src=url;
-
-});
 
 }
 
@@ -3029,17 +3091,18 @@ if(!selectionIsDisplayable()){
 return;
 }
 
+/*
+preload가 성공해 캐시가 있으면 캐시 URL 사용
+*/
 if(cached?.ok === true && cached?.urls?.length){
 showCharts(cached.urls);
 return;
 }
 
 /*
-캐시에 실패 기록이 있더라도 네트워크 일시 실패일 수 있으므로
-현재 사용자가 선택한 시점은 다시 한 번 직접 로드 시도한다.
+아직 preload 결과가 없어도
+현재 선택 위치 이미지는 즉시 표출 시도한다.
 */
-
-
 let urls=buildImageUrlsForForecastIndex(index);
 
 if(urls.length){
@@ -3085,37 +3148,6 @@ img.src=url;
 
 }
 
-async function headExists(url,timeoutMs=5000){
-
-let controller=new AbortController();
-let timer=setTimeout(()=>{
-controller.abort();
-},timeoutMs);
-
-try{
-
-let response=await fetch(url,{
-method:'HEAD',
-signal:controller.signal,
-cache:'force-cache'
-});
-
-return response.ok;
-
-}
-catch(error){
-
-return false;
-
-}
-finally{
-
-clearTimeout(timer);
-
-}
-
-}
-
 
 async function preloadForecastIndex(index,seq){
 
@@ -3146,85 +3178,16 @@ async function preloadAllForecastImages(){
 
 let seq=++imagePreloadSeq;
 let count=currentForecastList.length || 1;
-let activeIndex=Number(slider.value || 0);
-
 forecastImageCache=new Map();
 forecastLoadStates=Array.from({length:count},()=> 'loading');
-
 renderForecastTimeline();
-
 setViewerLoading(true,'이미지 로딩 중');
 
-/*
-1. 현재 선택된 예측시간을 가장 먼저 로드한다.
-*/
-let firstResult=await preloadForecastIndex(activeIndex,seq);
-
-if(seq!==imagePreloadSeq || firstResult.cancelled){
-return;
-}
-
-forecastLoadStates[activeIndex]=firstResult.ok ? 'available' : 'missing';
-forecastImageCache.set(activeIndex,{
-urls:firstResult.urls,
-ok:firstResult.ok
-});
-
-renderForecastTimeline();
-displayCurrentForecastImage();
-
-/*
-현재 이미지를 띄웠으면 스피너는 끈다.
-나머지 시간대 검사는 백그라운드로 진행한다.
-*/
-setViewerLoading(false);
-
-/*
-2. 현재 위치 주변 시간대를 우선 검사한다.
-*/
-let priority=[];
-
-for(let offset=1;offset<=3;offset++){
-
-let left=activeIndex-offset;
-let right=activeIndex+offset;
-
-if(left>=0){
-priority.push(left);
-}
-
-if(right<count){
-priority.push(right);
-}
-
-}
-
-/*
-3. 나머지는 그 뒤에 검사한다.
-*/
-let rest=[];
-
-for(let i=0;i<count;i++){
-
-if(i===activeIndex){
-continue;
-}
-
-if(priority.includes(i)){
-continue;
-}
-
-rest.push(i);
-
-}
-
-let indices=[...priority,...rest];
+let indices=Array.from({length:count},(_,i)=>i);
 let cursor=0;
 
 async function worker(){
-
 while(cursor<indices.length){
-
 let i=indices[cursor++];
 let result=await preloadForecastIndex(i,seq);
 
@@ -3233,15 +3196,13 @@ return;
 }
 
 forecastLoadStates[i]=result.ok ? 'available' : 'missing';
-forecastImageCache.set(i,{
-urls:result.urls,
-ok:result.ok
-});
-
+forecastImageCache.set(i,{urls:result.urls,ok:result.ok});
 updateForecastSegmentState(i);
 
+if(i===Number(slider.value || 0)){
+displayCurrentForecastImage();
 }
-
+}
 }
 
 let workers=Array.from(
@@ -3255,7 +3216,8 @@ if(seq!==imagePreloadSeq){
 return;
 }
 
-renderForecastTimeline();
+setViewerLoading(false);
+displayCurrentForecastImage();
 
 }
 
@@ -3298,9 +3260,9 @@ showViewerMessage(productStatus.message);
 return false;
 }
 
-if(!getProxyBaseUrl()){
+if(!MODELS[currentModel]?.folder){
 showViewerMessage(
-'Cloudflare Worker 주소가 설정되지 않았습니다.\nproxy-config.js의 CDS_PROXY_BASE_URL을 배포한 Worker 주소로 변경해 주세요.'
+`${MODELS[currentModel]?.name || currentModel}은(는)\n아직 URL 매핑이 등록되지 않았습니다.`
 );
 return false;
 }
@@ -3338,7 +3300,15 @@ preloadAllForecastImages();
 
 function getForecastHoursForProductAtRun(product,modelId,runUTC){
 
-let usesForecastHour=!!product?.usesForecastHourByModel?.[modelId];
+let pattern=product?.patternByModel?.[modelId];
+
+let patterns=Array.isArray(pattern)
+?pattern
+:[pattern];
+
+let usesForecastHour=patterns.some(
+p=>typeof p==='string' && p.includes('{fh}')
+);
 
 if(!usesForecastHour){
 return [0];
@@ -3374,23 +3344,28 @@ return modelHours;
 
 }
 
+
 function buildImageUrlsForCurrentSelectionAtRun(runUTC){
 
 let p=getCurrentProduct();
 
-if(!p || !p.patternByModel?.[currentModel]){
+if(!p){
 return [];
 }
 
-let count=getModelImageCount(p,currentModel);
+let pattern=p.patternByModel?.[currentModel];
 
-if(!count){
+if(!pattern){
 return [];
 }
+
+let patterns=Array.isArray(pattern)
+?pattern
+:[pattern];
 
 let model=MODELS[currentModel];
 
-if(!model){
+if(!model || !model.folder){
 return [];
 }
 
@@ -3419,6 +3394,17 @@ return [];
 }
 
 let run=formatUTCStampFromDate(runUTC);
+let ym=run.slice(0,6);
+let day=run.slice(6,8);
+
+let folder=
+p.folderByModel?.[currentModel] ||
+model.folder;
+
+if(!folder){
+return [];
+}
+
 let forecastHours=getForecastHoursForProductAtRun(
 p,
 currentModel,
@@ -3427,24 +3413,34 @@ runUTC
 
 let fhValue=forecastHours[0] ?? 0;
 let fh=String(fhValue).padStart(3,'0');
-let detailToken=getCurrentAuxToken();
 
-if(productRequiresDetail(p,currentModel) && !detailToken){
-return [];
-}
+let detailToken=getCurrentAuxToken();
 
 let urls=[];
 
-for(let imageIndex=0;imageIndex<count;imageIndex++){
-urls.push(buildProxyChartUrl({
-run,
-fh,
-detail:detailToken || '',
-imageIndex
-}));
+for(let pattern of patterns){
+
+if(pattern.includes('{detail}') && !detailToken){
+return [];
 }
 
-return urls.filter(Boolean);
+let file=pattern.replaceAll('{run}',run);
+
+if(file.includes('{fh}')){
+file=file.replaceAll('{fh}',fh);
+}
+
+if(file.includes('{detail}')){
+file=file.replaceAll('{detail}',detailToken);
+}
+
+urls.push(
+`https://data.kma.go.kr/CHT/${folder}/${ym}/${day}/${file}`
+);
+
+}
+
+return urls;
 
 }
 
@@ -3455,7 +3451,7 @@ return false;
 }
 
 let results=await Promise.all(
-urls.map(url=>headExists(url))
+urls.map(url=>loadImage(url))
 );
 
 if(CURRENT_PRODUCT_EXISTENCE_MODE==="any"){
@@ -3901,14 +3897,12 @@ categoryIds.add(c);
 let hazardCategories=getSafeGlobal("HAZARD_CATEGORIES",[]);
 let ensembleCategories=getSafeGlobal("ENSEMBLE_CATEGORIES",[]);
 let analysisCategories=getSafeGlobal("ANALYSIS_CATEGORIES",[]);
-let editCategories=getSafeGlobal("EDIT_CATEGORIES",[]);
 
 let hazardProducts=getSafeGlobal("HAZARD_PRODUCTS",[]);
 let ensembleProducts=getSafeGlobal("ENSEMBLE_PRODUCTS",[]);
 let analysisProducts=getSafeGlobal("ANALYSIS_PRODUCTS",[]);
-let editProducts=getSafeGlobal("EDIT_PRODUCTS",[]);
 
-[...hazardCategories,...ensembleCategories,...analysisCategories,...editCategories].forEach(c=>{
+[...hazardCategories,...ensembleCategories,...analysisCategories].forEach(c=>{
 if(c && c.id){
 categoryIds.add(c.id);
 }
@@ -3918,8 +3912,7 @@ let allProducts=[
 ...(PRODUCTS || []),
 ...hazardProducts,
 ...ensembleProducts,
-...analysisProducts,
-...editProducts
+...analysisProducts
 ];
 
 let seenProducts=new Set();
