@@ -26,12 +26,7 @@ let currentMainMenu='forecast';
 let imagePreloadSeq=0;
 let forecastLoadStates=[];
 let forecastImageCache=new Map();
-let forecastDisplayRequest=0;
-let displayedBlobUrls=new Set();
-
-const BLOB_MASK_IMAGES=true;
-const BLOB_MASK_FALLBACK_TO_DIRECT=true;
-const BLOB_FETCH_TIMEOUT_MS=9000;
+let forecastDisplayRequest=null;
 
 let auxAvailabilitySeq=0;
 let auxAvailabilityCache=new Map();
@@ -2639,37 +2634,10 @@ viewerWrap.classList.toggle('loading-active',!!isLoading);
 }
 
 
-function revokeDisplayedBlobUrls(){
-
-if(!displayedBlobUrls || displayedBlobUrls.size===0){
-return;
-}
-
-displayedBlobUrls.forEach(url=>{
-try{
-URL.revokeObjectURL(url);
-}
-catch(e){}
-});
-
-displayedBlobUrls=new Set();
-
-}
-
-
-function clearChartImages(){
-
-revokeDisplayedBlobUrls();
-chartImages.innerHTML='';
-
-}
-
-
 function showViewerMessage(message){
 
-forecastDisplayRequest++;
 setViewerLoading(false);
-clearChartImages();
+chartImages.innerHTML='';
 chartImages.classList.add('hidden');
 modelStatus.textContent=message;
 modelStatus.classList.remove('hidden');
@@ -2677,229 +2645,44 @@ modelStatus.classList.remove('hidden');
 }
 
 
-function showViewerNotice(message){
-
-modelStatus.textContent=message;
-modelStatus.classList.remove('hidden');
-
-}
-
-
-function waitForImageLoad(img,timeoutMs=NOW_IMAGE_TIMEOUT_MS){
-
-return new Promise((resolve,reject)=>{
-
-let done=false;
-
-let timer=setTimeout(()=>{
-if(done){return;}
-done=true;
-reject(new Error('image load timeout'));
-},timeoutMs);
-
-img.onload=()=>{
-if(done){return;}
-done=true;
-clearTimeout(timer);
-resolve(img);
-};
-
-img.onerror=()=>{
-if(done){return;}
-done=true;
-clearTimeout(timer);
-reject(new Error('image load error'));
-};
-
-});
-
-}
-
-
-async function fetchBlobUrl(url,timeoutMs=BLOB_FETCH_TIMEOUT_MS){
-
-let controller=new AbortController();
-let timer=setTimeout(()=>{
-controller.abort();
-},timeoutMs);
-
-try{
-
-let response=await fetch(url,{
-method:'GET',
-signal:controller.signal,
-cache:'force-cache'
-});
-
-if(!response.ok){
-throw new Error('HTTP '+response.status);
-}
-
-let blob=await response.blob();
-
-if(!blob || blob.size===0){
-throw new Error('empty blob');
-}
-
-return URL.createObjectURL(blob);
-
-}
-finally{
-clearTimeout(timer);
-}
-
-}
-
-
-async function createDisplayImage(url){
-
-let img=document.createElement('img');
-img.alt='chart';
-img.decoding='async';
-img.loading='eager';
-img.dataset.originalUrl=url;
-img.src=url;
-
-try{
-await waitForImageLoad(img);
-return {ok:true,img,masked:false};
-}
-catch(error){
-return {ok:false,error};
-}
-
-}
-
-
-async function maskDisplayedImage(img,url,requestId){
-
-if(!BLOB_MASK_IMAGES || !img || !url){
-return;
-}
-
-try{
-let blobUrl=await fetchBlobUrl(url);
-
-if(requestId!==forecastDisplayRequest || !img.isConnected){
-try{URL.revokeObjectURL(blobUrl);}catch(e){}
-return;
-}
-
-let oldBlobUrl=img.dataset.blobUrl;
-img.dataset.blobUrl=blobUrl;
-displayedBlobUrls.add(blobUrl);
-img.src=blobUrl;
-
-if(oldBlobUrl && oldBlobUrl!==blobUrl){
-displayedBlobUrls.delete(oldBlobUrl);
-try{URL.revokeObjectURL(oldBlobUrl);}catch(e){}
-}
-
-}
-catch(error){
-/*
-원본 서버가 CORS를 허용하지 않으면 blob 변환은 실패한다.
-이 경우 표시 자체는 direct-origin img 로 유지한다.
-*/
-}
-
-}
-
-
-function replaceDisplayedImages(images){
-
-let oldBlobUrls=displayedBlobUrls;
-let nextBlobUrls=new Set();
-
-images.forEach(img=>{
-if(img.dataset.blobUrl){
-nextBlobUrls.add(img.dataset.blobUrl);
-}
-});
-
-displayedBlobUrls=nextBlobUrls;
-chartImages.replaceChildren(...images);
-chartImages.classList.remove('hidden');
-
-oldBlobUrls.forEach(url=>{
-if(!nextBlobUrls.has(url)){
-try{
-URL.revokeObjectURL(url);
-}
-catch(e){}
-}
-});
-
-}
-
-
-async function showCharts(urls){
-
-let requestId=++forecastDisplayRequest;
+function showCharts(urls){
 
 modelStatus.textContent='';
 modelStatus.classList.add('hidden');
+chartImages.innerHTML='';
+chartImages.classList.remove('hidden');
 
 if(!urls || urls.length===0){
 showViewerMessage('표출할 이미지 URL이 없습니다.');
 return;
 }
 
-let results=await Promise.all(
-urls.map(url=>createDisplayImage(url))
-);
+let failedCount=0;
 
-if(requestId!==forecastDisplayRequest){
-results.forEach(result=>{
-let blobUrl=result?.img?.dataset?.blobUrl;
-if(blobUrl){
-try{URL.revokeObjectURL(blobUrl);}catch(e){}
-}
-});
-return;
-}
+urls.forEach(url=>{
 
-let loadedImages=results
-.filter(result=>result && result.ok && result.img)
-.map(result=>result.img);
+let img=document.createElement('img');
+img.alt='chart';
+img.decoding='async';
 
-let enough=CURRENT_PRODUCT_EXISTENCE_MODE==='any'
-?loadedImages.length>=1
-:loadedImages.length===urls.length;
+img.onerror=()=>{
 
-if(enough){
-replaceDisplayedImages(loadedImages);
-modelStatus.textContent='';
-modelStatus.classList.add('hidden');
+failedCount++;
 
-loadedImages.forEach(img=>{
-maskDisplayedImage(
-img,
-img.dataset.originalUrl,
-requestId
-);
-});
-
-return;
-}
-
-results.forEach(result=>{
-let blobUrl=result?.img?.dataset?.blobUrl;
-if(blobUrl){
-try{URL.revokeObjectURL(blobUrl);}catch(e){}
-}
-});
-
-if(chartImages.querySelector('img')){
-showViewerNotice(
-'이미지를 불러오지 못했습니다.\n기존 화면은 유지합니다.'
-);
-return;
-}
+if(failedCount===urls.length){
 
 showViewerMessage(
 '이미지를 찾을 수 없습니다.\n자료가 아직 생산되지 않았거나 해당 예측시간 자료가 없을 수 있습니다.'
 );
+
+}
+
+};
+
+img.src=url;
+chartImages.appendChild(img);
+
+});
 
 }
 
@@ -3094,7 +2877,7 @@ return;
 /*
 preload가 성공해 캐시가 있으면 캐시 URL 사용
 */
-if(cached?.ok === true && cached?.urls?.length){
+if(cached?.urls?.length){
 showCharts(cached.urls);
 return;
 }
@@ -3197,7 +2980,7 @@ return;
 
 forecastLoadStates[i]=result.ok ? 'available' : 'missing';
 forecastImageCache.set(i,{urls:result.urls,ok:result.ok});
-updateForecastSegmentState(i);
+renderForecastTimeline();
 
 if(i===Number(slider.value || 0)){
 displayCurrentForecastImage();
