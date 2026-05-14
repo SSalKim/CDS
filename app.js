@@ -35,7 +35,7 @@ let auxAvailabilityLoading=false;
 
 const AUX_AVAILABILITY_CONCURRENCY=6;
 
-const IMAGE_PRELOAD_CONCURRENCY=4;
+const IMAGE_PRELOAD_CONCURRENCY=2;
 
 const modelGroups=[
 
@@ -2998,6 +2998,37 @@ img.src=url;
 
 }
 
+async function headExists(url,timeoutMs=5000){
+
+let controller=new AbortController();
+let timer=setTimeout(()=>{
+controller.abort();
+},timeoutMs);
+
+try{
+
+let response=await fetch(url,{
+method:'HEAD',
+signal:controller.signal,
+cache:'force-cache'
+});
+
+return response.ok;
+
+}
+catch(error){
+
+return false;
+
+}
+finally{
+
+clearTimeout(timer);
+
+}
+
+}
+
 
 async function preloadForecastIndex(index,seq){
 
@@ -3028,16 +3059,85 @@ async function preloadAllForecastImages(){
 
 let seq=++imagePreloadSeq;
 let count=currentForecastList.length || 1;
+let activeIndex=Number(slider.value || 0);
+
 forecastImageCache=new Map();
 forecastLoadStates=Array.from({length:count},()=> 'loading');
+
 renderForecastTimeline();
+
 setViewerLoading(true,'이미지 로딩 중');
 
-let indices=Array.from({length:count},(_,i)=>i);
+/*
+1. 현재 선택된 예측시간을 가장 먼저 로드한다.
+*/
+let firstResult=await preloadForecastIndex(activeIndex,seq);
+
+if(seq!==imagePreloadSeq || firstResult.cancelled){
+return;
+}
+
+forecastLoadStates[activeIndex]=firstResult.ok ? 'available' : 'missing';
+forecastImageCache.set(activeIndex,{
+urls:firstResult.urls,
+ok:firstResult.ok
+});
+
+renderForecastTimeline();
+displayCurrentForecastImage();
+
+/*
+현재 이미지를 띄웠으면 스피너는 끈다.
+나머지 시간대 검사는 백그라운드로 진행한다.
+*/
+setViewerLoading(false);
+
+/*
+2. 현재 위치 주변 시간대를 우선 검사한다.
+*/
+let priority=[];
+
+for(let offset=1;offset<=3;offset++){
+
+let left=activeIndex-offset;
+let right=activeIndex+offset;
+
+if(left>=0){
+priority.push(left);
+}
+
+if(right<count){
+priority.push(right);
+}
+
+}
+
+/*
+3. 나머지는 그 뒤에 검사한다.
+*/
+let rest=[];
+
+for(let i=0;i<count;i++){
+
+if(i===activeIndex){
+continue;
+}
+
+if(priority.includes(i)){
+continue;
+}
+
+rest.push(i);
+
+}
+
+let indices=[...priority,...rest];
 let cursor=0;
 
 async function worker(){
+
 while(cursor<indices.length){
+
 let i=indices[cursor++];
 let result=await preloadForecastIndex(i,seq);
 
@@ -3046,13 +3146,15 @@ return;
 }
 
 forecastLoadStates[i]=result.ok ? 'available' : 'missing';
-forecastImageCache.set(i,{urls:result.urls,ok:result.ok});
-renderForecastTimeline();
+forecastImageCache.set(i,{
+urls:result.urls,
+ok:result.ok
+});
 
-if(i===Number(slider.value || 0)){
-displayCurrentForecastImage();
+updateForecastSegmentState(i);
+
 }
-}
+
 }
 
 let workers=Array.from(
@@ -3066,8 +3168,7 @@ if(seq!==imagePreloadSeq){
 return;
 }
 
-setViewerLoading(false);
-displayCurrentForecastImage();
+renderForecastTimeline();
 
 }
 
@@ -3267,7 +3368,7 @@ return false;
 }
 
 let results=await Promise.all(
-urls.map(url=>loadImage(url))
+urls.map(url=>headExists(url))
 );
 
 if(CURRENT_PRODUCT_EXISTENCE_MODE==="any"){
