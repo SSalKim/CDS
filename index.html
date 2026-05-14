@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>수치일기도표출시스템</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-shell">
+<aside class="sidebar">
+
+<div class="logo-block">
+<span class="title">수치일기도<br>표출시스템</span>
+<div class="subtitle">Chart Display System 3.0</div>
+</div>
+
+<nav class="main-menu" id="mainMenu">
+<button class="menu-btn" data-menu="edit">편집일기도</button>
+<button class="menu-btn" data-menu="analysis">분석장</button>
+<button class="menu-btn active" data-menu="forecast">예보장</button>
+<button class="menu-btn" data-menu="hazard">위험기상</button>
+<button class="menu-btn" data-menu="ensemble">앙상블</button>
+</nav>
+
+<div class="model-box">
+<div id="modelGrid" class="model-grid"></div>
+</div>
+
+</aside>
+
+<main class="main-panel">
+
+<div class="toolbar">
+
+<div class="toolbar-left">
+
+<button id="nowBtn">NOW</button>
+
+<input
+id="runDate"
+type="date"
+>
+
+<select id="runHour"></select>
+
+<div class="time-toggle-stack">
+<button id="kstBtn" class="time-mode active">KST</button>
+<button id="utcBtn" class="time-mode">UTC</button>
+</div>
+
+<select id="productCategory"></select>
+<select id="productSelect"></select>
+
+</div>
+
+</div>
+
+<div class="forecast-bar">
+  <div class="forecast-shell">
+    <input id="forecastSlider" class="native-forecast-slider" type="range" min="0" max="0" step="1" value="0">
+    <div id="forecastTimeline" class="forecast-timeline" aria-label="forecast timeline"></div>
+    <div id="forecastLabel" class="forecast-label-hidden">+000h</div>
+  </div>
+</div>
+
+<div class="viewer-layout">
+
+  <div class="viewer-wrap">
+
+    <div id="modelStatus" class="viewer-message hidden"></div>
+
+    <div id="chartImages" class="chart-images"></div>
+
+    <div id="loadingOverlay" class="loading hidden">
+      <div class="spinner"></div>
+      <div class="loading-text">이미지 로딩 중</div>
+    </div>
+
+  </div>
+
+  <aside id="auxSidebar" class="aux-sidebar hidden">
+    <div class="aux-sidebar-inner">
+      <div id="auxSidebarTitle" class="aux-sidebar-title"></div>
+      <div id="auxSidebarList" class="aux-sidebar-list"></div>
+    </div>
+  </aside>
+
+</div>
+
+</main>
+
+</div>
+
+<script src="models.js"></script>
+<script src="edit.js"></script>
+<script src="analysis.js"></script>
+<script src="products.js"></script>
+<script src="hazards.js"></script>
+<script src="ensemble.js"></script>
+
+<script src="catalog-config.js"></script>
+<script src="aux-data.js"></script>
+<script src="aux-rules.js"></script>
+<script src="proxy-config.js"></script>
+
+<script src="app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,1 @@
+window.CDS_PROXY_BASE_URL="https://cds.kwj1407.workers.dev";
