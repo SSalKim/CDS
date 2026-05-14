@@ -2712,19 +2712,30 @@ modelStatus.classList.remove('hidden');
 }
 
 
+
+
+function showViewerNotice(message){
+
+modelStatus.textContent=message;
+modelStatus.classList.remove('hidden');
+
+}
+
+
 function showCharts(urls){
+
+let requestId=++forecastDisplayRequest;
 
 modelStatus.textContent='';
 modelStatus.classList.add('hidden');
-chartImages.innerHTML='';
-chartImages.classList.remove('hidden');
 
 if(!urls || urls.length===0){
 showViewerMessage('표출할 이미지 URL이 없습니다.');
 return;
 }
 
-let failedCount=0;
+let loadedImages=[];
+let finished=0;
 
 urls.forEach(url=>{
 
@@ -2732,11 +2743,43 @@ let img=document.createElement('img');
 img.alt='chart';
 img.decoding='async';
 
-img.onerror=()=>{
+img.onload=()=>{
 
-failedCount++;
+if(requestId!==forecastDisplayRequest){
+return;
+}
 
-if(failedCount===urls.length){
+loadedImages.push(img);
+finished++;
+
+if(finished===urls.length){
+
+let enough=
+CURRENT_PRODUCT_EXISTENCE_MODE==='any'
+?loadedImages.length>=1
+:loadedImages.length===urls.length;
+
+if(enough){
+
+chartImages.innerHTML='';
+chartImages.classList.remove('hidden');
+
+loadedImages.forEach(loadedImg=>{
+chartImages.appendChild(loadedImg);
+});
+
+modelStatus.textContent='';
+modelStatus.classList.add('hidden');
+
+}
+else if(chartImages.querySelector('img')){
+
+showViewerNotice(
+'일부 이미지를 불러오지 못했습니다.\n기존 화면은 유지합니다.'
+);
+
+}
+else{
 
 showViewerMessage(
 '이미지를 찾을 수 없습니다.\n자료가 아직 생산되지 않았거나 해당 예측시간 자료가 없을 수 있습니다.'
@@ -2744,10 +2787,55 @@ showViewerMessage(
 
 }
 
+}
+
+};
+
+img.onerror=()=>{
+
+if(requestId!==forecastDisplayRequest){
+return;
+}
+
+finished++;
+
+if(finished===urls.length){
+
+let enough=
+CURRENT_PRODUCT_EXISTENCE_MODE==='any'
+?loadedImages.length>=1
+:loadedImages.length===urls.length;
+
+if(enough){
+
+chartImages.innerHTML='';
+chartImages.classList.remove('hidden');
+
+loadedImages.forEach(loadedImg=>{
+chartImages.appendChild(loadedImg);
+});
+
+}
+else if(chartImages.querySelector('img')){
+
+showViewerNotice(
+'이미지를 불러오지 못했습니다.\n기존 화면은 유지합니다.'
+);
+
+}
+else{
+
+showViewerMessage(
+'이미지를 찾을 수 없습니다.\n자료가 아직 생산되지 않았거나 해당 예측시간 자료가 없을 수 있습니다.'
+);
+
+}
+
+}
+
 };
 
 img.src=url;
-chartImages.appendChild(img);
 
 });
 
@@ -2941,18 +3029,17 @@ if(!selectionIsDisplayable()){
 return;
 }
 
-/*
-preload가 성공해 캐시가 있으면 캐시 URL 사용
-*/
-if(cached?.urls?.length){
+if(cached?.ok === true && cached?.urls?.length){
 showCharts(cached.urls);
 return;
 }
 
 /*
-아직 preload 결과가 없어도
-현재 선택 위치 이미지는 즉시 표출 시도한다.
+캐시에 실패 기록이 있더라도 네트워크 일시 실패일 수 있으므로
+현재 사용자가 선택한 시점은 다시 한 번 직접 로드 시도한다.
 */
+
+
 let urls=buildImageUrlsForForecastIndex(index);
 
 if(urls.length){
