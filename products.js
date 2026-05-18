@@ -113,6 +113,7 @@ const PRODUCTS=[
         kim_gdps: "kim_gdps_erly_asia_thk700_ft06_pa4_s{fh}_{run}.png",
         um_gdps: "gdps_erly_asia_thk700_ft06_pa4_s{fh}_{run}.gif",
         ecmwf: "ecmw_lc40_asia_thk700_s{fh}_{run}.gif",
+        ukmo: "ukum_erly_asia_thk700_s{fh}_{run}.png",
         kim_rdps: "kim_rdps_erly_asia_thk700_s{fh}_{run}.png",
         um_rdps: "rdps_lc30_asia_thk700_ft03_pa4_s{fh}_{run}.gif",
         kwrf_rdps: "kwrf_lc10_asia_thk700_ft03_pa4_s{fh}_{run}.gif",
@@ -127,6 +128,7 @@ const PRODUCTS=[
         kim_gdps: "kim_gdps_erly_asia_thk850_ft06_pa4_s{fh}_{run}.png",
         um_gdps: "gdps_erly_asia_thk850_ft06_pa4_s{fh}_{run}.gif",
         ecmwf: "ecmw_lc40_asia_thk850_s{fh}_{run}.gif",
+        ukmo: "ukum_erly_asia_thk850_s{fh}_{run}.png",
         kim_rdps: "kim_rdps_erly_asia_thk850_s{fh}_{run}.png",
         um_rdps: "rdps_lc30_asia_thk850_ft03_pa4_s{fh}_{run}.gif",
         kwrf_rdps: "kwrf_lc10_asia_thk850_ft03_pa4_s{fh}_{run}.gif",
@@ -221,12 +223,28 @@ const PRODUCTS=[
         ukmo: "ukum_erly_asia_surfce_s{fh}_{run}.png",
         kim_rdps: "kim_rdps_erly_asia_surfce_s{fh}_{run}.png",
         um_rdps: "rdps_lc30_asia_surfce_ft03_pa4_s{fh}_{run}.gif",
-        kwrf_rdps: "kwrf_lc10_asia_surfce_ft03_pa4_s{fh}_{run}.gif",
-        um_ldps: "ldps_asia_surfce_s{fh}_{run}.gif"
+        kwrf_rdps: "kwrf_lc10_asia_surfce_ft03_pa4_s{fh}_{run}.gif"
+    },
+    archiveStartByModel:{
+        um_ldps:"2018-01-18"
+    }
+},
+{category:"asia", id:"prcp3h", label:"해면기압, 3시간 누적강수량",
+    patternByModel:{
+        kim_rdps: "kim_rdps_erly_asia_prcp3h_s{fh}_{run}.png",
+        um_ldps: "ldps_asia_surfce_s{fh}_{run}.gif",
     },
     archiveStartByModel:{
         um_ldps:"2018-01-18"
     },
+    forecastStepByModel:{
+        kim_rdps:[
+            {start:0,end:144,step:3}
+        ],
+        um_ldps:[
+            {start:0,end:48,step:3}
+        ],
+    }
 },
 {category:"asia", id:"acrain", label:"총누적강수량",
     patternByModel:{
@@ -702,6 +720,7 @@ const PRODUCTS=[
         kim_gdps: "kim_gdps_erly_hkor_thk700_s{fh}_{run}.png",
         um_gdps: "gdps_erly_hkor_thk700_s{fh}_{run}.gif",
         ecmwf: "ecmw_lc20_hkor_thk700_s{fh}_{run}.gif",
+        ukmo: "ukum_erly_hkor_thk700_s{fh}_{run}.png",
         kim_rdps: "kim_rdps_erly_hkor_thk700_s{fh}_{run}.png",
         um_rdps: "rdps_lc10_hkor_thk700_s{fh}_{run}.gif",
         kwrf_rdps: "kwrf_lc10_hkor_thk700_s{fh}_{run}.gif",
@@ -714,6 +733,7 @@ const PRODUCTS=[
         kim_gdps: "kim_gdps_erly_hkor_thk850_s{fh}_{run}.png",
         um_gdps: "gdps_erly_hkor_thk850_s{fh}_{run}.gif",
         ecmwf: "ecmw_lc20_hkor_thk850_s{fh}_{run}.gif",
+        ukmo: "ukum_erly_hkor_thk850_s{fh}_{run}.png",
         kim_rdps: "kim_rdps_erly_hkor_thk850_s{fh}_{run}.png",
         um_rdps: "rdps_lc10_hkor_thk850_s{fh}_{run}.gif",
         kim_ldps: "kim_ldps_erly_hkor_thk850_s{fh}_{run}.png",
@@ -792,12 +812,16 @@ const PRODUCTS=[
         kim_gdps: "kim_gdps_erly_hkor_acrain_s{fh}_{run}.png",
         um_gdps: "gdps_erly_hkor_acrain_s{fh}_{run}.gif",
         ecmwf: "ecmw_lc20_hkor_acrain_s{fh}_{run}.gif",
+        ukmo: "ukum_erly_hkor_acrain_s{fh}_{run}.png",
         kim_rdps: "kim_rdps_erly_hkor_acrain_s{fh}_{run}.png",
         um_rdps: "rdps_lc10_hkor_acrain_s{fh}_{run}.gif",
         kwrf_rdps: "kwrf_lc10_hkor_acrain_s{fh}_{run}.gif",
         kim_ldps: "kim_ldps_erly_hkor_acrain_s{fh}_{run}.png",
         um_ldps: "ldps_lc06_acrain_s{fh}_{run}.gif"
-    }
+    },
+    archiveStartByModel:{
+        ukmo:"2026-05-11"
+    },
 },
 {category:"hkor", id:"acptot", label:"시간별 누적강수량",
     patternByModel:{
@@ -1551,7 +1575,7 @@ const PRODUCTS=[
             {start:15,end:144,step:3}
         ],
         kim_rdps:[
-            {start:1,end:48,step:1}
+            {start:1,end:72,step:1}
         ]
     },
 },

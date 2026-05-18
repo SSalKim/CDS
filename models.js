@@ -53,7 +53,7 @@ stepSchemeByCycleGroup:{
 ecmwf:{
 name:"ECMWF",
 folder:"ECMW",
-archiveStart:"2016-01-01",
+archiveStart:"2013-01-28",
 cycles:[0,12],
 forecastRules:[
 {cycles:[0,12],max:240}
@@ -107,7 +107,8 @@ archiveStart:"2012-06-01",
 archiveEnd:"2019-02-10",
 cycles:[0,6,12,18],
 forecastRules:[
-{cycles:[0,6,12,18],max:87}
+{until:"2013-09-29",cycles:[0,6,12,18],max:72},
+{from:"2013-09-30",cycles:[0,6,12,18],max:87},
 ],
 stepSchemeByCycleGroup:{
 "0,6,12,18":[
@@ -115,7 +116,6 @@ stepSchemeByCycleGroup:{
 ]
 }
 },
-
 
 kwrf_rdps:{
 name:"RDAPS_WRF",
@@ -148,7 +148,6 @@ stepSchemeByCycleGroup:{
 }
 },
 
-
 um_ldps:{
 name:"LDAPS_UM",
 folder:"LDPS",
@@ -166,7 +165,6 @@ stepSchemeByCycleGroup:{
 ]
 }
 },
-
 
 kim_klfs:{
 name:"KLAPS_KIM",
