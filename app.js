@@ -818,6 +818,25 @@ currentModel=modelId;
 
 applyCategoryRedirectForCurrentModel();
 
+let categoryId=getCurrentCategory();
+let currentProductObject=getProductByIdInCategory(
+categoryId,
+currentProduct
+);
+
+if(
+!currentProductObject ||
+!productSupportsModel(currentProductObject,currentModel)
+){
+let fallbackProduct=getProductsInCategory(categoryId).find(
+p=>productSupportsModel(p,currentModel)
+);
+
+if(fallbackProduct){
+currentProduct=fallbackProduct.id;
+}
+}
+
 refreshView({
 updateCategories:true,
 updateProducts:true,
@@ -2050,8 +2069,67 @@ p.type!=="header"
 
 }
 
+function getCategoryIdForModelFiltering(modelId){
+
+if(
+isForecastCatalog() &&
+getActiveModelSpecificProductCategory()[modelId]
+){
+return getActiveModelSpecificProductCategory()[modelId];
+}
+
+return getCurrentCategory();
+
+}
 
 
+function getProductByIdInCategory(categoryId,productId){
+
+return getActiveProducts().find(
+p=>
+p.category===categoryId &&
+p.id===productId &&
+p.type!=="header"
+);
+
+}
+
+
+function getCurrentCategoryRestrictionForModel(modelId){
+
+let categoryId=getCategoryIdForModelFiltering(modelId);
+
+let product=getProductByIdInCategory(
+categoryId,
+currentProduct
+);
+
+let productId=product?.id || currentProduct;
+
+let exactKey=`${categoryId}:${productId}`;
+let categoryKey=`${categoryId}:*`;
+
+let selectionRestrictions=getActiveSelectionModelRestrictions();
+let categoryRestrictions=getActiveCategoryModelRestrictions();
+
+return (
+selectionRestrictions[exactKey] ||
+selectionRestrictions[categoryKey] ||
+categoryRestrictions[categoryId] ||
+null
+);
+
+}
+
+
+function modelUsesSpecificProductCategory(modelId){
+
+return !!(
+isForecastCatalog() &&
+getActiveModelSpecificProductCategory()[modelId]
+);
+
+}
 
 
 function getCurrentSelectedProductForModelFiltering(){
@@ -2068,8 +2146,10 @@ return null;
 
 
 function isModelAllowedByCurrentCategory(modelId){
-/* category / selection restriction 확인 */
-let restriction=getCurrentCategoryRestriction();
+
+let categoryId=getCategoryIdForModelFiltering(modelId);
+
+let restriction=getCurrentCategoryRestrictionForModel(modelId);
 
 if(
 restriction &&
@@ -2078,9 +2158,19 @@ restriction &&
 return false;
 }
 
+/*
+초단기처럼 모델별 전용 category를 쓰는 경우:
+현재 선택 product가 아니라 해당 전용 category 안에
+지원 가능한 산출물이 하나라도 있으면 모델 선택을 허용한다.
+*/
+if(modelUsesSpecificProductCategory(modelId)){
+return categoryHasSupportedProduct(categoryId,modelId);
+}
 
-/* 현재 선택된 산출물이 해당 모델을 지원하는지 확인 */
-let product=getCurrentSelectedProductForModelFiltering();
+let product=getProductByIdInCategory(
+categoryId,
+currentProduct
+);
 
 if(product && !productSupportsModel(product,modelId)){
 return false;
@@ -2645,31 +2735,71 @@ modelStatus.classList.remove('hidden');
 }
 
 
+function showViewerNotice(message){
+
+modelStatus.textContent=message;
+modelStatus.classList.remove('hidden');
+
+}
+
+
 function showCharts(urls){
+
+let requestId=++forecastDisplayRequest;
 
 modelStatus.textContent='';
 modelStatus.classList.add('hidden');
-chartImages.innerHTML='';
-chartImages.classList.remove('hidden');
 
 if(!urls || urls.length===0){
 showViewerMessage('표출할 이미지 URL이 없습니다.');
 return;
 }
 
-let failedCount=0;
+let loadedImages=[];
+let finished=0;
 
-urls.forEach(url=>{
+function finishOne(){
 
-let img=document.createElement('img');
-img.alt='chart';
-img.decoding='async';
+if(requestId!==forecastDisplayRequest){
+return;
+}
 
-img.onerror=()=>{
+finished++;
 
-failedCount++;
+if(finished<urls.length){
+return;
+}
 
-if(failedCount===urls.length){
+let enough=
+CURRENT_PRODUCT_EXISTENCE_MODE==='any'
+?loadedImages.length>=1
+:loadedImages.length===urls.length;
+
+if(enough){
+
+chartImages.innerHTML='';
+chartImages.classList.remove('hidden');
+
+loadedImages.forEach(img=>{
+chartImages.appendChild(img);
+});
+
+modelStatus.textContent='';
+modelStatus.classList.add('hidden');
+
+return;
+
+}
+
+/*
+이미 화면에 기존 이미지가 있으면, 실패했다고 바로 지우지 않는다.
+*/
+if(chartImages.querySelector('img')){
+showViewerNotice(
+'이미지를 불러오지 못했습니다.\n기존 화면은 유지합니다.'
+);
+return;
+}
 
 showViewerMessage(
 '이미지를 찾을 수 없습니다.\n자료가 아직 생산되지 않았거나 해당 예측시간 자료가 없을 수 있습니다.'
@@ -2677,10 +2807,34 @@ showViewerMessage(
 
 }
 
+urls.forEach(url=>{
+
+let img=document.createElement('img');
+img.alt='chart';
+img.decoding='async';
+
+img.onload=()=>{
+
+if(requestId!==forecastDisplayRequest){
+return;
+}
+
+loadedImages.push(img);
+finishOne();
+
+};
+
+img.onerror=()=>{
+
+if(requestId!==forecastDisplayRequest){
+return;
+}
+
+finishOne();
+
 };
 
 img.src=url;
-chartImages.appendChild(img);
 
 });
 
@@ -2877,7 +3031,7 @@ return;
 /*
 preload가 성공해 캐시가 있으면 캐시 URL 사용
 */
-if(cached?.urls?.length){
+if(cached?.ok===true && cached?.urls?.length){
 showCharts(cached.urls);
 return;
 }

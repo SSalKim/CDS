@@ -52,7 +52,7 @@ const EDIT_PRODUCTS=[
         edit_chart:"up50_{run}.png"
     }
 },
-{category:"up30",id:"up30",label:"200hPa",
+{category:"up30",id:"up30",label:"300hPa",
     patternByModel:{
         edit_chart:"up30_{run}.png"
     }
@@ -86,21 +86,6 @@ up10:{hideProductSelect:true}
 
 const EDIT_CATEGORY_MODEL_RESTRICTIONS={
 
-sfc:{
-allowedModels:["edit_chart"],
-fallbackModel:"edit_chart"
-},
-
-upper:{
-allowedModels:["edit_chart"],
-fallbackModel:"edit_chart"
-},
-
-etc:{
-allowedModels:["edit_chart"],
-fallbackModel:"edit_chart"
-}
-
 };
 
 
@@ -110,8 +95,14 @@ const EDIT_SELECTION_MODEL_RESTRICTIONS={
 
 
 const EDIT_DEFAULT_PRODUCT_BY_CATEGORY={
-
-sfc:"sfc",
-upper:"up85"
-
+surf:"surf",
+ghmd_s24:"ghmd_s24",
+sfc3:"sfc3",
+up92:"up92",
+up85:"up85",
+up70:"up70",
+up50:"up50",
+up30:"up30",
+up20:"up20",
+up10:"up10"
 };
