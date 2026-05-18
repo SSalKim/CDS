@@ -816,12 +816,18 @@ return;
 }
 
 let previousForecastHour=getSelectedForecastHour();
+let previousUTCDate=getSelectedUTCDate();
 
 currentModel=modelId;
 
 applyCategoryRedirectForCurrentModel();
 
+/*
+모델 전환 후 현재 product가 새 category에 없거나,
+새 모델이 지원하지 않으면 해당 category의 첫 지원 product로 보정한다.
+*/
 let categoryId=getCurrentCategory();
+
 let currentProductObject=getProductByIdInCategory(
 categoryId,
 currentProduct
@@ -831,6 +837,7 @@ if(
 !currentProductObject ||
 !productSupportsModel(currentProductObject,currentModel)
 ){
+
 let fallbackProduct=getProductsInCategory(categoryId).find(
 p=>productSupportsModel(p,currentModel)
 );
@@ -838,6 +845,7 @@ p=>productSupportsModel(p,currentModel)
 if(fallbackProduct){
 currentProduct=fallbackProduct.id;
 }
+
 }
 
 refreshView({
@@ -2072,6 +2080,107 @@ p.type!=="header"
 
 }
 
+function getBaseVisibleCategory(){
+
+let selectableCategories=getSelectableCategories();
+
+return (
+productCategory.value ||
+selectableCategories[0]?.id ||
+'empty'
+);
+
+}
+
+
+function getCategoryIdForModelFiltering(modelId){
+
+/*
+초단기처럼 모델 전용 category가 있는 경우:
+대상 모델 기준의 전용 category를 사용한다.
+예: kim_klfs / um_klfs / um_vdps → klfs_vdps
+*/
+if(
+isForecastCatalog() &&
+getActiveModelSpecificProductCategory()[modelId]
+){
+return getActiveModelSpecificProductCategory()[modelId];
+}
+
+/*
+일반 모델로 돌아가는 경우:
+현재 currentModel이 초단기더라도 getCurrentCategory()를 쓰면 klfs_vdps가 반환된다.
+따라서 숨겨져 있던 실제 1차 드롭다운 값(productCategory.value)을 기준으로 복귀해야 한다.
+*/
+let categoryId=getBaseVisibleCategory();
+
+/*
+모델별 category redirect 적용.
+예: kim_ldps에서 asia → hkor
+*/
+if(isForecastCatalog()){
+
+let redirects=getActiveCategoryRedirectByModel()[modelId];
+
+if(redirects && redirects[categoryId]){
+categoryId=redirects[categoryId];
+}
+
+}
+
+return categoryId;
+
+}
+
+
+function getProductByIdInCategory(categoryId,productId){
+
+return getActiveProducts().find(
+p=>
+p.category===categoryId &&
+p.id===productId &&
+p.type!=="header"
+);
+
+}
+
+
+function getCategoryRestrictionForModelFiltering(modelId){
+
+let categoryId=getCategoryIdForModelFiltering(modelId);
+
+let product=getProductByIdInCategory(
+categoryId,
+currentProduct
+);
+
+let productId=product?.id || currentProduct;
+
+let exactKey=`${categoryId}:${productId}`;
+let categoryKey=`${categoryId}:*`;
+
+let selectionRestrictions=getActiveSelectionModelRestrictions();
+let categoryRestrictions=getActiveCategoryModelRestrictions();
+
+return (
+selectionRestrictions[exactKey] ||
+selectionRestrictions[categoryKey] ||
+categoryRestrictions[categoryId] ||
+null
+);
+
+}
+
+
+function modelUsesSpecificProductCategory(modelId){
+
+return !!(
+isForecastCatalog() &&
+getActiveModelSpecificProductCategory()[modelId]
+);
+
+}
+
 function getCategoryIdForModelFiltering(modelId){
 
 if(
@@ -2152,7 +2261,7 @@ function isModelAllowedByCurrentCategory(modelId){
 
 let categoryId=getCategoryIdForModelFiltering(modelId);
 
-let restriction=getCurrentCategoryRestrictionForModel(modelId);
+let restriction=getCategoryRestrictionForModelFiltering(modelId);
 
 if(
 restriction &&
@@ -2162,20 +2271,33 @@ return false;
 }
 
 /*
-초단기처럼 모델별 전용 category를 쓰는 경우:
-현재 선택 product가 아니라 해당 전용 category 안에
-지원 가능한 산출물이 하나라도 있으면 모델 선택을 허용한다.
+초단기/VDAPS처럼 모델 전용 category를 쓰는 모델은
+현재 선택된 일반 산출물 ID에 묶이면 안 된다.
+해당 전용 category 안에서 지원 산출물이 하나라도 있으면 선택 가능하게 둔다.
 */
 if(modelUsesSpecificProductCategory(modelId)){
 return categoryHasSupportedProduct(categoryId,modelId);
 }
 
+/*
+일반 모델로 돌아가는 경우:
+현재 currentProduct가 klfs_vdps 전용 product일 수 있다.
+그 product가 일반 category에 없으면, 현재 product 기준으로 막지 말고
+해당 category에서 지원 가능한 산출물이 하나라도 있는지만 본다.
+*/
 let product=getProductByIdInCategory(
 categoryId,
 currentProduct
 );
 
-if(product && !productSupportsModel(product,modelId)){
+if(!product){
+return categoryHasSupportedProduct(categoryId,modelId);
+}
+
+/*
+일반 상태에서는 현재 선택 산출물을 지원하는 모델만 활성화한다.
+*/
+if(!productSupportsModel(product,modelId)){
 return false;
 }
 
