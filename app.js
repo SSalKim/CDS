@@ -248,6 +248,9 @@ const AUTO_CHECK_LATEST_ON_SELECTION_CHANGE=false;
 const NOW_LOOKBACK_HOURS=168;
 const NOW_MAX_CANDIDATES=32;
 const NOW_IMAGE_TIMEOUT_MS=7000;
+const PRELOAD_IMAGE_TIMEOUT_MS=15000;
+const DISPLAY_IMAGE_RETRY_DELAY_MS=500;
+const DISPLAY_IMAGE_MAX_RETRIES=2;
 const AUTO_CHECK_DEBOUNCE_MS=250;
 
 let latestSearchSeq=0;
@@ -2743,9 +2746,12 @@ modelStatus.classList.remove('hidden');
 }
 
 
-function showCharts(urls){
+function showCharts(urls,{
+attempt=0
+}={}){
 
 let requestId=++forecastDisplayRequest;
+let hadPreviousImage=!!chartImages.querySelector('img');
 
 modelStatus.textContent='';
 modelStatus.classList.add('hidden');
@@ -2792,15 +2798,38 @@ return;
 }
 
 /*
-이미 화면에 기존 이미지가 있으면, 실패했다고 바로 지우지 않는다.
+빠른 전환/요청 취소/일시 지연 가능성이 있으므로 바로 실패 메시지를 띄우지 않고 재시도한다.
 */
-if(chartImages.querySelector('img')){
-showViewerNotice(
-'이미지를 불러오지 못했습니다.\n기존 화면은 유지합니다.'
-);
+if(attempt<DISPLAY_IMAGE_MAX_RETRIES){
+
+setTimeout(()=>{
+
+if(requestId!==forecastDisplayRequest){
 return;
 }
 
+showCharts(urls,{
+attempt:attempt+1
+});
+
+},DISPLAY_IMAGE_RETRY_DELAY_MS);
+
+return;
+
+}
+
+/*
+기존 화면이 있으면 실패 메시지를 띄우지 않는다.
+빠르게 넘기는 중의 false warning을 막기 위함.
+*/
+if(hadPreviousImage){
+console.warn('이미지 로드 실패. 기존 화면 유지:',urls);
+return;
+}
+
+/*
+기존 화면도 없고 재시도도 모두 실패했을 때만 실제 오류 메시지 표시.
+*/
 showViewerMessage(
 '이미지를 찾을 수 없습니다.\n자료가 아직 생산되지 않았거나 해당 예측시간 자료가 없을 수 있습니다.'
 );
@@ -3029,7 +3058,8 @@ return;
 }
 
 /*
-preload가 성공해 캐시가 있으면 캐시 URL 사용
+성공 캐시만 신뢰한다.
+실패 캐시는 네트워크 지연/timeout일 수 있으므로 현재 선택 이미지는 다시 직접 시도한다.
 */
 if(cached?.ok===true && cached?.urls?.length){
 showCharts(cached.urls);
@@ -3037,8 +3067,7 @@ return;
 }
 
 /*
-아직 preload 결과가 없어도
-현재 선택 위치 이미지는 즉시 표출 시도한다.
+캐시가 없거나 실패 캐시여도 현재 선택 위치 이미지는 직접 표출 시도한다.
 */
 let urls=buildImageUrlsForForecastIndex(index);
 
@@ -3052,7 +3081,7 @@ showViewerMessage('표출할 이미지 URL이 없습니다.');
 }
 
 
-function loadImage(url,timeoutMs=NOW_IMAGE_TIMEOUT_MS){
+function loadImage(url,timeoutMs=PRELOAD_IMAGE_TIMEOUT_MS){
 
 return new Promise(resolve=>{
 
