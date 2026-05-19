@@ -6,6 +6,9 @@ const COMPARE_WINTER_VARIANT_PRODUCTS=new Set(['acptot','acrain','tmerge']);
 const COMPARE_HKOR_ACPTOT_REGIONAL_MODELS=new Set(['kim_rdps','kim_ldps']);
 const COMPARE_WINTER_VARIANT_UNSUPPORTED_MODELS=new Set(['ukmo','um_ldps']);
 
+let compareImageAvailabilitySeq=0;
+let compareImageAvailabilityMap=new Map();
+
 function supportsModelCompareInCurrentMenu(){
 
 return !['edit','analysis'].includes(currentMainMenu);
@@ -588,6 +591,104 @@ return set.has(Number(forecastHour));
 
 }
 
+function getCompareAvailabilityKey(modelId,forecastHour){
+
+return `${modelId}|${Number(forecastHour)}`;
+
+}
+
+function getCompareImageAvailability(modelId,forecastHour){
+
+if(!compareModelHasForecastHour(modelId,forecastHour)){
+return 'missing';
+}
+
+return compareImageAvailabilityMap.get(
+getCompareAvailabilityKey(modelId,forecastHour)
+) || 'loading';
+
+}
+
+function updateCompareSegmentAvailability(modelId,forecastHour){
+
+if(!forecastTimeline){
+return;
+}
+
+let row=[...forecastTimeline.querySelectorAll('.compare-timeline-row')]
+.find(item=>item.dataset.modelId===modelId);
+
+if(!row){
+return;
+}
+
+let segment=[...row.querySelectorAll('.compare-segment')]
+.find(item=>Number(item.dataset.forecastHour)===Number(forecastHour));
+
+if(!segment){
+return;
+}
+
+segment.classList.remove('state-loading','state-available','state-missing');
+segment.classList.add('state-'+getCompareImageAvailability(modelId,forecastHour));
+
+}
+
+async function probeCompareImageAvailability(){
+
+let seq=++compareImageAvailabilitySeq;
+compareImageAvailabilityMap=new Map();
+
+let jobs=[];
+
+compareModels.forEach(modelId=>{
+currentForecastList.forEach(forecastHour=>{
+if(compareModelHasForecastHour(modelId,forecastHour)){
+jobs.push({
+modelId,
+forecastHour:Number(forecastHour)
+});
+}
+});
+});
+
+renderCompareForecastTimeline();
+
+if(!jobs.length){
+return;
+}
+
+await CDSImagePipeline.runConcurrentRange({
+count:jobs.length,
+concurrency:IMAGE_PRELOAD_CONCURRENCY,
+isCancelled:()=>seq!==compareImageAvailabilitySeq,
+task:async index=>{
+let job=jobs[index];
+let product=getEffectiveCompareProductForModel(job.modelId);
+let urls=buildCompareImageUrlsForModel(job.modelId,job.forecastHour);
+let exists=false;
+
+if(urls.length){
+exists=await urlsExist(urls,{
+existenceMode:getProductExistenceMode(product,job.modelId)
+});
+}
+
+if(seq!==compareImageAvailabilitySeq){
+return false;
+}
+
+compareImageAvailabilityMap.set(
+getCompareAvailabilityKey(job.modelId,job.forecastHour),
+exists?'available':'missing'
+);
+updateCompareSegmentAvailability(job.modelId,job.forecastHour);
+return true;
+}
+});
+
+}
+
 function rebuildCompareForecastAxis({
 reset=true,
 preserveForecastHour=null
@@ -614,7 +715,7 @@ slider.value=forecastTimelineState.clampIndex(oldValue);
 }
 
 updateForecastLabel();
-renderCompareForecastTimeline();
+probeCompareImageAvailability();
 
 }
 
@@ -1313,6 +1414,7 @@ let isLastRow=rowIndex===compareModels.length-1;
 
 let row=document.createElement('div');
 row.className='compare-timeline-row';
+row.dataset.modelId=modelId;
 
 let info=document.createElement('div');
 info.className='compare-row-info';
@@ -1324,13 +1426,13 @@ track.style.gridTemplateColumns=`repeat(${count}, minmax(4px, 1fr))`;
 
 for(let i=0;i<count;i++){
 let fh=currentForecastList[i] ?? 0;
-let available=compareModelHasForecastHour(modelId,fh);
+let availability=getCompareImageAvailability(modelId,fh);
 let seg=document.createElement('button');
 seg.type='button';
 
 let classes=[
 'compare-segment',
-available?'state-available':'state-missing'
+'state-'+availability
 ];
 
 if(i===activeIndex){
@@ -1344,6 +1446,7 @@ if(i===count-1){classes.push('edge-end');}
 
 seg.className=classes.join(' ');
 seg.dataset.index=String(i);
+seg.dataset.forecastHour=String(Number(fh));
 seg.dataset.time=getValidTimeLabelForForecastHour(fh);
 seg.dataset.lead=getForecastLeadLabelForHour(fh);
 seg.title=`${seg.dataset.time} / ${seg.dataset.lead}`;
