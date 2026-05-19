@@ -2,6 +2,7 @@ const ANALYSIS_CATEGORIES=[
 
 {id:"asia",name:"분석일기도"},
 {id:"hkor",name:"분석일기도(한반도)"},
+{id:"typh",name:"분석일기도(태풍영역)"},
 {id:"kas0",name:"분석장 영역 일기도"},
 {type:"header", name:"─────────────────"},
 {id:"axas",name:"보조분석도"},
@@ -24,15 +25,20 @@ const HOURLY_CYCLES=[
 12,13,14,15,16,17,18,19,20,21,22,23
 ];
 
+const THREE_HOUR_CYCLES=[0,3,6,9,12,15,18,21];
+const TWELVE_HOUR_CYCLES=[0,12];
+
 const ANALYSIS_PRODUCTS=[
 
 {category:"asia",id:"sfc3",label:"3시간:지상",
+    cycles:THREE_HOUR_CYCLES,
     patternByModel:{
         kim_anal:"kim_sfc3_anlden_pb4_{run}.gif",
         um_anal:"sfc3_anlden_pb4_{run}.gif"
     }
 },
 {category:"asia",id:"sfc3_ptrend",label:"3시간:기압변화",
+    cycles:THREE_HOUR_CYCLES,
     patternByModel:{
         kim_anal:"kim_sfc3_ptrend_pb4_{run}.gif",
         um_anal:"sfc3_ptrend_pb4_{run}.gif"
@@ -185,6 +191,190 @@ const ANALYSIS_PRODUCTS=[
         um_anal:HOURLY_CYCLES,
     }
 },
+
+/* 분석일기도(태풍영역) */
+
+{category:"typh",id:"sfc3",label:"3시간:지상",
+    cycles:THREE_HOUR_CYCLES,
+    patternByModel:{
+        kim_anal:"kim_sfc3_anlden_typh_pb4_{run}.gif",
+        um_anal:"sfc3_anlden_typh_pb4_{run}.gif"
+    }
+},
+{category:"typh",id:"sfc3_ptrend",label:"3시간:기압변화",
+    cycles:THREE_HOUR_CYCLES,
+    patternByModel:{
+        kim_anal:"kim_sfc3_ptrend_typh_pb4_{run}.gif",
+        um_anal:"sfc3_ptrend_typh_pb4_{run}.gif"
+    }
+},
+{category:"typh",id:"surf",label:"지상일기도",
+    patternByModel:{
+        kim_anal:"kim_surf_anlmod_typh_pb4_{run}.gif",
+        um_anal:"surf_anlmod_typh_pb4_{run}.gif"
+    }
+},
+{category:"typh",id:"up92",label:"고층:925hPa",
+    patternByModel:{
+        kim_anal:"kim_up92_anlmod_typh_pb4_{run}.gif",
+        um_anal:"up92_anlmod_typh_pb4_{run}.gif",
+    }
+},
+{category:"typh",id:"up85",label:"고층:850hPa",
+    patternByModel:{
+        kim_anal:"kim_up85_anlmod_typh_pb4_{run}.gif",
+        um_anal:"up85_anlmod_typh_pb4_{run}.gif",
+    }
+},
+{category:"typh",id:"up70",label:"고층:700hPa",
+    patternByModel:{
+        kim_anal:"kim_up70_anlmod_typh_pb4_{run}.gif",
+        um_anal:"up70_anlmod_typh_pb4_{run}.gif",
+    }
+},
+{category:"typh",id:"up50",label:"고층:500hPa",
+    patternByModel:{
+        kim_anal:"kim_up50_anlmod_typh_pb4_{run}.gif",
+        um_anal:"up50_anlmod_typh_pb4_{run}.gif",
+    }
+},
+{category:"typh",id:"up30",label:"고층:300hPa",
+    patternByModel:{
+        kim_anal:"kim_up30_anlmod_typh_pb4_{run}.gif",
+        um_anal:"up30_anlmod_typh_pb4_{run}.gif",
+    }
+},
+{category:"typh",id:"up20",label:"고층:200hPa",
+    patternByModel:{
+        kim_anal:"kim_up20_anlmod_typh_pb4_{run}.gif",
+        um_anal:"up20_anlmod_typh_pb4_{run}.gif",
+    }
+},
+{category:"typh",id:"up10",label:"고층:100hPa",
+    patternByModel:{
+        kim_anal:"kim_up10_anlmod_typh_pb4_{run}.gif",
+        um_anal:"up10_anlmod_typh_pb4_{run}.gif",
+    }
+},
+{category:"typh", type:"header", label:"──────────────────"},
+{category:"typh",id:"200div",label:"중첩분석: 200hPa 발산",
+    patternByModel:{
+        kim_anal:"kim_typh_anal_200div_pb4_{run}.gif",
+        um_anal:"typh_anal_200div_pb4_{run}.gif",
+    },
+    folderByModel:{
+        um_anal:"TYPH",
+    }
+},
+{category:"typh",id:"200sln",label:"중첩분석: 200hPa 유선",
+    patternByModel:{
+        kim_anal:"kim_typh_anal_200sln_pb4_{run}.gif",
+        um_anal:"typh_anal_200sln_pb4_{run}.gif",
+    },
+    folderByModel:{
+        um_anal:"TYPH",
+    }
+},
+{category:"typh",id:"200wnd",label:"중첩분석: 200hPa 바람",
+    patternByModel:{
+        kim_anal:"kim_typh_anal_200wnd_pb4_{run}.gif",
+        um_anal:"typh_anal_200wnd_pb4_{run}.gif",
+    },
+    folderByModel:{
+        um_anal:"TYPH",
+    }
+},
+{category:"typh",id:"500vor",label:"중첩분석: 500hPa 와도",
+    patternByModel:{
+        kim_anal:"kim_typh_anal_500vor_pb4_{run}.gif",
+        um_anal:"typh_anal_500vor_pb4_{run}.gif",
+    },
+    folderByModel:{
+        um_anal:"TYPH",
+    }
+},
+{category:"typh",id:"500sln",label:"중첩분석: 500hPa 유선",
+    patternByModel:{
+        kim_anal:"kim_typh_anal_500sln_pb4_{run}.gif",
+        um_anal:"typh_anal_500sln_pb4_{run}.gif",
+    },
+    folderByModel:{
+        um_anal:"TYPH",
+    }
+},
+{category:"typh",id:"850con",label:"중첩분석: 850hPa 수렴",
+    patternByModel:{
+        kim_anal:"kim_typh_anal_850con_pb4_{run}.gif",
+        um_anal:"typh_anal_850con_pb4_{run}.gif",
+    },
+    folderByModel:{
+        um_anal:"TYPH",
+    }
+},
+{category:"typh",id:"850sln",label:"중첩분석: 850hPa 유선",
+    patternByModel:{
+        kim_anal:"kim_typh_anal_850sln_pb4_{run}.gif",
+        um_anal:"typh_anal_850sln_pb4_{run}.gif",
+    },
+    folderByModel:{
+        um_anal:"TYPH",
+    }
+},
+{category:"typh",id:"850wnd",label:"중첩분석: 850hPa 바람",
+    patternByModel:{
+        kim_anal:"kim_typh_anal_850wnd_pb4_{run}.gif",
+        um_anal:"typh_anal_850wnd_pb4_{run}.gif",
+    },
+    folderByModel:{
+        um_anal:"TYPH",
+    }
+},
+{category:"typh",id:"850vor",label:"중첩분석: 850hPa 와도",
+    patternByModel:{
+        kim_anal:"kim_typh_anal_850vor_pb4_{run}.gif",
+        um_anal:"typh_anal_850vor_pb4_{run}.gif",
+    },
+    folderByModel:{
+        um_anal:"TYPH",
+    }
+},
+{category:"typh",id:"10msln",label:"중첩분석: 10m 유선",
+    patternByModel:{
+        kim_anal:"kim_typh_anal_10msln_pb4_{run}.gif",
+        um_anal:"typh_anal_10msln_pb4_{run}.gif",
+    },
+    folderByModel:{
+        um_anal:"TYPH",
+    }
+},
+{category:"typh",id:"wndshr",label:"중첩분석: 200-850 바람시어",
+    patternByModel:{
+        kim_anal:"kim_typh_anal_wndshr_pb4_{run}.gif",
+        um_anal:"typh_anal_wndshr_pb4_{run}.gif",
+    },
+    folderByModel:{
+        um_anal:"TYPH",
+    }
+},
+{category:"typh",id:"wndsh2",label:"중첩분석: 200-850 바람시어(2)",
+    patternByModel:{
+        kim_anal:"kim_typh_anal_wndsh2_pb4_{run}.gif",
+        um_anal:"typh_anal_wndsh2_pb4_{run}.gif",
+    },
+    folderByModel:{
+        um_anal:"TYPH",
+    }
+},
+{category:"typh",id:"prs200",label:"중첩분석: 해면기압-200 등고선",
+    patternByModel:{
+        kim_anal:"kim_typh_anal_prs200_pb4_{run}.gif",
+        um_anal:"typh_anal_prs200_pb4_{run}.gif",
+    },
+    folderByModel:{
+        um_anal:"TYPH",
+    }
+},
+
 
 /* 분석장 영역 일기도(KAS) */
 {category:"kas0",id:"gph500",label:"500 고도,기온,와도",
@@ -622,6 +812,7 @@ const ANALYSIS_PRODUCTS=[
 
 /* 24시간 강수량 */
 {category:"rain24",id:"rain24",label:"24시간 강수량",
+    cycles:TWELVE_HOUR_CYCLES,
     patternByModel:{
         kim_anal:[
             "kim_sfc3_rain24_pb4_{run}.gif"

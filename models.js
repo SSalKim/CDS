@@ -3,7 +3,7 @@ const MODELS={
 kim_gdps:{
 name:"GDAPS_KIM",
 folder:"KIMG",
-archiveStart:"2021-01-01",
+archiveStart:"2020-09-28",
 cycles:[0,6,12,18],
 forecastRules:[
 {cycles:[0,12],until:"2025-05-13",max:288},

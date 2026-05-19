@@ -203,6 +203,7 @@ const HAZARD_PRODUCTS=[
         um_rdps:"rdps_lc30_asia_frcvel_ft03_pa4_s{fh}_{run}.gif"
     }  
 },
+
 /* 낙뢰 */
 {category:"lgtn",id:"lght",label:"낙뢰가이던스",
     patternByModel:{
@@ -234,6 +235,7 @@ const HAZARD_PRODUCTS=[
     }
 
 },
+
 /* 안개 */
 {category:"fogv",id:"fxko4s",label:"습도 예상도",
     patternByModel:{
@@ -246,6 +248,36 @@ const HAZARD_PRODUCTS=[
         um_ldps:"ldps_l1p5_fxko4s1_{run}.gif"
     }  
 },
+{category:"fogv",id:"fogvis",label:"시정",
+    patternByModel:{
+        kim_rdps:"kim_rdps_fogvis_s{fh}_{run}.png",
+        kim_ldps:"kim_ldps_fogvis_s{fh}_{run}.png",
+        um_gdps:"gdps_ufog_lc20_fogvis_s{fh}_{run}.gif",
+        um_ldps:"ldps_l1p5_ufog_fogvis_h{fh}_{run}.gif"
+    },
+    archiveStartByModel:{
+        kim_rdps:"2026-03-30",
+        kim_ldps:"2026-03-30"
+    },
+    folderByModel:{
+        kim_rdps:"KIMR2",
+    },
+},
+{category:"fogv",id:"fogvis",label:"안개분율",
+    patternByModel:{
+        kim_rdps:"kim_rdps_fogfrc_s{fh}_{run}.png",
+        kim_ldps:"kim_ldps_fogfrc_s{fh}_{run}.png",
+        um_gdps:"gdps_ufog_lc20_fogfrc_s{fh}_{run}.gif",
+        um_ldps:"ldps_l1p5_ufog_fogfrc_h{fh}_{run}.gif"
+    },
+    archiveStartByModel:{
+        kim_rdps:"2026-03-30",
+        kim_ldps:"2026-03-30"
+    },
+    folderByModel:{
+        kim_rdps:"KIMR2",
+    },
+},
 {category:"fogv",id:"visnew",label:"구름변수:안개가이던스",
     patternByModel:{
         um_gdps:"gdps_hkor_visnew_s{fh}_{run}.gif",
@@ -254,6 +286,7 @@ const HAZARD_PRODUCTS=[
         um_ldps:"ldps_l1p5_visnew_s{fh}_{run}.gif"
     }
 },
+
 /* 대기안정도 */
 {category:"airq",id:"airstb",label:"안정도",
     patternByModel:{

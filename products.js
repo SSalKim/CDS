@@ -3,6 +3,7 @@
 const PRODUCT_CATEGORIES=[
 {id:"asia", name:"기본예상도"},
 {id:"hkor", name:"기본예상도(한반도)"},
+{id:"typh", name:"기본예상도(태풍영역)"},
 {id:"lkor1", name:"국지모델(한반도)"},
 {id:"lkor2", name:"국지모델(상세영역)"},
 {id:"nhem", name:"북반구예상"},
@@ -1129,6 +1130,427 @@ const PRODUCTS=[
     },
 },
 
+
+/* 기본예상도(태풍영역) */
+{category:"typh", id:"surfce", label:"해면기압,누적강수량",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_surfce_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_surfce_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:144,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:144,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"gph850", label:"850hPa 고도,기온,혼합비",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_gph850_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_gph850_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"wnd850", label:"850hPa 유선,풍속",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_wnd850_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_wnd850_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"con850", label:"850hPa 수렴도,등풍속",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_con850_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_con850_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"gph500", label:"500hPa 고도,기온,와도",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_gph500_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_gph500_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"gph200", label:"200hPa 고도,기온,풍속",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_gph200_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_gph200_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"wnd500", label:"500hPa 유선 예상",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_wnd500_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_wnd500_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"div200", label:"200/300 발산장,등풍속",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_div200_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_div200_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"wnd200", label:"200/300 유선 예상",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_wnd200_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_wnd200_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"wndshr", label:"300-850 바람시어 예상",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_wndshr_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_wndshr_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"ept925", label:"상당온위: 925hPa",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_ept925_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_ept925_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"ept850", label:"상당온위: 850hPa",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_ept850_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_ept850_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"gph700", label:"상당온위: 700hPa",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_gph700_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_gph700_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"thk850", label:"층후도: 1000-850hPa",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_thk850_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_thk850_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"thk700", label:"층후도: 1000-700hPa",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_thk700_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_thk700_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"thk500", label:"층후도: 1000-500hPa",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_thk500_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_thk500_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"ttd850", label:"습수도: 850hPa",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_ttd850_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_ttd850_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"ttd700", label:"습수도: 700hPa",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_ttd700_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_ttd700_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+{category:"typh", id:"ttd500", label:"습수도: 500hPa",
+    patternByModel:{
+        kim_gdps: "kim_typh_fcst_ttd500_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "typh_fcst_ttd500_ft06_pa4_s{fh}_{run}.gif"
+    },
+    forecastStepByModel:{
+        kim_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ],
+        um_gdps:[
+            {start:0,end:84,step:3},
+            {start:90,end:96,step:6},
+            {start:108,end:132,step:12}
+        ]
+    },
+    folderByModel:{
+        kim_gdps:"KIMN",
+        um_gdps:"TYPH"
+    },
+},
+
 /* 초단기 전용 */
 {category:"klfs_vdps", id:"gph200", label:"200 고도,기온,풍속",
     patternByModel:{
@@ -1578,6 +2000,9 @@ const PRODUCTS=[
             {start:1,end:72,step:1}
         ]
     },
+    existenceModeByModel:{
+        kim_rdps:"any"
+    },
 },
 {category:"radm", id:"rmwv", label:"수증기채널:천리안2A",
     patternByModel:{
@@ -1611,8 +2036,11 @@ const PRODUCTS=[
             {start:15,end:144,step:3}
         ],
         kim_rdps:[
-            {start:1,end:48,step:1}
+            {start:1,end:72,step:1}
         ]
+    },
+    existenceModeByModel:{
+        kim_rdps:"any"
     },
 },
 
@@ -1626,6 +2054,9 @@ const PRODUCTS=[
         um_gdps:[
             "gdps_erly_isen_{detail}_s{fh}_{run}.gif",
             "gdps_korea_isen_{detail}_s{fh}_{run}.gif"
+        ],
+        kim_rdps:[
+            "kim_rdps_erly_isen_{detail}_s{fh}_{run}.png"
         ]
     }
 },

@@ -14,20 +14,26 @@ const EDIT_CATEGORIES=[
 ];
 
 
+const EDIT_THREE_HOUR_CYCLES=[0,3,6,9,12,15,18,21];
+const EDIT_TWELVE_HOUR_CYCLES=[0,12];
+
 const EDIT_PRODUCTS=[
 
 {category:"surf",id:"surf",label:"지상12",
+    cycles:EDIT_TWELVE_HOUR_CYCLES,
     patternByModel:{
         edit_chart:"surf_{run}.png"
     }
 },
 {category:"ghmd_s24",id:"ghmd_s24",label:"지상24H예상",
+    cycles:EDIT_TWELVE_HOUR_CYCLES,
     patternByModel:{
         edit_chart:"ghmd_s24_{run}.png"
     }
 },
 
 {category:"sfc3",id:"sfc3",label:"지상03",
+    cycles:EDIT_THREE_HOUR_CYCLES,
     patternByModel:{
         edit_chart:"sfc3_{run}.png"
     }

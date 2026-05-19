@@ -55,7 +55,8 @@ fallbackModel:"kim_gdps"
 isen:{
 allowedModels:[
 "kim_gdps",
-"um_gdps"
+"um_gdps",
+"kim_rdps"
 ],
 fallbackModel:"kim_gdps"
 },

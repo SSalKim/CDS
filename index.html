@@ -40,17 +40,30 @@
 <input
 id="runDate"
 type="date"
+min="1900-01-01"
+max="2099-12-31"
 >
 
 <select id="runHour"></select>
 
 <div class="time-toggle-stack">
-<button id="kstBtn" class="time-mode active">KST</button>
-<button id="utcBtn" class="time-mode">UTC</button>
+<button id="kstBtn" class="time-mode active" type="button">KST</button>
+<button id="utcBtn" class="time-mode" type="button">UTC</button>
+</div>
+
+<div id="runShiftGroup" class="run-shift-group" aria-label="자료시각 이동">
+  <button type="button" data-shift-hours="-24">-24H</button>
+  <button type="button" data-shift-hours="-12">-12H</button>
+  <button type="button" data-shift-hours="-6">-6H</button>
+  <button type="button" data-shift-hours="6">+6H</button>
+  <button type="button" data-shift-hours="12">+12H</button>
+  <button type="button" data-shift-hours="24">+24H</button>
 </div>
 
 <select id="productCategory"></select>
 <select id="productSelect"></select>
+
+<div id="timelineTopControls" class="timeline-top-controls"></div>
 
 </div>
 
@@ -103,6 +116,18 @@ type="date"
 <script src="aux-data.js"></script>
 <script src="aux-rules.js"></script>
 
+<script src="chart-utils.js"></script>
+<script src="timeline-state.js"></script>
+<script src="image-pipeline.js"></script>
+<script src="time-controls.js"></script>
+<script src="catalog-core.js"></script>
+<script src="model-menu.js"></script>
+<script src="product-menu.js"></script>
+<script src="main-menu.js"></script>
+<script src="aux-panel.js"></script>
+<script src="catalog-selection.js"></script>
+<script src="forecast-domain.js"></script>
+<script src="compare-mode.js"></script>
 <script src="app.js"></script>
 
 </body>

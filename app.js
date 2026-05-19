@@ -16,17 +16,31 @@ const utcBtn=document.getElementById('utcBtn');
 const nowBtn=document.getElementById('nowBtn');
 const forecastTimeline=document.getElementById('forecastTimeline');
 const viewerWrap=document.querySelector('.viewer-wrap');
+const timelineTopControls=document.getElementById('timelineTopControls');
 
 let currentModel='kim_gdps';
 let currentProduct='gph500';
-let currentForecastList=[];
+const forecastTimelineState=CDSTimelineState.createTimelineState();
+let currentForecastList=forecastTimelineState.getForecastList();
 let timeMode='KST';
 let currentAuxValue=null;
 let currentMainMenu='forecast';
+let modelCompareMode=false;
+let compareModels=[];
+let compareForecastHourMap=new Map();
+let comparePlayTimer=null;
+let compareFitToScreen=true;
+let compareLayoutMode='auto';
+let compareManualLayout=null;
+let compareHoverIndex=null;
+let imageSwapSeq=0;
 let imagePreloadSeq=0;
-let forecastLoadStates=[];
-let forecastImageCache=new Map();
-let forecastDisplayRequest=null;
+let forecastLoadStates=forecastTimelineState.setLoadStates(['loading']);
+let forecastImageCache=forecastTimelineState.getImageCache();
+let forecastDisplayRequest=0;
+let analysisLowResolution=true;
+let analysisResolutionState=null;
+let analysisResolutionCache=new Map();
 
 let auxAvailabilitySeq=0;
 let auxAvailabilityCache=new Map();
@@ -36,216 +50,22 @@ let auxAvailabilityLoading=false;
 const AUX_AVAILABILITY_CONCURRENCY=6;
 
 const IMAGE_PRELOAD_CONCURRENCY=4;
-
-const modelGroups=[
-
-{
-id:'global',
-label:'전지구',
-models:[
-['kim_gdps','KIM_GDAPS'],
-['ukmo','UKUM'],
-['ecmwf','ECMWF']
-]
-},
-
-{
-id:'regional',
-label:'지역',
-models:[
-['kim_rdps','KIM_RDAPS']
-]
-},
-
-{
-id:'local',
-label:'국지',
-models:[
-['kim_ldps','KIM_LDAPS']
-]
-},
-
-{
-id:'nowcast',
-label:'초단기',
-models:[
-['kim_klfs','KIM_KLAPS']
-]
-},
-
-{
-id:'gens',
-label:'전지구확률',
-models:[
-['kim_epsg','KIM_EPSG'],
-['ecmwf_eps','ECMWF_EPS']
-]
-},
-
-{
-id:'lens',
-label:'국지확률',
-models:[
-['kim_lens','KIM_LENS']
-]
-},
-
-{
-id:'ended',
-label:'종료모델',
-models:[
-['um_gdps','UM_GDAPS'],
-['um_rdps','UM_RDAPS'],
-['kwrf_rdps','WRF_RDAPS'],
-['um_ldps','UM_LDAPS'],
-['um_klfs','UM_KLAPS'],
-['um_vdps','UM_VDAPS']
-]
-},
-
-{
-id:'ended_ens',
-label:'종료모델',
-models:[
-['um_epsg','UM_EPSG'],
-['um_lens','UM_LENS']
-]
-},
-
-{
-id:'model_analysis',
-label:'모델분석',
-models:[
-['kim_anal','KIM_ANAL'],
-['kas','KAS'],
-['kim_klps', 'KIM_KLPS']
-]
-},
-
-{
-id:'ended_analysis',
-label:'종료모델',
-models:[
-['um_anal','UM_ANAL'],
-['ecmwf_ra','ECMWF'],
-['um_klps', 'UM_KLPS']
-]
-},
-
-{
-id:'observation_hidden',
-label:'관측',
-hidden:true,
-models:[
-['obs_upper','OBS_UPPER']
-]
-},
-
-{
-id:'edit_hidden',
-label:'편집',
-hidden:true,
-models:[
-['edit_chart','EDIT_CHART']
-]
-}
-
-];
-
-
-const MODEL_GROUP_VISIBILITY_BY_MENU={
-edit:['edit_hidden'],
-analysis:['model_analysis', 'observation_hidden', 'ended_analysis'],
-forecast:['global','regional','local','nowcast','ended'],
-hazard:['global','regional','local','nowcast','ended'],
-ensemble:['gens','lens','ended_ens']
-};
-
-function getFirstModelIdInCurrentMenu({
-includeHidden=false
-}={}){
-
-for(let group of getVisibleModelGroups()){
-
-if(group.hidden && !includeHidden){
-continue;
-}
-
-if(group.models.length){
-return group.models[0][0];
-}
-
-}
-
-return null;
-
-}
-
-
-function getVisibleModelGroups(){
-
-let ids=MODEL_GROUP_VISIBILITY_BY_MENU[currentMainMenu];
-
-if(!ids){
-return modelGroups;
-}
-
-return modelGroups.filter(group=>
-ids.includes(group.id)
-);
-
-}
-
-
-function isModelVisibleInCurrentMenu(modelId){
-
-return getVisibleModelGroups().some(group=>
-group.models.some(model=>model[0]===modelId)
-);
-
-}
-
-
-function getFirstVisibleModelId(){
-
-for(let group of getVisibleModelGroups()){
-
-if(group.hidden){
-continue;
-}
-
-if(group.models.length){
-return group.models[0][0];
-}
-
-}
-
-return null;
-
-}
-
-
-function ensureCurrentModelVisibleForMenu(){
-
-if(isModelVisibleInCurrentMenu(currentModel)){
-return;
-}
-
-let fallback=
-getFirstModelIdInCurrentMenu({includeHidden:false}) ||
-getFirstModelIdInCurrentMenu({includeHidden:true});
-
-if(fallback){
-currentModel=fallback;
-}
-
-}
+const COMPARE_PLAY_INTERVAL_MS=500;
+const COMPARE_MAX_MODELS=6;
+const IMAGE_DECODE_TIMEOUT_MS=20000;
+const chartImageLoader=CDSChartUtils.createImageLoader({
+decodeTimeoutMs:IMAGE_DECODE_TIMEOUT_MS,
+cacheLimit:500,
+trimTo:250
+});
+const createDecodedDisplayImage=chartImageLoader.createDecodedDisplayImage;
+const revealPreparedImagesFromLoader=chartImageLoader.revealPreparedImages;
 
 const CURRENT_PRODUCT_EXISTENCE_MODE="all";
 
 const AUTO_CHECK_LATEST_ON_SELECTION_CHANGE=false;
 
-const NOW_LOOKBACK_HOURS=168;
+const NOW_LOOKBACK_HOURS=24;
 const NOW_MAX_CANDIDATES=32;
 const NOW_IMAGE_TIMEOUT_MS=7000;
 const PRELOAD_IMAGE_TIMEOUT_MS=15000;
@@ -256,407 +76,125 @@ const AUTO_CHECK_DEBOUNCE_MS=250;
 let latestSearchSeq=0;
 let autoCheckTimer=null;
 
-const MAIN_MENU_META={
+function invalidateForecastDisplay(){
 
-edit:{
-label:"편집일기도",
-catalog:"edit"
-},
-
-analysis:{
-label:"분석장",
-catalog:"analysis"
-},
-
-forecast:{
-label:"예보장",
-catalog:"forecast"
-},
-
-hazard:{
-label:"위험기상",
-catalog:"hazard"
-},
-
-ensemble:{
-label:"앙상블",
-catalog:"ensemble"
-}
-
-};
-
-
-const EMPTY_PRODUCT_CATEGORIES=[
-{id:"empty",name:"준비중"}
-];
-
-const EMPTY_PRODUCTS=[
-{category:"empty",id:"empty",label:"준비중",patternByModel:{}}
-];
-
-
-function getSafeGlobal(name,fallback){
-
-try{
-
-if(typeof window!=="undefined" && Object.prototype.hasOwnProperty.call(window,name)){
-return window[name];
-}
-
-}
-catch(e){}
-
-try{
-
-return Function(`return typeof ${name} !== "undefined" ? ${name} : undefined`)() ?? fallback;
-
-}
-catch(e){
-
-return fallback;
+forecastDisplayRequest++;
 
 }
 
-}
-
-
-function getCurrentCatalogKey(){
-
-return MAIN_MENU_META[currentMainMenu]?.catalog || 'forecast';
-
-}
-
-function getCurrentMainMenuLabel(){
-
-return MAIN_MENU_META[currentMainMenu]?.label || currentMainMenu;
-
-}
-
-
-function getCurrentModelName(modelId=currentModel){
-
-return MODELS[modelId]?.name || modelId;
-
-}
-
-
-function getCurrentProductLabel(product=getCurrentProduct()){
-
-return product?.label || '현재 선택한 산출자료';
-
-}
-
-
-function makeLatestNotFoundMessage(){
-
-let menuLabel=getCurrentMainMenuLabel();
-let modelName=getCurrentModelName();
-let productLabel=getCurrentProductLabel();
+function getProductExistenceMode(product=getCurrentProduct(),modelId=currentModel){
 
 return (
-`${menuLabel} / ${modelName}\n`+
-`현재 선택한 산출자료(${productLabel})의 최근 사용 가능한 자료를 찾지 못했습니다.\n`+
-`아직 생산되지 않았거나 해당 산출물이 최근 cycle에 없을 수 있습니다.`
+product?.existenceModeByModel?.[modelId] ||
+product?.existenceMode ||
+CURRENT_PRODUCT_EXISTENCE_MODE
 );
 
 }
 
+function invalidateImagePreload(){
 
-function makeProductArchiveStartMessage({
-modelId=currentModel,
-product=getCurrentProduct(),
-start
+imagePreloadSeq++;
+
+}
+
+function invalidateLatestSearch(){
+
+latestSearchSeq++;
+clearTimeout(autoCheckTimer);
+
+}
+
+function invalidateAuxAvailability(){
+
+auxAvailabilitySeq++;
+auxAvailabilityLoading=false;
+auxAvailabilityLoadingKey='';
+
+}
+
+function invalidateSelectionAsyncWork({
+latest=true,
+preload=true,
+display=true,
+aux=true
 }={}){
 
-let menuLabel=getCurrentMainMenuLabel();
-let modelName=getCurrentModelName(modelId);
-let productLabel=getCurrentProductLabel(product);
-
-return (
-`${menuLabel} / ${modelName}\n`+
-`현재 선택한 산출자료(${productLabel})는\n`+
-`${start} 이후부터 조회할 수 있습니다.`
-);
-
+if(latest){
+invalidateLatestSearch();
 }
 
-
-function makeProductArchiveEndMessage({
-modelId=currentModel,
-product=getCurrentProduct(),
-end
-}={}){
-
-let menuLabel=getCurrentMainMenuLabel();
-let modelName=getCurrentModelName(modelId);
-let productLabel=getCurrentProductLabel(product);
-
-return (
-`${menuLabel} / ${modelName}\n`+
-`현재 선택한 산출자료(${productLabel})는\n`+
-`${end}까지만 조회할 수 있습니다.`
-);
-
+if(preload){
+invalidateImagePreload();
 }
 
-
-function getCatalogConfig(){
-
-let all=getSafeGlobal('CATALOG_CONFIG',{});
-let key=getCurrentCatalogKey();
-
-return all[key] || all.empty || {};
-
+if(display){
+invalidateForecastDisplay();
 }
 
-
-function resolveCatalogValue(value,fallback){
-
-if(typeof value==='function'){
-
-try{
-return value() ?? fallback;
-}
-catch(e){
-console.warn('catalog 설정을 읽지 못했습니다.',e);
-return fallback;
+if(aux){
+invalidateAuxAvailability();
 }
 
 }
 
-return value ?? fallback;
+function setCurrentForecastList(list){
+
+currentForecastList=forecastTimelineState.setForecastList(list);
+return currentForecastList;
 
 }
 
+function setForecastLoadStates(states){
 
-function getCatalogValue(key,fallback){
-
-return resolveCatalogValue(
-getCatalogConfig()[key],
-fallback
-);
+forecastLoadStates=forecastTimelineState.setLoadStates(states);
+return forecastLoadStates;
 
 }
 
+function setAllForecastLoadStates(length,state='loading'){
 
-function getActiveCategories(){
-
-return getCatalogValue('categories',EMPTY_PRODUCT_CATEGORIES);
-
-}
-
-
-function isCategoryHeader(category){
-
-return category.type==='header' || category.type==='separator';
+forecastLoadStates=forecastTimelineState.setAllLoadStates(length,state);
+return forecastLoadStates;
 
 }
 
+function setForecastLoadState(index,state){
 
-function getSelectableCategories(){
-
-return getActiveCategories().filter(
-c=>!isCategoryHeader(c) && c.id
-);
+forecastLoadStates=forecastTimelineState.setLoadState(index,state);
+return forecastLoadStates;
 
 }
 
+function resetForecastImageCache(){
 
-function getActiveProducts(){
-
-return getCatalogValue('products',EMPTY_PRODUCTS);
-
-}
-
-
-function getActiveProductCategoryUIConfig(){
-
-return getCatalogValue('productCategoryUi',{});
+forecastImageCache=forecastTimelineState.resetImageCache();
+return forecastImageCache;
 
 }
 
+function resetAnalysisResolutionState(){
 
-function getActiveCategoryModelRestrictions(){
+analysisLowResolution=true;
+analysisResolutionState=null;
 
-return getCatalogValue('categoryModelRestrictions',{});
-
-}
-
-
-function getActiveSelectionModelRestrictions(){
-
-return getCatalogValue('selectionModelRestrictions',{});
-
-}
-
-
-function getActiveDefaultProductByCategory(){
-
-return getCatalogValue('defaultProductByCategory',{});
-
-}
-
-
-function getActiveModelSpecificProductCategory(){
-
-return getCatalogValue('modelSpecificProductCategory',{});
-
-}
-
-
-function getActiveCategoryRedirectByModel(){
-
-return getCatalogValue('categoryRedirectByModel',{});
-
-}
-
-
-function getActiveDisabledProductCategoriesByModel(){
-
-return getCatalogValue('disabledProductCategoriesByModel',{});
-
-}
-
-
-
-function isForecastCatalog(){
-
-return getCurrentCatalogKey()==="forecast";
-
-}
-
-function inferMainMenuIdFromButton(btn,index){
-
-if(btn.dataset?.menu){
-return btn.dataset.menu;
-}
-
-let text=(btn.textContent || "").trim();
-
-if(text.includes("편집")){
-return "edit";
-}
-
-if(text.includes("분석")){
-return "analysis";
-}
-
-if(text.includes("예보")){
-return "forecast";
-}
-
-if(text.includes("위험")){
-return "hazard";
-}
-
-if(text.includes("앙상블")){
-return "ensemble";
-}
-
-return ["edit","analysis","forecast","hazard","ensemble"][index] || "forecast";
-
-}
-
-
-function bindMainMenu(){
-
-let buttons=[...document.querySelectorAll(".menu-btn")];
-
-buttons.forEach((btn,index)=>{
-
-let menuId=inferMainMenuIdFromButton(btn,index);
-btn.dataset.menu=menuId;
-
-btn.onclick=()=>{
-
-if(menuId===currentMainMenu){
-return;
-}
-
-currentMainMenu=menuId;
-ensureCurrentModelVisibleForMenu();
-
-buttons.forEach(b=>{
-b.classList.toggle("active",b.dataset.menu===currentMainMenu);
-});
-
-let selectableCategories=getSelectableCategories();
-let firstCategory=selectableCategories[0];
-
-if(firstCategory){
-productCategory.value=firstCategory.id;
-}
-
-let firstProduct=getDefaultProductForCategory(
-productCategory.value || firstCategory?.id
-);
-
-if(firstProduct){
-currentProduct=firstProduct.id;
-}
-else{
-currentProduct="";
-}
-
-currentAuxValue=null;
-
-enforceModelRestrictionForCurrentCategory();
-
-refreshView({
-updateCategories:true,
-updateProducts:true,
-updateHours:true,
-resetSlider:true,
-updateChartAfter:false
-});
-
-setTimeout(()=>{
-
-jumpLatestAvailableForCurrentSelection({
-silent:false
-});
-
-},0);
-
-};
-
-});
-
-buttons.forEach(btn=>{
-btn.classList.toggle("active",btn.dataset.menu===currentMainMenu);
-});
-
-}
-
-
-function getDefaultProductForCategory(categoryId){
-
-let defaults=getActiveDefaultProductByCategory();
-let preferredId=defaults[categoryId];
-
-if(preferredId){
-
-let preferredProduct=getActiveProducts().find(
-p=>
-p.category===categoryId &&
-p.id===preferredId &&
-p.type!=="header"
-);
-
-if(preferredProduct){
-return preferredProduct;
+if(typeof renderTimelineTopControls==='function'){
+renderTimelineTopControls();
 }
 
 }
 
-return getActiveProducts().find(
-p=>
-p.category===categoryId &&
-p.type!=="header"
-);
+function setForecastImageCacheEntry(index,value){
+
+forecastTimelineState.setImageCacheEntry(index,value);
 
 }
 
+function getForecastImageCacheEntry(index){
+
+return forecastTimelineState.getImageCacheEntry(index);
+
+}
 
 /* 특정 드롭다운 영역/지점 선택 보조 패널 */
 
@@ -748,6 +286,14 @@ let key=getAuxAvailabilityCacheKey();
 
 if(
 auxAvailabilityLoading &&
+auxAvailabilityLoadingKey &&
+auxAvailabilityLoadingKey!==key
+){
+invalidateAuxAvailability();
+}
+
+if(
+auxAvailabilityLoading &&
 auxAvailabilityLoadingKey===key
 ){
 return;
@@ -767,665 +313,109 @@ updateChart();
 }
 
 
-function renderModels(){
 
-modelGrid.innerHTML='';
+function revealPreparedImages(root){
 
-let groups=getVisibleModelGroups().filter(
-group=>!group.hidden
-);
-
-let modelBox=modelGrid.closest('.model-box');
-
-if(modelBox){
-modelBox.classList.toggle('hidden',groups.length===0);
-}
-
-groups.forEach(group=>{
-
-let section=document.createElement('div');
-section.className='model-section';
-
-let title=document.createElement('div');
-title.className='model-section-title';
-title.textContent=group.label;
-
-let buttons=document.createElement('div');
-buttons.className='model-button-list';
-
-group.models.forEach(m=>{
-
-let modelId=m[0];
-let label=m[1];
-let modelAllowed=isModelAllowedByCurrentCategory(modelId);
-
-let btn=document.createElement('button');
-btn.type='button';
-btn.className=
-'model-cell'+
-(modelId===currentModel ? ' active' : '')+
-(!modelAllowed ? ' disabled' : '');
-
-btn.disabled=!modelAllowed;
-btn.textContent=label;
-
-btn.onclick=()=>{
-
-if(!modelAllowed){
-return;
-}
-
-let previousForecastHour=getSelectedForecastHour();
-let previousUTCDate=getSelectedUTCDate();
-
-currentModel=modelId;
-
-applyCategoryRedirectForCurrentModel();
-
-/*
-모델 전환 후 현재 product가 새 category에 없거나,
-새 모델이 지원하지 않으면 해당 category의 첫 지원 product로 보정한다.
-*/
-let categoryId=getCurrentCategory();
-
-let currentProductObject=getProductByIdInCategory(
-categoryId,
-currentProduct
-);
-
-if(
-!currentProductObject ||
-!productSupportsModel(currentProductObject,currentModel)
-){
-
-let fallbackProduct=getProductsInCategory(categoryId).find(
-p=>productSupportsModel(p,currentModel)
-);
-
-if(fallbackProduct){
-currentProduct=fallbackProduct.id;
-}
-
-}
-
-refreshView({
-updateCategories:true,
-updateProducts:true,
-updateHours:true,
-resetSlider:true,
-preserveForecastHour:previousForecastHour,
-updateChartAfter:true
-});
-
-};
-
-buttons.appendChild(btn);
-
-});
-
-section.appendChild(title);
-section.appendChild(buttons);
-modelGrid.appendChild(section);
-
-});
+return revealPreparedImagesFromLoader(root);
 
 }
 
 
-function pad2(value){
-return String(value).padStart(2,'0');
+function getSelectedForecastHour(){
+
+if(!productUsesForecastHour()){
+return null;
 }
 
+let index=Number(slider.value || 0);
 
-function formatDateInputLocal(date){
-let y=date.getFullYear();
-let m=pad2(date.getMonth()+1);
-let d=pad2(date.getDate());
-return `${y}-${m}-${d}`;
-}
-
-
-function formatDateInputFromUTCParts(date){
-let y=date.getUTCFullYear();
-let m=pad2(date.getUTCMonth()+1);
-let d=pad2(date.getUTCDate());
-return `${y}-${m}-${d}`;
-}
-
-
-function formatUTCStampFromDate(date){
-let y=date.getUTCFullYear();
-let m=pad2(date.getUTCMonth()+1);
-let d=pad2(date.getUTCDate());
-let h=pad2(date.getUTCHours());
-return `${y}${m}${d}${h}`;
-}
-
-
-function setToday(){
-runDate.value=formatDateInputLocal(new Date());
-}
-
-
-function parseDateOnly(dateString){
-
-let [y,m,d]=dateString.split('-').map(Number);
-
-return new Date(
-Date.UTC(y,m-1,d)
-);
+return forecastTimelineState.getHour(index);
 
 }
 
 
-function getSelectedUTCDate(){
+function getForecastIndexByHour(hour){
 
-if(!runDate.value){
-return new Date();
-}
-
-let [y,m,d]=runDate.value.split('-').map(Number);
-let h=parseInt(runHour.value || '0',10);
-
-if(Number.isNaN(h)){
-h=0;
-}
-
-if(timeMode==='KST'){
-return new Date(Date.UTC(y,m-1,d,h-9));
-}
-
-return new Date(Date.UTC(y,m-1,d,h));
+return forecastTimelineState.indexOfHour(hour);
 
 }
 
 
-function setControlsFromUTCDate(utcDate,mode=timeMode){
-
-let displayDate;
-
-if(mode==='KST'){
-displayDate=new Date(utcDate.getTime()+9*60*60*1000);
-}
-else{
-displayDate=new Date(utcDate.getTime());
-}
-
-runDate.value=formatDateInputFromUTCParts(displayDate);
-runHour.value=pad2(displayDate.getUTCHours());
-
-}
-
-
-function getUTCStamp(){
-return formatUTCStampFromDate(getSelectedUTCDate());
-}
-
-
-function getCyclesForSelection(modelId,product,date){
-
-let productCycles=
-product?.cyclesByModel?.[modelId] ||
-product?.cycles ||
-null;
-
-if(productCycles){
-return productCycles;
-}
-
-return getAvailableCycles(
+function makeChartImageUrls({
+product,
 modelId,
-date
-) || [];
+runUTC,
+patterns,
+forecastHour=0,
+detailToken=null,
+requireDetailToken=true,
+checkAvailability=false
+}={}){
 
-}
-
-
-function getCyclesForCurrentSelection(date=parseDateOnly(runDate.value)){
-
-return getCyclesForSelection(
-currentModel,
-getCurrentProduct(),
-date
-);
-
-}
-
-
-function populateHours(preferredUTCDate=null){
-
-let previousUTC=preferredUTCDate || getSelectedUTCDate();
-let previousUTCStamp=formatUTCStampFromDate(previousUTC);
-
-runHour.innerHTML='';
-
-let cycles=getCyclesForCurrentSelection(
-parseDateOnly(runDate.value)
-);
-
-let optionToSelect=null;
-
-cycles.forEach(cycleHour=>{
-
-let displayHour=timeMode==='KST'
-?(cycleHour+9)%24
-:cycleHour;
-
-let o=document.createElement('option');
-o.value=pad2(displayHour);
-o.textContent=o.value+':00';
-o.dataset.utcHour=pad2(cycleHour);
-
-let testDate=new Date(previousUTC.getTime());
-testDate.setUTCHours(cycleHour,0,0,0);
-
-if(formatUTCStampFromDate(testDate)===previousUTCStamp){
-optionToSelect=o.value;
-}
-
-runHour.appendChild(o);
-
+return CDSChartUtils.makeChartImageUrls({
+product,
+modelId,
+runUTC,
+patterns,
+forecastHour,
+detailToken,
+requireDetailToken,
+checkAvailability,
+models:MODELS,
+formatUTCStampFromDate,
+parseDateOnly,
+formatDateInputFromUTCParts,
+getEffectiveModelStatus,
+getProductArchiveStatus
 });
 
-if(runHour.options.length===0){
+}
+
+function normalizeRunDateYearInput(){
+
+if(!runDate || !runDate.value){
 return;
-}
-
-if(optionToSelect && [...runHour.options].some(o=>o.value===optionToSelect)){
-runHour.value=optionToSelect;
-}
-else if([...runHour.options].some(o=>o.value===runHour.value)){
-/* keep current value */
-}
-else{
-runHour.selectedIndex=0;
-}
-
-}
-
-
-function getProductsInCategory(categoryId){
-
-return getActiveProducts().filter(
-p=>
-p.category===categoryId &&
-p.type!=="header"
-);
-
-}
-
-
-function productSupportsModel(product,modelId){
-
-if(!product || product.type==="header"){
-return false;
-}
-
-return !!(
-product.patternByModel &&
-product.patternByModel[modelId]
-);
-
-}
-
-function getSelectionRestrictionForProduct(product){
-
-if(!product || !product.category || !product.id){
-return null;
-}
-
-let restrictions=getActiveSelectionModelRestrictions();
-
-return (
-restrictions[`${product.category}:${product.id}`] ||
-restrictions[`${product.category}:*`] ||
-null
-);
-
-}
-
-
-
-
-function canSelectProductByModelSwitch(product){
-
-let restriction=getSelectionRestrictionForProduct(product);
-
-if(!restriction || !restriction.allowModelSwitch){
-return false;
-}
-
-let fallback=restriction.fallbackModel;
-
-if(!fallback){
-return false;
-}
-
-if(!isModelVisibleInCurrentMenu(fallback)){
-return false;
-}
-
-return productSupportsModel(product,fallback);
-
-}
-
-
-function isProductSelectableInDropdown(product,modelId=currentModel){
-
-return (
-productSupportsModel(product,modelId) ||
-canSelectProductByModelSwitch(product)
-);
-
-}
-
-
-function getSupportedProductsInCategory(categoryId,modelId=currentModel){
-
-return getProductsInCategory(categoryId).filter(
-p=>productSupportsModel(p,modelId)
-);
-
-}
-
-
-function categoryHasSupportedProduct(categoryId,modelId=currentModel){
-
-return getProductsInCategory(categoryId).some(
-p=>productSupportsModel(p,modelId)
-);
-
-}
-
-
-function isCategoryAllowedByModelRestriction(categoryId,modelId=currentModel){
-
-let restriction=getActiveCategoryModelRestrictions()[categoryId];
-
-if(!restriction){
-return true;
-}
-
-return restriction.allowedModels.includes(modelId);
-
-}
-
-function categoryHasSupportedProductForAnyVisibleModel(categoryId){
-
-for(let group of getVisibleModelGroups()){
-
-for(let model of group.models){
-
-let modelId=model[0];
-
-if(!isCategoryAllowedByModelRestriction(categoryId,modelId)){
-continue;
-}
-
-if(categoryHasSupportedProduct(categoryId,modelId)){
-return true;
-}
-
-}
-
-}
-
-return false;
-
-}
-
-function isProductCategoryDisabled(categoryId){
-
-if(getCurrentCatalogKey()==="empty" || categoryId==="empty"){
-return false;
-}
-
-if(
-(
-getActiveDisabledProductCategoriesByModel()[currentModel] || []
-).includes(categoryId)
-){
-return true;
 }
 
 /*
-1차 드롭다운은 현재 모델 기준으로 막지 않는다.
-현재 대메뉴에서 보이는 모델 중 하나라도 해당 category 산출물을 지원하면 활성화한다.
+Native date input allows extended years in some browsers.
+Clamp only clearly extended YYYY...-MM-DD values; keep valid normal values unchanged.
 */
-if(!categoryHasSupportedProductForAnyVisibleModel(categoryId)){
-return true;
-}
+let match=runDate.value.match(/^(\d{5,})-(\d{2})-(\d{2})$/);
 
-return false;
-
-}
-
-
-function getFirstEnabledProductCategory(){
-
-return getSelectableCategories().find(
-c=>!isProductCategoryDisabled(c.id)
-);
-
-}
-
-function applyModelSwitchForCurrentProduct(){
-
-let product=getCurrentProduct();
-let restriction=getSelectionRestrictionForProduct(product);
-
-if(!product || !restriction || !restriction.allowModelSwitch){
-return false;
-}
-
-if(productSupportsModel(product,currentModel)){
-return false;
-}
-
-let fallback=restriction.fallbackModel;
-
-if(
-fallback &&
-isModelVisibleInCurrentMenu(fallback) &&
-productSupportsModel(product,fallback)
-){
-currentModel=fallback;
-return true;
-}
-
-return false;
-
-}
-
-
-function populateProductCategories(){
-
-let categories=getActiveCategories();
-let selectableCategories=getSelectableCategories();
-
-let prevCategory=
-productCategory.value ||
-selectableCategories[0]?.id ||
-'empty';
-
-if(!selectableCategories.some(c=>c.id===prevCategory)){
-prevCategory=selectableCategories[0]?.id || 'empty';
-}
-
-productCategory.innerHTML='';
-
-categories.forEach(c=>{
-
-let o=document.createElement('option');
-
-if(isCategoryHeader(c)){
-
-o.textContent=c.name || c.label || '────────';
-o.disabled=true;
-o.className='group-header';
-productCategory.appendChild(o);
-return;
-
-}
-
-o.value=c.id;
-o.textContent=c.name;
-
-if(isProductCategoryDisabled(c.id)){
-o.disabled=true;
-}
-
-productCategory.appendChild(o);
-
-});
-
-if(isProductCategoryDisabled(prevCategory)){
-
-let firstEnabled=getFirstEnabledProductCategory();
-
-if(firstEnabled){
-productCategory.value=firstEnabled.id;
-}
-
-}
-else{
-productCategory.value=prevCategory;
-}
-
-if(!productCategory.value && selectableCategories.length){
-productCategory.value=selectableCategories[0].id;
-}
-
-}
-
-function renderProductList(){
-
-productSelect.innerHTML='';
-
-let cat=getCurrentCategory();
-let products=getActiveProducts();
-
-products.forEach(p=>{
-
-if(p.category!==cat) return;
-
-let o=document.createElement('option');
-
-if(p.type==='header'){
-o.textContent=p.label;
-o.disabled=true;
-o.className='group-header';
-productSelect.appendChild(o);
+if(!match){
 return;
 }
 
-o.value=p.id;
-o.textContent=p.label;
+let year=match[1].slice(0,4);
+let month=match[2];
+let day=match[3];
+runDate.value=`${year}-${month}-${day}`;
 
-let supported=isProductSelectableInDropdown(p,currentModel);
-
-if(!supported){
-o.disabled=true;
 }
 
-productSelect.appendChild(o);
 
-});
+function getCurrentCategoryLabel(){
 
-let defaultProduct=getDefaultProductForCategory(cat);
-
-let currentProductObject=products.find(
-p=>p.category===cat && p.id===currentProduct && p.type!=='header'
+let categoryId=getCurrentCategory();
+let category=getActiveCategories().find(
+c=>c.id===categoryId
 );
 
-let existsInCategory=!!currentProductObject;
-
-let currentProductSupported=
-currentProductObject &&
-isProductSelectableInDropdown(currentProductObject,currentModel);
-
-let supportedDefaultProduct=
-defaultProduct &&
-isProductSelectableInDropdown(defaultProduct,currentModel)
-?defaultProduct
-:getProductsInCategory(cat).find(
-p=>isProductSelectableInDropdown(p,currentModel)
-);
-
-if(getProductCategoryUIConfig().hideProductSelect){
-
-if(supportedDefaultProduct){
-currentProduct=supportedDefaultProduct.id;
-}
-
-}
-else if(!existsInCategory || !currentProductSupported){
-
-if(supportedDefaultProduct){
-currentProduct=supportedDefaultProduct.id;
-}
+return category?.name || category?.label || categoryId || '';
 
 }
 
-productSelect.value=currentProduct;
-
-}
-
-function getSelectedForecastHour(){
-
-if(!productUsesForecastHour()){
-return null;
-}
-
-let index=Number(slider.value || 0);
-
-return currentForecastList[index] ?? null;
-
-}
-
-
-function getForecastIndexByHour(hour){
-
-if(hour===null || hour===undefined){
-return -1;
-}
-
-return currentForecastList.findIndex(
-h=>Number(h)===Number(hour)
-);
-
-}
-
-
-function getSelectedForecastHour(){
-
-if(!productUsesForecastHour()){
-return null;
-}
-
-let index=Number(slider.value || 0);
-
-return currentForecastList[index] ?? null;
-
-}
-
-
-function getForecastIndexByHour(hour){
-
-if(hour===null || hour===undefined){
-return -1;
-}
-
-return currentForecastList.findIndex(
-h=>Number(h)===Number(hour)
-);
-
-}
 
 function rebuildForecastAxis({
 reset=true,
 preserveForecastHour=null
 }={}){
+
+if(modelCompareMode){
+rebuildCompareForecastAxis({reset,preserveForecastHour});
+return;
+}
 
 let p=getCurrentProduct();
 let oldValue=Number(slider.value || 0);
@@ -1442,14 +432,14 @@ p
 
 if(!modelStatusResult.available){
 
-currentForecastList=[0];
+setCurrentForecastList([0]);
 slider.min=0;
 slider.max=0;
 slider.step=1;
 slider.value=0;
 slider.disabled=true;
 forecastLabel.textContent='자료 없음';
-forecastLoadStates=['missing'];
+setForecastLoadStates(['missing']);
 renderForecastTimeline();
 return;
 
@@ -1463,14 +453,14 @@ parseDateOnly(runDate.value)
 
 if(!productStatus.available){
 
-currentForecastList=[0];
+setCurrentForecastList([0]);
 slider.min=0;
 slider.max=0;
 slider.step=1;
 slider.value=0;
 slider.disabled=true;
 forecastLabel.textContent='자료 없음';
-forecastLoadStates=['missing'];
+setForecastLoadStates(['missing']);
 renderForecastTimeline();
 return;
 
@@ -1478,23 +468,44 @@ return;
 
 if(!productUsesForecastHour()){
 
-currentForecastList=[0];
+if(isRunTimeSliderMode()){
+setCurrentForecastList(buildRunTimeSliderOffsets());
+slider.min=0;
+slider.max=currentForecastList.length-1;
+slider.step=1;
+slider.disabled=false;
+setAllForecastLoadStates(currentForecastList.length,'loading');
+
+if(reset){
+let zeroIndex=forecastTimelineState.indexOfHour(0);
+slider.value=String(zeroIndex>=0?zeroIndex:0);
+}
+else{
+slider.value=forecastTimelineState.clampIndex(oldValue);
+}
+
+updateForecastLabel();
+renderForecastTimeline();
+return;
+}
+
+setCurrentForecastList([0]);
 slider.min=0;
 slider.max=0;
 slider.step=1;
 slider.value=0;
 slider.disabled=true;
 forecastLabel.textContent='단일 이미지';
-forecastLoadStates=['loading'];
+setForecastLoadStates(['loading']);
 renderForecastTimeline();
 return;
 
 }
 
-currentForecastList=getForecastHoursForCurrentSelection();
+setCurrentForecastList(getForecastHoursForCurrentSelection());
 
 if(!currentForecastList.length){
-currentForecastList=[0];
+setCurrentForecastList([0]);
 }
 
 slider.min=0;
@@ -1511,7 +522,7 @@ else if(reset){
 slider.value=0;
 }
 else{
-slider.value=Math.max(0,Math.min(oldValue,currentForecastList.length-1));
+slider.value=forecastTimelineState.clampIndex(oldValue);
 }
 
 updateForecastLabel();
@@ -1522,8 +533,17 @@ renderForecastTimeline();
 
 function updateForecastLabel(){
 
+if(modelCompareMode){
+let h=currentForecastList[+slider.value] ?? 0;
+forecastLabel.textContent=getForecastLeadLabelForHour(h);
+return;
+}
+
 if(!productUsesForecastHour()){
-forecastLabel.textContent='단일 이미지';
+let h=currentForecastList[+slider.value] ?? 0;
+forecastLabel.textContent=isRunTimeSliderMode()
+?getRunTimeOffsetLabel(h)
+:'단일 이미지';
 updateForecastTimelineMarker();
 return;
 }
@@ -1594,1163 +614,6 @@ return true;
 }
 
 
-function getCurrentAuxRule(){
-
-let catalogKey=getCurrentCatalogKey();
-let cat=getCurrentCategory();
-let p=getCurrentProduct();
-let rules=(getSafeGlobal('AUX_USAGE_RULES',{}) || {})[catalogKey] || {};
-
-let comboKey=p?.id ? `${cat}:${p.id}` : null;
-
-return (
-(comboKey && rules[comboKey]) ||
-(p?.auxSelectorKey && rules[p.auxSelectorKey]) ||
-(p?.id && rules[p.id]) ||
-rules[cat] ||
-null
-);
-
-}
-
-
-function resolveAuxItems(items,rule){
-
-return items.map(item=>{
-
-if(item.type!=='item'){
-return {...item};
-}
-
-let enabled=true;
-let includeList=rule.includeByModel?.[currentModel];
-let excludeList=rule.excludeByModel?.[currentModel];
-
-if(includeList){
-enabled=includeList.includes(item.value);
-}
-
-if(excludeList && excludeList.includes(item.value)){
-enabled=false;
-}
-
-return {
-...item,
-disabled:!enabled
-};
-
-});
-
-}
-
-
-function getCurrentAuxConfig(){
-
-let rule=getCurrentAuxRule();
-
-if(!rule){
-return null;
-}
-
-let selectors=getSafeGlobal('AUX_SELECTORS',{});
-let optionSets=getSafeGlobal('AUX_OPTION_SETS',{});
-let selector=selectors[rule.selector];
-
-if(!selector){
-return null;
-}
-
-let optionSet=optionSets[selector.optionSet];
-
-if(!optionSet || !Array.isArray(optionSet.items)){
-return null;
-}
-
-return {
-...selector,
-defaultValue:rule.defaultValue || selector.defaultValue,
-items:resolveAuxItems(optionSet.items,rule)
-};
-
-}
-
-function isAuxItemStaticallySupported(item){
-
-if(item.type!=='item'){
-return false;
-}
-
-if(item.disabled){
-return false;
-}
-
-if(item.excludeModels && item.excludeModels.includes(currentModel)){
-return false;
-}
-
-if(item.models){
-return item.models.includes(currentModel);
-}
-
-return true;
-
-}
-
-function isAuxItemVisible(item){
-
-if(!item){
-return false;
-}
-
-if(item.type!=='item'){
-return true;
-}
-
-/*
-일반 지점은 항상 표시 후보
-*/
-if(!item.hidden){
-return true;
-}
-
-let rule=getCurrentAuxRule();
-let showHiddenValues=rule?.showHiddenValues || [];
-let showHiddenByModel=rule?.showHiddenByModel?.[currentModel] || [];
-
-/*
-명시적으로 보이게 한 hidden 지점
-*/
-if(
-showHiddenValues.includes(item.value) ||
-showHiddenByModel.includes(item.value)
-){
-return true;
-}
-
-/*
-동적 availability가 켜진 경우:
-hidden 지점은 검사 결과 available일 때만 표시한다.
-*/
-if(rule?.dynamicAvailability){
-
-let key=getAuxAvailabilityCacheKey();
-let availableSet=auxAvailabilityCache.get(key);
-
-return !!(
-availableSet &&
-availableSet.has(item.value)
-);
-
-}
-
-/*
-동적 검사가 없는 일반 상황에서는 hidden 지점은 숨김
-*/
-return false;
-
-}
-
-function getVisibleAuxItems(config){
-
-if(!config || !Array.isArray(config.items)){
-return [];
-}
-
-let raw=config.items.filter(item=>isAuxItemVisible(item));
-
-let cleaned=[];
-
-raw.forEach(item=>{
-
-if(item.type==='separator'){
-
-/*
-맨 앞 separator 제거
-*/
-if(cleaned.length===0){
-return;
-}
-
-/*
-separator 연속 제거
-*/
-let prev=cleaned[cleaned.length-1];
-
-if(prev.type==='separator'){
-return;
-}
-
-}
-
-cleaned.push(item);
-
-});
-
-/*
-맨 끝 separator 제거
-*/
-while(
-cleaned.length &&
-cleaned[cleaned.length-1].type==='separator'
-){
-cleaned.pop();
-}
-
-return cleaned;
-
-}
-
-
-function getAuxAvailabilityCacheKey(){
-
-return [
-currentMainMenu,
-currentModel,
-getCurrentCategory(),
-currentProduct,
-getUTCStamp()
-].join('|');
-
-}
-
-
-function isDynamicAuxAvailabilityEnabled(){
-
-let rule=getCurrentAuxRule();
-return !!(rule && rule.dynamicAvailability);
-
-}
-
-
-function isAuxItemSupported(item){
-
-if(!isAuxItemStaticallySupported(item)){
-return false;
-}
-
-if(!isDynamicAuxAvailabilityEnabled()){
-return true;
-}
-
-let key=getAuxAvailabilityCacheKey();
-let availableSet=auxAvailabilityCache.get(key);
-
-if(!availableSet){
-return false;
-}
-
-return availableSet.has(item.value);
-
-}
-
-
-function getAuxEnabledItems(config){
-
-if(!config) return [];
-
-return getVisibleAuxItems(config).filter(
-item=>isAuxItemSupported(item)
-);
-
-}
-
-
-function getCurrentAuxToken(){
-
-let config=getCurrentAuxConfig();
-
-if(!config) return null;
-
-let selected=config.items.find(
-item=>item.type==='item' && item.value===currentAuxValue
-);
-
-if(!selected) return null;
-
-if(!isAuxItemSupported(selected)) return null;
-
-return selected.value;
-
-}
-
-
-function renderAuxSidebar(){
-
-let config=getCurrentAuxConfig();
-
-auxSidebar.classList.remove('aux-wide','aux-narrow');
-
-if(!config){
-
-currentAuxValue=null;
-auxSidebar.classList.add('hidden');
-auxSidebarTitle.textContent='';
-auxSidebarList.innerHTML='';
-return;
-
-}
-
-if(config.widthClass==='wide'){
-auxSidebar.classList.add('aux-wide');
-}
-
-if(config.widthClass==='narrow'){
-auxSidebar.classList.add('aux-narrow');
-}
-
-auxSidebar.classList.remove('hidden');
-auxSidebarTitle.textContent=config.title || '상세 선택';
-auxSidebarList.innerHTML='';
-
-let visibleItems=getVisibleAuxItems(config);
-
-let enabledItems=visibleItems.filter(
-item=>isAuxItemSupported(item)
-);
-
-let validValues=enabledItems.map(x=>x.value);
-
-if(!validValues.includes(currentAuxValue)){
-currentAuxValue=config.defaultValue;
-
-if(!validValues.includes(currentAuxValue)){
-currentAuxValue=validValues[0] || null;
-}
-
-}
-
-visibleItems.forEach(item=>{
-
-if(item.type==='separator'){
-let sep=document.createElement('div');
-sep.className='aux-separator';
-auxSidebarList.appendChild(sep);
-return;
-}
-
-let supported=isAuxItemSupported(item);
-let btn=document.createElement('button');
-btn.type='button';
-btn.className=
-'aux-item'+
-(item.value===currentAuxValue ? ' active' : '')+
-(!supported ? ' disabled' : '');
-btn.disabled=!supported;
-btn.textContent=item.label;
-
-btn.onclick=()=>{
-
-if(!supported){
-return;
-}
-
-currentAuxValue=item.value;
-
-refreshView({
-updateCategories:false,
-updateProducts:false,
-updateHours:false,
-resetSlider:true,
-updateChartAfter:true
-});
-
-};
-
-auxSidebarList.appendChild(btn);
-
-});
-
-let activeItem=auxSidebarList.querySelector('.aux-item.active');
-
-if(activeItem){
-activeItem.scrollIntoView({
-block:'nearest',
-inline:'nearest'
-});
-}
-
-}
-
-
-function moveAuxSelection(direction){
-
-let config=getCurrentAuxConfig();
-
-if(!config){
-return;
-}
-
-let items=getAuxEnabledItems(config);
-
-if(!items.length){
-return;
-}
-
-let currentIndex=items.findIndex(
-item=>item.value===currentAuxValue
-);
-
-if(currentIndex<0){
-currentIndex=0;
-}
-
-let nextIndex=currentIndex+direction;
-nextIndex=Math.max(0,Math.min(nextIndex,items.length-1));
-
-if(nextIndex===currentIndex){
-return;
-}
-
-currentAuxValue=items[nextIndex].value;
-
-refreshView({
-updateCategories:false,
-updateProducts:false,
-updateHours:false,
-resetSlider:true,
-updateChartAfter:true
-});
-
-
-
-}
-
-
-function syncProductCategoryVisibility(){
-
-if(getActiveModelSpecificProductCategory()[currentModel]){
-productCategory.classList.add('hidden');
-}
-else{
-productCategory.classList.remove('hidden');
-}
-
-}
-
-
-function getProductCategoryUIConfig(){
-
-return getActiveProductCategoryUIConfig()[
-getCurrentCategory()
-] || {};
-
-}
-
-
-function syncProductSelectVisibility(){
-
-let config=getProductCategoryUIConfig();
-
-if(config.hideProductSelect){
-productSelect.classList.add('hidden');
-}
-else{
-productSelect.classList.remove('hidden');
-}
-
-}
-
-
-function getCurrentCategoryRestriction(){
-
-let cat=getCurrentCategory();
-let exactKey=`${cat}:${currentProduct}`;
-let categoryKey=`${cat}:*`;
-
-let selectionRestrictions=getActiveSelectionModelRestrictions();
-let categoryRestrictions=getActiveCategoryModelRestrictions();
-
-return (
-selectionRestrictions[exactKey] ||
-selectionRestrictions[categoryKey] ||
-categoryRestrictions[cat] ||
-null
-);
-
-}
-
-function getProductByIdInCurrentCategory(productId){
-
-return getActiveProducts().find(
-p=>
-p.category===getCurrentCategory() &&
-p.id===productId &&
-p.type!=="header"
-);
-
-}
-
-function getBaseVisibleCategory(){
-
-let selectableCategories=getSelectableCategories();
-
-return (
-productCategory.value ||
-selectableCategories[0]?.id ||
-'empty'
-);
-
-}
-
-
-function getCategoryIdForModelFiltering(modelId){
-
-/*
-초단기처럼 모델 전용 category가 있는 경우:
-대상 모델 기준의 전용 category를 사용한다.
-예: kim_klfs / um_klfs / um_vdps → klfs_vdps
-*/
-if(
-isForecastCatalog() &&
-getActiveModelSpecificProductCategory()[modelId]
-){
-return getActiveModelSpecificProductCategory()[modelId];
-}
-
-/*
-일반 모델로 돌아가는 경우:
-현재 currentModel이 초단기더라도 getCurrentCategory()를 쓰면 klfs_vdps가 반환된다.
-따라서 숨겨져 있던 실제 1차 드롭다운 값(productCategory.value)을 기준으로 복귀해야 한다.
-*/
-let categoryId=getBaseVisibleCategory();
-
-/*
-모델별 category redirect 적용.
-예: kim_ldps에서 asia → hkor
-*/
-if(isForecastCatalog()){
-
-let redirects=getActiveCategoryRedirectByModel()[modelId];
-
-if(redirects && redirects[categoryId]){
-categoryId=redirects[categoryId];
-}
-
-}
-
-return categoryId;
-
-}
-
-
-function getProductByIdInCategory(categoryId,productId){
-
-return getActiveProducts().find(
-p=>
-p.category===categoryId &&
-p.id===productId &&
-p.type!=="header"
-);
-
-}
-
-
-function getCategoryRestrictionForModelFiltering(modelId){
-
-let categoryId=getCategoryIdForModelFiltering(modelId);
-
-let product=getProductByIdInCategory(
-categoryId,
-currentProduct
-);
-
-let productId=product?.id || currentProduct;
-
-let exactKey=`${categoryId}:${productId}`;
-let categoryKey=`${categoryId}:*`;
-
-let selectionRestrictions=getActiveSelectionModelRestrictions();
-let categoryRestrictions=getActiveCategoryModelRestrictions();
-
-return (
-selectionRestrictions[exactKey] ||
-selectionRestrictions[categoryKey] ||
-categoryRestrictions[categoryId] ||
-null
-);
-
-}
-
-
-function modelUsesSpecificProductCategory(modelId){
-
-return !!(
-isForecastCatalog() &&
-getActiveModelSpecificProductCategory()[modelId]
-);
-
-}
-
-
-function isModelAllowedByCurrentCategory(modelId){
-
-let categoryId=getCategoryIdForModelFiltering(modelId);
-
-let restriction=getCategoryRestrictionForModelFiltering(modelId);
-
-if(
-restriction &&
-!restriction.allowedModels.includes(modelId)
-){
-return false;
-}
-
-/*
-초단기/VDAPS처럼 모델 전용 category를 쓰는 모델은
-현재 선택된 일반 산출물 ID에 묶이면 안 된다.
-해당 전용 category 안에서 지원 산출물이 하나라도 있으면 선택 가능하게 둔다.
-*/
-if(modelUsesSpecificProductCategory(modelId)){
-return categoryHasSupportedProduct(categoryId,modelId);
-}
-
-/*
-일반 모델로 돌아가는 경우:
-현재 currentProduct가 klfs_vdps 전용 product일 수 있다.
-그 product가 일반 category에 없으면, 현재 product 기준으로 막지 말고
-해당 category에서 지원 가능한 산출물이 하나라도 있는지만 본다.
-*/
-let product=getProductByIdInCategory(
-categoryId,
-currentProduct
-);
-
-if(!product){
-return categoryHasSupportedProduct(categoryId,modelId);
-}
-
-/*
-일반 상태에서는 현재 선택 산출물을 지원하는 모델만 활성화한다.
-*/
-if(!productSupportsModel(product,modelId)){
-return false;
-}
-
-return true;
-
-}
-
-
-function enforceModelRestrictionForCurrentCategory(){
-
-let restriction=getCurrentCategoryRestriction();
-
-if(
-restriction &&
-!restriction.allowedModels.includes(currentModel)
-){
-
-let fallback=restriction.fallbackModel;
-
-if(fallback && isModelAllowedByCurrentCategory(fallback)){
-currentModel=fallback;
-return;
-}
-
-}
-
-enforceModelAllowedForCurrentSelection();
-
-}
-
-function getFirstAllowedVisibleModelIdForCurrentSelection(){
-
-for(let group of getVisibleModelGroups()){
-
-for(let model of group.models){
-
-let modelId=model[0];
-
-if(isModelAllowedByCurrentCategory(modelId)){
-return modelId;
-}
-
-}
-
-}
-
-return null;
-
-}
-
-
-function enforceModelAllowedForCurrentSelection(){
-
-if(isModelAllowedByCurrentCategory(currentModel)){
-return;
-}
-
-let fallback=getFirstAllowedVisibleModelIdForCurrentSelection();
-
-if(fallback){
-currentModel=fallback;
-}
-
-}
-
-
-function getCurrentProduct(){
-
-return getActiveProducts().find(
-p=>p.category===getCurrentCategory() && p.id===currentProduct
-);
-
-}
-
-
-function getCurrentPattern(){
-
-let p=getCurrentProduct();
-
-if(!p || !p.patternByModel || !p.patternByModel[currentModel]){
-return null;
-}
-
-return p.patternByModel[currentModel];
-
-}
-
-
-function getCurrentPatterns(){
-
-let pattern=getCurrentPattern();
-
-if(!pattern){
-return [];
-}
-
-return Array.isArray(pattern)
-?pattern
-:[pattern];
-
-}
-
-function hasProductArchiveOverride(product,modelId){
-
-return !!(
-product &&
-(
-Object.prototype.hasOwnProperty.call(product.archiveStartByModel || {},modelId) ||
-Object.prototype.hasOwnProperty.call(product.archiveEndByModel || {},modelId)
-)
-);
-
-}
-
-
-function getEffectiveArchiveRange(modelId,product=null){
-
-let m=MODELS[modelId] || {};
-
-let start=m.archiveStart || null;
-let end=m.archiveEnd || null;
-
-/*
-산출물별 모델 기간 override가 있으면 models.js 기본값보다 우선한다.
-예: 같은 파일명이지만 기간에 따라 um_anal / ecmwf_ra로 나뉘는 경우
-*/
-if(
-product &&
-Object.prototype.hasOwnProperty.call(product.archiveStartByModel || {},modelId)
-){
-start=product.archiveStartByModel[modelId] || null;
-}
-
-if(
-product &&
-Object.prototype.hasOwnProperty.call(product.archiveEndByModel || {},modelId)
-){
-end=product.archiveEndByModel[modelId] || null;
-}
-
-return {start,end};
-
-}
-
-
-function getEffectiveModelStatus(modelId,date,product=null){
-
-let m=MODELS[modelId];
-
-if(!m){
-return {
-available:false,
-message:`${modelId} 모델 메타데이터가 없습니다.`
-};
-}
-
-let {start,end}=getEffectiveArchiveRange(
-modelId,
-product
-);
-
-let dateOnly=parseDateOnly(
-formatDateInputFromUTCParts(date)
-);
-
-if(start && dateOnly < parseDateOnly(start)){
-return {
-available:false,
-message:
-`자료 보유기간 이전입니다.\n자료 보유기간: ${start} ~ ${end || '현재'}`
-};
-}
-
-if(end && dateOnly > parseDateOnly(end)){
-return {
-available:false,
-message:
-`운영 종료된 모델입니다.\n자료 보유기간: ${start || '미상'} ~ ${end}`
-};
-}
-
-/*
-주의:
-models.js의 getModelStatus()는 product별 archiveStartByModel/archiveEndByModel을 모른다.
-product override가 있는 경우에는 legacy getModelStatus를 호출하면
-다시 models.js 기본 기간으로 잘못 차단될 수 있으므로 건너뛴다.
-*/
-if(
-!hasProductArchiveOverride(product,modelId) &&
-typeof getModelStatus==='function'
-){
-let legacyStatus=getModelStatus(modelId,dateOnly);
-
-if(legacyStatus && legacyStatus.available===false){
-return legacyStatus;
-}
-}
-
-return {
-available:true,
-message:''
-};
-
-}
-
-
-function getProductArchiveStatus(product,modelId,date){
-
-if(!product){
-return {
-available:false,
-message:'선택된 산출자료를 찾을 수 없습니다.'
-};
-}
-
-let start=
-product.archiveStartByModel?.[modelId] ||
-product.archiveStart ||
-null;
-
-let end=
-product.archiveEndByModel?.[modelId] ||
-product.archiveEnd ||
-null;
-
-if(start && date < parseDateOnly(start)){
-return {
-available:false,
-message:makeProductArchiveStartMessage({
-modelId,
-product,
-start
-})
-};
-}
-
-if(end && date > parseDateOnly(end)){
-return {
-available:false,
-message:makeProductArchiveEndMessage({
-modelId,
-product,
-end
-})
-};
-}
-
-return {
-available:true,
-message:''
-};
-
-}
-
-
-function productUsesForecastHour(){
-
-let patterns=getCurrentPatterns();
-
-return patterns.some(
-pattern=>pattern.includes('{fh}')
-);
-
-}
-
-
-function expandProductSteps(scheme,maxLead){
-
-let out=[];
-
-scheme.forEach(rule=>{
-
-let end=Math.min(rule.end,maxLead);
-
-for(let h=rule.start;h<=end;h+=rule.step){
-out.push(h);
-}
-
-});
-
-return [...new Set(out)].sort((a,b)=>a-b);
-
-}
-
-
-function getForecastHoursForCurrentSelection(){
-
-let p=getCurrentProduct();
-let utcHour=parseInt(getUTCStamp().slice(8,10),10);
-let productScheme=p?.forecastStepByModel?.[currentModel];
-
-if(productScheme){
-
-let modelHours=getForecastHours(
-currentModel,
-parseDateOnly(runDate.value),
-utcHour
-) || [0];
-
-let maxLead=Math.max(...modelHours);
-return expandProductSteps(productScheme,maxLead);
-
-}
-
-return getForecastHours(
-currentModel,
-parseDateOnly(runDate.value),
-utcHour
-) || [0];
-
-}
-
-
-
-function buildImageUrlsForForecastIndex(index){
-
-let p=getCurrentProduct();
-let patterns=getCurrentPatterns();
-
-if(!p || !patterns.length || !MODELS[currentModel]){
-return [];
-}
-
-let run=getUTCStamp();
-let ym=run.slice(0,6);
-let day=run.slice(6,8);
-let folder=p.folderByModel?.[currentModel] || MODELS[currentModel].folder;
-let fhValue=currentForecastList[index] ?? currentForecastList[0] ?? 0;
-let fh=String(fhValue).padStart(3,'0');
-let detailToken=getCurrentAuxToken();
-
-return patterns.map(pattern=>{
-
-let file=pattern.replaceAll('{run}',run);
-
-if(file.includes('{fh}')){
-file=file.replaceAll('{fh}',fh);
-}
-
-if(file.includes('{detail}')){
-file=file.replaceAll('{detail}',detailToken || '');
-}
-
-return `https://data.kma.go.kr/CHT/${folder}/${ym}/${day}/${file}`;
-
-});
-
-}
-
-function buildImageUrlsForDetailValue(detailValue,index=Number(slider.value || 0)){
-
-let p=getCurrentProduct();
-let patterns=getCurrentPatterns();
-
-if(!p || !patterns.length || !MODELS[currentModel]){
-return [];
-}
-
-let run=getUTCStamp();
-let ym=run.slice(0,6);
-let day=run.slice(6,8);
-let folder=p.folderByModel?.[currentModel] || MODELS[currentModel].folder;
-let fhValue=currentForecastList[index] ?? currentForecastList[0] ?? 0;
-let fh=String(fhValue).padStart(3,'0');
-
-return patterns.map(pattern=>{
-
-let file=pattern.replaceAll('{run}',run);
-
-if(file.includes('{fh}')){
-file=file.replaceAll('{fh}',fh);
-}
-
-if(file.includes('{detail}')){
-file=file.replaceAll('{detail}',detailValue || '');
-}
-
-return `https://data.kma.go.kr/CHT/${folder}/${ym}/${day}/${file}`;
-
-});
-
-}
-
-async function checkAuxItemAvailability(item){
-
-if(!isAuxItemStaticallySupported(item)){
-return false;
-}
-
-let urls=buildImageUrlsForDetailValue(item.value);
-
-if(!urls.length){
-return false;
-}
-
-return await urlsExist(urls);
-
-}
-
-async function probeAuxAvailabilityForCurrentSelection(){
-
-let config=getCurrentAuxConfig();
-let rule=getCurrentAuxRule();
-
-if(!config || !rule || !rule.dynamicAvailability){
-return false;
-}
-
-let key=getAuxAvailabilityCacheKey();
-
-/* 이미 캐시가 있으면 재검사 안 함 */
-if(auxAvailabilityCache.has(key)){
-return false;
-}
-
-let seq=++auxAvailabilitySeq;
-auxAvailabilityLoading=true;
-auxAvailabilityLoadingKey=key;
-
-setViewerLoading(true,rule.loadingMessage || '관측지점 자료 확인 중');
-
-/*
-동적 검사 전 상태를 먼저 한 번 렌더링해서
-버튼들을 비활성화된 상태로 보이게 한다.
-*/
-renderAuxSidebar();
-
-let items=config.items.filter(
-item=>item.type==='item' && isAuxItemStaticallySupported(item)
-);
-
-let availableValues=new Set();
-let cursor=0;
-
-async function worker(){
-
-while(cursor<items.length){
-
-let item=items[cursor++];
-let ok=await checkAuxItemAvailability(item);
-
-if(seq!==auxAvailabilitySeq){
-return;
-}
-
-if(ok){
-availableValues.add(item.value);
-}
-
-}
-
-}
-
-let workers=Array.from(
-{length:Math.min(AUX_AVAILABILITY_CONCURRENCY,items.length)},
-()=>worker()
-);
-
-await Promise.all(workers);
-
-if(seq!==auxAvailabilitySeq){
-return true;
-}
-
-auxAvailabilityCache.set(key,availableValues);
-auxAvailabilityLoading=false;
-auxAvailabilityLoadingKey='';
-
-/* 현재 선택 지점이 없거나 비활성화되면 첫 사용 가능 지점 자동 선택 */
-if(
-!currentAuxValue ||
-!availableValues.has(currentAuxValue)
-){
-currentAuxValue=config.defaultValue;
-
-if(!currentAuxValue || !availableValues.has(currentAuxValue)){
-currentAuxValue=[...availableValues][0] || null;
-}
-}
-
-renderAuxSidebar();
-rebuildForecastAxis({reset:true});
-setViewerLoading(false);
-
-if(availableValues.size===0){
-showViewerMessage('해당 시각에 사용 가능한 관측단열선도 지점이 없습니다.');
-return true;
-}
-
-updateChart();
-return true;
-
-}
-
-
-function getForecastHourAtIndex(index){
-return currentForecastList[index] ?? 0;
-}
-
-
-function getForecastLeadLabel(index){
-
-if(!productUsesForecastHour()){
-return '단일';
-}
-
-let h=getForecastHourAtIndex(index);
-return '+'+String(h).padStart(3,'0')+'h';
-
-}
-
-
-function getValidTimeLabel(index){
-
-let h=getForecastHourAtIndex(index);
-let utc=getSelectedUTCDate();
-let validUTC=new Date(utc.getTime()+h*60*60*1000);
-let display=timeMode==='KST'
-?new Date(validUTC.getTime()+9*60*60*1000)
-:new Date(validUTC.getTime());
-
-let day=pad2(display.getUTCDate());
-let hour=pad2(display.getUTCHours());
-return `${day}.${hour}`;
-
-}
-
-
 function setViewerLoading(isLoading,message='이미지 로딩 중'){
 
 if(loadingOverlay){
@@ -2778,6 +641,7 @@ function showViewerMessage(message){
 
 setViewerLoading(false);
 chartImages.innerHTML='';
+chartImages.classList.remove('single-images');
 chartImages.classList.add('hidden');
 modelStatus.textContent=message;
 modelStatus.classList.remove('hidden');
@@ -2792,10 +656,129 @@ modelStatus.classList.remove('hidden');
 
 }
 
+function isAnalysisResolutionCandidate(urls){
 
-function showCharts(urls,{
-attempt=0
-}={}){
+return currentMainMenu==='analysis' &&
+Array.isArray(urls) &&
+urls.some(url=>typeof url==='string' && url.includes('pb4'));
+
+}
+
+function makeAnalysisLowResolutionUrls(urls){
+
+return urls.map(url=>
+typeof url==='string'
+?url.replaceAll('pb4','pa4')
+:url
+);
+
+}
+
+function getAnalysisResolutionCacheKey(urls){
+
+return Array.isArray(urls)
+?urls.join('\n')
+:'';
+
+}
+
+async function getAnalysisResolutionInfo(urls){
+
+if(!isAnalysisResolutionCandidate(urls)){
+return null;
+}
+
+let key=getAnalysisResolutionCacheKey(urls);
+
+if(analysisResolutionCache.has(key)){
+return analysisResolutionCache.get(key);
+}
+
+let resolutionPromise=(async()=>{
+
+let lowUrls=makeAnalysisLowResolutionUrls(urls);
+let [lowExists,highExists]=await Promise.all([
+urlsExist(lowUrls),
+urlsExist(urls)
+]);
+
+return {
+key,
+highUrls:urls,
+lowUrls,
+highExists,
+lowExists,
+canToggle:lowExists && highExists
+};
+
+})();
+
+analysisResolutionCache.set(key,resolutionPromise);
+
+return resolutionPromise;
+
+}
+
+function selectAnalysisResolutionUrls(info,baseUrls){
+
+if(!info){
+return baseUrls;
+}
+
+if(info.lowExists && (analysisLowResolution || !info.highExists)){
+return info.lowUrls;
+}
+
+return info.highUrls;
+
+}
+
+async function resolveAnalysisResolutionUrls(urls,{updateControls=false}={}){
+
+let info=await getAnalysisResolutionInfo(urls);
+
+if(updateControls){
+analysisResolutionState=info;
+
+if(typeof renderTimelineTopControls==='function'){
+renderTimelineTopControls();
+}
+}
+
+return selectAnalysisResolutionUrls(info,urls);
+
+}
+
+function renderAnalysisResolutionToggle(){
+
+if(!analysisResolutionState?.canToggle){
+return null;
+}
+
+let label=document.createElement('label');
+label.className='compare-fit-toggle analysis-resolution-toggle';
+
+let checkbox=document.createElement('input');
+checkbox.type='checkbox';
+checkbox.checked=analysisLowResolution;
+checkbox.onchange=()=>{
+analysisLowResolution=checkbox.checked;
+resetForecastImageCache();
+renderTimelineTopControls();
+displayCurrentForecastImage();
+};
+
+let text=document.createElement('span');
+text.textContent='저해상도';
+
+label.appendChild(checkbox);
+label.appendChild(text);
+return label;
+
+}
+
+
+async function showCharts(urls,{attempt=0}={}){
 
 let requestId=++forecastDisplayRequest;
 let hadPreviousImage=!!chartImages.querySelector('img');
@@ -2808,45 +791,49 @@ showViewerMessage('표출할 이미지 URL이 없습니다.');
 return;
 }
 
-let loadedImages=[];
-let finished=0;
-
-function finishOne(){
+let displayResult=await CDSImagePipeline.prepareDisplayImages(urls,{
+createDisplayImage:createDecodedDisplayImage,
+existenceMode:getProductExistenceMode()
+});
 
 if(requestId!==forecastDisplayRequest){
 return;
 }
 
-finished++;
-
-if(finished<urls.length){
-return;
-}
-
-let enough=
-CURRENT_PRODUCT_EXISTENCE_MODE==='any'
-?loadedImages.length>=1
-:loadedImages.length===urls.length;
+let loadedImages=displayResult.loadedImages;
+let enough=displayResult.enough;
 
 if(enough){
 
-chartImages.innerHTML='';
+chartImages.classList.remove('compare-images','fit-screen','fixed-size','layout-auto','layout-manual','compare-single','single-images');
+chartImages.classList.add('single-images');
 chartImages.classList.remove('hidden');
 
+let item=document.createElement('div');
+item.className='single-image-item';
+let stack=document.createElement('div');
+stack.className='single-image-stack';
 loadedImages.forEach(img=>{
-chartImages.appendChild(img);
+stack.appendChild(img);
 });
+
+if(loadedImages.length<urls.length){
+let warn=document.createElement('div');
+warn.className='compare-inline-warning';
+warn.textContent='일부 이미지 로드 실패';
+stack.appendChild(warn);
+}
+
+item.appendChild(stack);
+chartImages.replaceChildren(item);
+revealPreparedImages(chartImages);
 
 modelStatus.textContent='';
 modelStatus.classList.add('hidden');
-
 return;
 
 }
 
-/*
-빠른 전환/요청 취소/일시 지연 가능성이 있으므로 바로 실패 메시지를 띄우지 않고 재시도한다.
-*/
 if(attempt<DISPLAY_IMAGE_MAX_RETRIES){
 
 setTimeout(()=>{
@@ -2855,9 +842,7 @@ if(requestId!==forecastDisplayRequest){
 return;
 }
 
-showCharts(urls,{
-attempt:attempt+1
-});
+showCharts(urls,{attempt:attempt+1});
 
 },DISPLAY_IMAGE_RETRY_DELAY_MS);
 
@@ -2865,54 +850,13 @@ return;
 
 }
 
-/*
-기존 화면이 있으면 실패 메시지를 띄우지 않는다.
-빠르게 넘기는 중의 false warning을 막기 위함.
-*/
 if(hadPreviousImage){
-console.warn('이미지 로드 실패. 기존 화면 유지:',urls);
-return;
+console.warn('이미지 로드 실패. 이전 화면을 지우고 메시지를 표시합니다:',urls);
 }
 
-/*
-기존 화면도 없고 재시도도 모두 실패했을 때만 실제 오류 메시지 표시.
-*/
 showViewerMessage(
-'이미지를 찾을 수 없습니다.\n자료가 아직 생산되지 않았거나 해당 예측시간 자료가 없을 수 있습니다.'
+makeExpectedButMissingMessage()
 );
-
-}
-
-urls.forEach(url=>{
-
-let img=document.createElement('img');
-img.alt='chart';
-img.decoding='async';
-
-img.onload=()=>{
-
-if(requestId!==forecastDisplayRequest){
-return;
-}
-
-loadedImages.push(img);
-finishOne();
-
-};
-
-img.onerror=()=>{
-
-if(requestId!==forecastDisplayRequest){
-return;
-}
-
-finishOne();
-
-};
-
-img.src=url;
-
-});
 
 }
 
@@ -2923,41 +867,89 @@ if(!forecastTimeline){
 return;
 }
 
+if(modelCompareMode){
+renderCompareForecastTimeline();
+return;
+}
+
+let shell=forecastTimeline.closest('.forecast-shell');
+let bar=forecastTimeline.closest('.forecast-bar');
+
+if(shell){shell.classList.add('compare-active');}
+if(bar){bar.classList.add('compare-active');}
+
+forecastTimeline.classList.add('compare-timeline','single-timeline');
+forecastTimeline.classList.remove('is-single');
+chartImages.classList.remove('compare-images','fit-screen','fixed-size','layout-auto','layout-manual','compare-single','single-images');
+clearCompareImageItemHeights();
+
 let count=currentForecastList.length || 1;
 let activeIndex=Number(slider.value || 0);
 activeIndex=Math.max(0,Math.min(activeIndex,count-1));
 
 forecastTimeline.innerHTML='';
 forecastTimeline.style.setProperty('--forecast-count',String(count));
-forecastTimeline.classList.toggle('is-single',count<=1);
+
+let list=document.createElement('div');
+list.className='compare-timeline-list single-timeline-list';
+
+renderTimelineTopControls();
+
+let row=document.createElement('div');
+row.className='compare-timeline-row single-timeline-row';
+
+let info=document.createElement('div');
+info.className='compare-row-info';
+info.innerHTML=`<div class="compare-row-model">${getModelDisplayLabel(currentModel)}</div>`;
 
 let track=document.createElement('div');
-track.className='forecast-track';
+track.className='compare-track single-forecast-track';
 track.style.gridTemplateColumns=`repeat(${count}, minmax(4px, 1fr))`;
 
+compareHoverIndex=null;
+
 for(let i=0;i<count;i++){
-let state=forecastLoadStates[i] || 'loading';
+let state=forecastTimelineState.getLoadState(i);
 let seg=document.createElement('button');
 seg.type='button';
-seg.className=`forecast-segment state-${state}`+(i===activeIndex?' active':'');
+let classes=[
+'compare-segment',
+'forecast-segment',
+`state-${state}`
+];
+if(i===activeIndex){
+classes.push('active','active-time-label','active-lead-label');
+}
+if(i===0){classes.push('edge-start');}
+if(i===count-1){classes.push('edge-end');}
+seg.className=classes.join(' ');
 seg.dataset.index=String(i);
-seg.title=`${getValidTimeLabel(i)} / ${getForecastLeadLabel(i)}`;
+seg.dataset.time=getValidTimeLabel(i);
+seg.dataset.lead=getForecastLeadLabel(i);
+seg.title=`${seg.dataset.time} / ${seg.dataset.lead}`;
 seg.onclick=()=>{
+focusTimelineForKeyboardControl();
 setForecastIndex(i);
 };
+seg.onmouseenter=()=>setCompareHoverIndex(i);
 track.appendChild(seg);
 }
 
-let marker=document.createElement('div');
-marker.className='forecast-marker';
-marker.innerHTML=`<div class="marker-time">${getValidTimeLabel(activeIndex)}</div><div class="marker-lead">${getForecastLeadLabel(activeIndex)}</div>`;
-let left=count<=1 ? 50 : ((activeIndex+0.5)/count)*100;
-marker.style.left=`${left}%`;
+let activeForecastHour=currentForecastList[activeIndex] ?? 0;
+track.appendChild(
+createCompareTimelineLabel('time',activeIndex,count,activeForecastHour)
+);
+track.appendChild(
+createCompareTimelineLabel('lead',activeIndex,count,activeForecastHour)
+);
 
-forecastTimeline.appendChild(track);
-forecastTimeline.appendChild(marker);
-
+track.onmouseleave=()=>setCompareHoverIndex(null);
 bindForecastTimelinePointer(track);
+
+row.appendChild(info);
+row.appendChild(track);
+list.appendChild(row);
+forecastTimeline.appendChild(list);
 
 }
 
@@ -2968,14 +960,14 @@ if(!forecastTimeline){
 return;
 }
 
-let seg=forecastTimeline.querySelector(`.forecast-segment[data-index="${index}"]`);
+let seg=forecastTimeline.querySelector(`.forecast-segment[data-index="${index}"]`) || forecastTimeline.querySelector(`.compare-segment[data-index="${index}"]`);
 
 if(!seg){
 return;
 }
 
 seg.classList.remove('state-loading','state-available','state-missing');
-seg.classList.add('state-'+(forecastLoadStates[index] || 'loading'));
+seg.classList.add('state-'+forecastTimelineState.getLoadState(index));
 
 }
 
@@ -2986,25 +978,10 @@ if(!forecastTimeline){
 return;
 }
 
-let count=currentForecastList.length || 1;
-let activeIndex=Number(slider.value || 0);
-activeIndex=Math.max(0,Math.min(activeIndex,count-1));
-
-forecastTimeline.querySelectorAll('.forecast-segment').forEach((seg,i)=>{
-seg.classList.toggle('active',i===activeIndex);
-});
-
-let marker=forecastTimeline.querySelector('.forecast-marker');
-if(marker){
-let left=count<=1 ? 50 : ((activeIndex+0.5)/count)*100;
-marker.style.left=`${left}%`;
-let time=marker.querySelector('.marker-time');
-let lead=marker.querySelector('.marker-lead');
-if(time){time.textContent=getValidTimeLabel(activeIndex);}
-if(lead){lead.textContent=getForecastLeadLabel(activeIndex);}
-}
+updateCompareTimelineActiveLabels();
 
 }
+
 
 function refreshForecastTimelineLabels(){
 
@@ -3013,12 +990,14 @@ return;
 }
 
 forecastTimeline
-.querySelectorAll('.forecast-segment')
+.querySelectorAll('.forecast-segment,.compare-segment')
 .forEach((seg,i)=>{
-seg.title=`${getValidTimeLabel(i)} / ${getForecastLeadLabel(i)}`;
+seg.dataset.time=getValidTimeLabel(i);
+seg.dataset.lead=getForecastLeadLabel(i);
+seg.title=`${seg.dataset.time} / ${seg.dataset.lead}`;
 });
 
-updateForecastTimelineMarker();
+updateCompareTimelineActiveLabels();
 
 }
 
@@ -3039,6 +1018,8 @@ setForecastIndex(indexFromEvent(e));
 }
 
 track.onpointerdown=e=>{
+e.preventDefault();
+focusTimelineForKeyboardControl();
 dragging=true;
 track.setPointerCapture?.(e.pointerId);
 apply(e);
@@ -3065,12 +1046,16 @@ dragging=false;
 
 function setForecastIndex(index){
 
+if(modelCompareMode){
+setCompareForecastIndex(index);
+return;
+}
+
 if(slider.disabled){
 return;
 }
 
-let max=(currentForecastList.length || 1)-1;
-let next=Math.max(0,Math.min(Number(index)||0,max));
+let next=forecastTimelineState.clampIndex(index);
 
 slider.value=String(next);
 updateForecastLabel();
@@ -3079,6 +1064,11 @@ displayCurrentForecastImage();
 }
 
 function moveForecastSelection(delta){
+
+if(modelCompareMode){
+moveCompareForecastSelection(delta);
+return;
+}
 
 let max=(currentForecastList.length || 1)-1;
 
@@ -3095,10 +1085,16 @@ current+delta
 }
 
 
-function displayCurrentForecastImage(){
+async function displayCurrentForecastImage(){
+
+if(modelCompareMode){
+renderCompareImages();
+return;
+}
 
 let index=Number(slider.value || 0);
-let cached=forecastImageCache.get(index);
+let cached=getForecastImageCacheEntry(index);
+let requestId=forecastDisplayRequest;
 
 if(!selectionIsDisplayable()){
 return;
@@ -3109,17 +1105,37 @@ return;
 실패 캐시는 네트워크 지연/timeout일 수 있으므로 현재 선택 이미지는 다시 직접 시도한다.
 */
 if(cached?.ok===true && cached?.urls?.length){
-showCharts(cached.urls);
+let urls=await resolveAnalysisResolutionUrls(
+cached.baseUrls || cached.urls,
+{updateControls:true}
+);
+
+if(requestId!==forecastDisplayRequest){
+return;
+}
+
+showCharts(urls);
+return;
+}
+
+if(cached && cached.ok===false){
+showViewerMessage(makeExpectedButMissingMessage());
 return;
 }
 
 /*
-캐시가 없거나 실패 캐시여도 현재 선택 위치 이미지는 직접 표출 시도한다.
+캐시가 없으면 현재 선택 위치 이미지는 직접 표출 시도한다.
 */
 let urls=buildImageUrlsForForecastIndex(index);
 
 if(urls.length){
-showCharts(urls);
+let displayUrls=await resolveAnalysisResolutionUrls(urls,{updateControls:true});
+
+if(requestId!==forecastDisplayRequest){
+return;
+}
+
+showCharts(displayUrls);
 return;
 }
 
@@ -3130,59 +1146,40 @@ showViewerMessage('표출할 이미지 URL이 없습니다.');
 
 function loadImage(url,timeoutMs=PRELOAD_IMAGE_TIMEOUT_MS){
 
-return new Promise(resolve=>{
-
-let done=false;
-let img=new Image();
-
-let timer=setTimeout(()=>{
-if(done){return;}
-done=true;
-resolve(false);
-},timeoutMs);
-
-img.onload=()=>{
-if(done){return;}
-done=true;
-clearTimeout(timer);
-resolve(true);
-};
-
-img.onerror=()=>{
-if(done){return;}
-done=true;
-clearTimeout(timer);
-resolve(false);
-};
-
-img.src=url;
-
-});
+return CDSChartUtils.loadImage(url,timeoutMs);
 
 }
 
 
 async function preloadForecastIndex(index,seq){
 
-let urls=buildImageUrlsForForecastIndex(index);
+let baseUrls=buildImageUrlsForForecastIndex(index);
 
-if(!urls.length){
-return {index,ok:false,urls:[]};
+if(!baseUrls.length){
+return {index,ok:false,urls:[],baseUrls:[]};
 }
 
-let results=await Promise.all(
-urls.map(url=>loadImage(url))
+let urls=await resolveAnalysisResolutionUrls(
+baseUrls,
+{updateControls:index===Number(slider.value || 0)}
 );
 
 if(seq!==imagePreloadSeq){
-return {index,ok:false,urls,cancelled:true};
+return {index,ok:false,urls,baseUrls,cancelled:true};
 }
 
-let ok=CURRENT_PRODUCT_EXISTENCE_MODE==='any'
-?results.some(Boolean)
-:results.every(Boolean);
+let ok=await urlsExist(urls);
 
-return {index,ok,urls};
+if(seq!==imagePreloadSeq){
+return {index,ok:false,urls,baseUrls,cancelled:true};
+}
+
+return {
+index,
+ok,
+urls,
+baseUrls
+};
 
 }
 
@@ -3191,39 +1188,35 @@ async function preloadAllForecastImages(){
 
 let seq=++imagePreloadSeq;
 let count=currentForecastList.length || 1;
-forecastImageCache=new Map();
-forecastLoadStates=Array.from({length:count},()=> 'loading');
+resetForecastImageCache();
+setAllForecastLoadStates(count,'loading');
 renderForecastTimeline();
 setViewerLoading(true,'이미지 로딩 중');
 
-let indices=Array.from({length:count},(_,i)=>i);
-let cursor=0;
-
-async function worker(){
-while(cursor<indices.length){
-let i=indices[cursor++];
+await CDSImagePipeline.runConcurrentRange({
+count,
+concurrency:IMAGE_PRELOAD_CONCURRENCY,
+isCancelled:()=>seq!==imagePreloadSeq,
+task:async i=>{
 let result=await preloadForecastIndex(i,seq);
 
 if(seq!==imagePreloadSeq || result.cancelled){
-return;
+return false;
 }
 
-forecastLoadStates[i]=result.ok ? 'available' : 'missing';
-forecastImageCache.set(i,{urls:result.urls,ok:result.ok});
-renderForecastTimeline();
+setForecastLoadState(i,result.ok ? 'available' : 'missing');
+setForecastImageCacheEntry(i,{
+urls:result.urls,
+baseUrls:result.baseUrls,
+ok:result.ok
+});
+updateForecastSegmentState(i);
 
 if(i===Number(slider.value || 0)){
 displayCurrentForecastImage();
 }
 }
-}
-
-let workers=Array.from(
-{length:Math.min(IMAGE_PRELOAD_CONCURRENCY,indices.length)},
-()=>worker()
-);
-
-await Promise.all(workers);
+});
 
 if(seq!==imagePreloadSeq){
 return;
@@ -3234,6 +1227,73 @@ displayCurrentForecastImage();
 
 }
 
+
+function getCycleSupportStatus(modelId=currentModel,product=getCurrentProduct(),runUTC=getSelectedUTCDate()){
+
+let runDateOnly=parseDateOnly(
+formatDateInputFromUTCParts(runUTC)
+);
+
+let cycles=getCyclesForSelection(
+modelId,
+product,
+runDateOnly
+) || [];
+
+let cycleHour=runUTC.getUTCHours();
+
+if(cycles.includes(cycleHour)){
+return {supported:true,message:''};
+}
+
+let modelName=getCurrentModelName(modelId);
+let displayRun=timeMode==='KST'
+?new Date(runUTC.getTime()+9*60*60*1000)
+:new Date(runUTC.getTime());
+let displayDate=formatDateInputFromUTCParts(displayRun);
+let displayHour=pad2(displayRun.getUTCHours());
+let supportedText=cycles.length
+?cycles.map(h=>{
+let shown=timeMode==='KST' ? (Number(h)+9)%24 : Number(h);
+return pad2(shown)+'시';
+}).join(', ')
+:'없음';
+
+return {
+supported:false,
+message:
+`${modelName}은(는) ${displayDate} ${displayHour}:00 ${timeMode} 자료시각을 지원하지 않습니다.
+`+
+`지원 시각: ${supportedText}`
+};
+
+}
+
+function makeExpectedButMissingMessage(){
+
+let p=getCurrentProduct();
+let modelName=getCurrentModelName();
+let productLabel=getCurrentProductLabel(p);
+let index=Number(slider.value || 0);
+let runUTC=getRunUTCForForecastIndex(index);
+let display=timeMode==='KST'
+?new Date(runUTC.getTime()+9*60*60*1000)
+:new Date(runUTC.getTime());
+let displayDate=formatDateInputFromUTCParts(display);
+let displayHour=pad2(display.getUTCHours());
+let lead=getForecastLeadLabel(index);
+
+return (
+`${getCurrentMainMenuLabel()} / ${modelName}
+`+
+`${productLabel} / ${displayDate} ${displayHour}:00 ${timeMode} / ${lead}
+`+
+`모델·산출물·자료시각 조합은 유효하지만 이미지 파일을 찾지 못했습니다.
+`+
+`가장 최근 cycle이라면 아직 생산 또는 업로드 전일 수 있습니다.`
+);
+
+}
 
 function selectionIsDisplayable(){
 
@@ -3255,9 +1315,21 @@ showViewerMessage(s.message);
 return false;
 }
 
+let cycleStatus=getCycleSupportStatus(
+currentModel,
+p,
+getSelectedUTCDate()
+);
+
+if(!cycleStatus.supported){
+showViewerMessage(cycleStatus.message);
+return false;
+}
+
 if(!p.patternByModel?.[currentModel]){
 showViewerMessage(
-`${MODELS[currentModel]?.name || currentModel}은(는)\n현재 선택한 산출자료를 지원하지 않습니다.`
+`${MODELS[currentModel]?.name || currentModel}은(는)
+현재 선택한 산출자료를 지원하지 않습니다.`
 );
 return false;
 }
@@ -3294,12 +1366,21 @@ return true;
 
 function updateChart(){
 
-imagePreloadSeq++;
+invalidateImagePreload();
+invalidateForecastDisplay();
+resetAnalysisResolutionState();
+
+if(modelCompareMode){
+updateCompareChart();
+return;
+}
+
+chartImages.classList.remove('compare-images','fit-screen','fixed-size','layout-auto','layout-manual','compare-single','single-images');
 
 if(!selectionIsDisplayable()){
 
-forecastImageCache=new Map();
-forecastLoadStates=['missing'];
+resetForecastImageCache();
+setForecastLoadStates(['missing']);
 
 setViewerLoading(false);
 return;
@@ -3366,58 +1447,6 @@ if(!p){
 return [];
 }
 
-let pattern=p.patternByModel?.[currentModel];
-
-if(!pattern){
-return [];
-}
-
-let patterns=Array.isArray(pattern)
-?pattern
-:[pattern];
-
-let model=MODELS[currentModel];
-
-if(!model || !model.folder){
-return [];
-}
-
-let modelStatus=getEffectiveModelStatus(
-currentModel,
-runUTC,
-p
-);
-
-if(!modelStatus.available){
-return [];
-}
-
-let runDateOnly=parseDateOnly(
-formatDateInputFromUTCParts(runUTC)
-);
-
-let productStatus=getProductArchiveStatus(
-p,
-currentModel,
-runDateOnly
-);
-
-if(!productStatus.available){
-return [];
-}
-
-let run=formatUTCStampFromDate(runUTC);
-let ym=run.slice(0,6);
-let day=run.slice(6,8);
-
-let folder=
-p.folderByModel?.[currentModel] ||
-model.folder;
-
-if(!folder){
-return [];
-}
-
 let forecastHours=getForecastHoursForProductAtRun(
 p,
 currentModel,
@@ -3425,53 +1454,27 @@ runUTC
 );
 
 let fhValue=forecastHours[0] ?? 0;
-let fh=String(fhValue).padStart(3,'0');
-
 let detailToken=getCurrentAuxToken();
 
-let urls=[];
-
-for(let pattern of patterns){
-
-if(pattern.includes('{detail}') && !detailToken){
-return [];
-}
-
-let file=pattern.replaceAll('{run}',run);
-
-if(file.includes('{fh}')){
-file=file.replaceAll('{fh}',fh);
-}
-
-if(file.includes('{detail}')){
-file=file.replaceAll('{detail}',detailToken);
-}
-
-urls.push(
-`https://data.kma.go.kr/CHT/${folder}/${ym}/${day}/${file}`
-);
+return makeChartImageUrls({
+product:p,
+modelId:currentModel,
+runUTC,
+forecastHour:fhValue,
+detailToken,
+checkAvailability:true
+});
 
 }
 
-return urls;
+async function urlsExist(urls,{
+existenceMode=getProductExistenceMode()
+}={}){
 
-}
-
-async function urlsExist(urls){
-
-if(!urls || urls.length===0){
-return false;
-}
-
-let results=await Promise.all(
-urls.map(url=>loadImage(url))
-);
-
-if(CURRENT_PRODUCT_EXISTENCE_MODE==="any"){
-return results.some(Boolean);
-}
-
-return results.every(Boolean);
+return CDSImagePipeline.urlsExist(urls,{
+loadImage,
+existenceMode
+});
 
 }
 
@@ -3491,33 +1494,15 @@ urls:[]
 
 }
 
-let exists=await urlsExist(urls);
+let resolvedUrls=await resolveAnalysisResolutionUrls(urls);
+let exists=await urlsExist(resolvedUrls);
 
 return {
 exists,
-urls
+urls:resolvedUrls
 };
 
 }
-
-function getCyclesForSelection(modelId,currentProductObj,date){
-
-let productCycles=
-currentProductObj?.cyclesByModel?.[modelId] ||
-currentProductObj?.cycles ||
-null;
-
-if(productCycles){
-return productCycles;
-}
-
-return getAvailableCycles(
-modelId,
-date
-) || [];
-
-}
-
 
 function getRecentRunCandidates(
 modelId,
@@ -3574,15 +1559,91 @@ return candidates;
 
 }
 
+function getRecentRunCandidateIgnoringAvailability(
+modelId,
+baseDate=new Date(),
+lookbackHours=24
+){
 
-function setRunControlsToUTC(runUTC){
+let base=new Date(baseDate.getTime());
+base.setUTCMinutes(0,0,0);
 
-setControlsFromUTCDate(
-runUTC,
-timeMode
+for(let i=0;i<=lookbackHours;i++){
+
+let d=new Date(
+base.getTime()-i*60*60*1000
 );
 
-populateHours(runUTC);
+let dateOnly=parseDateOnly(
+formatDateInputFromUTCParts(d)
+);
+
+let cycles=getCyclesForSelection(
+modelId,
+getCurrentProduct(),
+dateOnly
+);
+
+if(cycles.includes(d.getUTCHours())){
+return d;
+}
+
+}
+
+return null;
+
+}
+
+function currentSelectionArchiveUnavailableAtRun(runUTC){
+
+let product=getCurrentProduct();
+
+if(!runUTC || !product){
+return false;
+}
+
+let modelStatus=getEffectiveModelStatus(
+currentModel,
+runUTC,
+product
+);
+
+if(!modelStatus.available){
+return true;
+}
+
+let productStatus=getProductArchiveStatus(
+product,
+currentModel,
+parseDateOnly(formatDateInputFromUTCParts(runUTC))
+);
+
+return !productStatus.available;
+
+}
+
+function jumpCurrentCycleForArchiveUnavailableSelection(){
+
+let currentRun=getRecentRunCandidateIgnoringAvailability(
+currentModel,
+new Date()
+);
+
+if(!currentRun || !currentSelectionArchiveUnavailableAtRun(currentRun)){
+return false;
+}
+
+setRunControlsToUTC(currentRun);
+
+refreshView({
+updateCategories:false,
+updateProducts:true,
+updateHours:false,
+resetSlider:true,
+updateChartAfter:true
+});
+
+return true;
 
 }
 
@@ -3614,6 +1675,10 @@ let result=await currentSelectionExistsAtRun(
 runUTC
 );
 
+if(searchId!==latestSearchSeq){
+return false;
+}
+
 if(result.exists){
 
 setRunControlsToUTC(runUTC);
@@ -3630,6 +1695,10 @@ return true;
 
 }
 
+}
+
+if(jumpCurrentCycleForArchiveUnavailableSelection()){
+return false;
 }
 
 if(!silent){
@@ -3663,6 +1732,10 @@ return false;
 }
 finally{
 
+if(searchId!==latestSearchSeq){
+return;
+}
+
 setViewerLoading(false);
 
 }
@@ -3670,39 +1743,6 @@ setViewerLoading(false);
 }
 
 
-
-
-function switchTimeMode(nextMode){
-
-latestSearchSeq++;
-clearTimeout(autoCheckTimer);
-
-if(timeMode===nextMode){
-return;
-}
-
-let selectedUTC=getSelectedUTCDate();
-let currentIndex=Number(slider.value || 0);
-
-timeMode=nextMode;
-
-kstBtn.classList.toggle('active',timeMode==='KST');
-utcBtn.classList.toggle('active',timeMode==='UTC');
-
-setControlsFromUTCDate(selectedUTC,timeMode);
-populateHours(selectedUTC);
-
-slider.value=String(
-Math.max(
-0,
-Math.min(currentIndex,(currentForecastList.length || 1)-1)
-)
-);
-
-updateForecastLabel();
-refreshForecastTimelineLabels();
-
-}
 
 
 function handleCategoryChange(){
@@ -3713,6 +1753,7 @@ if(getActiveModelSpecificProductCategory()[currentModel]){
 return;
 }
 
+invalidateSelectionAsyncWork();
 let cat=getCurrentCategory();
 let products=getActiveProducts();
 
@@ -3761,6 +1802,12 @@ return;
 
 currentProduct=event.target.value;
 
+invalidateSelectionAsyncWork();
+
+if(modelCompareMode){
+normalizeCompareModels();
+}
+
 applyModelSwitchForCurrentProduct();
 enforceModelAllowedForCurrentSelection();
 
@@ -3776,7 +1823,20 @@ updateChartAfter:true
 }
 
 
+
 function bindEvents(){
+
+document.addEventListener('click',event=>{
+if(!event.target.closest('.compare-layout-control')){
+document.querySelectorAll('.compare-layout-menu').forEach(menu=>{
+menu.classList.add('hidden');
+});
+}
+});
+
+document.querySelectorAll('[data-shift-hours]').forEach(button=>{
+button.onclick=()=>shiftRunTimeByHours(button.dataset.shiftHours);
+});
 
 productCategory.onchange=handleCategoryChange;
 productSelect.onchange=handleProductChange;
@@ -3856,30 +1916,9 @@ return;
 
 });
 
-runDate.onchange=()=>{
-latestSearchSeq++;
-clearTimeout(autoCheckTimer);
-populateHours();
-refreshView({
-  updateCategories:false,
-  updateProducts:true,
-  updateHours:false,
-  resetSlider:true,
-  updateChartAfter:true
-});
-};
-
-runHour.onchange=()=>{
-latestSearchSeq++;
-clearTimeout(autoCheckTimer);
-refreshView({
-  updateCategories:false,
-  updateProducts:true,
-  updateHours:false,
-  resetSlider:true,
-  updateChartAfter:true
-});
-};
+runDate.onchange=handleRunDateChanged;
+runDate.addEventListener('input',normalizeRunDateYearInput);
+runHour.onchange=handleRunHourChanged;
 
 kstBtn.onclick=()=>switchTimeMode('KST');
 utcBtn.onclick=()=>switchTimeMode('UTC');
