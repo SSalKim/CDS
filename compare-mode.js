@@ -8,6 +8,7 @@ const COMPARE_WINTER_VARIANT_UNSUPPORTED_MODELS=new Set(['ukmo','um_ldps']);
 
 let compareImageAvailabilitySeq=0;
 let compareImageAvailabilityMap=new Map();
+let compareImageRenderFrame=null;
 
 function supportsModelCompareInCurrentMenu(){
 
@@ -748,13 +749,44 @@ return '+'+String(Number(forecastHour || 0)).padStart(3,'0')+'h';
 
 }
 
-function setCompareForecastIndex(index){
+function setCompareForecastIndex(index,{
+renderImages=true
+}={}){
 
 let next=forecastTimelineState.clampIndex(index);
 
 slider.value=String(next);
 updateForecastLabel();
 updateCompareTimelineActiveLabels();
+
+if(!renderImages){
+return;
+}
+
+renderCompareImages();
+
+}
+
+function scheduleCompareImageRender(){
+
+if(compareImageRenderFrame!==null){
+return;
+}
+
+compareImageRenderFrame=requestAnimationFrame(()=>{
+compareImageRenderFrame=null;
+renderCompareImages();
+});
+
+}
+
+function flushScheduledCompareImageRender(){
+
+if(compareImageRenderFrame!==null){
+cancelAnimationFrame(compareImageRenderFrame);
+compareImageRenderFrame=null;
+}
+
 renderCompareImages();
 
 }
@@ -917,10 +949,15 @@ let count=currentForecastList.length || 1;
 return Math.max(0,Math.min(count-1,Math.floor((x/rect.width)*count)));
 }
 
-function apply(e){
+function apply(e,{renderImages=false,scheduleImages=false}={}){
 let index=indexFromEvent(e);
 setCompareHoverIndex(index);
-setCompareForecastIndex(index);
+setCompareForecastIndex(index,{renderImages});
+
+if(scheduleImages){
+scheduleCompareImageRender();
+}
+
 }
 
 track.onpointerdown=e=>{
@@ -928,7 +965,7 @@ e.preventDefault();
 focusTimelineForKeyboardControl();
 dragging=true;
 track.setPointerCapture?.(e.pointerId);
-apply(e);
+apply(e,{renderImages:false,scheduleImages:true});
 };
 
 track.onpointermove=e=>{
@@ -936,16 +973,20 @@ if(!dragging){
 return;
 }
 e.preventDefault();
-apply(e);
+apply(e,{renderImages:false,scheduleImages:true});
 };
 
 track.onpointerup=e=>{
 dragging=false;
+e.preventDefault();
+apply(e,{renderImages:false});
+flushScheduledCompareImageRender();
 track.releasePointerCapture?.(e.pointerId);
 };
 
 track.onpointercancel=()=>{
 dragging=false;
+flushScheduledCompareImageRender();
 };
 
 }

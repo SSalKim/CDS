@@ -249,10 +249,12 @@ const PRODUCTS=[
 },
 {category:"asia", id:"acrain", label:"총누적강수량",
     patternByModel:{
-        um_gdps: "gdps_erly_asia_surfce_ft06_pa4_s{fh}_{run}.gif",
+        um_gdps: "gdps_erly_asia_acrain_ft06_pa4_s{fh}_{run}.gif",
+        kim_rdps: "kim_rdps_erly_asia_acrain_s{fh}_{run}.png",
         um_ldps: "ldps_asia_acrain_s{fh}_{run}.gif"
     },
     archiveStartByModel:{
+        kim_rdps:"2026-05-12",
         um_ldps:"2018-01-18"
     },
 },

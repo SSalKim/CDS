@@ -17,6 +17,7 @@ const nowBtn=document.getElementById('nowBtn');
 const forecastTimeline=document.getElementById('forecastTimeline');
 const viewerWrap=document.querySelector('.viewer-wrap');
 const timelineTopControls=document.getElementById('timelineTopControls');
+const appTitleReset=document.getElementById('appTitleReset');
 
 let currentModel='kim_gdps';
 let currentProduct='gph500';
@@ -1825,6 +1826,31 @@ updateChartAfter:true
 
 
 function bindEvents(){
+
+if(appTitleReset){
+
+let resetToInitialPage=()=>{
+let initialUrl=window.location.origin+window.location.pathname;
+
+if(window.location.href!==initialUrl){
+window.location.href=initialUrl;
+return;
+}
+
+window.location.reload();
+};
+
+appTitleReset.onclick=resetToInitialPage;
+appTitleReset.onkeydown=e=>{
+if(e.key!=='Enter' && e.key!==' '){
+return;
+}
+
+e.preventDefault();
+resetToInitialPage();
+};
+
+}
 
 document.addEventListener('click',event=>{
 if(!event.target.closest('.compare-layout-control')){
