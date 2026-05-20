@@ -1332,7 +1332,7 @@ const PRODUCTS=[
         um_gdps:"TYPH"
     },
 },
-{category:"typh", id:"wndshr", label:"300-850 바람시어 예상",
+{category:"typh", id:"wndshr", label:"200-850 바람시어 예상",
     patternByModel:{
         kim_gdps: "kim_typh_fcst_wndshr_ft06_pa4_s{fh}_{run}.gif",
         um_gdps: "typh_fcst_wndshr_ft06_pa4_s{fh}_{run}.gif"
