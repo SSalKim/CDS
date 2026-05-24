@@ -26,19 +26,41 @@ let run=formatUTCStampFromDate(runUTC);
 
 return {
 run,
+runmin:run+'00',
 ym:run.slice(0,6),
-day:run.slice(6,8)
+day:run.slice(6,8),
+hour:run.slice(8,10)
 };
 
 }
 
 function applyChartPatternTokens(pattern,{
 run,
+runmin=null,
+ym=null,
+day=null,
+hour=null,
 forecastHour=0,
 detailToken=null
 }={}){
 
 let file=pattern.replaceAll('{run}',run);
+
+if(file.includes('{runmin}')){
+file=file.replaceAll('{runmin}',runmin || (run ? run+'00' : ''));
+}
+
+if(file.includes('{ym}')){
+file=file.replaceAll('{ym}',ym || '');
+}
+
+if(file.includes('{day}')){
+file=file.replaceAll('{day}',day || '');
+}
+
+if(file.includes('{hour}')){
+file=file.replaceAll('{hour}',hour || '');
+}
 
 if(file.includes('{fh}')){
 file=file.replaceAll(
@@ -52,6 +74,12 @@ file=file.replaceAll('{detail}',detailToken || '');
 }
 
 return file;
+
+}
+
+function isAbsoluteUrlPattern(pattern){
+
+return /^https?:\/\//i.test(pattern);
 
 }
 
@@ -85,9 +113,10 @@ if(!patternList.length){
 return [];
 }
 
+let hasRelativePattern=patternList.some(pattern=>!isAbsoluteUrlPattern(pattern));
 let folder=getProductFolderForModel(product,modelId,models);
 
-if(!folder){
+if(hasRelativePattern && !folder){
 return [];
 }
 
@@ -127,15 +156,23 @@ patternList.some(pattern=>pattern.includes('{detail}')) &&
 return [];
 }
 
-let {run,ym,day}=getChartUrlParts(runUTC,formatUTCStampFromDate);
+let {run,runmin,ym,day,hour}=getChartUrlParts(runUTC,formatUTCStampFromDate);
 
 return patternList.map(pattern=>{
 
 let file=applyChartPatternTokens(pattern,{
 run,
+runmin,
+ym,
+day,
+hour,
 forecastHour,
 detailToken
 });
+
+if(isAbsoluteUrlPattern(file)){
+return file;
+}
 
 return `${baseUrl}/${folder}/${ym}/${day}/${file}`;
 
@@ -267,6 +304,19 @@ img.alt='chart';
 img.decoding='async';
 img.loading='eager';
 img.classList.add('prepared-chart-image');
+
+if(typeof url==='string' && url.includes('nmsc.kma.go.kr/IMG/GK2A')){
+img.classList.add('nmsc-chart-image');
+
+if(url.includes('/EA/') || url.includes('_ea020lc_')){
+img.classList.add('nmsc-ea-image');
+}
+
+if(url.includes('/KO/') || url.includes('_ko020lc_')){
+img.classList.add('nmsc-ko-image');
+}
+}
+
 return img;
 
 }

@@ -1349,6 +1349,21 @@ option.group-header{
   max-width:none;
 }
 
+.single-image-stack.nmsc-image-stack{
+  align-items:flex-start;
+  gap:6px;
+  --nmsc-pair-height:540px;
+}
+
+.nmsc-image-slot{
+  flex:0 0 auto;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  width:max-content;
+  max-width:none;
+}
+
 .chart-images.single-images img,
 .single-image-stack img{
   display:block;
@@ -1363,6 +1378,37 @@ option.group-header{
 
 .chart-images.single-images .compare-inline-warning{
   flex-basis:100%;
+}
+
+.single-image-stack.nmsc-image-stack img.nmsc-chart-image{
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:contain;
+}
+
+.single-image-stack.nmsc-image-stack img.nmsc-ko-image{
+  width:auto !important;
+  height:auto !important;
+}
+
+.single-image-stack.nmsc-image-stack.nmsc-has-ko-height img.nmsc-ea-image{
+  height:var(--nmsc-pair-height) !important;
+  width:auto !important;
+}
+
+.single-image-stack.nmsc-image-stack.nmsc-wait-for-ko:not(.nmsc-has-ko-height) .nmsc-ea-slot img{
+  visibility:hidden;
+}
+
+.compare-image-stack img.nmsc-chart-image{
+  max-height:calc(100vh - 150px) !important;
+  max-width:calc(100vw - 140px) !important;
+  object-fit:contain;
+}
+
+.compare-image-stack img.nmsc-ea-image,
+.compare-image-stack img.nmsc-ko-image{
+  max-height:calc(100vh - 170px) !important;
 }
 
 

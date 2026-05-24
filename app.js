@@ -779,7 +779,226 @@ return label;
 }
 
 
-async function showCharts(urls,{attempt=0}={}){
+function isNmscSatelliteUrl(url){
+
+return typeof url==='string' &&
+url.includes('nmsc.kma.go.kr/IMG/GK2A');
+
+}
+
+function isNmscEastAsiaUrl(url){
+
+return isNmscSatelliteUrl(url) &&
+(url.includes('/EA/') || url.includes('_ea020lc_'));
+
+}
+
+function isNmscKoreaUrl(url){
+
+return isNmscSatelliteUrl(url) &&
+(url.includes('/KO/') || url.includes('_ko020lc_'));
+
+}
+
+function setSingleImageDisplayMode(){
+
+chartImages.classList.remove('compare-images','fit-screen','fixed-size','layout-auto','layout-manual','compare-single','single-images');
+chartImages.classList.add('single-images');
+chartImages.classList.remove('hidden');
+
+}
+
+function createSingleImageDisplayShell({
+nmsc=false
+}={}){
+
+setSingleImageDisplayMode();
+
+let item=document.createElement('div');
+item.className='single-image-item';
+
+let stack=document.createElement('div');
+stack.className='single-image-stack';
+
+if(nmsc){
+stack.classList.add('nmsc-image-stack');
+}
+
+item.appendChild(stack);
+chartImages.replaceChildren(item);
+
+return {item,stack};
+
+}
+
+function syncNmscImagePairHeight(stack){
+
+if(!stack){
+return;
+}
+
+let koImage=stack.querySelector('img.nmsc-ko-image');
+
+if(!koImage){
+return;
+}
+
+let height=koImage.naturalHeight || koImage.getBoundingClientRect().height;
+
+if(!height){
+return;
+}
+
+stack.style.setProperty('--nmsc-pair-height',`${height}px`);
+stack.classList.add('nmsc-has-ko-height');
+
+}
+
+function createNmscImageSlot(url){
+
+let slot=document.createElement('div');
+slot.className='nmsc-image-slot';
+
+if(isNmscEastAsiaUrl(url)){
+slot.classList.add('nmsc-ea-slot');
+}
+
+if(isNmscKoreaUrl(url)){
+slot.classList.add('nmsc-ko-slot');
+}
+
+return slot;
+
+}
+
+function renderNmscPreparedImages(urls,preparedImages){
+
+let {stack}=createSingleImageDisplayShell({nmsc:true});
+
+if(
+urls.some(isNmscEastAsiaUrl) &&
+urls.some(isNmscKoreaUrl)
+){
+stack.classList.add('nmsc-wait-for-ko');
+}
+
+urls.forEach((url,index)=>{
+let slot=createNmscImageSlot(url);
+let img=preparedImages[index];
+
+if(img){
+slot.replaceChildren(img);
+slot.classList.add('loaded');
+}
+
+stack.appendChild(slot);
+});
+
+syncNmscImagePairHeight(stack);
+
+if(!stack.classList.contains('nmsc-has-ko-height')){
+stack.classList.remove('nmsc-wait-for-ko');
+}
+
+revealPreparedImages(chartImages);
+return stack;
+
+}
+
+async function showProgressiveCharts(urls,{requestId,attempt=0,hadPreviousImage=false}={}){
+
+let {stack}=createSingleImageDisplayShell({nmsc:true});
+let loadedImages=[];
+
+if(
+urls.some(isNmscEastAsiaUrl) &&
+urls.some(isNmscKoreaUrl)
+){
+stack.classList.add('nmsc-wait-for-ko');
+}
+
+let slots=urls.map(url=>{
+let slot=createNmscImageSlot(url);
+stack.appendChild(slot);
+return slot;
+});
+
+let jobs=urls.map(async (url,index)=>{
+let img=await createDecodedDisplayImage(url);
+
+if(requestId!==forecastDisplayRequest){
+return null;
+}
+
+if(!img){
+return null;
+}
+
+loadedImages.push(img);
+slots[index].replaceChildren(img);
+slots[index].classList.add('loaded');
+syncNmscImagePairHeight(stack);
+revealPreparedImages(chartImages);
+return img;
+});
+
+await Promise.all(jobs);
+
+if(requestId!==forecastDisplayRequest){
+return;
+}
+
+if(loadedImages.length){
+syncNmscImagePairHeight(stack);
+
+if(!stack.classList.contains('nmsc-has-ko-height')){
+stack.classList.remove('nmsc-wait-for-ko');
+}
+
+modelStatus.textContent='';
+modelStatus.classList.add('hidden');
+
+if(loadedImages.length<urls.length){
+let warn=document.createElement('div');
+warn.className='compare-inline-warning';
+warn.textContent='일부 이미지 로드 실패';
+stack.appendChild(warn);
+}
+
+return;
+}
+
+if(attempt<DISPLAY_IMAGE_MAX_RETRIES){
+
+setTimeout(()=>{
+
+if(requestId!==forecastDisplayRequest){
+return;
+}
+
+showCharts(urls,{attempt:attempt+1});
+
+},DISPLAY_IMAGE_RETRY_DELAY_MS);
+
+return;
+
+}
+
+if(hadPreviousImage){
+console.warn('이미지 로드 실패. 이전 화면을 지우고 메시지를 표시합니다:',urls);
+}
+
+showViewerMessage(
+makeExpectedButMissingMessage()
+);
+
+}
+
+
+async function showCharts(urls,{
+attempt=0,
+progressiveNmsc=true
+}={}){
 
 let requestId=++forecastDisplayRequest;
 let hadPreviousImage=!!chartImages.querySelector('img');
@@ -789,6 +1008,11 @@ modelStatus.classList.add('hidden');
 
 if(!urls || urls.length===0){
 showViewerMessage('표출할 이미지 URL이 없습니다.');
+return;
+}
+
+if(progressiveNmsc && urls.some(isNmscSatelliteUrl)){
+await showProgressiveCharts(urls,{requestId,attempt,hadPreviousImage});
 return;
 }
 
@@ -803,17 +1027,26 @@ return;
 
 let loadedImages=displayResult.loadedImages;
 let enough=displayResult.enough;
+let preparedImages=displayResult.prepared || [];
 
 if(enough){
 
-chartImages.classList.remove('compare-images','fit-screen','fixed-size','layout-auto','layout-manual','compare-single','single-images');
-chartImages.classList.add('single-images');
-chartImages.classList.remove('hidden');
+if(urls.some(isNmscSatelliteUrl)){
+let stack=renderNmscPreparedImages(urls,preparedImages);
 
-let item=document.createElement('div');
-item.className='single-image-item';
-let stack=document.createElement('div');
-stack.className='single-image-stack';
+if(loadedImages.length<urls.length){
+let warn=document.createElement('div');
+warn.className='compare-inline-warning';
+warn.textContent='일부 이미지 로드 실패';
+stack.appendChild(warn);
+}
+
+modelStatus.textContent='';
+modelStatus.classList.add('hidden');
+return;
+}
+
+let {stack}=createSingleImageDisplayShell();
 loadedImages.forEach(img=>{
 stack.appendChild(img);
 });
@@ -825,8 +1058,6 @@ warn.textContent='일부 이미지 로드 실패';
 stack.appendChild(warn);
 }
 
-item.appendChild(stack);
-chartImages.replaceChildren(item);
 revealPreparedImages(chartImages);
 
 modelStatus.textContent='';
@@ -1115,7 +1346,7 @@ if(requestId!==forecastDisplayRequest){
 return;
 }
 
-showCharts(urls);
+showCharts(urls,{progressiveNmsc:false});
 return;
 }
 
@@ -1173,6 +1404,17 @@ let ok=await urlsExist(urls);
 
 if(seq!==imagePreloadSeq){
 return {index,ok:false,urls,baseUrls,cancelled:true};
+}
+
+if(ok && urls.some(isNmscSatelliteUrl)){
+await CDSImagePipeline.prepareDisplayImages(urls,{
+createDisplayImage:createDecodedDisplayImage,
+existenceMode:getProductExistenceMode()
+});
+
+if(seq!==imagePreloadSeq){
+return {index,ok:false,urls,baseUrls,cancelled:true};
+}
 }
 
 return {

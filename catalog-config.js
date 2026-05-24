@@ -46,6 +46,7 @@ radm:{
 allowedModels:[
 "kim_gdps",
 "um_gdps",
+"ecmwf",
 "kim_rdps",
 "um_ldps"
 ],

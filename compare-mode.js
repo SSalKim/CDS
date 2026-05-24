@@ -8,6 +8,7 @@ const COMPARE_WINTER_VARIANT_UNSUPPORTED_MODELS=new Set(['ukmo','um_ldps']);
 
 let compareImageAvailabilitySeq=0;
 let compareImageAvailabilityMap=new Map();
+let compareImageAvailabilityContextKey='';
 let compareImageRenderFrame=null;
 
 function supportsModelCompareInCurrentMenu(){
@@ -598,6 +599,26 @@ return `${modelId}|${Number(forecastHour)}`;
 
 }
 
+function getCompareAvailabilityContextKey(){
+
+let categoryId=productCategory?.value || '';
+let detailToken=typeof getCurrentAuxToken==='function'
+?getCurrentAuxToken()
+:'';
+let runStamp=typeof getUTCStamp==='function'
+?getUTCStamp()
+:'';
+
+return [
+currentMainMenu,
+categoryId,
+currentProduct,
+runStamp,
+detailToken || ''
+].join('|');
+
+}
+
 function getCompareImageAvailability(modelId,forecastHour){
 
 if(!compareModelHasForecastHour(modelId,forecastHour)){
@@ -638,13 +659,23 @@ segment.classList.add('state-'+getCompareImageAvailability(modelId,forecastHour)
 async function probeCompareImageAvailability(){
 
 let seq=++compareImageAvailabilitySeq;
+let contextKey=getCompareAvailabilityContextKey();
+
+if(contextKey!==compareImageAvailabilityContextKey){
+compareImageAvailabilityContextKey=contextKey;
 compareImageAvailabilityMap=new Map();
+}
 
 let jobs=[];
 
-compareModels.forEach(modelId=>{
 currentForecastList.forEach(forecastHour=>{
-if(compareModelHasForecastHour(modelId,forecastHour)){
+compareModels.forEach(modelId=>{
+let key=getCompareAvailabilityKey(modelId,forecastHour);
+
+if(
+compareModelHasForecastHour(modelId,forecastHour) &&
+!compareImageAvailabilityMap.has(key)
+){
 jobs.push({
 modelId,
 forecastHour:Number(forecastHour)
