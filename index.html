@@ -12,7 +12,7 @@
 
 <div class="logo-block" id="appTitleReset" role="button" tabindex="0">
 <span class="title">수치일기도<br>표출시스템</span>
-<div class="subtitle">Chart Display System 3.1</div>
+<div class="subtitle">Chart Display System 3.2</div>
 </div>
 
 <nav class="main-menu" id="mainMenu">
@@ -37,6 +37,7 @@
 
 <button id="nowBtn">NOW</button>
 
+<div class="main-datetime-group">
 <input
 id="runDate"
 type="date"
@@ -45,6 +46,7 @@ max="2099-12-31"
 >
 
 <select id="runHour"></select>
+</div>
 
 <div class="time-toggle-stack">
 <button id="kstBtn" class="time-mode active" type="button">KST</button>
@@ -128,6 +130,7 @@ max="2099-12-31"
 <script src="catalog-selection.js"></script>
 <script src="forecast-domain.js"></script>
 <script src="compare-mode.js"></script>
+<script src="radar-analysis.js"></script>
 <script src="app.js"></script>
 
 <!-- Google tag (gtag.js) -->

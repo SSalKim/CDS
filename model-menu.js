@@ -388,4 +388,12 @@ modelGrid.appendChild(section);
 
 });
 
+if(typeof renderRadarAnalysisLauncher==='function'){
+let radarLauncher=renderRadarAnalysisLauncher();
+
+if(radarLauncher){
+modelGrid.appendChild(radarLauncher);
+}
+}
+
 }

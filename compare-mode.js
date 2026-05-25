@@ -857,6 +857,8 @@ clearInterval(comparePlayTimer);
 comparePlayTimer=null;
 }
 
+updateTimelinePlaybackButtons();
+
 }
 
 function moveForecastSelectionLoop(delta){
@@ -900,30 +902,51 @@ comparePlayTimer=setInterval(()=>{
 moveTimelineSelection(1);
 },COMPARE_PLAY_INTERVAL_MS);
 
+updateTimelinePlaybackButtons();
+
+}
+
+function toggleTimelineAnimation(){
+
+if(comparePlayTimer){
+stopCompareAnimation();
+return;
+}
+
+playTimelineAnimation();
+
+}
+
+function updateTimelinePlaybackButtons(){
+
+document.querySelectorAll('.timeline-play-toggle').forEach(button=>{
+button.textContent=comparePlayTimer?'Ⅱ':'▶';
+button.title=comparePlayTimer?'정지':'재생';
+button.classList.toggle('is-playing',!!comparePlayTimer);
+});
+
 }
 
 function renderTimelinePlaybackControls(){
 
 let prev=document.createElement('button');
 prev.type='button';
+prev.className='timeline-step-button';
 prev.textContent='‹';
 prev.title='이전 이미지';
 prev.onclick=()=>moveTimelineSelection(-1);
 
 let play=document.createElement('button');
 play.type='button';
-play.textContent='▶';
-play.title='재생';
-play.onclick=playTimelineAnimation;
-
-let stop=document.createElement('button');
-stop.type='button';
-stop.textContent='■';
-stop.title='정지';
-stop.onclick=stopCompareAnimation;
+play.className='timeline-play-toggle';
+play.textContent=comparePlayTimer?'Ⅱ':'▶';
+play.title=comparePlayTimer?'정지':'재생';
+play.classList.toggle('is-playing',!!comparePlayTimer);
+play.onclick=toggleTimelineAnimation;
 
 let next=document.createElement('button');
 next.type='button';
+next.className='timeline-step-button';
 next.textContent='›';
 next.title='다음 이미지';
 next.onclick=()=>moveTimelineSelection(1);
@@ -932,7 +955,6 @@ let playback=document.createElement('div');
 playback.className='compare-playback-controls timeline-playback-controls';
 playback.appendChild(prev);
 playback.appendChild(play);
-playback.appendChild(stop);
 playback.appendChild(next);
 
 return playback;
