@@ -844,12 +844,6 @@ setCompareForecastIndex(next);
 
 }
 
-function playCompareAnimation(){
-
-playTimelineAnimation();
-
-}
-
 function stopCompareAnimation(){
 
 if(comparePlayTimer){
@@ -1298,17 +1292,6 @@ controls.appendChild(resolutionToggle);
 controls.appendChild(renderTimelinePlaybackControls());
 
 return controls;
-
-}
-
-function clearTimelineTopControls(){
-
-if(!timelineTopControls){
-return;
-}
-
-timelineTopControls.innerHTML='';
-timelineTopControls.classList.add('hidden');
 
 }
 

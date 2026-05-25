@@ -76,15 +76,6 @@ canSelectProductByModelSwitch(product)
 }
 
 
-function getSupportedProductsInCategory(categoryId,modelId=currentModel){
-
-return getProductsInCategory(categoryId).filter(
-p=>productSupportsModel(p,modelId)
-);
-
-}
-
-
 function categoryHasSupportedProduct(categoryId,modelId=currentModel){
 
 return getProductsInCategory(categoryId).some(

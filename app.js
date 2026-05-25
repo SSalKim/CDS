@@ -392,18 +392,6 @@ runDate.value=`${match[1].slice(0,4)}-${match[2]}-${match[3]}`;
 }
 
 
-function getCurrentCategoryLabel(){
-
-let categoryId=getCurrentCategory();
-let category=getActiveCategories().find(
-c=>c.id===categoryId
-);
-
-return category?.name || category?.label || categoryId || '';
-
-}
-
-
 function rebuildForecastAxis({
 reset=true,
 preserveForecastHour=null

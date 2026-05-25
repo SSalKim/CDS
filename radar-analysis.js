@@ -592,8 +592,6 @@ root:null,
 timeline:null,
 timeLabel:null,
 dateInput:null,
-datePickerInput:null,
-timeInput:null,
 paneGrid:null,
 playButton:null,
 playTimer:null,
@@ -647,7 +645,7 @@ function formatDateDisplayInput(date){
 return `${date.getFullYear()}.${pad2(date.getMonth()+1)}.${pad2(date.getDate())}.`;
 }
 
-function formatDateTimeDisplayInput(date){
+function formatDateTimeDisplay(date){
 return `${formatDateDisplayInput(date)} ${formatTimeInput(date)}`;
 }
 
@@ -679,120 +677,6 @@ let month=Math.max(1,Math.min(12,Number(match[2])));
 let maxDay=new Date(year,month,0).getDate();
 let day=Math.max(1,Math.min(maxDay,Number(match[3])));
 return `${String(year).padStart(4,'0')}-${pad2(month)}-${pad2(day)}`;
-}
-
-function getValidDateInputValue(input){
-let value=String(input?.value || '');
-return normalizeDateTextValue(
-value,
-input?.dataset?.lastValidDate || formatDateInput(new Date())
-);
-}
-
-function normalizeDateInputYearValue(input){
-if(!input){
-return false;
-}
-
-let value=String(input.value || '');
-let extended=value.match(/^(\d{5,})-(\d{2})-(\d{2})$/);
-
-if(extended){
-input.value=`${extended[1].slice(0,4)}-${extended[2]}-${extended[3]}`;
-}
-
-if(/^\d{4}-\d{2}-\d{2}$/.test(input.value)){
-input.dataset.lastValidDate=input.value;
-return true;
-}
-
-return false;
-}
-
-function setDateInputYear(input,yearText){
-if(!input || !/^\d{4}$/.test(yearText)){
-return;
-}
-
-let [,month,day]=getValidDateInputValue(input).split('-').map(Number);
-let year=Number(yearText);
-let maxDay=new Date(year,month,0).getDate();
-let safeDay=Math.min(day,maxDay);
-input.value=`${yearText}-${pad2(month)}-${pad2(safeDay)}`;
-input.dataset.lastValidDate=input.value;
-input.dispatchEvent(new Event('change',{bubbles:true}));
-}
-
-function attachDateInputYearKeyboardFix(input){
-if(!input || input.dataset.dateYearFixBound==='1'){
-return;
-}
-
-input.dataset.dateYearFixBound='1';
-input.dataset.lastValidDate=getValidDateInputValue(input);
-let activePart='year';
-let yearBuffer='';
-let lastDigitAt=0;
-
-function resolveDatePart(event){
-let rect=input.getBoundingClientRect();
-let x=event.clientX-rect.left;
-let editableWidth=Math.max(1,rect.width-28);
-
-if(x<=editableWidth*.48){
-return 'year';
-}
-
-return x<=editableWidth*.72 ? 'month' : 'day';
-}
-
-input.addEventListener('pointerdown',event=>{
-activePart=resolveDatePart(event);
-yearBuffer='';
-});
-
-input.addEventListener('focus',()=>{
-activePart=activePart || 'year';
-yearBuffer='';
-normalizeDateInputYearValue(input);
-});
-
-input.addEventListener('keydown',event=>{
-if(event.ctrlKey || event.metaKey || event.altKey){
-return;
-}
-
-if(/^\d$/.test(event.key) && activePart==='year'){
-event.preventDefault();
-let now=Date.now();
-
-if(now-lastDigitAt>1600 || yearBuffer.length>=4){
-yearBuffer='';
-}
-
-lastDigitAt=now;
-yearBuffer+=event.key;
-
-if(yearBuffer.length===4){
-setDateInputYear(input,yearBuffer);
-yearBuffer='';
-}
-}
-else if(event.key==='Enter'){
-yearBuffer='';
-input.blur();
-}
-else if(event.key==='Tab' || event.key.startsWith('Arrow')){
-yearBuffer='';
-}
-});
-
-input.addEventListener('change',()=>normalizeDateInputYearValue(input));
-input.addEventListener('blur',()=>{
-yearBuffer='';
-activePart='year';
-normalizeDateInputYearValue(input);
-});
 }
 
 function formatTimeInput(date){
@@ -848,7 +732,7 @@ text:`${pad2(hour)}:${pad2(roundedMinute)}`
 };
 }
 
-function normalizeDateTimeTextValue(value,fallbackDate=radarState.baseTime || new Date()){
+function normalizeDateTimeText(value,fallbackDate=radarState.baseTime || new Date()){
 let raw=String(value || '').trim();
 let fallbackDateText=formatDateInput(fallbackDate);
 let fallbackTimeText=formatTimeInput(fallbackDate);
@@ -883,7 +767,7 @@ display
 }
 
 function parseLocalDateTime(dateValue,timeValue){
-let dateTime=normalizeDateTimeTextValue(dateValue,radarState.baseTime || new Date());
+let dateTime=normalizeDateTimeText(dateValue,radarState.baseTime || new Date());
 let normalizedDate=dateTime.date;
 let [year,month,day]=normalizedDate.split('-').map(Number);
 let normalizedTime=normalizeRadarTimeValue(timeValue || dateTime.time);
@@ -1887,17 +1771,15 @@ renderRadarPanes();
 preloadRadarImages();
 }
 
+function syncRadarDateTimeInput(){
+if(radarState.dateInput){
+radarState.dateInput.value=formatDateTimeDisplay(radarState.baseTime);
+}
+}
+
 function setRadarBaseTime(date){
 radarState.baseTime=roundDateToFiveMinutes(date);
-
-if(radarState.dateInput){
-radarState.dateInput.value=formatDateTimeDisplayInput(radarState.baseTime);
-}
-
-if(radarState.timeInput){
-radarState.timeInput.value=formatTimeInput(radarState.baseTime);
-}
-
+syncRadarDateTimeInput();
 rebuildRadarTimelineAroundBase();
 }
 
@@ -1907,15 +1789,7 @@ setRadarBaseTime(new Date(radarState.baseTime.getTime()+minutes*60*1000));
 
 function setRadarNow(){
 radarState.baseTime=floorDateToFiveMinutes(new Date());
-
-if(radarState.dateInput){
-radarState.dateInput.value=formatDateTimeDisplayInput(radarState.baseTime);
-}
-
-if(radarState.timeInput){
-radarState.timeInput.value=formatTimeInput(radarState.baseTime);
-}
-
+syncRadarDateTimeInput();
 rebuildRadarTimelineAroundBase();
 }
 
@@ -2010,18 +1884,6 @@ select.appendChild(option);
 select.value=String(value);
 select.onchange=()=>onchange(select.value);
 return select;
-}
-
-function createRadarField(labelText,control){
-let label=document.createElement('label');
-label.className='radar-field';
-
-let span=document.createElement('span');
-span.textContent=labelText;
-
-label.appendChild(span);
-label.appendChild(control);
-return label;
 }
 
 function createRadarInlineField(labelLines,control){
@@ -2565,337 +2427,7 @@ control.appendChild(panel);
 return control;
 }
 
-function createRadarDatePickerControl(dateInput){
-let control=document.createElement('div');
-control.className='radar-date-picker-control';
-
-let toggle=document.createElement('button');
-toggle.type='button';
-toggle.className='radar-date-picker-toggle';
-toggle.setAttribute('aria-label','날짜 선택');
-toggle.setAttribute('aria-expanded','false');
-
-let panel=document.createElement('div');
-panel.className='radar-date-picker-panel hidden';
-panel.onclick=event=>event.stopPropagation();
-let visibleMonth=new Date(radarState.baseTime.getFullYear(),radarState.baseTime.getMonth(),1);
-
-function getSelectedDateParts(){
-let normalized=normalizeDateTextValue(dateInput.value,formatDateInput(radarState.baseTime));
-let [year,month,day]=normalized.split('-').map(Number);
-return {year,month,day};
-}
-
-function selectDate(year,month,day){
-let selected=new Date(year,month-1,day,radarState.baseTime.getHours(),radarState.baseTime.getMinutes(),0,0);
-dateInput.value=formatDateDisplayInput(selected);
-setRadarBaseTime(parseLocalDateTime(formatDateInput(selected),radarState.timeInput.value));
-setPanelOpen(false);
-}
-
-function renderPanel(){
-let selected=getSelectedDateParts();
-let year=visibleMonth.getFullYear();
-let month=visibleMonth.getMonth();
-panel.innerHTML='';
-
-let header=document.createElement('div');
-header.className='radar-date-picker-header';
-
-let prev=document.createElement('button');
-prev.type='button';
-prev.className='radar-date-picker-nav';
-prev.textContent='‹';
-prev.onclick=event=>{
-event.stopPropagation();
-visibleMonth=new Date(year,month-1,1);
-renderPanel();
-};
-
-let title=document.createElement('div');
-title.className='radar-date-picker-title';
-
-let yearSelect=document.createElement('select');
-yearSelect.className='radar-date-picker-year-select';
-let currentYear=new Date().getFullYear();
-for(let optionYear=currentYear-10;optionYear<=currentYear+10;optionYear++){
-let option=document.createElement('option');
-option.value=String(optionYear);
-option.textContent=String(optionYear);
-yearSelect.appendChild(option);
-}
-yearSelect.value=String(year);
-yearSelect.onchange=event=>{
-event.stopPropagation();
-visibleMonth=new Date(Number(yearSelect.value),month,1);
-renderPanel();
-};
-
-let monthSelect=document.createElement('select');
-monthSelect.className='radar-date-picker-month-select';
-for(let optionMonth=0;optionMonth<12;optionMonth++){
-let option=document.createElement('option');
-option.value=String(optionMonth);
-option.textContent=`${pad2(optionMonth+1)}월`;
-monthSelect.appendChild(option);
-}
-monthSelect.value=String(month);
-monthSelect.onchange=event=>{
-event.stopPropagation();
-visibleMonth=new Date(year,Number(monthSelect.value),1);
-renderPanel();
-};
-
-title.appendChild(yearSelect);
-title.appendChild(monthSelect);
-
-let next=document.createElement('button');
-next.type='button';
-next.className='radar-date-picker-nav';
-next.textContent='›';
-next.onclick=event=>{
-event.stopPropagation();
-visibleMonth=new Date(year,month+1,1);
-renderPanel();
-};
-
-header.appendChild(prev);
-header.appendChild(title);
-header.appendChild(next);
-panel.appendChild(header);
-
-let grid=document.createElement('div');
-grid.className='radar-date-picker-grid';
-
-['일','월','화','수','목','금','토'].forEach((label,index)=>{
-let weekday=document.createElement('div');
-weekday.className='radar-date-picker-weekday'+(index===0 || index===6 ? ' weekend' : '');
-weekday.textContent=label;
-grid.appendChild(weekday);
-});
-
-let firstDay=new Date(year,month,1).getDay();
-let daysInMonth=new Date(year,month+1,0).getDate();
-
-for(let i=0;i<firstDay;i++){
-let blank=document.createElement('span');
-blank.className='radar-date-picker-blank';
-grid.appendChild(blank);
-}
-
-for(let day=1;day<=daysInMonth;day++){
-let dayButton=document.createElement('button');
-dayButton.type='button';
-dayButton.className='radar-date-picker-day';
-dayButton.textContent=String(day);
-
-let dayOfWeek=new Date(year,month,day).getDay();
-if(dayOfWeek===0 || dayOfWeek===6){
-dayButton.classList.add('weekend');
-}
-
-if(selected.year===year && selected.month===month+1 && selected.day===day){
-dayButton.classList.add('selected');
-}
-
-dayButton.onclick=event=>{
-event.stopPropagation();
-selectDate(year,month+1,day);
-};
-grid.appendChild(dayButton);
-}
-
-panel.appendChild(grid);
-}
-
-function positionPanel(){
-let dateRect=dateInput.getBoundingClientRect();
-let toggleRect=control.getBoundingClientRect();
-let width=Math.max(120,Math.round(toggleRect.right-dateRect.left));
-let left=Math.min(Math.max(8,dateRect.left),window.innerWidth-width-8);
-panel.style.left=`${left}px`;
-panel.style.top=`${toggleRect.bottom+1}px`;
-panel.style.width=`${width}px`;
-}
-
-function setPanelOpen(open){
-let isOpen=!!open;
-panel.classList.toggle('hidden',!isOpen);
-toggle.setAttribute('aria-expanded',String(isOpen));
-
-if(isOpen){
-let selected=getSelectedDateParts();
-visibleMonth=new Date(selected.year,selected.month-1,1);
-renderPanel();
-positionPanel();
-requestAnimationFrame(positionPanel);
-}
-}
-
-toggle.onclick=event=>{
-event.stopPropagation();
-setPanelOpen(panel.classList.contains('hidden'));
-};
-
-toggle.onkeydown=event=>{
-if(event.key==='Enter' || event.key===' '){
-event.preventDefault();
-event.stopPropagation();
-setPanelOpen(panel.classList.contains('hidden'));
-}
-};
-
-document.addEventListener('click',()=>setPanelOpen(false));
-control.appendChild(toggle);
-control.appendChild(panel);
-return control;
-}
-
-function createRadarTimePickerControl(timeInput){
-let control=document.createElement('div');
-control.className='radar-time-control';
-
-let toggle=document.createElement('button');
-toggle.type='button';
-toggle.className='radar-time-picker-toggle';
-toggle.setAttribute('aria-label','시각 선택');
-toggle.setAttribute('aria-expanded','false');
-
-let panel=document.createElement('div');
-panel.className='radar-time-picker-panel hidden';
-panel.onclick=event=>event.stopPropagation();
-let pendingTime=null;
-
-function getCurrentParts(){
-let normalized=normalizeRadarTimeValue(timeInput.value);
-
-if(normalized){
-return {hour:normalized.hour,minute:normalized.minute};
-}
-
-return {
-hour:radarState.baseTime.getHours(),
-minute:Math.round(radarState.baseTime.getMinutes()/5)*5
-};
-}
-
-function queueTime(hour,minute){
-pendingTime={hour,minute};
-timeInput.value=`${pad2(hour)}:${pad2(minute)}`;
-}
-
-function commitPendingTime(){
-if(!pendingTime){
-return;
-}
-
-let nextText=`${pad2(pendingTime.hour)}:${pad2(pendingTime.minute)}`;
-pendingTime=null;
-timeInput.value=nextText;
-setRadarBaseTime(parseLocalDateTime(radarState.dateInput.value,timeInput.value));
-}
-
-function renderPanel(){
-let current=getCurrentParts();
-panel.innerHTML='';
-
-let hourSection=document.createElement('div');
-hourSection.className='radar-time-picker-section radar-time-hour-section';
-let hourTitle=document.createElement('div');
-hourTitle.className='radar-time-picker-title';
-hourTitle.textContent='시';
-let hourSelect=document.createElement('select');
-hourSelect.className='radar-time-picker-select radar-time-hour-select';
-
-for(let hour=0;hour<24;hour++){
-let option=document.createElement('option');
-option.value=String(hour);
-option.textContent=pad2(hour);
-hourSelect.appendChild(option);
-}
-
-hourSelect.value=String(current.hour);
-hourSelect.onchange=()=>queueTime(Number(hourSelect.value),Number(minuteSelect.value));
-hourSection.appendChild(hourTitle);
-hourSection.appendChild(hourSelect);
-
-let minuteSection=document.createElement('div');
-minuteSection.className='radar-time-picker-section radar-time-minute-section';
-let minuteTitle=document.createElement('div');
-minuteTitle.className='radar-time-picker-title';
-minuteTitle.textContent='분';
-let minuteSelect=document.createElement('select');
-minuteSelect.className='radar-time-picker-select radar-time-minute-select';
-
-for(let minute=0;minute<60;minute+=5){
-let option=document.createElement('option');
-option.value=String(minute);
-option.textContent=pad2(minute);
-minuteSelect.appendChild(option);
-}
-
-minuteSelect.value=String(current.minute);
-minuteSelect.onchange=()=>queueTime(Number(hourSelect.value),Number(minuteSelect.value));
-minuteSection.appendChild(minuteTitle);
-minuteSection.appendChild(minuteSelect);
-panel.appendChild(hourSection);
-panel.appendChild(minuteSection);
-}
-
-function positionPanel(){
-let rect=control.getBoundingClientRect();
-let width=panel.offsetWidth || 260;
-let left=Math.min(Math.max(8,rect.left),window.innerWidth-width-8);
-panel.style.left=`${left}px`;
-panel.style.top=`${rect.bottom+5}px`;
-}
-
-function setPanelOpen(open){
-let isOpen=!!open;
-let wasOpen=!panel.classList.contains('hidden');
-
-if(!isOpen && wasOpen){
-commitPendingTime();
-}
-
-panel.classList.toggle('hidden',!isOpen);
-toggle.setAttribute('aria-expanded',String(isOpen));
-
-if(isOpen){
-pendingTime=null;
-renderPanel();
-positionPanel();
-requestAnimationFrame(positionPanel);
-}
-}
-
-toggle.onclick=event=>{
-event.stopPropagation();
-setPanelOpen(panel.classList.contains('hidden'));
-};
-
-toggle.onkeydown=event=>{
-if(event.key==='Enter' || event.key===' '){
-event.preventDefault();
-event.stopPropagation();
-setPanelOpen(panel.classList.contains('hidden'));
-}
-};
-
-timeInput.onclick=event=>event.stopPropagation();
-timeInput.onfocus=()=>setPanelOpen(false);
-
-document.addEventListener('click',()=>{
-setPanelOpen(false);
-});
-
-control.appendChild(timeInput);
-control.appendChild(toggle);
-control.appendChild(panel);
-return control;
-}
-
-function createRadarDateTimePickerControl(dateInput){
+function createRadarDateTimeControl(dateInput){
 let control=document.createElement('div');
 control.className='radar-datetime-picker-control';
 
@@ -2914,13 +2446,13 @@ let pendingDate=null;
 let pendingTime=null;
 
 function getCurrentDateParts(){
-let normalized=pendingDate || normalizeDateTimeTextValue(dateInput.value,radarState.baseTime).date;
+let normalized=pendingDate || normalizeDateTimeText(dateInput.value,radarState.baseTime).date;
 let [year,month,day]=normalized.split('-').map(Number);
 return {year,month,day,normalized};
 }
 
 function getCurrentTimeParts(){
-let normalized=pendingTime || normalizeRadarTimeValue(normalizeDateTimeTextValue(dateInput.value,radarState.baseTime).time);
+let normalized=pendingTime || normalizeRadarTimeValue(normalizeDateTimeText(dateInput.value,radarState.baseTime).time);
 
 if(normalized){
 return {hour:normalized.hour,minute:normalized.minute};
@@ -2951,7 +2483,7 @@ if(!pendingDate && !pendingTime){
 return;
 }
 
-let currentDateTime=normalizeDateTimeTextValue(dateInput.value,radarState.baseTime);
+let currentDateTime=normalizeDateTimeText(dateInput.value,radarState.baseTime);
 let nextDate=pendingDate || currentDateTime.date;
 let nextTime=pendingTime ? `${pad2(pendingTime.hour)}:${pad2(pendingTime.minute)}` : currentDateTime.time;
 pendingDate=null;
@@ -3335,27 +2867,26 @@ dateInput.maxLength=17;
 dateInput.placeholder='YYYY.MM.DD. HH:mm';
 dateInput.autocomplete='off';
 dateInput.spellcheck=false;
-dateInput.value=formatDateTimeDisplayInput(radarState.baseTime);
-let commitRadarDateInput=()=>{
-let normalizedDateTime=normalizeDateTimeTextValue(dateInput.value,radarState.baseTime);
+dateInput.value=formatDateTimeDisplay(radarState.baseTime);
+let commitDateTimeInput=()=>{
+let normalizedDateTime=normalizeDateTimeText(dateInput.value,radarState.baseTime);
 dateInput.value=normalizedDateTime.display;
 setRadarBaseTime(parseLocalDateTime(dateInput.value));
 };
 dateInput.oninput=()=>{
 dateInput.value=dateInput.value.replace(/[^\d.\-/\s:]/g,'').slice(0,17);
 };
-dateInput.onchange=commitRadarDateInput;
-dateInput.onblur=commitRadarDateInput;
+dateInput.onchange=commitDateTimeInput;
+dateInput.onblur=commitDateTimeInput;
 dateInput.onkeydown=event=>{
 if(event.key==='Enter'){
-commitRadarDateInput();
+commitDateTimeInput();
 event.currentTarget.blur();
 }
 };
 radarState.dateInput=dateInput;
-radarState.timeInput=null;
 
-playbackRow.appendChild(createRadarButtonGroup('radar-datetime-group',[dateInput,createRadarDateTimePickerControl(dateInput)]));
+playbackRow.appendChild(createRadarButtonGroup('radar-datetime-group',[dateInput,createRadarDateTimeControl(dateInput)]));
 
 let shiftControls=document.createElement('div');
 shiftControls.className='radar-shift-controls';

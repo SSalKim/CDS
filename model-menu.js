@@ -221,25 +221,6 @@ group.models.some(model=>model[0]===modelId)
 }
 
 
-function getFirstVisibleModelId(){
-
-for(let group of getVisibleModelGroups()){
-
-if(group.hidden){
-continue;
-}
-
-if(group.models.length){
-return group.models[0][0];
-}
-
-}
-
-return null;
-
-}
-
-
 function ensureCurrentModelVisibleForMenu(){
 
 if(isModelVisibleInCurrentMenu(currentModel)){

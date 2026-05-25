@@ -53,17 +53,6 @@ null
 
 }
 
-function getProductByIdInCurrentCategory(productId){
-
-return getActiveProducts().find(
-p=>
-p.category===getCurrentCategory() &&
-p.id===productId &&
-p.type!=="header"
-);
-
-}
-
 function getBaseVisibleCategory(){
 
 let selectableCategories=getSelectableCategories();
