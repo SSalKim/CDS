@@ -547,9 +547,12 @@ const RADAR_MAX_IMAGE_SIZE=1500;
 const RADAR_DEFAULT_IMAGE_SIZE=800;
 const RADAR_IMAGE_WIDTH_MARGIN=35;
 const RADAR_IMAGE_HEIGHT_MARGIN=20;
+const RADAR_PUBLICATION_DELAY_MINUTES=4;
+const RADAR_CACHE_REFRESH_INTERVAL_MS=5*60*1000;
+const RADAR_IMAGE_LOAD_TIMEOUT_MS=30000;
 
 const radarState={
-baseTime:floorDateToFiveMinutes(new Date()),
+baseTime:getLatestPublishedRadarTime(),
 periodMinutes:60,
 intervalMinutes:5,
 frames:[],
@@ -602,7 +605,10 @@ autoRefreshEnabled:false,
 imageCache:new Map(),
 preloadRunId:0,
 activeLoadRunId:0,
+cacheRefreshTimer:null,
+cacheRefreshRunId:0,
 keyboardBound:false,
+resumeBound:false,
 resizeBound:false,
 resizeTimer:null,
 mapTool:null,
@@ -618,6 +624,10 @@ let out=new Date(date.getTime());
 out.setSeconds(0,0);
 out.setMinutes(Math.floor(out.getMinutes()/5)*5);
 return out;
+}
+
+function getLatestPublishedRadarTime(date=new Date()){
+return floorDateToFiveMinutes(new Date(date.getTime()-RADAR_PUBLICATION_DELAY_MINUTES*60*1000));
 }
 
 function roundDateToFiveMinutes(date){
@@ -1227,6 +1237,7 @@ radarState.resizeTimer=setTimeout(reloadRadarImagesForSizeChange,150);
 function resetRadarImageCache(){
 radarState.imageCache.clear();
 radarState.preloadRunId+=1;
+radarState.cacheRefreshRunId+=1;
 resetRadarFrameLoadStates();
 }
 
@@ -1326,15 +1337,14 @@ function refreshAllRadarFrameLoadStates(){
 radarState.frames.forEach((_,frameIndex)=>refreshRadarFrameLoadState(frameIndex));
 }
 
-function cacheRadarImage(url){
-if(!url){
-return Promise.resolve({status:'error',url});
+function getCacheBustedRadarUrl(url){
+let separator=url.includes('?') ? '&' : '?';
+return `${url}${separator}_cds_cache=${Date.now()}`;
 }
 
-let cached=radarState.imageCache.get(url);
-
-if(cached){
-return cached.promise;
+function loadRadarImage(url,{refresh=false}={}){
+if(!url){
+return Promise.resolve({status:'error',url});
 }
 
 let entry={
@@ -1347,22 +1357,89 @@ promise:null
 entry.promise=new Promise(resolve=>{
 let image=new Image();
 entry.image=image;
+let settled=false;
+let timeoutId=setTimeout(()=>{
+finish('error');
+},RADAR_IMAGE_LOAD_TIMEOUT_MS);
+
+function finish(status){
+if(settled){
+return;
+}
+
+settled=true;
+clearTimeout(timeoutId);
+entry.status=status;
+resolve(entry);
+}
 
 image.onload=()=>{
-entry.status='loaded';
-resolve(entry);
+if(image.decode){
+image.decode().then(()=>finish('loaded')).catch(()=>finish('loaded'));
+}
+else{
+finish('loaded');
+}
 };
 
 image.onerror=()=>{
-entry.status='error';
-resolve(entry);
+finish('error');
 };
 
-image.src=url;
+image.src=refresh ? getCacheBustedRadarUrl(url) : url;
 });
 
+return entry;
+}
+
+function cacheRadarImage(url){
+if(!url){
+return Promise.resolve({status:'error',url});
+}
+
+let cached=radarState.imageCache.get(url);
+
+if(cached){
+return cached.promise;
+}
+
+let entry=loadRadarImage(url);
 radarState.imageCache.set(url,entry);
 return entry.promise;
+}
+
+function createResolvedRadarCacheEntry(url,sourceEntry){
+let entry={
+url,
+status:sourceEntry.status,
+image:sourceEntry.image,
+promise:null,
+updatedAt:Date.now()
+};
+
+entry.promise=Promise.resolve(entry);
+return entry;
+}
+
+function getRadarImageDisplaySource(url,entry){
+return entry?.image?.currentSrc || entry?.image?.src || url;
+}
+
+function applyRadarImageEntry(paneElement,img,url,entry){
+if(!img || !entry || entry.status!=='loaded'){
+return false;
+}
+
+let source=getRadarImageDisplaySource(url,entry);
+
+if(img.getAttribute('src')!==source){
+img.src=source;
+}
+
+paneElement.dataset.renderedSrc=source;
+paneElement.classList.add('has-current-image');
+setRadarPaneError(paneElement,'');
+return true;
 }
 
 function getRadarPaneIndexes(paneIndexes){
@@ -1433,6 +1510,100 @@ loadNext();
 }
 }
 
+function getRefreshableRadarCacheUrls(){
+let seen=new Set();
+
+radarState.frames.forEach((_,frameIndex)=>{
+getRadarFrameUrls(frameIndex).forEach(url=>{
+let entry=radarState.imageCache.get(url);
+
+if(entry && entry.status!=='loading'){
+seen.add(url);
+}
+});
+});
+
+return [...seen];
+}
+
+function refreshRadarCacheInBackground(){
+let urls=getRefreshableRadarCacheUrls();
+
+if(!urls.length){
+return;
+}
+
+let runId=++radarState.cacheRefreshRunId;
+let nextIndex=0;
+let activeCount=0;
+let results=[];
+let concurrency=6;
+
+function finishIfDone(resolve){
+if(nextIndex>=urls.length && activeCount===0){
+resolve(results);
+}
+}
+
+let allDone=new Promise(resolve=>{
+function loadNext(){
+if(runId!==radarState.cacheRefreshRunId){
+resolve([]);
+return;
+}
+
+let url=urls[nextIndex++];
+
+if(!url){
+finishIfDone(resolve);
+return;
+}
+
+activeCount+=1;
+loadRadarImage(url,{refresh:true}).promise
+.then(entry=>results.push({url,entry}))
+.finally(()=>{
+activeCount-=1;
+loadNext();
+finishIfDone(resolve);
+});
+}
+
+for(let i=0;i<Math.min(concurrency,urls.length);i++){
+loadNext();
+}
+});
+
+allDone.then(refreshResults=>{
+if(runId!==radarState.cacheRefreshRunId || !refreshResults.length){
+return;
+}
+
+refreshResults.forEach(({url,entry})=>{
+let current=radarState.imageCache.get(url);
+
+if(!current || current.status==='loading'){
+return;
+}
+
+if(entry.status==='loaded' || current.status!=='loaded'){
+radarState.imageCache.set(url,createResolvedRadarCacheEntry(url,entry));
+}
+});
+
+refreshAllRadarFrameLoadStates();
+refreshRadarPaneImages();
+});
+}
+
+function startRadarCacheRefresh(){
+if(radarState.cacheRefreshTimer){
+clearInterval(radarState.cacheRefreshTimer);
+}
+
+radarState.cacheRefreshTimer=setInterval(refreshRadarCacheInBackground,RADAR_CACHE_REFRESH_INTERVAL_MS);
+}
+
 function setRadarPageLoading(pane,isLoading){
 pane.classList.toggle('is-loading',!!isLoading);
 }
@@ -1487,11 +1658,7 @@ setRadarPaneError(paneElement,'');
 paneElement.classList.toggle('has-current-image',hasCurrent);
 
 if(cached?.status==='loaded'){
-if(img && img.getAttribute('src')!==url){
-img.src=url;
-}
-
-paneElement.classList.add('has-current-image');
+applyRadarImageEntry(paneElement,img,url,cached);
 setRadarPageLoading(paneElement,false);
 return;
 }
@@ -1522,12 +1689,7 @@ return;
 }
 
 if(entry.status==='loaded' && img){
-if(img.getAttribute('src')!==url){
-img.src=url;
-}
-
-paneElement.classList.add('has-current-image');
-setRadarPaneError(paneElement,'');
+applyRadarImageEntry(paneElement,img,url,entry);
 }
 else{
 setRadarPaneError(paneElement,'레이더 이미지를 불러오지 못했습니다.');
@@ -1788,7 +1950,7 @@ setRadarBaseTime(new Date(radarState.baseTime.getTime()+minutes*60*1000));
 }
 
 function setRadarNow(){
-radarState.baseTime=floorDateToFiveMinutes(new Date());
+radarState.baseTime=getLatestPublishedRadarTime();
 syncRadarDateTimeInput();
 rebuildRadarTimelineAroundBase();
 }
@@ -1859,6 +2021,18 @@ stopRadarAutoRefresh();
 else{
 startRadarAutoRefresh();
 }
+}
+
+function syncRadarAfterResume(){
+if(!radarState.root){
+return;
+}
+
+updateRadarTimelineActiveState();
+updateRadarTimeLabel();
+refreshRadarPaneImages();
+preloadRadarImages();
+refreshRadarCacheInBackground();
 }
 
 function updateRadarAutoRefreshButton(){
@@ -3043,6 +3217,8 @@ viewer.className='radar-pane-viewer';
 let image=document.createElement('img');
 image.className='radar-pane-image';
 image.alt='레이더 이미지';
+image.loading='eager';
+image.decoding='sync';
 image.onclick=applyRadarMapClick;
 
 if(previousImageSource){
@@ -3126,6 +3302,16 @@ window.addEventListener('resize',scheduleRadarSizeRefresh);
 radarState.resizeBound=true;
 }
 
+if(!radarState.resumeBound){
+document.addEventListener('visibilitychange',()=>{
+if(document.visibilityState==='visible'){
+syncRadarAfterResume();
+}
+});
+window.addEventListener('focus',syncRadarAfterResume);
+radarState.resumeBound=true;
+}
+
 buildRadarFrames();
 radarState.activeIndex=Math.max(0,radarState.frames.length-1);
 
@@ -3165,6 +3351,7 @@ renderRadarTimeline();
 updateRadarTimeLabel();
 renderRadarPanes();
 preloadRadarImages();
+startRadarCacheRefresh();
 }
 
 function openRadarAnalysisPage(){
