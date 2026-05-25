@@ -592,6 +592,7 @@ root:null,
 timeline:null,
 timeLabel:null,
 dateInput:null,
+datePickerInput:null,
 timeInput:null,
 paneGrid:null,
 playButton:null,
@@ -642,11 +643,24 @@ function formatDateInput(date){
 return `${date.getFullYear()}-${pad2(date.getMonth()+1)}-${pad2(date.getDate())}`;
 }
 
+function formatDateDisplayInput(date){
+return `${date.getFullYear()}.${pad2(date.getMonth()+1)}.${pad2(date.getDate())}.`;
+}
+
+function formatDateTimeDisplayInput(date){
+return `${formatDateDisplayInput(date)} ${formatTimeInput(date)}`;
+}
+
+function formatNormalizedDateDisplay(value){
+let [year,month,day]=normalizeDateTextValue(value).split('-').map(Number);
+return `${String(year).padStart(4,'0')}.${pad2(month)}.${pad2(day)}.`;
+}
+
 function normalizeDateTextValue(value,fallbackValue=formatDateInput(new Date())){
 let raw=String(value || '').trim();
 let fallback=String(fallbackValue || formatDateInput(new Date()));
-let fallbackMatch=fallback.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-let match=raw.match(/^(\d{4})[-./\s]+(\d{1,2})[-./\s]+(\d{1,2})$/);
+let fallbackMatch=fallback.match(/^(\d{4})[-./\s]+(\d{1,2})[-./\s]+(\d{1,2})\.?$/);
+let match=raw.match(/^(\d{4})[-./\s]+(\d{1,2})[-./\s]+(\d{1,2})\.?$/);
 
 if(!match && /^\d{8}$/.test(raw)){
 match=raw.match(/^(\d{4})(\d{2})(\d{2})$/);
@@ -669,12 +683,10 @@ return `${String(year).padStart(4,'0')}-${pad2(month)}-${pad2(day)}`;
 
 function getValidDateInputValue(input){
 let value=String(input?.value || '');
-
-if(/^\d{4}-\d{2}-\d{2}$/.test(value)){
-return value;
-}
-
-return input?.dataset?.lastValidDate || formatDateInput(new Date());
+return normalizeDateTextValue(
+value,
+input?.dataset?.lastValidDate || formatDateInput(new Date())
+);
 }
 
 function normalizeDateInputYearValue(input){
@@ -836,13 +848,45 @@ text:`${pad2(hour)}:${pad2(roundedMinute)}`
 };
 }
 
+function normalizeDateTimeTextValue(value,fallbackDate=radarState.baseTime || new Date()){
+let raw=String(value || '').trim();
+let fallbackDateText=formatDateInput(fallbackDate);
+let fallbackTimeText=formatTimeInput(fallbackDate);
+let datePart='';
+let timePart='';
+let compact=raw.match(/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})$/);
+
+if(compact){
+datePart=`${compact[1]}-${compact[2]}-${compact[3]}`;
+timePart=`${compact[4]}:${compact[5]}`;
+}
+else{
+let dateTime=raw.match(/^(\d{4})[-./\s]+(\d{1,2})[-./\s]+(\d{1,2})\.?\s+(\d{1,2})(?::?(\d{2}))?$/);
+
+if(dateTime){
+datePart=`${dateTime[1]}-${dateTime[2]}-${dateTime[3]}`;
+timePart=`${dateTime[4]}:${dateTime[5] ?? '00'}`;
+}
+else{
+datePart=raw;
+}
+}
+
+let normalizedDate=normalizeDateTextValue(datePart,fallbackDateText);
+let normalizedTime=normalizeRadarTimeValue(timePart || fallbackTimeText) || normalizeRadarTimeValue(fallbackTimeText);
+let display=`${formatNormalizedDateDisplay(normalizedDate)} ${normalizedTime.text}`;
+return {
+date:normalizedDate,
+time:normalizedTime.text,
+display
+};
+}
+
 function parseLocalDateTime(dateValue,timeValue){
-let normalizedDate=normalizeDateTextValue(
-dateValue,
-formatDateInput(radarState.baseTime || new Date())
-);
+let dateTime=normalizeDateTimeTextValue(dateValue,radarState.baseTime || new Date());
+let normalizedDate=dateTime.date;
 let [year,month,day]=normalizedDate.split('-').map(Number);
-let normalizedTime=normalizeRadarTimeValue(timeValue);
+let normalizedTime=normalizeRadarTimeValue(timeValue || dateTime.time);
 
 if(!year || !month || !day || !normalizedTime){
 return radarState.baseTime || floorDateToFiveMinutes(new Date());
@@ -1847,7 +1891,7 @@ function setRadarBaseTime(date){
 radarState.baseTime=roundDateToFiveMinutes(date);
 
 if(radarState.dateInput){
-radarState.dateInput.value=formatDateInput(radarState.baseTime);
+radarState.dateInput.value=formatDateTimeDisplayInput(radarState.baseTime);
 }
 
 if(radarState.timeInput){
@@ -1865,7 +1909,7 @@ function setRadarNow(){
 radarState.baseTime=floorDateToFiveMinutes(new Date());
 
 if(radarState.dateInput){
-radarState.dateInput.value=formatDateInput(radarState.baseTime);
+radarState.dateInput.value=formatDateTimeDisplayInput(radarState.baseTime);
 }
 
 if(radarState.timeInput){
@@ -2521,6 +2565,192 @@ control.appendChild(panel);
 return control;
 }
 
+function createRadarDatePickerControl(dateInput){
+let control=document.createElement('div');
+control.className='radar-date-picker-control';
+
+let toggle=document.createElement('button');
+toggle.type='button';
+toggle.className='radar-date-picker-toggle';
+toggle.setAttribute('aria-label','날짜 선택');
+toggle.setAttribute('aria-expanded','false');
+
+let panel=document.createElement('div');
+panel.className='radar-date-picker-panel hidden';
+panel.onclick=event=>event.stopPropagation();
+let visibleMonth=new Date(radarState.baseTime.getFullYear(),radarState.baseTime.getMonth(),1);
+
+function getSelectedDateParts(){
+let normalized=normalizeDateTextValue(dateInput.value,formatDateInput(radarState.baseTime));
+let [year,month,day]=normalized.split('-').map(Number);
+return {year,month,day};
+}
+
+function selectDate(year,month,day){
+let selected=new Date(year,month-1,day,radarState.baseTime.getHours(),radarState.baseTime.getMinutes(),0,0);
+dateInput.value=formatDateDisplayInput(selected);
+setRadarBaseTime(parseLocalDateTime(formatDateInput(selected),radarState.timeInput.value));
+setPanelOpen(false);
+}
+
+function renderPanel(){
+let selected=getSelectedDateParts();
+let year=visibleMonth.getFullYear();
+let month=visibleMonth.getMonth();
+panel.innerHTML='';
+
+let header=document.createElement('div');
+header.className='radar-date-picker-header';
+
+let prev=document.createElement('button');
+prev.type='button';
+prev.className='radar-date-picker-nav';
+prev.textContent='‹';
+prev.onclick=event=>{
+event.stopPropagation();
+visibleMonth=new Date(year,month-1,1);
+renderPanel();
+};
+
+let title=document.createElement('div');
+title.className='radar-date-picker-title';
+
+let yearSelect=document.createElement('select');
+yearSelect.className='radar-date-picker-year-select';
+let currentYear=new Date().getFullYear();
+for(let optionYear=currentYear-10;optionYear<=currentYear+10;optionYear++){
+let option=document.createElement('option');
+option.value=String(optionYear);
+option.textContent=String(optionYear);
+yearSelect.appendChild(option);
+}
+yearSelect.value=String(year);
+yearSelect.onchange=event=>{
+event.stopPropagation();
+visibleMonth=new Date(Number(yearSelect.value),month,1);
+renderPanel();
+};
+
+let monthSelect=document.createElement('select');
+monthSelect.className='radar-date-picker-month-select';
+for(let optionMonth=0;optionMonth<12;optionMonth++){
+let option=document.createElement('option');
+option.value=String(optionMonth);
+option.textContent=`${pad2(optionMonth+1)}월`;
+monthSelect.appendChild(option);
+}
+monthSelect.value=String(month);
+monthSelect.onchange=event=>{
+event.stopPropagation();
+visibleMonth=new Date(year,Number(monthSelect.value),1);
+renderPanel();
+};
+
+title.appendChild(yearSelect);
+title.appendChild(monthSelect);
+
+let next=document.createElement('button');
+next.type='button';
+next.className='radar-date-picker-nav';
+next.textContent='›';
+next.onclick=event=>{
+event.stopPropagation();
+visibleMonth=new Date(year,month+1,1);
+renderPanel();
+};
+
+header.appendChild(prev);
+header.appendChild(title);
+header.appendChild(next);
+panel.appendChild(header);
+
+let grid=document.createElement('div');
+grid.className='radar-date-picker-grid';
+
+['일','월','화','수','목','금','토'].forEach((label,index)=>{
+let weekday=document.createElement('div');
+weekday.className='radar-date-picker-weekday'+(index===0 || index===6 ? ' weekend' : '');
+weekday.textContent=label;
+grid.appendChild(weekday);
+});
+
+let firstDay=new Date(year,month,1).getDay();
+let daysInMonth=new Date(year,month+1,0).getDate();
+
+for(let i=0;i<firstDay;i++){
+let blank=document.createElement('span');
+blank.className='radar-date-picker-blank';
+grid.appendChild(blank);
+}
+
+for(let day=1;day<=daysInMonth;day++){
+let dayButton=document.createElement('button');
+dayButton.type='button';
+dayButton.className='radar-date-picker-day';
+dayButton.textContent=String(day);
+
+let dayOfWeek=new Date(year,month,day).getDay();
+if(dayOfWeek===0 || dayOfWeek===6){
+dayButton.classList.add('weekend');
+}
+
+if(selected.year===year && selected.month===month+1 && selected.day===day){
+dayButton.classList.add('selected');
+}
+
+dayButton.onclick=event=>{
+event.stopPropagation();
+selectDate(year,month+1,day);
+};
+grid.appendChild(dayButton);
+}
+
+panel.appendChild(grid);
+}
+
+function positionPanel(){
+let dateRect=dateInput.getBoundingClientRect();
+let toggleRect=control.getBoundingClientRect();
+let width=Math.max(120,Math.round(toggleRect.right-dateRect.left));
+let left=Math.min(Math.max(8,dateRect.left),window.innerWidth-width-8);
+panel.style.left=`${left}px`;
+panel.style.top=`${toggleRect.bottom+1}px`;
+panel.style.width=`${width}px`;
+}
+
+function setPanelOpen(open){
+let isOpen=!!open;
+panel.classList.toggle('hidden',!isOpen);
+toggle.setAttribute('aria-expanded',String(isOpen));
+
+if(isOpen){
+let selected=getSelectedDateParts();
+visibleMonth=new Date(selected.year,selected.month-1,1);
+renderPanel();
+positionPanel();
+requestAnimationFrame(positionPanel);
+}
+}
+
+toggle.onclick=event=>{
+event.stopPropagation();
+setPanelOpen(panel.classList.contains('hidden'));
+};
+
+toggle.onkeydown=event=>{
+if(event.key==='Enter' || event.key===' '){
+event.preventDefault();
+event.stopPropagation();
+setPanelOpen(panel.classList.contains('hidden'));
+}
+};
+
+document.addEventListener('click',()=>setPanelOpen(false));
+control.appendChild(toggle);
+control.appendChild(panel);
+return control;
+}
+
 function createRadarTimePickerControl(timeInput){
 let control=document.createElement('div');
 control.className='radar-time-control';
@@ -2576,7 +2806,6 @@ hourTitle.className='radar-time-picker-title';
 hourTitle.textContent='시';
 let hourSelect=document.createElement('select');
 hourSelect.className='radar-time-picker-select radar-time-hour-select';
-hourSelect.size=8;
 
 for(let hour=0;hour<24;hour++){
 let option=document.createElement('option');
@@ -2597,7 +2826,6 @@ minuteTitle.className='radar-time-picker-title';
 minuteTitle.textContent='분';
 let minuteSelect=document.createElement('select');
 minuteSelect.className='radar-time-picker-select radar-time-minute-select';
-minuteSelect.size=8;
 
 for(let minute=0;minute<60;minute+=5){
 let option=document.createElement('option');
@@ -2663,6 +2891,305 @@ setPanelOpen(false);
 
 control.appendChild(timeInput);
 control.appendChild(toggle);
+control.appendChild(panel);
+return control;
+}
+
+function createRadarDateTimePickerControl(dateInput){
+let control=document.createElement('div');
+control.className='radar-datetime-picker-control';
+
+let timeToggle=document.createElement('button');
+timeToggle.type='button';
+timeToggle.className='radar-time-picker-toggle';
+timeToggle.setAttribute('aria-label','날짜와 시각 선택');
+timeToggle.setAttribute('aria-expanded','false');
+
+let panel=document.createElement('div');
+panel.className='radar-datetime-picker-panel hidden';
+panel.onclick=event=>event.stopPropagation();
+
+let visibleMonth=new Date(radarState.baseTime.getFullYear(),radarState.baseTime.getMonth(),1);
+let pendingDate=null;
+let pendingTime=null;
+
+function getCurrentDateParts(){
+let normalized=pendingDate || normalizeDateTimeTextValue(dateInput.value,radarState.baseTime).date;
+let [year,month,day]=normalized.split('-').map(Number);
+return {year,month,day,normalized};
+}
+
+function getCurrentTimeParts(){
+let normalized=pendingTime || normalizeRadarTimeValue(normalizeDateTimeTextValue(dateInput.value,radarState.baseTime).time);
+
+if(normalized){
+return {hour:normalized.hour,minute:normalized.minute};
+}
+
+return {
+hour:radarState.baseTime.getHours(),
+minute:Math.round(radarState.baseTime.getMinutes()/5)*5
+};
+}
+
+function queueDate(year,month,day){
+let selected=new Date(year,month-1,day,radarState.baseTime.getHours(),radarState.baseTime.getMinutes(),0,0);
+pendingDate=formatDateInput(selected);
+let currentTime=getCurrentTimeParts();
+dateInput.value=`${formatDateDisplayInput(selected)} ${pad2(currentTime.hour)}:${pad2(currentTime.minute)}`;
+renderPanel();
+}
+
+function queueTime(hour,minute){
+pendingTime={hour,minute};
+let currentDate=pendingDate || getCurrentDateParts().normalized;
+dateInput.value=`${formatNormalizedDateDisplay(currentDate)} ${pad2(hour)}:${pad2(minute)}`;
+}
+
+function commitPendingDateTime(){
+if(!pendingDate && !pendingTime){
+return;
+}
+
+let currentDateTime=normalizeDateTimeTextValue(dateInput.value,radarState.baseTime);
+let nextDate=pendingDate || currentDateTime.date;
+let nextTime=pendingTime ? `${pad2(pendingTime.hour)}:${pad2(pendingTime.minute)}` : currentDateTime.time;
+pendingDate=null;
+pendingTime=null;
+let normalizedTime=normalizeRadarTimeValue(nextTime)?.text || formatTimeInput(radarState.baseTime);
+dateInput.value=`${formatNormalizedDateDisplay(nextDate)} ${normalizedTime}`;
+setRadarBaseTime(parseLocalDateTime(dateInput.value));
+}
+
+function renderCalendar(){
+let selected=getCurrentDateParts();
+let year=visibleMonth.getFullYear();
+let month=visibleMonth.getMonth();
+let calendar=document.createElement('div');
+calendar.className='radar-date-picker-calendar';
+
+let header=document.createElement('div');
+header.className='radar-date-picker-header';
+
+let prev=document.createElement('button');
+prev.type='button';
+prev.className='radar-date-picker-nav';
+prev.textContent='‹';
+prev.onclick=event=>{
+event.stopPropagation();
+visibleMonth=new Date(year,month-1,1);
+renderPanel();
+};
+
+let title=document.createElement('div');
+title.className='radar-date-picker-title';
+
+let yearSelect=document.createElement('select');
+yearSelect.className='radar-date-picker-year-select';
+let currentYear=new Date().getFullYear();
+for(let optionYear=currentYear-10;optionYear<=currentYear+10;optionYear++){
+let option=document.createElement('option');
+option.value=String(optionYear);
+option.textContent=String(optionYear);
+yearSelect.appendChild(option);
+}
+yearSelect.value=String(year);
+yearSelect.onchange=event=>{
+event.stopPropagation();
+visibleMonth=new Date(Number(yearSelect.value),month,1);
+renderPanel();
+};
+
+let monthSelect=document.createElement('select');
+monthSelect.className='radar-date-picker-month-select';
+for(let optionMonth=0;optionMonth<12;optionMonth++){
+let option=document.createElement('option');
+option.value=String(optionMonth);
+option.textContent=`${pad2(optionMonth+1)}월`;
+monthSelect.appendChild(option);
+}
+monthSelect.value=String(month);
+monthSelect.onchange=event=>{
+event.stopPropagation();
+visibleMonth=new Date(year,Number(monthSelect.value),1);
+renderPanel();
+};
+
+title.appendChild(yearSelect);
+title.appendChild(monthSelect);
+
+let next=document.createElement('button');
+next.type='button';
+next.className='radar-date-picker-nav';
+next.textContent='›';
+next.onclick=event=>{
+event.stopPropagation();
+visibleMonth=new Date(year,month+1,1);
+renderPanel();
+};
+
+header.appendChild(prev);
+header.appendChild(title);
+header.appendChild(next);
+calendar.appendChild(header);
+
+let grid=document.createElement('div');
+grid.className='radar-date-picker-grid';
+
+['일','월','화','수','목','금','토'].forEach((label,index)=>{
+let weekday=document.createElement('div');
+weekday.className='radar-date-picker-weekday'+(index===0 || index===6 ? ' weekend' : '');
+weekday.textContent=label;
+grid.appendChild(weekday);
+});
+
+let firstDay=new Date(year,month,1).getDay();
+let daysInMonth=new Date(year,month+1,0).getDate();
+
+for(let i=0;i<firstDay;i++){
+let blank=document.createElement('span');
+blank.className='radar-date-picker-blank';
+grid.appendChild(blank);
+}
+
+for(let day=1;day<=daysInMonth;day++){
+let dayButton=document.createElement('button');
+dayButton.type='button';
+dayButton.className='radar-date-picker-day';
+dayButton.textContent=String(day);
+
+let dayOfWeek=new Date(year,month,day).getDay();
+if(dayOfWeek===0 || dayOfWeek===6){
+dayButton.classList.add('weekend');
+}
+
+if(selected.year===year && selected.month===month+1 && selected.day===day){
+dayButton.classList.add('selected');
+}
+
+dayButton.onclick=event=>{
+event.stopPropagation();
+queueDate(year,month+1,day);
+};
+grid.appendChild(dayButton);
+}
+
+calendar.appendChild(grid);
+return calendar;
+}
+
+function renderTimePicker(){
+let current=getCurrentTimeParts();
+let wrap=document.createElement('div');
+wrap.className='radar-datetime-time-section';
+
+let label=document.createElement('div');
+label.className='radar-datetime-time-label';
+label.textContent='시각';
+
+let hourInput=document.createElement('input');
+hourInput.type='number';
+hourInput.className='radar-time-picker-number radar-time-hour-input';
+hourInput.min='0';
+hourInput.max='23';
+hourInput.step='1';
+hourInput.value=pad2(current.hour);
+
+let colon=document.createElement('span');
+colon.className='radar-datetime-time-colon';
+colon.textContent=':';
+
+let minuteInput=document.createElement('input');
+minuteInput.type='number';
+minuteInput.className='radar-time-picker-number radar-time-minute-input';
+minuteInput.min='0';
+minuteInput.max='55';
+minuteInput.step='5';
+minuteInput.value=pad2(current.minute);
+
+function clampTimeInputs(){
+let hour=Math.max(0,Math.min(23,Number.parseInt(hourInput.value,10) || 0));
+let minute=Math.max(0,Math.min(55,Number.parseInt(minuteInput.value,10) || 0));
+minute=Math.round(minute/5)*5;
+hourInput.value=pad2(hour);
+minuteInput.value=pad2(minute);
+queueTime(hour,minute);
+}
+
+hourInput.onchange=clampTimeInputs;
+hourInput.onblur=clampTimeInputs;
+minuteInput.onchange=clampTimeInputs;
+minuteInput.onblur=clampTimeInputs;
+[hourInput,minuteInput].forEach(input=>{
+input.onkeydown=event=>{
+if(event.key==='Enter'){
+event.currentTarget.blur();
+}
+};
+});
+
+wrap.appendChild(label);
+wrap.appendChild(hourInput);
+wrap.appendChild(colon);
+wrap.appendChild(minuteInput);
+return wrap;
+}
+
+function renderPanel(){
+panel.innerHTML='';
+panel.appendChild(renderCalendar());
+panel.appendChild(renderTimePicker());
+}
+
+function positionPanel(){
+let dateRect=dateInput.getBoundingClientRect();
+let controlRect=control.getBoundingClientRect();
+let width=Math.round(controlRect.right-dateRect.left);
+let left=Math.min(Math.max(8,dateRect.left),window.innerWidth-width-8);
+panel.style.left=`${left}px`;
+panel.style.top=`${controlRect.bottom+1}px`;
+panel.style.width=`${width}px`;
+}
+
+function setPanelOpen(open){
+let isOpen=!!open;
+let wasOpen=!panel.classList.contains('hidden');
+
+if(!isOpen && wasOpen){
+commitPendingDateTime();
+}
+
+panel.classList.toggle('hidden',!isOpen);
+timeToggle.setAttribute('aria-expanded',String(isOpen));
+
+if(isOpen){
+let selected=getCurrentDateParts();
+visibleMonth=new Date(selected.year,selected.month-1,1);
+pendingDate=null;
+pendingTime=null;
+renderPanel();
+positionPanel();
+requestAnimationFrame(positionPanel);
+}
+}
+
+function togglePanel(event){
+event.stopPropagation();
+setPanelOpen(panel.classList.contains('hidden'));
+}
+
+timeToggle.onclick=togglePanel;
+
+timeToggle.onkeydown=event=>{
+if(event.key==='Enter' || event.key===' '){
+event.preventDefault();
+togglePanel(event);
+}
+};
+
+document.addEventListener('click',()=>setPanelOpen(false));
+
+control.appendChild(timeToggle);
 control.appendChild(panel);
 return control;
 }
@@ -2802,38 +3329,20 @@ playbackRow.appendChild(nowBtn);
 
 let dateInput=document.createElement('input');
 dateInput.type='text';
-dateInput.className='radar-date-input';
+dateInput.className='radar-datetime-input';
 dateInput.inputMode='numeric';
-dateInput.maxLength=10;
-dateInput.placeholder='YYYY-MM-DD';
-dateInput.value=formatDateInput(radarState.baseTime);
-let dateInputCommitTimer=null;
+dateInput.maxLength=17;
+dateInput.placeholder='YYYY.MM.DD. HH:mm';
+dateInput.autocomplete='off';
+dateInput.spellcheck=false;
+dateInput.value=formatDateTimeDisplayInput(radarState.baseTime);
 let commitRadarDateInput=()=>{
-if(dateInputCommitTimer){
-clearTimeout(dateInputCommitTimer);
-dateInputCommitTimer=null;
-}
-dateInput.value=normalizeDateTextValue(dateInput.value,formatDateInput(radarState.baseTime));
-setRadarBaseTime(parseLocalDateTime(dateInput.value,radarState.timeInput.value));
-};
-let scheduleRadarDateInputCommit=()=>{
-let raw=dateInput.value.trim();
-
-if(
-/^\d{4}$/.test(raw) ||
-/^\d{8}$/.test(raw) ||
-/^\d{4}[-./\s]+\d{1,2}[-./\s]+\d{1,2}$/.test(raw)
-){
-if(dateInputCommitTimer){
-clearTimeout(dateInputCommitTimer);
-}
-
-dateInputCommitTimer=setTimeout(commitRadarDateInput,700);
-}
+let normalizedDateTime=normalizeDateTimeTextValue(dateInput.value,radarState.baseTime);
+dateInput.value=normalizedDateTime.display;
+setRadarBaseTime(parseLocalDateTime(dateInput.value));
 };
 dateInput.oninput=()=>{
-dateInput.value=dateInput.value.replace(/[^\d.\-/\s]/g,'').slice(0,10);
-scheduleRadarDateInputCommit();
+dateInput.value=dateInput.value.replace(/[^\d.\-/\s:]/g,'').slice(0,17);
 };
 dateInput.onchange=commitRadarDateInput;
 dateInput.onblur=commitRadarDateInput;
@@ -2844,23 +3353,9 @@ event.currentTarget.blur();
 }
 };
 radarState.dateInput=dateInput;
+radarState.timeInput=null;
 
-let timeInput=document.createElement('input');
-timeInput.type='text';
-timeInput.className='radar-time-input';
-timeInput.inputMode='numeric';
-timeInput.maxLength=5;
-timeInput.placeholder='HH:mm';
-timeInput.value=formatTimeInput(radarState.baseTime);
-timeInput.onchange=()=>setRadarBaseTime(parseLocalDateTime(radarState.dateInput.value,timeInput.value));
-timeInput.onkeydown=event=>{
-if(event.key==='Enter'){
-event.currentTarget.blur();
-}
-};
-radarState.timeInput=timeInput;
-
-playbackRow.appendChild(createRadarButtonGroup('radar-datetime-group',[dateInput,createRadarTimePickerControl(timeInput)]));
+playbackRow.appendChild(createRadarButtonGroup('radar-datetime-group',[dateInput,createRadarDateTimePickerControl(dateInput)]));
 
 let shiftControls=document.createElement('div');
 shiftControls.className='radar-shift-controls';
