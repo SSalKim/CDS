@@ -642,6 +642,147 @@ function formatDateInput(date){
 return `${date.getFullYear()}-${pad2(date.getMonth()+1)}-${pad2(date.getDate())}`;
 }
 
+function normalizeDateTextValue(value,fallbackValue=formatDateInput(new Date())){
+let raw=String(value || '').trim();
+let fallback=String(fallbackValue || formatDateInput(new Date()));
+let fallbackMatch=fallback.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+let match=raw.match(/^(\d{4})[-./\s]+(\d{1,2})[-./\s]+(\d{1,2})$/);
+
+if(!match && /^\d{8}$/.test(raw)){
+match=raw.match(/^(\d{4})(\d{2})(\d{2})$/);
+}
+
+if(!match && /^\d{4}$/.test(raw) && fallbackMatch){
+match=[raw,raw,fallbackMatch[2],fallbackMatch[3]];
+}
+
+if(!match){
+return fallbackMatch ? fallback : formatDateInput(new Date());
+}
+
+let year=Math.max(1,Math.min(9999,Number(match[1])));
+let month=Math.max(1,Math.min(12,Number(match[2])));
+let maxDay=new Date(year,month,0).getDate();
+let day=Math.max(1,Math.min(maxDay,Number(match[3])));
+return `${String(year).padStart(4,'0')}-${pad2(month)}-${pad2(day)}`;
+}
+
+function getValidDateInputValue(input){
+let value=String(input?.value || '');
+
+if(/^\d{4}-\d{2}-\d{2}$/.test(value)){
+return value;
+}
+
+return input?.dataset?.lastValidDate || formatDateInput(new Date());
+}
+
+function normalizeDateInputYearValue(input){
+if(!input){
+return false;
+}
+
+let value=String(input.value || '');
+let extended=value.match(/^(\d{5,})-(\d{2})-(\d{2})$/);
+
+if(extended){
+input.value=`${extended[1].slice(0,4)}-${extended[2]}-${extended[3]}`;
+}
+
+if(/^\d{4}-\d{2}-\d{2}$/.test(input.value)){
+input.dataset.lastValidDate=input.value;
+return true;
+}
+
+return false;
+}
+
+function setDateInputYear(input,yearText){
+if(!input || !/^\d{4}$/.test(yearText)){
+return;
+}
+
+let [,month,day]=getValidDateInputValue(input).split('-').map(Number);
+let year=Number(yearText);
+let maxDay=new Date(year,month,0).getDate();
+let safeDay=Math.min(day,maxDay);
+input.value=`${yearText}-${pad2(month)}-${pad2(safeDay)}`;
+input.dataset.lastValidDate=input.value;
+input.dispatchEvent(new Event('change',{bubbles:true}));
+}
+
+function attachDateInputYearKeyboardFix(input){
+if(!input || input.dataset.dateYearFixBound==='1'){
+return;
+}
+
+input.dataset.dateYearFixBound='1';
+input.dataset.lastValidDate=getValidDateInputValue(input);
+let activePart='year';
+let yearBuffer='';
+let lastDigitAt=0;
+
+function resolveDatePart(event){
+let rect=input.getBoundingClientRect();
+let x=event.clientX-rect.left;
+let editableWidth=Math.max(1,rect.width-28);
+
+if(x<=editableWidth*.48){
+return 'year';
+}
+
+return x<=editableWidth*.72 ? 'month' : 'day';
+}
+
+input.addEventListener('pointerdown',event=>{
+activePart=resolveDatePart(event);
+yearBuffer='';
+});
+
+input.addEventListener('focus',()=>{
+activePart=activePart || 'year';
+yearBuffer='';
+normalizeDateInputYearValue(input);
+});
+
+input.addEventListener('keydown',event=>{
+if(event.ctrlKey || event.metaKey || event.altKey){
+return;
+}
+
+if(/^\d$/.test(event.key) && activePart==='year'){
+event.preventDefault();
+let now=Date.now();
+
+if(now-lastDigitAt>1600 || yearBuffer.length>=4){
+yearBuffer='';
+}
+
+lastDigitAt=now;
+yearBuffer+=event.key;
+
+if(yearBuffer.length===4){
+setDateInputYear(input,yearBuffer);
+yearBuffer='';
+}
+}
+else if(event.key==='Enter'){
+yearBuffer='';
+input.blur();
+}
+else if(event.key==='Tab' || event.key.startsWith('Arrow')){
+yearBuffer='';
+}
+});
+
+input.addEventListener('change',()=>normalizeDateInputYearValue(input));
+input.addEventListener('blur',()=>{
+yearBuffer='';
+activePart='year';
+normalizeDateInputYearValue(input);
+});
+}
+
 function formatTimeInput(date){
 return `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
 }
@@ -696,7 +837,11 @@ text:`${pad2(hour)}:${pad2(roundedMinute)}`
 }
 
 function parseLocalDateTime(dateValue,timeValue){
-let [year,month,day]=String(dateValue || '').split('-').map(Number);
+let normalizedDate=normalizeDateTextValue(
+dateValue,
+formatDateInput(radarState.baseTime || new Date())
+);
+let [year,month,day]=normalizedDate.split('-').map(Number);
 let normalizedTime=normalizeRadarTimeValue(timeValue);
 
 if(!year || !month || !day || !normalizedTime){
@@ -1017,6 +1162,10 @@ radarState.lightning.interval=normalizeRadarLightningInterval(interval);
 if(reload && radarState.lightning.enabled){
 applyRadarLightningSettings();
 }
+}
+
+function notifyRadarOverlayDropdownOpen(source){
+document.dispatchEvent(new CustomEvent('radarOverlayDropdownOpen',{detail:{source}}));
 }
 
 function applyRadarMapClick(event){
@@ -1936,7 +2085,13 @@ panel.style.top=`${rect.bottom+5}px`;
 }
 
 function setPanelOpen(open){
-radarState.wind.open=!!open;
+let nextOpen=!!open;
+
+if(nextOpen && !radarState.wind.open){
+notifyRadarOverlayDropdownOpen('wind');
+}
+
+radarState.wind.open=nextOpen;
 panel.classList.toggle('hidden',!radarState.wind.open);
 checkLabel.setAttribute('aria-expanded',String(radarState.wind.open));
 if(radarState.wind.open){
@@ -1947,6 +2102,11 @@ requestAnimationFrame(positionPanel);
 
 document.addEventListener('click',()=>{
 setPanelOpen(false);
+});
+document.addEventListener('radarOverlayDropdownOpen',event=>{
+if(event.detail?.source!=='wind'){
+setPanelOpen(false);
+}
 });
 
 let modeGroup=document.createElement('div');
@@ -2103,6 +2263,11 @@ applyRadarStationSettings();
 function setPanelOpen(open){
 let nextOpen=!!open;
 let wasOpen=radarState.station.open;
+
+if(nextOpen && !wasOpen){
+notifyRadarOverlayDropdownOpen('station');
+}
+
 radarState.station.open=nextOpen;
 
 if(!nextOpen && wasOpen){
@@ -2122,6 +2287,11 @@ requestAnimationFrame(positionPanel);
 }
 
 document.addEventListener('click',()=>setPanelOpen(false));
+document.addEventListener('radarOverlayDropdownOpen',event=>{
+if(event.detail?.source!=='station'){
+setPanelOpen(false);
+}
+});
 
 let densityGroup=document.createElement('div');
 densityGroup.className='radar-wind-mode-group radar-station-density-group';
@@ -2254,6 +2424,11 @@ applyRadarLightningSettings();
 function setPanelOpen(open){
 let nextOpen=!!open;
 let wasOpen=radarState.lightning.open;
+
+if(nextOpen && !wasOpen){
+notifyRadarOverlayDropdownOpen('lightning');
+}
+
 radarState.lightning.open=nextOpen;
 
 if(!nextOpen && wasOpen){
@@ -2273,6 +2448,11 @@ requestAnimationFrame(positionPanel);
 }
 
 document.addEventListener('click',()=>setPanelOpen(false));
+document.addEventListener('radarOverlayDropdownOpen',event=>{
+if(event.detail?.source!=='lightning'){
+setPanelOpen(false);
+}
+});
 
 let typeGroup=document.createElement('div');
 typeGroup.className='radar-wind-mode-group radar-lightning-type-group';
@@ -2621,10 +2801,48 @@ nowBtn.onclick=setRadarNow;
 playbackRow.appendChild(nowBtn);
 
 let dateInput=document.createElement('input');
-dateInput.type='date';
+dateInput.type='text';
 dateInput.className='radar-date-input';
+dateInput.inputMode='numeric';
+dateInput.maxLength=10;
+dateInput.placeholder='YYYY-MM-DD';
 dateInput.value=formatDateInput(radarState.baseTime);
-dateInput.onchange=()=>setRadarBaseTime(parseLocalDateTime(dateInput.value,radarState.timeInput.value));
+let dateInputCommitTimer=null;
+let commitRadarDateInput=()=>{
+if(dateInputCommitTimer){
+clearTimeout(dateInputCommitTimer);
+dateInputCommitTimer=null;
+}
+dateInput.value=normalizeDateTextValue(dateInput.value,formatDateInput(radarState.baseTime));
+setRadarBaseTime(parseLocalDateTime(dateInput.value,radarState.timeInput.value));
+};
+let scheduleRadarDateInputCommit=()=>{
+let raw=dateInput.value.trim();
+
+if(
+/^\d{4}$/.test(raw) ||
+/^\d{8}$/.test(raw) ||
+/^\d{4}[-./\s]+\d{1,2}[-./\s]+\d{1,2}$/.test(raw)
+){
+if(dateInputCommitTimer){
+clearTimeout(dateInputCommitTimer);
+}
+
+dateInputCommitTimer=setTimeout(commitRadarDateInput,700);
+}
+};
+dateInput.oninput=()=>{
+dateInput.value=dateInput.value.replace(/[^\d.\-/\s]/g,'').slice(0,10);
+scheduleRadarDateInputCommit();
+};
+dateInput.onchange=commitRadarDateInput;
+dateInput.onblur=commitRadarDateInput;
+dateInput.onkeydown=event=>{
+if(event.key==='Enter'){
+commitRadarDateInput();
+event.currentTarget.blur();
+}
+};
 radarState.dateInput=dateInput;
 
 let timeInput=document.createElement('input');

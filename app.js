@@ -378,20 +378,16 @@ if(!runDate || !runDate.value){
 return;
 }
 
-/*
-Native date input allows extended years in some browsers.
-Clamp only clearly extended YYYY...-MM-DD values; keep valid normal values unchanged.
-*/
-let match=runDate.value.match(/^(\d{5,})-(\d{2})-(\d{2})$/);
-
-if(!match){
+if(typeof normalizeDateInputYearValue==='function'){
+normalizeDateInputYearValue(runDate);
 return;
 }
 
-let year=match[1].slice(0,4);
-let month=match[2];
-let day=match[3];
-runDate.value=`${year}-${month}-${day}`;
+let match=runDate.value.match(/^(\d{5,})-(\d{2})-(\d{2})$/);
+
+if(match){
+runDate.value=`${match[1].slice(0,4)}-${match[2]}-${match[3]}`;
+}
 
 }
 
@@ -2184,8 +2180,17 @@ return;
 
 });
 
+runDate.min='1900-01-01';
+runDate.max='2099-12-31';
 runDate.onchange=handleRunDateChanged;
-runDate.addEventListener('input',normalizeRunDateYearInput);
+
+if(typeof attachDateInputYearKeyboardFix==='function'){
+attachDateInputYearKeyboardFix(runDate);
+}
+else{
+runDate.addEventListener('blur',normalizeRunDateYearInput);
+}
+
 runHour.onchange=handleRunHourChanged;
 
 kstBtn.onclick=()=>switchTimeMode('KST');
