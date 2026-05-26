@@ -188,8 +188,12 @@ let sorted=[...new Set(cycles.map(Number))]
 .filter(h=>!Number.isNaN(h))
 .sort((a,b)=>a-b);
 
-if(sorted.length<=1){
+if(sorted.length===0){
 return 6;
+}
+
+if(sorted.length===1){
+return 24;
 }
 
 let minStep=24;

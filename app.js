@@ -784,6 +784,17 @@ return isNmscSatelliteUrl(url) &&
 
 }
 
+function isNmscMtDryAirUrl(url){
+
+return isNmscSatelliteUrl(url) &&
+(
+url.includes('/L2/mT_DAI/') ||
+url.includes('gk2a_ami_le2_dai_') ||
+url.includes('gk2a_ami_le2_dab-')
+);
+
+}
+
 function setSingleImageDisplayMode(){
 
 chartImages.classList.remove('compare-images','fit-screen','fixed-size','layout-auto','layout-manual','compare-single','single-images');
@@ -855,9 +866,29 @@ return slot;
 
 }
 
+function applyNmscMtStackMode(stack,urls){
+
+if(!stack || !Array.isArray(urls) || !urls.some(isNmscMtDryAirUrl)){
+return;
+}
+
+stack.classList.add('nmsc-mt-stack');
+
+let maxHeight=viewerWrap?.clientHeight
+?Math.max(240,viewerWrap.clientHeight-8)
+:null;
+
+if(maxHeight){
+stack.style.setProperty('--nmsc-mt-max-height',`${maxHeight}px`);
+}
+
+}
+
 function renderNmscPreparedImages(urls,preparedImages){
 
 let {stack}=createSingleImageDisplayShell({nmsc:true});
+
+applyNmscMtStackMode(stack,urls);
 
 if(
 urls.some(isNmscEastAsiaUrl) &&
@@ -893,6 +924,8 @@ async function showProgressiveCharts(urls,{requestId,attempt=0,hadPreviousImage=
 
 let {stack}=createSingleImageDisplayShell({nmsc:true});
 let loadedImages=[];
+
+applyNmscMtStackMode(stack,urls);
 
 if(
 urls.some(isNmscEastAsiaUrl) &&

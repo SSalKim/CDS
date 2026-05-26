@@ -1158,6 +1158,48 @@ conf_rain_intensities:{
   ]
 },
 
+sstRegions:{
+  type: "region",
+  items:[
+    {
+      type: "item",
+      value: "glob",
+      label: "전구"
+    },
+    {
+      type: "item",
+      value: "rdps",
+      label: "아시아"
+    },
+    {
+      type: "item",
+      value: "korea",
+      label: "한반도"
+    }
+  ]
+},
+
+astdLevels:{
+  type: "height",
+  items:[
+    {
+      type: "item",
+      value: "700hpa",
+      label: "700hPa"
+    },
+    {
+      type: "item",
+      value: "850hpa",
+      label: "850hPa"
+    },
+    {
+      type: "item",
+      value: "925hpa",
+      label: "925hPa"
+    }
+  ]
+},
+
 };
 
 

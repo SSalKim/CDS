@@ -100,7 +100,9 @@ id:'observation_hidden',
 label:'관측',
 hidden:true,
 models:[
-['obs_upper','OBS_UPPER']
+['obs_upper','OBS_UPPER'],
+['sat_gk2a','SAT_GK2A'],
+['usst','USST']
 ]
 },
 

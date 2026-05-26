@@ -16,8 +16,9 @@ const ANALYSIS_CATEGORIES=[
 {type:"header", name:"─────────────────"},
 {id:"grtopo",name:"지형과바람"},
 {type:"header", name:"─────────────────"},
+{id:"ssta",name:"해수면온도"},
+{type:"header", name:"─────────────────"},
 {id:"dust",name:"황사일기도"},
-
 ];
 
 const HOURLY_CYCLES=[
@@ -588,6 +589,30 @@ const ANALYSIS_PRODUCTS=[
         um_anal:[0,12]
     }
 },
+{category:"axas",id:"axrg",label:"종합장(지역)",
+    patternByModel:{
+        um_anal:[
+            "r3oi_lc30_anal_axfe03_pb4_{run}.gif",
+            "r3oi_lc30_anal_axfe04_pb4_{run}.gif",
+        ],
+        ecmwf_ra:[
+            "r3oi_lc30_anal_axfe03_pb4_{run}.gif",
+            "r3oi_lc30_anal_axfe04_pb4_{run}.gif",
+        ],
+    },
+    folderByModel:{
+        ecmwf_ra:"ANAL",
+    },
+    archiveStartByModel:{
+        um_anal:"2002-09-01",
+    },
+    archiveEndByModel:{
+        ecmwf_ra:"2002-08-31"
+    },
+    cyclesByModel:{
+        um_anal:[0,12]
+    }
+},
 {category:"axas",id:"irdf",label:"적외분석장",
     patternByModel:{
         kim_anal:[
@@ -626,29 +651,35 @@ const ANALYSIS_PRODUCTS=[
         um_anal:[0,12]
     }
 },
-{category:"axas",id:"axrg",label:"종합장(지역)",
+{category:"axas", id:"mt_dai", label:"위성센터: mT 상층 건조역 강도",
     patternByModel:{
-        um_anal:[
-            "r3oi_lc30_anal_axfe03_pb4_{run}.gif",
-            "r3oi_lc30_anal_axfe04_pb4_{run}.gif",
-        ],
-        ecmwf_ra:[
-            "r3oi_lc30_anal_axfe03_pb4_{run}.gif",
-            "r3oi_lc30_anal_axfe04_pb4_{run}.gif",
-        ],
-    },
-    folderByModel:{
-        ecmwf_ra:"ANAL",
+        sat_gk2a:[
+            "https://nmsc.kma.go.kr/IMG/GK2A/AMI/L2/mT_DAI/EA/{ym}/{day}/{hour}/gk2a_ami_le2_dai_ea020lc_{runmin}.png",
+        ]
     },
     archiveStartByModel:{
-        um_anal:"2002-09-01",
+        sat_gk2a:"2022-06-15"
     },
-    archiveEndByModel:{
-        ecmwf_ra:"2002-08-31"
+},
+{category:"axas", id:"mt_dab_d", label:"위성센터: mT 상층 건조역 경계변화(동적)",
+    patternByModel:{
+        sat_gk2a:[
+            "https://nmsc.kma.go.kr/IMG/GK2A/AMI/L2/mT_DAI/EA/{ym}/{day}/{hour}/gk2a_ami_le2_dab-d_ea020lc_{runmin}.png",
+        ]
     },
-    cyclesByModel:{
-        um_anal:[0,12]
-    }
+    archiveStartByModel:{
+        sat_gk2a:"2022-06-15"
+    },
+},
+{category:"axas", id:"mt_dab_s", label:"위성센터: mT 상층 건조역 경계변화(정적)",
+    patternByModel:{
+        sat_gk2a:[
+            "https://nmsc.kma.go.kr/IMG/GK2A/AMI/L2/mT_DAI/EA/{ym}/{day}/{hour}/gk2a_ami_le2_dab-s_ea020lc_{runmin}.png",
+        ]
+    },
+    archiveStartByModel:{
+        sat_gk2a:"2022-06-15"
+    },
 },
 
 /* 북반구분석도 */
@@ -849,6 +880,30 @@ const ANALYSIS_PRODUCTS=[
     }
 },
 
+/* 해수면온도 */
+{category:"ssta",id:"usst_anal",label:"분석",
+    patternByModel:{
+        usst:"usst_{detail}_anal_{run}.gif"
+    },
+    folderByModel:{
+        usst:"EXTJ"
+    },
+},
+{category:"ssta",id:"usst_anom",label:"편차",
+    patternByModel:{
+        usst:"usst_{detail}_anom_{run}.gif"
+    },
+    folderByModel:{
+        usst:"EXTJ"
+    }
+},
+{category:"ssta",id:"gk2a_astd",label:"위성센터: 해기차",
+    patternByModel:{
+        sat_gk2a:"https://nmsc.kma.go.kr/IMG/GK2A/AMI/L2/ASTD/KO/{ym}/{day}/{hour}/gk2a_ami_le2_astd_{detail}_ko060lc_{runmin}.png",
+    }
+},
+
+/* 황사일기도 */
 {category:"dust",id:"smsand",label:"황사일기도",
     patternByModel:{
         kim_anal:[
@@ -903,6 +958,42 @@ allowModelSwitch:true
 "asia:sfc1_ptrend":{
 allowedModels:["kas"],
 fallbackModel:"kas",
+allowModelSwitch:true
+},
+
+"axas:mt_dai":{
+allowedModels:["sat_gk2a"],
+fallbackModel:"sat_gk2a",
+allowModelSwitch:true
+},
+
+"axas:mt_dab_d":{
+allowedModels:["sat_gk2a"],
+fallbackModel:"sat_gk2a",
+allowModelSwitch:true
+},
+
+"axas:mt_dab_s":{
+allowedModels:["sat_gk2a"],
+fallbackModel:"sat_gk2a",
+allowModelSwitch:true
+},
+
+"ssta:usst_anal":{
+allowedModels:["usst"],
+fallbackModel:"usst",
+allowModelSwitch:true
+},
+
+"ssta:usst_anom":{
+allowedModels:["usst"],
+fallbackModel:"usst",
+allowModelSwitch:true
+},
+
+"ssta:gk2a_astd":{
+allowedModels:["sat_gk2a"],
+fallbackModel:"sat_gk2a",
 allowModelSwitch:true
 }
 

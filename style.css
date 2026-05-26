@@ -1398,6 +1398,18 @@ option.group-header{
   width:auto !important;
 }
 
+.single-image-stack.nmsc-image-stack.nmsc-mt-stack{
+  align-items:center;
+}
+
+.single-image-stack.nmsc-image-stack.nmsc-mt-stack img.nmsc-mt-image{
+  width:auto !important;
+  height:auto !important;
+  max-width:calc(100vw - 24px) !important;
+  max-height:var(--nmsc-mt-max-height,calc(100vh - 190px)) !important;
+  object-fit:contain;
+}
+
 .single-image-stack.nmsc-image-stack.nmsc-wait-for-ko:not(.nmsc-has-ko-height) .nmsc-ea-slot img{
   visibility:hidden;
 }

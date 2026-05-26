@@ -315,6 +315,14 @@ img.classList.add('nmsc-ea-image');
 if(url.includes('/KO/') || url.includes('_ko020lc_')){
 img.classList.add('nmsc-ko-image');
 }
+
+if(
+url.includes('/L2/mT_DAI/') ||
+url.includes('gk2a_ami_le2_dai_') ||
+url.includes('gk2a_ami_le2_dab-')
+){
+img.classList.add('nmsc-mt-image');
+}
 }
 
 return img;

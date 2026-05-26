@@ -349,6 +349,20 @@ archiveStart:"1957-04-01",
 cycles:[0,6,12,18]
 },
 
+sat_gk2a:{
+name:"SAT_GK2A",
+folder:"SAT",
+archiveStart:"2022-06-15",
+cycles:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23]
+},
+
+usst:{
+name:"USST",
+folder:"EXTJ",
+archiveStart:"2004-02-12",
+cycles:[0]
+},
+
 edit_chart:{
 name:"MANUAL_CHART",
 folder:"MAN",

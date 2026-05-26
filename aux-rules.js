@@ -118,6 +118,20 @@ conf_rain_intensity:{
   defaultValue:'no1'
 },
 
+sstRegion:{
+  title:'지역',
+  widthClass:'narrow',
+  optionSet:'sstRegions',
+  defaultValue:'glob'
+},
+
+astdLevel:{
+  title:'고도',
+  widthClass:'narrow',
+  optionSet:'astdLevels',
+  defaultValue:'700hpa'
+},
+
 };
 
 const AUX_USAGE_RULES={
@@ -143,6 +157,15 @@ analysis:{
   },
   grtopo:{
     selector:'localArea'
+  },
+  "ssta:usst_anal":{
+    selector:'sstRegion'
+  },
+  "ssta:usst_anom":{
+    selector:'sstRegion'
+  },
+  "ssta:gk2a_astd":{
+    selector:'astdLevel'
   }
 },
 
