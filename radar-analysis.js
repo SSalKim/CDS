@@ -1,4 +1,6 @@
-/* Radar analysis standalone page and sidebar launcher. */
+/* Radar analysis standalone page and sidebar launcher.
+   Loop/cache patch: playback skips uncached frames, avoids background UI refresh while playing,
+   and retries previously failed image loads during preload/current-frame requests. */
 
 const RADAR_CMP_IMAGE_URL='https://radar.kma.go.kr/cgi-bin/nph-rdr_cmp_img';
 const RADAR_SFC_PTY_IMAGE_URL='https://radar.kma.go.kr/cgi-bin/center/nph-rdr_sfc_pty_img';
@@ -604,6 +606,7 @@ autoRefreshTimer:null,
 autoRefreshEnabled:false,
 imageCache:new Map(),
 preloadRunId:0,
+playbackPreloadAt:0,
 cacheRefreshTimer:null,
 cacheRefreshRunId:0,
 keyboardBound:false,
@@ -1336,6 +1339,20 @@ function refreshAllRadarFrameLoadStates(){
 radarState.frames.forEach((_,frameIndex)=>refreshRadarFrameLoadState(frameIndex));
 }
 
+function getNextRadarLoopIndex(){
+let count=radarState.frames.length;
+
+for(let offset=1;offset<count;offset++){
+let index=(radarState.activeIndex+offset)%count;
+
+if(getRadarFrameCacheState(index)==='available'){
+return index;
+}
+}
+
+return radarState.activeIndex;
+}
+
 function getCacheBustedRadarUrl(url){
 let separator=url.includes('?') ? '&' : '?';
 return `${url}${separator}_cds_cache=${Date.now()}`;
@@ -1391,14 +1408,14 @@ image.src=refresh ? getCacheBustedRadarUrl(url) : url;
 return entry;
 }
 
-function cacheRadarImage(url){
+function cacheRadarImage(url,{retryError=false}={}){
 if(!url){
 return Promise.resolve({status:'error',url});
 }
 
 let cached=radarState.imageCache.get(url);
 
-if(cached){
+if(cached && !(retryError && cached.status==='error')){
 return cached.promise;
 }
 
@@ -1522,7 +1539,7 @@ if(!job){
 return;
 }
 
-cacheRadarImage(job.url).finally(()=>{
+cacheRadarImage(job.url,{retryError:true}).finally(()=>{
 refreshRadarFrameLoadState(job.frameIndex);
 loadNext();
 });
@@ -1531,6 +1548,17 @@ loadNext();
 for(let i=0;i<Math.min(concurrency,jobs.length);i++){
 loadNext();
 }
+}
+
+function requestRadarPlaybackPreload({force=false}={}){
+let now=Date.now();
+
+if(!force && now-radarState.playbackPreloadAt<5000){
+return;
+}
+
+radarState.playbackPreloadAt=now;
+preloadRadarImages(null,{playbackFirst:true});
 }
 
 function getRefreshableRadarCacheUrls(){
@@ -1615,7 +1643,10 @@ radarState.imageCache.set(url,createResolvedRadarCacheEntry(url,entry));
 });
 
 refreshAllRadarFrameLoadStates();
+
+if(!radarState.isPlaying){
 refreshRadarPaneImages();
+}
 });
 }
 
@@ -1688,16 +1719,15 @@ refreshRadarFrameLoadState(frameIndex);
 return;
 }
 
-if(cached?.status==='error'){
-setRadarPaneError(paneElement,'레이더 이미지를 불러오지 못했습니다.');
+if(cached?.status==='error' && radarState.isPlaying){
 setRadarPageLoading(paneElement,false);
 refreshRadarFrameLoadState(frameIndex);
 return;
 }
 
-setRadarPageLoading(paneElement,true);
+setRadarPageLoading(paneElement,!radarState.isPlaying);
 paneElement.dataset.loadingUrl=url;
-cacheRadarImage(url).then(entry=>{
+cacheRadarImage(url,{retryError:true}).then(entry=>{
 if(!paneElement.isConnected || paneElement.dataset.currentUrl!==url){
 return;
 }
@@ -1981,12 +2011,13 @@ function startRadarLoop(){
 stopRadarLoop();
 radarState.isPlaying=true;
 updateRadarPlayButton();
-preloadRadarImages(null,{playbackFirst:true});
+requestRadarPlaybackPreload({force:true});
 radarState.playTimer=setInterval(()=>{
-let next=radarState.activeIndex+1;
+let next=getNextRadarLoopIndex();
 
-if(next>=radarState.frames.length){
-next=0;
+if(next===radarState.activeIndex){
+requestRadarPlaybackPreload();
+return;
 }
 
 setRadarActiveIndex(next);
