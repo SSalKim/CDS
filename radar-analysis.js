@@ -604,7 +604,6 @@ autoRefreshTimer:null,
 autoRefreshEnabled:false,
 imageCache:new Map(),
 preloadRunId:0,
-activeLoadRunId:0,
 cacheRefreshTimer:null,
 cacheRefreshRunId:0,
 keyboardBound:false,
@@ -1437,6 +1436,8 @@ img.src=source;
 }
 
 paneElement.dataset.renderedSrc=source;
+paneElement.dataset.renderedUrl=url;
+paneElement.dataset.renderedFrameIndex=paneElement.dataset.currentFrameIndex || '';
 paneElement.classList.add('has-current-image');
 setRadarPaneError(paneElement,'');
 return true;
@@ -1452,19 +1453,41 @@ return paneIndexes
 return Array.from({length:radarState.paneCount},(_,index)=>index);
 }
 
-function collectRadarPreloadJobs(paneIndexes){
+function getRadarPreloadFrameOrder(playbackFirst=false){
+let count=radarState.frames.length;
+let active=Math.max(0,Math.min(radarState.activeIndex,count-1));
+let order=[];
+
+if(!count){
+return order;
+}
+
+order.push(active);
+
+if(playbackFirst){
+for(let offset=1;offset<count;offset++){
+order.push((active+offset)%count);
+}
+
+return order;
+}
+
+for(let i=active-1;i>=0;i--){
+order.push(i);
+}
+
+for(let i=active+1;i<count;i++){
+order.push(i);
+}
+
+return order;
+}
+
+function collectRadarPreloadJobs(paneIndexes,{playbackFirst=false}={}){
 let jobs=[];
 let seen=new Set();
-let frameOrder=[];
 let targetPaneIndexes=getRadarPaneIndexes(paneIndexes);
-
-for(let i=radarState.activeIndex;i>=0;i--){
-frameOrder.push(i);
-}
-
-for(let i=radarState.activeIndex+1;i<radarState.frames.length;i++){
-frameOrder.push(i);
-}
+let frameOrder=getRadarPreloadFrameOrder(playbackFirst);
 
 frameOrder.forEach(frameIndex=>{
 targetPaneIndexes.forEach(paneIndex=>{
@@ -1480,9 +1503,9 @@ jobs.push({url,frameIndex});
 return jobs;
 }
 
-function preloadRadarImages(paneIndexes){
+function preloadRadarImages(paneIndexes,options={}){
 let runId=++radarState.preloadRunId;
-let jobs=collectRadarPreloadJobs(paneIndexes);
+let jobs=collectRadarPreloadJobs(paneIndexes,options);
 let nextIndex=0;
 let concurrency=10;
 
@@ -1634,7 +1657,8 @@ error.classList.add('hidden');
 }
 
 function loadActiveRadarFrameImages(paneIndexes){
-let frame=radarState.frames[radarState.activeIndex];
+let frameIndex=radarState.activeIndex;
+let frame=radarState.frames[frameIndex];
 
 if(!frame || !radarState.paneGrid){
 return;
@@ -1644,47 +1668,37 @@ let paneElements=getRadarPaneElements();
 let targets=getRadarPaneIndexes(paneIndexes)
 .map(paneIndex=>({paneIndex,paneElement:paneElements[paneIndex]}))
 .filter(item=>item.paneElement);
-let runId=++radarState.activeLoadRunId;
-let jobs=[];
 
 targets.forEach(({paneElement,paneIndex})=>{
-let url=getRadarFrameUrl(paneIndex,radarState.activeIndex);
+let url=getRadarFrameUrl(paneIndex,frameIndex);
 let img=paneElement.querySelector('.radar-pane-image');
 let hasCurrent=!!img?.getAttribute('src');
 let cached=radarState.imageCache.get(url);
 
 paneElement.dataset.currentUrl=url;
+paneElement.dataset.currentFrameIndex=String(frameIndex);
+paneElement.dataset.loadingUrl='';
 setRadarPaneError(paneElement,'');
 paneElement.classList.toggle('has-current-image',hasCurrent);
 
 if(cached?.status==='loaded'){
 applyRadarImageEntry(paneElement,img,url,cached);
 setRadarPageLoading(paneElement,false);
+refreshRadarFrameLoadState(frameIndex);
 return;
 }
 
 if(cached?.status==='error'){
 setRadarPaneError(paneElement,'레이더 이미지를 불러오지 못했습니다.');
 setRadarPageLoading(paneElement,false);
+refreshRadarFrameLoadState(frameIndex);
 return;
 }
 
 setRadarPageLoading(paneElement,true);
-jobs.push(cacheRadarImage(url).then(entry=>({paneElement,paneIndex,img,url,entry})));
-});
-
-if(!jobs.length){
-refreshRadarFrameLoadState(radarState.activeIndex);
-return;
-}
-
-Promise.all(jobs).then(results=>{
-if(runId!==radarState.activeLoadRunId){
-return;
-}
-
-results.forEach(({paneElement,img,url,entry})=>{
-if(paneElement.dataset.currentUrl!==url){
+paneElement.dataset.loadingUrl=url;
+cacheRadarImage(url).then(entry=>{
+if(!paneElement.isConnected || paneElement.dataset.currentUrl!==url){
 return;
 }
 
@@ -1694,13 +1708,11 @@ applyRadarImageEntry(paneElement,img,url,entry);
 else{
 setRadarPaneError(paneElement,'레이더 이미지를 불러오지 못했습니다.');
 }
-});
 
-results.forEach(({paneElement})=>{
 setRadarPageLoading(paneElement,false);
+paneElement.dataset.loadingUrl='';
+refreshRadarFrameLoadState(frameIndex);
 });
-
-refreshRadarFrameLoadState(radarState.activeIndex);
 });
 }
 
@@ -1969,6 +1981,7 @@ function startRadarLoop(){
 stopRadarLoop();
 radarState.isPlaying=true;
 updateRadarPlayButton();
+preloadRadarImages(null,{playbackFirst:true});
 radarState.playTimer=setInterval(()=>{
 let next=radarState.activeIndex+1;
 
