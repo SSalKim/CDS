@@ -7,7 +7,7 @@ const RADAR_SFC_PTY_IMAGE_URL='https://radar.kma.go.kr/cgi-bin/center/nph-rdr_sf
 const RADAR_R2D_HAIL_IMAGE_URL='https://radar.kma.go.kr/cgi-bin/nph-rdr_r2d_hail_img';
 const RADAR_R2D_HAIL_ACC_IMAGE_URL='https://radar.kma.go.kr/cgi-bin/nph-rdr_r2d_hail_acc_img';
 const RADAR_LGT_DST_IMAGE_URL='https://radar.kma.go.kr/cgi-bin/tablet2/nph-lgt_dst_img';
-
+const RADAR_SFC_OBS_IMAGE_URL='https://radar.kma.go.kr/cgi-bin/tablet2/nph-sfc_obs_img';
 
 const RADAR_DEFAULT_PARAMS={
 tm:'',
@@ -467,6 +467,78 @@ children:[
     }
 ]
 },
+
+
+{
+id:'AWS',
+label:'AWS',
+baseUrl:RADAR_SFC_OBS_IMAGE_URL,
+defaultLevel2:'rn_60m',
+children:[
+    {
+    id:'rn_15x',
+    label:'강수15분*4',
+    params:{obs:'rn_15x'}
+    },
+    {
+    id:'rn_60m',
+    label:'강수60분',
+    params:{obs:'rn_60m'},
+    },
+    {
+    id:'rn_03h',
+    label:'강수3H',
+    params:{obs:'rn_03h'},
+    },
+    {
+    id:'rn_06h',
+    label:'강수6H',
+    params:{obs:'rn_06h'},
+    },
+    {
+    id:'rn_12h',
+    label:'강수12H',
+    params:{obs:'rn_12h'},
+    },
+    {
+    id:'rn_day',
+    label:'일강수',
+    params:{obs:'rn_day'},
+    },
+    {
+    id:'ta',
+    label:'기온',
+    params:{obs:'ta'},
+    },
+    {
+    id:'hm',
+    label:'습도',
+    params:{obs:'hm'},
+    },
+    {
+    id:'tw_win',
+    label:'습구온도',
+    params:{obs:'tw_win'},
+    },
+    {
+    id:'wv_10m',
+    label:'바람(10분)',
+    params:{obs:'wv_10m'},
+    },
+    {
+    id:'ws_10m',
+    label:'풍속(10분)',
+    params:{obs:'ws_10m'},
+    },
+    {
+    id:'ws_10m',
+    label:'풍속(10분)',
+    params:{obs:'ws_10m'},
+    },
+]
+},
+
+
 
 
 
