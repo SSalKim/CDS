@@ -529,12 +529,7 @@ children:[
     id:'ws_10m',
     label:'풍속(10분)',
     params:{obs:'ws_10m'},
-    },
-    {
-    id:'ws_10m',
-    label:'풍속(10분)',
-    params:{obs:'ws_10m'},
-    },
+    }
 ]
 },
 
