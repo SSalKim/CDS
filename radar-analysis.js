@@ -334,7 +334,13 @@ children:[
     id:'RSRA',
     label:'눈비영역(종합)',
     params:{obs:'RSRA'}
-    }
+    },
+    {
+    id:'SPOT',
+    baseUrl:RADAR_CMP_IMAGE_URL,
+    label:'강수정체(SPOT)',
+    params:{cmp:'SPT'}
+    },
 ]
 },
 

@@ -791,22 +791,6 @@ const ANALYSIS_PRODUCTS=[
         um_anal:"2010-01-01",
     }
 },
-{category:"nhem",id:"gph850",label:"하층 바람분석",
-    patternByModel:{
-        kim_anal:"kim_nhem_ps60_gph850_pb4_{run}.gif",
-        um_anal:"nhem_ps60_gph850_pb4_{run}.gif",
-        ecmwf_ra:"nhem_ps60_gph850_pa4_{run}.gif"  
-    },
-    folderByModel:{
-        ecmwf_ra:"ANAL",
-    },
-    archiveStartByModel:{
-        um_anal:"2010-01-01",
-    },
-    archiveEndByModel:{
-        ecmwf_ra:"2009-12-31"
-    }
-},
 {category:"nhem",id:"gph200",label:"상층 바람분석",
     patternByModel:{
         kim_anal:"kim_nhem_ps60_gph200_pb4_{run}.gif",
