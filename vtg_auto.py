@@ -21,6 +21,7 @@ TD_LIST_ENDPOINT = "td_lst.php"
 TYP_LIST_ENDPOINT = "typ_lst.php"
 NOAA_BDECK_URL = "https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/b{atcf_id}.dat"
 ACTIVE_MODEL_TARGET = 33
+VALID_FCST_HOURS = (120, 240)
 CYCLE_HOURS = (0, 6, 12, 18)
 WINDOW_START_OFFSET_HOURS = 3
 WINDOW_END_OFFSET_HOURS = 12
@@ -510,6 +511,9 @@ def parse_fcst_hours(value: str) -> list[int]:
             hour = int(token)
         except ValueError:
             raise SystemExit("--fcst-hours must be a comma/space separated list of integers.")
+        if hour not in VALID_FCST_HOURS:
+            allowed = ", ".join(f"{value}h" for value in VALID_FCST_HOURS)
+            raise SystemExit(f"--fcst-hours only supports {allowed}.")
         if hour not in hours:
             hours.append(hour)
     if not hours:

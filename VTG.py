@@ -231,6 +231,7 @@ DATA_SOURCE_COLUMN = "_DATA_SOURCE"
 MS_PER_KT = 0.514444
 KMA_BASE_URL = "https://apihub-pub.kma.go.kr/api/typ01/url/typ_gts_now.php"
 DEFAULT_AUTH_KEY = ""
+VALID_FCST_HOURS = (120, 240)
 PROJECT_ROOT = Path(__file__).resolve().parent
 
 
@@ -343,8 +344,8 @@ def parse_args() -> Settings:
         help="Comma-separated extra ATCF IDs to merge as the same storm, e.g. wp992026.",
     )
     parser.add_argument("--data-time", default=Settings.data_time)
-    parser.add_argument("--fcst-hours", type=int, default=Settings.fcst_hours)
-    parser.add_argument("--auto-fcst-hours", action="store_true", help="Choose 72, 120, 180, or 240h automatically.")
+    parser.add_argument("--fcst-hours", type=int, choices=VALID_FCST_HOURS, default=Settings.fcst_hours)
+    parser.add_argument("--auto-fcst-hours", action="store_true", help="Choose 120 or 240h automatically.")
     parser.add_argument("--margin-lat", type=float, default=Settings.margin_lat)
     parser.add_argument("--margin-lon", type=float, default=Settings.margin_lon)
     parser.add_argument("--manual-kma-lat", type=float, default=Settings.manual_kma_lat)
@@ -927,11 +928,11 @@ def model_lead_support(df: pd.DataFrame, settings: Settings) -> dict[int, int]:
     support = {}
     names = plotted_model_names(df, settings)
     if not names:
-        return {lead: 0 for lead in (72, 120, 180, 240)}
+        return {lead: 0 for lead in VALID_FCST_HOURS}
     forecast = df[df["SRC"].isin(names)].copy()
     forecast["TMD"] = pd.to_numeric(forecast["TMD"], errors="coerce")
     max_leads = forecast.groupby("SRC")["TMD"].max()
-    for lead in (72, 120, 180, 240):
+    for lead in VALID_FCST_HOURS:
         support[lead] = int(max_leads.ge(lead).sum())
     return support
 
@@ -968,18 +969,14 @@ def choose_auto_fcst_hours(df: pd.DataFrame, settings: Settings) -> int:
     support = model_lead_support(df, settings)
     model_total = max(len(plotted_model_names(df, settings)), 1)
     min_support = max(5, math.ceil(model_total * 0.35))
-    supported = [lead for lead in (72, 120, 180, 240) if support.get(lead, 0) >= min_support]
-    base = max(supported) if supported else 72
+    supported = [lead for lead in VALID_FCST_HOURS if support.get(lead, 0) >= min_support]
+    base = max(supported) if supported else 120
 
     lat = current_storm_latitude(df)
     speed = kma_motion_km_per_day(df)
 
-    if lat >= 36 and speed >= 520:
-        return min(base, 72)
     if lat >= 32 and speed >= 420:
         return min(base, 120)
-    if lat >= 28 and speed >= 360:
-        return min(base, 180)
     return base
 
 
