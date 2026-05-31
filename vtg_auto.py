@@ -442,6 +442,8 @@ def run_vtg(
     metadata = load_json(metadata_path, None)
     if metadata:
         result["metadata"] = metadata
+        if metadata.get("no_output"):
+            result["status"] = "no_output"
     return result
 
 
@@ -532,8 +534,22 @@ def manifest_inventory_key(metadata: dict) -> str:
     )
 
 
+def metadata_has_output_image(metadata: dict) -> bool:
+    if metadata.get("no_output"):
+        return False
+    if not str(metadata.get("image_path") or "").strip():
+        return False
+    if "model_count" not in metadata:
+        return True
+    try:
+        return int(metadata.get("model_count") or 0) > 0
+    except (TypeError, ValueError):
+        return False
+
+
 def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list[dict]:
     entries_by_key: dict[str, dict] = {}
+    suppressed_keys: set[str] = set()
     metadata_dir = output_root / "metadata"
     if metadata_dir.exists():
         for path in sorted(metadata_dir.glob("*.json")):
@@ -546,8 +562,12 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
                 continue
             if fcst_hours not in VALID_FCST_HOURS:
                 continue
-            entry = manifest_entry_from_metadata(path, metadata)
             key = manifest_inventory_key(metadata)
+            if not metadata_has_output_image(metadata):
+                suppressed_keys.add(key)
+                entries_by_key.pop(key, None)
+                continue
+            entry = manifest_entry_from_metadata(path, metadata)
             entries_by_key[key] = entry
 
     if output_root.exists():
@@ -556,6 +576,8 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
             if not metadata:
                 continue
             key = manifest_inventory_key(metadata)
+            if key in suppressed_keys:
+                continue
             if key in entries_by_key:
                 existing_metadata = entries_by_key[key].get("result", {}).get("metadata", {})
                 if isinstance(existing_metadata, dict):
@@ -577,6 +599,10 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
         if fcst_hours not in VALID_FCST_HOURS:
             continue
         key = manifest_inventory_key(metadata)
+        if not metadata_has_output_image(metadata):
+            suppressed_keys.add(key)
+            entries_by_key.pop(key, None)
+            continue
         entries_by_key[key] = entry
 
     return sorted(

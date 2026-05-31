@@ -1198,8 +1198,8 @@ def write_run_metadata(
         "typ_name": settings.typ_name,
         "typ_name_ko": settings.typ_name_ko,
         "linked_td_number": settings.linked_td_number,
-        "atcf_id": settings.atcf_id,
-        "extra_atcf_ids": list(settings.extra_atcf_ids),
+        "atcf_id": "" if settings.skip_atcf else settings.atcf_id,
+        "extra_atcf_ids": [] if settings.skip_atcf else list(settings.extra_atcf_ids),
         "data_time": settings.data_time,
         "fcst_hours": settings.fcst_hours,
         "intensity": intensity,
@@ -1208,6 +1208,42 @@ def write_run_metadata(
         "models": model_names,
         "model_labels": model_labels,
         "skip_atcf": settings.skip_atcf,
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
+def write_no_output_metadata(
+    path: Path,
+    *,
+    settings: Settings,
+    intensity: str,
+    reason: str,
+) -> None:
+    payload = {
+        "generated_at_utc": datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"),
+        "image_path": "",
+        "storm_stage": settings.storm_stage,
+        "storm_year": storm_year(settings),
+        "typ_number": settings.typ_number,
+        "typ_name": settings.typ_name,
+        "typ_name_ko": settings.typ_name_ko,
+        "linked_td_number": settings.linked_td_number,
+        "atcf_id": "" if settings.skip_atcf else settings.atcf_id,
+        "extra_atcf_ids": [] if settings.skip_atcf else list(settings.extra_atcf_ids),
+        "data_time": settings.data_time,
+        "fcst_hours": settings.fcst_hours,
+        "intensity": intensity,
+        "model_count": 0,
+        "target_model_count": active_model_target_count(settings),
+        "models": [],
+        "model_labels": [],
+        "skip_atcf": settings.skip_atcf,
+        "no_output": True,
+        "no_output_reason": reason,
     }
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -1748,6 +1784,18 @@ def main() -> None:
         df = limit_forecast_hours(df, settings)
 
     intensity = current_intensity(df)
+    if not plotted_model_names(df, settings):
+        reason = "No available model forecast points for this storm/time."
+        if settings.metadata_path:
+            write_no_output_metadata(
+                settings.metadata_path,
+                settings=settings,
+                intensity=intensity,
+                reason=reason,
+            )
+        print(reason)
+        return
+
     target = plot_guidance(df, past_kma, settings, intensity)
     if settings.metadata_path:
         write_run_metadata(

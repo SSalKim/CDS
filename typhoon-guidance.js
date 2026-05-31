@@ -314,7 +314,7 @@ let runs=Array.isArray(source) ? source : [];
 let statusRuns=normalizeStatusRuns(status);
 
 let seen=new Set();
-return [...runs,...statusRuns]
+let normalized=[...runs,...statusRuns]
 .map((entry,index)=>{
 let metadata=entry?.result?.metadata || {};
 let job=entry?.job || {};
@@ -330,7 +330,7 @@ let tdNumber=metadata.linked_td_number || job.linked_td_number || job.td_number 
 let typName=metadata.typ_name || job.typ_name || 'NAMELESS';
 let typNameKo=metadata.typ_name_ko || job.typ_name_ko || koreanTyphoonName(typName);
 let stormKey=[year,stage,typNumber,typName].join('|');
-return {
+return applyTyphoonSortKey({
 index,
 entry,
 metadata,
@@ -346,11 +346,10 @@ typNumber,
 tdNumber,
 typNameKo,
 typName,
-stormKey,
-sortKey:`${year}${String(typNumber).padStart(2,'0')}${dataTime}${String(fcstHours).padStart(3,'0')}${generatedAt}`.padEnd(37,'0')
-};
+stormKey
+});
 })
-.filter(run=>run.year && run.dataTime)
+.filter(run=>run.year && run.dataTime && run.imagePath && !run.metadata?.no_output)
 .filter(run=>{
 let key=`${run.year}|${run.stage}|${run.typNumber}|${run.dataTime}|${run.fcstHours}|${run.imagePath}`;
 if(seen.has(key)){
@@ -358,8 +357,69 @@ return false;
 }
 seen.add(key);
 return true;
-})
+});
+
+return dedupeLinkedTyphoonEntries(linkTdEntriesToTyphoons(normalized))
 .sort((a,b)=>a.sortKey.localeCompare(b.sortKey));
+}
+
+function applyTyphoonSortKey(run){
+run.sortKey=`${run.year}${String(run.typNumber).padStart(2,'0')}${run.dataTime}${String(run.fcstHours).padStart(3,'0')}${run.generatedAt}`.padEnd(37,'0');
+return run;
+}
+
+function linkTdEntriesToTyphoons(entries){
+let tdLinks=new Map();
+entries.forEach(entry=>{
+if(entry.stage==='TD' || !entry.tdNumber){
+return;
+}
+tdLinks.set(`${entry.year}|${Number(entry.tdNumber)}`,entry);
+});
+
+if(!tdLinks.size){
+return entries;
+}
+
+return entries.map(entry=>{
+if(entry.stage!=='TD'){
+return entry;
+}
+let linked=tdLinks.get(`${entry.year}|${entry.typNumber}`);
+if(!linked){
+return entry;
+}
+return applyTyphoonSortKey({
+...entry,
+originalStage:'TD',
+stage:linked.stage,
+typNumber:linked.typNumber,
+typName:linked.typName,
+typNameKo:linked.typNameKo,
+tdNumber:entry.typNumber,
+stormKey:linked.stormKey
+});
+});
+}
+
+function dedupeLinkedTyphoonEntries(entries){
+let byKey=new Map();
+entries.forEach(entry=>{
+let key=`${entry.year}|${entry.stormKey}|${entry.dataTime}|${entry.fcstHours}`;
+let existing=byKey.get(key);
+if(!existing){
+byKey.set(key,entry);
+return;
+}
+if(existing.originalStage==='TD' && entry.originalStage!=='TD'){
+byKey.set(key,entry);
+return;
+}
+if(String(entry.generatedAt || '')>String(existing.generatedAt || '')){
+byKey.set(key,entry);
+}
+});
+return [...byKey.values()];
 }
 
 function normalizeStatusRuns(status){
