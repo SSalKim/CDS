@@ -474,6 +474,64 @@ def manifest_entry_from_metadata(path: Path, metadata: dict) -> dict:
     }
 
 
+def relative_asset_path(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def metadata_from_image_path(path: Path, output_root: Path) -> dict | None:
+    match = re.match(
+        r"^(?P<stage>TYP|TD)_(?P<cyclone_id>\d{4})_(?P<name>.+)_(?P<data_time>\d{10,12})_(?P<fcst_hours>\d{2,3})h\.png$",
+        path.name,
+        re.IGNORECASE,
+    )
+    if not match:
+        return None
+
+    try:
+        fcst_hours = int(match.group("fcst_hours"))
+        typ_number = int(match.group("cyclone_id")[-2:])
+    except ValueError:
+        return None
+    if fcst_hours not in VALID_FCST_HOURS:
+        return None
+
+    parent_year = path.parent.parent.name if path.parent and path.parent.parent else ""
+    storm_year = parent_year if re.fullmatch(r"\d{4}", parent_year) else f"20{match.group('cyclone_id')[:2]}"
+    try:
+        generated_at = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).strftime("%Y%m%d%H%M%S")
+    except OSError:
+        generated_at = ""
+
+    stage = match.group("stage").upper()
+    return {
+        "generated_at_utc": generated_at,
+        "image_path": relative_asset_path(path),
+        "storm_stage": stage,
+        "storm_year": storm_year,
+        "typ_number": typ_number,
+        "typ_name": match.group("name"),
+        "typ_name_ko": "",
+        "data_time": match.group("data_time"),
+        "fcst_hours": fcst_hours,
+        "model_count": 0,
+        "target_model_count": ACTIVE_MODEL_TARGET,
+        "models": [],
+        "skip_atcf": False,
+    }
+
+
+def manifest_inventory_key(metadata: dict) -> str:
+    return (
+        f"{metadata.get('data_time')}|"
+        f"{metadata.get('storm_stage')}|"
+        f"{metadata.get('typ_number')}|"
+        f"{metadata.get('fcst_hours')}"
+    )
+
+
 def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list[dict]:
     entries_by_key: dict[str, dict] = {}
     metadata_dir = output_root / "metadata"
@@ -483,14 +541,30 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
             if not isinstance(metadata, dict):
                 continue
             entry = manifest_entry_from_metadata(path, metadata)
-            key = f"{metadata.get('data_time')}|{metadata.get('storm_stage')}|{metadata.get('typ_number')}|{metadata.get('fcst_hours')}|{metadata.get('image_path')}"
+            key = manifest_inventory_key(metadata)
             entries_by_key[key] = entry
+
+    if output_root.exists():
+        for path in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/*/*.png")):
+            metadata = metadata_from_image_path(path, output_root)
+            if not metadata:
+                continue
+            key = manifest_inventory_key(metadata)
+            if key in entries_by_key:
+                existing_metadata = entries_by_key[key].get("result", {}).get("metadata", {})
+                if isinstance(existing_metadata, dict):
+                    existing_metadata["image_path"] = metadata["image_path"]
+                    existing_metadata.setdefault("generated_at_utc", metadata.get("generated_at_utc"))
+                    existing_metadata.setdefault("target_model_count", metadata.get("target_model_count"))
+                    existing_metadata.setdefault("models", metadata.get("models"))
+                continue
+            entries_by_key[key] = manifest_entry_from_metadata(path, metadata)
 
     for entry in run_entries:
         metadata = entry.get("result", {}).get("metadata")
         if not isinstance(metadata, dict) or not metadata:
             continue
-        key = f"{metadata.get('data_time')}|{metadata.get('storm_stage')}|{metadata.get('typ_number')}|{metadata.get('fcst_hours')}|{metadata.get('image_path')}"
+        key = manifest_inventory_key(metadata)
         entries_by_key[key] = entry
 
     return sorted(
@@ -634,7 +708,10 @@ def main() -> int:
         "inventory": build_manifest_inventory(output_root, run_entries),
     }
     should_clear_previous_manifest = not run_entries and bool(previous_manifest.get("runs"))
-    should_write_outputs = not args.dry_run and (actual_run_count > 0 or should_clear_previous_manifest)
+    inventory_changed = previous_manifest.get("inventory") != manifest.get("inventory")
+    should_write_outputs = not args.dry_run and (
+        actual_run_count > 0 or should_clear_previous_manifest or inventory_changed
+    )
     if should_write_outputs:
         write_json(manifest_path, manifest)
         write_json(status_path, status)
