@@ -7,10 +7,11 @@ from __future__ import annotations
 import argparse
 import io
 import json
+import math
 import os
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Iterable
@@ -237,11 +238,14 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 class Settings:
     typ_number: int = 6
     typ_name: str = "JANGMI"
+    typ_name_ko: str = ""
+    linked_td_number: int | None = None
     storm_stage: str = "TYP"
     atcf_id: str = "wp062026"
     extra_atcf_ids: tuple[str, ...] = ()
     data_time: str = "202605301200"
     fcst_hours: int = 120
+    auto_fcst_hours: bool = False
     margin_lat: float = 25
     margin_lon: float = 25
     manual_kma_lat: float = 7.8
@@ -261,6 +265,7 @@ class Settings:
     base_url: str = KMA_BASE_URL
     source_overrides: tuple[tuple[str, str], ...] = ()
     skip_atcf: bool = False
+    auto_extent: bool = True
     overwrite_output: bool = False
     show_plot: bool = True
 
@@ -328,6 +333,8 @@ def parse_args() -> Settings:
     parser = argparse.ArgumentParser(description="Plot tropical cyclone track guidance.")
     parser.add_argument("--typ-number", type=int, default=Settings.typ_number)
     parser.add_argument("--typ-name", default=Settings.typ_name)
+    parser.add_argument("--typ-name-ko", default=Settings.typ_name_ko)
+    parser.add_argument("--linked-td-number", type=int, default=Settings.linked_td_number)
     parser.add_argument("--storm-stage", choices=("TYP", "TD"), default=Settings.storm_stage)
     parser.add_argument("--atcf-id", default=Settings.atcf_id)
     parser.add_argument(
@@ -337,6 +344,7 @@ def parse_args() -> Settings:
     )
     parser.add_argument("--data-time", default=Settings.data_time)
     parser.add_argument("--fcst-hours", type=int, default=Settings.fcst_hours)
+    parser.add_argument("--auto-fcst-hours", action="store_true", help="Choose 72, 120, 180, or 240h automatically.")
     parser.add_argument("--margin-lat", type=float, default=Settings.margin_lat)
     parser.add_argument("--margin-lon", type=float, default=Settings.margin_lon)
     parser.add_argument("--manual-kma-lat", type=float, default=Settings.manual_kma_lat)
@@ -366,6 +374,7 @@ def parse_args() -> Settings:
         help="Prefer a source for this run, e.g. ECMWF_EPS=NOAA. Repeat or comma-separate.",
     )
     parser.add_argument("--skip-atcf", action="store_true", help="Use KMA APIHUB data only.")
+    parser.add_argument("--no-auto-extent", action="store_true", help="Use fixed margin/padding map extent.")
     parser.add_argument("--overwrite", action="store_true", help="Overwrite the deterministic output PNG.")
     parser.add_argument("--no-show", action="store_true", help="Save the PNG without opening a GUI window.")
     args = parser.parse_args()
@@ -377,6 +386,8 @@ def parse_args() -> Settings:
     return Settings(
         typ_number=args.typ_number,
         typ_name=args.typ_name.strip(),
+        typ_name_ko=args.typ_name_ko.strip(),
+        linked_td_number=args.linked_td_number,
         storm_stage=args.storm_stage,
         atcf_id=args.atcf_id.lower(),
         extra_atcf_ids=tuple(
@@ -386,6 +397,7 @@ def parse_args() -> Settings:
         ),
         data_time=args.data_time,
         fcst_hours=args.fcst_hours,
+        auto_fcst_hours=args.auto_fcst_hours,
         margin_lat=args.margin_lat,
         margin_lon=args.margin_lon,
         manual_kma_lat=args.manual_kma_lat,
@@ -402,6 +414,7 @@ def parse_args() -> Settings:
         auth_key=args.auth_key,
         source_overrides=source_overrides,
         skip_atcf=args.skip_atcf,
+        auto_extent=not args.no_auto_extent,
         overwrite_output=args.overwrite,
         show_plot=not args.no_show,
     )
@@ -867,6 +880,22 @@ def active_model_target_count(settings: Settings) -> int:
     return count
 
 
+def model_display_label(model_name: str) -> str:
+    for model in MODEL_INFO:
+        if model["name"] == model_name:
+            return model.get("label", model_name).strip()
+    return model_name
+
+
+def plotted_model_labels(df: pd.DataFrame, settings: Settings) -> list[str]:
+    labels: list[str] = []
+    for model_name in sorted(plotted_model_names(df, settings)):
+        label = model_display_label(model_name)
+        if label and label not in labels:
+            labels.append(label)
+    return labels
+
+
 def has_forecast_points(track: pd.DataFrame, min_hour: float = 3) -> bool:
     if track.empty or "TMD" not in track:
         return False
@@ -882,6 +911,82 @@ def plotted_model_names(df: pd.DataFrame, settings: Settings) -> set[str]:
         if model_name in active and model_name not in excluded and has_forecast_points(track):
             names.add(model_name)
     return names
+
+
+def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    radius_km = 6371.0
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+    a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
+    return 2 * radius_km * math.atan2(math.sqrt(a), math.sqrt(max(0.0, 1 - a)))
+
+
+def model_lead_support(df: pd.DataFrame, settings: Settings) -> dict[int, int]:
+    support = {}
+    names = plotted_model_names(df, settings)
+    if not names:
+        return {lead: 0 for lead in (72, 120, 180, 240)}
+    forecast = df[df["SRC"].isin(names)].copy()
+    forecast["TMD"] = pd.to_numeric(forecast["TMD"], errors="coerce")
+    max_leads = forecast.groupby("SRC")["TMD"].max()
+    for lead in (72, 120, 180, 240):
+        support[lead] = int(max_leads.ge(lead).sum())
+    return support
+
+
+def kma_motion_km_per_day(df: pd.DataFrame) -> float:
+    kma = df[df["SRC"].eq("KMA")].copy()
+    if kma.empty:
+        return 0.0
+    kma["TMD"] = pd.to_numeric(kma["TMD"], errors="coerce")
+    kma = kma.dropna(subset=["TMD", "LAT", "LON"]).sort_values("TMD")
+    if kma.empty:
+        return 0.0
+    start = kma.iloc[0]
+    candidates = kma[kma["TMD"].between(18, 36)]
+    if candidates.empty:
+        candidates = kma[kma["TMD"].gt(start["TMD"])]
+    if candidates.empty:
+        return 0.0
+    target = candidates.iloc[(candidates["TMD"] - 24).abs().argsort().iloc[0]]
+    hours = max(float(target["TMD"] - start["TMD"]), 1.0)
+    distance = haversine_km(float(start["LAT"]), float(start["LON"]), float(target["LAT"]), float(target["LON"]))
+    return distance / hours * 24
+
+
+def current_storm_latitude(df: pd.DataFrame) -> float:
+    start = df[(df["SRC"].eq("KMA")) & (pd.to_numeric(df["TMD"], errors="coerce").eq(0))]
+    if not start.empty:
+        return float(pd.to_numeric(start["LAT"], errors="coerce").dropna().iloc[0])
+    values = pd.to_numeric(df["LAT"], errors="coerce").dropna()
+    return float(values.iloc[0]) if not values.empty else 0.0
+
+
+def choose_auto_fcst_hours(df: pd.DataFrame, settings: Settings) -> int:
+    support = model_lead_support(df, settings)
+    model_total = max(len(plotted_model_names(df, settings)), 1)
+    min_support = max(5, math.ceil(model_total * 0.35))
+    supported = [lead for lead in (72, 120, 180, 240) if support.get(lead, 0) >= min_support]
+    base = max(supported) if supported else 72
+
+    lat = current_storm_latitude(df)
+    speed = kma_motion_km_per_day(df)
+
+    if lat >= 36 and speed >= 520:
+        return min(base, 72)
+    if lat >= 32 and speed >= 420:
+        return min(base, 120)
+    if lat >= 28 and speed >= 360:
+        return min(base, 180)
+    return base
+
+
+def limit_forecast_hours(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    limited = df.copy()
+    limited["TMD"] = pd.to_numeric(limited["TMD"], errors="coerce")
+    return limited[limited["TMD"].le(settings.fcst_hours)].copy()
 
 
 def track_intensity_summary(track: pd.DataFrame, model_name: str) -> str:
@@ -1081,6 +1186,7 @@ def write_run_metadata(
     intensity: str,
 ) -> None:
     model_names = sorted(plotted_model_names(df, settings))
+    model_labels = plotted_model_labels(df, settings)
     image_path = target
     try:
         image_path = target.resolve().relative_to(PROJECT_ROOT.resolve())
@@ -1093,6 +1199,8 @@ def write_run_metadata(
         "storm_year": storm_year(settings),
         "typ_number": settings.typ_number,
         "typ_name": settings.typ_name,
+        "typ_name_ko": settings.typ_name_ko,
+        "linked_td_number": settings.linked_td_number,
         "atcf_id": settings.atcf_id,
         "extra_atcf_ids": list(settings.extra_atcf_ids),
         "data_time": settings.data_time,
@@ -1101,6 +1209,7 @@ def write_run_metadata(
         "model_count": len(model_names),
         "target_model_count": active_model_target_count(settings),
         "models": model_names,
+        "model_labels": model_labels,
         "skip_atcf": settings.skip_atcf,
     }
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -1120,6 +1229,66 @@ def map_extent(settings: Settings, center_lat: float, center_lon: float) -> list
         center_lat - settings.margin_lat / 1.2,
         center_lat + settings.margin_lat / 1.2,
     ]
+
+
+def numeric_track_points(df: pd.DataFrame) -> pd.DataFrame:
+    if df.empty:
+        return pd.DataFrame(columns=["LAT", "LON", "TMD", "FT_TIME"])
+    points = df.copy()
+    for column in ["LAT", "LON", "TMD"]:
+        if column in points:
+            points[column] = pd.to_numeric(points[column], errors="coerce")
+    return points.dropna(subset=["LAT", "LON"])
+
+
+def robust_series_bounds(series: pd.Series) -> tuple[float, float]:
+    clean = pd.to_numeric(series, errors="coerce").dropna()
+    if clean.empty:
+        return 0.0, 0.0
+    if len(clean) >= 10:
+        return float(clean.quantile(0.08)), float(clean.quantile(0.92))
+    return float(clean.min()), float(clean.max())
+
+
+def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
+    points = numeric_track_points(df)
+    if points.empty:
+        return None
+
+    primary_limit = min(settings.fcst_hours, 120)
+    primary = points[pd.to_numeric(points["TMD"], errors="coerce").between(0, primary_limit)].copy()
+    if primary.empty:
+        primary = points.copy()
+
+    current_dt = pd.to_datetime(settings.data_time, format="%Y%m%d%H%M", errors="coerce")
+    if not pd.isna(current_dt) and not past_kma.empty and "FT_TIME" in past_kma:
+        past = numeric_track_points(past_kma)
+        if not past.empty:
+            start = current_dt.to_pydatetime() - timedelta(hours=48)
+            end = current_dt.to_pydatetime()
+            past = past[past["FT_TIME"].between(start, end)]
+            if not past.empty:
+                primary = pd.concat([primary, past[["LAT", "LON", "TMD"]]], ignore_index=True)
+
+    lat_min, lat_max = robust_series_bounds(primary["LAT"])
+    lon_min, lon_max = robust_series_bounds(primary["LON"])
+    lat_span = max(lat_max - lat_min, 7.0)
+    lon_span = max(lon_max - lon_min, 9.0)
+
+    center_lat = (lat_min + lat_max) / 2 + max(-1.0, min(2.5, lat_span * 0.06))
+    center_lon = (lon_min + lon_max) / 2 + max(2.0, min(7.0, lon_span * 0.22))
+
+    west_margin = lon_span * 0.68 + max(2.0, min(5.0, settings.margin_lon * 0.12))
+    east_margin = lon_span * 0.95 + max(6.0, min(10.0, settings.extra_east_lon))
+    lat_margin = lat_span * 0.72 + max(2.5, min(5.5, settings.margin_lat * 0.14))
+
+    return [
+        center_lon - west_margin,
+        center_lon + east_margin,
+        center_lat - lat_margin,
+        center_lat + lat_margin,
+    ]
+
 
 def clamp_west_pacific_extent(
     extent: list[float],
@@ -1223,10 +1392,14 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     current_dt = pd.to_datetime(settings.data_time, format="%Y%m%d%H%M", errors="coerce")
     current_dt = None if pd.isna(current_dt) else current_dt.to_pydatetime()
 
-    center_lat = df["LAT"].mean() + settings.lat_padding if not df.empty else 25
-    center_lon = df["LON"].mean() + settings.lon_padding if not df.empty else 135
-
-    extent = map_extent(settings, center_lat, center_lon)
+    if settings.auto_extent:
+        extent = auto_map_extent(df, past_kma, settings)
+    else:
+        extent = None
+    if extent is None:
+        center_lat = df["LAT"].mean() + settings.lat_padding if not df.empty else 25
+        center_lon = df["LON"].mean() + settings.lon_padding if not df.empty else 135
+        extent = map_extent(settings, center_lat, center_lon)
     extent = clamp_west_pacific_extent(extent)
 
     fig_width = settings.figure_width
@@ -1558,18 +1731,23 @@ def main() -> None:
         raise SystemExit("KMA_APIHUB_AUTH_KEY or --auth-key is required.")
 
     configure_plot_fonts()
+    fetch_settings = replace(settings, fcst_hours=max(settings.fcst_hours, 240)) if settings.auto_fcst_hours else settings
 
     with requests.Session() as session:
-        kma_forecast_text = fetch_text(session, kma_url(settings, "2"), retries=10, timeout=3, encoding="cp949")
-        kma_df = read_kma_csv(kma_forecast_text, settings, forecast_only=True)
-        atcf_df = empty_atcf_frame() if settings.skip_atcf else fetch_atcf_data(session, settings)
-        df = normalize_track_data(kma_df, atcf_df, settings)
+        kma_forecast_text = fetch_text(session, kma_url(fetch_settings, "2"), retries=10, timeout=3, encoding="cp949")
+        kma_df = read_kma_csv(kma_forecast_text, fetch_settings, forecast_only=True)
+        atcf_df = empty_atcf_frame() if fetch_settings.skip_atcf else fetch_atcf_data(session, fetch_settings)
+        df = normalize_track_data(kma_df, atcf_df, fetch_settings)
 
-        kma_past_text = fetch_text(session, kma_url(settings, "0"), retries=3, timeout=10, encoding="cp949")
-        past_kma = build_past_kma_track(read_kma_csv(kma_past_text, settings, forecast_only=False))
+        kma_past_text = fetch_text(session, kma_url(fetch_settings, "0"), retries=3, timeout=10, encoding="cp949")
+        past_kma = build_past_kma_track(read_kma_csv(kma_past_text, fetch_settings, forecast_only=False))
 
     if df.empty:
         raise SystemExit("No forecast data matched the requested storm/time/model configuration.")
+
+    if settings.auto_fcst_hours:
+        settings = replace(settings, fcst_hours=choose_auto_fcst_hours(df, fetch_settings))
+        df = limit_forecast_hours(df, settings)
 
     intensity = current_intensity(df)
     target = plot_guidance(df, past_kma, settings, intensity)

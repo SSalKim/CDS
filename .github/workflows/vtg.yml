@@ -2,11 +2,20 @@ name: Generate VTG images
 
 on:
   schedule:
-    - cron: "3/10 * * * *"
+    - cron: "3-59/10 * * * *"
   workflow_dispatch:
     inputs:
       now:
         description: "Optional UTC override, YYYYmmddHHMM"
+        required: false
+        type: string
+      force:
+        description: "Run again even when the previous image already reached the model target"
+        required: false
+        default: true
+        type: boolean
+      manual_args:
+        description: "Optional raw VTG.py args for one manual image run"
         required: false
         type: string
       dry_run:
@@ -31,6 +40,8 @@ jobs:
       MPLBACKEND: Agg
       PYTHONUNBUFFERED: "1"
       NOW_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.now || '' }}
+      FORCE_INPUT: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.force) }}
+      MANUAL_VTG_ARGS: ${{ github.event_name == 'workflow_dispatch' && inputs.manual_args || '' }}
       DRY_RUN_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
 
     steps:
@@ -56,23 +67,27 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements-vtg.txt
 
-      - name: Print trigger context
-        run: |
-          echo "event_name=${{ github.event_name }}"
-          echo "ref=${{ github.ref }}"
-          echo "sha=${{ github.sha }}"
-          echo "utc_now=$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-
       - name: Run VTG automation
         run: |
           args=()
           if [ -n "$NOW_INPUT" ]; then
             args+=(--now "$NOW_INPUT")
           fi
+          if [ "$FORCE_INPUT" = "true" ]; then
+            args+=(--force)
+          fi
           if [ "$DRY_RUN_INPUT" = "true" ]; then
             args+=(--dry-run)
           fi
-          python vtg_auto.py "${args[@]}"
+          if [ -n "$MANUAL_VTG_ARGS" ]; then
+            if [ "$DRY_RUN_INPUT" = "true" ]; then
+              echo "Manual VTG args: $MANUAL_VTG_ARGS"
+            else
+              python vtg_manual_run.py --vtg-args "$MANUAL_VTG_ARGS"
+            fi
+          else
+            python vtg_auto.py "${args[@]}"
+          fi
 
       - name: Commit generated VTG assets
         if: ${{ env.DRY_RUN_INPUT != 'true' }}

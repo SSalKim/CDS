@@ -41,7 +41,9 @@ class StormJob:
     year: int
     data_time: str
     td_number: int | None
+    linked_td_number: int | None
     typ_number: int
+    typ_name_ko: str
     typ_name: str
     typ_en: str
     atcf_id: str | None
@@ -243,6 +245,16 @@ def manual_atcf_id(manual_map: dict, *, year: int, td_number: int | None, typ_nu
     return None
 
 
+def linked_td_number_for_typ(td_rows: list[dict], *, year: int, typ_number: int) -> int | None:
+    for row in td_rows:
+        try:
+            if int(row.get("YY", 0)) == year and int(row.get("TYP", -1)) == typ_number:
+                return int(row.get("TD", 0))
+        except (TypeError, ValueError):
+            continue
+    return None
+
+
 def build_storm_jobs(
     *,
     now: datetime,
@@ -270,10 +282,12 @@ def build_storm_jobs(
         if parse_utc_stamp(row.get("TM_ST", "")) and data_dt < parse_utc_stamp(row.get("TM_ST", "")):
             continue
         typ_en = row.get("TYP_EN", "").strip().upper()
+        typ_name_ko = row.get("TYP_NAME", "").strip()
+        linked_td_number = linked_td_number_for_typ(td_rows, year=year, typ_number=typ_number)
         manual_id = manual_atcf_id(
             manual_map,
             year=year,
-            td_number=None,
+            td_number=linked_td_number,
             typ_number=typ_number,
             typ_en=typ_en,
         )
@@ -290,8 +304,10 @@ def build_storm_jobs(
             year=year,
             data_time=data_time,
             td_number=None,
+            linked_td_number=linked_td_number,
             typ_number=typ_number,
-            typ_name=typ_en or row.get("TYP_NAME", "").strip() or "NAMELESS",
+            typ_name_ko=typ_name_ko,
+            typ_name=typ_en or typ_name_ko or "NAMELESS",
             typ_en=typ_en,
             atcf_id=atcf_id,
             skip_atcf=not bool(atcf_id),
@@ -325,7 +341,9 @@ def build_storm_jobs(
             year=year,
             data_time=data_time,
             td_number=td_number,
+            linked_td_number=None,
             typ_number=td_number,
+            typ_name_ko="",
             typ_name="NAMELESS",
             typ_en="",
             atcf_id=manual_id,
@@ -354,6 +372,9 @@ def run_vtg(
     output_root: Path,
     auth_key: str,
     python: str,
+    fcst_hours: int,
+    auto_fcst_hours: bool,
+    source_overrides: list[str],
     dry_run: bool,
 ) -> dict:
     metadata_path = metadata_path_for(output_root, job)
@@ -364,12 +385,14 @@ def run_vtg(
         str(job.typ_number),
         "--typ-name",
         job.typ_name,
+        "--typ-name-ko",
+        job.typ_name_ko,
         "--storm-stage",
         "TD" if job.stage.startswith("TD_") else "TYP",
         "--data-time",
         job.data_time,
         "--fcst-hours",
-        "120",
+        str(fcst_hours),
         "--output-root",
         str(output_root),
         "--metadata-path",
@@ -381,8 +404,14 @@ def run_vtg(
     ]
     if job.atcf_id:
         command.extend(["--atcf-id", job.atcf_id])
+    if job.linked_td_number is not None:
+        command.extend(["--linked-td-number", str(job.linked_td_number)])
     if job.skip_atcf:
         command.append("--skip-atcf")
+    if auto_fcst_hours:
+        command.append("--auto-fcst-hours")
+    for override in source_overrides:
+        command.extend(["--source-override", override])
 
     if dry_run:
         return {
@@ -390,12 +419,6 @@ def run_vtg(
             "command": redacted_command(command),
             "metadata_path": str(metadata_path),
         }
-
-    # Prevent a failed/stale run from reusing metadata written by an older run.
-    try:
-        metadata_path.unlink()
-    except FileNotFoundError:
-        pass
 
     completed = subprocess.run(
         command,
@@ -411,13 +434,67 @@ def run_vtg(
         "stderr": completed.stderr[-4000:],
         "metadata_path": str(metadata_path),
     }
-
-    # Only trust newly generated metadata when VTG.py completed successfully.
-    if completed.returncode == 0:
-        metadata = load_json(metadata_path, None)
-        if metadata:
-            result["metadata"] = metadata
+    metadata = load_json(metadata_path, None)
+    if metadata:
+        result["metadata"] = metadata
     return result
+
+
+def manifest_entry_from_metadata(path: Path, metadata: dict) -> dict:
+    data_time = str(metadata.get("data_time") or "")
+    year = int(str(metadata.get("storm_year") or data_time[:4] or "0") or 0)
+    typ_number = int(metadata.get("typ_number") or 0)
+    stage = str(metadata.get("storm_stage") or "TYP")
+    storm_key_prefix = "td" if stage.upper() == "TD" else "typ"
+    storm_key = f"{storm_key_prefix}_{year}_{typ_number:02d}" if year and typ_number else path.stem
+    return {
+        "job": {
+            "storm_key": storm_key,
+            "stage": stage,
+            "year": year,
+            "data_time": data_time,
+            "td_number": metadata.get("typ_number") if stage.upper() == "TD" else None,
+            "linked_td_number": metadata.get("linked_td_number"),
+            "typ_number": typ_number,
+            "typ_name_ko": metadata.get("typ_name_ko") or "",
+            "typ_name": metadata.get("typ_name") or "NAMELESS",
+            "typ_en": metadata.get("typ_name") or "",
+            "atcf_id": metadata.get("atcf_id"),
+            "skip_atcf": bool(metadata.get("skip_atcf")),
+        },
+        "window": {"data_time": data_time},
+        "result": {"status": "inventory", "metadata": metadata},
+        "metadata_path": str(path.as_posix()),
+    }
+
+
+def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list[dict]:
+    entries_by_key: dict[str, dict] = {}
+    metadata_dir = output_root / "metadata"
+    if metadata_dir.exists():
+        for path in sorted(metadata_dir.glob("*.json")):
+            metadata = load_json(path, None)
+            if not isinstance(metadata, dict):
+                continue
+            entry = manifest_entry_from_metadata(path, metadata)
+            key = f"{metadata.get('data_time')}|{metadata.get('storm_stage')}|{metadata.get('typ_number')}|{metadata.get('image_path')}"
+            entries_by_key[key] = entry
+
+    for entry in run_entries:
+        metadata = entry.get("result", {}).get("metadata")
+        if not isinstance(metadata, dict) or not metadata:
+            continue
+        key = f"{metadata.get('data_time')}|{metadata.get('storm_stage')}|{metadata.get('typ_number')}|{metadata.get('image_path')}"
+        entries_by_key[key] = entry
+
+    return sorted(
+        entries_by_key.values(),
+        key=lambda item: (
+            item.get("job", {}).get("year") or 0,
+            item.get("job", {}).get("typ_number") or 0,
+            item.get("job", {}).get("data_time") or "",
+        ),
+    )
 
 
 def parse_args() -> argparse.Namespace:
@@ -429,8 +506,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--status-path", type=Path, default=None)
     parser.add_argument("--manifest-path", type=Path, default=None)
     parser.add_argument("--python", default=sys.executable)
+    parser.add_argument("--fcst-hours", type=int, default=240)
+    parser.add_argument("--auto-fcst-hours", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--source-override", action="append", default=[])
     parser.add_argument("--complete-model-count", type=int, default=ACTIVE_MODEL_TARGET)
     parser.add_argument("--atcf-search-radius", type=int, default=3)
+    parser.add_argument("--force", action="store_true", help="Run even if a previous metadata record met the completion target.")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
@@ -478,25 +559,28 @@ def main() -> int:
             atcf_search_radius=args.atcf_search_radius,
         )
         for job in jobs:
-            # Active cycle windows are intentionally retried on every scheduled run.
-            # Do not skip a cycle just because it reached the previous complete-model target;
-            # late-arriving ATCF/model data can still improve the output.
+            previous = cycle_status.get(job.storm_key, {})
+            if previous.get("completed") and not args.force:
+                run_entries.append({
+                    "job": asdict(job),
+                    "window": asdict(window),
+                    "result": {"status": "skipped_completed", "metadata": previous.get("metadata")},
+                })
+                continue
             actual_run_count += 1
             result = run_vtg(
                 job=job,
                 output_root=output_root,
                 auth_key=args.auth_key,
                 python=args.python,
+                fcst_hours=args.fcst_hours,
+                auto_fcst_hours=args.auto_fcst_hours,
+                source_overrides=args.source_override,
                 dry_run=args.dry_run,
             )
             metadata = result.get("metadata") or {}
             model_count = int(metadata.get("model_count") or 0)
-            target_count = int(metadata.get("target_model_count") or args.complete_model_count or 0)
-            completed = (
-                result.get("status") == "ok"
-                and target_count > 0
-                and model_count >= target_count
-            )
+            completed = model_count >= args.complete_model_count
             cycle_status[job.storm_key] = {
                 "updated_at_utc": format_utc_stamp(now),
                 "completed": completed,
@@ -519,6 +603,7 @@ def main() -> int:
         "complete_model_count": args.complete_model_count,
         "active_windows": [asdict(window) for window in windows],
         "runs": run_entries,
+        "inventory": build_manifest_inventory(output_root, run_entries),
     }
     should_clear_previous_manifest = not run_entries and bool(previous_manifest.get("runs"))
     should_write_outputs = not args.dry_run and (actual_run_count > 0 or should_clear_previous_manifest)
