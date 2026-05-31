@@ -391,6 +391,12 @@ def run_vtg(
             "metadata_path": str(metadata_path),
         }
 
+    # Prevent a failed/stale run from reusing metadata written by an older run.
+    try:
+        metadata_path.unlink()
+    except FileNotFoundError:
+        pass
+
     completed = subprocess.run(
         command,
         cwd=PROJECT_ROOT,
@@ -405,9 +411,12 @@ def run_vtg(
         "stderr": completed.stderr[-4000:],
         "metadata_path": str(metadata_path),
     }
-    metadata = load_json(metadata_path, None)
-    if metadata:
-        result["metadata"] = metadata
+
+    # Only trust newly generated metadata when VTG.py completed successfully.
+    if completed.returncode == 0:
+        metadata = load_json(metadata_path, None)
+        if metadata:
+            result["metadata"] = metadata
     return result
 
 
@@ -469,14 +478,9 @@ def main() -> int:
             atcf_search_radius=args.atcf_search_radius,
         )
         for job in jobs:
-            previous = cycle_status.get(job.storm_key, {})
-            if previous.get("completed"):
-                run_entries.append({
-                    "job": asdict(job),
-                    "window": asdict(window),
-                    "result": {"status": "skipped_completed", "metadata": previous.get("metadata")},
-                })
-                continue
+            # Active cycle windows are intentionally retried on every scheduled run.
+            # Do not skip a cycle just because it reached the previous complete-model target;
+            # late-arriving ATCF/model data can still improve the output.
             actual_run_count += 1
             result = run_vtg(
                 job=job,
@@ -487,7 +491,12 @@ def main() -> int:
             )
             metadata = result.get("metadata") or {}
             model_count = int(metadata.get("model_count") or 0)
-            completed = model_count >= args.complete_model_count
+            target_count = int(metadata.get("target_model_count") or args.complete_model_count or 0)
+            completed = (
+                result.get("status") == "ok"
+                and target_count > 0
+                and model_count >= target_count
+            )
             cycle_status[job.storm_key] = {
                 "updated_at_utc": format_utc_stamp(now),
                 "completed": completed,
