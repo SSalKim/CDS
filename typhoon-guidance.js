@@ -1,6 +1,16 @@
 const TYPHOON_MANIFEST_PATH='VTG_IMG/manifest.json';
+const TYPHOON_STATUS_PATH='VTG_IMG/vtg_auto_status.json';
 const TYPHOON_REFRESH_MS=10*60*1000;
 const TYPHOON_SLOT_HOURS=6;
+const TYPHOON_PAGE_CACHE_TOKEN=new URLSearchParams(window.location.search).get('fresh') || String(Date.now());
+const TYPHOON_FCST_OPTIONS=[
+{hours:120,label:'5일'},
+{hours:240,label:'10일'}
+];
+
+const TYPHOON_KO_NAME_FALLBACK={
+JANGMI:'장미'
+};
 
 const TYPHOON_MODEL_LABELS={
 KMA:'KMA OFCL',
@@ -53,11 +63,19 @@ slots:[],
 selectedYear:'',
 selectedStormKey:'',
 selectedSlotIndex:0,
-timer:null
+selectedFcstHours:120,
+timer:null,
+keyboardBound:false
 };
 
 function openTyphoonGuidancePage(){
 window.open('typhoon.html','_blank','noopener');
+}
+
+function reloadTyphoonGuidancePage(){
+let url=new URL(window.location.href);
+url.searchParams.set('fresh',String(Date.now()));
+window.location.replace(url.toString());
 }
 
 function renderTyphoonGuidanceLauncher(){
@@ -89,6 +107,11 @@ if(!typhoonState.timer){
 typhoonState.timer=window.setInterval(loadTyphoonManifest,TYPHOON_REFRESH_MS);
 }
 
+if(!typhoonState.keyboardBound){
+document.addEventListener('keydown',handleTyphoonKeydown);
+typhoonState.keyboardBound=true;
+}
+
 document.addEventListener('visibilitychange',()=>{
 if(document.visibilityState==='visible'){
 loadTyphoonManifest();
@@ -108,20 +131,17 @@ page.className='typhoon-page';
 let header=document.createElement('header');
 header.className='typhoon-header';
 
-let titleWrap=document.createElement('div');
-titleWrap.className='typhoon-title-wrap';
+let titleWrap=document.createElement('button');
+titleWrap.type='button';
+titleWrap.className='typhoon-title-wrap typhoon-title-button';
+titleWrap.title='페이지 새로고침';
+titleWrap.onclick=reloadTyphoonGuidancePage;
 
 let title=document.createElement('div');
 title.className='typhoon-title';
-title.textContent='태풍 모델예측';
-
-let subtitle=document.createElement('div');
-subtitle.className='typhoon-subtitle';
-subtitle.dataset.role='subtitle';
-subtitle.textContent='VTG';
+title.innerHTML='<span>태풍</span><span>모델예측</span>';
 
 titleWrap.appendChild(title);
-titleWrap.appendChild(subtitle);
 
 let controls=document.createElement('div');
 controls.className='typhoon-select-controls';
@@ -144,19 +164,18 @@ selectLatestSlotForStorm();
 renderTyphoonManifest();
 };
 
-let refresh=document.createElement('button');
-refresh.type='button';
-refresh.className='typhoon-refresh-button';
-refresh.title='새로고침';
-refresh.textContent='↻';
-refresh.onclick=loadTyphoonManifest;
+let updatedAt=document.createElement('div');
+updatedAt.className='typhoon-updated-time';
+updatedAt.dataset.role='subtitle';
+updatedAt.textContent='';
 
 controls.appendChild(yearSelect);
 controls.appendChild(stormSelect);
-controls.appendChild(refresh);
+controls.appendChild(createTyphoonFcstSelector());
 
 header.appendChild(titleWrap);
 header.appendChild(controls);
+header.appendChild(updatedAt);
 
 let timeBar=document.createElement('div');
 timeBar.className='forecast-bar typhoon-time-bar';
@@ -173,13 +192,11 @@ slider.value='0';
 slider.className='native-forecast-slider typhoon-time-slider';
 slider.dataset.role='timeSlider';
 slider.oninput=event=>{
-typhoonState.selectedSlotIndex=Number(event.target.value);
-renderTyphoonSelectedRun();
-renderTyphoonTimeline();
+setTyphoonSlotIndex(Number(event.target.value));
 };
 
 let timeline=document.createElement('div');
-timeline.className='forecast-timeline typhoon-timeline';
+timeline.className='forecast-timeline compare-timeline single-timeline typhoon-timeline';
 timeline.dataset.role='timeline';
 
 let timeLabel=document.createElement('div');
@@ -191,24 +208,49 @@ shell.appendChild(timeline);
 shell.appendChild(timeLabel);
 timeBar.appendChild(shell);
 
-let content=document.createElement('section');
-content.className='typhoon-content';
-
 let viewer=document.createElement('div');
 viewer.className='typhoon-viewer';
 viewer.dataset.role='viewer';
 
-let side=document.createElement('aside');
-side.className='typhoon-side-panel';
-side.dataset.role='sidePanel';
-
-content.appendChild(viewer);
-content.appendChild(side);
 page.appendChild(header);
 page.appendChild(timeBar);
-page.appendChild(content);
+page.appendChild(viewer);
 
 root.replaceChildren(page);
+}
+
+function createTyphoonFcstSelector(){
+let group=document.createElement('div');
+group.className='typhoon-fcst-toggle';
+group.setAttribute('role','radiogroup');
+group.setAttribute('aria-label','예측기간');
+
+TYPHOON_FCST_OPTIONS.forEach(option=>{
+let label=document.createElement('label');
+label.className='typhoon-fcst-option';
+
+let input=document.createElement('input');
+input.type='radio';
+input.name='typhoonFcstHours';
+input.value=String(option.hours);
+input.dataset.role='fcstOption';
+input.checked=typhoonState.selectedFcstHours===option.hours;
+input.onchange=()=>{
+let currentDataTime=getSelectedTyphoonDataTime();
+typhoonState.selectedFcstHours=option.hours;
+selectLatestSlotForStorm(currentDataTime);
+renderTyphoonManifest();
+};
+
+let text=document.createElement('span');
+text.textContent=option.label;
+
+label.appendChild(input);
+label.appendChild(text);
+group.appendChild(label);
+});
+
+return group;
 }
 
 async function loadTyphoonManifest(){
@@ -220,14 +262,30 @@ return;
 root.classList.add('typhoon-loading-state');
 
 try{
-let response=await fetch(`${TYPHOON_MANIFEST_PATH}?fresh=${Date.now()}`,{cache:'no-store'});
-if(!response.ok){
-throw new Error(`HTTP ${response.status}`);
+let manifest=null;
+let status=null;
+let manifestError=null;
+
+try{
+manifest=await fetchTyphoonJson(TYPHOON_MANIFEST_PATH);
+}
+catch(error){
+manifestError=error;
 }
 
-let manifest=await response.json();
+try{
+status=await fetchTyphoonJson(TYPHOON_STATUS_PATH);
+}
+catch(error){
+status=null;
+}
+
+if(!manifest && !status){
+throw manifestError || new Error('HTTP 404');
+}
+
 typhoonState.manifest=manifest;
-typhoonState.entries=normalizeTyphoonEntries(manifest);
+typhoonState.entries=normalizeTyphoonEntries(manifest || {},status);
 syncTyphoonSelection();
 renderTyphoonManifest();
 }
@@ -242,11 +300,21 @@ root.classList.remove('typhoon-loading-state');
 }
 }
 
-function normalizeTyphoonEntries(manifest){
+async function fetchTyphoonJson(path){
+let response=await fetch(`${path}?fresh=${Date.now()}`,{cache:'no-store'});
+if(!response.ok){
+throw new Error(`HTTP ${response.status}`);
+}
+return response.json();
+}
+
+function normalizeTyphoonEntries(manifest,status){
 let source=Array.isArray(manifest?.inventory) && manifest.inventory.length ? manifest.inventory : manifest?.runs;
 let runs=Array.isArray(source) ? source : [];
+let statusRuns=normalizeStatusRuns(status);
 
-return runs
+let seen=new Set();
+return [...runs,...statusRuns]
 .map((entry,index)=>{
 let metadata=entry?.result?.metadata || {};
 let job=entry?.job || {};
@@ -254,12 +322,13 @@ let windowInfo=entry?.window || {};
 let imagePath=normalizeTyphoonAssetPath(metadata.image_path || '');
 let dataTime=metadata.data_time || job.data_time || windowInfo.data_time || '';
 let generatedAt=metadata.generated_at_utc || manifest.updated_at_utc || '';
+let fcstHours=Number(metadata.fcst_hours || job.fcst_hours || parseTyphoonFcstHoursFromPath(imagePath) || 120);
 let year=String(metadata.storm_year || job.year || dataTime.slice(0,4) || '');
 let stage=(metadata.storm_stage || job.stage || 'TYP').toUpperCase();
 let typNumber=Number(metadata.typ_number || job.typ_number || 0);
 let tdNumber=metadata.linked_td_number || job.linked_td_number || job.td_number || null;
-let typNameKo=metadata.typ_name_ko || job.typ_name_ko || '';
 let typName=metadata.typ_name || job.typ_name || 'NAMELESS';
+let typNameKo=metadata.typ_name_ko || job.typ_name_ko || koreanTyphoonName(typName);
 let stormKey=[year,stage,typNumber,typName].join('|');
 return {
 index,
@@ -270,6 +339,7 @@ windowInfo,
 imagePath,
 dataTime,
 generatedAt,
+fcstHours,
 year,
 stage,
 typNumber,
@@ -277,11 +347,54 @@ tdNumber,
 typNameKo,
 typName,
 stormKey,
-sortKey:`${year}${String(typNumber).padStart(2,'0')}${dataTime}${generatedAt}`.padEnd(34,'0')
+sortKey:`${year}${String(typNumber).padStart(2,'0')}${dataTime}${String(fcstHours).padStart(3,'0')}${generatedAt}`.padEnd(37,'0')
 };
 })
 .filter(run=>run.year && run.dataTime)
+.filter(run=>{
+let key=`${run.year}|${run.stage}|${run.typNumber}|${run.dataTime}|${run.fcstHours}|${run.imagePath}`;
+if(seen.has(key)){
+return false;
+}
+seen.add(key);
+return true;
+})
 .sort((a,b)=>a.sortKey.localeCompare(b.sortKey));
+}
+
+function normalizeStatusRuns(status){
+let cycles=status?.cycles || {};
+let entries=[];
+Object.keys(cycles).forEach(dataTime=>{
+let storms=cycles[dataTime] || {};
+Object.keys(storms).forEach(stormKey=>{
+let record=storms[stormKey] || {};
+let metadata=record.metadata || {};
+if(!metadata.data_time){
+metadata={...metadata,data_time:dataTime};
+}
+entries.push({
+job:{
+storm_key:stormKey,
+stage:metadata.storm_stage || 'TYP',
+year:Number(metadata.storm_year || String(dataTime).slice(0,4)),
+data_time:dataTime,
+td_number:null,
+linked_td_number:metadata.linked_td_number || null,
+typ_number:metadata.typ_number || 0,
+typ_name:metadata.typ_name || 'NAMELESS',
+typ_name_ko:metadata.typ_name_ko || koreanTyphoonName(metadata.typ_name || ''),
+typ_en:metadata.typ_name || '',
+atcf_id:metadata.atcf_id || '',
+fcst_hours:metadata.fcst_hours || parseTyphoonFcstHoursFromPath(metadata.image_path || '') || 120,
+skip_atcf:!!metadata.skip_atcf
+},
+window:{data_time:dataTime},
+result:{status:record.last_status || 'status',metadata}
+});
+});
+});
+return entries;
 }
 
 function syncTyphoonSelection(){
@@ -332,7 +445,7 @@ typhoonState.selectedStormKey=storms.length ? storms[storms.length-1].key : '';
 selectLatestSlotForStorm();
 }
 
-function selectLatestSlotForStorm(){
+function selectLatestSlotForStorm(preferredDataTime=''){
 typhoonState.slots=buildTyphoonSlotsForStorm(typhoonState.selectedStormKey);
 let latestAvailable=-1;
 typhoonState.slots.forEach((slot,index)=>{
@@ -340,12 +453,37 @@ if(slot.entry){
 latestAvailable=index;
 }
 });
-typhoonState.selectedSlotIndex=Math.max(0,latestAvailable);
+let preferredIndex=preferredDataTime ? typhoonState.slots.findIndex(slot=>slot.dataTime===preferredDataTime && slot.entry) : -1;
+typhoonState.selectedSlotIndex=Math.max(0,preferredIndex>=0 ? preferredIndex : latestAvailable);
+}
+
+function getSelectedTyphoonSlot(){
+return typhoonState.slots[typhoonState.selectedSlotIndex] || null;
+}
+
+function getSelectedTyphoonRun(){
+return getSelectedTyphoonSlot()?.entry || null;
+}
+
+function getSelectedTyphoonDataTime(){
+return getSelectedTyphoonSlot()?.dataTime || '';
+}
+
+function setTyphoonSlotIndex(index){
+let maxIndex=Math.max(0,typhoonState.slots.length-1);
+typhoonState.selectedSlotIndex=Math.max(0,Math.min(Number(index)||0,maxIndex));
+renderTyphoonSelectedRun();
+renderTyphoonTimeline();
+}
+
+function moveTyphoonSelection(offset){
+setTyphoonSlotIndex(typhoonState.selectedSlotIndex+offset);
 }
 
 function buildTyphoonSlotsForStorm(stormKey){
 let entries=typhoonState.entries
 .filter(entry=>entry.stormKey===stormKey)
+.filter(entry=>entry.fcstHours===typhoonState.selectedFcstHours)
 .sort((a,b)=>a.dataTime.localeCompare(b.dataTime));
 
 if(!entries.length){
@@ -407,17 +545,19 @@ stormSelect.value=typhoonState.selectedStormKey;
 
 yearSelect.disabled=!typhoonState.years.length;
 stormSelect.disabled=!typhoonState.storms.length;
+
+typhoonState.root?.querySelectorAll('[data-role="fcstOption"]').forEach(input=>{
+input.checked=Number(input.value)===typhoonState.selectedFcstHours;
+});
 }
 
-function updateTyphoonSubtitle(){
+function updateTyphoonSubtitle(run=getSelectedTyphoonRun()){
 let subtitle=typhoonState.root?.querySelector('[data-role="subtitle"]');
 if(!subtitle){
 return;
 }
-let manifest=typhoonState.manifest || {};
-let updated=formatTyphoonTime(manifest.updated_at_utc);
-let count=typhoonState.entries.length;
-subtitle.textContent=updated ? `VTG · ${updated} 업데이트 · ${count}개 산출물` : `VTG · ${count}개 산출물`;
+let updated=formatTyphoonKst(run?.generatedAt || run?.metadata?.generated_at_utc || '');
+subtitle.textContent=updated && updated!=='-' ? `최근 업데이트 ${updated}` : '';
 }
 
 function renderTyphoonTimeline(){
@@ -430,38 +570,198 @@ return;
 
 let slots=typhoonState.slots;
 timeline.innerHTML='';
+timeline.style.setProperty('--forecast-count',String(slots.length || 1));
 slider.min='0';
 slider.max=String(Math.max(0,slots.length-1));
 slider.value=String(Math.min(typhoonState.selectedSlotIndex,Math.max(0,slots.length-1)));
 slider.disabled=slots.length<=1;
 
+let list=document.createElement('div');
+list.className='compare-timeline-list single-timeline-list typhoon-timeline-list';
+
+let row=document.createElement('div');
+row.className='compare-timeline-row single-timeline-row typhoon-timeline-row';
+
+let info=document.createElement('div');
+info.className='compare-row-info';
+info.innerHTML='<div class="compare-row-model">VTG</div>';
+
+let track=document.createElement('div');
+track.className='compare-track single-forecast-track typhoon-track';
+track.tabIndex=0;
+track.setAttribute('role','slider');
+track.setAttribute('aria-label','태풍 모델예측 시각 슬라이더');
+track.setAttribute('aria-valuemin','0');
+track.setAttribute('aria-valuemax',String(Math.max(0,slots.length-1)));
+track.setAttribute('aria-valuenow',String(typhoonState.selectedSlotIndex));
+track.style.gridTemplateColumns=`repeat(${Math.max(1,slots.length)}, minmax(4px, 1fr))`;
+
 slots.forEach((slot,index)=>{
 let segment=document.createElement('button');
 segment.type='button';
-segment.className='typhoon-time-segment'+(slot.entry?' available':' missing')+(index===typhoonState.selectedSlotIndex?' active':'');
-segment.textContent=formatCycleCompact(slot.dataTime);
+let classes=['compare-segment','forecast-segment',slot.entry?'state-available':'state-missing'];
+if(index===typhoonState.selectedSlotIndex){
+classes.push('active','active-time-label','active-lead-label');
+}
+if(index===0){
+classes.push('edge-start');
+}
+if(index===slots.length-1){
+classes.push('edge-end');
+}
+segment.className=classes.join(' ');
+segment.dataset.index=String(index);
+segment.dataset.time=formatTyphoonDateLabel(slot.dataTime);
+segment.dataset.lead=formatTyphoonHourLabel(slot.dataTime);
 segment.title=slot.entry ? formatTyphoonTime(slot.dataTime) : `${formatTyphoonTime(slot.dataTime)} 자료 없음`;
 segment.onclick=()=>{
-typhoonState.selectedSlotIndex=index;
-renderTyphoonSelectedRun();
-renderTyphoonTimeline();
+setTyphoonSlotIndex(index);
 };
-timeline.appendChild(segment);
+bindTyphoonTimelineHover(segment,list);
+track.appendChild(segment);
 });
 
 let selected=slots[typhoonState.selectedSlotIndex];
+if(selected){
+track.appendChild(createTyphoonTimelineLabel('date',typhoonState.selectedSlotIndex,slots.length,selected.dataTime));
+track.appendChild(createTyphoonTimelineLabel('hour',typhoonState.selectedSlotIndex,slots.length,selected.dataTime));
+}
+
+bindTyphoonTimelinePointer(track);
+
+row.appendChild(info);
+row.appendChild(track);
+list.appendChild(row);
+timeline.appendChild(list);
+
 label.textContent=selected ? formatTyphoonTime(selected.dataTime) : '';
 }
 
+function bindTyphoonTimelineHover(segment,list){
+segment.onpointerenter=()=>{
+segment.classList.add('hover-sync','hover-time-label','hover-lead-label');
+list.classList.add('is-hovering');
+};
+segment.onpointerleave=()=>{
+segment.classList.remove('hover-sync','hover-time-label','hover-lead-label');
+list.classList.remove('is-hovering');
+};
+}
+
+function bindTyphoonTimelinePointer(track){
+let dragging=false;
+let dragRect=null;
+let dragCount=1;
+let activePointerId=null;
+
+function indexFromClientX(clientX){
+let rect=dragRect || track.getBoundingClientRect();
+let x=Math.max(0,Math.min(clientX-rect.left,rect.width));
+let count=dragCount || typhoonState.slots.length || 1;
+return Math.max(0,Math.min(count-1,Math.floor((x/Math.max(1,rect.width))*count)));
+}
+
+function applyClientX(clientX){
+setTyphoonSlotIndex(indexFromClientX(clientX));
+}
+
+function beginDrag(event){
+if(event.button!==undefined && event.button!==0){
+return false;
+}
+event.preventDefault();
+track.focus?.({preventScroll:true});
+dragRect=track.getBoundingClientRect();
+dragCount=typhoonState.slots.length || 1;
+dragging=true;
+applyClientX(event.clientX);
+return true;
+}
+
+function endPointerDrag(){
+dragging=false;
+dragRect=null;
+dragCount=1;
+activePointerId=null;
+window.removeEventListener('pointermove',handleWindowPointerMove);
+window.removeEventListener('pointerup',handleWindowPointerUp);
+window.removeEventListener('pointercancel',handleWindowPointerUp);
+}
+
+function handleWindowPointerMove(event){
+if(!dragging || (activePointerId!==null && event.pointerId!==activePointerId)){
+return;
+}
+event.preventDefault();
+applyClientX(event.clientX);
+}
+
+function handleWindowPointerUp(event){
+if(activePointerId!==null && event.pointerId!==activePointerId){
+return;
+}
+endPointerDrag();
+}
+
+track.onpointerdown=event=>{
+if(!beginDrag(event)){
+return;
+}
+activePointerId=event.pointerId;
+window.addEventListener('pointermove',handleWindowPointerMove);
+window.addEventListener('pointerup',handleWindowPointerUp);
+window.addEventListener('pointercancel',handleWindowPointerUp);
+};
+
+track.onmousedown=event=>{
+if(window.PointerEvent || dragging || !beginDrag(event)){
+return;
+}
+
+let handleMove=moveEvent=>applyClientX(moveEvent.clientX);
+let handleUp=()=>{
+dragging=false;
+dragRect=null;
+dragCount=1;
+window.removeEventListener('mousemove',handleMove);
+window.removeEventListener('mouseup',handleUp);
+};
+
+window.addEventListener('mousemove',handleMove);
+window.addEventListener('mouseup',handleUp);
+};
+}
+
+function handleTyphoonKeydown(event){
+let active=document.activeElement;
+let tag=active?.tagName;
+
+if(tag==='INPUT' || tag==='SELECT' || tag==='TEXTAREA'){
+return;
+}
+
+if(event.key==='ArrowLeft' || event.key==='ArrowUp'){
+event.preventDefault();
+moveTyphoonSelection(-1);
+return;
+}
+
+if(event.key==='ArrowRight' || event.key==='ArrowDown'){
+event.preventDefault();
+moveTyphoonSelection(1);
+}
+}
+
 function renderTyphoonSelectedRun(){
-let slots=typhoonState.slots;
-let selected=slots[typhoonState.selectedSlotIndex];
+let selected=getSelectedTyphoonSlot();
 if(!selected){
+updateTyphoonSubtitle(null);
 renderTyphoonEmpty('표출 가능한 자료 없음');
 return;
 }
 
 if(!selected.entry){
+updateTyphoonSubtitle(null);
 renderTyphoonMissingSlot(selected.dataTime);
 return;
 }
@@ -471,13 +771,12 @@ renderTyphoonRun(selected.entry);
 
 function renderTyphoonRun(run){
 let viewer=typhoonState.root?.querySelector('[data-role="viewer"]');
-let side=typhoonState.root?.querySelector('[data-role="sidePanel"]');
-if(!viewer || !side){
+if(!viewer){
 return;
 }
 
+updateTyphoonSubtitle(run);
 viewer.innerHTML='';
-side.innerHTML='';
 
 if(!run.imagePath){
 renderTyphoonMissingSlot(run.dataTime);
@@ -500,84 +799,23 @@ error.classList.remove('hidden');
 
 viewer.appendChild(image);
 viewer.appendChild(error);
-renderTyphoonSidePanel(side,run);
-}
-
-function renderTyphoonSidePanel(side,run){
-let metadata=run.metadata || {};
-let models=displayModelLabels(metadata);
-
-let title=document.createElement('div');
-title.className='typhoon-side-title';
-title.textContent=cycleStormLabel(run);
-
-let rows=document.createElement('div');
-rows.className='typhoon-info-rows';
-
-[
-['자료시각',formatTyphoonTime(run.dataTime)],
-['KST',formatTyphoonKst(run.dataTime)],
-['예측기간',`${metadata.fcst_hours || '-'}h`],
-['강도',metadata.intensity || '-'],
-['모델',modelCountLabel(run)],
-['ATCF',metadata.atcf_id || run.job?.atcf_id || '-'],
-['TD',run.tdNumber ? `${run.tdNumber}호` : '-']
-].forEach(([rowLabel,value])=>{
-let row=document.createElement('div');
-row.className='typhoon-info-row';
-row.innerHTML=`<span>${escapeHtml(rowLabel)}</span><strong>${escapeHtml(value)}</strong>`;
-rows.appendChild(row);
-});
-
-let modelTitle=document.createElement('div');
-modelTitle.className='typhoon-model-title';
-modelTitle.textContent='표출 모델';
-
-let modelList=document.createElement('div');
-modelList.className='typhoon-model-list';
-
-if(models.length){
-models.forEach(model=>{
-let item=document.createElement('span');
-item.textContent=model;
-modelList.appendChild(item);
-});
-}
-else{
-let empty=document.createElement('span');
-empty.textContent='-';
-modelList.appendChild(empty);
-}
-
-side.appendChild(title);
-side.appendChild(rows);
-side.appendChild(modelTitle);
-side.appendChild(modelList);
 }
 
 function renderTyphoonMissingSlot(dataTime){
 let viewer=typhoonState.root?.querySelector('[data-role="viewer"]');
-let side=typhoonState.root?.querySelector('[data-role="sidePanel"]');
 if(viewer){
 viewer.innerHTML=`<div class="typhoon-status-panel">${escapeHtml(formatTyphoonTime(dataTime))} 자료 없음</div>`;
-}
-if(side){
-side.innerHTML='';
 }
 }
 
 function renderTyphoonEmpty(message){
 let viewer=typhoonState.root?.querySelector('[data-role="viewer"]');
-let side=typhoonState.root?.querySelector('[data-role="sidePanel"]');
 let timeline=typhoonState.root?.querySelector('[data-role="timeline"]');
 if(timeline){
 timeline.innerHTML='';
 }
 if(viewer){
 viewer.innerHTML=`<div class="typhoon-status-panel">${escapeHtml(message)}</div>`;
-}
-if(side){
-side.innerHTML='';
 }
 updateTyphoonSubtitle();
 renderTyphoonSelects();
@@ -605,8 +843,12 @@ function stormDropdownLabel(entry){
 if(entry.stage==='TD'){
 return `TD ${entry.typNumber}호`;
 }
-let name=entry.typNameKo || entry.typName;
+let name=entry.typNameKo || koreanTyphoonName(entry.typName) || entry.typName;
 return `제${entry.typNumber}호 ${name}`.trim();
+}
+
+function koreanTyphoonName(name){
+return TYPHOON_KO_NAME_FALLBACK[String(name || '').trim().toUpperCase()] || '';
 }
 
 function cycleStormLabel(run){
@@ -641,12 +883,18 @@ return path.slice(markerIndex);
 return path.replace(/^\/+/,'');
 }
 
+function parseTyphoonFcstHoursFromPath(value){
+let match=String(value || '').match(/_(\d{2,3})h\.png(?:$|\?)/i);
+return match ? Number(match[1]) : 0;
+}
+
 function cacheBustedTyphoonPath(path,version){
 if(!path){
 return '';
 }
 let separator=path.includes('?') ? '&' : '?';
-return `${path}${separator}fresh=${encodeURIComponent(version || Date.now())}`;
+let cacheKey=[version,TYPHOON_PAGE_CACHE_TOKEN].filter(Boolean).join('-') || Date.now();
+return `${path}${separator}fresh=${encodeURIComponent(cacheKey)}`;
 }
 
 function formatCycleCompact(value){
@@ -654,6 +902,44 @@ if(!value || value.length<10){
 return '-';
 }
 return `${value.slice(4,6)}-${value.slice(6,8)} ${value.slice(8,10)}UTC`;
+}
+
+function formatTyphoonDateLabel(value){
+if(!value || value.length<8){
+return '-';
+}
+return `${value.slice(4,6)}-${value.slice(6,8)}`;
+}
+
+function formatTyphoonHourLabel(value){
+if(!value || value.length<10){
+return '-';
+}
+return `${value.slice(8,10)}UTC`;
+}
+
+function getTyphoonTimelineLabelLeftPercent(index,count){
+if(count<=1){
+return 50;
+}
+return ((Number(index)+0.5)/count)*100;
+}
+
+function createTyphoonTimelineLabel(type,index,count,dataTime){
+let label=document.createElement('div');
+let isDate=type==='date';
+label.className='compare-active-label '+(isDate?'compare-active-time':'compare-active-lead');
+label.textContent=isDate ? formatTyphoonDateLabel(dataTime) : formatTyphoonHourLabel(dataTime);
+if(index===0){
+label.classList.add('edge-start');
+}
+if(index===count-1){
+label.classList.add('edge-end');
+}
+let leftPercent=getTyphoonTimelineLabelLeftPercent(index,count)+'%';
+label.style.left=leftPercent;
+label.style.setProperty('--label-left',leftPercent);
+return label;
 }
 
 function formatTyphoonTime(value){
@@ -669,18 +955,23 @@ if(!date){
 return '-';
 }
 date.setUTCHours(date.getUTCHours()+9);
-return `${date.getUTCFullYear()}-${pad2(date.getUTCMonth()+1)}-${pad2(date.getUTCDate())} ${pad2(date.getUTCHours())}KST`;
+return `${date.getUTCFullYear()}-${pad2(date.getUTCMonth()+1)}-${pad2(date.getUTCDate())} ${pad2(date.getUTCHours())}:${pad2(date.getUTCMinutes())} KST`;
 }
 
 function parseTyphoonUtcDate(value){
-if(!value || value.length<10){
+let raw=String(value || '').trim();
+if(!raw){
 return null;
 }
-let year=Number(value.slice(0,4));
-let month=Number(value.slice(4,6))-1;
-let day=Number(value.slice(6,8));
-let hour=Number(value.slice(8,10));
-let minute=Number(value.slice(10,12) || 0);
+if(!/^\d{10,14}$/.test(raw)){
+let date=new Date(raw);
+return Number.isNaN(date.getTime()) ? null : date;
+}
+let year=Number(raw.slice(0,4));
+let month=Number(raw.slice(4,6))-1;
+let day=Number(raw.slice(6,8));
+let hour=Number(raw.slice(8,10));
+let minute=Number(raw.slice(10,12) || 0);
 if([year,month,day,hour,minute].some(Number.isNaN)){
 return null;
 }

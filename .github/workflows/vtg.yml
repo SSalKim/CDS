@@ -40,7 +40,7 @@ jobs:
       MPLBACKEND: Agg
       PYTHONUNBUFFERED: "1"
       NOW_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.now || '' }}
-      FORCE_INPUT: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.force) }}
+      FORCE_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
       MANUAL_VTG_ARGS: ${{ github.event_name == 'workflow_dispatch' && inputs.manual_args || '' }}
       DRY_RUN_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
 
@@ -86,6 +86,7 @@ jobs:
               python vtg_manual_run.py --vtg-args "$MANUAL_VTG_ARGS"
             fi
           else
+            args+=(--fcst-hours "120,240" --no-auto-fcst-hours)
             python vtg_auto.py "${args[@]}"
           fi
 

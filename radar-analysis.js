@@ -1887,6 +1887,17 @@ dragging=false;
 };
 }
 
+function bindRadarTimelineHover(segment,list){
+segment.onpointerenter=()=>{
+segment.classList.add('hover-sync','hover-time-label','hover-lead-label');
+list.classList.add('is-hovering');
+};
+segment.onpointerleave=()=>{
+segment.classList.remove('hover-sync','hover-time-label','hover-lead-label');
+list.classList.remove('is-hovering');
+};
+}
+
 function moveRadarSelection(offset){
 setRadarActiveIndex(radarState.activeIndex+offset);
 }
@@ -1960,6 +1971,7 @@ seg.dataset.time=formatRadarDateLabel(frame);
 seg.dataset.lead=formatRadarTimeLabel(frame);
 seg.title=`${seg.dataset.time} / ${seg.dataset.lead}`;
 seg.onclick=()=>setRadarActiveIndex(index);
+bindRadarTimelineHover(seg,list);
 track.appendChild(seg);
 });
 

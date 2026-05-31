@@ -1246,7 +1246,7 @@ def robust_series_bounds(series: pd.Series) -> tuple[float, float]:
     if clean.empty:
         return 0.0, 0.0
     if len(clean) >= 10:
-        return float(clean.quantile(0.08)), float(clean.quantile(0.92))
+        return float(clean.quantile(0.05)), float(clean.quantile(0.95))
     return float(clean.min()), float(clean.max())
 
 
@@ -1272,15 +1272,15 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
 
     lat_min, lat_max = robust_series_bounds(primary["LAT"])
     lon_min, lon_max = robust_series_bounds(primary["LON"])
-    lat_span = max(lat_max - lat_min, 7.0)
-    lon_span = max(lon_max - lon_min, 9.0)
+    lat_span = max(lat_max - lat_min, 9.0)
+    lon_span = max(lon_max - lon_min, 12.0)
 
-    center_lat = (lat_min + lat_max) / 2 + max(-1.0, min(2.5, lat_span * 0.06))
-    center_lon = (lon_min + lon_max) / 2 + max(2.0, min(7.0, lon_span * 0.22))
+    center_lat = (lat_min + lat_max) / 2 + max(-0.8, min(2.0, lat_span * 0.04))
+    center_lon = (lon_min + lon_max) / 2 + max(1.2, min(5.0, lon_span * 0.12))
 
-    west_margin = lon_span * 0.68 + max(2.0, min(5.0, settings.margin_lon * 0.12))
-    east_margin = lon_span * 0.95 + max(6.0, min(10.0, settings.extra_east_lon))
-    lat_margin = lat_span * 0.72 + max(2.5, min(5.5, settings.margin_lat * 0.14))
+    west_margin = lon_span * 0.98 + max(4.0, min(7.0, settings.extra_west_lon + settings.margin_lon * 0.10))
+    east_margin = lon_span * 1.02 + max(7.0, min(11.0, settings.extra_east_lon))
+    lat_margin = lat_span * 0.84 + max(3.5, min(6.5, settings.margin_lat * 0.18))
 
     return [
         center_lon - west_margin,
@@ -1409,6 +1409,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
         extent,
         fig_width=fig_width,
         fig_height=fig_height,
+        east_expand_ratio=0.58 if settings.auto_extent else 0.75,
     )
 
     extent = clamp_west_pacific_extent(extent)

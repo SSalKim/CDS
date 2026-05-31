@@ -354,8 +354,12 @@ def build_storm_jobs(
     return jobs
 
 
-def metadata_path_for(output_root: Path, job: StormJob) -> Path:
-    return output_root / "metadata" / f"{job.data_time}_{job.storm_key}.json"
+def metadata_path_for(output_root: Path, job: StormJob, fcst_hours: int) -> Path:
+    return output_root / "metadata" / f"{job.data_time}_{job.storm_key}_{fcst_hours}h.json"
+
+
+def status_key_for(job: StormJob, fcst_hours: int) -> str:
+    return f"{job.storm_key}_{fcst_hours}h"
 
 
 def redacted_command(command: list[str]) -> list[str]:
@@ -377,7 +381,7 @@ def run_vtg(
     source_overrides: list[str],
     dry_run: bool,
 ) -> dict:
-    metadata_path = metadata_path_for(output_root, job)
+    metadata_path = metadata_path_for(output_root, job, fcst_hours)
     command = [
         python,
         str(PROJECT_ROOT / "VTG.py"),
@@ -460,6 +464,7 @@ def manifest_entry_from_metadata(path: Path, metadata: dict) -> dict:
             "typ_name": metadata.get("typ_name") or "NAMELESS",
             "typ_en": metadata.get("typ_name") or "",
             "atcf_id": metadata.get("atcf_id"),
+            "fcst_hours": metadata.get("fcst_hours"),
             "skip_atcf": bool(metadata.get("skip_atcf")),
         },
         "window": {"data_time": data_time},
@@ -477,14 +482,14 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
             if not isinstance(metadata, dict):
                 continue
             entry = manifest_entry_from_metadata(path, metadata)
-            key = f"{metadata.get('data_time')}|{metadata.get('storm_stage')}|{metadata.get('typ_number')}|{metadata.get('image_path')}"
+            key = f"{metadata.get('data_time')}|{metadata.get('storm_stage')}|{metadata.get('typ_number')}|{metadata.get('fcst_hours')}|{metadata.get('image_path')}"
             entries_by_key[key] = entry
 
     for entry in run_entries:
         metadata = entry.get("result", {}).get("metadata")
         if not isinstance(metadata, dict) or not metadata:
             continue
-        key = f"{metadata.get('data_time')}|{metadata.get('storm_stage')}|{metadata.get('typ_number')}|{metadata.get('image_path')}"
+        key = f"{metadata.get('data_time')}|{metadata.get('storm_stage')}|{metadata.get('typ_number')}|{metadata.get('fcst_hours')}|{metadata.get('image_path')}"
         entries_by_key[key] = entry
 
     return sorted(
@@ -493,8 +498,23 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
             item.get("job", {}).get("year") or 0,
             item.get("job", {}).get("typ_number") or 0,
             item.get("job", {}).get("data_time") or "",
+            item.get("result", {}).get("metadata", {}).get("fcst_hours") or 0,
         ),
     )
+
+
+def parse_fcst_hours(value: str) -> list[int]:
+    hours: list[int] = []
+    for token in str(value or "").replace(",", " ").split():
+        try:
+            hour = int(token)
+        except ValueError:
+            raise SystemExit("--fcst-hours must be a comma/space separated list of integers.")
+        if hour not in hours:
+            hours.append(hour)
+    if not hours:
+        raise SystemExit("--fcst-hours must include at least one forecast hour.")
+    return hours
 
 
 def parse_args() -> argparse.Namespace:
@@ -506,8 +526,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--status-path", type=Path, default=None)
     parser.add_argument("--manifest-path", type=Path, default=None)
     parser.add_argument("--python", default=sys.executable)
-    parser.add_argument("--fcst-hours", type=int, default=240)
-    parser.add_argument("--auto-fcst-hours", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--fcst-hours", default="120,240", help="Comma/space separated forecast hours to generate.")
+    parser.add_argument("--auto-fcst-hours", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--source-override", action="append", default=[])
     parser.add_argument("--complete-model-count", type=int, default=ACTIVE_MODEL_TARGET)
     parser.add_argument("--atcf-search-radius", type=int, default=3)
@@ -535,6 +555,8 @@ def main() -> int:
     if not args.auth_key:
         raise SystemExit("KMA_APIHUB_AUTH_KEY is required.")
 
+    fcst_hours_list = parse_fcst_hours(args.fcst_hours)
+
     years = {now.year}
     for window in windows:
         year = int(window.data_time[:4])
@@ -559,41 +581,43 @@ def main() -> int:
             atcf_search_radius=args.atcf_search_radius,
         )
         for job in jobs:
-            previous = cycle_status.get(job.storm_key, {})
-            if previous.get("completed") and not args.force:
+            for fcst_hours in fcst_hours_list:
+                status_key = status_key_for(job, fcst_hours)
+                previous = cycle_status.get(status_key, {})
+                if previous.get("completed") and not args.force:
+                    run_entries.append({
+                        "job": asdict(job),
+                        "window": asdict(window),
+                        "result": {"status": "skipped_completed", "metadata": previous.get("metadata")},
+                    })
+                    continue
+                actual_run_count += 1
+                result = run_vtg(
+                    job=job,
+                    output_root=output_root,
+                    auth_key=args.auth_key,
+                    python=args.python,
+                    fcst_hours=fcst_hours,
+                    auto_fcst_hours=args.auto_fcst_hours,
+                    source_overrides=args.source_override,
+                    dry_run=args.dry_run,
+                )
+                metadata = result.get("metadata") or {}
+                model_count = int(metadata.get("model_count") or 0)
+                completed = model_count >= args.complete_model_count
+                cycle_status[status_key] = {
+                    "updated_at_utc": format_utc_stamp(now),
+                    "completed": completed,
+                    "metadata": metadata,
+                    "last_status": result.get("status"),
+                    "reason": job.reason,
+                }
                 run_entries.append({
                     "job": asdict(job),
                     "window": asdict(window),
-                    "result": {"status": "skipped_completed", "metadata": previous.get("metadata")},
+                    "result": result,
+                    "completed": completed,
                 })
-                continue
-            actual_run_count += 1
-            result = run_vtg(
-                job=job,
-                output_root=output_root,
-                auth_key=args.auth_key,
-                python=args.python,
-                fcst_hours=args.fcst_hours,
-                auto_fcst_hours=args.auto_fcst_hours,
-                source_overrides=args.source_override,
-                dry_run=args.dry_run,
-            )
-            metadata = result.get("metadata") or {}
-            model_count = int(metadata.get("model_count") or 0)
-            completed = model_count >= args.complete_model_count
-            cycle_status[job.storm_key] = {
-                "updated_at_utc": format_utc_stamp(now),
-                "completed": completed,
-                "metadata": metadata,
-                "last_status": result.get("status"),
-                "reason": job.reason,
-            }
-            run_entries.append({
-                "job": asdict(job),
-                "window": asdict(window),
-                "result": result,
-                "completed": completed,
-            })
 
     previous_manifest = load_json(manifest_path, {})
     manifest = {

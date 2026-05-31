@@ -50,8 +50,9 @@ def main() -> int:
 
     typ_number = int(option_value(tokens, ("--typ-number",), "0") or 0)
     storm_stage = (option_value(tokens, ("--storm-stage",), "TYP") or "TYP").upper()
+    fcst_hours = int(option_value(tokens, ("--fcst-hours",), "120") or 120)
     year = data_time[:4]
-    metadata_name = f"{data_time}_{storm_stage.lower()}_{year}_{typ_number:02d}.json"
+    metadata_name = f"{data_time}_{storm_stage.lower()}_{year}_{typ_number:02d}_{fcst_hours}h.json"
     metadata_path = args.output_root / "metadata" / metadata_name
 
     command = [args.python, str(PROJECT_ROOT / "VTG.py"), *tokens]
@@ -90,6 +91,7 @@ def main() -> int:
                     "typ_name": metadata.get("typ_name", ""),
                     "typ_en": metadata.get("typ_name", ""),
                     "atcf_id": metadata.get("atcf_id"),
+                    "fcst_hours": metadata.get("fcst_hours", fcst_hours),
                     "skip_atcf": bool(metadata.get("skip_atcf")),
                 },
                 "window": {"data_time": metadata.get("data_time", data_time)},
