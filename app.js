@@ -251,6 +251,7 @@ updateProducts=true,
 updateHours=true,
 resetSlider=true,
 preserveForecastHour=null,
+imageRefreshToken='',
 updateChartAfter=true
 }={}){
 
@@ -301,14 +302,17 @@ return;
 }
 
 if(!auxAvailabilityCache.has(key)){
-await probeAuxAvailabilityForCurrentSelection();
+await probeAuxAvailabilityForCurrentSelection({
+preserveForecastHour,
+imageRefreshToken
+});
 return;
 }
 
 }
 
 if(updateChartAfter){
-updateChart();
+updateChart({imageRefreshToken});
 }
 
 }
@@ -331,6 +335,20 @@ return null;
 let index=Number(slider.value || 0);
 
 return forecastTimelineState.getHour(index);
+
+}
+
+function getSelectedTimelineHourForPreserve(){
+
+if(!currentForecastList || !currentForecastList.length){
+return null;
+}
+
+let index=forecastTimelineState.clampIndex(Number(slider.value || 0));
+let hour=currentForecastList[index];
+let numericHour=Number(hour);
+
+return Number.isFinite(numericHour) ? numericHour : null;
 
 }
 
@@ -1400,7 +1418,9 @@ return CDSChartUtils.loadImage(url,timeoutMs);
 }
 
 
-async function preloadForecastIndex(index,seq){
+async function preloadForecastIndex(index,seq,{
+imageRefreshToken=''
+}={}){
 
 let baseUrls=buildImageUrlsForForecastIndex(index);
 
@@ -1417,14 +1437,15 @@ if(seq!==imagePreloadSeq){
 return {index,ok:false,urls,baseUrls,cancelled:true};
 }
 
-let ok=await urlsExist(urls);
+let loadUrls=addImageRefreshTokenToUrls(urls,imageRefreshToken);
+let ok=await urlsExist(loadUrls);
 
 if(seq!==imagePreloadSeq){
 return {index,ok:false,urls,baseUrls,cancelled:true};
 }
 
 if(ok && urls.some(isNmscSatelliteUrl)){
-await CDSImagePipeline.prepareDisplayImages(urls,{
+await CDSImagePipeline.prepareDisplayImages(loadUrls,{
 createDisplayImage:createDecodedDisplayImage,
 existenceMode:getProductExistenceMode()
 });
@@ -1437,14 +1458,16 @@ return {index,ok:false,urls,baseUrls,cancelled:true};
 return {
 index,
 ok,
-urls,
+urls:loadUrls,
 baseUrls
 };
 
 }
 
 
-async function preloadAllForecastImages(){
+async function preloadAllForecastImages({
+imageRefreshToken=''
+}={}){
 
 let seq=++imagePreloadSeq;
 let count=currentForecastList.length || 1;
@@ -1458,7 +1481,7 @@ count,
 concurrency:IMAGE_PRELOAD_CONCURRENCY,
 isCancelled:()=>seq!==imagePreloadSeq,
 task:async i=>{
-let result=await preloadForecastIndex(i,seq);
+let result=await preloadForecastIndex(i,seq,{imageRefreshToken});
 
 if(seq!==imagePreloadSeq || result.cancelled){
 return false;
@@ -1624,7 +1647,9 @@ return true;
 }
 
 
-function updateChart(){
+function updateChart({
+imageRefreshToken=''
+}={}){
 
 invalidateImagePreload();
 invalidateForecastDisplay();
@@ -1647,7 +1672,7 @@ return;
 
 }
 
-preloadAllForecastImages();
+preloadAllForecastImages({imageRefreshToken});
 
 }
 
@@ -1728,18 +1753,42 @@ checkAvailability:true
 }
 
 async function urlsExist(urls,{
-existenceMode=getProductExistenceMode()
+existenceMode=getProductExistenceMode(),
+imageRefreshToken=''
 }={}){
 
 return CDSImagePipeline.urlsExist(urls,{
-loadImage,
+loadImage:url=>loadImage(addImageRefreshToken(url,imageRefreshToken)),
 existenceMode
 });
 
 }
 
+function addImageRefreshToken(url,token){
 
-async function currentSelectionExistsAtRun(runUTC){
+if(!token || typeof url!=='string'){
+return url;
+}
+
+let separator=url.includes('?') ? '&' : '?';
+return `${url}${separator}_cds_refresh=${encodeURIComponent(token)}`;
+
+}
+
+function addImageRefreshTokenToUrls(urls,token){
+
+if(!token || !Array.isArray(urls)){
+return urls;
+}
+
+return urls.map(url=>addImageRefreshToken(url,token));
+
+}
+
+
+async function currentSelectionExistsAtRun(runUTC,{
+imageRefreshToken=''
+}={}){
 
 let urls=buildImageUrlsForCurrentSelectionAtRun(
 runUTC
@@ -1755,7 +1804,7 @@ urls:[]
 }
 
 let resolvedUrls=await resolveAnalysisResolutionUrls(urls);
-let exists=await urlsExist(resolvedUrls);
+let exists=await urlsExist(resolvedUrls,{imageRefreshToken});
 
 return {
 exists,
@@ -1909,10 +1958,13 @@ return true;
 
 
 async function jumpLatestAvailableForCurrentSelection({
-silent=false
+silent=false,
+preserveForecastHour=getSelectedTimelineHourForPreserve(),
+forceImageRefresh=false
 }={}){
 
 let searchId=++latestSearchSeq;
+let imageRefreshToken=forceImageRefresh ? String(Date.now()) : '';
 
 setViewerLoading(true,'최신 자료 검색 중');
 
@@ -1932,7 +1984,8 @@ return false;
 }
 
 let result=await currentSelectionExistsAtRun(
-runUTC
+runUTC,
+{imageRefreshToken}
 );
 
 if(searchId!==latestSearchSeq){
@@ -1948,6 +2001,8 @@ updateCategories:false,
 updateProducts:true,
 updateHours:false,
 resetSlider:true,
+preserveForecastHour,
+imageRefreshToken,
 updateChartAfter:true
 });
 
@@ -1970,7 +2025,7 @@ makeLatestNotFoundMessage()
 }
 else{
 
-updateChart();
+updateChart({imageRefreshToken});
 
 }
 
@@ -2007,7 +2062,7 @@ setViewerLoading(false);
 
 function handleCategoryChange(){
 
-let previousForecastHour=getSelectedForecastHour();
+let previousForecastHour=getSelectedTimelineHourForPreserve();
 
 if(getActiveModelSpecificProductCategory()[currentModel]){
 return;
@@ -2054,7 +2109,7 @@ updateChartAfter:true
 
 function handleProductChange(event){
 
-let previousForecastHour=getSelectedForecastHour();
+let previousForecastHour=getSelectedTimelineHourForPreserve();
 
 if(!event.target.value){
 return;
@@ -2219,7 +2274,8 @@ utcBtn.onclick=()=>switchTimeMode('UTC');
 nowBtn.onclick=()=>{
 
 jumpLatestAvailableForCurrentSelection({
-silent:false
+silent:false,
+forceImageRefresh:true
 });
 
 };

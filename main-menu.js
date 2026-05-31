@@ -48,6 +48,8 @@ if(menuId===currentMainMenu){
 return;
 }
 
+let previousForecastHour=getSelectedTimelineHourForPreserve();
+
 invalidateSelectionAsyncWork();
 currentMainMenu=menuId;
 
@@ -88,13 +90,15 @@ updateCategories:true,
 updateProducts:true,
 updateHours:true,
 resetSlider:true,
+preserveForecastHour:previousForecastHour,
 updateChartAfter:false
 });
 
 setTimeout(()=>{
 
 jumpLatestAvailableForCurrentSelection({
-silent:false
+silent:false,
+preserveForecastHour:previousForecastHour
 });
 
 },0);

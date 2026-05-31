@@ -350,6 +350,8 @@ if(!supported){
 return;
 }
 
+let previousForecastHour=getSelectedTimelineHourForPreserve();
+
 invalidateSelectionAsyncWork({latest:false});
 currentAuxValue=item.value;
 
@@ -358,6 +360,7 @@ updateCategories:false,
 updateProducts:false,
 updateHours:false,
 resetSlider:true,
+preserveForecastHour:previousForecastHour,
 updateChartAfter:true
 });
 
@@ -408,6 +411,8 @@ if(nextIndex===currentIndex){
 return;
 }
 
+let previousForecastHour=getSelectedTimelineHourForPreserve();
+
 currentAuxValue=items[nextIndex].value;
 
 refreshView({
@@ -415,6 +420,7 @@ updateCategories:false,
 updateProducts:false,
 updateHours:false,
 resetSlider:true,
+preserveForecastHour:previousForecastHour,
 updateChartAfter:true
 });
 
@@ -438,7 +444,10 @@ return await urlsExist(urls);
 
 }
 
-async function probeAuxAvailabilityForCurrentSelection(){
+async function probeAuxAvailabilityForCurrentSelection({
+preserveForecastHour=null,
+imageRefreshToken=''
+}={}){
 
 let config=getCurrentAuxConfig();
 let rule=getCurrentAuxRule();
@@ -520,7 +529,10 @@ currentAuxValue=[...availableValues][0] || null;
 }
 
 renderAuxSidebar();
-rebuildForecastAxis({reset:true});
+rebuildForecastAxis({
+reset:true,
+preserveForecastHour
+});
 setViewerLoading(false);
 
 if(availableValues.size===0){
@@ -528,7 +540,7 @@ showViewerMessage('해당 시각에 사용 가능한 관측단열선도 지점�
 return true;
 }
 
-updateChart();
+updateChart({imageRefreshToken});
 return true;
 
 }
