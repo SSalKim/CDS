@@ -247,10 +247,10 @@ let groups=getVisibleModelGroups().filter(
 group=>!group.hidden
 );
 
-let modelBox=modelGrid.closest('.model-box');
+let radarLauncher=null;
 
-if(modelBox){
-modelBox.classList.toggle('hidden',groups.length===0);
+if(typeof renderRadarAnalysisLauncher==='function'){
+radarLauncher=renderRadarAnalysisLauncher();
 }
 
 let compareToggle=renderModelCompareToggle();
@@ -371,12 +371,14 @@ modelGrid.appendChild(section);
 
 });
 
-if(typeof renderRadarAnalysisLauncher==='function'){
-let radarLauncher=renderRadarAnalysisLauncher();
-
 if(radarLauncher){
 modelGrid.appendChild(radarLauncher);
 }
+
+let modelBox=modelGrid.closest('.model-box');
+
+if(modelBox){
+modelBox.classList.toggle('hidden',modelGrid.children.length===0);
 }
 
 }

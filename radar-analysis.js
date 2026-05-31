@@ -3476,9 +3476,6 @@ window.open('radar.html','_blank','noopener');
 }
 
 function renderRadarAnalysisLauncher(){
-if(currentMainMenu!=='forecast'){
-return null;
-}
 
 let section=document.createElement('div');
 section.className='model-section radar-analysis-section';

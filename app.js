@@ -67,6 +67,7 @@ const CURRENT_PRODUCT_EXISTENCE_MODE="all";
 const AUTO_CHECK_LATEST_ON_SELECTION_CHANGE=false;
 
 const NOW_LOOKBACK_HOURS=24;
+const SST_LOOKBACK_HOURS=48;
 const NOW_MAX_CANDIDATES=32;
 const NOW_IMAGE_TIMEOUT_MS=7000;
 const PRELOAD_IMAGE_TIMEOUT_MS=15000;
@@ -75,6 +76,7 @@ const DISPLAY_IMAGE_MAX_RETRIES=2;
 const AUTO_CHECK_DEBOUNCE_MS=250;
 
 let latestSearchSeq=0;
+let latestSearchInProgress=false;
 let autoCheckTimer=null;
 
 function invalidateForecastDisplay(){
@@ -102,6 +104,7 @@ imagePreloadSeq++;
 function invalidateLatestSearch(){
 
 latestSearchSeq++;
+latestSearchInProgress=false;
 clearTimeout(autoCheckTimer);
 
 }
@@ -1465,12 +1468,32 @@ baseUrls
 }
 
 
+async function jumpOlderAvailableRunForMissingSelection(){
+
+if(latestSearchInProgress || modelCompareMode){
+return false;
+}
+
+let baseRunUTC=getSelectedUTCDate();
+
+await jumpLatestAvailableForCurrentSelection({
+silent:false,
+preserveForecastHour:getSelectedTimelineHourForPreserve(),
+baseDate:baseRunUTC,
+skipRunUTC:baseRunUTC
+});
+
+return true;
+
+}
+
 async function preloadAllForecastImages({
 imageRefreshToken=''
 }={}){
 
 let seq=++imagePreloadSeq;
 let count=currentForecastList.length || 1;
+let availableCount=0;
 resetForecastImageCache();
 setAllForecastLoadStates(count,'loading');
 renderForecastTimeline();
@@ -1485,6 +1508,10 @@ let result=await preloadForecastIndex(i,seq,{imageRefreshToken});
 
 if(seq!==imagePreloadSeq || result.cancelled){
 return false;
+}
+
+if(result.ok){
+availableCount++;
 }
 
 setForecastLoadState(i,result.ok ? 'available' : 'missing');
@@ -1502,6 +1529,13 @@ displayCurrentForecastImage();
 });
 
 if(seq!==imagePreloadSeq){
+return;
+}
+
+if(
+availableCount===0 &&
+await jumpOlderAvailableRunForMissingSelection()
+){
 return;
 }
 
@@ -1813,6 +1847,61 @@ urls:resolvedUrls
 
 }
 
+function isSeaSurfaceTemperatureDailySelection(product=getCurrentProduct()){
+
+return !!(
+currentMainMenu==='analysis' &&
+product?.category==='ssta' &&
+currentModel==='usst'
+);
+
+}
+
+function getLatestSearchLookbackHours(product=getCurrentProduct()){
+
+let baseLookback=Math.max(24,Number(NOW_LOOKBACK_HOURS) || 24);
+
+if(isSeaSurfaceTemperatureDailySelection(product)){
+return Math.max(baseLookback,SST_LOOKBACK_HOURS);
+}
+
+return baseLookback;
+
+}
+
+function getLatestSearchMaxCandidates(lookbackHours){
+
+let hours=Math.max(0,Number(lookbackHours) || 0);
+
+return Math.max(
+NOW_MAX_CANDIDATES,
+Math.floor(hours)+1
+);
+
+}
+
+function getDefaultLatestSearchBaseDate(product=getCurrentProduct()){
+
+let now=new Date();
+
+if(!isSeaSurfaceTemperatureDailySelection(product)){
+return now;
+}
+
+let kstNow=new Date(now.getTime()+9*60*60*1000);
+
+return new Date(Date.UTC(
+kstNow.getUTCFullYear(),
+kstNow.getUTCMonth(),
+kstNow.getUTCDate()-1,
+23,
+0,
+0,
+0
+));
+
+}
+
 function getRecentRunCandidates(
 modelId,
 baseDate=new Date(),
@@ -1960,11 +2049,19 @@ return true;
 async function jumpLatestAvailableForCurrentSelection({
 silent=false,
 preserveForecastHour=getSelectedTimelineHourForPreserve(),
-forceImageRefresh=false
+forceImageRefresh=false,
+baseDate=null,
+skipRunUTC=null
 }={}){
 
 let searchId=++latestSearchSeq;
+latestSearchInProgress=true;
 let imageRefreshToken=forceImageRefresh ? String(Date.now()) : '';
+let product=getCurrentProduct();
+let lookbackHours=getLatestSearchLookbackHours(product);
+let maxCandidates=getLatestSearchMaxCandidates(lookbackHours);
+let searchBaseDate=baseDate || getDefaultLatestSearchBaseDate(product);
+let skipRunStamp=skipRunUTC ? formatUTCStampFromDate(skipRunUTC) : null;
 
 setViewerLoading(true,'최신 자료 검색 중');
 
@@ -1972,15 +2069,19 @@ try{
 
 let candidates=getRecentRunCandidates(
 currentModel,
-new Date(),
-NOW_LOOKBACK_HOURS,
-NOW_MAX_CANDIDATES
+searchBaseDate,
+lookbackHours,
+maxCandidates
 );
 
 for(let runUTC of candidates){
 
 if(searchId!==latestSearchSeq){
 return false;
+}
+
+if(skipRunStamp && formatUTCStampFromDate(runUTC)===skipRunStamp){
+continue;
 }
 
 let result=await currentSelectionExistsAtRun(
@@ -2051,6 +2152,7 @@ if(searchId!==latestSearchSeq){
 return;
 }
 
+latestSearchInProgress=false;
 setViewerLoading(false);
 
 }
