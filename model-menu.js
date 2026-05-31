@@ -247,10 +247,14 @@ let groups=getVisibleModelGroups().filter(
 group=>!group.hidden
 );
 
-let radarLauncher=null;
+let utilityLaunchers=[];
 
 if(typeof renderRadarAnalysisLauncher==='function'){
-radarLauncher=renderRadarAnalysisLauncher();
+utilityLaunchers.push(renderRadarAnalysisLauncher());
+}
+
+if(typeof renderTyphoonGuidanceLauncher==='function'){
+utilityLaunchers.push(renderTyphoonGuidanceLauncher());
 }
 
 let compareToggle=renderModelCompareToggle();
@@ -371,9 +375,7 @@ modelGrid.appendChild(section);
 
 });
 
-if(radarLauncher){
-modelGrid.appendChild(radarLauncher);
-}
+utilityLaunchers.filter(Boolean).forEach(launcher=>modelGrid.appendChild(launcher));
 
 let modelBox=modelGrid.closest('.model-box');
 

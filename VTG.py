@@ -1081,9 +1081,14 @@ def write_run_metadata(
     intensity: str,
 ) -> None:
     model_names = sorted(plotted_model_names(df, settings))
+    image_path = target
+    try:
+        image_path = target.resolve().relative_to(PROJECT_ROOT.resolve())
+    except ValueError:
+        pass
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"),
-        "image_path": str(target.as_posix()),
+        "image_path": image_path.as_posix(),
         "storm_stage": settings.storm_stage,
         "storm_year": storm_year(settings),
         "typ_number": settings.typ_number,
