@@ -470,7 +470,7 @@ def manifest_entry_from_metadata(path: Path, metadata: dict) -> dict:
         },
         "window": {"data_time": data_time},
         "result": {"status": "inventory", "metadata": metadata},
-        "metadata_path": str(path.as_posix()),
+        "metadata_path": relative_asset_path(path),
     }
 
 
@@ -540,6 +540,12 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
             metadata = load_json(path, None)
             if not isinstance(metadata, dict):
                 continue
+            try:
+                fcst_hours = int(metadata.get("fcst_hours") or 0)
+            except (TypeError, ValueError):
+                continue
+            if fcst_hours not in VALID_FCST_HOURS:
+                continue
             entry = manifest_entry_from_metadata(path, metadata)
             key = manifest_inventory_key(metadata)
             entries_by_key[key] = entry
@@ -563,6 +569,12 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
     for entry in run_entries:
         metadata = entry.get("result", {}).get("metadata")
         if not isinstance(metadata, dict) or not metadata:
+            continue
+        try:
+            fcst_hours = int(metadata.get("fcst_hours") or 0)
+        except (TypeError, ValueError):
+            continue
+        if fcst_hours not in VALID_FCST_HOURS:
             continue
         key = manifest_inventory_key(metadata)
         entries_by_key[key] = entry
@@ -608,7 +620,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--auto-fcst-hours", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--source-override", action="append", default=[])
     parser.add_argument("--complete-model-count", type=int, default=ACTIVE_MODEL_TARGET)
+    parser.add_argument("--min-run-interval-minutes", type=int, default=0)
     parser.add_argument("--atcf-search-radius", type=int, default=3)
+    parser.add_argument("--index-only", action="store_true", help="Rebuild manifest inventory from existing PNG/metadata files and exit.")
     parser.add_argument("--force", action="store_true", help="Run even if a previous metadata record met the completion target.")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
@@ -629,6 +643,21 @@ def main() -> int:
     windows = active_cycle_windows(now)
     status = load_json(status_path, {"cycles": {}})
     manual_map = load_manual_map(args.manual_map)
+
+    if args.index_only:
+        manifest = {
+            "updated_at_utc": format_utc_stamp(now),
+            "window_start_offset_hours": WINDOW_START_OFFSET_HOURS,
+            "window_end_offset_hours": WINDOW_END_OFFSET_HOURS,
+            "complete_model_count": args.complete_model_count,
+            "active_windows": [asdict(window) for window in windows],
+            "runs": [],
+            "inventory": build_manifest_inventory(output_root, []),
+        }
+        if not args.dry_run:
+            write_json(manifest_path, manifest)
+        print(json.dumps(manifest, ensure_ascii=False, indent=2))
+        return 0
 
     if not args.auth_key:
         raise SystemExit("KMA_APIHUB_AUTH_KEY is required.")
@@ -667,6 +696,19 @@ def main() -> int:
                         "job": asdict(job),
                         "window": asdict(window),
                         "result": {"status": "skipped_completed", "metadata": previous.get("metadata")},
+                    })
+                    continue
+                previous_updated = parse_utc_stamp(previous.get("updated_at_utc", ""))
+                if (
+                    args.min_run_interval_minutes > 0
+                    and previous_updated
+                    and now - previous_updated < timedelta(minutes=args.min_run_interval_minutes)
+                    and not args.force
+                ):
+                    run_entries.append({
+                        "job": asdict(job),
+                        "window": asdict(window),
+                        "result": {"status": "skipped_recent", "metadata": previous.get("metadata")},
                     })
                     continue
                 actual_run_count += 1

@@ -2,7 +2,8 @@ name: Generate VTG images
 
 on:
   schedule:
-    - cron: "3-59/10 * * * *"
+    - cron: "3,13,23,33,43,53 * * * *"
+    - cron: "8,18,28,38,48,58 * * * *"
   workflow_dispatch:
     inputs:
       now:
@@ -86,7 +87,7 @@ jobs:
               python vtg_manual_run.py --vtg-args "$MANUAL_VTG_ARGS"
             fi
           else
-            args+=(--fcst-hours "120,240" --no-auto-fcst-hours)
+            args+=(--fcst-hours "120,240" --no-auto-fcst-hours --min-run-interval-minutes 8)
             python vtg_auto.py "${args[@]}"
           fi
 
