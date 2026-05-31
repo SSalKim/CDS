@@ -339,7 +339,7 @@ children:[
     id:'SPOT',
     baseUrl:RADAR_CMP_IMAGE_URL,
     label:'강수정체(SPOT)',
-    params:{cmp:'SPT'}
+    params:{cmp:'SPT', qcd:'KMA'}
     },
 ]
 },
