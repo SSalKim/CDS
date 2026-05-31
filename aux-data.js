@@ -115,116 +115,66 @@ kmaStations:{
     },
     {
       type: "item",
-      value: "47143",
-      label: "143 대구"
+      value: "47131",
+      label: "131 청주"
     },
     {
       type: "item",
-      value: "47142",
-      label: "- 142 대구공항"
+      value: "47128",
+      label: "- 128 청주공항"
     },
     {
       type: "item",
-      value: "47130",
-      label: "- 130 울진"
+      value: "47127",
+      label: "- 127 충주"
     },
     {
       type: "item",
-      value: "47136",
-      label: "- 136 안동"
+      value: "47135",
+      label: "- 135 추풍령"
     },
     {
       type: "item",
-      value: "47137",
-      label: "- 137 상주"
-    },
-    {
-      type: "item",
-      value: "47138",
-      label: "- 138 포항"
-    },
-    {
-      type: "item",
-      value: "47139",
-      label: "- 139 포항공항"
-    },
-    {
-      type: "item",
-      value: "47279",
-      label: "- 279 구미"
-    },
-    {
-      type: "item",
-      value: "47283",
-      label: "- 283 경주"
-    },
-    {
-      type: "item",
-      value: "47115",
-      label: "- 115 울릉도"
-    },
-    {
-      type: "item",
-      value: "47096",
-      label: "- 096 독도"
+      value: "47605",
+      label: "- 605 영동"
     },
     {
       type: "separator"
     },
     {
       type: "item",
-      value: "47159",
-      label: "159 부산"
+      value: "47133",
+      label: "133 대전"
     },
     {
       type: "item",
-      value: "47152",
-      label: "- 152 울산"
+      value: "47129",
+      label: "- 129 서산"
     },
     {
       type: "item",
-      value: "47151",
-      label: "- 151 울산공항"
+      value: "47177",
+      label: "- 177 홍성"
     },
     {
       type: "item",
-      value: "47153",
-      label: "- 153 김해공항"
+      value: "47239",
+      label: "- 239 세종"
     },
     {
       type: "item",
-      value: "47155",
-      label: "- 155 창원"
+      value: "47232",
+      label: "- 232 천안"
     },
     {
       type: "item",
-      value: "47255",
-      label: "- 255 북창원"
-    },
-    {
-      type: "item",
-      value: "47161",
-      label: "- 161 사천공항"
-    },
-    {
-      type: "item",
-      value: "47162",
-      label: "- 162 통영"
-    },
-    {
-      type: "item",
-      value: "47192",
-      label: "- 192 진주"
-    },
-    {
-      type: "item",
-      value: "47284",
-      label: "- 284 거창"
+      value: "47235",
+      label: "- 235 보령"
     },
     {
       type: "separator"
     },
-    {
+     {
       type: "item",
       value: "47146",
       label: "146 전주"
@@ -337,61 +287,111 @@ kmaStations:{
     },
     {
       type: "item",
-      value: "47133",
-      label: "133 대전"
+      value: "47143",
+      label: "143 대구"
     },
     {
       type: "item",
-      value: "47129",
-      label: "- 129 서산"
+      value: "47142",
+      label: "- 142 대구공항"
     },
     {
       type: "item",
-      value: "47177",
-      label: "- 177 홍성"
+      value: "47130",
+      label: "- 130 울진"
     },
     {
       type: "item",
-      value: "47239",
-      label: "- 239 세종"
+      value: "47136",
+      label: "- 136 안동"
     },
     {
       type: "item",
-      value: "47232",
-      label: "- 232 천안"
+      value: "47137",
+      label: "- 137 상주"
     },
     {
       type: "item",
-      value: "47235",
-      label: "- 235 보령"
+      value: "47138",
+      label: "- 138 포항"
+    },
+    {
+      type: "item",
+      value: "47139",
+      label: "- 139 포항공항"
+    },
+    {
+      type: "item",
+      value: "47279",
+      label: "- 279 구미"
+    },
+    {
+      type: "item",
+      value: "47283",
+      label: "- 283 경주"
+    },
+    {
+      type: "item",
+      value: "47115",
+      label: "- 115 울릉도"
+    },
+    {
+      type: "item",
+      value: "47096",
+      label: "- 096 독도"
     },
     {
       type: "separator"
     },
     {
       type: "item",
-      value: "47131",
-      label: "131 청주"
+      value: "47159",
+      label: "159 부산"
     },
     {
       type: "item",
-      value: "47128",
-      label: "- 128 청주공항"
+      value: "47152",
+      label: "- 152 울산"
     },
     {
       type: "item",
-      value: "47127",
-      label: "- 127 충주"
+      value: "47151",
+      label: "- 151 울산공항"
     },
     {
       type: "item",
-      value: "47135",
-      label: "- 135 추풍령"
+      value: "47153",
+      label: "- 153 김해공항"
     },
     {
       type: "item",
-      value: "47605",
-      label: "- 605 영동"
+      value: "47155",
+      label: "- 155 창원"
+    },
+    {
+      type: "item",
+      value: "47255",
+      label: "- 255 북창원"
+    },
+    {
+      type: "item",
+      value: "47161",
+      label: "- 161 사천공항"
+    },
+    {
+      type: "item",
+      value: "47162",
+      label: "- 162 통영"
+    },
+    {
+      type: "item",
+      value: "47192",
+      label: "- 192 진주"
+    },
+    {
+      type: "item",
+      value: "47284",
+      label: "- 284 거창"
     },
     {
       type: "separator"
