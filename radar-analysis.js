@@ -2730,6 +2730,44 @@ control.appendChild(panel);
 return control;
 }
 
+function createRadarDatePickerMonth(year,month){
+let out=new Date(0,0,1);
+out.setFullYear(Number(year) || new Date().getFullYear(),Number(month) || 0,1);
+out.setHours(0,0,0,0);
+return out;
+}
+
+function getRadarDatePickerMaxYear(){
+return new Date().getFullYear();
+}
+
+function clampRadarDatePickerVisibleMonth(date){
+let maxYear=getRadarDatePickerMaxYear();
+let year=date.getFullYear();
+let month=date.getMonth();
+
+if(year>maxYear){
+year=maxYear;
+month=11;
+}
+
+if(year<1){
+year=1;
+month=0;
+}
+
+return createRadarDatePickerMonth(year,month);
+}
+
+function getRadarDatePickerYearRange(centerYear){
+let maxYear=getRadarDatePickerMaxYear();
+let year=Math.max(1,Math.min(maxYear,Number(centerYear) || maxYear));
+return {
+start:Math.max(1,year-10),
+end:Math.min(maxYear,year+10)
+};
+}
+
 function createRadarDateTimeControl(dateInput){
 let control=document.createElement('div');
 control.className='radar-datetime-picker-control';
@@ -2744,7 +2782,7 @@ let panel=document.createElement('div');
 panel.className='radar-datetime-picker-panel hidden';
 panel.onclick=event=>event.stopPropagation();
 
-let visibleMonth=new Date(radarState.baseTime.getFullYear(),radarState.baseTime.getMonth(),1);
+let visibleMonth=clampRadarDatePickerVisibleMonth(createRadarDatePickerMonth(radarState.baseTime.getFullYear(),radarState.baseTime.getMonth()));
 let pendingDate=null;
 let pendingTime=null;
 
@@ -2797,6 +2835,7 @@ setRadarBaseTime(parseLocalDateTime(dateInput.value));
 }
 
 function renderCalendar(){
+visibleMonth=clampRadarDatePickerVisibleMonth(visibleMonth);
 let selected=getCurrentDateParts();
 let year=visibleMonth.getFullYear();
 let month=visibleMonth.getMonth();
@@ -2812,7 +2851,7 @@ prev.className='radar-date-picker-nav';
 prev.textContent='‹';
 prev.onclick=event=>{
 event.stopPropagation();
-visibleMonth=new Date(year,month-1,1);
+visibleMonth=clampRadarDatePickerVisibleMonth(createRadarDatePickerMonth(year,month-1));
 renderPanel();
 };
 
@@ -2821,8 +2860,8 @@ title.className='radar-date-picker-title';
 
 let yearSelect=document.createElement('select');
 yearSelect.className='radar-date-picker-year-select';
-let currentYear=new Date().getFullYear();
-for(let optionYear=currentYear-10;optionYear<=currentYear+10;optionYear++){
+let yearRange=getRadarDatePickerYearRange(year);
+for(let optionYear=yearRange.start;optionYear<=yearRange.end;optionYear++){
 let option=document.createElement('option');
 option.value=String(optionYear);
 option.textContent=String(optionYear);
@@ -2831,7 +2870,7 @@ yearSelect.appendChild(option);
 yearSelect.value=String(year);
 yearSelect.onchange=event=>{
 event.stopPropagation();
-visibleMonth=new Date(Number(yearSelect.value),month,1);
+visibleMonth=clampRadarDatePickerVisibleMonth(createRadarDatePickerMonth(Number(yearSelect.value),month));
 renderPanel();
 };
 
@@ -2846,7 +2885,7 @@ monthSelect.appendChild(option);
 monthSelect.value=String(month);
 monthSelect.onchange=event=>{
 event.stopPropagation();
-visibleMonth=new Date(year,Number(monthSelect.value),1);
+visibleMonth=clampRadarDatePickerVisibleMonth(createRadarDatePickerMonth(year,Number(monthSelect.value)));
 renderPanel();
 };
 
@@ -2857,9 +2896,13 @@ let next=document.createElement('button');
 next.type='button';
 next.className='radar-date-picker-nav';
 next.textContent='›';
+next.disabled=year>=getRadarDatePickerMaxYear() && month>=11;
 next.onclick=event=>{
 event.stopPropagation();
-visibleMonth=new Date(year,month+1,1);
+if(next.disabled){
+return;
+}
+visibleMonth=clampRadarDatePickerVisibleMonth(createRadarDatePickerMonth(year,month+1));
 renderPanel();
 };
 
@@ -3082,6 +3125,7 @@ let checks=createRadarButtonGroup('radar-check-group',[
 createRadarWindControl(),
 createRadarLightningControl(),
 createRadarStationControl(),
+createRadarCheckbox('typ','태풍'),
 createRadarCheckbox('topo','지형고도'),
 createRadarCheckbox('highway','고속도로'),
 createRadarCheckbox('lonlat','위경도')
