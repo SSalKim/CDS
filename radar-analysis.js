@@ -2252,6 +2252,10 @@ checkLabel.appendChild(chevron);
 let panel=document.createElement('div');
 panel.className='radar-wind-panel'+(radarState.wind.open ? '' : ' hidden');
 panel.onclick=event=>event.stopPropagation();
+let pointerStartedInsidePanel=false;
+let markPointerInsidePanel=()=>{pointerStartedInsidePanel=true;};
+panel.addEventListener('pointerdown',markPointerInsidePanel);
+panel.addEventListener('mousedown',markPointerInsidePanel);
 
 let pendingWindMode=radarState.wind.mode;
 let pendingWindSource=radarState.wind.source;
@@ -2343,7 +2347,10 @@ setPanelOpen(false);
 });
 control.addEventListener('focusout',()=>{
 requestAnimationFrame(()=>{
-if(radarState.wind.open && !control.contains(document.activeElement)){
+let shouldKeepOpen=control.contains(document.activeElement) || pointerStartedInsidePanel;
+pointerStartedInsidePanel=false;
+
+if(radarState.wind.open && !shouldKeepOpen){
 setPanelOpen(false);
 }
 });
@@ -2486,6 +2493,10 @@ checkLabel.appendChild(chevron);
 let panel=document.createElement('div');
 panel.className='radar-wind-panel radar-station-panel'+(radarState.station.open ? '' : ' hidden');
 panel.onclick=event=>event.stopPropagation();
+let pointerStartedInsidePanel=false;
+let markPointerInsidePanel=()=>{pointerStartedInsidePanel=true;};
+panel.addEventListener('pointerdown',markPointerInsidePanel);
+panel.addEventListener('mousedown',markPointerInsidePanel);
 
 function positionPanel(){
 let rect=checkLabel.getBoundingClientRect();
@@ -2546,7 +2557,10 @@ setPanelOpen(false);
 });
 control.addEventListener('focusout',()=>{
 requestAnimationFrame(()=>{
-if(radarState.station.open && !control.contains(document.activeElement)){
+let shouldKeepOpen=control.contains(document.activeElement) || pointerStartedInsidePanel;
+pointerStartedInsidePanel=false;
+
+if(radarState.station.open && !shouldKeepOpen){
 setPanelOpen(false);
 }
 });
@@ -2662,6 +2676,10 @@ checkLabel.appendChild(chevron);
 let panel=document.createElement('div');
 panel.className='radar-wind-panel radar-lightning-panel'+(radarState.lightning.open ? '' : ' hidden');
 panel.onclick=event=>event.stopPropagation();
+let pointerStartedInsidePanel=false;
+let markPointerInsidePanel=()=>{pointerStartedInsidePanel=true;};
+panel.addEventListener('pointerdown',markPointerInsidePanel);
+panel.addEventListener('mousedown',markPointerInsidePanel);
 
 function positionPanel(){
 let rect=checkLabel.getBoundingClientRect();
@@ -2722,7 +2740,10 @@ setPanelOpen(false);
 });
 control.addEventListener('focusout',()=>{
 requestAnimationFrame(()=>{
-if(radarState.lightning.open && !control.contains(document.activeElement)){
+let shouldKeepOpen=control.contains(document.activeElement) || pointerStartedInsidePanel;
+pointerStartedInsidePanel=false;
+
+if(radarState.lightning.open && !shouldKeepOpen){
 setPanelOpen(false);
 }
 });
