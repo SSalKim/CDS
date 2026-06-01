@@ -2110,7 +2110,7 @@ option.group-header{
   flex-wrap:nowrap;
   align-items:stretch;
   gap:0;
-  padding:10px 12px;
+  padding:6px 7px;
   border-bottom:1px solid var(--line);
   background:#f8fafc;
 }
@@ -2127,8 +2127,8 @@ option.group-header{
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  margin:-10px 2px -10px -12px;
-  padding:8px 10px;
+  margin:-6px 1px -6px -7px;
+  padding:5px 7px;
   border-right:1px solid var(--line);
   background:#ffffff;
   color:#1d4ed8;
@@ -2143,8 +2143,8 @@ option.group-header{
   display:flex;
   flex-direction:column;
   justify-content:center;
-  gap:6px;
-  padding-left:10px;
+  gap:4px;
+  padding-left:6px;
   overflow:hidden;
 }
 
@@ -2153,7 +2153,7 @@ option.group-header{
   display:flex;
   flex-wrap:nowrap;
   align-items:center;
-  gap:8px;
+  gap:5px;
   overflow-x:auto;
   overflow-y:hidden;
   scrollbar-width:thin;
@@ -2173,9 +2173,9 @@ option.group-header{
 }
 
 .radar-now-button{
-  height:32px;
+  height:30px;
   min-width:48px;
-  padding:0 10px;
+  padding:0 8px;
   border:1px solid #93c5fd;
   border-radius:8px;
   background:#eff6ff;
@@ -2192,7 +2192,7 @@ option.group-header{
 .radar-field{
   display:flex;
   flex-direction:column;
-  gap:4px;
+  gap:3px;
   color:var(--text-muted);
   font-size:11px;
   font-weight:800;
@@ -2200,14 +2200,14 @@ option.group-header{
 
 .radar-field input,
 .radar-field select{
-  height:30px;
+  height:28px;
   min-width:74px;
   border:1px solid var(--line-soft);
   border-radius:7px;
   background:#ffffff;
   color:var(--text);
   font-size:12px;
-  padding:0 8px;
+  padding:0 6px;
 }
 
 .radar-field input{
@@ -2217,7 +2217,7 @@ option.group-header{
 .radar-controls input:not([type="checkbox"]),
 .radar-controls select,
 .radar-pane-controls select{
-  height:30px;
+  height:28px;
   min-width:auto;
   border:1px solid var(--line-soft);
   border-radius:7px;
@@ -2225,7 +2225,7 @@ option.group-header{
   color:var(--text);
   font-size:12px;
   font-weight:800;
-  padding:0 8px;
+  padding:0 6px;
 }
 
 .radar-date-input{
@@ -2816,7 +2816,7 @@ option.group-header{
   display:grid;
   grid-template-columns:repeat(var(--radar-pane-count,1), minmax(0, 1fr));
   gap:8px;
-  padding:8px 12px 12px;
+  padding:6px 7px 7px;
   overflow:auto;
   background:#eef2f7;
 }
@@ -2891,7 +2891,7 @@ option.group-header{
 
 .radar-pane-header{
   flex:0 0 auto;
-  padding:8px;
+  padding:5px 6px;
   border-bottom:1px solid var(--line);
   background:#f8fafc;
 }
@@ -2899,8 +2899,16 @@ option.group-header{
 .radar-pane-controls{
   display:flex;
   flex-wrap:wrap;
-  gap:8px;
+  gap:5px;
   align-items:flex-end;
+}
+
+.radar-pane-controls select{
+  height:26px !important;
+  min-height:26px !important;
+  padding:0 6px !important;
+  font-size:11px !important;
+  line-height:24px !important;
 }
 
 .radar-pane-viewer{
@@ -3515,8 +3523,8 @@ option.group-header{
 .radar-page .radar-inline-field,
 .radar-page .radar-shift-controls,
 .radar-page .timeline-playback-controls button{
-  height:32px !important;
-  min-height:32px !important;
+  height:30px !important;
+  min-height:30px !important;
 }
 
 .radar-page .radar-wind-control .radar-check{
@@ -3531,8 +3539,8 @@ option.group-header{
 
 .radar-page .radar-playback-controls button,
 .radar-page .radar-shift-controls button{
-  height:32px !important;
-  min-height:32px !important;
+  height:30px !important;
+  min-height:30px !important;
 }
 
 .radar-page .radar-controls button,
@@ -3549,7 +3557,7 @@ option.group-header{
 .radar-page .radar-controls input:not([type="checkbox"]),
 .radar-page .radar-controls select{
   box-sizing:border-box !important;
-  line-height:30px !important;
+  line-height:28px !important;
   padding-top:0 !important;
   padding-bottom:0 !important;
 }
