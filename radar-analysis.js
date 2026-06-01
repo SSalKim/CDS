@@ -3540,7 +3540,7 @@ let button=document.createElement('button');
 button.type='button';
 button.className='radar-analysis-launcher';
 button.title='레이더 분석 페이지 열기';
-button.innerHTML='<span class="radar-launcher-icon">↗</span><span class="radar-launcher-text"><span>레이더</span><span>실황감시</span><small>(시범)</small></span>';
+button.innerHTML='<span class="radar-launcher-icon">↗</span><span class="radar-launcher-text"><span>레이더</span><span>실황감시</span></span>';
 button.onclick=openRadarAnalysisPage;
 
 section.appendChild(button);
