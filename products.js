@@ -288,6 +288,13 @@ const PRODUCTS=[
         ecmwf: "ecmw_lc20_rain12_{run}.gif"
     }
 },
+{category:"asia", id:"dmrf12", label:"12시간 누적강수량(중기)",
+    patternByModel:{
+        kim_gdps: "kim_gdps_dmrf_r12h_{run}.png",
+        um_gdps: "gdps_dmrf_r12h_{run}.gif",
+        ecmwf: "ecmw_dmrf_r12h_{run}.gif"
+    }
+},
 {category:"asia", id:"rainth", label:"총누적강수량(3시간간격)",
     patternByModel:{
         kim_gdps: "kim_gdps_lc40_rainth_{run}.png",
@@ -2005,6 +2012,11 @@ const PRODUCTS=[
     existenceModeByModel:{
         kim_rdps:"any"
     },
+    archiveStartByModel:{
+        kim_gdps:"2020-09-28",
+        um_gdps:"2020-03-23",
+        um_ldps:"2020-04-10"
+    },
 },
 {category:"radm", id:"rmwv", label:"수증기채널:천리안2A",
     patternByModel:{
@@ -2040,6 +2052,11 @@ const PRODUCTS=[
         kim_rdps:[
             {start:1,end:72,step:1}
         ]
+    },
+    archiveStartByModel:{
+        kim_gdps:"2020-09-28",
+        um_gdps:"2020-03-23",
+        um_ldps:"2020-04-10"
     },
     existenceModeByModel:{
         kim_rdps:"any"

@@ -228,7 +228,19 @@ COMPARE_WINTER_VARIANT_PRODUCTS.has(product?.id);
 function shouldUsePrcp3hForHkorAcptotCompare(modelId,product){
 
 return isHkorAcptotCompareProduct(product) &&
-COMPARE_HKOR_ACPTOT_REGIONAL_MODELS.has(modelId);
+COMPARE_HKOR_ACPTOT_REGIONAL_MODELS.has(modelId) &&
+!isOnlyKimRegionalAcptotCompareSelection();
+
+}
+
+function isOnlyKimRegionalAcptotCompareSelection(){
+
+return (
+compareModels.length>0 &&
+compareModels.every(modelId=>
+COMPARE_HKOR_ACPTOT_REGIONAL_MODELS.has(modelId)
+)
+);
 
 }
 

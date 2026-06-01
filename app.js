@@ -200,6 +200,18 @@ return forecastTimelineState.getImageCacheEntry(index);
 
 }
 
+function setForecastAvailabilityResult(index,{
+ok,
+urls=[],
+baseUrls=[]
+}={}){
+
+setForecastLoadState(index,ok ? 'available' : 'missing');
+setForecastImageCacheEntry(index,{urls,baseUrls,ok});
+updateForecastSegmentState(index);
+
+}
+
 /* 특정 드롭다운 영역/지점 선택 보조 패널 */
 
 
@@ -1384,14 +1396,16 @@ if(requestId!==forecastDisplayRequest){
 return;
 }
 
+setForecastAvailabilityResult(index,{
+ok:true,
+urls,
+baseUrls:cached.baseUrls || cached.urls
+});
 showCharts(urls,{progressiveNmsc:false});
 return;
 }
 
-if(cached && cached.ok===false){
-showViewerMessage(makeExpectedButMissingMessage());
-return;
-}
+let wasMissingCache=!!(cached && cached.ok===false);
 
 /*
 캐시가 없으면 현재 선택 위치 이미지는 직접 표출 시도한다.
@@ -1405,7 +1419,30 @@ if(requestId!==forecastDisplayRequest){
 return;
 }
 
-showCharts(displayUrls);
+let imageRefreshToken=wasMissingCache ? String(Date.now()) : '';
+let loadUrls=addImageRefreshTokenToUrls(displayUrls,imageRefreshToken);
+let exists=await urlsExist(displayUrls,{imageRefreshToken});
+
+if(requestId!==forecastDisplayRequest){
+return;
+}
+
+if(exists){
+setForecastAvailabilityResult(index,{
+ok:true,
+urls:loadUrls,
+baseUrls:urls
+});
+showCharts(loadUrls);
+return;
+}
+
+setForecastAvailabilityResult(index,{
+ok:false,
+urls:loadUrls,
+baseUrls:urls
+});
+showViewerMessage(makeExpectedButMissingMessage());
 return;
 }
 
