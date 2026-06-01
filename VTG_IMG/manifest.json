@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "202606010614",
+  "updated_at_utc": "202606010634",
   "window_start_offset_hours": 3,
   "window_end_offset_hours": 12,
   "complete_model_count": 33,
@@ -41,7 +41,7 @@
         "stderr": "g)\n/opt/hostedtoolcache/Python/3.12.13/x64/lib/python3.12/site-packages/cartopy/io/__init__.py:242: DownloadWarning: Downloading: https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_admin_0_boundary_lines_land.zip\n  warnings.warn(f'Downloading: {url}', DownloadWarning)\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\n",
         "metadata_path": "/home/runner/work/CDS/CDS/VTG_IMG/metadata/202606010000_typ_2026_06_120h.json",
         "metadata": {
-          "generated_at_utc": "20260601061519",
+          "generated_at_utc": "20260601063517",
           "image_path": "VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202606010000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -54,7 +54,7 @@
           "data_time": "202606010000",
           "fcst_hours": 120,
           "intensity": "STS",
-          "model_count": 10,
+          "model_count": 12,
           "target_model_count": 33,
           "models": [
             "AIGEFS",
@@ -66,6 +66,8 @@
             "GFS_EPS",
             "HAFS",
             "JGSM",
+            "KIM_3h",
+            "KIM_EPS",
             "TEPS"
           ],
           "model_labels": [
@@ -78,6 +80,8 @@
             "GFS GEFS",
             "HAFS",
             "JGSM",
+            "KIM",
+            "KIM EPS",
             "JGSM TEPS"
           ],
           "skip_atcf": false
@@ -110,11 +114,11 @@
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt)\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt)\nCMC: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nGFS_EPS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nSaved: /home/runner/work/CDS/CDS/VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202606010000_240h.png\n",
+        "stdout": "[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt)\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt)\nCMC: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nGFS_EPS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nSaved: /home/runner/work/CDS/CDS/VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202606010000_240h.png\n",
         "stderr": "ily 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\n",
         "metadata_path": "/home/runner/work/CDS/CDS/VTG_IMG/metadata/202606010000_typ_2026_06_240h.json",
         "metadata": {
-          "generated_at_utc": "20260601061613",
+          "generated_at_utc": "20260601063607",
           "image_path": "VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202606010000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -127,7 +131,7 @@
           "data_time": "202606010000",
           "fcst_hours": 240,
           "intensity": "STS",
-          "model_count": 10,
+          "model_count": 12,
           "target_model_count": 33,
           "models": [
             "AIGEFS",
@@ -139,6 +143,8 @@
             "GFS_EPS",
             "HAFS",
             "JGSM",
+            "KIM_3h",
+            "KIM_EPS",
             "TEPS"
           ],
           "model_labels": [
@@ -151,6 +157,8 @@
             "GFS GEFS",
             "HAFS",
             "JGSM",
+            "KIM",
+            "KIM EPS",
             "JGSM TEPS"
           ],
           "skip_atcf": false
@@ -242,7 +250,7 @@
       "result": {
         "status": "inventory",
         "metadata": {
-          "generated_at_utc": "20260601061348",
+          "generated_at_utc": "20260601063349",
           "image_path": "VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202605310000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -840,7 +848,7 @@
         "stderr": "g)\n/opt/hostedtoolcache/Python/3.12.13/x64/lib/python3.12/site-packages/cartopy/io/__init__.py:242: DownloadWarning: Downloading: https://naturalearth.s3.amazonaws.com/10m_cultural/ne_10m_admin_0_boundary_lines_land.zip\n  warnings.warn(f'Downloading: {url}', DownloadWarning)\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\n",
         "metadata_path": "/home/runner/work/CDS/CDS/VTG_IMG/metadata/202606010000_typ_2026_06_120h.json",
         "metadata": {
-          "generated_at_utc": "20260601061519",
+          "generated_at_utc": "20260601063517",
           "image_path": "VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202606010000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -853,7 +861,7 @@
           "data_time": "202606010000",
           "fcst_hours": 120,
           "intensity": "STS",
-          "model_count": 10,
+          "model_count": 12,
           "target_model_count": 33,
           "models": [
             "AIGEFS",
@@ -865,6 +873,8 @@
             "GFS_EPS",
             "HAFS",
             "JGSM",
+            "KIM_3h",
+            "KIM_EPS",
             "TEPS"
           ],
           "model_labels": [
@@ -877,6 +887,8 @@
             "GFS GEFS",
             "HAFS",
             "JGSM",
+            "KIM",
+            "KIM EPS",
             "JGSM TEPS"
           ],
           "skip_atcf": false
@@ -909,11 +921,11 @@
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt)\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt)\nCMC: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nGFS_EPS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nSaved: /home/runner/work/CDS/CDS/VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202606010000_240h.png\n",
+        "stdout": "[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt)\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/FNV3_2026_06_01T00_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_01/GENC_2026_06_01T00_00_atcf_a_deck.txt)\nCMC: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nGFS_EPS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nSaved: /home/runner/work/CDS/CDS/VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202606010000_240h.png\n",
         "stderr": "ily 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\nfindfont: Font family 'Malgun Gothic' not found.\n",
         "metadata_path": "/home/runner/work/CDS/CDS/VTG_IMG/metadata/202606010000_typ_2026_06_240h.json",
         "metadata": {
-          "generated_at_utc": "20260601061613",
+          "generated_at_utc": "20260601063607",
           "image_path": "VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202606010000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -926,7 +938,7 @@
           "data_time": "202606010000",
           "fcst_hours": 240,
           "intensity": "STS",
-          "model_count": 10,
+          "model_count": 12,
           "target_model_count": 33,
           "models": [
             "AIGEFS",
@@ -938,6 +950,8 @@
             "GFS_EPS",
             "HAFS",
             "JGSM",
+            "KIM_3h",
+            "KIM_EPS",
             "TEPS"
           ],
           "model_labels": [
@@ -950,6 +964,8 @@
             "GFS GEFS",
             "HAFS",
             "JGSM",
+            "KIM",
+            "KIM EPS",
             "JGSM TEPS"
           ],
           "skip_atcf": false
