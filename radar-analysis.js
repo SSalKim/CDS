@@ -1024,9 +1024,7 @@ radarState.common.yp=String(defaults.yp);
 radarState.common.zoom=String(defaults.zoom);
 radarState.mapTool=null;
 updateRadarMapModeButtons();
-resetRadarImageCache();
-renderRadarPanes();
-preloadRadarImages();
+reloadRadarImagesForCurrentSettings();
 }
 
 function getRadarWindValue(){
@@ -1039,42 +1037,31 @@ let modePrefix=radarState.wind.mode==='barb' ? '1' : '0';
 return modePrefix+sourceCode;
 }
 
+function normalizeRadarWindMode(mode){
+return mode==='barb' ? 'barb' : 'vector';
+}
+
+function normalizeRadarWindSource(source){
+return RADAR_WIND_SOURCE_CODES[source] ? source : 'WISSDOM';
+}
+
+function normalizeRadarWindHeight(height){
+let value=String(height || '').trim();
+return value || RADAR_DEFAULT_PARAMS.ht;
+}
+
 function applyRadarWindSettings({reload=true}={}){
 radarState.common.wv=getRadarWindValue();
 radarState.common.ht=String(radarState.wind.height || RADAR_DEFAULT_PARAMS.ht);
 
 if(reload){
-resetRadarImageCache();
-renderRadarPanes();
-preloadRadarImages();
+reloadRadarImagesForCurrentSettings();
 }
 }
 
 function setRadarWindEnabled(enabled){
 radarState.wind.enabled=!!enabled;
 applyRadarWindSettings();
-}
-
-function setRadarWindMode(mode){
-radarState.wind.mode=mode==='barb' ? 'barb' : 'vector';
-if(radarState.wind.enabled){
-applyRadarWindSettings();
-}
-}
-
-function setRadarWindSource(source){
-radarState.wind.source=RADAR_WIND_SOURCE_CODES[source] ? source : 'WISSDOM';
-if(radarState.wind.enabled){
-applyRadarWindSettings();
-}
-}
-
-function setRadarWindHeight(height){
-let value=String(height || '').trim();
-radarState.wind.height=value || RADAR_DEFAULT_PARAMS.ht;
-if(radarState.wind.enabled){
-applyRadarWindSettings();
-}
 }
 
 function getRadarStationValue(){
@@ -1087,6 +1074,14 @@ let suffix=String(radarState.station.label || '01').slice(-1);
 return normalizeRadarAwsValue(prefix+suffix);
 }
 
+function normalizeRadarStationDensity(density){
+return density==='full' ? 'full' : 'sparse';
+}
+
+function normalizeRadarStationLabel(label){
+return RADAR_STATION_OPTIONS.some(option=>option.value===label) ? label : '01';
+}
+
 function normalizeRadarAwsValue(value){
 let aws=String(value ?? RADAR_DEFAULT_PARAMS.aws);
 return aws==='10' ? '00' : aws;
@@ -1096,9 +1091,7 @@ function applyRadarStationSettings({reload=true}={}){
 radarState.common.aws=getRadarStationValue();
 
 if(reload){
-resetRadarImageCache();
-renderRadarPanes();
-preloadRadarImages();
+reloadRadarImagesForCurrentSettings();
 }
 }
 
@@ -1107,21 +1100,8 @@ radarState.station.enabled=!!enabled;
 applyRadarStationSettings();
 }
 
-function setRadarStationDensity(density,{reload=false}={}){
-radarState.station.density=density==='full' ? 'full' : 'sparse';
-
-if(reload && radarState.station.enabled){
-applyRadarStationSettings();
-}
-}
-
-function setRadarStationLabel(label,{reload=false}={}){
-let value=RADAR_STATION_OPTIONS.some(option=>option.value===label) ? label : '01';
-radarState.station.label=value;
-
-if(reload && radarState.station.enabled){
-applyRadarStationSettings();
-}
+function normalizeRadarLightningType(type){
+return RADAR_LIGHTNING_TYPES.some(option=>option.value===type) ? type : 'T';
 }
 
 function normalizeRadarLightningInterval(value){
@@ -1140,9 +1120,7 @@ if(!radarState.lightning.enabled){
 return '';
 }
 
-return RADAR_LIGHTNING_TYPES.some(option=>option.value===radarState.lightning.type)
-? radarState.lightning.type
-: 'T';
+return normalizeRadarLightningType(radarState.lightning.type);
 }
 
 function applyRadarLightningSettings({reload=true}={}){
@@ -1150,31 +1128,13 @@ radarState.common.gc=getRadarLightningType();
 radarState.common.gc_itv=normalizeRadarLightningInterval(radarState.lightning.interval);
 
 if(reload){
-resetRadarImageCache();
-renderRadarPanes();
-preloadRadarImages();
+reloadRadarImagesForCurrentSettings();
 }
 }
 
 function setRadarLightningEnabled(enabled){
 radarState.lightning.enabled=!!enabled;
 applyRadarLightningSettings();
-}
-
-function setRadarLightningType(type,{reload=false}={}){
-radarState.lightning.type=RADAR_LIGHTNING_TYPES.some(option=>option.value===type) ? type : 'T';
-
-if(reload && radarState.lightning.enabled){
-applyRadarLightningSettings();
-}
-}
-
-function setRadarLightningInterval(interval,{reload=false}={}){
-radarState.lightning.interval=normalizeRadarLightningInterval(interval);
-
-if(reload && radarState.lightning.enabled){
-applyRadarLightningSettings();
-}
 }
 
 function notifyRadarOverlayDropdownOpen(source){
@@ -1218,9 +1178,7 @@ let yp=normalizeRadarMapNumber(radarState.common.yp,defaults.yp);
 radarState.common.xp=String(Math.round(xp+dx));
 radarState.common.yp=String(Math.round(yp+dy));
 radarState.common.zoom=String(nextZoom);
-resetRadarImageCache();
-renderRadarPanes();
-preloadRadarImages();
+reloadRadarImagesForCurrentSettings();
 }
 
 function clampRadarImageSize(size){
@@ -1314,6 +1272,12 @@ radarState.imageCache.clear();
 radarState.preloadRunId+=1;
 radarState.cacheRefreshRunId+=1;
 resetRadarFrameLoadStates();
+}
+
+function reloadRadarImagesForCurrentSettings(){
+resetRadarImageCache();
+renderRadarPanes();
+preloadRadarImages();
 }
 
 function resetRadarFrameLoadStates(){
@@ -2035,7 +1999,13 @@ loadActiveRadarFrameImages();
 }
 
 function setRadarActiveIndex(index){
-radarState.activeIndex=Math.max(0,Math.min(Number(index)||0,radarState.frames.length-1));
+let nextIndex=Math.max(0,Math.min(Number(index)||0,radarState.frames.length-1));
+
+if(nextIndex===radarState.activeIndex){
+return;
+}
+
+radarState.activeIndex=nextIndex;
 updateRadarTimelineActiveState();
 updateRadarTimeLabel();
 refreshRadarPaneImages();
@@ -2211,9 +2181,7 @@ input.type='checkbox';
 input.checked=radarState.common[key]==='1';
 input.onchange=()=>{
 radarState.common[key]=input.checked?'1':'0';
-resetRadarImageCache();
-renderRadarPanes();
-preloadRadarImages();
+reloadRadarImagesForCurrentSettings();
 };
 
 let span=document.createElement('span');
@@ -2285,6 +2253,56 @@ let panel=document.createElement('div');
 panel.className='radar-wind-panel'+(radarState.wind.open ? '' : ' hidden');
 panel.onclick=event=>event.stopPropagation();
 
+let pendingWindMode=radarState.wind.mode;
+let pendingWindSource=radarState.wind.source;
+let pendingWindHeight=radarState.wind.height;
+let modeRadios=[];
+let sourceSelect=null;
+let heightInput=null;
+
+function resetPendingWindSettings(){
+pendingWindMode=radarState.wind.mode;
+pendingWindSource=radarState.wind.source;
+pendingWindHeight=radarState.wind.height;
+
+modeRadios.forEach(radio=>{
+radio.checked=radio.value===pendingWindMode;
+});
+
+if(sourceSelect){
+sourceSelect.value=pendingWindSource;
+}
+
+if(heightInput){
+heightInput.value=pendingWindHeight;
+}
+}
+
+function applyPendingWindSettings(){
+let selectedMode=modeRadios.find(radio=>radio.checked)?.value || pendingWindMode;
+let selectedSource=sourceSelect?.value || pendingWindSource;
+let selectedHeight=heightInput?.value || pendingWindHeight;
+let nextMode=normalizeRadarWindMode(selectedMode);
+let nextSource=normalizeRadarWindSource(selectedSource);
+let nextHeight=normalizeRadarWindHeight(selectedHeight);
+let changed=(
+radarState.wind.mode!==nextMode ||
+radarState.wind.source!==nextSource ||
+radarState.wind.height!==nextHeight
+);
+
+radarState.wind.mode=nextMode;
+radarState.wind.source=nextSource;
+radarState.wind.height=nextHeight;
+pendingWindMode=nextMode;
+pendingWindSource=nextSource;
+pendingWindHeight=nextHeight;
+
+if(changed && radarState.wind.enabled){
+applyRadarWindSettings();
+}
+}
+
 function positionPanel(){
 let rect=checkLabel.getBoundingClientRect();
 let width=panel.offsetWidth || 190;
@@ -2295,9 +2313,15 @@ panel.style.top=`${rect.bottom+5}px`;
 
 function setPanelOpen(open){
 let nextOpen=!!open;
+let wasOpen=radarState.wind.open;
 
 if(nextOpen && !radarState.wind.open){
 notifyRadarOverlayDropdownOpen('wind');
+resetPendingWindSettings();
+}
+
+if(!nextOpen && wasOpen){
+applyPendingWindSettings();
 }
 
 radarState.wind.open=nextOpen;
@@ -2317,6 +2341,13 @@ if(event.detail?.source!=='wind'){
 setPanelOpen(false);
 }
 });
+control.addEventListener('focusout',()=>{
+requestAnimationFrame(()=>{
+if(radarState.wind.open && !control.contains(document.activeElement)){
+setPanelOpen(false);
+}
+});
+});
 
 let modeGroup=document.createElement('div');
 modeGroup.className='radar-wind-mode-group';
@@ -2335,9 +2366,10 @@ radio.value=option.value;
 radio.checked=radarState.wind.mode===option.value;
 radio.onchange=()=>{
 if(radio.checked){
-setRadarWindMode(option.value);
+pendingWindMode=option.value;
 }
 };
+modeRadios.push(radio);
 
 let span=document.createElement('span');
 span.textContent=option.label;
@@ -2346,25 +2378,28 @@ label.appendChild(span);
 modeGroup.appendChild(label);
 });
 
-let sourceSelect=createSelect(
+sourceSelect=createSelect(
 [
 {value:'WISSDOM',label:'WISSDOM'},
 {value:'KLAPS',label:'KLAPS'},
 {value:'VDAPS',label:'VDAPS'}
 ],
 radarState.wind.source,
-value=>setRadarWindSource(value)
+value=>{
+pendingWindSource=value;
+}
 );
 sourceSelect.className='radar-wind-source-select';
 
-let heightInput=document.createElement('input');
+heightInput=document.createElement('input');
 heightInput.type='number';
 heightInput.className='radar-wind-height-input';
 heightInput.value=radarState.wind.height;
 heightInput.min='0';
 heightInput.step='10';
-heightInput.onchange=()=>setRadarWindHeight(heightInput.value);
-heightInput.onblur=()=>setRadarWindHeight(heightInput.value);
+heightInput.oninput=()=>{pendingWindHeight=heightInput.value;};
+heightInput.onchange=()=>{pendingWindHeight=heightInput.value;};
+heightInput.onblur=()=>{pendingWindHeight=heightInput.value;};
 heightInput.onkeydown=event=>{
 if(event.key==='Enter'){
 event.currentTarget.blur();
@@ -2461,10 +2496,18 @@ panel.style.top=`${rect.bottom+5}px`;
 }
 
 function commitPendingSettings(){
-setRadarStationDensity(pendingDensity,{reload:false});
-setRadarStationLabel(pendingLabel,{reload:false});
+let selectedDensity=densityGroup?.querySelector('input[name="radarStationDensity"]:checked')?.value || pendingDensity;
+let selectedLabel=labelSelect?.value || pendingLabel;
+let nextDensity=normalizeRadarStationDensity(selectedDensity);
+let nextLabel=normalizeRadarStationLabel(selectedLabel);
+let changed=radarState.station.density!==nextDensity || radarState.station.label!==nextLabel;
 
-if(radarState.station.enabled){
+radarState.station.density=nextDensity;
+radarState.station.label=nextLabel;
+pendingDensity=nextDensity;
+pendingLabel=nextLabel;
+
+if(changed && radarState.station.enabled){
 applyRadarStationSettings();
 }
 }
@@ -2500,6 +2543,13 @@ document.addEventListener('radarOverlayDropdownOpen',event=>{
 if(event.detail?.source!=='station'){
 setPanelOpen(false);
 }
+});
+control.addEventListener('focusout',()=>{
+requestAnimationFrame(()=>{
+if(radarState.station.open && !control.contains(document.activeElement)){
+setPanelOpen(false);
+}
+});
 });
 
 let densityGroup=document.createElement('div');
@@ -2622,10 +2672,18 @@ panel.style.top=`${rect.bottom+5}px`;
 }
 
 function commitPendingSettings(){
-setRadarLightningType(pendingType,{reload:false});
-setRadarLightningInterval(pendingInterval,{reload:false});
+let selectedType=typeGroup?.querySelector('input[name="radarLightningType"]:checked')?.value || pendingType;
+let selectedInterval=intervalInput?.value || pendingInterval;
+let nextType=normalizeRadarLightningType(selectedType);
+let nextInterval=normalizeRadarLightningInterval(selectedInterval);
+let changed=radarState.lightning.type!==nextType || radarState.lightning.interval!==nextInterval;
 
-if(radarState.lightning.enabled){
+radarState.lightning.type=nextType;
+radarState.lightning.interval=nextInterval;
+pendingType=nextType;
+pendingInterval=nextInterval;
+
+if(changed && radarState.lightning.enabled){
 applyRadarLightningSettings();
 }
 }
@@ -2661,6 +2719,13 @@ document.addEventListener('radarOverlayDropdownOpen',event=>{
 if(event.detail?.source!=='lightning'){
 setPanelOpen(false);
 }
+});
+control.addEventListener('focusout',()=>{
+requestAnimationFrame(()=>{
+if(radarState.lightning.open && !control.contains(document.activeElement)){
+setPanelOpen(false);
+}
+});
 });
 
 let typeGroup=document.createElement('div');
@@ -3164,9 +3229,7 @@ let paneCountSelect=createSelect(
 radarState.paneCount,
 value=>{
 radarState.paneCount=Number(value);
-resetRadarImageCache();
-renderRadarPanes();
-preloadRadarImages();
+reloadRadarImagesForCurrentSettings();
 }
 );
 paneCountSelect.className='radar-pane-count-select';
