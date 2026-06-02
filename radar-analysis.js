@@ -376,9 +376,16 @@ children:[
 
 {
 id:'PTY',
-baseUrl:RADAR_CMP_IMAGE_URL,
 label:'밝은띠',
-params:{cmp:'PTY', qcd:'QCD'}
+baseUrl:RADAR_CMP_IMAGE_URL,
+params:{cmp:'PTY', obs:'ECHD'},
+children:[
+    {
+    id:'QCD',
+    label:'---',
+    params:{qcd:'QCD'}
+    }
+]
 },
 
 {
