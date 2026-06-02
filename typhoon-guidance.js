@@ -3,6 +3,9 @@ const TYPHOON_STATUS_PATH='VTG_IMG/vtg_auto_status.json';
 const TYPHOON_REFRESH_MS=10*60*1000;
 const TYPHOON_SLOT_HOURS=6;
 const TYPHOON_PAGE_CACHE_TOKEN=new URLSearchParams(window.location.search).get('fresh') || String(Date.now());
+const TYPHOON_IMAGE_PRELOAD_RADIUS=4;
+const TYPHOON_IMAGE_CACHE_LIMIT=80;
+const TYPHOON_IMAGE_TIMEOUT_MS=20000;
 const TYPHOON_FCST_OPTIONS=[
 {hours:120,label:'5일'},
 {hours:240,label:'10일'}
@@ -65,7 +68,9 @@ selectedStormKey:'',
 selectedSlotIndex:0,
 selectedFcstHours:120,
 timer:null,
-keyboardBound:false
+keyboardBound:false,
+imageCache:new Map(),
+imageRequestSeq:0
 };
 
 function openTyphoonGuidancePage(){
@@ -286,6 +291,7 @@ throw manifestError || new Error('HTTP 404');
 
 typhoonState.manifest=manifest;
 typhoonState.entries=normalizeTyphoonEntries(manifest || {},status);
+pruneTyphoonImageCache();
 syncTyphoonSelection();
 renderTyphoonManifest();
 }
@@ -531,7 +537,11 @@ return getSelectedTyphoonSlot()?.dataTime || '';
 
 function setTyphoonSlotIndex(index){
 let maxIndex=Math.max(0,typhoonState.slots.length-1);
-typhoonState.selectedSlotIndex=Math.max(0,Math.min(Number(index)||0,maxIndex));
+let nextIndex=Math.max(0,Math.min(Number(index)||0,maxIndex));
+if(nextIndex===typhoonState.selectedSlotIndex){
+return;
+}
+typhoonState.selectedSlotIndex=nextIndex;
 renderTyphoonSelectedRun();
 renderTyphoonTimeline();
 }
@@ -829,13 +839,187 @@ return;
 renderTyphoonRun(selected.entry);
 }
 
-function renderTyphoonRun(run){
+function getTyphoonImageUrl(run){
+
+if(!run?.imagePath){
+return '';
+}
+
+let version=run.generatedAt || run.metadata?.generated_at_utc || typhoonState.manifest?.updated_at_utc || '';
+return cacheBustedTyphoonPath(run.imagePath,version);
+
+}
+
+function configureTyphoonImageElement(image,url){
+
+image.className='typhoon-guidance-image';
+image.alt='태풍 모델예측 이미지';
+image.decoding='async';
+image.loading='eager';
+image.dataset.cacheUrl=url;
+return image;
+
+}
+
+function getTyphoonActiveImageUrls(){
+
+return new Set(
+typhoonState.entries
+.map(run=>getTyphoonImageUrl(run))
+.filter(Boolean)
+);
+
+}
+
+function pruneTyphoonImageCache(){
+
+let activeUrls=getTyphoonActiveImageUrls();
+
+for(let url of typhoonState.imageCache.keys()){
+if(!activeUrls.has(url)){
+typhoonState.imageCache.delete(url);
+}
+}
+
+while(typhoonState.imageCache.size>TYPHOON_IMAGE_CACHE_LIMIT){
+let oldest=typhoonState.imageCache.keys().next().value;
+if(!oldest){
+break;
+}
+typhoonState.imageCache.delete(oldest);
+}
+
+}
+
+function loadTyphoonCachedImage(run){
+
+let url=getTyphoonImageUrl(run);
+
+if(!url){
+return Promise.resolve({ok:false,url:'',image:null});
+}
+
+let cached=typhoonState.imageCache.get(url);
+if(cached){
+return cached.promise;
+}
+
+let promise=new Promise(resolve=>{
+let done=false;
+let image=configureTyphoonImageElement(new Image(),url);
+
+let timer=setTimeout(()=>{
+if(done){return;}
+done=true;
+resolve({ok:false,url,image:null});
+},TYPHOON_IMAGE_TIMEOUT_MS);
+
+image.onload=async()=>{
+if(done){return;}
+
+try{
+if(typeof image.decode==='function'){
+await image.decode();
+}
+}
+catch(e){}
+
+if(done){return;}
+done=true;
+clearTimeout(timer);
+resolve({ok:true,url,image});
+};
+
+image.onerror=()=>{
+if(done){return;}
+done=true;
+clearTimeout(timer);
+resolve({ok:false,url,image:null});
+};
+
+image.src=url;
+});
+
+typhoonState.imageCache.set(url,{url,promise});
+
+promise.then(result=>{
+if(!result?.ok){
+typhoonState.imageCache.delete(url);
+}
+});
+
+pruneTyphoonImageCache();
+return promise;
+
+}
+
+function preloadNearbyTyphoonImages(centerIndex=typhoonState.selectedSlotIndex){
+
+let slots=typhoonState.slots || [];
+let start=Math.max(0,Number(centerIndex)-TYPHOON_IMAGE_PRELOAD_RADIUS);
+let end=Math.min(slots.length-1,Number(centerIndex)+TYPHOON_IMAGE_PRELOAD_RADIUS);
+
+for(let i=start;i<=end;i++){
+let run=slots[i]?.entry;
+if(run){
+loadTyphoonCachedImage(run);
+}
+}
+
+}
+
+function createTyphoonStatusPanel(message,{hidden=false}={}){
+
+let panel=document.createElement('div');
+panel.className='typhoon-status-panel'+(hidden?' hidden':'');
+panel.textContent=message;
+return panel;
+
+}
+
+async function renderTyphoonRun(run){
 let viewer=typhoonState.root?.querySelector('[data-role="viewer"]');
 if(!viewer){
 return;
 }
 
 updateTyphoonSubtitle(run);
+
+let requestId=++typhoonState.imageRequestSeq;
+
+if(!run.imagePath){
+renderTyphoonMissingSlot(run.dataTime);
+return;
+}
+
+let url=getTyphoonImageUrl(run);
+let currentImage=viewer.querySelector('.typhoon-guidance-image');
+
+preloadNearbyTyphoonImages(typhoonState.selectedSlotIndex);
+
+if(currentImage?.dataset.cacheUrl===url && currentImage.complete){
+return;
+}
+
+if(!currentImage){
+viewer.replaceChildren(createTyphoonStatusPanel('이미지 로딩 중'));
+}
+
+let result=await loadTyphoonCachedImage(run);
+
+if(requestId!==typhoonState.imageRequestSeq){
+return;
+}
+
+if(result.ok && result.image){
+let error=createTyphoonStatusPanel('이미지 로드 실패',{hidden:true});
+viewer.replaceChildren(result.image,error);
+return;
+}
+
+viewer.replaceChildren(createTyphoonStatusPanel('이미지 로드 실패'));
+return;
+
 viewer.innerHTML='';
 
 if(!run.imagePath){
@@ -862,6 +1046,7 @@ viewer.appendChild(error);
 }
 
 function renderTyphoonMissingSlot(dataTime){
+typhoonState.imageRequestSeq++;
 let viewer=typhoonState.root?.querySelector('[data-role="viewer"]');
 if(viewer){
 viewer.innerHTML=`<div class="typhoon-status-panel">${escapeHtml(formatTyphoonTime(dataTime))} 자료 없음</div>`;
@@ -869,6 +1054,7 @@ viewer.innerHTML=`<div class="typhoon-status-panel">${escapeHtml(formatTyphoonTi
 }
 
 function renderTyphoonEmpty(message){
+typhoonState.imageRequestSeq++;
 let viewer=typhoonState.root?.querySelector('[data-role="viewer"]');
 let timeline=typhoonState.root?.querySelector('[data-role="timeline"]');
 if(timeline){
