@@ -24,17 +24,17 @@ KIM_6h:'KIM',
 KIM_EPS:'KIM EPS',
 UM:'UM',
 UM_GFDL_6h:'UM',
-UM_KEPS:'UM KEPS',
+UM_KEPS:'UM EPS',
 UKM:'UKMO',
 UKMO_EPS:'UKMO EPS',
 GFS:'GFS',
-GFS_EPS:'GFS GEFS',
+GFS_EPS:'GFS EPS',
 CMC:'CMC',
-CMC_EPS:'CMC GEPS',
+CMC_EPS:'CMC EPS',
 NAVGEM:'NAVGEM',
 FNMOC_EPS:'NAVGEM EPS',
 JGSM:'JGSM',
-TEPS:'JGSM TEPS',
+TEPS:'JGSM EPS',
 CTCX:'COAMPS-TC',
 COAMPS_EPS:'COAMPS-TC EPS',
 AFUM:'GALWEM',
@@ -45,7 +45,7 @@ ECMWF_AIFS_EPS:'ECMWF AIFS EPS',
 IFEC_AI:'KMA AIFS-ECMWF',
 IFKM_AI:'KMA AIFS-KIM',
 AGFS:'AIGFS',
-AIGEFS:'AIGEFS',
+AIGEFS:'AIGFS EPS',
 FNEC_AI:'FourCastNet-ECMWF',
 FNKM_AI:'FourCastNet-KIM',
 PGEC_AI:'Pangu-Weather-ECMWF',
@@ -53,44 +53,75 @@ PGKM_AI:'Pangu-Weather-KIM',
 GCEC_AI:'GraphCast-ECMWF',
 GCKM_AI:'GraphCast-KIM',
 GENC:'GenCast',
-FNV3:'FNV3'
+FNV3:'FNV3',
+HKO_AREC: 'Aurora-ECMWF',
+HKO_FXEC: 'FuXi-ECMWF',
+HKO_FWEC: 'FengWu-ECMWF',
 };
 
 const TYPHOON_MODEL_INFO=[
 {name:'ECMWF',description:'유럽중기예보센터(ECMWF) 전구모델(IFS)'},
 {name:'ECMWF EPS',description:'유럽중기예보센터(ECMWF) 앙상블모델(EPS) 평균'},
-{name:'KIM',description:'기상청(KMA) 전구모델(KIM GDAPS)'},
-{name:'KIM EPS',description:'기상청(KMA) 앙상블모델(KIM EPSG) 평균'},
+{name:'KIM',description:'기상청 전구모델(KIM GDAPS)'},
+{name:'KIM EPS',description:'기상청 앙상블모델(KIM GENS) 평균'},
 {name:'UKMO',description:'영국기상청(UKMO) 전구모델(UM)'},
-{name:'UKMO EPS',description:'영국기상청(UKMO) 앙상블모델(UM) 평균'},
+{name:'UKMO EPS',description:'영국기상청(UKMO) 앙상블모델(UM EPS) 평균'},
 {name:'GFS',description:'미해양대기청(NOAA NCEP) 전구모델(GFS)'},
-{name:'GFS GEFS',description:'미해양대기청(NOAA NCEP) 앙상블모델(GEFS) 평균'},
+{name:'GFS EPS',description:'미해양대기청(NOAA NCEP) 앙상블모델(GEFS) 평균'},
 {name:'CMC',description:'캐나다기상센터(CMC) 전구모델(GEM GDPS)'},
-{name:'CMC GEPS',description:'캐나다기상센터(CMC) 앙상블모델(GEM GEPS)'},
+{name:'CMC EPS',description:'캐나다기상센터(CMC) 앙상블모델(GEM GEPS) 평균'},
 {name:'NAVGEM',description:'미해군수치기상해양센터(FNMOC) 전구모델(NAVGEM)'},
-{name:'NAVGEM EPS',description:'미해군수치기상해양센터(FNMOC) 앙상블모델(NAVGEM-ENS) 평균'},
+{name:'NAVGEM EPS',description:'미해군수치기상해양센터(FNMOC) 앙상블모델(NAVGEM EPS) 평균'},
 {name:'JGSM',description:'일본기상청(JMA) 전구모델(GSM)'},
-{name:'JGSM TEPS',description:'일본기상청(JMA) 태풍앙상블모델(TEPS) 평균'},
-{name:'COAMPS-TC',description:'미해군연구소(NRL) 전구모델(COAMPS-TC) 실험(Exp) 버전'},
-{name:'COAMPS-TC EPS',description:'미해군연구소(NRL) 앙상블모델(COAMPS-TC-ENS) 평균'},
+{name:'JGSM EPS',description:'일본기상청(JMA) 태풍앙상블모델(TEPS)'},
+{name:'COAMPS-TC',description:'미해군연구소(NRL) 전구모델(COAMPS-TC CTCX)'},
+{name:'COAMPS-TC EPS',description:'미해군연구소(NRL) 앙상블모델(COAMPS-TC EPS) 평균'},
 {name:'GALWEM',description:'미공군(USAF) 전구모델(UM)'},
 {name:'HAFS',description:'미해양대기청(NOAA EMC) 태풍모델(HAFS-A)'},
 {name:'HWRF',description:'미해양대기청(NOAA EMC) 태풍모델(HWRF)'},
-{name:'ECMWF AIFS',description:'[AI] 유럽중기예보센터(ECMWF) AI 전구모델(AIFS)'},
-{name:'ECMWF AIFS EPS',description:'[AI] 유럽중기예보센터(ECMWF) AI 앙상블모델(AIFS-ENS) 평균'},
-{name:'KMA AIFS-ECMWF',description:'[AI] 기상청 수치모델링센터 수행 AIFS (ECMWF 초기장 사용)'},
-{name:'KMA AIFS-KIM',description:'[AI] 기상청 수치모델링센터 수행 AIFS (KIM 초기장 사용)'},
+{name:'ECMWF AIFS',description:'[AI] 유럽중기예보센터(ECMWF) AI 전구모델(AIFS-Single)'},
+{name:'ECMWF AIFS EPS',description:'[AI] 유럽중기예보센터(ECMWF) AI 앙상블모델(AIFS-ENS)'},
+{name:'KMA AIFS-ECMWF',description:'[AI] 기상청 수치예보센터 수행 AIFS (ECMWF 초기장)'},
+{name:'KMA AIFS-KIM',description:'[AI] 기상청 수치예보센터 수행 AIFS (KIM 초기장)'},
 {name:'AIGFS',description:'[AI] 미해양대기청(NOAA NCEP) AI 전구모델(AIGFS)'},
-{name:'AIGEFS',description:'[AI] 미해양대기청(NOAA NCEP) AI 앙상블모델(AIGEFS) 평균'},
-{name:'FourCastNet-ECMWF',description:'[AI] 기상청 수치모델링센터 수행 FourCastNet (ECMWF 초기장)'},
-{name:'FourCastNet-KIM',description:'[AI] 기상청 수치모델링센터 수행 FourCastNet (KIM 초기장)'},
-{name:'Pangu-Weather-ECMWF',description:'[AI] 기상청 수치모델링센터 수행 Pangu-Weather (ECMWF 초기장)'},
-{name:'Pangu-Weather-KIM',description:'[AI] 기상청 수치모델링센터 수행 Pangu-Weather (KIM 초기장)'},
-{name:'GraphCast-ECMWF',description:'[AI] 기상청 수치모델링센터 수행 GraphCast (ECMWF 초기장)'},
-{name:'GraphCast-KIM',description:'[AI] 기상청 수치모델링센터 수행 GraphCast (KIM 초기장)'},
+{name:'AIGFS EPS',description:'[AI] 미해양대기청(NOAA NCEP) AI 앙상블모델(AIGEFS) 평균'},
+{name:'FourCastNet-ECMWF',description:'[AI] 기상청 수치예보센터 수행 FourCastNet (ECMWF 초기장)'},
+{name:'FourCastNet-KIM',description:'[AI] 기상청 수치예보센터 수행 FourCastNet (KIM 초기장)'},
+{name:'Pangu-Weather-ECMWF',description:'[AI] 기상청 수치예보센터 수행 Pangu-Weather (ECMWF 초기장)'},
+{name:'Pangu-Weather-KIM',description:'[AI] 기상청 수치예보센터 수행 Pangu-Weather (KIM 초기장)'},
+{name:'GraphCast-ECMWF',description:'[AI] 기상청 수치예보센터 수행 GraphCast (ECMWF 초기장)'},
+{name:'GraphCast-KIM',description:'[AI] 기상청 수치예보센터 수행 GraphCast (KIM 초기장)'},
 {name:'GenCast',description:'[AI] 구글 딥마인드(GDM) 앙상블모델(GenCast) 평균'},
-{name:'FNV3',description:'[AI] 구글 딥마인드(GDM) 앙상블 실험모델(FNV3) 평균'}
+{name:'FNV3',description:'[AI] 구글 딥마인드(GDM) 앙상블 실험모델(FNV3) 평균'},
+{name:'Aurora-ECMWF',description:'[AI] 홍콩기상청 수행 Aurora (ECMWF 초기장)'},
+{name:'FuXi-ECMWF',description:'[AI] 홍콩기상청 수행 FuXi (ECMWF 초기장)'},
+{name:'FengWu-ECMWF',description:'[AI] 홍콩기상청 수행 FengWu (ECMWF 초기장)'},
 ];
+
+const TYPHOON_DEFAULT_MODEL_TARGET=TYPHOON_MODEL_INFO.length;
+
+const TYPHOON_MODEL_INFO_GROUP_ENDS=new Set([
+'ECMWF EPS',
+'KIM EPS',
+'UKMO EPS',
+'GFS EPS',
+'CMC EPS',
+'NAVGEM EPS',
+'JGSM EPS',
+'COAMPS-TC EPS',
+'GALWEM',
+'HWRF',
+'ECMWF AIFS EPS',
+'KMA AIFS-KIM',
+'AIGFS EPS',
+'FourCastNet-KIM',
+'Pangu-Weather-KIM',
+'GraphCast-KIM',
+'FNV3',
+'Aurora-ECMWF',
+'FuXi-ECMWF',
+'FengWu-ECMWF'
+]);
 
 const TYPHOON_MODEL_INFO_COLORS={
 'ECMWF':'#ED2939',
@@ -98,15 +129,16 @@ const TYPHOON_MODEL_INFO_COLORS={
 'KIM':'#FA8128',
 'KIM EPS':'#FFB347',
 'UKMO':'#FFF200',
+'UM EPS':'#B8CE9E',
 'UKMO EPS':'#B8CE9E',
 'GFS':'#03C04A',
-'GFS GEFS':'#7DDBA7',
+'GFS EPS':'#7DDBA7',
 'CMC':'#0CCBF0',
-'CMC GEPS':'#AAF7F4',
+'CMC EPS':'#AAF7F4',
 'NAVGEM':'#4470AD',
 'NAVGEM EPS':'#99AFD7',
 'JGSM':'#997950',
-'JGSM TEPS':'#654321',
+'JGSM EPS':'#654321',
 'COAMPS-TC':'#78081C',
 'COAMPS-TC EPS':'#A13B4E',
 'GALWEM':'#4F746C',
@@ -115,9 +147,9 @@ const TYPHOON_MODEL_INFO_COLORS={
 'ECMWF AIFS':'#C71585',
 'ECMWF AIFS EPS':'#E34FA5',
 'KMA AIFS-ECMWF':'#C8A3D3',
-'KMA AIFS-KIM':'#D8BF8A',
+'KMA AIFS-KIM':'#DDA520',
 'AIGFS':'#E0FF78',
-'AIGEFS':'#78FF8F',
+'AIGFS EPS':'#78FF8F',
 'FourCastNet-ECMWF':'#004B1C',
 'FourCastNet-KIM':'#388E3C',
 'Pangu-Weather-ECMWF':'#3944BC',
@@ -125,7 +157,10 @@ const TYPHOON_MODEL_INFO_COLORS={
 'GraphCast-ECMWF':'#4D248D',
 'GraphCast-KIM':'#6C33C6',
 'GenCast':'#9866C7',
-'FNV3':'#DA70D6'
+'FNV3':'#DA70D6',
+'Aurora-ECMWF':'#1E90FF',
+'FuXi-ECMWF':'#20B2AA',
+'FengWu-ECMWF':'#A6C875'
 };
 
 const typhoonState={
@@ -312,6 +347,9 @@ list.className='typhoon-model-info-list';
 TYPHOON_MODEL_INFO.forEach(item=>{
 let row=document.createElement('div');
 row.className='typhoon-model-info-row';
+if(TYPHOON_MODEL_INFO_GROUP_ENDS.has(item.name)){
+row.classList.add('is-group-end');
+}
 row.style.setProperty('--typhoon-model-color',TYPHOON_MODEL_INFO_COLORS[item.name] || '#1d4ed8');
 
 let name=document.createElement('div');
@@ -1213,7 +1251,7 @@ return `${cycloneId} ${run.typName}`.trim();
 function modelCountLabel(run){
 let metadata=run.metadata || {};
 let count=metadata.model_count;
-let target=metadata.target_model_count || 33;
+let target=metadata.target_model_count || TYPHOON_DEFAULT_MODEL_TARGET;
 if(count===undefined || count===null || count===''){
 return `0/${target}`;
 }

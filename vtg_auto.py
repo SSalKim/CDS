@@ -20,7 +20,7 @@ KMA_LIST_BASE_URL = "https://apihub-pub.kma.go.kr/api/typ01/url"
 TD_LIST_ENDPOINT = "td_lst.php"
 TYP_LIST_ENDPOINT = "typ_lst.php"
 NOAA_BDECK_URL = "https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/b{atcf_id}.dat"
-ACTIVE_MODEL_TARGET = 33
+ACTIVE_MODEL_TARGET = 36
 VALID_FCST_HOURS = (120, 240)
 CYCLE_HOURS = (0, 6, 12, 18)
 WINDOW_START_OFFSET_HOURS = 3
@@ -547,6 +547,21 @@ def metadata_has_output_image(metadata: dict) -> bool:
         return False
 
 
+def metadata_model_count(metadata: dict | None) -> int:
+    if not isinstance(metadata, dict):
+        return 0
+    try:
+        return int(metadata.get("model_count") or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def previous_completed_for_target(previous: dict, complete_model_count: int) -> bool:
+    if not previous.get("completed"):
+        return False
+    return metadata_model_count(previous.get("metadata")) >= complete_model_count
+
+
 def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list[dict]:
     entries_by_key: dict[str, dict] = {}
     suppressed_keys: set[str] = set()
@@ -717,7 +732,7 @@ def main() -> int:
             for fcst_hours in fcst_hours_list:
                 status_key = status_key_for(job, fcst_hours)
                 previous = cycle_status.get(status_key, {})
-                if previous.get("completed") and not args.force:
+                if previous_completed_for_target(previous, args.complete_model_count) and not args.force:
                     run_entries.append({
                         "job": asdict(job),
                         "window": asdict(window),
@@ -749,7 +764,7 @@ def main() -> int:
                     dry_run=args.dry_run,
                 )
                 metadata = result.get("metadata") or {}
-                model_count = int(metadata.get("model_count") or 0)
+                model_count = metadata_model_count(metadata)
                 completed = model_count >= args.complete_model_count
                 cycle_status[status_key] = {
                     "updated_at_utc": format_utc_stamp(now),
