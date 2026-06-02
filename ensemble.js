@@ -33,7 +33,7 @@ const ENSEMBLE_CATEGORIES=[
 {id:"psn3",name:"LENS: 강설확률(3시간)"},
 {id:"psn1",name:"LENS: 강설확률(1시간)"},
 {id:"pvis",name:"LENS: 시정확률(1시간)"},
-{id:"fogf",name:"LENS: 시정확률-fog fraction"},
+{id:"fogf",name:"LENS: 시정확률-안개분율"},
 {id:"pgst",name:"LENS: 강풍확률-강풍가이던스"},
 {id:"mwnd",name:"LENS: 강풍확률-평균(mean)"},
 {id:"sprd",name:"LENS: 평균/편차"}
@@ -427,7 +427,7 @@ const ENSEMBLE_PRODUCTS=[
         ],
     }
 },
-{category:"fogf",id:"fogf",label:"fog fraction",
+{category:"fogf",id:"fogf",label:"안개분율",
     patternByModel:{
         um_lens:"lens_frac_fog_01h_s{fh}_{run}.png"
     },

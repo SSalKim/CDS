@@ -74,6 +74,7 @@ const PRELOAD_IMAGE_TIMEOUT_MS=15000;
 const DISPLAY_IMAGE_RETRY_DELAY_MS=500;
 const DISPLAY_IMAGE_MAX_RETRIES=2;
 const AUTO_CHECK_DEBOUNCE_MS=250;
+const QUIET_IMAGE_PROBE_HOSTS=new Set(['dmdw.kma.go.kr']);
 
 let latestSearchSeq=0;
 let latestSearchInProgress=false;
@@ -225,7 +226,9 @@ const AUTO_NOW_ON_STARTUP=true;
 
 function init(){
 
+if(isCatalogValidationEnabled()){
 validateCatalog();
+}
 setToday();
 populateProductCategories();
 bindMainMenu();
@@ -1451,7 +1454,58 @@ showViewerMessage('표출할 이미지 URL이 없습니다.');
 }
 
 
+function shouldUseQuietImageProbe(url){
+
+try{
+let parsed=new URL(url,window.location.href);
+return (
+QUIET_IMAGE_PROBE_HOSTS.has(parsed.hostname) &&
+parsed.pathname.startsWith('/map/data/CHT/')
+);
+}
+catch(e){
+return false;
+}
+
+}
+
+
+async function quietImageExists(url,timeoutMs=PRELOAD_IMAGE_TIMEOUT_MS){
+
+if(typeof fetch!=='function' || typeof AbortController==='undefined'){
+return null;
+}
+
+let controller=new AbortController();
+let timer=setTimeout(()=>controller.abort(),timeoutMs);
+
+try{
+let response=await fetch(url,{
+method:'HEAD',
+cache:'no-store',
+signal:controller.signal
+});
+return response.ok;
+}
+catch(e){
+return null;
+}
+finally{
+clearTimeout(timer);
+}
+
+}
+
+
 async function loadImage(url,timeoutMs=PRELOAD_IMAGE_TIMEOUT_MS){
+
+if(shouldUseQuietImageProbe(url)){
+let exists=await quietImageExists(url,timeoutMs);
+
+if(exists===false){
+return false;
+}
+}
 
 let result=await chartImageLoader.getDecodedImage(url,timeoutMs);
 return !!result?.ok;
@@ -2423,7 +2477,24 @@ forceImageRefresh:true
 }
 
 
+function isCatalogValidationEnabled(){
+
+try{
+let params=new URLSearchParams(window.location.search);
+return params.has('debugCatalog');
+}
+catch(e){
+return false;
+}
+
+}
+
+
 function validateCatalog(){
+
+if(!isCatalogValidationEnabled()){
+return;
+}
 
 let modelIds=new Set(Object.keys(MODELS || {}));
 let categoryIds=new Set(

@@ -37,7 +37,7 @@
 }
 
 body{
-  font-family:"Noto Sans KR";
+  font-family:"Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
   background:var(--bg-app);
   height:100vh;
   overflow:hidden;
@@ -138,12 +138,15 @@ select{
 }
 
 .menu-btn{
-  padding:10px;
+  padding:10px 5px;
   border:none;
   border-radius:12px;
   background:var(--bg-soft);
   cursor:pointer;
+  font-size:13px;
   font-weight:600;
+  white-space:nowrap;
+  word-break:keep-all;
 }
 
 .menu-btn.active{
@@ -241,10 +244,12 @@ select{
   background:#fff;
   border-radius:10px;
   padding:7px 4px;
-  font-size:11px;
+  font-size:10px;
   font-weight:700;
   cursor:pointer;
   color:#475569;
+  white-space:nowrap;
+  word-break:keep-all;
 }
 
 .model-compare-toggle.active{
@@ -3204,10 +3209,12 @@ option.group-header{
   border:1px solid #93c5fd !important;
   background:#eff6ff !important;
   color:#1d4ed8 !important;
-  font-size:11px !important;
+  font-size:10px !important;
   font-weight:800 !important;
   letter-spacing:-0.2px;
   box-shadow:none !important;
+  white-space:nowrap !important;
+  word-break:keep-all !important;
 }
 
 .model-compare-toggle:hover{
