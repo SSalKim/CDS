@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import os
 import re
 import subprocess
@@ -20,7 +21,12 @@ KMA_LIST_BASE_URL = "https://apihub-pub.kma.go.kr/api/typ01/url"
 TD_LIST_ENDPOINT = "td_lst.php"
 TYP_LIST_ENDPOINT = "typ_lst.php"
 NOAA_BDECK_URL = "https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/b{atcf_id}.dat"
+KMA_GTS_NOW_URL = f"{KMA_LIST_BASE_URL}/typ_gts_now.php"
 ACTIVE_MODEL_TARGET = 36
+DEFAULT_ATCF_SEARCH_POSITIVE_RADIUS = 10
+DEFAULT_ATCF_SEARCH_NEGATIVE_RADIUS = 5
+DEFAULT_ATCF_POSITION_MAX_DISTANCE_KM = 600.0
+DEFAULT_ATCF_POSITION_MIN_DISTANCE_GAP_KM = 250.0
 VALID_FCST_HOURS = (120, 240)
 CYCLE_HOURS = (0, 6, 12, 18)
 WINDOW_START_OFFSET_HOURS = 3
@@ -49,7 +55,22 @@ class StormJob:
     typ_en: str
     atcf_id: str | None
     skip_atcf: bool
+    atcf_match_method: str = ""
     reason: str = ""
+
+
+@dataclass(frozen=True)
+class TrackPoint:
+    time_utc: str
+    lat: float
+    lon: float
+
+
+@dataclass(frozen=True)
+class AtcfMatch:
+    atcf_id: str
+    method: str
+    distance_km: float | None = None
 
 
 def utc_now() -> datetime:
@@ -102,6 +123,18 @@ def kma_list_url(endpoint: str, year: int, auth_key: str) -> str:
     return f"{KMA_LIST_BASE_URL}/{endpoint}?{query}"
 
 
+def kma_gts_now_url(data_time: str, auth_key: str, *, mode: str = "2") -> str:
+    query = urlencode({
+        "src": "",
+        "tm": data_time,
+        "mode": mode,
+        "disp": "1",
+        "help": "0",
+        "authKey": auth_key,
+    })
+    return f"{KMA_GTS_NOW_URL}?{query}"
+
+
 def parse_kma_csv_lines(text: str, *, fixed_columns: int) -> list[list[str]]:
     rows: list[list[str]] = []
     for raw_line in text.splitlines():
@@ -150,40 +183,196 @@ def fetch_typ_rows(year: int, auth_key: str) -> list[dict]:
     return rows
 
 
+def safe_int(value) -> int | None:
+    try:
+        return int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def safe_float(value) -> float | None:
+    try:
+        return float(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def fetch_kma_reference_point(*, typ_number: int, data_time: str, auth_key: str) -> TrackPoint | None:
+    try:
+        text = fetch_text(kma_gts_now_url(data_time, auth_key), timeout=12)
+    except (HTTPError, URLError, TimeoutError):
+        return None
+
+    candidates: list[TrackPoint] = []
+    for row in parse_kma_csv_lines(text, fixed_columns=18):
+        if safe_int(row[2]) != typ_number:
+            continue
+        tmd = safe_int(row[4])
+        lat = safe_float(row[7])
+        lon = safe_float(row[8])
+        ft_time = row[6].strip() if len(row) > 6 else ""
+        source = row[17].strip().upper() if len(row) > 17 else ""
+        if lat is None or lon is None or not ft_time:
+            continue
+        if ft_time[:10] != data_time[:10]:
+            continue
+        if tmd == 0 and (not source or source == "KMA"):
+            return TrackPoint(time_utc=ft_time, lat=lat, lon=lon)
+        if tmd == 0:
+            candidates.append(TrackPoint(time_utc=ft_time, lat=lat, lon=lon))
+    return candidates[0] if candidates else None
+
+
 def normalize_name(value: str) -> str:
     return re.sub(r"[^A-Z0-9]", "", str(value or "").upper())
 
 
-def candidate_offsets(radius: int) -> list[int]:
+def candidate_offsets(positive_radius: int, negative_radius: int) -> list[int]:
     offsets = [0]
-    for value in range(1, radius + 1):
-        offsets.extend([-value, value])
+    for value in range(1, max(positive_radius, negative_radius) + 1):
+        if value <= positive_radius:
+            offsets.append(value)
+        if value <= negative_radius:
+            offsets.append(-value)
     return offsets
 
 
-def find_atcf_id(
+def candidate_atcf_ids(*, typ_number: int, year: int, positive_radius: int, negative_radius: int) -> list[str]:
+    ids: list[str] = []
+    seen: set[str] = set()
+
+    def add(candidate_number: int) -> None:
+        if candidate_number < 1 or candidate_number > 99:
+            return
+        atcf_id = f"wp{candidate_number:02d}{year}"
+        if atcf_id not in seen:
+            seen.add(atcf_id)
+            ids.append(atcf_id)
+
+    for offset in candidate_offsets(positive_radius, negative_radius):
+        add(typ_number + offset)
+    for candidate_number in range(90, 100):
+        add(candidate_number)
+    return ids
+
+
+def parse_atcf_coord(value: str) -> float | None:
+    text = str(value or "").strip().upper()
+    if len(text) < 2:
+        return None
+    direction = text[-1]
+    number = safe_float(text[:-1])
+    if number is None:
+        return None
+    coord = number / 10.0
+    if direction in {"S", "W"}:
+        return -coord
+    if direction in {"N", "E"}:
+        return coord
+    return None
+
+
+def bdeck_track_points(text: str, *, reference_time: str) -> list[TrackPoint]:
+    points: list[TrackPoint] = []
+    target_time = reference_time[:10]
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        try:
+            row = [item.strip() for item in next(csv.reader([line]))]
+        except csv.Error:
+            continue
+        if len(row) < 8:
+            continue
+        if row[2] != target_time:
+            continue
+        if safe_int(row[5]) != 0:
+            continue
+        lat = parse_atcf_coord(row[6])
+        lon = parse_atcf_coord(row[7])
+        if lat is None or lon is None:
+            continue
+        points.append(TrackPoint(time_utc=f"{target_time}00", lat=lat, lon=lon))
+    return points
+
+
+def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    radius_km = 6371.0
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlon = math.radians(((lon2 - lon1 + 180.0) % 360.0) - 180.0)
+    a = math.sin(dphi / 2.0) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlon / 2.0) ** 2
+    return 2.0 * radius_km * math.asin(min(1.0, math.sqrt(a)))
+
+
+def find_atcf_match(
     *,
     typ_en: str,
     typ_number: int,
     year: int,
-    radius: int,
-) -> str | None:
+    positive_radius: int,
+    negative_radius: int,
+) -> AtcfMatch | None:
     target_name = normalize_name(typ_en)
     if not target_name:
         return None
 
-    for offset in candidate_offsets(radius):
-        candidate_number = typ_number + offset
-        if candidate_number < 1 or candidate_number > 99:
-            continue
-        atcf_id = f"wp{candidate_number:02d}{year}"
+    for atcf_id in candidate_atcf_ids(
+        typ_number=typ_number,
+        year=year,
+        positive_radius=positive_radius,
+        negative_radius=negative_radius,
+    ):
         try:
             text = fetch_text(NOAA_BDECK_URL.format(atcf_id=atcf_id), timeout=10)
         except (HTTPError, URLError, TimeoutError):
             continue
         if target_name in normalize_name(text):
-            return atcf_id
+            return AtcfMatch(atcf_id=atcf_id, method="name")
     return None
+
+
+def find_atcf_position_match(
+    *,
+    typ_number: int,
+    year: int,
+    data_time: str,
+    kma_point: TrackPoint | None,
+    positive_radius: int,
+    negative_radius: int,
+    max_distance_km: float,
+    min_distance_gap_km: float,
+) -> AtcfMatch | None:
+    if kma_point is None:
+        return None
+
+    candidates: list[AtcfMatch] = []
+    for atcf_id in candidate_atcf_ids(
+        typ_number=typ_number,
+        year=year,
+        positive_radius=positive_radius,
+        negative_radius=negative_radius,
+    ):
+        try:
+            text = fetch_text(NOAA_BDECK_URL.format(atcf_id=atcf_id), timeout=10)
+        except (HTTPError, URLError, TimeoutError):
+            continue
+        for point in bdeck_track_points(text, reference_time=kma_point.time_utc):
+            distance = haversine_km(kma_point.lat, kma_point.lon, point.lat, point.lon)
+            if distance <= max_distance_km:
+                candidates.append(AtcfMatch(atcf_id=atcf_id, method="position", distance_km=distance))
+
+    if not candidates:
+        return None
+    candidates.sort(key=lambda item: item.distance_km or float("inf"))
+    if len(candidates) >= 2:
+        best_distance = candidates[0].distance_km or float("inf")
+        next_distance = candidates[1].distance_km or float("inf")
+        if next_distance - best_distance < min_distance_gap_km:
+            return None
+    return candidates[0]
 
 
 def active_cycle_windows(now: datetime) -> list[CycleWindow]:
@@ -263,7 +452,11 @@ def build_storm_jobs(
     td_rows: list[dict],
     typ_rows: list[dict],
     manual_map: dict,
-    atcf_search_radius: int,
+    auth_key: str,
+    atcf_search_positive_radius: int,
+    atcf_search_negative_radius: int,
+    atcf_position_max_distance_km: float,
+    atcf_position_min_distance_gap_km: float,
 ) -> list[StormJob]:
     jobs: list[StormJob] = []
     data_dt = parse_utc_stamp(data_time)
@@ -292,12 +485,34 @@ def build_storm_jobs(
             typ_number=typ_number,
             typ_en=typ_en,
         )
-        atcf_id = manual_id or find_atcf_id(
+        atcf_match = AtcfMatch(manual_id, "manual") if manual_id else find_atcf_match(
             typ_en=typ_en,
             typ_number=typ_number,
             year=year,
-            radius=atcf_search_radius,
+            positive_radius=atcf_search_positive_radius,
+            negative_radius=atcf_search_negative_radius,
         )
+        if atcf_match is None and typ_en:
+            kma_point = fetch_kma_reference_point(typ_number=typ_number, data_time=data_time, auth_key=auth_key)
+            atcf_match = find_atcf_position_match(
+                typ_number=typ_number,
+                year=year,
+                data_time=data_time,
+                kma_point=kma_point,
+                positive_radius=atcf_search_positive_radius,
+                negative_radius=atcf_search_negative_radius,
+                max_distance_km=atcf_position_max_distance_km,
+                min_distance_gap_km=atcf_position_min_distance_gap_km,
+            )
+        atcf_id = atcf_match.atcf_id if atcf_match else None
+        atcf_method = atcf_match.method if atcf_match else ""
+        if atcf_match and atcf_match.method == "position":
+            reason = (
+                "ATCF name match not found; using temporary position match "
+                f"{atcf_match.atcf_id} ({atcf_match.distance_km:.0f} km)."
+            )
+        else:
+            reason = "" if atcf_id else "ATCF name match not found; generating KMA-only guidance."
         active_typhoons.append(typ_number)
         jobs.append(StormJob(
             storm_key=f"typ_{year}_{typ_number:02d}",
@@ -312,7 +527,8 @@ def build_storm_jobs(
             typ_en=typ_en,
             atcf_id=atcf_id,
             skip_atcf=not bool(atcf_id),
-            reason="" if atcf_id else "ATCF name match not found; generating KMA-only guidance.",
+            atcf_match_method=atcf_method,
+            reason=reason,
         ))
 
     active_typhoon_set = set(active_typhoons)
@@ -349,6 +565,7 @@ def build_storm_jobs(
             typ_en="",
             atcf_id=manual_id,
             skip_atcf=not bool(manual_id),
+            atcf_match_method="manual" if manual_id else "",
             reason="" if manual_id else "TD has no linked typhoon number yet.",
         ))
 
@@ -559,6 +776,8 @@ def metadata_model_count(metadata: dict | None) -> int:
 def previous_completed_for_target(previous: dict, complete_model_count: int) -> bool:
     if not previous.get("completed"):
         return False
+    if previous.get("atcf_match_method") == "position":
+        return False
     return metadata_model_count(previous.get("metadata")) >= complete_model_count
 
 
@@ -662,7 +881,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--source-override", action="append", default=[])
     parser.add_argument("--complete-model-count", type=int, default=ACTIVE_MODEL_TARGET)
     parser.add_argument("--min-run-interval-minutes", type=int, default=0)
-    parser.add_argument("--atcf-search-radius", type=int, default=3)
+    parser.add_argument("--atcf-search-radius", type=int, default=None, help="Legacy symmetric ATCF search radius.")
+    parser.add_argument("--atcf-search-positive-radius", type=int, default=DEFAULT_ATCF_SEARCH_POSITIVE_RADIUS)
+    parser.add_argument("--atcf-search-negative-radius", type=int, default=DEFAULT_ATCF_SEARCH_NEGATIVE_RADIUS)
+    parser.add_argument("--atcf-position-max-distance-km", type=float, default=DEFAULT_ATCF_POSITION_MAX_DISTANCE_KM)
+    parser.add_argument("--atcf-position-min-distance-gap-km", type=float, default=DEFAULT_ATCF_POSITION_MIN_DISTANCE_GAP_KM)
     parser.add_argument("--index-only", action="store_true", help="Rebuild manifest inventory from existing PNG/metadata files and exit.")
     parser.add_argument("--force", action="store_true", help="Run even if a previous metadata record met the completion target.")
     parser.add_argument("--dry-run", action="store_true")
@@ -704,6 +927,16 @@ def main() -> int:
         raise SystemExit("KMA_APIHUB_AUTH_KEY is required.")
 
     fcst_hours_list = parse_fcst_hours(args.fcst_hours)
+    atcf_search_positive_radius = (
+        args.atcf_search_radius
+        if args.atcf_search_radius is not None
+        else args.atcf_search_positive_radius
+    )
+    atcf_search_negative_radius = (
+        args.atcf_search_radius
+        if args.atcf_search_radius is not None
+        else args.atcf_search_negative_radius
+    )
 
     years = {now.year}
     for window in windows:
@@ -726,7 +959,11 @@ def main() -> int:
             td_rows=td_rows,
             typ_rows=typ_rows,
             manual_map=manual_map,
-            atcf_search_radius=args.atcf_search_radius,
+            auth_key=args.auth_key,
+            atcf_search_positive_radius=atcf_search_positive_radius,
+            atcf_search_negative_radius=atcf_search_negative_radius,
+            atcf_position_max_distance_km=args.atcf_position_max_distance_km,
+            atcf_position_min_distance_gap_km=args.atcf_position_min_distance_gap_km,
         )
         for job in jobs:
             for fcst_hours in fcst_hours_list:
@@ -771,6 +1008,8 @@ def main() -> int:
                     "completed": completed,
                     "metadata": metadata,
                     "last_status": result.get("status"),
+                    "atcf_id": job.atcf_id,
+                    "atcf_match_method": job.atcf_match_method,
                     "reason": job.reason,
                 }
                 run_entries.append({
