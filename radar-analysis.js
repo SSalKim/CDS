@@ -340,7 +340,7 @@ children:[
     baseUrl:RADAR_CMP_IMAGE_URL,
     label:'강수정체(SPOT)',
     params:{cmp:'SPT', qcd:'KMA'}
-    },
+    }
 ]
 },
 
@@ -375,10 +375,17 @@ children:[
 },
 
 {
+id:'PTY',
+baseUrl:RADAR_CMP_IMAGE_URL,
+label:'밝은띠',
+params:{cmp:'PTY', qcd:'QCD'}
+},
+
+{
 id:'HAIL',
 label:'우박',
 baseUrl:RADAR_CMP_IMAGE_URL,
-defaultLevel2:'HAIL',
+defaultLevel2:'HLSP',
 children:[
     {
     id:'HAIL',
@@ -391,15 +398,15 @@ children:[
     ]
     },
     {
-    id:'HAIL2',
-    label:'우박위험고도',
-    params:{cmp:'HAIL2', qcd:'CMAX'}
-    },
-    {
     id:'HLSP',
     label:'우박가능영역',
     baseUrl:RADAR_R2D_HAIL_IMAGE_URL,
     params:{cmp:'HLSP'}
+    },
+    {
+    id:'HAIL2',
+    label:'우박위험고도',
+    params:{cmp:'HAIL2', qcd:'CMAX'}
     },
     {
     id:'HAIL_ACC',
