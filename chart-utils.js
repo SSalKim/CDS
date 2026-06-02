@@ -298,8 +298,7 @@ if(!result.ok || !result.img){
 return null;
 }
 
-let img=result.img.cloneNode(false);
-img.src=url;
+let img=result.img;
 img.alt='chart';
 img.decoding='async';
 img.loading='eager';
