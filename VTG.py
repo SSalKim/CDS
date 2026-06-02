@@ -73,11 +73,11 @@ MODEL_INFO = [
     {"name": "PGKM_AI", "color": "#727EF2", "style": "--", "label": "Pangu-Weather-KIM", "zorder": 64},
     {"name": "GCEC_AI", "color": "#4D248D", "style": "--", "label": "GraphCast-ECMWF", "zorder": 68},
     {"name": "GCKM_AI", "color": "#6C33C6", "style": "--", "label": "GraphCast-KIM", "zorder": 67},
+    {"name": "GENC", "color": "#9866C7", "style": "--", "label": "GenCast", "zorder": 69},
+    {"name": "FNV3", "color": "#DA70D6", "style": "--", "label": "FNV3", "zorder": 99},
     {"name": "HKO_AREC", "color": "#1E90FF", "style": "--", "label": "Aurora-ECMWF", "zorder": 66},
     {"name": "HKO_FXEC", "color": "#20B2AA", "style": "--", "label": "FuXi-ECMWF", "zorder": 59},
     {"name": "HKO_FWEC", "color": "#A6C875", "style": "--", "label": "FengWu-ECMWF", "zorder": 58},
-    {"name": "GENC", "color": "#9866C7", "style": "--", "label": "GenCast", "zorder": 69},
-    {"name": "FNV3", "color": "#DA70D6", "style": "--", "label": "FNV3", "zorder": 99},
 ]
 
 MODEL_SOURCES = [
@@ -116,11 +116,11 @@ MODEL_SOURCES = [
     {"name": "PGKM_AI", "apihub": "PGKM_AI", "noaa": None, "knackwx": None},
     {"name": "GCEC_AI", "apihub": "GCEC_AI", "noaa": None, "knackwx": None},
     {"name": "GCKM_AI", "apihub": "GCKM_AI", "noaa": None, "knackwx": None},
+    {"name": "GENC", "apihub": None, "noaa": None, "knackwx": "GENC", "raw_github": "GENC"},
+    {"name": "FNV3", "apihub": None, "noaa": "FGNE", "knackwx": "FNV3", "raw_github": "FNV3"},
     {"name": "HKO_AREC", "apihub": "HKO_AREC", "noaa": None, "knackwx": None},
     {"name": "HKO_FXEC", "apihub": "HKO_FXEC", "noaa": None, "knackwx": None},
     {"name": "HKO_FWEC", "apihub": "HKO_FWEC", "noaa": None, "knackwx": None},
-    {"name": "GENC", "apihub": None, "noaa": None, "knackwx": "GENC", "raw_github": "GENC"},
-    {"name": "FNV3", "apihub": None, "noaa": "FGNE", "knackwx": "FNV3", "raw_github": "FNV3"},
 ]
 
 MODEL_CATEGORIES = {
