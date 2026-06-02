@@ -1451,9 +1451,10 @@ showViewerMessage('표출할 이미지 URL이 없습니다.');
 }
 
 
-function loadImage(url,timeoutMs=PRELOAD_IMAGE_TIMEOUT_MS){
+async function loadImage(url,timeoutMs=PRELOAD_IMAGE_TIMEOUT_MS){
 
-return CDSChartUtils.loadImage(url,timeoutMs);
+let result=await chartImageLoader.getDecodedImage(url,timeoutMs);
+return !!result?.ok;
 
 }
 
