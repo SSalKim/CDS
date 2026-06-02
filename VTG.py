@@ -773,7 +773,73 @@ def normalize_track_data(kma_df: pd.DataFrame, atcf_df: pd.DataFrame, settings: 
         if col in df:
             df[col] = pd.to_numeric(df[col], errors="coerce")
     df = df.dropna(subset=["LAT", "LON"])
-    return apply_common_kma_start(df, settings)
+    df = apply_common_kma_start(df, settings)
+    return trim_dateline_reflected_tracks(df)
+
+
+def suspected_dateline_reflection_cutoff(track: pd.DataFrame) -> float | None:
+    clean = track.dropna(subset=["LAT", "LON", "TMD"]).copy()
+    if clean.empty or len(clean) < 5:
+        return None
+
+    clean["LAT"] = pd.to_numeric(clean["LAT"], errors="coerce")
+    clean["LON"] = pd.to_numeric(clean["LON"], errors="coerce")
+    clean["TMD"] = pd.to_numeric(clean["TMD"], errors="coerce")
+    clean = clean.dropna(subset=["LAT", "LON", "TMD"]).sort_values(["TMD", "FT_TM(UTC)", "SEQ"])
+    forecast = clean[clean["TMD"].ge(0)].reset_index(drop=True)
+    if len(forecast) < 5:
+        return None
+
+    lons = forecast["LON"].astype(float)
+    lats = forecast["LAT"].astype(float)
+    if lons.max() < 172.0 or lons.min() < 0 or lons.max() > 180.5:
+        return None
+
+    peak_pos = int(lons.idxmax())
+    if peak_pos < 2 or peak_pos >= len(forecast) - 2:
+        return None
+
+    peak_lon = float(lons.iloc[peak_pos])
+    prior_min_lon = float(lons.iloc[:peak_pos + 1].min())
+    if peak_lon - prior_min_lon < 7.0:
+        return None
+
+    tail = lons.iloc[peak_pos + 1:]
+    tail_backtrack = peak_lon - float(tail.min())
+    negative_steps = int((lons.diff().iloc[peak_pos + 1:] < -0.8).sum())
+    if tail_backtrack < 5.0 or negative_steps < 2:
+        return None
+
+    lat_drop = float(lats.iloc[peak_pos] - lats.iloc[peak_pos + 1:].median())
+    if lat_drop > 4.0:
+        return None
+
+    return float(forecast["TMD"].iloc[peak_pos])
+
+
+def trim_dateline_reflected_tracks(df: pd.DataFrame) -> pd.DataFrame:
+    if df.empty or DATA_SOURCE_COLUMN not in df.columns:
+        return df
+
+    frames: list[pd.DataFrame] = []
+    for (model_name, source_name), track in df.groupby(["SRC", DATA_SOURCE_COLUMN], dropna=False):
+        cutoff = None
+        if str(source_name) == "APIHUB":
+            cutoff = suspected_dateline_reflection_cutoff(track)
+        if cutoff is None:
+            frames.append(track)
+            continue
+
+        tmd = pd.to_numeric(track["TMD"], errors="coerce")
+        trimmed = track[tmd.le(cutoff) | tmd.isna()].copy()
+        removed = len(track) - len(trimmed)
+        print(
+            f"{model_name} APIHUB: trimmed {removed} point(s) after {cutoff:g}h "
+            "due to suspected dateline-reflected longitude tail"
+        )
+        frames.append(trimmed)
+
+    return pd.concat(frames, ignore_index=True) if frames else df
 
 
 def apply_common_kma_start(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:

@@ -56,6 +56,78 @@ GENC:'GenCast',
 FNV3:'FNV3'
 };
 
+const TYPHOON_MODEL_INFO=[
+{name:'ECMWF',description:'유럽중기예보센터(ECMWF) 전구모델(IFS)'},
+{name:'ECMWF EPS',description:'유럽중기예보센터(ECMWF) 앙상블모델(EPS) 평균'},
+{name:'KIM',description:'기상청(KMA) 전구모델(KIM GDAPS)'},
+{name:'KIM EPS',description:'기상청(KMA) 앙상블모델(KIM EPSG) 평균'},
+{name:'UKMO',description:'영국기상청(UKMO) 전구모델(UM)'},
+{name:'UKMO EPS',description:'영국기상청(UKMO) 앙상블모델(UM) 평균'},
+{name:'GFS',description:'미해양대기청(NOAA NCEP) 전구모델(GFS)'},
+{name:'GFS GEFS',description:'미해양대기청(NOAA NCEP) 앙상블모델(GEFS) 평균'},
+{name:'CMC',description:'캐나다기상청(CMC) 전구모델(GEM GDPS)'},
+{name:'CMC GEPS',description:'캐나다기상청(CMC) 앙상블모델(GEM GEPS)'},
+{name:'NAVGEM',description:'미해군수치기상해양센터(FNMOC) 전구모델(NAVGEM)'},
+{name:'NAVGEM EPS',description:'미해군수치기상해양센터(FNMOC) 앙상블모델(NAVGEM-ENS) 평균'},
+{name:'JGSM',description:'일본기상청(JMA) 전구모델(GSM)'},
+{name:'JGSM TEPS',description:'일본기상청(JMA) 태풍앙상블모델(TEPS) 평균'},
+{name:'COAMPS-TC',description:'미해군연구소(NRL) 전구모델(COAMPS-TC) 실험(Exp) 버전'},
+{name:'COAMPS-TC EPS',description:'미해군연구소(NRL) 앙상블모델(COAMPS-TC-ENS) 평균'},
+{name:'GALWEM',description:'미공군(USAF) 전구모델(UM)'},
+{name:'HAFS',description:'미해양대기청(NOAA EMC) 태풍모델(HAFS-A)'},
+{name:'HWRF',description:'미해양대기청(NOAA EMC) 태풍모델(HWRF)'},
+{name:'ECMWF AIFS',description:'[AI] 유럽중기예보센터(ECMWF) AI 전구모델(AIFS)'},
+{name:'ECMWF AIFS EPS',description:'[AI] 유럽중기예보센터(ECMWF) AI 앙상블모델(AIFS-ENS) 평균'},
+{name:'KMA AIFS-ECMWF',description:'[AI] 기상청 수치모델링센터 수행 AIFS (ECMWF 초기장 사용)'},
+{name:'KMA AIFS-KIM',description:'[AI] 기상청 수치모델링센터 수행 AIFS (KIM 초기장 사용)'},
+{name:'AIGFS',description:'[AI] 미해양대기청(NOAA NCEP) AI 전구모델(AIGFS)'},
+{name:'AIGEFS',description:'[AI] 미해양대기청(NOAA NCEP) AI 앙상블모델(AIGEFS) 평균'},
+{name:'FourCastNet-ECMWF',description:'[AI] 기상청 수치모델링센터 수행 FourCastNet (ECMWF 초기장)'},
+{name:'FourCastNet-KIM',description:'[AI] 기상청 수치모델링센터 수행 FourCastNet (KIM 초기장)'},
+{name:'Pangu-Weather-ECMWF',description:'[AI] 기상청 수치모델링센터 수행 Pangu-Weather (ECMWF 초기장)'},
+{name:'Pangu-Weather-KIM',description:'[AI] 기상청 수치모델링센터 수행 Pangu-Weather (KIM 초기장)'},
+{name:'GraphCast-ECMWF',description:'[AI] 기상청 수치모델링센터 수행 GraphCast (ECMWF 초기장)'},
+{name:'GraphCast-KIM',description:'[AI] 기상청 수치모델링센터 수행 GraphCast (KIM 초기장)'},
+{name:'GenCast',description:'[AI] 구글 딥마인드(GDM) 앙상블모델(GenCast) 평균'},
+{name:'FNV3',description:'[AI] 구글 딥마인드(GDM) 앙상블 실험모델(FNV3) 평균'}
+];
+
+const TYPHOON_MODEL_INFO_COLORS={
+'ECMWF':'#ED2939',
+'ECMWF EPS':'#FC6C85',
+'KIM':'#FA8128',
+'KIM EPS':'#FFB347',
+'UKMO':'#FFF200',
+'UKMO EPS':'#B8CE9E',
+'GFS':'#03C04A',
+'GFS GEFS':'#7DDBA7',
+'CMC':'#0CCBF0',
+'CMC GEPS':'#AAF7F4',
+'NAVGEM':'#4470AD',
+'NAVGEM EPS':'#99AFD7',
+'JGSM':'#997950',
+'JGSM TEPS':'#654321',
+'COAMPS-TC':'#78081C',
+'COAMPS-TC EPS':'#A13B4E',
+'GALWEM':'#4F746C',
+'HAFS':'#9D5E5C',
+'HWRF':'#9E9E9E',
+'ECMWF AIFS':'#C71585',
+'ECMWF AIFS EPS':'#E34FA5',
+'KMA AIFS-ECMWF':'#C8A3D3',
+'KMA AIFS-KIM':'#D8BF8A',
+'AIGFS':'#E0FF78',
+'AIGEFS':'#78FF8F',
+'FourCastNet-ECMWF':'#004B1C',
+'FourCastNet-KIM':'#388E3C',
+'Pangu-Weather-ECMWF':'#3944BC',
+'Pangu-Weather-KIM':'#727EF2',
+'GraphCast-ECMWF':'#4D248D',
+'GraphCast-KIM':'#6C33C6',
+'GenCast':'#9866C7',
+'FNV3':'#DA70D6'
+};
+
 const typhoonState={
 root:null,
 manifest:null,
@@ -217,11 +289,46 @@ let viewer=document.createElement('div');
 viewer.className='typhoon-viewer';
 viewer.dataset.role='viewer';
 
+let content=document.createElement('div');
+content.className='typhoon-content';
+content.appendChild(viewer);
+content.appendChild(createTyphoonModelInfoPanel());
+
 page.appendChild(header);
 page.appendChild(timeBar);
-page.appendChild(viewer);
+page.appendChild(content);
 
 root.replaceChildren(page);
+}
+
+function createTyphoonModelInfoPanel(){
+let panel=document.createElement('aside');
+panel.className='typhoon-model-info-panel';
+panel.setAttribute('aria-label','태풍 모델 설명');
+
+let list=document.createElement('div');
+list.className='typhoon-model-info-list';
+
+TYPHOON_MODEL_INFO.forEach(item=>{
+let row=document.createElement('div');
+row.className='typhoon-model-info-row';
+row.style.setProperty('--typhoon-model-color',TYPHOON_MODEL_INFO_COLORS[item.name] || '#1d4ed8');
+
+let name=document.createElement('div');
+name.className='typhoon-model-info-name';
+name.textContent=item.name;
+
+let description=document.createElement('div');
+description.className='typhoon-model-info-description';
+description.textContent=item.description;
+
+row.appendChild(name);
+row.appendChild(description);
+list.appendChild(row);
+});
+
+panel.appendChild(list);
+return panel;
 }
 
 function createTyphoonFcstSelector(){
@@ -1154,7 +1261,7 @@ function formatTyphoonDateLabel(value){
 if(!value || value.length<8){
 return '-';
 }
-return `${value.slice(4,6)}-${value.slice(6,8)}`;
+return `${value.slice(4,6)}.${value.slice(6,8)}`;
 }
 
 function formatTyphoonHourLabel(value){

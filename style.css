@@ -1854,7 +1854,7 @@ option.group-header{
   flex-wrap:nowrap;
   align-items:stretch;
   gap:0;
-  padding:10px 12px;
+  padding:6px 7px;
   border-bottom:1px solid var(--line);
   background:#f8fafc;
 }
@@ -1870,8 +1870,8 @@ option.group-header{
   flex-direction:column;
   align-items:center;
   justify-content:center;
-  margin:-10px 2px -10px -12px;
-  padding:8px 10px;
+  margin:-6px 1px -6px -7px;
+  padding:5px 7px;
   border-right:1px solid var(--line);
   background:#ffffff;
   color:#1d4ed8;
@@ -1892,7 +1892,7 @@ option.group-header{
   align-items:center;
   justify-content:center;
   color:#1d4ed8;
-  font-size:17px;
+  font-size:16px;
   font-weight:950;
   line-height:1.08;
 }
@@ -1903,7 +1903,7 @@ option.group-header{
   margin-left:auto;
   padding-left:14px;
   color:#64748b;
-  font-size:12px;
+  font-size:11px;
   font-weight:800;
   white-space:nowrap;
   text-align:right;
@@ -1913,23 +1913,24 @@ option.group-header{
   display:flex;
   align-items:center;
   justify-content:flex-start;
-  gap:8px;
+  gap:5px;
   min-width:0;
   flex:1 1 auto;
-  padding-left:10px;
+  padding-left:6px;
   overflow:hidden;
 }
 
 .typhoon-year-select,
 .typhoon-storm-select{
-  height:34px;
+  height:30px;
   border:1px solid var(--line-soft);
-  border-radius:6px;
-  background:#f8fafc;
+  border-radius:7px;
+  background:#ffffff;
   color:#0f172a;
   font-size:12px;
-  font-weight:900;
-  padding:0 28px 0 9px;
+  font-weight:800;
+  padding:0 24px 0 7px;
+  box-sizing:border-box;
 }
 
 .typhoon-year-select{
@@ -1946,9 +1947,9 @@ option.group-header{
   display:inline-flex;
   align-items:center;
   flex:0 0 auto;
-  height:34px;
+  height:30px;
   border:1px solid var(--line-soft);
-  border-radius:7px;
+  border-radius:8px;
   overflow:hidden;
   background:#ffffff;
 }
@@ -1956,13 +1957,13 @@ option.group-header{
 .typhoon-fcst-option{
   position:relative;
   height:100%;
-  min-width:48px;
+  min-width:44px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  padding:0 10px;
+  padding:0 8px;
   color:#334155;
-  font-size:12px;
+  font-size:11px;
   font-weight:900;
   cursor:pointer;
   user-select:none;
@@ -1996,6 +1997,15 @@ option.group-header{
   z-index:3;
 }
 
+.typhoon-content{
+  flex:1;
+  min-width:0;
+  min-height:0;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) max-content;
+  background:var(--bg-viewer);
+}
+
 .typhoon-viewer{
   position:relative;
   flex:1;
@@ -2009,6 +2019,55 @@ option.group-header{
   overflow:auto;
   padding:2px;
   background:var(--bg-viewer);
+}
+
+.typhoon-model-info-panel{
+  width:max-content;
+  min-width:max-content;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  border-left:1px solid var(--line);
+  background:#ffffff;
+  overflow:hidden;
+}
+
+.typhoon-model-info-list{
+  flex:1;
+  min-height:0;
+  overflow:auto;
+  padding:5px 10px 8px;
+}
+
+.typhoon-model-info-row{
+  display:grid;
+  grid-template-columns:156px max-content;
+  gap:12px;
+  min-width:max-content;
+  padding:4px 0;
+  border-bottom:1px solid rgba(203,213,225,.58);
+}
+
+.typhoon-model-info-row:last-child{
+  border-bottom:none;
+}
+
+.typhoon-model-info-name{
+  color:var(--typhoon-model-color,#1d4ed8);
+  font-size:11px;
+  font-weight:950;
+  line-height:1.2;
+  white-space:nowrap;
+  text-shadow:0 0 1px rgba(15,23,42,.28);
+}
+
+.typhoon-model-info-description{
+  color:#334155;
+  font-size:11px;
+  font-weight:650;
+  line-height:1.35;
+  white-space:nowrap;
+  word-break:normal;
 }
 
 .typhoon-guidance-image{
@@ -2034,6 +2093,24 @@ option.group-header{
   color:#475569;
   font-size:14px;
   font-weight:900;
+}
+
+@media (max-width: 980px){
+  .typhoon-content{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:minmax(0,1fr) 230px;
+  }
+
+  .typhoon-model-info-panel{
+    width:100%;
+    min-width:0;
+    border-left:none;
+    border-top:1px solid var(--line);
+  }
+
+  .typhoon-model-info-row{
+    grid-template-columns:156px max-content;
+  }
 }
 
 @media (max-width: 560px){
@@ -3338,6 +3415,21 @@ option.group-header{
 
 .radar-page .radar-timeline .compare-timeline-list,
 .radar-page .radar-timeline .single-timeline-list{
+  padding-top:15px !important;
+  padding-bottom:15px !important;
+}
+
+.typhoon-page .typhoon-time-bar{
+  padding-top:3px !important;
+  padding-bottom:3px !important;
+}
+
+.typhoon-page .typhoon-time-shell{
+  min-height:36px !important;
+}
+
+.typhoon-page .typhoon-timeline .compare-timeline-list,
+.typhoon-page .typhoon-timeline .single-timeline-list{
   padding-top:15px !important;
   padding-bottom:15px !important;
 }
