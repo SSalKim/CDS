@@ -1,6 +1,7 @@
 const HAZARD_CATEGORIES=[
 
 {id:"stbl",name:"안정도(대류)"},
+{id:"stbk",name:"안정도(대류)-한반도"},
 {id:"lgtn",name:"낙뢰"},
 {id:"fogv",name:"안개"},
 {id:"airq",name:"대기안정도"},
@@ -14,124 +15,88 @@ const HAZARD_PRODUCTS=[
 {category:"stbl",id:"kindex",label:"K Index",
     patternByModel:{
         kim_gdps:[
-        "kim_gdps_erly_asia_kindex_ft06_pa4_s{fh}_{run}.png",
-        "kim_gdps_erly_hkor_kindex_s{fh}_{run}.png"
+        "kim_gdps_erly_asia_kindex_ft06_pa4_s{fh}_{run}.png"
         ],
         um_gdps:[
-        "gdps_erly_asia_kindex_ft06_pa4_s{fh}_{run}.gif",
-        "gdps_erly_hkor_kindex_s{fh}_{run}.gif"
+        "gdps_erly_asia_kindex_ft06_pa4_s{fh}_{run}.gif"
         ],
         ecmwf:[
-        "ecmw_lc40_asia_kindex_s{fh}_{run}.gif",
-        "ecmw_lc20_hkor_kindex_s{fh}_{run}.gif"
+        "ecmw_lc40_asia_kindex_s{fh}_{run}.gif"
         ],
         kim_rdps:[
-        "kim_rdps_erly_asia_kindex_s{fh}_{run}.png",
-        "kim_rdps_erly_hkor_kindex_s{fh}_{run}.png"
+        "kim_rdps_erly_asia_kindex_s{fh}_{run}.png"
         ],
         um_rdps:[
-        "rdps_lc30_asia_kindex_ft03_pa4_s{fh}_{run}.gif",
-        "rdps_lc10_hkor_kindex_s{fh}_{run}.gif"
+        "rdps_lc30_asia_kindex_ft03_pa4_s{fh}_{run}.gif"
         ],
         kwrf_rdps:[
-        "kwrf_lc30_asia_kindex_ft03_pa4_s{fh}_{run}.gif",
-        "kwrf_lc10_hkor_kindex_s{fh}_{run}.gif"
-        ],
-        kim_ldps:[
-        "kim_ldps_erly_hkor_kindex_s{fh}_{run}.png"
+        "kwrf_lc30_asia_kindex_ft03_pa4_s{fh}_{run}.gif"
         ]
     }  
 },
 {category:"stbl",id:"lindex",label:"Lifted Index",
     patternByModel:{
         kim_gdps:[
-        "kim_gdps_erly_asia_lindex_ft06_pa4_s{fh}_{run}.png",
-        "kim_gdps_erly_hkor_lindex_s{fh}_{run}.png"
+        "kim_gdps_erly_asia_lindex_ft06_pa4_s{fh}_{run}.png"
         ],
         um_gdps:[
-        "gdps_erly_asia_lindex_ft06_pa4_s{fh}_{run}.gif",
-        "gdps_erly_hkor_lindex_s{fh}_{run}.gif"
+        "gdps_erly_asia_lindex_ft06_pa4_s{fh}_{run}.gif"
         ],
         ecmwf:[
-        "ecmw_lc40_asia_lindex_s{fh}_{run}.gif",
-        "ecmw_lc20_hkor_lindex_s{fh}_{run}.gif"
+        "ecmw_lc40_asia_lindex_s{fh}_{run}.gif"
         ],
         kim_rdps:[
-        "kim_rdps_erly_asia_lindex_s{fh}_{run}.png",
-        "kim_rdps_erly_hkor_lindex_s{fh}_{run}.png"
+        "kim_rdps_erly_asia_lindex_s{fh}_{run}.png"
         ],
         um_rdps:[
-        "rdps_lc30_asia_lindex_ft03_pa4_s{fh}_{run}.gif",
-        "rdps_lc10_hkor_lindex_s{fh}_{run}.gif"
+        "rdps_lc30_asia_lindex_ft03_pa4_s{fh}_{run}.gif"
         ],
         kwrf_rdps:[
-        "kwrf_lc30_asia_lindex_ft03_pa4_s{fh}_{run}.gif",
-        "kwrf_lc10_hkor_lindex_s{fh}_{run}.gif"
-        ],
-        kim_ldps:[
-        "kim_ldps_erly_hkor_lindex_s{fh}_{run}.png"
+        "kwrf_lc30_asia_lindex_ft03_pa4_s{fh}_{run}.gif"
         ]
     }  
 },
 {category:"stbl",id:"sindex",label:"쇼월터 Index",
     patternByModel:{
         kim_gdps:[
-        "kim_gdps_erly_asia_sindex_ft06_pa4_s{fh}_{run}.png",
-        "kim_gdps_erly_hkor_sindex_s{fh}_{run}.png"
+        "kim_gdps_erly_asia_sindex_ft06_pa4_s{fh}_{run}.png"
         ],
         um_gdps:[
-        "gdps_erly_asia_sindex_ft06_pa4_s{fh}_{run}.gif",
-        "gdps_erly_hkor_sindex_s{fh}_{run}.gif"
+        "gdps_erly_asia_sindex_ft06_pa4_s{fh}_{run}.gif"
         ],
         ecmwf:[
-        "ecmw_lc40_asia_sindex_s{fh}_{run}.gif",
-        "ecmw_lc20_hkor_sindex_s{fh}_{run}.gif"
+        "ecmw_lc40_asia_sindex_s{fh}_{run}.gif"
         ],
         kim_rdps:[
-        "kim_rdps_erly_asia_sindex_s{fh}_{run}.png",
-        "kim_rdps_erly_hkor_sindex_s{fh}_{run}.png"
+        "kim_rdps_erly_asia_sindex_s{fh}_{run}.png"
         ],
         um_rdps:[
-        "rdps_lc30_asia_sindex_ft03_pa4_s{fh}_{run}.gif",
-        "rdps_lc10_hkor_sindex_s{fh}_{run}.gif"
+        "rdps_lc30_asia_sindex_ft03_pa4_s{fh}_{run}.gif"
         ],
         kwrf_rdps:[
-        "kwrf_lc30_asia_sindex_ft03_pa4_s{fh}_{run}.gif",
-        "kwrf_lc10_hkor_sindex_s{fh}_{run}.gif"
-        ],
-        kim_ldps:[
-        "kim_ldps_erly_hkor_sindex_s{fh}_{run}.png"
+        "kwrf_lc30_asia_sindex_ft03_pa4_s{fh}_{run}.gif"
         ]
     }  
 },
 {category:"stbl",id:"totidx",label:"토탈 total 지수",
     patternByModel:{
         kim_gdps:[
-        "kim_gdps_erly_asia_totidx_ft06_pa4_s{fh}_{run}.png",
-        "kim_gdps_erly_hkor_totidx_s{fh}_{run}.png"
+        "kim_gdps_erly_asia_totidx_ft06_pa4_s{fh}_{run}.png"
         ],
         um_gdps:[
-        "gdps_erly_asia_totidx_ft06_pa4_s{fh}_{run}.gif",
-        "gdps_erly_hkor_totidx_s{fh}_{run}.gif"
+        "gdps_erly_asia_totidx_ft06_pa4_s{fh}_{run}.gif"
         ],
         ecmwf:[
-        "ecmw_lc40_asia_totidx_s{fh}_{run}.gif",
-        "ecmw_lc20_hkor_totidx_s{fh}_{run}.gif"
+        "ecmw_lc40_asia_totidx_s{fh}_{run}.gif"
         ],
         kim_rdps:[
-        "kim_rdps_erly_asia_totidx_s{fh}_{run}.png",
-        "kim_rdps_erly_hkor_totidx_s{fh}_{run}.png"
+        "kim_rdps_erly_asia_totidx_s{fh}_{run}.png"
         ],
         um_rdps:[
-        "rdps_lc30_asia_totidx_ft03_pa4_s{fh}_{run}.gif",
-        "rdps_lc10_hkor_totidx_s{fh}_{run}.gif"
+        "rdps_lc30_asia_totidx_ft03_pa4_s{fh}_{run}.gif"
         ],
         kwrf_rdps:[
-        "kwrf_lc30_asia_totidx_ft03_pa4_s{fh}_{run}.gif",
-        "kwrf_lc10_hkor_totidx_s{fh}_{run}.gif"
-        ],
-        kim_ldps:[
-        "kim_ldps_erly_hkor_totidx_s{fh}_{run}.png"
+        "kwrf_lc30_asia_totidx_ft03_pa4_s{fh}_{run}.gif"
         ]
     }  
 },
@@ -145,54 +110,38 @@ const HAZARD_PRODUCTS=[
 {category:"stbl",id:"sbcape",label:"지상기반 CAPE",
     patternByModel:{
         kim_gdps:[
-        "kim_gdps_erly_asia_sbcape_ft06_pa4_s{fh}_{run}.png",
-        "kim_gdps_erly_hkor_sbcape_s{fh}_{run}.png"
+        "kim_gdps_erly_asia_sbcape_ft06_pa4_s{fh}_{run}.png"
         ],
         um_gdps:[
-        "gdps_erly_asia_sbcape_ft06_pa4_s{fh}_{run}.gif",
-        "gdps_erly_hkor_sbcape_s{fh}_{run}.gif"
+        "gdps_erly_asia_sbcape_ft06_pa4_s{fh}_{run}.gif"
         ],
         ecmwf:[
-        "ecmw_lc40_asia_sbcape_s{fh}_{run}.gif",
-        "ecmw_lc20_hkor_sbcape_s{fh}_{run}.gif"
+        "ecmw_lc40_asia_sbcape_s{fh}_{run}.gif"
         ],
         kim_rdps:[
-        "kim_rdps_erly_asia_sbcape_s{fh}_{run}.png",
-        "kim_rdps_erly_hkor_sbcape_s{fh}_{run}.png"
-        ],
-        kim_ldps:[
-        "kim_ldps_erly_hkor_sbcape_s{fh}_{run}.png"
+        "kim_rdps_erly_asia_sbcape_s{fh}_{run}.png"
         ]
     }  
 },
 {category:"stbl",id:"srh03k",label:"SRH",
     patternByModel:{
         kim_gdps:[
-        "kim_gdps_erly_asia_srh03k_ft06_pa4_s{fh}_{run}.png",
-        "kim_gdps_erly_hkor_srh03k_s{fh}_{run}.png"
+        "kim_gdps_erly_asia_srh03k_ft06_pa4_s{fh}_{run}.png"
         ],
         um_gdps:[
-        "gdps_erly_asia_srh03k_ft06_pa4_s{fh}_{run}.gif",
-        "gdps_erly_hkor_srh03k_s{fh}_{run}.gif"
+        "gdps_erly_asia_srh03k_ft06_pa4_s{fh}_{run}.gif"
         ],
         ecmwf:[
-        "ecmw_lc40_asia_srh03k_s{fh}_{run}.gif",
-        "ecmw_lc20_hkor_srh03k_s{fh}_{run}.gif"
+        "ecmw_lc40_asia_srh03k_s{fh}_{run}.gif"
         ],
         kim_rdps:[
-        "kim_rdps_erly_asia_srh03k_s{fh}_{run}.png",
-        "kim_rdps_erly_hkor_srh03k_s{fh}_{run}.png"
+        "kim_rdps_erly_asia_srh03k_s{fh}_{run}.png"
         ],
         um_rdps:[
-        "rdps_lc30_asia_srh03k_ft03_pa4_s{fh}_{run}.gif",
-        "rdps_lc10_hkor_srh03k_s{fh}_{run}.gif"
+        "rdps_lc30_asia_srh03k_ft03_pa4_s{fh}_{run}.gif"
         ],
         kwrf_rdps:[
-        "kwrf_lc30_asia_srh03k_ft03_pa4_s{fh}_{run}.gif",
-        "kwrf_lc10_hkor_srh03k_s{fh}_{run}.gif"
-        ],
-        kim_ldps:[
-        "kim_ldps_erly_hkor_srh03k_s{fh}_{run}.png"
+        "kwrf_lc30_asia_srh03k_ft03_pa4_s{fh}_{run}.gif"
         ]
     }  
 },
@@ -201,6 +150,152 @@ const HAZARD_PRODUCTS=[
         kim_gdps:"kim_gdps_erly_asia_frcvel_ft06_pa4_s{fh}_{run}.png",
         um_gdps:"gdps_erly_asia_frcvel_ft06_pa4_s{fh}_{run}.gif",
         um_rdps:"rdps_lc30_asia_frcvel_ft03_pa4_s{fh}_{run}.gif"
+    }  
+},
+
+/* 안정도(대류)-한반도 */
+{category:"stbk",id:"kindex",label:"K Index",
+    patternByModel:{
+        kim_gdps:[
+        "kim_gdps_erly_hkor_kindex_s{fh}_{run}.png"
+        ],
+        um_gdps:[
+        "gdps_erly_hkor_kindex_s{fh}_{run}.gif"
+        ],
+        ecmwf:[
+        "ecmw_lc20_hkor_kindex_s{fh}_{run}.gif"
+        ],
+        kim_rdps:[
+        "kim_rdps_erly_hkor_kindex_s{fh}_{run}.png"
+        ],
+        um_rdps:[
+        "rdps_lc10_hkor_kindex_s{fh}_{run}.gif"
+        ],
+        kwrf_rdps:[
+        "kwrf_lc10_hkor_kindex_s{fh}_{run}.gif"
+        ],
+        kim_ldps:[
+        "kim_ldps_erly_hkor_kindex_s{fh}_{run}.png"
+        ]
+    }  
+},
+{category:"stbk",id:"lindex",label:"Lifted Index",
+    patternByModel:{
+        kim_gdps:[
+        "kim_gdps_erly_hkor_lindex_s{fh}_{run}.png"
+        ],
+        um_gdps:[
+        "gdps_erly_hkor_lindex_s{fh}_{run}.gif"
+        ],
+        ecmwf:[
+        "ecmw_lc20_hkor_lindex_s{fh}_{run}.gif"
+        ],
+        kim_rdps:[
+        "kim_rdps_erly_hkor_lindex_s{fh}_{run}.png"
+        ],
+        um_rdps:[
+        "rdps_lc10_hkor_lindex_s{fh}_{run}.gif"
+        ],
+        kwrf_rdps:[
+        "kwrf_lc10_hkor_lindex_s{fh}_{run}.gif"
+        ],
+        kim_ldps:[
+        "kim_ldps_erly_hkor_lindex_s{fh}_{run}.png"
+        ]
+    }  
+},
+{category:"stbk",id:"sindex",label:"쇼월터 Index",
+    patternByModel:{
+        kim_gdps:[
+        "kim_gdps_erly_hkor_sindex_s{fh}_{run}.png"
+        ],
+        um_gdps:[
+        "gdps_erly_hkor_sindex_s{fh}_{run}.gif"
+        ],
+        ecmwf:[
+        "ecmw_lc20_hkor_sindex_s{fh}_{run}.gif"
+        ],
+        kim_rdps:[
+        "kim_rdps_erly_hkor_sindex_s{fh}_{run}.png"
+        ],
+        um_rdps:[
+        "rdps_lc10_hkor_sindex_s{fh}_{run}.gif"
+        ],
+        kwrf_rdps:[
+        "kwrf_lc10_hkor_sindex_s{fh}_{run}.gif"
+        ],
+        kim_ldps:[
+        "kim_ldps_erly_hkor_sindex_s{fh}_{run}.png"
+        ]
+    }  
+},
+{category:"stbk",id:"totidx",label:"토탈 total 지수",
+    patternByModel:{
+        kim_gdps:[
+        "kim_gdps_erly_hkor_totidx_s{fh}_{run}.png"
+        ],
+        um_gdps:[
+        "gdps_erly_hkor_totidx_s{fh}_{run}.gif"
+        ],
+        ecmwf:[
+        "ecmw_lc20_hkor_totidx_s{fh}_{run}.gif"
+        ],
+        kim_rdps:[
+        "kim_rdps_erly_hkor_totidx_s{fh}_{run}.png"
+        ],
+        um_rdps:[
+        "rdps_lc10_hkor_totidx_s{fh}_{run}.gif"
+        ],
+        kwrf_rdps:[
+        "kwrf_lc10_hkor_totidx_s{fh}_{run}.gif"
+        ],
+        kim_ldps:[
+        "kim_ldps_erly_hkor_totidx_s{fh}_{run}.png"
+        ]
+    }  
+},
+{category:"stbk",id:"sbcape",label:"지상기반 CAPE",
+    patternByModel:{
+        kim_gdps:[
+        "kim_gdps_erly_hkor_sbcape_s{fh}_{run}.png"
+        ],
+        um_gdps:[
+        "gdps_erly_hkor_sbcape_s{fh}_{run}.gif"
+        ],
+        ecmwf:[
+        "ecmw_lc20_hkor_sbcape_s{fh}_{run}.gif"
+        ],
+        kim_rdps:[
+        "kim_rdps_erly_hkor_sbcape_s{fh}_{run}.png"
+        ],
+        kim_ldps:[
+        "kim_ldps_erly_hkor_sbcape_s{fh}_{run}.png"
+        ]
+    }  
+},
+{category:"stbk",id:"srh03k",label:"SRH",
+    patternByModel:{
+        kim_gdps:[
+        "kim_gdps_erly_hkor_srh03k_s{fh}_{run}.png"
+        ],
+        um_gdps:[
+        "gdps_erly_hkor_srh03k_s{fh}_{run}.gif"
+        ],
+        ecmwf:[
+        "ecmw_lc20_hkor_srh03k_s{fh}_{run}.gif"
+        ],
+        kim_rdps:[
+        "kim_rdps_erly_hkor_srh03k_s{fh}_{run}.png"
+        ],
+        um_rdps:[
+        "rdps_lc10_hkor_srh03k_s{fh}_{run}.gif"
+        ],
+        kwrf_rdps:[
+        "kwrf_lc10_hkor_srh03k_s{fh}_{run}.gif"
+        ],
+        kim_ldps:[
+        "kim_ldps_erly_hkor_srh03k_s{fh}_{run}.png"
+        ]
     }  
 },
 
