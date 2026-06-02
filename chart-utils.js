@@ -1,6 +1,6 @@
 (function(global){
 
-const DEFAULT_CHART_BASE_URL='https://data.kma.go.kr/CHT';
+const DEFAULT_CHART_BASE_URL='https://dmdw.kma.go.kr/map/data/CHT';
 
 function normalizePatternList(pattern){
 
