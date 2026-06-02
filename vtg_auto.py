@@ -8,6 +8,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -101,10 +102,26 @@ def active_at(now: datetime, start_text: str, end_text: str) -> bool:
     return True
 
 
-def fetch_text(url: str, *, timeout: float = 12) -> str:
-    request = Request(url, headers={"User-Agent": "CDS-VTG-Auto/1.0"})
-    with urlopen(request, timeout=timeout) as response:
-        data = response.read()
+def fetch_text(url: str, *, timeout: float = 12, retries: int = 1, retry_delay: float = 2.0) -> str:
+    last_error: Exception | None = None
+    for attempt in range(retries + 1):
+        request = Request(url, headers={"User-Agent": "CDS-VTG-Auto/1.0"})
+        try:
+            with urlopen(request, timeout=timeout) as response:
+                data = response.read()
+            break
+        except HTTPError as exc:
+            last_error = exc
+            if exc.code < 500 or attempt >= retries:
+                raise
+        except (URLError, TimeoutError) as exc:
+            last_error = exc
+            if attempt >= retries:
+                raise
+        time.sleep(retry_delay)
+    else:
+        raise last_error or TimeoutError(f"request failed: {url}")
+
     for encoding in ("utf-8", "cp949", "euc-kr"):
         try:
             return data.decode(encoding)
@@ -256,6 +273,33 @@ def candidate_atcf_ids(*, typ_number: int, year: int, positive_radius: int, nega
     return ids
 
 
+def candidate_td_atcf_ids(*, td_number: int, year: int) -> list[str]:
+    ids: list[str] = []
+    seen: set[str] = set()
+    start_number = max(1, min(50, math.ceil(td_number / 2)))
+
+    def add(candidate_number: int) -> None:
+        if candidate_number < 1 or candidate_number > 99:
+            return
+        atcf_id = f"wp{candidate_number:02d}{year}"
+        if atcf_id not in seen:
+            seen.add(atcf_id)
+            ids.append(atcf_id)
+
+    add(start_number)
+    for offset in range(1, 50):
+        for candidate_number in (start_number + offset, start_number - offset):
+            if 1 <= candidate_number <= 50:
+                add(candidate_number)
+        if len(ids) >= 50:
+            break
+    for candidate_number in range(90, 100):
+        add(candidate_number)
+    for candidate_number in range(51, 90):
+        add(candidate_number)
+    return ids
+
+
 def parse_atcf_coord(value: str) -> float | None:
     text = str(value or "").strip().upper()
     if len(text) < 2:
@@ -340,21 +384,27 @@ def find_atcf_position_match(
     year: int,
     data_time: str,
     kma_point: TrackPoint | None,
-    positive_radius: int,
-    negative_radius: int,
+    positive_radius: int | None = None,
+    negative_radius: int | None = None,
+    atcf_ids: list[str] | None = None,
     max_distance_km: float,
     min_distance_gap_km: float,
 ) -> AtcfMatch | None:
     if kma_point is None:
         return None
 
+    if atcf_ids is None:
+        if positive_radius is None or negative_radius is None:
+            raise ValueError("positive_radius and negative_radius are required when atcf_ids is not provided.")
+        atcf_ids = candidate_atcf_ids(
+            typ_number=typ_number,
+            year=year,
+            positive_radius=positive_radius,
+            negative_radius=negative_radius,
+        )
+
     candidates: list[AtcfMatch] = []
-    for atcf_id in candidate_atcf_ids(
-        typ_number=typ_number,
-        year=year,
-        positive_radius=positive_radius,
-        negative_radius=negative_radius,
-    ):
+    for atcf_id in atcf_ids:
         try:
             text = fetch_text(NOAA_BDECK_URL.format(atcf_id=atcf_id), timeout=10)
         except (HTTPError, URLError, TimeoutError):
@@ -552,9 +602,35 @@ def build_storm_jobs(
             typ_number=td_number,
             typ_en="",
         )
+        atcf_match = AtcfMatch(manual_id, "manual") if manual_id else None
+        if atcf_match is None:
+            kma_point = fetch_kma_reference_point(typ_number=td_number, data_time=data_time, auth_key=auth_key)
+            atcf_match = find_atcf_position_match(
+                typ_number=td_number,
+                year=year,
+                data_time=data_time,
+                kma_point=kma_point,
+                atcf_ids=candidate_td_atcf_ids(td_number=td_number, year=year),
+                max_distance_km=atcf_position_max_distance_km,
+                min_distance_gap_km=atcf_position_min_distance_gap_km,
+            )
+        atcf_id = atcf_match.atcf_id if atcf_match else None
+        atcf_method = atcf_match.method if atcf_match else ""
+        if atcf_match and atcf_match.method == "position":
+            stage = "TD_POSITION_ATCF"
+            reason = (
+                "TD has no linked typhoon number yet; using temporary position match "
+                f"{atcf_match.atcf_id} ({atcf_match.distance_km:.0f} km)."
+            )
+        elif manual_id:
+            stage = "TD_MANUAL_ATCF"
+            reason = ""
+        else:
+            stage = "TD_UNLINKED"
+            reason = "TD has no linked typhoon number yet."
         jobs.append(StormJob(
             storm_key=f"td_{year}_{td_number:02d}",
-            stage="TD_MANUAL_ATCF" if manual_id else "TD_UNLINKED",
+            stage=stage,
             year=year,
             data_time=data_time,
             td_number=td_number,
@@ -563,10 +639,10 @@ def build_storm_jobs(
             typ_name_ko="",
             typ_name="NAMELESS",
             typ_en="",
-            atcf_id=manual_id,
-            skip_atcf=not bool(manual_id),
-            atcf_match_method="manual" if manual_id else "",
-            reason="" if manual_id else "TD has no linked typhoon number yet.",
+            atcf_id=atcf_id,
+            skip_atcf=not bool(atcf_id),
+            atcf_match_method=atcf_method,
+            reason=reason,
         ))
 
     return jobs
