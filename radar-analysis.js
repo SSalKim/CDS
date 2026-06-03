@@ -561,12 +561,14 @@ children:[
 ];
 
 const RADAR_PERIOD_OPTIONS=[
+{value:30,label:'30m'},
 {value:60,label:'1h'},
 {value:120,label:'2h'},
 {value:180,label:'3h'},
 {value:360,label:'6h'},
 {value:720,label:'12h'},
-{value:1440,label:'1D'}
+{value:1440,label:'1D'},
+{value:2880,label:'2D'}
 ];
 
 const RADAR_INTERVAL_OPTIONS=[
@@ -576,7 +578,8 @@ const RADAR_INTERVAL_OPTIONS=[
 {value:30,label:'30m'},
 {value:60,label:'1h'},
 {value:120,label:'2h'},
-{value:180,label:'3h'}
+{value:180,label:'3h'},
+{value:360,label:'6h'},
 ];
 
 const RADAR_TIME_SHIFT_OPTIONS=[
@@ -651,8 +654,8 @@ paneCount:4,
 panes:[
 {level1:'HSP',level2:'HSO',level3:'ECHD'},
 {level1:'PCPH',level2:'EXT',level3:'1H'},
-{level1:'SFC',level2:'SPOT'},
-{level1:'HAIL',level2:'HLSP'}
+{level1:'HAIL',level2:'HLSP'},
+{level1:'SFC',level2:'SPOT'}
 ],
 paneSizes:[
 RADAR_DEFAULT_IMAGE_SIZE,
