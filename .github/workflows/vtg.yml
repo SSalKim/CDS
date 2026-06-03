@@ -1,9 +1,6 @@
 name: Generate VTG images
 
 on:
-  schedule:
-    - cron: "3,13,23,33,43,53 * * * *"
-    - cron: "8,18,28,38,48,58 * * * *"
   workflow_dispatch:
     inputs:
       now:
