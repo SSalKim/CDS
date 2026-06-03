@@ -102,6 +102,15 @@ def active_at(now: datetime, start_text: str, end_text: str) -> bool:
     return True
 
 
+def active_typ_at(now: datetime, row: dict) -> bool:
+    now_flag = str(row.get("NOW", "")).strip()
+    if now_flag == "1":
+        return True
+    if now_flag == "2":
+        return False
+    return active_at(now, row.get("TM_ST", ""), row.get("TM_ED", ""))
+
+
 def fetch_text(url: str, *, timeout: float = 12, retries: int = 1, retry_delay: float = 2.0) -> str:
     last_error: Exception | None = None
     for attempt in range(retries + 1):
@@ -520,7 +529,7 @@ def build_storm_jobs(
             year = int(row["YY"])
         except (TypeError, ValueError):
             continue
-        is_active = row.get("NOW") == "1" or active_at(now, row.get("TM_ST", ""), row.get("TM_ED", ""))
+        is_active = active_typ_at(now, row)
         if not is_active:
             continue
         if parse_utc_stamp(row.get("TM_ST", "")) and data_dt < parse_utc_stamp(row.get("TM_ST", "")):
@@ -857,6 +866,23 @@ def previous_completed_for_target(previous: dict, complete_model_count: int) -> 
     return metadata_model_count(previous.get("metadata")) >= complete_model_count
 
 
+def is_final_check_window(now: datetime, window: CycleWindow, minutes: int) -> bool:
+    if minutes <= 0:
+        return False
+    end = parse_utc_stamp(window.end_utc)
+    if end is None:
+        return False
+    remaining = end - now
+    return timedelta(0) < remaining <= timedelta(minutes=minutes)
+
+
+def previous_final_check_done(previous: dict, window: CycleWindow) -> bool:
+    return (
+        previous.get("final_check_window_end_utc") == window.end_utc
+        and bool(previous.get("final_checked_at_utc"))
+    )
+
+
 def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list[dict]:
     entries_by_key: dict[str, dict] = {}
     suppressed_keys: set[str] = set()
@@ -957,6 +983,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--source-override", action="append", default=[])
     parser.add_argument("--complete-model-count", type=int, default=ACTIVE_MODEL_TARGET)
     parser.add_argument("--min-run-interval-minutes", type=int, default=0)
+    parser.add_argument("--final-check-before-window-end-minutes", type=int, default=10)
     parser.add_argument("--atcf-search-radius", type=int, default=None, help="Legacy symmetric ATCF search radius.")
     parser.add_argument("--atcf-search-positive-radius", type=int, default=DEFAULT_ATCF_SEARCH_POSITIVE_RADIUS)
     parser.add_argument("--atcf-search-negative-radius", type=int, default=DEFAULT_ATCF_SEARCH_NEGATIVE_RADIUS)
@@ -990,6 +1017,7 @@ def main() -> int:
             "window_start_offset_hours": WINDOW_START_OFFSET_HOURS,
             "window_end_offset_hours": WINDOW_END_OFFSET_HOURS,
             "complete_model_count": args.complete_model_count,
+            "final_check_before_window_end_minutes": args.final_check_before_window_end_minutes,
             "active_windows": [asdict(window) for window in windows],
             "runs": [],
             "inventory": build_manifest_inventory(output_root, []),
@@ -1029,6 +1057,11 @@ def main() -> int:
     actual_run_count = 0
     for window in windows:
         cycle_status = status.setdefault("cycles", {}).setdefault(window.data_time, {})
+        final_check_window = is_final_check_window(
+            now,
+            window,
+            args.final_check_before_window_end_minutes,
+        )
         jobs = build_storm_jobs(
             now=now,
             data_time=window.data_time,
@@ -1045,11 +1078,21 @@ def main() -> int:
             for fcst_hours in fcst_hours_list:
                 status_key = status_key_for(job, fcst_hours)
                 previous = cycle_status.get(status_key, {})
-                if previous_completed_for_target(previous, args.complete_model_count) and not args.force:
+                previous_completed = previous_completed_for_target(previous, args.complete_model_count)
+                final_check_due = (
+                    previous_completed
+                    and final_check_window
+                    and not previous_final_check_done(previous, window)
+                )
+                if previous_completed and not args.force and not final_check_due:
                     run_entries.append({
                         "job": asdict(job),
                         "window": asdict(window),
-                        "result": {"status": "skipped_completed", "metadata": previous.get("metadata")},
+                        "result": {
+                            "status": "skipped_completed",
+                            "metadata": previous.get("metadata"),
+                            "final_check_window": final_check_window,
+                        },
                     })
                     continue
                 previous_updated = parse_utc_stamp(previous.get("updated_at_utc", ""))
@@ -1058,11 +1101,16 @@ def main() -> int:
                     and previous_updated
                     and now - previous_updated < timedelta(minutes=args.min_run_interval_minutes)
                     and not args.force
+                    and not final_check_due
                 ):
                     run_entries.append({
                         "job": asdict(job),
                         "window": asdict(window),
-                        "result": {"status": "skipped_recent", "metadata": previous.get("metadata")},
+                        "result": {
+                            "status": "skipped_recent",
+                            "metadata": previous.get("metadata"),
+                            "final_check_window": final_check_window,
+                        },
                     })
                     continue
                 actual_run_count += 1
@@ -1079,7 +1127,7 @@ def main() -> int:
                 metadata = result.get("metadata") or {}
                 model_count = metadata_model_count(metadata)
                 completed = model_count >= args.complete_model_count
-                cycle_status[status_key] = {
+                status_record = {
                     "updated_at_utc": format_utc_stamp(now),
                     "completed": completed,
                     "metadata": metadata,
@@ -1088,11 +1136,16 @@ def main() -> int:
                     "atcf_match_method": job.atcf_match_method,
                     "reason": job.reason,
                 }
+                if final_check_window:
+                    status_record["final_checked_at_utc"] = format_utc_stamp(now)
+                    status_record["final_check_window_end_utc"] = window.end_utc
+                cycle_status[status_key] = status_record
                 run_entries.append({
                     "job": asdict(job),
                     "window": asdict(window),
                     "result": result,
                     "completed": completed,
+                    "final_check": final_check_window,
                 })
 
     previous_manifest = load_json(manifest_path, {})
@@ -1101,6 +1154,7 @@ def main() -> int:
         "window_start_offset_hours": WINDOW_START_OFFSET_HOURS,
         "window_end_offset_hours": WINDOW_END_OFFSET_HOURS,
         "complete_model_count": args.complete_model_count,
+        "final_check_before_window_end_minutes": args.final_check_before_window_end_minutes,
         "active_windows": [asdict(window) for window in windows],
         "runs": run_entries,
         "inventory": build_manifest_inventory(output_root, run_entries),
