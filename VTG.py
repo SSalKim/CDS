@@ -1379,13 +1379,13 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
     if settings.fcst_hours <= 120:
         lon_total = max(24.0, lon_span * 1.45 + 7.0)
         lat_total = max(10.5, lat_span * 1.55 + 4.5)
-        focus_x = 0.40
-        focus_y = 0.40
+        focus_x = 0.37
+        focus_y = 0.37
     else:
         lon_total = max(34.0, lon_span * 1.65 + 9.0)
         lat_total = max(14.0, lat_span * 1.70 + 6.0)
-        focus_x = 0.43
-        focus_y = 0.43
+        focus_x = 0.41
+        focus_y = 0.41
 
     lon_min = focus_lon - lon_total * focus_x
     lon_max = lon_min + lon_total
