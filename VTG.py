@@ -605,7 +605,7 @@ def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFra
     frames: list[pd.DataFrame] = []
     with ThreadPoolExecutor(max_workers=4) as executor:
         futures = {
-            executor.submit(fetch_text, session, url, retries=2, timeout=8): (source, url, skiprows)
+            executor.submit(fetch_text, session, url, retries=2, timeout=15): (source, url, skiprows)
             for source, url, skiprows in atcf_urls(settings)
         }
         for future in as_completed(futures):

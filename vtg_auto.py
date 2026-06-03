@@ -169,7 +169,7 @@ def parse_kma_csv_lines(text: str, *, fixed_columns: int) -> list[list[str]]:
 
 def fetch_td_rows(year: int, auth_key: str) -> list[dict]:
     rows = []
-    text = fetch_text(kma_list_url(TD_LIST_ENDPOINT, year, auth_key))
+    text = fetch_text(kma_list_url(TD_LIST_ENDPOINT, year, auth_key), timeout=20)
     for row in parse_kma_csv_lines(text, fixed_columns=5):
         rows.append({
             "YY": row[0],
@@ -184,7 +184,7 @@ def fetch_td_rows(year: int, auth_key: str) -> list[dict]:
 
 def fetch_typ_rows(year: int, auth_key: str) -> list[dict]:
     rows = []
-    text = fetch_text(kma_list_url(TYP_LIST_ENDPOINT, year, auth_key))
+    text = fetch_text(kma_list_url(TYP_LIST_ENDPOINT, year, auth_key), timeout=20)
     for row in parse_kma_csv_lines(text, fixed_columns=8):
         rows.append({
             "YY": row[0],
@@ -370,7 +370,7 @@ def find_atcf_match(
         negative_radius=negative_radius,
     ):
         try:
-            text = fetch_text(NOAA_BDECK_URL.format(atcf_id=atcf_id), timeout=10)
+            text = fetch_text(NOAA_BDECK_URL.format(atcf_id=atcf_id), timeout=15)
         except (HTTPError, URLError, TimeoutError):
             continue
         if target_name in normalize_name(text):
@@ -406,7 +406,7 @@ def find_atcf_position_match(
     candidates: list[AtcfMatch] = []
     for atcf_id in atcf_ids:
         try:
-            text = fetch_text(NOAA_BDECK_URL.format(atcf_id=atcf_id), timeout=10)
+            text = fetch_text(NOAA_BDECK_URL.format(atcf_id=atcf_id), timeout=15)
         except (HTTPError, URLError, TimeoutError):
             continue
         for point in bdeck_track_points(text, reference_time=kma_point.time_utc):
