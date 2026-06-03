@@ -647,12 +647,12 @@ intervalMinutes:5,
 frames:[],
 frameLoadStates:[],
 activeIndex:0,
-paneCount:3,
+paneCount:4,
 panes:[
 {level1:'HSP',level2:'HSO',level3:'ECHD'},
-{level1:'SFC',level2:'RNEX'},
-{level1:'HCI',level2:'EXT'},
-{level1:'LGT',level2:'LGT_DST_T',level3:'1H'}
+{level1:'PCPH',level2:'EXT',level3:'1H'},
+{level1:'SFC',level2:'SPOT'},
+{level1:'HAIL',level2:'HLSP'}
 ],
 paneSizes:[
 RADAR_DEFAULT_IMAGE_SIZE,
