@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "202606031453",
+  "updated_at_utc": "202606031503",
   "window_start_offset_hours": 3,
   "window_end_offset_hours": 12,
   "complete_model_count": 36,
@@ -10,6 +10,12 @@
       "cycle_time_utc": "202606030600",
       "start_utc": "202606030900",
       "end_utc": "202606031800"
+    },
+    {
+      "data_time": "202606031200",
+      "cycle_time_utc": "202606031200",
+      "start_utc": "202606031500",
+      "end_utc": "202606040000"
     }
   ],
   "runs": [
@@ -75,6 +81,72 @@
         "stdout": "",
         "stderr": "No forecast data matched the requested storm/time/model configuration.\n",
         "metadata_path": "/home/runner/work/CDS/CDS/VTG_IMG/metadata/202606030600_td_2026_11_240h.json"
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_11",
+        "stage": "TD_UNLINKED",
+        "year": 2026,
+        "data_time": "202606031200",
+        "td_number": 11,
+        "linked_td_number": null,
+        "typ_number": 11,
+        "typ_name_ko": "",
+        "typ_name": "NAMELESS",
+        "typ_en": "",
+        "atcf_id": null,
+        "skip_atcf": true,
+        "atcf_match_method": "",
+        "reason": "TD has no linked typhoon number yet."
+      },
+      "window": {
+        "data_time": "202606031200",
+        "cycle_time_utc": "202606031200",
+        "start_utc": "202606031500",
+        "end_utc": "202606040000"
+      },
+      "result": {
+        "status": "failed",
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "No forecast data matched the requested storm/time/model configuration.\n",
+        "metadata_path": "/home/runner/work/CDS/CDS/VTG_IMG/metadata/202606031200_td_2026_11_120h.json"
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_11",
+        "stage": "TD_UNLINKED",
+        "year": 2026,
+        "data_time": "202606031200",
+        "td_number": 11,
+        "linked_td_number": null,
+        "typ_number": 11,
+        "typ_name_ko": "",
+        "typ_name": "NAMELESS",
+        "typ_en": "",
+        "atcf_id": null,
+        "skip_atcf": true,
+        "atcf_match_method": "",
+        "reason": "TD has no linked typhoon number yet."
+      },
+      "window": {
+        "data_time": "202606031200",
+        "cycle_time_utc": "202606031200",
+        "start_utc": "202606031500",
+        "end_utc": "202606040000"
+      },
+      "result": {
+        "status": "failed",
+        "returncode": 1,
+        "stdout": "",
+        "stderr": "No forecast data matched the requested storm/time/model configuration.\n",
+        "metadata_path": "/home/runner/work/CDS/CDS/VTG_IMG/metadata/202606031200_td_2026_11_240h.json"
       },
       "completed": false,
       "final_check": false
@@ -163,7 +235,7 @@
       "result": {
         "status": "inventory",
         "metadata": {
-          "generated_at_utc": "20260603145251",
+          "generated_at_utc": "20260603150253",
           "image_path": "VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202605310000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
