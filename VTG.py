@@ -188,15 +188,14 @@ PRESSURE_UNDER_900_COLOR = "#1F00FF"
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
-SOURCE_ORDER = ("APIHUB", "NOAA", "KNACKWX", "RAW.GITHUB")
+SOURCE_ORDER = ("APIHUB", "NOAA", "RAW.GITHUB")
 MODEL_SOURCE_PRIORITY_OVERRIDES = {
-    "GENC": ("RAW.GITHUB", "APIHUB", "NOAA", "KNACKWX"),
-    "FNV3": ("RAW.GITHUB", "APIHUB", "NOAA", "KNACKWX"),
+    "GENC": ("RAW.GITHUB", "APIHUB", "NOAA"),
+    "FNV3": ("RAW.GITHUB", "APIHUB", "NOAA"),
 }
 SOURCE_DISPLAY_NAMES = {
     "APIHUB": "KMA APIHUB",
     "NOAA": "NOAA ATCF",
-    "KNACKWX": "KNACKWX ATCF",
     "RAW.GITHUB": "GITHUB",
 }
 SOURCE_ALIASES = {
@@ -209,8 +208,6 @@ SOURCE_ALIASES = {
     "EMCNCEP": "NOAA",
     "NCEPATCF": "NOAA",
     "EMCNCEPATCF": "NOAA",
-    "KNACKWX": "KNACKWX",
-    "KNACKWXATCF": "KNACKWX",
     "RAWGITHUB": "RAW.GITHUB",
     "GITHUB": "RAW.GITHUB",
     "GDM": "RAW.GITHUB",
@@ -218,7 +215,6 @@ SOURCE_ALIASES = {
 SOURCE_IDENTIFIER_COLUMNS = {
     "APIHUB": "apihub",
     "NOAA": "noaa",
-    "KNACKWX": "knackwx",
     "RAW.GITHUB": "raw_github",
 }
 SOURCE_MODEL_IDS = {
@@ -242,6 +238,7 @@ KMA_BASE_URL = "https://apihub-pub.kma.go.kr/api/typ01/url/typ_gts_now.php"
 DEFAULT_AUTH_KEY = ""
 VALID_FCST_HOURS = (120, 240)
 PROJECT_ROOT = Path(__file__).resolve().parent
+PLOT_FONT_FAMILY = "DejaVu Sans"
 REQUEST_HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -265,6 +262,7 @@ class Settings:
     extra_atcf_ids: tuple[str, ...] = ()
     data_time: str = "202605301200"
     fcst_hours: int = 120
+    fcst_hours_options: tuple[int, ...] = ()
     auto_fcst_hours: bool = False
     margin_lat: float = 25
     margin_lon: float = 25
@@ -289,10 +287,10 @@ class Settings:
     overwrite_output: bool = False
     show_plot: bool = True
 
-# DB→TD 승격 시간대 이중 ATCF ID 조회
+# Double ATCF ID lookup for TD-to-typhoon promotion windows.
 # python VTG2.py --atcf-id wp062026 --extra-atcf-ids wp992026
 
-# Source 임시 변경
+# Temporary source override.
 # --source-override ECMWF_EPS=NOAA
 
 def alias_key(value: str) -> str:
@@ -349,6 +347,23 @@ def parse_source_overrides(values: Iterable[str]) -> tuple[tuple[str, str], ...]
     return tuple(overrides)
 
 
+def parse_fcst_hours_value(value: str) -> tuple[int, ...]:
+    hours: list[int] = []
+    for token in str(value or "").replace(",", " ").split():
+        try:
+            hour = int(token)
+        except ValueError as exc:
+            raise ValueError("--fcst-hours must be a comma/space separated list of integers.") from exc
+        if hour not in VALID_FCST_HOURS:
+            allowed = ", ".join(f"{item}h" for item in VALID_FCST_HOURS)
+            raise ValueError(f"--fcst-hours only supports {allowed}.")
+        if hour not in hours:
+            hours.append(hour)
+    if not hours:
+        raise ValueError("--fcst-hours must include at least one forecast hour.")
+    return tuple(hours)
+
+
 def parse_args() -> Settings:
     parser = argparse.ArgumentParser(description="Plot tropical cyclone track guidance.")
     parser.add_argument("--typ-number", type=int, default=Settings.typ_number)
@@ -363,7 +378,7 @@ def parse_args() -> Settings:
         help="Comma-separated extra ATCF IDs to merge as the same storm, e.g. wp992026.",
     )
     parser.add_argument("--data-time", default=Settings.data_time)
-    parser.add_argument("--fcst-hours", type=int, choices=VALID_FCST_HOURS, default=Settings.fcst_hours)
+    parser.add_argument("--fcst-hours", default=str(Settings.fcst_hours))
     parser.add_argument("--auto-fcst-hours", action="store_true", help="Choose 120 or 240h automatically.")
     parser.add_argument("--margin-lat", type=float, default=Settings.margin_lat)
     parser.add_argument("--margin-lon", type=float, default=Settings.margin_lon)
@@ -400,6 +415,7 @@ def parse_args() -> Settings:
     args = parser.parse_args()
     try:
         source_overrides = parse_source_overrides(args.source_override)
+        fcst_hours_options = parse_fcst_hours_value(args.fcst_hours)
     except ValueError as exc:
         parser.error(str(exc))
 
@@ -416,7 +432,8 @@ def parse_args() -> Settings:
             if item.strip()
         ),
         data_time=args.data_time,
-        fcst_hours=args.fcst_hours,
+        fcst_hours=fcst_hours_options[0],
+        fcst_hours_options=fcst_hours_options,
         auto_fcst_hours=args.auto_fcst_hours,
         margin_lat=args.margin_lat,
         margin_lon=args.margin_lon,
@@ -441,6 +458,7 @@ def parse_args() -> Settings:
 
 
 def configure_plot_fonts() -> None:
+    global PLOT_FONT_FAMILY
     font_dirs = [
         str(PROJECT_ROOT / "fonts"),
         "/usr/share/fonts/truetype/nanum",
@@ -452,7 +470,13 @@ def configure_plot_fonts() -> None:
             fm.fontManager.addfont(font_file)
         except RuntimeError:
             pass
-    plt.rcParams["font.family"] = ["NanumSquare", "Malgun Gothic", "DejaVu Sans"]
+    available = {font.name for font in fm.fontManager.ttflist}
+    for candidate in ("NanumSquare", "NanumGothic", "NanumBarunGothic", "Malgun Gothic", "DejaVu Sans"):
+        if candidate in available:
+            PLOT_FONT_FAMILY = candidate
+            break
+    print(f"Using plot font: {PLOT_FONT_FAMILY}")
+    plt.rcParams["font.family"] = [PLOT_FONT_FAMILY, "DejaVu Sans"]
     plt.rcParams["axes.unicode_minus"] = False
 
 
@@ -531,19 +555,9 @@ def canonical_model_name(model_name: str) -> str:
     return MODEL_SOURCE_ALIASES.get(model_name, model_name)
 
 
-def storm_id_from_atcf_id(atcf_id: str) -> str:
-    return f"{atcf_id[2:4].upper()}W"
-
-
 def storm_numbers(settings: Settings) -> set[int]:
     ids = (settings.atcf_id, *settings.extra_atcf_ids)
     return {int(atcf_id[2:4]) for atcf_id in ids}
-
-
-def knackwx_url(settings: Settings, atcf_id: str) -> str:
-    init_time = f"{settings.data_time[8:10]}z"
-    params = urlencode({"stormID": storm_id_from_atcf_id(atcf_id), "cycle": "late", "initTime": init_time})
-    return f"https://api.knackwx.com/atcf/v1/aid/archive?{params}"
 
 
 def raw_github_url(settings: Settings, model: str) -> str:
@@ -559,10 +573,7 @@ def raw_github_url(settings: Settings, model: str) -> str:
 def atcf_urls(settings: Settings) -> list[tuple[str, str, int]]:
     urls = []
     for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
-        urls.extend([
-            ("NOAA", f"https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/a{atcf_id}.dat", 0),
-            ("KNACKWX", knackwx_url(settings, atcf_id), 0),
-        ])
+        urls.append(("NOAA", f"https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/a{atcf_id}.dat", 0))
     urls.extend([
         ("RAW.GITHUB", raw_github_url(settings, "GENC"), 6),
         ("RAW.GITHUB", raw_github_url(settings, "FNV3"), 6),
@@ -899,12 +910,26 @@ def apply_common_kma_start(df: pd.DataFrame, settings: Settings) -> pd.DataFrame
     kma_tm = str(kma_start.iloc[0]["FT_TM(UTC)"])
 
     starts = [kma_start]
-    for model_name in sorted(name for name in df["SRC"].dropna().unique() if name != "KMA"):
-        model_start = df[(df["SRC"] == model_name) & (df["TMD"] == 0)].head(1).copy()
+    model_names = sorted(name for name in df["SRC"].dropna().unique() if name != "KMA")
+    for model_name in model_names:
+        model_track = df[df["SRC"] == model_name].copy()
+        model_start = model_track[model_track["TMD"] == 0].head(1).copy()
+        if model_start.empty:
+            model_track["TMD"] = pd.to_numeric(model_track["TMD"], errors="coerce")
+            model_start = (
+                model_track[model_track["TMD"].gt(0)]
+                .sort_values(["TMD", "FT_TM(UTC)", "SEQ"])
+                .head(1)
+                .copy()
+            )
         if model_start.empty:
             continue
         model_start.loc[:, "LAT"] = kma_lat
         model_start.loc[:, "LON"] = kma_lon
+        model_start.loc[:, "TMD"] = 0
+        model_start.loc[:, "SEQ"] = 0
+        model_start.loc[:, "FT"] = 0
+        model_start.loc[:, "TYP_TM(UTC)"] = kma_tm
         model_start.loc[:, "FT_TM(UTC)"] = kma_tm
         starts.append(model_start)
 
@@ -1109,12 +1134,11 @@ def track_intensity_summary(track: pd.DataFrame, model_name: str) -> str:
         and forecast["WS"].notna().any()
     )
 
-    # 기압이 없으면 대표 시각을 잡지 않는다.
-    # 비활성화 값처럼 ----hPa ---KT +000h로 고정한다.
+    # If pressure is missing, keep the inactive-style summary.
     if not has_pressure:
         return f"{'----':>4}hPa {'---':>3}KT +000h"
 
-    # 기압이 있으면 무조건 해당 모델의 최저기압 시점을 대표값으로 사용한다.
+    # If pressure exists, summarize the model at its minimum pressure time.
     peak = forecast.loc[valid_pressure.idxmin()]
 
     pressure = peak["PS"]
@@ -1250,6 +1274,11 @@ def storm_number_label(settings: Settings) -> str:
     return f"({atcf_id[2:4]}{basin_label})"
 
 
+def display_typ_name(settings: Settings) -> str:
+    name = str(settings.typ_name or "").strip()
+    return "" if name.upper() in {"NONAME", "NAMELESS"} else name
+
+
 def output_path(settings: Settings) -> Path:
     year_str = storm_year(settings)
     cyclone_id = tc_id(settings)
@@ -1262,6 +1291,18 @@ def output_path(settings: Settings) -> Path:
         dir_name = f"TYP_{cyclone_id}_{storm_name}"
         file_name = f"TYP_{cyclone_id}_{storm_name}_{settings.data_time}_{settings.fcst_hours}h.png"
     return settings.output_root / year_str / dir_name / file_name
+
+
+def metadata_path_for_settings(settings: Settings) -> Path | None:
+    hours = settings.fcst_hours_options or (settings.fcst_hours,)
+    if settings.metadata_path and len(hours) == 1:
+        return settings.metadata_path
+
+    year_str = storm_year(settings)
+    stage = settings.storm_stage.upper()
+    storm_prefix = "td" if stage == "TD" else "typ"
+    storm_key = f"{storm_prefix}_{year_str}_{settings.typ_number:02d}"
+    return settings.output_root / "metadata" / f"{settings.data_time}_{storm_key}_{settings.fcst_hours}h.json"
 
 
 def next_available_path(path: Path) -> Path:
@@ -1389,7 +1430,7 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
     if points.empty:
         return None
 
-    primary_limit = 120 if settings.fcst_hours <= 120 else min(settings.fcst_hours, 180)
+    primary_limit = 120 if settings.fcst_hours <= 120 else settings.fcst_hours
     primary = points[pd.to_numeric(points["TMD"], errors="coerce").between(0, primary_limit)].copy()
     if primary.empty:
         primary = points.copy()
@@ -1402,16 +1443,33 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
     focus_lat = (lat_min + lat_max) / 2
     focus_lon = (lon_min + lon_max) / 2
 
+    if settings.fcst_hours > 120 and not past_kma.empty:
+        current_dt = pd.to_datetime(settings.data_time, format="%Y%m%d%H%M", errors="coerce")
+        past_points = past_kma.copy()
+        if "FT_TIME" in past_points and not pd.isna(current_dt):
+            cutoff = current_dt.to_pydatetime() - timedelta(hours=96)
+            past_points = past_points[past_points["FT_TIME"].ge(cutoff)].copy()
+        past_points = numeric_track_points(past_points)
+        if not past_points.empty:
+            past_lat_min, past_lat_max = robust_series_bounds(past_points["LAT"])
+            past_lon_min, past_lon_max = robust_series_bounds(past_points["LON"])
+            past_focus_lat = (past_lat_min + past_lat_max) / 2
+            past_focus_lon = (past_lon_min + past_lon_max) / 2
+            focus_lat = focus_lat * 0.86 + past_focus_lat * 0.14
+            focus_lon = focus_lon * 0.86 + past_focus_lon * 0.14
+            lat_span = max(lat_span, (max(lat_max, past_lat_max) - min(lat_min, past_lat_min)) * 0.82)
+            lon_span = max(lon_span, (max(lon_max, past_lon_max) - min(lon_min, past_lon_min)) * 0.82)
+
     if settings.fcst_hours <= 120:
         lon_total = max(24.0, lon_span * 1.45 + 7.0)
         lat_total = max(10.5, lat_span * 1.55 + 4.5)
         focus_x = 0.37
         focus_y = 0.37
     else:
-        lon_total = max(34.0, lon_span * 1.65 + 9.0)
-        lat_total = max(14.0, lat_span * 1.70 + 6.0)
-        focus_x = 0.41
-        focus_y = 0.41
+        lon_total = max(39.0, lon_span * 1.78 + 11.0)
+        lat_total = max(16.0, lat_span * 1.82 + 7.0)
+        focus_x = 0.43
+        focus_y = 0.43
 
     lon_min = focus_lon - lon_total * focus_x
     lon_max = lon_min + lon_total
@@ -1614,21 +1672,22 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str) -
 
     cyclone_id = tc_id(settings)
     storm_number = storm_number_label(settings)
-    title = f"{intensity} {cyclone_id} {settings.typ_name}".strip()
+    display_name = display_typ_name(settings)
+    title = f"{intensity} {cyclone_id} {display_name}".strip()
     title_text = ax.text(
         0.022,
-        0.982 if settings.typ_name else 0.980,
+        0.982 if display_name else 0.980,
         title,
         transform=ax.transAxes,
         fontsize=38,
         color="#AAF7F4",
         fontweight="1000",
-        fontfamily="NanumSquare",
+        fontfamily=PLOT_FONT_FAMILY,
         verticalalignment="top",
         zorder=100,
     )
 
-    if settings.typ_name:
+    if display_name:
         fig.canvas.draw()
         bbox = title_text.get_window_extent().transformed(ax.transAxes.inverted())
         storm_x = bbox.x1 + 0.005
@@ -1636,8 +1695,8 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str) -
         storm_x = 0.185
 
     if storm_number:
-        ax.text(storm_x, 0.966, storm_number, transform=ax.transAxes, fontsize=17.5 if not settings.typ_name else 16.5,
-                color="#AAF7F4", fontweight="700", fontfamily="NanumSquare", verticalalignment="top",
+        ax.text(storm_x, 0.966, storm_number, transform=ax.transAxes, fontsize=17.5 if not display_name else 16.5,
+                color="#AAF7F4", fontweight="700", fontfamily=PLOT_FONT_FAMILY, verticalalignment="top",
                 horizontalalignment="left", zorder=100)
 
     start = df.loc[(df["SRC"] == "KMA") & (df["TMD"] == 0), "TYP_TM(UTC)"].dropna()
@@ -1647,29 +1706,29 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str) -
 
     model_nums = len(plotted_model_names(df, settings))
     ax.text(0.978, 0.978, f"{start_date} {start_hour}UTC", transform=ax.transAxes,
-            fontsize=34, color="white", fontweight="1000", fontfamily="NanumSquare",
+            fontsize=34, color="white", fontweight="1000", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="top", horizontalalignment="right", zorder=100,
             bbox=dict(boxstyle="square,pad=0.5", facecolor="none", linewidth=0))
     ax.text(0.022, 0.932, "VORTEX TRACK GUIDANCE", transform=ax.transAxes,
-            fontsize=22.5, color="white", fontweight="800", fontfamily="NanumSquare",
+            fontsize=22.5, color="white", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="top", zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
     fig.canvas.draw()
     guidance_probe = ax.text(0.022, 0.932, "VORTEX TRACK GUIDANCE", transform=ax.transAxes,
-                             fontsize=22.5, fontweight="800", fontfamily="NanumSquare", alpha=0)
+                             fontsize=22.5, fontweight="800", fontfamily=PLOT_FONT_FAMILY, alpha=0)
     fig.canvas.draw()
     guidance_bbox = guidance_probe.get_window_extent().transformed(ax.transAxes.inverted())
     guidance_probe.remove()
     ax.text(guidance_bbox.x1 + 0.006, 0.932, "+", transform=ax.transAxes,
-            fontsize=22.5, color="white", fontweight="800", fontfamily="NanumSquare",
+            fontsize=22.5, color="white", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="top", zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
     ax.text(0.978, 0.932, f"{model_nums} MODELS @ {settings.fcst_hours} HOURS", transform=ax.transAxes,
-            fontsize=22.5, color="#DCB0E1", fontweight="800", fontfamily="NanumSquare",
+            fontsize=22.5, color="#DCB0E1", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="top", horizontalalignment="right", zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
     ax.text(0.005, 0.006, "Plotted by WooJin Kim\nUsing KMA APIHUB & NRL ATCF", transform=ax.transAxes,
-            fontsize=11, color="aliceblue", fontweight="800", fontfamily="NanumSquare",
+            fontsize=11, color="aliceblue", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="bottom", horizontalalignment="left", zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
 
@@ -1773,7 +1832,7 @@ def draw_model_legend_table(ax, rows: list[dict]) -> None:
     pressure_x = x1 - pad_x - 0.080
     wind_x = x1 - pad_x - 0.040
     lead_x = x1 - pad_x
-    label_font_family = "NanumSquare"
+    label_font_family = PLOT_FONT_FAMILY
     label_font_weight = "700"
 
     for idx, row in enumerate(rows):
@@ -1826,7 +1885,7 @@ def draw_model_legend_table(ax, rows: list[dict]) -> None:
             y,
             pressure_text,
             transform=ax.transAxes,
-            fontfamily="NanumSquare",
+            fontfamily=PLOT_FONT_FAMILY,
             fontsize=font_size,
             fontweight="700",
             color=metric_text_color,
@@ -1839,7 +1898,7 @@ def draw_model_legend_table(ax, rows: list[dict]) -> None:
             y,
             wind_text,
             transform=ax.transAxes,
-            fontfamily="NanumSquare",
+            fontfamily=PLOT_FONT_FAMILY,
             fontsize=font_size,
             fontweight="700",
             color=metric_text_color,
@@ -1852,7 +1911,7 @@ def draw_model_legend_table(ax, rows: list[dict]) -> None:
             y,
             lead_text,
             transform=ax.transAxes,
-            fontfamily="NanumSquare",
+            fontfamily=PLOT_FONT_FAMILY,
             fontsize=font_size,
             fontweight="700",
             color=metric_text_color,
@@ -1868,7 +1927,9 @@ def main() -> None:
         raise SystemExit("KMA_APIHUB_AUTH_KEY or --auth-key is required.")
 
     configure_plot_fonts()
-    fetch_settings = replace(settings, fcst_hours=max(settings.fcst_hours, 240)) if settings.auto_fcst_hours else settings
+    requested_hours = settings.fcst_hours_options or (settings.fcst_hours,)
+    fetch_hour = max(settings.fcst_hours, 240) if settings.auto_fcst_hours else max(requested_hours)
+    fetch_settings = replace(settings, fcst_hours=fetch_hour)
 
     with requests.Session() as session:
         session.headers.update(REQUEST_HEADERS)
@@ -1895,35 +1956,63 @@ def main() -> None:
         past_kma = build_past_kma_track(read_kma_csv(kma_past_text, fetch_settings, forecast_only=False))
 
     if df.empty:
-        raise SystemExit("No forecast data matched the requested storm/time/model configuration.")
-
-    if settings.auto_fcst_hours:
-        settings = replace(settings, fcst_hours=choose_auto_fcst_hours(df, fetch_settings))
-        df = limit_forecast_hours(df, settings)
-
-    intensity = current_intensity(df)
-    if not plotted_model_names(df, settings):
-        reason = "No available model forecast points for this storm/time."
-        if settings.metadata_path:
-            write_no_output_metadata(
-                settings.metadata_path,
-                settings=settings,
-                intensity=intensity,
-                reason=reason,
+        reason = "No forecast data matched the requested storm/time/model configuration."
+        for fcst_hours in requested_hours:
+            metadata_path = settings.metadata_path if len(requested_hours) == 1 else None
+            hour_settings = replace(
+                settings,
+                fcst_hours=fcst_hours,
+                fcst_hours_options=(fcst_hours,),
+                metadata_path=metadata_path,
             )
-        print(reason)
+            metadata_path = metadata_path_for_settings(hour_settings)
+            if metadata_path:
+                write_no_output_metadata(
+                    metadata_path,
+                    settings=hour_settings,
+                    intensity="",
+                    reason=reason,
+                )
+            print(f"{fcst_hours}h: {reason}")
         return
 
-    target = plot_guidance(df, past_kma, settings, intensity)
-    if settings.metadata_path:
-        write_run_metadata(
-            settings.metadata_path,
-            target=target,
-            df=df,
-            settings=settings,
-            intensity=intensity,
+    if settings.auto_fcst_hours:
+        requested_hours = (choose_auto_fcst_hours(df, fetch_settings),)
+
+    for fcst_hours in requested_hours:
+        metadata_path = settings.metadata_path if len(requested_hours) == 1 else None
+        hour_settings = replace(
+            settings,
+            fcst_hours=fcst_hours,
+            fcst_hours_options=(fcst_hours,),
+            metadata_path=metadata_path,
         )
-    print(f"Saved: {target}")
+        hour_df = limit_forecast_hours(df, hour_settings)
+        intensity = current_intensity(hour_df)
+        metadata_path = metadata_path_for_settings(hour_settings)
+
+        if not plotted_model_names(hour_df, hour_settings):
+            reason = "No available model forecast points for this storm/time."
+            if metadata_path:
+                write_no_output_metadata(
+                    metadata_path,
+                    settings=hour_settings,
+                    intensity=intensity,
+                    reason=reason,
+                )
+            print(f"{fcst_hours}h: {reason}")
+            continue
+
+        target = plot_guidance(hour_df, past_kma, hour_settings, intensity)
+        if metadata_path:
+            write_run_metadata(
+                metadata_path,
+                target=target,
+                df=hour_df,
+                settings=hour_settings,
+                intensity=intensity,
+            )
+        print(f"Saved: {target}")
 
 
 if __name__ == "__main__":

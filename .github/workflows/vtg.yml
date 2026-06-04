@@ -144,11 +144,15 @@ jobs:
       - name: Prepare self-hosted Python
         if: ${{ env.RUNNER_KIND == 'self-hosted' }}
         run: |
-          python3 -m venv .venv-vtg
-          echo "$PWD/.venv-vtg/bin" >> "$GITHUB_PATH"
-          . .venv-vtg/bin/activate
-          python -m pip install --upgrade pip
-          python --version
+          cache_root="$HOME/.cache/cds-vtg"
+          venv_path="$cache_root/venv"
+          mkdir -p "$cache_root"
+          if [ ! -x "$venv_path/bin/python" ]; then
+            python3 -m venv "$venv_path"
+            "$venv_path/bin/python" -m pip install --upgrade pip
+          fi
+          echo "$venv_path/bin" >> "$GITHUB_PATH"
+          "$venv_path/bin/python" --version
 
       - name: Diagnose KMA APIHUB connectivity
         if: ${{ env.DIAGNOSTICS_INPUT == 'true' }}
@@ -223,8 +227,20 @@ jobs:
       - name: Install Python dependencies
         if: ${{ steps.vtg_precheck.outputs.deps_needed == 'true' }}
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements-vtg.txt
+          if [ "$RUNNER_KIND" = "self-hosted" ]; then
+            cache_root="$HOME/.cache/cds-vtg"
+            hash_file="$cache_root/requirements-vtg.sha256"
+            req_hash="$(sha256sum requirements-vtg.txt | awk '{print $1}')"
+            if [ -f "$hash_file" ] && [ "$(cat "$hash_file")" = "$req_hash" ]; then
+              echo "Self-hosted Python requirements unchanged; skipping pip install."
+              exit 0
+            fi
+            python -m pip install -r requirements-vtg.txt
+            echo "$req_hash" > "$hash_file"
+          else
+            python -m pip install --upgrade pip
+            python -m pip install -r requirements-vtg.txt
+          fi
 
       - name: Run VTG automation
         if: ${{ steps.vtg_precheck.outputs.run_step_needed == 'true' }}

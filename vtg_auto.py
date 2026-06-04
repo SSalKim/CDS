@@ -598,6 +598,7 @@ def build_storm_jobs(
     atcf_search_negative_radius: int,
     atcf_position_max_distance_km: float,
     atcf_position_min_distance_gap_km: float,
+    resolve_atcf: bool = True,
 ) -> list[StormJob]:
     jobs: list[StormJob] = []
     data_dt = parse_utc_stamp(data_time)
@@ -619,21 +620,24 @@ def build_storm_jobs(
         typ_en = row.get("TYP_EN", "").strip().upper()
         typ_name_ko = row.get("TYP_NAME", "").strip()
         linked_td_number = linked_td_number_for_typ(td_rows, year=year, typ_number=typ_number)
-        manual_id = manual_atcf_id(
-            manual_map,
-            year=year,
-            td_number=linked_td_number,
-            typ_number=typ_number,
-            typ_en=typ_en,
-        )
-        atcf_match = AtcfMatch(manual_id, "manual") if manual_id else find_atcf_match(
-            typ_en=typ_en,
-            typ_number=typ_number,
-            year=year,
-            positive_radius=atcf_search_positive_radius,
-            negative_radius=atcf_search_negative_radius,
-        )
-        if atcf_match is None and typ_en:
+        manual_id = None
+        atcf_match = None
+        if resolve_atcf:
+            manual_id = manual_atcf_id(
+                manual_map,
+                year=year,
+                td_number=linked_td_number,
+                typ_number=typ_number,
+                typ_en=typ_en,
+            )
+            atcf_match = AtcfMatch(manual_id, "manual") if manual_id else find_atcf_match(
+                typ_en=typ_en,
+                typ_number=typ_number,
+                year=year,
+                positive_radius=atcf_search_positive_radius,
+                negative_radius=atcf_search_negative_radius,
+            )
+        if resolve_atcf and atcf_match is None and typ_en:
             kma_point = fetch_kma_reference_point(typ_number=typ_number, data_time=data_time, auth_key=auth_key)
             atcf_match = find_atcf_position_match(
                 typ_number=typ_number,
@@ -647,7 +651,9 @@ def build_storm_jobs(
             )
         atcf_id = atcf_match.atcf_id if atcf_match else None
         atcf_method = atcf_match.method if atcf_match else ""
-        if atcf_match and atcf_match.method == "position":
+        if not resolve_atcf:
+            reason = "ATCF matching skipped for lightweight precheck."
+        elif atcf_match and atcf_match.method == "position":
             reason = (
                 "ATCF name match not found; using temporary position match "
                 f"{atcf_match.atcf_id} ({atcf_match.distance_km:.0f} km)."
@@ -686,15 +692,18 @@ def build_storm_jobs(
             continue
         if typ_number != 0:
             continue
-        manual_id = manual_atcf_id(
-            manual_map,
-            year=year,
-            td_number=td_number,
-            typ_number=td_number,
-            typ_en="",
-        )
-        atcf_match = AtcfMatch(manual_id, "manual") if manual_id else None
-        if atcf_match is None:
+        manual_id = None
+        atcf_match = None
+        if resolve_atcf:
+            manual_id = manual_atcf_id(
+                manual_map,
+                year=year,
+                td_number=td_number,
+                typ_number=td_number,
+                typ_en="",
+            )
+            atcf_match = AtcfMatch(manual_id, "manual") if manual_id else None
+        if resolve_atcf and atcf_match is None:
             kma_point = fetch_kma_reference_point(typ_number=td_number, data_time=data_time, auth_key=auth_key)
             atcf_match = find_atcf_position_match(
                 typ_number=td_number,
@@ -707,7 +716,10 @@ def build_storm_jobs(
             )
         atcf_id = atcf_match.atcf_id if atcf_match else None
         atcf_method = atcf_match.method if atcf_match else ""
-        if atcf_match and atcf_match.method == "position":
+        if not resolve_atcf:
+            stage = "TD_UNLINKED"
+            reason = "ATCF matching skipped for lightweight precheck."
+        elif atcf_match and atcf_match.method == "position":
             stage = "TD_POSITION_ATCF"
             reason = (
                 "TD has no linked typhoon number yet; using temporary position match "
@@ -804,18 +816,18 @@ def run_command_with_network_retry(
     return completed
 
 
-def run_vtg(
+def vtg_command(
     *,
     job: StormJob,
     output_root: Path,
     auth_key: str,
     python: str,
-    fcst_hours: int,
+    fcst_hours_list: list[int],
     auto_fcst_hours: bool,
     source_overrides: list[str],
-    dry_run: bool,
-) -> dict:
-    metadata_path = metadata_path_for(output_root, job, fcst_hours)
+) -> tuple[list[str], dict[int, Path]]:
+    unique_hours = list(dict.fromkeys(fcst_hours_list))
+    metadata_paths = {fcst_hours: metadata_path_for(output_root, job, fcst_hours) for fcst_hours in unique_hours}
     command = [
         python,
         str(PROJECT_ROOT / "VTG.py"),
@@ -830,16 +842,16 @@ def run_vtg(
         "--data-time",
         job.data_time,
         "--fcst-hours",
-        str(fcst_hours),
+        ",".join(str(fcst_hours) for fcst_hours in unique_hours),
         "--output-root",
         str(output_root),
-        "--metadata-path",
-        str(metadata_path),
         "--auth-key",
         auth_key,
         "--overwrite",
         "--no-show",
     ]
+    if len(unique_hours) == 1:
+        command.extend(["--metadata-path", str(metadata_paths[unique_hours[0]])])
     if job.atcf_id:
         command.extend(["--atcf-id", job.atcf_id])
     if job.linked_td_number is not None:
@@ -850,12 +862,38 @@ def run_vtg(
         command.append("--auto-fcst-hours")
     for override in source_overrides:
         command.extend(["--source-override", override])
+    return command, metadata_paths
+
+
+def run_vtg_batch(
+    *,
+    job: StormJob,
+    output_root: Path,
+    auth_key: str,
+    python: str,
+    fcst_hours_list: list[int],
+    auto_fcst_hours: bool,
+    source_overrides: list[str],
+    dry_run: bool,
+) -> dict[int, dict]:
+    command, metadata_paths = vtg_command(
+        job=job,
+        output_root=output_root,
+        auth_key=auth_key,
+        python=python,
+        fcst_hours_list=fcst_hours_list,
+        auto_fcst_hours=auto_fcst_hours,
+        source_overrides=source_overrides,
+    )
 
     if dry_run:
         return {
-            "status": "dry_run",
-            "command": redacted_command(command),
-            "metadata_path": str(metadata_path),
+            fcst_hours: {
+                "status": "dry_run",
+                "command": redacted_command(command),
+                "metadata_path": str(metadata_path),
+            }
+            for fcst_hours, metadata_path in metadata_paths.items()
         }
 
     completed = run_command_with_network_retry(
@@ -864,19 +902,50 @@ def run_vtg(
         retries=1,
         retry_delay_seconds=60,
     )
-    result = {
-        "status": "ok" if completed.returncode == 0 else "failed",
-        "returncode": completed.returncode,
-        "stdout": completed.stdout[-4000:],
-        "stderr": completed.stderr[-4000:],
-        "metadata_path": str(metadata_path),
-    }
-    metadata = load_json(metadata_path, None)
-    if metadata:
-        result["metadata"] = metadata
-        if metadata.get("no_output"):
-            result["status"] = "no_output"
-    return result
+    results: dict[int, dict] = {}
+    for fcst_hours, metadata_path in metadata_paths.items():
+        result = {
+            "status": "ok" if completed.returncode == 0 else "failed",
+            "returncode": completed.returncode,
+            "stdout": completed.stdout[-4000:],
+            "stderr": completed.stderr[-4000:],
+            "metadata_path": str(metadata_path),
+        }
+        metadata = load_json(metadata_path, None)
+        if metadata:
+            result["metadata"] = metadata
+            if metadata.get("no_output"):
+                result["status"] = "no_output"
+        elif completed.returncode == 0:
+            result["status"] = "failed"
+            result["stderr"] = (
+                result["stderr"] + f"\nMetadata was not written for {fcst_hours}h: {metadata_path}"
+            )[-4000:]
+        results[fcst_hours] = result
+    return results
+
+
+def run_vtg(
+    *,
+    job: StormJob,
+    output_root: Path,
+    auth_key: str,
+    python: str,
+    fcst_hours: int,
+    auto_fcst_hours: bool,
+    source_overrides: list[str],
+    dry_run: bool,
+) -> dict:
+    return run_vtg_batch(
+        job=job,
+        output_root=output_root,
+        auth_key=auth_key,
+        python=python,
+        fcst_hours_list=[fcst_hours],
+        auto_fcst_hours=auto_fcst_hours,
+        source_overrides=source_overrides,
+        dry_run=dry_run,
+    )[fcst_hours]
 
 
 def manifest_entry_from_metadata(path: Path, metadata: dict) -> dict:
@@ -1207,8 +1276,10 @@ def main() -> int:
             atcf_search_negative_radius=atcf_search_negative_radius,
             atcf_position_max_distance_km=args.atcf_position_max_distance_km,
             atcf_position_min_distance_gap_km=args.atcf_position_min_distance_gap_km,
+            resolve_atcf=not args.check_run_needed,
         )
         for job in jobs:
+            due_hours: list[int] = []
             for fcst_hours in fcst_hours_list:
                 status_key = status_key_for(job, fcst_hours)
                 previous = cycle_status.get(status_key, {})
@@ -1258,16 +1329,28 @@ def main() -> int:
                         },
                     })
                     continue
-                result = run_vtg(
-                    job=job,
-                    output_root=output_root,
-                    auth_key=args.auth_key,
-                    python=args.python,
-                    fcst_hours=fcst_hours,
-                    auto_fcst_hours=args.auto_fcst_hours,
-                    source_overrides=args.source_override,
-                    dry_run=args.dry_run,
-                )
+                due_hours.append(fcst_hours)
+
+            if args.check_run_needed or not due_hours:
+                continue
+
+            batch_results = run_vtg_batch(
+                job=job,
+                output_root=output_root,
+                auth_key=args.auth_key,
+                python=args.python,
+                fcst_hours_list=due_hours,
+                auto_fcst_hours=args.auto_fcst_hours,
+                source_overrides=args.source_override,
+                dry_run=args.dry_run,
+            )
+            for fcst_hours in due_hours:
+                status_key = status_key_for(job, fcst_hours)
+                result = batch_results.get(fcst_hours, {
+                    "status": "failed",
+                    "metadata_path": str(metadata_path_for(output_root, job, fcst_hours)),
+                    "stderr": "VTG batch run did not return a result for this forecast hour.",
+                })
                 metadata = result.get("metadata") or {}
                 model_count = metadata_model_count(metadata)
                 completed = model_count >= args.complete_model_count
