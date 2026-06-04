@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "202606041203",
+  "updated_at_utc": "202606041213",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
@@ -16,7 +16,7 @@
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606040600",
         "td_number": 11,
@@ -25,14 +25,18 @@
         "typ_name_ko": "",
         "typ_name": "NONAME",
         "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true,
-        "atcf_match_method": "",
-        "reason": "TD has no linked typhoon number yet.",
-        "analysis_point": null,
-        "analysis_source": "",
-        "analysis_match_method": "",
-        "analysis_distance_km": null
+        "atcf_id": "wp912026",
+        "skip_atcf": false,
+        "atcf_match_method": "position",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (154 km).",
+        "analysis_point": {
+          "time_utc": "202606040600",
+          "lat": 18.7,
+          "lon": 118.4
+        },
+        "analysis_source": "BDECK",
+        "analysis_match_method": "position",
+        "analysis_distance_km": 153.7766162794442
       },
       "window": {
         "data_time": "202606040600",
@@ -43,11 +47,11 @@
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nKMA 0h is missing; using the mean of 7 model 0h start point(s): 18.59N, 116.51E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
-        "stderr": "le dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
+        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt)\nECMWF KNACKWX: trimmed after 12h due to forecast gap to 54h\nKMA 0h is missing; using BDECK analysis point: 18.70N, 118.40E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
+        "stderr": "",
         "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606040600_td_2026_11_120h.json",
         "metadata": {
-          "generated_at_utc": "20260604120329",
+          "generated_at_utc": "20260604121447",
           "render_signature": "d58377c7eaa73cbecc1e4736e367aa680fc31405944e312d08776e315f08ba6f",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png",
           "storm_stage": "TD",
@@ -56,22 +60,28 @@
           "typ_name": "NONAME",
           "typ_name_ko": "",
           "linked_td_number": null,
-          "atcf_id": "",
+          "atcf_id": "wp912026",
           "extra_atcf_ids": [],
           "data_time": "202606040600",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 2,
+          "model_count": 5,
           "target_model_count": 36,
           "models": [
+            "ECMWF",
             "ECMWF_AIFS",
-            "ECMWF_EPS"
+            "ECMWF_AIFS_EPS",
+            "FNV3",
+            "GFS_EPS"
           ],
           "model_labels": [
+            "ECMWF",
             "ECMWF AIFS",
-            "ECMWF EPS"
+            "ECMWF AIFS EPS",
+            "FNV3",
+            "GFS EPS"
           ],
-          "skip_atcf": true
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -80,7 +90,7 @@
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606040600",
         "td_number": 11,
@@ -89,14 +99,18 @@
         "typ_name_ko": "",
         "typ_name": "NONAME",
         "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true,
-        "atcf_match_method": "",
-        "reason": "TD has no linked typhoon number yet.",
-        "analysis_point": null,
-        "analysis_source": "",
-        "analysis_match_method": "",
-        "analysis_distance_km": null
+        "atcf_id": "wp912026",
+        "skip_atcf": false,
+        "atcf_match_method": "position",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (154 km).",
+        "analysis_point": {
+          "time_utc": "202606040600",
+          "lat": 18.7,
+          "lon": 118.4
+        },
+        "analysis_source": "BDECK",
+        "analysis_match_method": "position",
+        "analysis_distance_km": 153.7766162794442
       },
       "window": {
         "data_time": "202606040600",
@@ -107,11 +121,11 @@
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nKMA 0h is missing; using the mean of 7 model 0h start point(s): 18.59N, 116.51E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
-        "stderr": "le dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
+        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt)\nECMWF KNACKWX: trimmed after 12h due to forecast gap to 54h\nKMA 0h is missing; using BDECK analysis point: 18.70N, 118.40E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
+        "stderr": "",
         "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606040600_td_2026_11_240h.json",
         "metadata": {
-          "generated_at_utc": "20260604120331",
+          "generated_at_utc": "20260604121449",
           "render_signature": "d58377c7eaa73cbecc1e4736e367aa680fc31405944e312d08776e315f08ba6f",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png",
           "storm_stage": "TD",
@@ -120,22 +134,28 @@
           "typ_name": "NONAME",
           "typ_name_ko": "",
           "linked_td_number": null,
-          "atcf_id": "",
+          "atcf_id": "wp912026",
           "extra_atcf_ids": [],
           "data_time": "202606040600",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 2,
+          "model_count": 5,
           "target_model_count": 36,
           "models": [
+            "ECMWF",
             "ECMWF_AIFS",
-            "ECMWF_EPS"
+            "ECMWF_AIFS_EPS",
+            "FNV3",
+            "GFS_EPS"
           ],
           "model_labels": [
+            "ECMWF",
             "ECMWF AIFS",
-            "ECMWF EPS"
+            "ECMWF AIFS EPS",
+            "FNV3",
+            "GFS EPS"
           ],
-          "skip_atcf": true
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -3269,7 +3289,7 @@
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606040600",
         "td_number": 11,
@@ -3278,14 +3298,18 @@
         "typ_name_ko": "",
         "typ_name": "NONAME",
         "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true,
-        "atcf_match_method": "",
-        "reason": "TD has no linked typhoon number yet.",
-        "analysis_point": null,
-        "analysis_source": "",
-        "analysis_match_method": "",
-        "analysis_distance_km": null
+        "atcf_id": "wp912026",
+        "skip_atcf": false,
+        "atcf_match_method": "position",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (154 km).",
+        "analysis_point": {
+          "time_utc": "202606040600",
+          "lat": 18.7,
+          "lon": 118.4
+        },
+        "analysis_source": "BDECK",
+        "analysis_match_method": "position",
+        "analysis_distance_km": 153.7766162794442
       },
       "window": {
         "data_time": "202606040600",
@@ -3296,11 +3320,11 @@
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nKMA 0h is missing; using the mean of 7 model 0h start point(s): 18.59N, 116.51E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
-        "stderr": "le dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
+        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt)\nECMWF KNACKWX: trimmed after 12h due to forecast gap to 54h\nKMA 0h is missing; using BDECK analysis point: 18.70N, 118.40E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
+        "stderr": "",
         "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606040600_td_2026_11_120h.json",
         "metadata": {
-          "generated_at_utc": "20260604120329",
+          "generated_at_utc": "20260604121447",
           "render_signature": "d58377c7eaa73cbecc1e4736e367aa680fc31405944e312d08776e315f08ba6f",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png",
           "storm_stage": "TD",
@@ -3309,22 +3333,28 @@
           "typ_name": "NONAME",
           "typ_name_ko": "",
           "linked_td_number": null,
-          "atcf_id": "",
+          "atcf_id": "wp912026",
           "extra_atcf_ids": [],
           "data_time": "202606040600",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 2,
+          "model_count": 5,
           "target_model_count": 36,
           "models": [
+            "ECMWF",
             "ECMWF_AIFS",
-            "ECMWF_EPS"
+            "ECMWF_AIFS_EPS",
+            "FNV3",
+            "GFS_EPS"
           ],
           "model_labels": [
+            "ECMWF",
             "ECMWF AIFS",
-            "ECMWF EPS"
+            "ECMWF AIFS EPS",
+            "FNV3",
+            "GFS EPS"
           ],
-          "skip_atcf": true
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -3333,7 +3363,7 @@
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606040600",
         "td_number": 11,
@@ -3342,14 +3372,18 @@
         "typ_name_ko": "",
         "typ_name": "NONAME",
         "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true,
-        "atcf_match_method": "",
-        "reason": "TD has no linked typhoon number yet.",
-        "analysis_point": null,
-        "analysis_source": "",
-        "analysis_match_method": "",
-        "analysis_distance_km": null
+        "atcf_id": "wp912026",
+        "skip_atcf": false,
+        "atcf_match_method": "position",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (154 km).",
+        "analysis_point": {
+          "time_utc": "202606040600",
+          "lat": 18.7,
+          "lon": 118.4
+        },
+        "analysis_source": "BDECK",
+        "analysis_match_method": "position",
+        "analysis_distance_km": 153.7766162794442
       },
       "window": {
         "data_time": "202606040600",
@@ -3360,11 +3394,11 @@
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nKMA 0h is missing; using the mean of 7 model 0h start point(s): 18.59N, 116.51E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
-        "stderr": "le dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1261: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1262: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040600' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
+        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T06_00_atcf_a_deck.txt)\nECMWF KNACKWX: trimmed after 12h due to forecast gap to 54h\nKMA 0h is missing; using BDECK analysis point: 18.70N, 118.40E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
+        "stderr": "",
         "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606040600_td_2026_11_240h.json",
         "metadata": {
-          "generated_at_utc": "20260604120331",
+          "generated_at_utc": "20260604121449",
           "render_signature": "d58377c7eaa73cbecc1e4736e367aa680fc31405944e312d08776e315f08ba6f",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png",
           "storm_stage": "TD",
@@ -3373,22 +3407,28 @@
           "typ_name": "NONAME",
           "typ_name_ko": "",
           "linked_td_number": null,
-          "atcf_id": "",
+          "atcf_id": "wp912026",
           "extra_atcf_ids": [],
           "data_time": "202606040600",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 2,
+          "model_count": 5,
           "target_model_count": 36,
           "models": [
+            "ECMWF",
             "ECMWF_AIFS",
-            "ECMWF_EPS"
+            "ECMWF_AIFS_EPS",
+            "FNV3",
+            "GFS_EPS"
           ],
           "model_labels": [
+            "ECMWF",
             "ECMWF AIFS",
-            "ECMWF EPS"
+            "ECMWF AIFS EPS",
+            "FNV3",
+            "GFS EPS"
           ],
-          "skip_atcf": true
+          "skip_atcf": false
         }
       },
       "completed": false,
