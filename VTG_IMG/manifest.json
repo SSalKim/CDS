@@ -1,101 +1,18 @@
 {
-  "updated_at_utc": "202601140500",
+  "updated_at_utc": "202601211700",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202601140000",
-      "cycle_time_utc": "202601140000",
-      "start_utc": "202601140500",
-      "end_utc": "202601141100"
+      "data_time": "202601211200",
+      "cycle_time_utc": "202601211200",
+      "start_utc": "202601211700",
+      "end_utc": "202601212300"
     }
   ],
-  "runs": [
-    {
-      "job": {
-        "storm_key": "td_2026_01_typ_01",
-        "stage": "TD_PRE_TYP_POSITION_ATCF",
-        "year": 2026,
-        "data_time": "202601140000",
-        "td_number": 1,
-        "linked_td_number": 1,
-        "typ_number": 1,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp012026",
-        "skip_atcf": false,
-        "atcf_match_method": "position",
-        "reason": "TD is linked to future typhoon 1; name withheld until typhoon start; using temporary position match wp012026 (43 km).",
-        "analysis_point": {
-          "time_utc": "202601140000",
-          "lat": 8.1,
-          "lon": 131.8
-        },
-        "analysis_source": "BDECK",
-        "analysis_match_method": "position",
-        "analysis_distance_km": 43.03165258468804
-      },
-      "window": {
-        "data_time": "202601140000",
-        "cycle_time_utc": "202601140000",
-        "start_utc": "202601140500",
-        "end_utc": "202601141100"
-      },
-      "result": {
-        "status": "failed",
-        "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\n[attempt 2/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\nCMC_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHAFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHWRF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nJGSM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nNAVGEM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nTEPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nKMA 0h is missing; using BDECK analysis point: 8.10N, 131.80E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601140000_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601140000_240h.png\n",
-        "stderr": "\nMetadata was not written for 120h: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601140000_td_2026_01_typ_01_120h.json",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601140000_td_2026_01_typ_01_120h.json"
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "td_2026_01_typ_01",
-        "stage": "TD_PRE_TYP_POSITION_ATCF",
-        "year": 2026,
-        "data_time": "202601140000",
-        "td_number": 1,
-        "linked_td_number": 1,
-        "typ_number": 1,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp012026",
-        "skip_atcf": false,
-        "atcf_match_method": "position",
-        "reason": "TD is linked to future typhoon 1; name withheld until typhoon start; using temporary position match wp012026 (43 km).",
-        "analysis_point": {
-          "time_utc": "202601140000",
-          "lat": 8.1,
-          "lon": 131.8
-        },
-        "analysis_source": "BDECK",
-        "analysis_match_method": "position",
-        "analysis_distance_km": 43.03165258468804
-      },
-      "window": {
-        "data_time": "202601140000",
-        "cycle_time_utc": "202601140000",
-        "start_utc": "202601140500",
-        "end_utc": "202601141100"
-      },
-      "result": {
-        "status": "failed",
-        "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\n[attempt 2/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\nCMC_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHAFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHWRF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nJGSM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nNAVGEM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nTEPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nKMA 0h is missing; using BDECK analysis point: 8.10N, 131.80E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601140000_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601140000_240h.png\n",
-        "stderr": "\nMetadata was not written for 240h: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601140000_td_2026_01_typ_01_240h.json",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601140000_td_2026_01_typ_01_240h.json"
-      },
-      "completed": false,
-      "final_check": false
-    }
-  ],
+  "runs": [],
   "inventory": [
     {
       "job": {
