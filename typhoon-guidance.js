@@ -647,13 +647,17 @@ if(entry.dataTime>storm.latest){
 storm.latest=entry.dataTime;
 }
 });
-return [...byKey.values()].sort((a,b)=>a.typNumber-b.typNumber || a.label.localeCompare(b.label));
+return [...byKey.values()].sort((a,b)=>
+String(b.latest || '').localeCompare(String(a.latest || '')) ||
+Number(b.typNumber || 0)-Number(a.typNumber || 0) ||
+a.label.localeCompare(b.label)
+);
 }
 
 function selectDefaultStormForYear(){
 let storms=buildTyphoonStormsForYear(typhoonState.selectedYear);
 typhoonState.storms=storms;
-typhoonState.selectedStormKey=storms.length ? storms[storms.length-1].key : '';
+typhoonState.selectedStormKey=storms.length ? storms[0].key : '';
 selectLatestSlotForStorm();
 }
 

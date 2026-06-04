@@ -141,7 +141,7 @@ def active_typ_at(now: datetime, row: dict) -> bool:
     if now_flag == "1":
         return True
     if now_flag == "2":
-        return False
+        return active_at(now, row.get("TM_ST", ""), row.get("TM_ED", ""))
     return active_at(now, row.get("TM_ST", ""), row.get("TM_ED", ""))
 
 
