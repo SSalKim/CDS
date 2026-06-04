@@ -1,21 +1,15 @@
 {
-  "updated_at_utc": "202606032300",
+  "updated_at_utc": "202606040635",
   "window_start_offset_hours": 3,
   "window_end_offset_hours": 12,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202606031200",
-      "cycle_time_utc": "202606031200",
-      "start_utc": "202606031500",
-      "end_utc": "202606040000"
-    },
-    {
-      "data_time": "202606031800",
-      "cycle_time_utc": "202606031800",
-      "start_utc": "202606032100",
-      "end_utc": "202606040600"
+      "data_time": "202606040000",
+      "cycle_time_utc": "202606040000",
+      "start_utc": "202606040300",
+      "end_utc": "202606041200"
     }
   ],
   "runs": [
@@ -24,7 +18,7 @@
         "storm_key": "td_2026_11",
         "stage": "TD_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202606031200",
+        "data_time": "202606040000",
         "td_number": 11,
         "linked_td_number": null,
         "typ_number": 11,
@@ -34,24 +28,24 @@
         "atcf_id": "wp912026",
         "skip_atcf": false,
         "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (162 km)."
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (95 km)."
       },
       "window": {
-        "data_time": "202606031200",
-        "cycle_time_utc": "202606031200",
-        "start_utc": "202606031500",
-        "end_utc": "202606040000"
+        "data_time": "202606040000",
+        "cycle_time_utc": "202606040000",
+        "start_utc": "202606040300",
+        "end_utc": "202606041200"
       },
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nKMA 0h is missing; using the mean of 9 model 0h start point(s): 16.70N, 114.70E.\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031200_120h.png\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031200_240h.png\n",
-        "stderr": " incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606031200_td_2026_11_120h.json",
+        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt)\nKMA 0h is missing; using the mean of 3 model 0h start point(s): 18.17N, 116.27E.\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_120h.png\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_240h.png\n",
+        "stderr": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:797: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
+        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606040000_td_2026_11_120h.json",
         "metadata": {
-          "generated_at_utc": "20260604063343",
+          "generated_at_utc": "20260604063835",
           "render_signature": "2c30f03cfd044741b27d5c477ffcb15138a909c7b2c0c3fab80d403532a42390",
-          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031200_120h.png",
+          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 11,
@@ -60,30 +54,16 @@
           "linked_td_number": null,
           "atcf_id": "wp912026",
           "extra_atcf_ids": [],
-          "data_time": "202606031200",
+          "data_time": "202606040000",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 8,
+          "model_count": 1,
           "target_model_count": 36,
           "models": [
-            "ECMWF",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "GCEC_AI",
-            "GCKM_AI",
-            "IFKM_AI",
-            "PGEC_AI"
+            "ECMWF_AIFS"
           ],
           "model_labels": [
-            "ECMWF",
-            "ECMWF EPS",
-            "FourCastNet-ECMWF",
-            "FourCastNet-KIM",
-            "GraphCast-ECMWF",
-            "GraphCast-KIM",
-            "KMA AIFS-KIM",
-            "Pangu-Weather-ECMWF"
+            "ECMWF AIFS"
           ],
           "skip_atcf": false
         }
@@ -96,7 +76,7 @@
         "storm_key": "td_2026_11",
         "stage": "TD_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202606031200",
+        "data_time": "202606040000",
         "td_number": 11,
         "linked_td_number": null,
         "typ_number": 11,
@@ -106,24 +86,24 @@
         "atcf_id": "wp912026",
         "skip_atcf": false,
         "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (162 km)."
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (95 km)."
       },
       "window": {
-        "data_time": "202606031200",
-        "cycle_time_utc": "202606031200",
-        "start_utc": "202606031500",
-        "end_utc": "202606040000"
+        "data_time": "202606040000",
+        "cycle_time_utc": "202606040000",
+        "start_utc": "202606040300",
+        "end_utc": "202606041200"
       },
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nKMA 0h is missing; using the mean of 9 model 0h start point(s): 16.70N, 114.70E.\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031200_120h.png\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031200_240h.png\n",
-        "stderr": " incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606031200_td_2026_11_240h.json",
+        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt)\nKMA 0h is missing; using the mean of 3 model 0h start point(s): 18.17N, 116.27E.\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_120h.png\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_240h.png\n",
+        "stderr": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:797: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
+        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606040000_td_2026_11_240h.json",
         "metadata": {
-          "generated_at_utc": "20260604063345",
+          "generated_at_utc": "20260604063836",
           "render_signature": "2c30f03cfd044741b27d5c477ffcb15138a909c7b2c0c3fab80d403532a42390",
-          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031200_240h.png",
+          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 11,
@@ -132,144 +112,18 @@
           "linked_td_number": null,
           "atcf_id": "wp912026",
           "extra_atcf_ids": [],
-          "data_time": "202606031200",
+          "data_time": "202606040000",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 8,
+          "model_count": 1,
           "target_model_count": 36,
           "models": [
-            "ECMWF",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "GCEC_AI",
-            "GCKM_AI",
-            "IFKM_AI",
-            "PGEC_AI"
+            "ECMWF_AIFS"
           ],
           "model_labels": [
-            "ECMWF",
-            "ECMWF EPS",
-            "FourCastNet-ECMWF",
-            "FourCastNet-KIM",
-            "GraphCast-ECMWF",
-            "GraphCast-KIM",
-            "KMA AIFS-KIM",
-            "Pangu-Weather-ECMWF"
+            "ECMWF AIFS"
           ],
           "skip_atcf": false
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
-        "year": 2026,
-        "data_time": "202606031800",
-        "td_number": 11,
-        "linked_td_number": null,
-        "typ_number": 11,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp912026",
-        "skip_atcf": false,
-        "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (169 km)."
-      },
-      "window": {
-        "data_time": "202606031800",
-        "cycle_time_utc": "202606031800",
-        "start_utc": "202606032100",
-        "end_utc": "202606040600"
-      },
-      "result": {
-        "status": "no_output",
-        "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nKMA 0h is missing; using the mean of 1 model 0h start point(s): 18.50N, 116.00E.\n120h: No available model forecast points for this storm/time.\n240h: No available model forecast points for this storm/time.\n",
-        "stderr": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:797: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031800' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031800' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606031800_td_2026_11_120h.json",
-        "metadata": {
-          "generated_at_utc": "20260604063533",
-          "render_signature": "2c30f03cfd044741b27d5c477ffcb15138a909c7b2c0c3fab80d403532a42390",
-          "image_path": "",
-          "storm_stage": "TD",
-          "storm_year": "2026",
-          "typ_number": 11,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "atcf_id": "wp912026",
-          "extra_atcf_ids": [],
-          "data_time": "202606031800",
-          "fcst_hours": 120,
-          "intensity": "TD",
-          "model_count": 0,
-          "target_model_count": 36,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": false,
-          "no_output": true,
-          "no_output_reason": "No available model forecast points for this storm/time."
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
-        "year": 2026,
-        "data_time": "202606031800",
-        "td_number": 11,
-        "linked_td_number": null,
-        "typ_number": 11,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp912026",
-        "skip_atcf": false,
-        "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (169 km)."
-      },
-      "window": {
-        "data_time": "202606031800",
-        "cycle_time_utc": "202606031800",
-        "start_utc": "202606032100",
-        "end_utc": "202606040600"
-      },
-      "result": {
-        "status": "no_output",
-        "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nKMA 0h is missing; using the mean of 1 model 0h start point(s): 18.50N, 116.00E.\n120h: No available model forecast points for this storm/time.\n240h: No available model forecast points for this storm/time.\n",
-        "stderr": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:797: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031800' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031800' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606031800_td_2026_11_240h.json",
-        "metadata": {
-          "generated_at_utc": "20260604063533",
-          "render_signature": "2c30f03cfd044741b27d5c477ffcb15138a909c7b2c0c3fab80d403532a42390",
-          "image_path": "",
-          "storm_stage": "TD",
-          "storm_year": "2026",
-          "typ_number": 11,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "atcf_id": "wp912026",
-          "extra_atcf_ids": [],
-          "data_time": "202606031800",
-          "fcst_hours": 240,
-          "intensity": "TD",
-          "model_count": 0,
-          "target_model_count": 36,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": false,
-          "no_output": true,
-          "no_output_reason": "No available model forecast points for this storm/time."
         }
       },
       "completed": false,
@@ -2827,7 +2681,7 @@
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202606031200",
         "td_number": 11,
@@ -2835,24 +2689,16 @@
         "typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp912026",
-        "skip_atcf": false,
-        "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (162 km)."
+        "fcst_hours": 120,
+        "skip_atcf": false
       },
       "window": {
-        "data_time": "202606031200",
-        "cycle_time_utc": "202606031200",
-        "start_utc": "202606031500",
-        "end_utc": "202606040000"
+        "data_time": "202606031200"
       },
       "result": {
-        "status": "ok",
-        "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nKMA 0h is missing; using the mean of 9 model 0h start point(s): 16.70N, 114.70E.\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031200_120h.png\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031200_240h.png\n",
-        "stderr": " incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606031200_td_2026_11_120h.json",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604063343",
           "render_signature": "2c30f03cfd044741b27d5c477ffcb15138a909c7b2c0c3fab80d403532a42390",
@@ -2893,13 +2739,12 @@
           "skip_atcf": false
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202606031200_td_2026_11_120h.json"
     },
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202606031200",
         "td_number": 11,
@@ -2907,24 +2752,16 @@
         "typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp912026",
-        "skip_atcf": false,
-        "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (162 km)."
+        "fcst_hours": 240,
+        "skip_atcf": false
       },
       "window": {
-        "data_time": "202606031200",
-        "cycle_time_utc": "202606031200",
-        "start_utc": "202606031500",
-        "end_utc": "202606040000"
+        "data_time": "202606031200"
       },
       "result": {
-        "status": "ok",
-        "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nKMA 0h is missing; using the mean of 9 model 0h start point(s): 16.70N, 114.70E.\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031200_120h.png\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031200_240h.png\n",
-        "stderr": " incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031200' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606031200_td_2026_11_240h.json",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604063345",
           "render_signature": "2c30f03cfd044741b27d5c477ffcb15138a909c7b2c0c3fab80d403532a42390",
@@ -2965,13 +2802,12 @@
           "skip_atcf": false
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202606031200_td_2026_11_240h.json"
     },
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606040000",
         "td_number": 11,
@@ -2979,18 +2815,26 @@
         "typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp912026",
-        "fcst_hours": 120,
-        "skip_atcf": false
+        "skip_atcf": false,
+        "atcf_match_method": "position",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (95 km)."
       },
       "window": {
-        "data_time": "202606040000"
+        "data_time": "202606040000",
+        "cycle_time_utc": "202606040000",
+        "start_utc": "202606040300",
+        "end_utc": "202606041200"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
+        "returncode": 0,
+        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt)\nKMA 0h is missing; using the mean of 3 model 0h start point(s): 18.17N, 116.27E.\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_120h.png\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_240h.png\n",
+        "stderr": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:797: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
+        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606040000_td_2026_11_120h.json",
         "metadata": {
-          "generated_at_utc": "20260604061704",
+          "generated_at_utc": "20260604063835",
           "render_signature": "2c30f03cfd044741b27d5c477ffcb15138a909c7b2c0c3fab80d403532a42390",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_120h.png",
           "storm_stage": "TD",
@@ -3015,12 +2859,13 @@
           "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202606040000_td_2026_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606040000",
         "td_number": 11,
@@ -3028,18 +2873,26 @@
         "typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp912026",
-        "fcst_hours": 240,
-        "skip_atcf": false
+        "skip_atcf": false,
+        "atcf_match_method": "position",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (95 km)."
       },
       "window": {
-        "data_time": "202606040000"
+        "data_time": "202606040000",
+        "cycle_time_utc": "202606040000",
+        "start_utc": "202606040300",
+        "end_utc": "202606041200"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
+        "returncode": 0,
+        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T00_00_atcf_a_deck.txt)\nKMA 0h is missing; using the mean of 3 model 0h start point(s): 18.17N, 116.27E.\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_120h.png\nNo KMA past track data to plot.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_240h.png\n",
+        "stderr": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:797: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
+        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606040000_td_2026_11_240h.json",
         "metadata": {
-          "generated_at_utc": "20260604061705",
+          "generated_at_utc": "20260604063836",
           "render_signature": "2c30f03cfd044741b27d5c477ffcb15138a909c7b2c0c3fab80d403532a42390",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_240h.png",
           "storm_stage": "TD",
@@ -3064,7 +2917,8 @@
           "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202606040000_td_2026_11_240h.json"
+      "completed": false,
+      "final_check": false
     }
   ]
 }
