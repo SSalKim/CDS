@@ -134,11 +134,21 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
+        if: ${{ env.RUNNER_KIND != 'self-hosted' }}
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: requirements-vtg.txt
+
+      - name: Prepare self-hosted Python
+        if: ${{ env.RUNNER_KIND == 'self-hosted' }}
+        run: |
+          python3 -m venv .venv-vtg
+          echo "$PWD/.venv-vtg/bin" >> "$GITHUB_PATH"
+          . .venv-vtg/bin/activate
+          python -m pip install --upgrade pip
+          python --version
 
       - name: Diagnose KMA APIHUB connectivity
         if: ${{ env.DIAGNOSTICS_INPUT == 'true' }}
