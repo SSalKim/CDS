@@ -70,10 +70,13 @@ MODEL_INFO = [
     {"name": "AIGEFS", "color": "#78FF8F", "style": "--", "label": "AIGFS EPS", "zorder": 60},
     {"name": "FNEC_AI", "color": "#004B1C", "style": "--", "label": "FourCastNet-ECMWF", "zorder": 63},
     {"name": "FNKM_AI", "color": "#388E3C", "style": "--", "label": "FourCastNet-KIM", "zorder": 62},
+    {"name": "FNUM_AI", "color": "#4BB200", "style": "--", "label": "FourCastNet-UM", "zorder": 61},
     {"name": "PGEC_AI", "color": "#3944BC", "style": "--", "label": "Pangu-Weather-ECMWF", "zorder": 65},
     {"name": "PGKM_AI", "color": "#727EF2", "style": "--", "label": "Pangu-Weather-KIM", "zorder": 64},
+    {"name": "PGUM_AI", "color": "#727EF2", "style": "--", "label": "Pangu-Weather-UM", "zorder": 63},
     {"name": "GCEC_AI", "color": "#4D248D", "style": "--", "label": "GraphCast-ECMWF", "zorder": 68},
     {"name": "GCKM_AI", "color": "#6C33C6", "style": "--", "label": "GraphCast-KIM", "zorder": 67},
+    {"name": "GCUM_AI", "color": "#9866C7", "style": "--", "label": "GraphCast-UM", "zorder": 66},
     {"name": "GENC", "color": "#9866C7", "style": "--", "label": "GenCast", "zorder": 69},
     {"name": "FNV3", "color": "#DA70D6", "style": "--", "label": "FNV3", "zorder": 99},
     {"name": "HKO_AREC", "color": "#1E90FF", "style": "--", "label": "Aurora-ECMWF", "zorder": 66},
@@ -113,10 +116,13 @@ MODEL_SOURCES = [
     {"name": "IFKM_AI", "apihub": "IFKM_AI", "noaa": None, "knackwx": None},
     {"name": "FNEC_AI", "apihub": "FNEC_AI", "noaa": None, "knackwx": None},
     {"name": "FNKM_AI", "apihub": "FNKM_AI", "noaa": None, "knackwx": None},
+    {"name": "FNUM_AI", "apihub": "FNUM_AI", "noaa": None, "knackwx": None},
     {"name": "PGEC_AI", "apihub": "PGEC_AI", "noaa": None, "knackwx": None},
     {"name": "PGKM_AI", "apihub": "PGKM_AI", "noaa": None, "knackwx": None},
+    {"name": "PGUM_AI", "apihub": "PGUM_AI", "noaa": None, "knackwx": None},
     {"name": "GCEC_AI", "apihub": "GCEC_AI", "noaa": None, "knackwx": None},
     {"name": "GCKM_AI", "apihub": "GCKM_AI", "noaa": None, "knackwx": None},
+    {"name": "GCUM_AI", "apihub": "GCUM_AI", "noaa": None, "knackwx": None},
     {"name": "GENC", "apihub": None, "noaa": None, "knackwx": "GENC", "raw_github": "GENC"},
     {"name": "FNV3", "apihub": None, "noaa": "FGNE", "knackwx": "FNV3", "raw_github": "FNV3"},
     {"name": "HKO_AREC", "apihub": "HKO_AREC", "noaa": None, "knackwx": None},
@@ -156,10 +162,13 @@ MODEL_CATEGORIES = {
     "IFKM_AI": ("AI", "DETERMINISTIC"),
     "FNEC_AI": ("AI", "DETERMINISTIC"),
     "FNKM_AI": ("AI", "DETERMINISTIC"),
+    "FNUM_AI": ("AI", "DETERMINISTIC"),
     "PGEC_AI": ("AI", "DETERMINISTIC"),
     "PGKM_AI": ("AI", "DETERMINISTIC"),
+    "PGUM_AI": ("AI", "DETERMINISTIC"),
     "GCEC_AI": ("AI", "DETERMINISTIC"),
     "GCKM_AI": ("AI", "DETERMINISTIC"),
+    "GCUM_AI": ("AI", "DETERMINISTIC"),
     "HKO_AREC": ("AI", "DETERMINISTIC"),
     "HKO_FXEC": ("AI", "DETERMINISTIC"),
     "HKO_FWEC": ("AI", "DETERMINISTIC"),
@@ -171,6 +180,9 @@ MODEL_ACTIVE_WINDOWS = {
     "UM": (None, "202603312359"),
     "UM_GFDL_6h": (None, "202603312359"),
     "UM_KEPS": (None, "202603312359"),
+    "FNUM_AI": (None, "202603312359"),
+    "PGUM_AI": (None, "202603312359"),
+    "GCUM_AI": (None, "202603312359"),
     "UKM": ("202604010000", None),
     "UKMO_EPS": ("202604010000", None),
 }
@@ -1306,7 +1318,9 @@ def excluded_models_for(df: pd.DataFrame) -> set[str]:
     if has_um:
         excluded.update({"UM_GFDL_6h", "UKM"})
     elif has_um_gfdl:
-        excluded.add("UKM")
+        excluded.update({"UM", "UKM"})
+    else:
+        excluded.add("UM_GFDL_6h")
 
     return excluded
 
@@ -1332,6 +1346,8 @@ def active_model_target_count(settings: Settings) -> int:
     active = active_model_names(settings)
     count = len(active)
     if {"KIM_3h", "KIM_6h"}.issubset(active):
+        count -= 1
+    if {"UM", "UM_GFDL_6h"}.issubset(active):
         count -= 1
     return count
 
