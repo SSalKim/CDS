@@ -186,7 +186,7 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 3
+MAP_EXTENT_CACHE_VERSION = 4
 MAX_STABLE_240_LON_SPAN = 78.0
 MAX_STABLE_240_LAT_SPAN = 42.0
 MAX_DISPLAY_240_LON_SPAN = 96.0
@@ -1970,8 +1970,8 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
     else:
         lon_total = max(48.0, lon_span * 1.90 + 14.0)
         lat_total = max(24.0, lat_span * 1.95 + 10.0)
-        focus_x = 0.43
-        focus_y = 0.43
+        focus_x = 0.455
+        focus_y = 0.405
 
     lon_min = focus_lon - lon_total * focus_x
     lon_max = lon_min + lon_total
