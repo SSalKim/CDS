@@ -1,15 +1,15 @@
 {
-  "updated_at_utc": "202601142300",
+  "updated_at_utc": "202601150500",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202601141800",
-      "cycle_time_utc": "202601141800",
-      "start_utc": "202601142300",
-      "end_utc": "202601150500"
+      "data_time": "202601150000",
+      "cycle_time_utc": "202601150000",
+      "start_utc": "202601150500",
+      "end_utc": "202601151100"
     }
   ],
   "runs": [
@@ -18,7 +18,7 @@
         "storm_key": "td_2026_01_typ_01",
         "stage": "TD_PRE_TYP_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202601141800",
+        "data_time": "202601150000",
         "td_number": 1,
         "linked_td_number": 1,
         "typ_number": 1,
@@ -28,28 +28,28 @@
         "atcf_id": "wp012026",
         "skip_atcf": false,
         "atcf_match_method": "position",
-        "reason": "TD is linked to future typhoon 1; name withheld until typhoon start; using temporary position match wp012026 (39 km).",
+        "reason": "TD is linked to future typhoon 1; name withheld until typhoon start; using temporary position match wp012026 (7 km).",
         "analysis_point": {
-          "time_utc": "202601141800",
-          "lat": 9.2,
-          "lon": 130.0
+          "time_utc": "202601150000",
+          "lat": 9.4,
+          "lon": 129.5
         },
         "analysis_source": "BDECK",
         "analysis_match_method": "position",
-        "analysis_distance_km": 38.73248868060319
+        "analysis_distance_km": 7.261178464765317
       },
       "window": {
-        "data_time": "202601141800",
-        "cycle_time_utc": "202601141800",
-        "start_utc": "202601142300",
-        "end_utc": "202601150500"
+        "data_time": "202601150000",
+        "cycle_time_utc": "202601150000",
+        "start_utc": "202601150500",
+        "end_utc": "202601151100"
       },
       "result": {
         "status": "failed",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=18z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=18z)\n[attempt 2/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=18z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=18z)\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nFNV3: selected GITHUB by source priority; skipped NOAA ATCF\nGFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHAFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHWRF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nJGSM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nTEPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nKMA 0h is missing; using BDECK analysis point: 9.20N, 130.00E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601141800_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601141800_240h.png\n",
-        "stderr": "\nMetadata was not written for 120h: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601141800_td_2026_01_typ_01_120h.json",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601141800_td_2026_01_typ_01_120h.json"
+        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\n[attempt 2/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\nCMC_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nFNV3: selected GITHUB by source priority; skipped NOAA ATCF\nGFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHAFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHWRF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nJGSM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nNAVGEM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nTEPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nKMA 0h is missing; using BDECK analysis point: 9.40N, 129.50E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601150000_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601150000_240h.png\n",
+        "stderr": "\nMetadata was not written for 120h: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601150000_td_2026_01_typ_01_120h.json",
+        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601150000_td_2026_01_typ_01_120h.json"
       },
       "completed": false,
       "final_check": false
@@ -59,7 +59,7 @@
         "storm_key": "td_2026_01_typ_01",
         "stage": "TD_PRE_TYP_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202601141800",
+        "data_time": "202601150000",
         "td_number": 1,
         "linked_td_number": 1,
         "typ_number": 1,
@@ -69,28 +69,28 @@
         "atcf_id": "wp012026",
         "skip_atcf": false,
         "atcf_match_method": "position",
-        "reason": "TD is linked to future typhoon 1; name withheld until typhoon start; using temporary position match wp012026 (39 km).",
+        "reason": "TD is linked to future typhoon 1; name withheld until typhoon start; using temporary position match wp012026 (7 km).",
         "analysis_point": {
-          "time_utc": "202601141800",
-          "lat": 9.2,
-          "lon": 130.0
+          "time_utc": "202601150000",
+          "lat": 9.4,
+          "lon": 129.5
         },
         "analysis_source": "BDECK",
         "analysis_match_method": "position",
-        "analysis_distance_km": 38.73248868060319
+        "analysis_distance_km": 7.261178464765317
       },
       "window": {
-        "data_time": "202601141800",
-        "cycle_time_utc": "202601141800",
-        "start_utc": "202601142300",
-        "end_utc": "202601150500"
+        "data_time": "202601150000",
+        "cycle_time_utc": "202601150000",
+        "start_utc": "202601150500",
+        "end_utc": "202601151100"
       },
       "result": {
         "status": "failed",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=18z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=18z)\n[attempt 2/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=18z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=18z)\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nFNV3: selected GITHUB by source priority; skipped NOAA ATCF\nGFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHAFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHWRF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nJGSM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nTEPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nKMA 0h is missing; using BDECK analysis point: 9.20N, 130.00E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601141800_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601141800_240h.png\n",
-        "stderr": "\nMetadata was not written for 240h: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601141800_td_2026_01_typ_01_240h.json",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601141800_td_2026_01_typ_01_240h.json"
+        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\n[attempt 2/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\nCMC_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nFNV3: selected GITHUB by source priority; skipped NOAA ATCF\nGFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHAFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHWRF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nJGSM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nNAVGEM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nTEPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nKMA 0h is missing; using BDECK analysis point: 9.40N, 129.50E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601150000_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601150000_240h.png\n",
+        "stderr": "\nMetadata was not written for 240h: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601150000_td_2026_01_typ_01_240h.json",
+        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601150000_td_2026_01_typ_01_240h.json"
       },
       "completed": false,
       "final_check": false
@@ -831,8 +831,8 @@
       "result": {
         "status": "inventory",
         "metadata": {
-          "generated_at_utc": "20260604154054",
-          "render_signature": "f690750e8c5651c1de6e897fc6680b2b0f9177e4ee10c372daef15f717046c06",
+          "generated_at_utc": "20260604164316",
+          "render_signature": "dd9aef326ddc9e77a3cd1d2df1dc650e6dc0c1198d7ab8169781bc7b703476c5",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601150000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -845,8 +845,8 @@
           "data_time": "202601150000",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 28,
-          "target_model_count": 37,
+          "model_count": 31,
+          "target_model_count": 39,
           "models": [
             "CMC",
             "CMC_EPS",
@@ -858,9 +858,11 @@
             "FNEC_AI",
             "FNKM_AI",
             "FNMOC_EPS",
+            "FNUM_AI",
             "FNV3",
             "GCEC_AI",
             "GCKM_AI",
+            "GCUM_AI",
             "GENC",
             "GFS",
             "GFS_EPS",
@@ -874,6 +876,7 @@
             "NAVGEM",
             "PGEC_AI",
             "PGKM_AI",
+            "PGUM_AI",
             "TEPS",
             "UM"
           ],
@@ -888,9 +891,11 @@
             "FourCastNet-ECMWF",
             "FourCastNet-KIM",
             "NAVGEM EPS",
+            "FourCastNet-UM",
             "FNV3",
             "GraphCast-ECMWF",
             "GraphCast-KIM",
+            "GraphCast-UM",
             "GenCast",
             "GFS",
             "GFS EPS",
@@ -904,6 +909,7 @@
             "NAVGEM",
             "Pangu-Weather-ECMWF",
             "Pangu-Weather-KIM",
+            "Pangu-Weather-UM",
             "JGSM EPS",
             "UM"
           ],
@@ -934,8 +940,8 @@
       "result": {
         "status": "inventory",
         "metadata": {
-          "generated_at_utc": "20260604154055",
-          "render_signature": "f690750e8c5651c1de6e897fc6680b2b0f9177e4ee10c372daef15f717046c06",
+          "generated_at_utc": "20260604164318",
+          "render_signature": "dd9aef326ddc9e77a3cd1d2df1dc650e6dc0c1198d7ab8169781bc7b703476c5",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601150000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -948,8 +954,8 @@
           "data_time": "202601150000",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 28,
-          "target_model_count": 37,
+          "model_count": 31,
+          "target_model_count": 39,
           "models": [
             "CMC",
             "CMC_EPS",
@@ -961,9 +967,11 @@
             "FNEC_AI",
             "FNKM_AI",
             "FNMOC_EPS",
+            "FNUM_AI",
             "FNV3",
             "GCEC_AI",
             "GCKM_AI",
+            "GCUM_AI",
             "GENC",
             "GFS",
             "GFS_EPS",
@@ -977,6 +985,7 @@
             "NAVGEM",
             "PGEC_AI",
             "PGKM_AI",
+            "PGUM_AI",
             "TEPS",
             "UM"
           ],
@@ -991,9 +1000,11 @@
             "FourCastNet-ECMWF",
             "FourCastNet-KIM",
             "NAVGEM EPS",
+            "FourCastNet-UM",
             "FNV3",
             "GraphCast-ECMWF",
             "GraphCast-KIM",
+            "GraphCast-UM",
             "GenCast",
             "GFS",
             "GFS EPS",
@@ -1007,6 +1018,7 @@
             "NAVGEM",
             "Pangu-Weather-ECMWF",
             "Pangu-Weather-KIM",
+            "Pangu-Weather-UM",
             "JGSM EPS",
             "UM"
           ],
