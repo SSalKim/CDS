@@ -748,6 +748,7 @@ def build_storm_jobs(
         linked_typ_row = None
         linked_typ_en = ""
         linked_typ_name_ko = ""
+        linked_typ_start = None
         if typ_number != 0:
             linked_typ_row = next(
                 (
@@ -759,6 +760,10 @@ def build_storm_jobs(
             if linked_typ_row:
                 linked_typ_en = str(linked_typ_row.get("TYP_EN") or "").strip().upper()
                 linked_typ_name_ko = str(linked_typ_row.get("TYP_NAME") or "").strip()
+                linked_typ_start = parse_utc_stamp(str(linked_typ_row.get("TM_ST") or ""))
+        linked_typ_has_started = bool(typ_number and linked_typ_start and data_dt >= linked_typ_start)
+        display_typ_en = linked_typ_en if linked_typ_has_started else ""
+        display_typ_name_ko = linked_typ_name_ko if linked_typ_has_started else ""
 
         manual_id = None
         atcf_match = None
@@ -768,12 +773,12 @@ def build_storm_jobs(
                 year=year,
                 td_number=td_number,
                 typ_number=typ_number or td_number,
-                typ_en=linked_typ_en,
+                typ_en=display_typ_en,
             )
             atcf_match = AtcfMatch(manual_id, "manual") if manual_id else None
-            if atcf_match is None and linked_typ_en:
+            if atcf_match is None and display_typ_en:
                 atcf_match = find_atcf_match(
-                    typ_en=linked_typ_en,
+                    typ_en=display_typ_en,
                     typ_number=typ_number,
                     year=year,
                     positive_radius=atcf_search_positive_radius,
@@ -812,14 +817,30 @@ def build_storm_jobs(
             stage = "TD_UNLINKED"
             reason = "ATCF matching skipped for lightweight precheck."
         elif typ_number != 0 and atcf_match and atcf_match.method == "position":
-            stage = "TD_LINKED_TYP_POSITION_ATCF"
-            reason = (
-                f"TD is linked to typhoon {typ_number}; using temporary position match "
-                f"{atcf_match.atcf_id} ({atcf_match.distance_km:.0f} km)."
-            )
+            if linked_typ_has_started:
+                stage = "TD_LINKED_TYP_POSITION_ATCF"
+                reason = (
+                    f"TD is linked to typhoon {typ_number}; using temporary position match "
+                    f"{atcf_match.atcf_id} ({atcf_match.distance_km:.0f} km)."
+                )
+            else:
+                stage = "TD_PRE_TYP_POSITION_ATCF"
+                reason = (
+                    f"TD is linked to future typhoon {typ_number}; name withheld until typhoon start; "
+                    f"using temporary position match {atcf_match.atcf_id} "
+                    f"({atcf_match.distance_km:.0f} km)."
+                )
         elif typ_number != 0:
-            stage = "TD_LINKED_TYP"
-            reason = "" if atcf_id else f"TD is linked to typhoon {typ_number}; ATCF match not found."
+            if linked_typ_has_started:
+                stage = "TD_LINKED_TYP"
+                reason = "" if atcf_id else f"TD is linked to typhoon {typ_number}; ATCF match not found."
+            else:
+                stage = "TD_PRE_TYP"
+                reason = (
+                    f"TD is linked to future typhoon {typ_number}; name withheld until typhoon start."
+                    if atcf_id
+                    else f"TD is linked to future typhoon {typ_number}; name withheld until typhoon start; ATCF match not found."
+                )
         elif atcf_match and atcf_match.method == "position":
             stage = "TD_POSITION_ATCF"
             reason = (
@@ -844,9 +865,9 @@ def build_storm_jobs(
             td_number=td_number,
             linked_td_number=td_number if typ_number else None,
             typ_number=typ_number or td_number,
-            typ_name_ko=linked_typ_name_ko if typ_number else "",
-            typ_name=linked_typ_en or linked_typ_name_ko or "NONAME",
-            typ_en=linked_typ_en,
+            typ_name_ko=display_typ_name_ko if typ_number else "",
+            typ_name=display_typ_en or display_typ_name_ko or "NONAME",
+            typ_en=display_typ_en,
             atcf_id=atcf_id,
             skip_atcf=not bool(atcf_id),
             atcf_match_method=atcf_method,
