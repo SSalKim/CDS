@@ -1,89 +1,141 @@
 {
-  "updated_at_utc": "202606041853",
+  "updated_at_utc": "202601160500",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202606041200",
-      "cycle_time_utc": "202606041200",
-      "start_utc": "202606041700",
-      "end_utc": "202606042300"
+      "data_time": "202601160000",
+      "cycle_time_utc": "202601160000",
+      "start_utc": "202601160500",
+      "end_utc": "202601161100"
     }
   ],
   "runs": [
     {
       "job": {
-        "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
+        "storm_key": "typ_2026_01",
+        "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202606041200",
-        "td_number": 11,
-        "linked_td_number": null,
-        "typ_number": 11,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp912026",
+        "data_time": "202601160000",
+        "td_number": null,
+        "linked_td_number": 1,
+        "typ_number": 1,
+        "typ_name_ko": "노카엔",
+        "typ_name": "NOKAEN",
+        "typ_en": "NOKAEN",
+        "atcf_id": "wp012026",
         "skip_atcf": false,
-        "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (76 km).",
+        "atcf_match_method": "name",
+        "reason": "",
         "analysis_point": {
-          "time_utc": "202606041200",
-          "lat": 20.2,
-          "lon": 119.1
+          "time_utc": "202601160000",
+          "lat": 11.2,
+          "lon": 128.7
         },
         "analysis_source": "BDECK",
-        "analysis_match_method": "position",
-        "analysis_distance_km": 76.215979422884
+        "analysis_match_method": "name",
+        "analysis_distance_km": null
       },
       "window": {
-        "data_time": "202606041200",
-        "cycle_time_utc": "202606041200",
-        "start_utc": "202606041700",
-        "end_utc": "202606042300"
+        "data_time": "202601160000",
+        "cycle_time_utc": "202601160000",
+        "start_utc": "202601160500",
+        "end_utc": "202601161100"
       },
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt)\nCMC_EPS KNACKWX: trimmed after 120h due to forecast gap to 156h\nKMA 0h is missing; using BDECK analysis point: 20.20N, 119.10E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png\n",
+        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\n[attempt 2/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\nCMC_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF APIHUB: trimmed after 144h due to forecast gap to 162h\nECMWF NOAA: trimmed after 144h due to forecast gap to 162h\nECMWF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHAFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHWRF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nJGSM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nNAVGEM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nTEPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nKMA 0h is missing; using BDECK analysis point: 11.20N, 128.70E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160000_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160000_240h.png\n",
         "stderr": "",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606041200_td_2026_11_120h.json",
+        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601160000_typ_2026_01_120h.json",
         "metadata": {
-          "generated_at_utc": "20260604185535",
+          "generated_at_utc": "20260604185744",
           "render_signature": "ea36990d579dcfecf33274c98377f5657528f91f0e62770c973473490d091226",
-          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png",
-          "storm_stage": "TD",
+          "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160000_120h.png",
+          "storm_stage": "TYP",
           "storm_year": "2026",
-          "typ_number": 11,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "atcf_id": "wp912026",
+          "typ_number": 1,
+          "typ_name": "NOKAEN",
+          "typ_name_ko": "노카엔",
+          "linked_td_number": 1,
+          "atcf_id": "wp012026",
           "extra_atcf_ids": [],
-          "data_time": "202606041200",
+          "data_time": "202601160000",
           "fcst_hours": 120,
-          "intensity": "TD",
-          "model_count": 7,
-          "target_model_count": 36,
+          "intensity": "TYP",
+          "model_count": 33,
+          "target_model_count": 39,
           "models": [
+            "AFUM",
             "CMC",
             "CMC_EPS",
+            "COAMPS_EPS",
             "ECMWF",
             "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "FNV3",
-            "GFS_EPS"
+            "ECMWF_EPS",
+            "FNEC_AI",
+            "FNKM_AI",
+            "FNMOC_EPS",
+            "FNUM_AI",
+            "GCEC_AI",
+            "GCKM_AI",
+            "GCUM_AI",
+            "GFS",
+            "GFS_EPS",
+            "HAFS",
+            "HKO_AREC",
+            "HKO_FWEC",
+            "HKO_FXEC",
+            "HWRF",
+            "IFEC_AI",
+            "IFKM_AI",
+            "JGSM",
+            "KIM_3h",
+            "KIM_EPS",
+            "NAVGEM",
+            "PGEC_AI",
+            "PGKM_AI",
+            "PGUM_AI",
+            "TEPS",
+            "UM",
+            "UM_KEPS"
           ],
           "model_labels": [
+            "GALWEM",
             "CMC",
             "CMC EPS",
+            "COAMPS-TC EPS",
             "ECMWF",
             "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "FNV3",
-            "GFS EPS"
+            "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "NAVGEM EPS",
+            "FourCastNet-UM",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "GraphCast-UM",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "Aurora-ECMWF",
+            "FengWu-ECMWF",
+            "FuXi-ECMWF",
+            "HWRF",
+            "KMA AIFS-ECMWF",
+            "KMA AIFS-KIM",
+            "JGSM",
+            "KIM",
+            "KIM EPS",
+            "NAVGEM",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "Pangu-Weather-UM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
           ],
           "skip_atcf": false
         }
@@ -93,75 +145,127 @@
     },
     {
       "job": {
-        "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
+        "storm_key": "typ_2026_01",
+        "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202606041200",
-        "td_number": 11,
-        "linked_td_number": null,
-        "typ_number": 11,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp912026",
+        "data_time": "202601160000",
+        "td_number": null,
+        "linked_td_number": 1,
+        "typ_number": 1,
+        "typ_name_ko": "노카엔",
+        "typ_name": "NOKAEN",
+        "typ_en": "NOKAEN",
+        "atcf_id": "wp012026",
         "skip_atcf": false,
-        "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (76 km).",
+        "atcf_match_method": "name",
+        "reason": "",
         "analysis_point": {
-          "time_utc": "202606041200",
-          "lat": 20.2,
-          "lon": 119.1
+          "time_utc": "202601160000",
+          "lat": 11.2,
+          "lon": 128.7
         },
         "analysis_source": "BDECK",
-        "analysis_match_method": "position",
-        "analysis_distance_km": 76.215979422884
+        "analysis_match_method": "name",
+        "analysis_distance_km": null
       },
       "window": {
-        "data_time": "202606041200",
-        "cycle_time_utc": "202606041200",
-        "start_utc": "202606041700",
-        "end_utc": "202606042300"
+        "data_time": "202601160000",
+        "cycle_time_utc": "202601160000",
+        "start_utc": "202601160500",
+        "end_utc": "202601161100"
       },
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt)\nCMC_EPS KNACKWX: trimmed after 120h due to forecast gap to 156h\nKMA 0h is missing; using BDECK analysis point: 20.20N, 119.10E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png\n",
+        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\n[attempt 2/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\nCMC_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF APIHUB: trimmed after 144h due to forecast gap to 162h\nECMWF NOAA: trimmed after 144h due to forecast gap to 162h\nECMWF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHAFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHWRF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nJGSM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nNAVGEM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nTEPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nKMA 0h is missing; using BDECK analysis point: 11.20N, 128.70E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160000_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160000_240h.png\n",
         "stderr": "",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606041200_td_2026_11_240h.json",
+        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601160000_typ_2026_01_240h.json",
         "metadata": {
-          "generated_at_utc": "20260604185537",
+          "generated_at_utc": "20260604185745",
           "render_signature": "ea36990d579dcfecf33274c98377f5657528f91f0e62770c973473490d091226",
-          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png",
-          "storm_stage": "TD",
+          "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160000_240h.png",
+          "storm_stage": "TYP",
           "storm_year": "2026",
-          "typ_number": 11,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "atcf_id": "wp912026",
+          "typ_number": 1,
+          "typ_name": "NOKAEN",
+          "typ_name_ko": "노카엔",
+          "linked_td_number": 1,
+          "atcf_id": "wp012026",
           "extra_atcf_ids": [],
-          "data_time": "202606041200",
+          "data_time": "202601160000",
           "fcst_hours": 240,
-          "intensity": "TD",
-          "model_count": 7,
-          "target_model_count": 36,
+          "intensity": "TYP",
+          "model_count": 33,
+          "target_model_count": 39,
           "models": [
+            "AFUM",
             "CMC",
             "CMC_EPS",
+            "COAMPS_EPS",
             "ECMWF",
             "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "FNV3",
-            "GFS_EPS"
+            "ECMWF_EPS",
+            "FNEC_AI",
+            "FNKM_AI",
+            "FNMOC_EPS",
+            "FNUM_AI",
+            "GCEC_AI",
+            "GCKM_AI",
+            "GCUM_AI",
+            "GFS",
+            "GFS_EPS",
+            "HAFS",
+            "HKO_AREC",
+            "HKO_FWEC",
+            "HKO_FXEC",
+            "HWRF",
+            "IFEC_AI",
+            "IFKM_AI",
+            "JGSM",
+            "KIM_3h",
+            "KIM_EPS",
+            "NAVGEM",
+            "PGEC_AI",
+            "PGKM_AI",
+            "PGUM_AI",
+            "TEPS",
+            "UM",
+            "UM_KEPS"
           ],
           "model_labels": [
+            "GALWEM",
             "CMC",
             "CMC EPS",
+            "COAMPS-TC EPS",
             "ECMWF",
             "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "FNV3",
-            "GFS EPS"
+            "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "NAVGEM EPS",
+            "FourCastNet-UM",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "GraphCast-UM",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "Aurora-ECMWF",
+            "FengWu-ECMWF",
+            "FuXi-ECMWF",
+            "HWRF",
+            "KMA AIFS-ECMWF",
+            "KMA AIFS-KIM",
+            "JGSM",
+            "KIM",
+            "KIM EPS",
+            "NAVGEM",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "Pangu-Weather-UM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
           ],
           "skip_atcf": false
         }
@@ -1646,7 +1750,7 @@
     {
       "job": {
         "storm_key": "typ_2026_01",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2026,
         "data_time": "202601160000",
         "td_number": null,
@@ -1656,17 +1760,33 @@
         "typ_name": "NOKAEN",
         "typ_en": "NOKAEN",
         "atcf_id": "wp012026",
-        "fcst_hours": 120,
-        "skip_atcf": false
+        "skip_atcf": false,
+        "atcf_match_method": "name",
+        "reason": "",
+        "analysis_point": {
+          "time_utc": "202601160000",
+          "lat": 11.2,
+          "lon": 128.7
+        },
+        "analysis_source": "BDECK",
+        "analysis_match_method": "name",
+        "analysis_distance_km": null
       },
       "window": {
-        "data_time": "202601160000"
+        "data_time": "202601160000",
+        "cycle_time_utc": "202601160000",
+        "start_utc": "202601160500",
+        "end_utc": "202601161100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
+        "returncode": 0,
+        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\n[attempt 2/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\nCMC_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF APIHUB: trimmed after 144h due to forecast gap to 162h\nECMWF NOAA: trimmed after 144h due to forecast gap to 162h\nECMWF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHAFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHWRF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nJGSM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nNAVGEM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nTEPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nKMA 0h is missing; using BDECK analysis point: 11.20N, 128.70E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160000_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160000_240h.png\n",
+        "stderr": "",
+        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601160000_typ_2026_01_120h.json",
         "metadata": {
-          "generated_at_utc": "20260604173305",
-          "render_signature": "3e90a26383f6b785ce5aa5abf471a51754283c00291b2f6a325524e9ce5eadac",
+          "generated_at_utc": "20260604185744",
+          "render_signature": "ea36990d579dcfecf33274c98377f5657528f91f0e62770c973473490d091226",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1754,12 +1874,13 @@
           "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202601160000_typ_2026_01_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2026_01",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2026,
         "data_time": "202601160000",
         "td_number": null,
@@ -1769,17 +1890,33 @@
         "typ_name": "NOKAEN",
         "typ_en": "NOKAEN",
         "atcf_id": "wp012026",
-        "fcst_hours": 240,
-        "skip_atcf": false
+        "skip_atcf": false,
+        "atcf_match_method": "name",
+        "reason": "",
+        "analysis_point": {
+          "time_utc": "202601160000",
+          "lat": 11.2,
+          "lon": 128.7
+        },
+        "analysis_source": "BDECK",
+        "analysis_match_method": "name",
+        "analysis_distance_km": null
       },
       "window": {
-        "data_time": "202601160000"
+        "data_time": "202601160000",
+        "cycle_time_utc": "202601160000",
+        "start_utc": "202601160500",
+        "end_utc": "202601161100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
+        "returncode": 0,
+        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\n[attempt 2/2] request failed: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z (404 Client Error: Not Found for url: https://api.knackwx.com/atcf/v1/aid/archive?stormID=01W&cycle=late&initTime=00z)\nCMC_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF APIHUB: trimmed after 144h due to forecast gap to 162h\nECMWF NOAA: trimmed after 144h due to forecast gap to 162h\nECMWF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nGFS_EPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHAFS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nHWRF: selected KMA APIHUB by source priority; skipped NOAA ATCF\nJGSM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nNAVGEM: selected KMA APIHUB by source priority; skipped NOAA ATCF\nTEPS: selected KMA APIHUB by source priority; skipped NOAA ATCF\nKMA 0h is missing; using BDECK analysis point: 11.20N, 128.70E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160000_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160000_240h.png\n",
+        "stderr": "",
+        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202601160000_typ_2026_01_240h.json",
         "metadata": {
-          "generated_at_utc": "20260604173306",
-          "render_signature": "3e90a26383f6b785ce5aa5abf471a51754283c00291b2f6a325524e9ce5eadac",
+          "generated_at_utc": "20260604185745",
+          "render_signature": "ea36990d579dcfecf33274c98377f5657528f91f0e62770c973473490d091226",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1867,7 +2004,8 @@
           "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202601160000_typ_2026_01_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
@@ -6261,7 +6399,7 @@
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202606041200",
         "td_number": 11,
@@ -6269,32 +6407,16 @@
         "typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp912026",
-        "skip_atcf": false,
-        "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (76 km).",
-        "analysis_point": {
-          "time_utc": "202606041200",
-          "lat": 20.2,
-          "lon": 119.1
-        },
-        "analysis_source": "BDECK",
-        "analysis_match_method": "position",
-        "analysis_distance_km": 76.215979422884
+        "fcst_hours": 120,
+        "skip_atcf": false
       },
       "window": {
-        "data_time": "202606041200",
-        "cycle_time_utc": "202606041200",
-        "start_utc": "202606041700",
-        "end_utc": "202606042300"
+        "data_time": "202606041200"
       },
       "result": {
-        "status": "ok",
-        "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt)\nCMC_EPS KNACKWX: trimmed after 120h due to forecast gap to 156h\nKMA 0h is missing; using BDECK analysis point: 20.20N, 119.10E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png\n",
-        "stderr": "",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606041200_td_2026_11_120h.json",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604185535",
           "render_signature": "ea36990d579dcfecf33274c98377f5657528f91f0e62770c973473490d091226",
@@ -6333,13 +6455,12 @@
           "skip_atcf": false
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202606041200_td_2026_11_120h.json"
     },
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202606041200",
         "td_number": 11,
@@ -6347,32 +6468,16 @@
         "typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp912026",
-        "skip_atcf": false,
-        "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (76 km).",
-        "analysis_point": {
-          "time_utc": "202606041200",
-          "lat": 20.2,
-          "lon": 119.1
-        },
-        "analysis_source": "BDECK",
-        "analysis_match_method": "position",
-        "analysis_distance_km": 76.215979422884
+        "fcst_hours": 240,
+        "skip_atcf": false
       },
       "window": {
-        "data_time": "202606041200",
-        "cycle_time_utc": "202606041200",
-        "start_utc": "202606041700",
-        "end_utc": "202606042300"
+        "data_time": "202606041200"
       },
       "result": {
-        "status": "ok",
-        "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt)\n[attempt 2/2] request failed: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt (404 Client Error: Not Found for url: https://raw.githubusercontent.com/SSalKim/GDM/main/forecast_files/2026_06_04/GENC_2026_06_04T12_00_atcf_a_deck.txt)\nCMC_EPS KNACKWX: trimmed after 120h due to forecast gap to 156h\nKMA 0h is missing; using BDECK analysis point: 20.20N, 119.10E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png\n",
-        "stderr": "",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606041200_td_2026_11_240h.json",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604185537",
           "render_signature": "ea36990d579dcfecf33274c98377f5657528f91f0e62770c973473490d091226",
@@ -6411,8 +6516,7 @@
           "skip_atcf": false
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202606041200_td_2026_11_240h.json"
     }
   ]
 }
