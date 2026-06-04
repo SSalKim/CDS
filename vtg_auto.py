@@ -105,6 +105,32 @@ def parse_utc_stamp(value: str) -> datetime | None:
         return None
 
 
+def normalize_kma_list_stamp_year(value: str, year: int) -> str:
+    text = str(value or "").strip()
+    if not re.fullmatch(r"\d{12}", text):
+        return text
+    stamp_year = int(text[:4])
+    if stamp_year in (2100, 9999):
+        return text
+    if stamp_year != year:
+        return f"{year:04d}{text[4:]}"
+    return text
+
+
+def normalize_kma_list_row_years(row: dict) -> dict:
+    try:
+        year = int(row.get("YY", 0))
+    except (TypeError, ValueError):
+        return row
+    if not year:
+        return row
+    normalized = dict(row)
+    for key in ("TM_ST", "TM_ED"):
+        if key in normalized:
+            normalized[key] = normalize_kma_list_stamp_year(str(normalized[key]), year)
+    return normalized
+
+
 def parse_cycle_override(value: str) -> datetime | None:
     text = str(value or "").strip()
     if not re.fullmatch(r"\d{10}", text):
@@ -224,6 +250,7 @@ def load_cached_kma_rows(cache_dir: Path | None, endpoint: str, year: int) -> li
     rows = payload.get("rows")
     if not isinstance(rows, list):
         return None
+    rows = [normalize_kma_list_row_years(row) if isinstance(row, dict) else row for row in rows]
     print(
         f"Using cached KMA APIHUB {Path(endpoint).stem} rows for {year} "
         f"from {path} (updated_at_utc={payload.get('updated_at_utc', '')})."
@@ -272,8 +299,8 @@ def fetch_td_rows(year: int, auth_key: str, *, cache_dir: Path | None = None) ->
             "YY": row[0],
             "TD": row[1],
             "TYP": row[2],
-            "TM_ST": row[3],
-            "TM_ED": row[4],
+            "TM_ST": normalize_kma_list_stamp_year(row[3], year),
+            "TM_ED": normalize_kma_list_stamp_year(row[4], year),
             "REM": ",".join(row[5:]).strip(),
         })
     write_cached_kma_rows(cache_dir, TD_LIST_ENDPOINT, year, rows)
@@ -294,8 +321,8 @@ def fetch_typ_rows(year: int, auth_key: str, *, cache_dir: Path | None = None) -
             "SEQ": row[1],
             "NOW": row[2],
             "EFF": row[3],
-            "TM_ST": row[4],
-            "TM_ED": row[5],
+            "TM_ST": normalize_kma_list_stamp_year(row[4], year),
+            "TM_ED": normalize_kma_list_stamp_year(row[5], year),
             "TYP_NAME": row[6],
             "TYP_EN": row[7],
             "REM": ",".join(row[8:]).strip(),
