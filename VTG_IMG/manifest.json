@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "202606041333",
+  "updated_at_utc": "202606041343",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
@@ -28,15 +28,15 @@
         "atcf_id": "wp912026",
         "skip_atcf": false,
         "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (154 km).",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (122 km).",
         "analysis_point": {
           "time_utc": "202606040600",
-          "lat": 18.7,
-          "lon": 118.4
+          "lat": 19.3,
+          "lon": 118.8
         },
         "analysis_source": "BDECK",
         "analysis_match_method": "position",
-        "analysis_distance_km": 153.7766162794442
+        "analysis_distance_km": 122.23308150872303
       },
       "window": {
         "data_time": "202606040600",
@@ -47,11 +47,11 @@
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nECMWF KNACKWX: trimmed after 12h due to forecast gap to 54h\nKMA 0h is missing; using BDECK analysis point: 18.70N, 118.40E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
+        "stdout": "Using plot font: NanumSquare\nECMWF: selected NOAA ATCF by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF, KNACKWX ATCF\nGENC KNACKWX: trimmed after 84h due to forecast gap to 120h\nKMA 0h is missing; using BDECK analysis point: 19.30N, 118.80E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\n240h map extent candidate is too broad for stable cache; using uncached extent (93.3 lon x 53.0 lat).\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
         "stderr": "",
         "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606040600_td_2026_11_120h.json",
         "metadata": {
-          "generated_at_utc": "20260604133452",
+          "generated_at_utc": "20260604134447",
           "render_signature": "d58377c7eaa73cbecc1e4736e367aa680fc31405944e312d08776e315f08ba6f",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png",
           "storm_stage": "TD",
@@ -65,20 +65,26 @@
           "data_time": "202606040600",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 5,
+          "model_count": 8,
           "target_model_count": 36,
           "models": [
             "ECMWF",
             "ECMWF_AIFS",
             "ECMWF_AIFS_EPS",
+            "ECMWF_EPS",
             "FNV3",
+            "GENC",
+            "GFS",
             "GFS_EPS"
           ],
           "model_labels": [
             "ECMWF",
             "ECMWF AIFS",
             "ECMWF AIFS EPS",
+            "ECMWF EPS",
             "FNV3",
+            "GenCast",
+            "GFS",
             "GFS EPS"
           ],
           "skip_atcf": false
@@ -102,15 +108,15 @@
         "atcf_id": "wp912026",
         "skip_atcf": false,
         "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (154 km).",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (122 km).",
         "analysis_point": {
           "time_utc": "202606040600",
-          "lat": 18.7,
-          "lon": 118.4
+          "lat": 19.3,
+          "lon": 118.8
         },
         "analysis_source": "BDECK",
         "analysis_match_method": "position",
-        "analysis_distance_km": 153.7766162794442
+        "analysis_distance_km": 122.23308150872303
       },
       "window": {
         "data_time": "202606040600",
@@ -121,11 +127,11 @@
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nECMWF KNACKWX: trimmed after 12h due to forecast gap to 54h\nKMA 0h is missing; using BDECK analysis point: 18.70N, 118.40E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
+        "stdout": "Using plot font: NanumSquare\nECMWF: selected NOAA ATCF by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF, KNACKWX ATCF\nGENC KNACKWX: trimmed after 84h due to forecast gap to 120h\nKMA 0h is missing; using BDECK analysis point: 19.30N, 118.80E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\n240h map extent candidate is too broad for stable cache; using uncached extent (93.3 lon x 53.0 lat).\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
         "stderr": "",
         "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606040600_td_2026_11_240h.json",
         "metadata": {
-          "generated_at_utc": "20260604133453",
+          "generated_at_utc": "20260604134449",
           "render_signature": "d58377c7eaa73cbecc1e4736e367aa680fc31405944e312d08776e315f08ba6f",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png",
           "storm_stage": "TD",
@@ -139,20 +145,26 @@
           "data_time": "202606040600",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 5,
+          "model_count": 8,
           "target_model_count": 36,
           "models": [
             "ECMWF",
             "ECMWF_AIFS",
             "ECMWF_AIFS_EPS",
+            "ECMWF_EPS",
             "FNV3",
+            "GENC",
+            "GFS",
             "GFS_EPS"
           ],
           "model_labels": [
             "ECMWF",
             "ECMWF AIFS",
             "ECMWF AIFS EPS",
+            "ECMWF EPS",
             "FNV3",
+            "GenCast",
+            "GFS",
             "GFS EPS"
           ],
           "skip_atcf": false
@@ -3301,15 +3313,15 @@
         "atcf_id": "wp912026",
         "skip_atcf": false,
         "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (154 km).",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (122 km).",
         "analysis_point": {
           "time_utc": "202606040600",
-          "lat": 18.7,
-          "lon": 118.4
+          "lat": 19.3,
+          "lon": 118.8
         },
         "analysis_source": "BDECK",
         "analysis_match_method": "position",
-        "analysis_distance_km": 153.7766162794442
+        "analysis_distance_km": 122.23308150872303
       },
       "window": {
         "data_time": "202606040600",
@@ -3320,11 +3332,11 @@
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nECMWF KNACKWX: trimmed after 12h due to forecast gap to 54h\nKMA 0h is missing; using BDECK analysis point: 18.70N, 118.40E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
+        "stdout": "Using plot font: NanumSquare\nECMWF: selected NOAA ATCF by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF, KNACKWX ATCF\nGENC KNACKWX: trimmed after 84h due to forecast gap to 120h\nKMA 0h is missing; using BDECK analysis point: 19.30N, 118.80E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\n240h map extent candidate is too broad for stable cache; using uncached extent (93.3 lon x 53.0 lat).\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
         "stderr": "",
         "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606040600_td_2026_11_120h.json",
         "metadata": {
-          "generated_at_utc": "20260604133452",
+          "generated_at_utc": "20260604134447",
           "render_signature": "d58377c7eaa73cbecc1e4736e367aa680fc31405944e312d08776e315f08ba6f",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png",
           "storm_stage": "TD",
@@ -3338,20 +3350,26 @@
           "data_time": "202606040600",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 5,
+          "model_count": 8,
           "target_model_count": 36,
           "models": [
             "ECMWF",
             "ECMWF_AIFS",
             "ECMWF_AIFS_EPS",
+            "ECMWF_EPS",
             "FNV3",
+            "GENC",
+            "GFS",
             "GFS_EPS"
           ],
           "model_labels": [
             "ECMWF",
             "ECMWF AIFS",
             "ECMWF AIFS EPS",
+            "ECMWF EPS",
             "FNV3",
+            "GenCast",
+            "GFS",
             "GFS EPS"
           ],
           "skip_atcf": false
@@ -3375,15 +3393,15 @@
         "atcf_id": "wp912026",
         "skip_atcf": false,
         "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (154 km).",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (122 km).",
         "analysis_point": {
           "time_utc": "202606040600",
-          "lat": 18.7,
-          "lon": 118.4
+          "lat": 19.3,
+          "lon": 118.8
         },
         "analysis_source": "BDECK",
         "analysis_match_method": "position",
-        "analysis_distance_km": 153.7766162794442
+        "analysis_distance_km": 122.23308150872303
       },
       "window": {
         "data_time": "202606040600",
@@ -3394,11 +3412,11 @@
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nECMWF KNACKWX: trimmed after 12h due to forecast gap to 54h\nKMA 0h is missing; using BDECK analysis point: 18.70N, 118.40E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
+        "stdout": "Using plot font: NanumSquare\nECMWF: selected NOAA ATCF by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF, KNACKWX ATCF\nGENC KNACKWX: trimmed after 84h due to forecast gap to 120h\nKMA 0h is missing; using BDECK analysis point: 19.30N, 118.80E.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png\n240h map extent candidate is too broad for stable cache; using uncached extent (93.3 lon x 53.0 lat).\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png\n",
         "stderr": "",
         "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606040600_td_2026_11_240h.json",
         "metadata": {
-          "generated_at_utc": "20260604133453",
+          "generated_at_utc": "20260604134449",
           "render_signature": "d58377c7eaa73cbecc1e4736e367aa680fc31405944e312d08776e315f08ba6f",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png",
           "storm_stage": "TD",
@@ -3412,20 +3430,26 @@
           "data_time": "202606040600",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 5,
+          "model_count": 8,
           "target_model_count": 36,
           "models": [
             "ECMWF",
             "ECMWF_AIFS",
             "ECMWF_AIFS_EPS",
+            "ECMWF_EPS",
             "FNV3",
+            "GENC",
+            "GFS",
             "GFS_EPS"
           ],
           "model_labels": [
             "ECMWF",
             "ECMWF AIFS",
             "ECMWF AIFS EPS",
+            "ECMWF EPS",
             "FNV3",
+            "GenCast",
+            "GFS",
             "GFS EPS"
           ],
           "skip_atcf": false
