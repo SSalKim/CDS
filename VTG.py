@@ -186,7 +186,9 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 1
+MAP_EXTENT_CACHE_VERSION = 2
+MAX_STABLE_240_LON_SPAN = 78.0
+MAX_STABLE_240_LAT_SPAN = 42.0
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
@@ -1436,8 +1438,62 @@ def robust_series_bounds(series: pd.Series) -> tuple[float, float]:
     return float(clean.min()), float(clean.max())
 
 
-def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
+def longitude_delta(a: float, b: float) -> float:
+    return ((a - b + 180) % 360) - 180
+
+
+def extent_points_for_auto_map(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     points = numeric_track_points(df)
+    if points.empty or settings.fcst_hours <= 120:
+        return points
+
+    points = points[pd.to_numeric(points["LAT"], errors="coerce").between(-5, 62)].copy()
+    if points.empty or "SRC" not in points:
+        return points
+
+    centers = (
+        points[points["SRC"].ne("KMA")]
+        .groupby("SRC", dropna=True)[["LAT", "LON"]]
+        .median(numeric_only=True)
+        .dropna()
+    )
+    if len(centers) < 4:
+        return points
+
+    center_lat = float(centers["LAT"].median())
+    center_lon = float(centers["LON"].median())
+    keep_models = set()
+    for model_name, row in centers.iterrows():
+        lon_distance = abs(longitude_delta(float(row["LON"]), center_lon))
+        lat_distance = abs(float(row["LAT"]) - center_lat)
+        if lon_distance <= 38 and lat_distance <= 24:
+            keep_models.add(model_name)
+
+    if len(keep_models) < max(3, math.ceil(len(centers) * 0.45)):
+        return points
+
+    keep_mask = points["SRC"].eq("KMA") | points["SRC"].isin(keep_models)
+    filtered = points[keep_mask].copy()
+    removed_models = sorted(set(centers.index) - keep_models)
+    if removed_models:
+        print(
+            "240h map extent ignored distant model cluster(s): "
+            + ", ".join(str(name) for name in removed_models)
+        )
+    return filtered if not filtered.empty else points
+
+
+def robust_bounds(points: pd.DataFrame, column: str, settings: Settings) -> tuple[float, float]:
+    clean = pd.to_numeric(points[column], errors="coerce").dropna()
+    if clean.empty:
+        return 0.0, 0.0
+    if settings.fcst_hours > 120 and len(clean) >= 10:
+        return float(clean.quantile(0.10)), float(clean.quantile(0.90))
+    return robust_series_bounds(clean)
+
+
+def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
+    points = extent_points_for_auto_map(df, settings)
     if points.empty:
         return None
 
@@ -1446,8 +1502,8 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
     if primary.empty:
         primary = points.copy()
 
-    lat_min, lat_max = robust_series_bounds(primary["LAT"])
-    lon_min, lon_max = robust_series_bounds(primary["LON"])
+    lat_min, lat_max = robust_bounds(primary, "LAT", settings)
+    lon_min, lon_max = robust_bounds(primary, "LON", settings)
     lat_span = max(lat_max - lat_min, 7.5 if settings.fcst_hours <= 120 else 10.0)
     lon_span = max(lon_max - lon_min, 10.0 if settings.fcst_hours <= 120 else 14.0)
 
@@ -1546,8 +1602,21 @@ def padded_extent(extent: list[float], *, lon_ratio: float = 0.035, lat_ratio: f
     ]
 
 
+def reasonable_stable_240_extent(extent: list[float]) -> bool:
+    lon_span = extent[1] - extent[0]
+    lat_span = extent[3] - extent[2]
+    return lon_span <= MAX_STABLE_240_LON_SPAN and lat_span <= MAX_STABLE_240_LAT_SPAN
+
+
 def stable_240_map_extent(extent: list[float], settings: Settings) -> list[float]:
     if settings.fcst_hours != 240:
+        return extent
+
+    if not reasonable_stable_240_extent(extent):
+        print(
+            "240h map extent candidate is too broad for stable cache; "
+            f"using uncached extent ({extent[1] - extent[0]:.1f} lon x {extent[3] - extent[2]:.1f} lat)."
+        )
         return extent
 
     path = map_extent_cache_path(settings)
@@ -1560,11 +1629,15 @@ def stable_240_map_extent(extent: list[float], settings: Settings) -> list[float
             payload = None
     if isinstance(payload, dict) and payload.get("version") == MAP_EXTENT_CACHE_VERSION:
         cached_extent = valid_extent(payload.get("extent"))
+        if cached_extent and not reasonable_stable_240_extent(cached_extent):
+            cached_extent = None
 
     if cached_extent and extent_contains(cached_extent, extent):
         return cached_extent
 
     stable_extent = padded_extent(merged_extent(cached_extent, extent)) if cached_extent else padded_extent(extent)
+    if not reasonable_stable_240_extent(stable_extent):
+        stable_extent = extent
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(
