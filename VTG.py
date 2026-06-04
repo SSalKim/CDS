@@ -197,7 +197,7 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 6
+MAP_EXTENT_CACHE_VERSION = 7
 MAX_STABLE_240_LON_SPAN = 78.0
 MAX_STABLE_240_LAT_SPAN = 42.0
 MAX_DISPLAY_240_LON_SPAN = 96.0
@@ -1898,11 +1898,33 @@ def longitude_delta(a: float, b: float) -> float:
     return ((a - b + 180) % 360) - 180
 
 
+def ignore_low_priority_late_extent_points(points: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    if settings.fcst_hours <= 120 or DATA_SOURCE_COLUMN not in points:
+        return points
+
+    lead_hours = pd.to_numeric(points["TMD"], errors="coerce")
+    sources = points[DATA_SOURCE_COLUMN].astype("string").str.upper()
+    late_knackwx = sources.eq("KNACKWX") & lead_hours.gt(120)
+    if not late_knackwx.any():
+        return points
+
+    filtered = points[~late_knackwx].copy()
+    if filtered.empty or filtered["SRC"].nunique(dropna=True) < 3:
+        return points
+
+    print(
+        "240h map extent ignored "
+        f"{int(late_knackwx.sum())} low-priority KNACKWX point(s) after 120h."
+    )
+    return filtered
+
+
 def extent_points_for_auto_map(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     points = numeric_track_points(df)
     if points.empty or settings.fcst_hours <= 120:
         return points
 
+    points = ignore_low_priority_late_extent_points(points, settings)
     points = points[pd.to_numeric(points["LAT"], errors="coerce").between(-5, 62)].copy()
     if points.empty or "SRC" not in points:
         return points
