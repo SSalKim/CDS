@@ -464,6 +464,7 @@ def fetch_text(
     *,
     retries: int = 3,
     timeout: float = 8,
+    retry_delay: float = 1.0,
     encoding: str | None = None,
 ) -> str | None:
     for attempt in range(1, retries + 1):
@@ -476,7 +477,7 @@ def fetch_text(
         except requests.exceptions.RequestException as exc:
             print(f"[attempt {attempt}/{retries}] request failed: {url} ({exc})")
             if attempt < retries:
-                time.sleep(1)
+                time.sleep(retry_delay)
     return None
 
 
@@ -1860,12 +1861,26 @@ def main() -> None:
     fetch_settings = replace(settings, fcst_hours=max(settings.fcst_hours, 240)) if settings.auto_fcst_hours else settings
 
     with requests.Session() as session:
-        kma_forecast_text = fetch_text(session, kma_url(fetch_settings, "2"), retries=10, timeout=3, encoding="cp949")
+        kma_forecast_text = fetch_text(
+            session,
+            kma_url(fetch_settings, "2"),
+            retries=5,
+            timeout=8,
+            retry_delay=3,
+            encoding="cp949",
+        )
         kma_df = read_kma_csv(kma_forecast_text, fetch_settings, forecast_only=True)
         atcf_df = empty_atcf_frame() if fetch_settings.skip_atcf else fetch_atcf_data(session, fetch_settings)
         df = normalize_track_data(kma_df, atcf_df, fetch_settings)
 
-        kma_past_text = fetch_text(session, kma_url(fetch_settings, "0"), retries=3, timeout=10, encoding="cp949")
+        kma_past_text = fetch_text(
+            session,
+            kma_url(fetch_settings, "0"),
+            retries=3,
+            timeout=10,
+            retry_delay=3,
+            encoding="cp949",
+        )
         past_kma = build_past_kma_track(read_kma_csv(kma_past_text, fetch_settings, forecast_only=False))
 
     if df.empty:

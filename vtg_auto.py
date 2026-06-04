@@ -111,7 +111,7 @@ def active_typ_at(now: datetime, row: dict) -> bool:
     return active_at(now, row.get("TM_ST", ""), row.get("TM_ED", ""))
 
 
-def fetch_text(url: str, *, timeout: float = 12, retries: int = 1, retry_delay: float = 2.0) -> str:
+def fetch_text(url: str, *, timeout: float = 12, retries: int = 2, retry_delay: float = 3.0) -> str:
     last_error: Exception | None = None
     for attempt in range(retries + 1):
         request = Request(url, headers={"User-Agent": "CDS-VTG-Auto/1.0"})
@@ -178,7 +178,7 @@ def parse_kma_csv_lines(text: str, *, fixed_columns: int) -> list[list[str]]:
 
 def fetch_td_rows(year: int, auth_key: str) -> list[dict]:
     rows = []
-    text = fetch_text(kma_list_url(TD_LIST_ENDPOINT, year, auth_key), timeout=20)
+    text = fetch_text(kma_list_url(TD_LIST_ENDPOINT, year, auth_key), timeout=20, retries=2, retry_delay=5.0)
     for row in parse_kma_csv_lines(text, fixed_columns=5):
         rows.append({
             "YY": row[0],
@@ -193,7 +193,7 @@ def fetch_td_rows(year: int, auth_key: str) -> list[dict]:
 
 def fetch_typ_rows(year: int, auth_key: str) -> list[dict]:
     rows = []
-    text = fetch_text(kma_list_url(TYP_LIST_ENDPOINT, year, auth_key), timeout=20)
+    text = fetch_text(kma_list_url(TYP_LIST_ENDPOINT, year, auth_key), timeout=20, retries=2, retry_delay=5.0)
     for row in parse_kma_csv_lines(text, fixed_columns=8):
         rows.append({
             "YY": row[0],
@@ -225,7 +225,7 @@ def safe_float(value) -> float | None:
 
 def fetch_kma_reference_point(*, typ_number: int, data_time: str, auth_key: str) -> TrackPoint | None:
     try:
-        text = fetch_text(kma_gts_now_url(data_time, auth_key), timeout=12)
+        text = fetch_text(kma_gts_now_url(data_time, auth_key), timeout=15, retries=1, retry_delay=3.0)
     except (HTTPError, URLError, TimeoutError):
         return None
 
@@ -673,6 +673,55 @@ def redacted_command(command: list[str]) -> list[str]:
     return redacted
 
 
+def looks_like_transient_network_error(text: str) -> bool:
+    haystack = str(text or "").lower()
+    markers = (
+        "timed out",
+        "timeout",
+        "connecttimeout",
+        "read timed out",
+        "temporarily unavailable",
+        "temporary failure",
+        "connection reset",
+        "connection aborted",
+        "remote end closed connection",
+    )
+    return any(marker in haystack for marker in markers)
+
+
+def run_command_with_network_retry(
+    command: list[str],
+    *,
+    cwd: Path,
+    retries: int = 1,
+    retry_delay_seconds: int = 60,
+) -> subprocess.CompletedProcess[str]:
+    completed: subprocess.CompletedProcess[str] | None = None
+    for attempt in range(retries + 1):
+        completed = subprocess.run(
+            command,
+            cwd=cwd,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        if completed.returncode == 0:
+            return completed
+
+        combined_output = f"{completed.stdout}\n{completed.stderr}"
+        if attempt >= retries or not looks_like_transient_network_error(combined_output):
+            return completed
+
+        print(
+            "VTG.py failed with a transient network-looking error; "
+            f"retrying in {retry_delay_seconds}s ({attempt + 1}/{retries})."
+        )
+        time.sleep(retry_delay_seconds)
+
+    assert completed is not None
+    return completed
+
+
 def run_vtg(
     *,
     job: StormJob,
@@ -727,12 +776,11 @@ def run_vtg(
             "metadata_path": str(metadata_path),
         }
 
-    completed = subprocess.run(
+    completed = run_command_with_network_retry(
         command,
         cwd=PROJECT_ROOT,
-        text=True,
-        capture_output=True,
-        check=False,
+        retries=1,
+        retry_delay_seconds=60,
     )
     result = {
         "status": "ok" if completed.returncode == 0 else "failed",

@@ -68,6 +68,22 @@ jobs:
 
       - name: Run VTG automation
         run: |
+          run_with_retry() {
+            local attempt=1
+            local max_attempts=2
+            local delay_seconds=60
+            until "$@"; do
+              local status=$?
+              if [ "$attempt" -ge "$max_attempts" ]; then
+                echo "Command failed after $attempt attempt(s)."
+                return "$status"
+              fi
+              echo "Command failed with exit code $status. Retrying in ${delay_seconds}s..."
+              sleep "$delay_seconds"
+              attempt=$((attempt + 1))
+            done
+          }
+
           args=()
           if [ -n "$NOW_INPUT" ]; then
             args+=(--now "$NOW_INPUT")
@@ -82,11 +98,11 @@ jobs:
             if [ "$DRY_RUN_INPUT" = "true" ]; then
               echo "Manual VTG args: $MANUAL_VTG_ARGS"
             else
-              python vtg_manual_run.py --vtg-args "$MANUAL_VTG_ARGS"
+              run_with_retry python vtg_manual_run.py --vtg-args "$MANUAL_VTG_ARGS"
             fi
           else
             args+=(--fcst-hours "120,240" --no-auto-fcst-hours --min-run-interval-minutes 8)
-            python vtg_auto.py "${args[@]}"
+            run_with_retry python vtg_auto.py "${args[@]}"
           fi
 
       - name: Commit generated VTG assets
