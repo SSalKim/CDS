@@ -262,6 +262,14 @@ REQUEST_HEADERS = {
     "Connection": "close",
 }
 
+ANALYSIS_SOURCE_PRIORITY = {
+    "MODEL_0H_MEAN": 1,
+    "BDECK": 2,
+    "JTWC_BDECK": 2,
+    "KMA_OFFICIAL": 3,
+    "KMA": 3,
+}
+
 
 @dataclass(frozen=True)
 class Settings:
@@ -295,9 +303,27 @@ class Settings:
     base_url: str = KMA_BASE_URL
     source_overrides: tuple[tuple[str, str], ...] = ()
     skip_atcf: bool = False
+    analysis_lat: float | None = None
+    analysis_lon: float | None = None
+    analysis_time: str = ""
+    analysis_source: str = ""
+    analysis_atcf_id: str = ""
+    analysis_match_method: str = ""
+    analysis_distance_km: float | None = None
     auto_extent: bool = True
     overwrite_output: bool = False
     show_plot: bool = True
+
+
+@dataclass(frozen=True)
+class AnalysisPoint:
+    time_utc: str
+    lat: float
+    lon: float
+    source: str
+    atcf_id: str = ""
+    match_method: str = ""
+    distance_km: float | None = None
 
 # Double ATCF ID lookup for TD-to-typhoon promotion windows.
 # python VTG2.py --atcf-id wp062026 --extra-atcf-ids wp992026
@@ -421,6 +447,13 @@ def parse_args() -> Settings:
         help="Prefer a source for this run, e.g. ECMWF_EPS=NOAA. Repeat or comma-separate.",
     )
     parser.add_argument("--skip-atcf", action="store_true", help="Use KMA APIHUB data only.")
+    parser.add_argument("--analysis-lat", type=float, default=Settings.analysis_lat)
+    parser.add_argument("--analysis-lon", type=float, default=Settings.analysis_lon)
+    parser.add_argument("--analysis-time", default=Settings.analysis_time)
+    parser.add_argument("--analysis-source", default=Settings.analysis_source)
+    parser.add_argument("--analysis-atcf-id", default=Settings.analysis_atcf_id)
+    parser.add_argument("--analysis-match-method", default=Settings.analysis_match_method)
+    parser.add_argument("--analysis-distance-km", type=float, default=Settings.analysis_distance_km)
     parser.add_argument("--no-auto-extent", action="store_true", help="Use fixed margin/padding map extent.")
     parser.add_argument("--overwrite", action="store_true", help="Overwrite the deterministic output PNG.")
     parser.add_argument("--no-show", action="store_true", help="Save the PNG without opening a GUI window.")
@@ -463,6 +496,13 @@ def parse_args() -> Settings:
         auth_key=args.auth_key,
         source_overrides=source_overrides,
         skip_atcf=args.skip_atcf,
+        analysis_lat=args.analysis_lat,
+        analysis_lon=args.analysis_lon,
+        analysis_time=args.analysis_time.strip(),
+        analysis_source=args.analysis_source.strip().upper(),
+        analysis_atcf_id=args.analysis_atcf_id.strip().lower(),
+        analysis_match_method=args.analysis_match_method.strip(),
+        analysis_distance_km=args.analysis_distance_km,
         auto_extent=not args.no_auto_extent,
         overwrite_output=args.overwrite,
         show_plot=not args.no_show,
@@ -747,18 +787,247 @@ def parse_ft_time(series: pd.Series) -> pd.Series:
     return pd.to_datetime(clean, format="%Y%m%d%H%M", errors="coerce")
 
 
-def current_intensity(df: pd.DataFrame) -> str:
-    current = df.loc[(df["SRC"] == "KMA") & (df["TMD"] == 0), "WS"]
-    if current.empty or pd.isna(current.iloc[0]):
-        return "TD"
-    ws_10m = float(current.iloc[0])
-    if 17 <= ws_10m < 25:
-        return "TS"
-    if 25 <= ws_10m < 33:
-        return "STS"
-    if ws_10m >= 33:
-        return "TY"
-    return "TD"
+def normalize_history_time(value: str) -> str:
+    text = str(value or "").strip().split(".", 1)[0]
+    if len(text) >= 12 and text[:12].isdigit():
+        return text[:12]
+    if len(text) >= 10 and text[:10].isdigit():
+        return f"{text[:10]}00"
+    return ""
+
+
+def analysis_source_priority(source: str) -> int:
+    return ANALYSIS_SOURCE_PRIORITY.get(str(source or "").strip().upper(), 0)
+
+
+def storm_history_keys(settings: Settings) -> list[str]:
+    year = storm_year(settings)
+    keys: list[str] = []
+
+    def add(key: str) -> None:
+        if key and key not in keys:
+            keys.append(key)
+
+    if settings.linked_td_number:
+        add(f"td_{year}_{settings.linked_td_number:02d}")
+    if settings.storm_stage.upper() == "TD" and not settings.linked_td_number:
+        add(f"td_{year}_{settings.typ_number:02d}")
+    add(f"typ_{year}_{settings.typ_number:02d}")
+    return keys
+
+
+def track_history_paths(settings: Settings) -> list[Path]:
+    base = settings.output_root / "metadata" / "track_history" / storm_year(settings)
+    return [base / f"{key}.json" for key in storm_history_keys(settings)]
+
+
+def history_aliases(settings: Settings) -> list[str]:
+    aliases = storm_history_keys(settings)
+    for atcf_id in (settings.atcf_id, *settings.extra_atcf_ids):
+        atcf_id = str(atcf_id or "").strip().lower()
+        if atcf_id and not settings.skip_atcf and atcf_id not in aliases:
+            aliases.append(atcf_id)
+    return aliases
+
+
+def empty_track_history(settings: Settings) -> dict:
+    keys = storm_history_keys(settings)
+    return {
+        "version": 1,
+        "year": storm_year(settings),
+        "primary_key": keys[0] if keys else "",
+        "aliases": history_aliases(settings),
+        "points": [],
+    }
+
+
+def load_track_history(settings: Settings) -> dict:
+    history = empty_track_history(settings)
+    for path in track_history_paths(settings):
+        if not path.exists():
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(payload, dict):
+            continue
+        for alias in payload.get("aliases", []):
+            alias = str(alias or "").strip()
+            if alias and alias not in history["aliases"]:
+                history["aliases"].append(alias)
+        for point in payload.get("points", []):
+            if isinstance(point, dict):
+                upsert_history_point(history, point)
+    return history
+
+
+def history_point_payload(point: AnalysisPoint) -> dict:
+    payload = {
+        "time_utc": normalize_history_time(point.time_utc),
+        "lat": round(float(point.lat), 4),
+        "lon": round(float(point.lon), 4),
+        "source": point.source,
+    }
+    if point.atcf_id:
+        payload["atcf_id"] = point.atcf_id
+    if point.match_method:
+        payload["match_method"] = point.match_method
+    if point.distance_km is not None:
+        payload["distance_km"] = round(float(point.distance_km), 1)
+    return payload
+
+
+def upsert_history_point(history: dict, point: dict | AnalysisPoint) -> bool:
+    payload = history_point_payload(point) if isinstance(point, AnalysisPoint) else dict(point)
+    payload["time_utc"] = normalize_history_time(str(payload.get("time_utc") or ""))
+    if not payload["time_utc"]:
+        return False
+    try:
+        payload["lat"] = round(float(payload["lat"]), 4)
+        payload["lon"] = round(float(payload["lon"]), 4)
+    except (KeyError, TypeError, ValueError):
+        return False
+    payload["source"] = str(payload.get("source") or "MODEL_0H_MEAN").strip().upper()
+
+    points = history.setdefault("points", [])
+    for index, existing in enumerate(points):
+        if normalize_history_time(str(existing.get("time_utc") or "")) != payload["time_utc"]:
+            continue
+        existing_priority = analysis_source_priority(str(existing.get("source") or ""))
+        payload_priority = analysis_source_priority(payload["source"])
+        if payload_priority < existing_priority:
+            return False
+        if payload_priority == existing_priority and existing == payload:
+            return False
+        points[index] = payload
+        return True
+
+    points.append(payload)
+    return True
+
+
+def save_track_history(settings: Settings, history: dict, *, original: dict) -> None:
+    history["aliases"] = sorted(set([*history.get("aliases", []), *history_aliases(settings)]))
+    history["points"] = sorted(
+        history.get("points", []),
+        key=lambda item: normalize_history_time(str(item.get("time_utc") or "")),
+    )
+    if history == original:
+        return
+    history["updated_at_utc"] = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    paths = track_history_paths(settings)
+    if not paths:
+        return
+    primary = paths[0]
+    primary.parent.mkdir(parents=True, exist_ok=True)
+    primary.write_text(
+        json.dumps(history, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
+def cli_analysis_point(settings: Settings) -> AnalysisPoint | None:
+    if settings.analysis_lat is None or settings.analysis_lon is None:
+        return None
+    time_utc = normalize_history_time(settings.analysis_time or settings.data_time)
+    if not time_utc or time_utc[:10] != settings.data_time[:10]:
+        print(
+            "Warning: analysis point time does not match data_time; "
+            f"ignoring analysis point ({time_utc} vs {settings.data_time})."
+        )
+        return None
+    return AnalysisPoint(
+        time_utc=time_utc,
+        lat=float(settings.analysis_lat),
+        lon=float(settings.analysis_lon),
+        source=settings.analysis_source or "BDECK",
+        atcf_id=settings.analysis_atcf_id,
+        match_method=settings.analysis_match_method,
+        distance_km=settings.analysis_distance_km,
+    )
+
+
+def kma_start_analysis_point(df: pd.DataFrame, settings: Settings) -> AnalysisPoint | None:
+    if df.empty:
+        return None
+    start = df[(df["SRC"] == "KMA") & (pd.to_numeric(df["TMD"], errors="coerce") == 0)].head(1)
+    if start.empty:
+        return None
+    row = start.iloc[0]
+    try:
+        lat = float(row["LAT"])
+        lon = float(row["LON"])
+    except (TypeError, ValueError):
+        return None
+    source = str(row.get(DATA_SOURCE_COLUMN, "") or "").strip().upper()
+    if source == "APIHUB":
+        source = "KMA_OFFICIAL"
+    elif not source:
+        source = "MODEL_0H_MEAN"
+    return AnalysisPoint(
+        time_utc=normalize_history_time(str(row.get("FT_TM(UTC)") or settings.data_time)),
+        lat=lat,
+        lon=lon,
+        source=source,
+        atcf_id=settings.analysis_atcf_id or ("" if settings.skip_atcf else settings.atcf_id),
+        match_method=settings.analysis_match_method if source == "BDECK" else "",
+        distance_km=settings.analysis_distance_km if source == "BDECK" else None,
+    )
+
+
+def official_points_from_past_kma(past_kma: pd.DataFrame) -> list[AnalysisPoint]:
+    if past_kma.empty:
+        return []
+    points: list[AnalysisPoint] = []
+    for _, row in past_kma.iterrows():
+        try:
+            lat = float(row["LAT"])
+            lon = float(row["LON"])
+        except (TypeError, ValueError):
+            continue
+        time_utc = normalize_history_time(str(row.get("FT_TM(UTC)") or ""))
+        if not time_utc:
+            continue
+        points.append(AnalysisPoint(time_utc=time_utc, lat=lat, lon=lon, source="KMA_OFFICIAL"))
+    return points
+
+
+def history_to_past_track(history: dict, current_dt: datetime | None) -> pd.DataFrame:
+    rows = []
+    for point in history.get("points", []):
+        time_utc = normalize_history_time(str(point.get("time_utc") or ""))
+        if not time_utc:
+            continue
+        try:
+            lat = float(point["lat"])
+            lon = float(point["lon"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        rows.append({
+            "FT_TM(UTC)": time_utc,
+            "LAT": lat,
+            "LON": lon,
+            "SRC": "KMA",
+            DATA_SOURCE_COLUMN: str(point.get("source") or ""),
+        })
+    if not rows:
+        return pd.DataFrame(columns=[*KMA_COLUMNS, "FT_TIME"])
+    past = pd.DataFrame(rows)
+    past["FT_TIME"] = parse_ft_time(past["FT_TM(UTC)"])
+    past = past.dropna(subset=["FT_TIME"]).sort_values("FT_TIME").reset_index(drop=True)
+    if current_dt is not None:
+        past = past[past["FT_TIME"].le(current_dt + timedelta(minutes=1))].copy()
+    if past.empty:
+        return past
+    gaps = past["FT_TIME"].diff().gt(pd.Timedelta(hours=18))
+    if gaps.any():
+        past = past.loc[gaps[gaps].index[-1]:].reset_index(drop=True)
+    return past
+
+
+def current_intensity(settings: Settings) -> str:
+    return "TD" if settings.storm_stage.upper() == "TD" else "TYP"
 
 
 def trim_discontinuous_forecast(group: pd.DataFrame, *, gap_factor: float = 2.5) -> pd.DataFrame:
@@ -923,33 +1192,46 @@ def trim_dateline_reflected_tracks(df: pd.DataFrame) -> pd.DataFrame:
 def apply_common_kma_start(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     kma_start = df[(df["SRC"] == "KMA") & (df["TMD"] == 0)].head(1).copy()
     if kma_start.empty or kma_start[["LAT", "LON"]].isna().any(axis=None):
-        model_zero = (
-            df[(df["SRC"] != "KMA") & (df["TMD"] == 0)]
-            .dropna(subset=["LAT", "LON"])
-            .drop_duplicates(subset=["SRC"], keep="first")
-        )
-        if model_zero.empty:
-            print("Warning: KMA 0h is missing and no model 0h points are available.")
-            return df.reset_index(drop=True)
-        lat = float(model_zero["LAT"].mean())
-        lon = float(model_zero["LON"].mean())
-        print(
-            "KMA 0h is missing; using the mean of "
-            f"{len(model_zero)} model 0h start point(s): {lat:.2f}N, {lon:.2f}E."
-        )
+        override = cli_analysis_point(settings)
+        source = "MODEL_0H_MEAN"
+        if override:
+            lat = override.lat
+            lon = override.lon
+            time_utc = override.time_utc
+            source = override.source
+            print(
+                "KMA 0h is missing; using "
+                f"{source} analysis point: {lat:.2f}N, {lon:.2f}E."
+            )
+        else:
+            model_zero = (
+                df[(df["SRC"] != "KMA") & (df["TMD"] == 0)]
+                .dropna(subset=["LAT", "LON"])
+                .drop_duplicates(subset=["SRC"], keep="first")
+            )
+            if model_zero.empty:
+                print("Warning: KMA 0h is missing and no model 0h points are available.")
+                return df.reset_index(drop=True)
+            lat = float(model_zero["LAT"].mean())
+            lon = float(model_zero["LON"].mean())
+            time_utc = settings.data_time
+            print(
+                "KMA 0h is missing; using the mean of "
+                f"{len(model_zero)} model 0h start point(s): {lat:.2f}N, {lon:.2f}E."
+            )
         kma_start = pd.DataFrame([{
             "FT": 0,
             "YY": int(settings.data_time[:4]),
             "TYP": settings.typ_number,
             "SEQ": 0,
             "TMD": 0,
-            "TYP_TM(UTC)": settings.data_time,
-            "FT_TM(UTC)": settings.data_time,
+            "TYP_TM(UTC)": time_utc,
+            "FT_TM(UTC)": time_utc,
             "LAT": lat,
             "LON": lon,
             "WS": 0,
             "SRC": "KMA",
-            DATA_SOURCE_COLUMN: "MODEL_0H_MEAN",
+            DATA_SOURCE_COLUMN: source,
         }])
 
     kma_lat = kma_start.iloc[0]["LAT"]
@@ -1297,6 +1579,32 @@ def plot_past_track(ax, past_kma: pd.DataFrame, current_dt: datetime | None) -> 
     if markers:
         marker_df = pd.DataFrame(markers).drop_duplicates(subset=["FT_TIME"])
         ax.plot(marker_df["LON"], marker_df["LAT"], marker="o", color="white", linestyle="None", markersize=5, zorder=0, transform=ccrs.PlateCarree())
+
+
+def update_and_merge_past_track(
+    *,
+    df: pd.DataFrame,
+    official_past: pd.DataFrame,
+    settings: Settings,
+) -> pd.DataFrame:
+    history = load_track_history(settings)
+    original = json.loads(json.dumps(history, ensure_ascii=False))
+
+    for point in official_points_from_past_kma(official_past):
+        upsert_history_point(history, point)
+
+    current_point = kma_start_analysis_point(df, settings)
+    if current_point:
+        upsert_history_point(history, current_point)
+
+    save_track_history(settings, history, original=original)
+
+    current_dt = pd.to_datetime(settings.data_time, format="%Y%m%d%H%M", errors="coerce")
+    current_py_dt = None if pd.isna(current_dt) else current_dt.to_pydatetime()
+    merged = history_to_past_track(history, current_py_dt)
+    if not merged.empty:
+        return merged
+    return official_past
 
 
 def tc_id(settings: Settings) -> str:
@@ -2316,6 +2624,12 @@ def main() -> None:
         )
         past_kma = build_past_kma_track(read_kma_csv(kma_past_text, fetch_settings, forecast_only=False))
 
+    past_kma = update_and_merge_past_track(
+        df=df,
+        official_past=past_kma,
+        settings=fetch_settings,
+    )
+
     if df.empty:
         reason = "No forecast data matched the requested storm/time/model configuration."
         for fcst_hours in requested_hours:
@@ -2331,7 +2645,7 @@ def main() -> None:
                 write_no_output_metadata(
                     metadata_path,
                     settings=hour_settings,
-                    intensity="",
+                    intensity=current_intensity(hour_settings),
                     reason=reason,
                 )
             print(f"{fcst_hours}h: {reason}")
@@ -2349,7 +2663,7 @@ def main() -> None:
             metadata_path=metadata_path,
         )
         hour_df = limit_forecast_hours(df, hour_settings)
-        intensity = current_intensity(hour_df)
+        intensity = current_intensity(hour_settings)
         metadata_path = metadata_path_for_settings(hour_settings)
 
         if not plotted_model_names(hour_df, hour_settings):

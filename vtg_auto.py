@@ -69,6 +69,10 @@ class StormJob:
     skip_atcf: bool
     atcf_match_method: str = ""
     reason: str = ""
+    analysis_point: TrackPoint | None = None
+    analysis_source: str = ""
+    analysis_match_method: str = ""
+    analysis_distance_km: float | None = None
 
 
 @dataclass(frozen=True)
@@ -83,6 +87,8 @@ class AtcfMatch:
     atcf_id: str
     method: str
     distance_km: float | None = None
+    point: TrackPoint | None = None
+    reference_point: TrackPoint | None = None
 
 
 def utc_now() -> datetime:
@@ -335,7 +341,12 @@ def fetch_kma_reference_point(*, typ_number: int, data_time: str, auth_key: str)
             return TrackPoint(time_utc=ft_time, lat=lat, lon=lon)
         if tmd == 0:
             candidates.append(TrackPoint(time_utc=ft_time, lat=lat, lon=lon))
-    return candidates[0] if candidates else None
+    if not candidates:
+        return None
+
+    lat = sum(point.lat for point in candidates) / len(candidates)
+    lon = sum(point.lon for point in candidates) / len(candidates)
+    return TrackPoint(time_utc=f"{data_time[:10]}00", lat=lat, lon=lon)
 
 
 def normalize_name(value: str) -> str:
@@ -439,6 +450,15 @@ def bdeck_track_points(text: str, *, reference_time: str) -> list[TrackPoint]:
     return points
 
 
+def fetch_bdeck_analysis_point(atcf_id: str, *, data_time: str) -> TrackPoint | None:
+    try:
+        text = fetch_text(NOAA_BDECK_URL.format(atcf_id=atcf_id), timeout=15)
+    except (HTTPError, URLError, TimeoutError):
+        return None
+    points = bdeck_track_points(text, reference_time=f"{data_time[:10]}00")
+    return points[0] if points else None
+
+
 def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     radius_km = 6371.0
     phi1 = math.radians(lat1)
@@ -510,7 +530,13 @@ def find_atcf_position_match(
         for point in bdeck_track_points(text, reference_time=kma_point.time_utc):
             distance = haversine_km(kma_point.lat, kma_point.lon, point.lat, point.lon)
             if distance <= max_distance_km:
-                candidates.append(AtcfMatch(atcf_id=atcf_id, method="position", distance_km=distance))
+                candidates.append(AtcfMatch(
+                    atcf_id=atcf_id,
+                    method="position",
+                    distance_km=distance,
+                    point=point,
+                    reference_point=kma_point,
+                ))
 
     if not candidates:
         return None
@@ -669,6 +695,12 @@ def build_storm_jobs(
             )
         atcf_id = atcf_match.atcf_id if atcf_match else None
         atcf_method = atcf_match.method if atcf_match else ""
+        analysis_point = atcf_match.point if atcf_match and atcf_match.method == "position" else None
+        if analysis_point is None and atcf_id:
+            analysis_point = fetch_bdeck_analysis_point(atcf_id, data_time=data_time)
+        analysis_source = "BDECK" if analysis_point else ""
+        analysis_match_method = atcf_match.method if analysis_point and atcf_match else ""
+        analysis_distance_km = atcf_match.distance_km if analysis_point and atcf_match else None
         if not resolve_atcf:
             reason = "ATCF matching skipped for lightweight precheck."
         elif atcf_match and atcf_match.method == "position":
@@ -694,6 +726,10 @@ def build_storm_jobs(
             skip_atcf=not bool(atcf_id),
             atcf_match_method=atcf_method,
             reason=reason,
+            analysis_point=analysis_point,
+            analysis_source=analysis_source,
+            analysis_match_method=analysis_match_method,
+            analysis_distance_km=analysis_distance_km,
         ))
 
     active_typhoon_set = set(active_typhoons)
@@ -708,8 +744,22 @@ def build_storm_jobs(
             continue
         if typ_number in active_typhoon_set:
             continue
+
+        linked_typ_row = None
+        linked_typ_en = ""
+        linked_typ_name_ko = ""
         if typ_number != 0:
-            continue
+            linked_typ_row = next(
+                (
+                    item for item in typ_rows
+                    if safe_int(item.get("YY")) == year and safe_int(item.get("SEQ")) == typ_number
+                ),
+                None,
+            )
+            if linked_typ_row:
+                linked_typ_en = str(linked_typ_row.get("TYP_EN") or "").strip().upper()
+                linked_typ_name_ko = str(linked_typ_row.get("TYP_NAME") or "").strip()
+
         manual_id = None
         atcf_match = None
         if resolve_atcf:
@@ -717,26 +767,59 @@ def build_storm_jobs(
                 manual_map,
                 year=year,
                 td_number=td_number,
-                typ_number=td_number,
-                typ_en="",
+                typ_number=typ_number or td_number,
+                typ_en=linked_typ_en,
             )
             atcf_match = AtcfMatch(manual_id, "manual") if manual_id else None
+            if atcf_match is None and linked_typ_en:
+                atcf_match = find_atcf_match(
+                    typ_en=linked_typ_en,
+                    typ_number=typ_number,
+                    year=year,
+                    positive_radius=atcf_search_positive_radius,
+                    negative_radius=atcf_search_negative_radius,
+                )
         if resolve_atcf and atcf_match is None:
-            kma_point = fetch_kma_reference_point(typ_number=td_number, data_time=data_time, auth_key=auth_key)
+            reference_typ_number = typ_number or td_number
+            kma_point = fetch_kma_reference_point(typ_number=reference_typ_number, data_time=data_time, auth_key=auth_key)
             atcf_match = find_atcf_position_match(
-                typ_number=td_number,
+                typ_number=reference_typ_number,
                 year=year,
                 data_time=data_time,
                 kma_point=kma_point,
-                atcf_ids=candidate_td_atcf_ids(td_number=td_number, year=year),
+                atcf_ids=(
+                    candidate_atcf_ids(
+                        typ_number=typ_number,
+                        year=year,
+                        positive_radius=atcf_search_positive_radius,
+                        negative_radius=atcf_search_negative_radius,
+                    )
+                    if typ_number
+                    else candidate_td_atcf_ids(td_number=td_number, year=year)
+                ),
                 max_distance_km=atcf_position_max_distance_km,
                 min_distance_gap_km=atcf_position_min_distance_gap_km,
             )
         atcf_id = atcf_match.atcf_id if atcf_match else None
         atcf_method = atcf_match.method if atcf_match else ""
+        analysis_point = atcf_match.point if atcf_match and atcf_match.method == "position" else None
+        if analysis_point is None and atcf_id:
+            analysis_point = fetch_bdeck_analysis_point(atcf_id, data_time=data_time)
+        analysis_source = "BDECK" if analysis_point else ""
+        analysis_match_method = atcf_match.method if analysis_point and atcf_match else ""
+        analysis_distance_km = atcf_match.distance_km if analysis_point and atcf_match else None
         if not resolve_atcf:
             stage = "TD_UNLINKED"
             reason = "ATCF matching skipped for lightweight precheck."
+        elif typ_number != 0 and atcf_match and atcf_match.method == "position":
+            stage = "TD_LINKED_TYP_POSITION_ATCF"
+            reason = (
+                f"TD is linked to typhoon {typ_number}; using temporary position match "
+                f"{atcf_match.atcf_id} ({atcf_match.distance_km:.0f} km)."
+            )
+        elif typ_number != 0:
+            stage = "TD_LINKED_TYP"
+            reason = "" if atcf_id else f"TD is linked to typhoon {typ_number}; ATCF match not found."
         elif atcf_match and atcf_match.method == "position":
             stage = "TD_POSITION_ATCF"
             reason = (
@@ -750,20 +833,28 @@ def build_storm_jobs(
             stage = "TD_UNLINKED"
             reason = "TD has no linked typhoon number yet."
         jobs.append(StormJob(
-            storm_key=f"td_{year}_{td_number:02d}",
+            storm_key=(
+                f"td_{year}_{td_number:02d}_typ_{typ_number:02d}"
+                if typ_number
+                else f"td_{year}_{td_number:02d}"
+            ),
             stage=stage,
             year=year,
             data_time=data_time,
             td_number=td_number,
-            linked_td_number=None,
-            typ_number=td_number,
-            typ_name_ko="",
-            typ_name="NONAME",
-            typ_en="",
+            linked_td_number=td_number if typ_number else None,
+            typ_number=typ_number or td_number,
+            typ_name_ko=linked_typ_name_ko if typ_number else "",
+            typ_name=linked_typ_en or linked_typ_name_ko or "NONAME",
+            typ_en=linked_typ_en,
             atcf_id=atcf_id,
             skip_atcf=not bool(atcf_id),
             atcf_match_method=atcf_method,
             reason=reason,
+            analysis_point=analysis_point,
+            analysis_source=analysis_source,
+            analysis_match_method=analysis_match_method,
+            analysis_distance_km=analysis_distance_km,
         ))
 
     return jobs
@@ -897,6 +988,23 @@ def vtg_command(
         command.extend(["--metadata-path", str(metadata_paths[unique_hours[0]])])
     if job.atcf_id:
         command.extend(["--atcf-id", job.atcf_id])
+    if job.analysis_point:
+        command.extend([
+            "--analysis-lat",
+            f"{job.analysis_point.lat:.4f}",
+            "--analysis-lon",
+            f"{job.analysis_point.lon:.4f}",
+            "--analysis-time",
+            job.analysis_point.time_utc,
+            "--analysis-source",
+            job.analysis_source or "BDECK",
+        ])
+        if job.analysis_match_method:
+            command.extend(["--analysis-match-method", job.analysis_match_method])
+        if job.atcf_id:
+            command.extend(["--analysis-atcf-id", job.atcf_id])
+        if job.analysis_distance_km is not None:
+            command.extend(["--analysis-distance-km", f"{job.analysis_distance_km:.1f}"])
     if job.linked_td_number is not None:
         command.extend(["--linked-td-number", str(job.linked_td_number)])
     if job.skip_atcf:
