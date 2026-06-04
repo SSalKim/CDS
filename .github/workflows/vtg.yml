@@ -21,6 +21,11 @@ on:
         required: false
         default: false
         type: boolean
+      diagnostics:
+        description: "Print KMA APIHUB connectivity diagnostics"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -41,6 +46,7 @@ jobs:
       FORCE_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
       MANUAL_VTG_ARGS: ${{ github.event_name == 'workflow_dispatch' && inputs.manual_args || '' }}
       DRY_RUN_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+      DIAGNOSTICS_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.diagnostics || false }}
 
     steps:
       - name: Check out repository
@@ -55,6 +61,42 @@ jobs:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: requirements-vtg.txt
+
+      - name: Diagnose KMA APIHUB connectivity
+        if: ${{ env.DIAGNOSTICS_INPUT == 'true' }}
+        continue-on-error: true
+        run: |
+          set +e
+          host="apihub-pub.kma.go.kr"
+          year="$(date -u +%Y)"
+          now_utc="$(date -u +%Y%m%d%H)00"
+
+          echo "KMA APIHUB diagnostics at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          echo "Runner public IP:"
+          curl -sS --connect-timeout 10 --max-time 15 https://api.ipify.org || true
+          echo
+          echo "DNS results for ${host}:"
+          getent ahosts "$host" | awk '{print $1}' | sort -u || true
+
+          probe() {
+            local label="$1"
+            local url="$2"
+            echo "::group::${label}"
+            for attempt in 1 2 3; do
+              printf "attempt=%s " "$attempt"
+              curl -sS -o /tmp/kma_probe_${label}_${attempt}.txt \
+                --connect-timeout 20 \
+                --max-time 40 \
+                -w 'http_code=%{http_code} remote_ip=%{remote_ip} namelookup=%{time_namelookup}s connect=%{time_connect}s tls=%{time_appconnect}s starttransfer=%{time_starttransfer}s total=%{time_total}s error="%{errormsg}"\n' \
+                "$url"
+              sleep 2
+            done
+            echo "::endgroup::"
+          }
+
+          probe "td_lst" "https://${host}/api/typ01/url/td_lst.php?YY=${year}&disp=1&help=1&authKey=${KMA_APIHUB_AUTH_KEY}"
+          probe "typ_lst" "https://${host}/api/typ01/url/typ_lst.php?YY=${year}&disp=1&help=1&authKey=${KMA_APIHUB_AUTH_KEY}"
+          probe "typ_gts_now" "https://${host}/api/typ01/url/typ_gts_now.php?src=&tm=${now_utc}&mode=2&disp=1&help=0&authKey=${KMA_APIHUB_AUTH_KEY}"
 
       - name: Precheck VTG run
         id: vtg_precheck
