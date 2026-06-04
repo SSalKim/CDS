@@ -773,6 +773,31 @@ def metadata_path_for(output_root: Path, job: StormJob, fcst_hours: int) -> Path
     return output_root / "metadata" / f"{job.data_time}_{job.storm_key}_{fcst_hours}h.json"
 
 
+def deterministic_output_path_for(output_root: Path, job: StormJob, fcst_hours: int) -> Path:
+    year_str = str(job.year)
+    cyclone_id = f"{job.year % 100:02d}{job.typ_number:02d}"
+    stage = "TD" if job.stage.startswith("TD_") else "TYP"
+    storm_name = job.typ_name or "NONAME"
+    dir_name = f"{stage}_{cyclone_id}_{storm_name}"
+    file_name = f"{stage}_{cyclone_id}_{storm_name}_{job.data_time}_{fcst_hours}h.png"
+    return output_root / year_str / dir_name / file_name
+
+
+def clear_existing_outputs(output_root: Path, job: StormJob, fcst_hours_list: list[int]) -> None:
+    root = output_root.resolve()
+    for fcst_hours in dict.fromkeys(fcst_hours_list):
+        target = deterministic_output_path_for(output_root, job, fcst_hours)
+        try:
+            resolved = target.resolve()
+        except OSError:
+            resolved = target.absolute()
+        if not str(resolved).lower().startswith(str(root).lower()):
+            raise RuntimeError(f"Refusing to delete output outside {root}: {resolved}")
+        if target.exists():
+            target.unlink()
+            print(f"Removed stale deterministic output before forced rerun: {target}")
+
+
 def status_key_for(job: StormJob, fcst_hours: int) -> str:
     return f"{job.storm_key}_{fcst_hours}h"
 
@@ -893,6 +918,7 @@ def run_vtg_batch(
     auto_fcst_hours: bool,
     source_overrides: list[str],
     dry_run: bool,
+    clear_existing: bool = False,
 ) -> dict[int, dict]:
     command, metadata_paths = vtg_command(
         job=job,
@@ -913,6 +939,9 @@ def run_vtg_batch(
             }
             for fcst_hours, metadata_path in metadata_paths.items()
         }
+
+    if clear_existing:
+        clear_existing_outputs(output_root, job, fcst_hours_list)
 
     completed = run_command_with_network_retry(
         command,
@@ -1388,6 +1417,7 @@ def main() -> int:
                 auto_fcst_hours=args.auto_fcst_hours,
                 source_overrides=args.source_override,
                 dry_run=args.dry_run,
+                clear_existing=args.force,
             )
             for fcst_hours in due_hours:
                 status_key = status_key_for(job, fcst_hours)

@@ -1446,11 +1446,19 @@ def write_preserved_output_metadata(
         previous_model_count = int(previous.get("model_count") or 0)
     except (TypeError, ValueError):
         previous_model_count = 0
+    previous_image_path = str(previous.get("image_path") or "")
+    previous_render_signature = str(previous.get("render_signature") or "")
+    target_image_path = relative_image_path(target)
+    preserved_render_signature = (
+        previous_render_signature
+        if previous_image_path == target_image_path and not previous.get("no_output")
+        else ""
+    )
 
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"),
-        "render_signature": render_signature(),
-        "image_path": relative_image_path(target),
+        "render_signature": preserved_render_signature,
+        "image_path": target_image_path,
         "storm_stage": settings.storm_stage,
         "storm_year": storm_year(settings),
         "typ_number": settings.typ_number,
