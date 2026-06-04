@@ -73,7 +73,7 @@ MODEL_INFO = [
     {"name": "FNUM_AI", "color": "#4BB200", "style": "--", "label": "FourCastNet-UM", "zorder": 60},
     {"name": "PGEC_AI", "color": "#3944BC", "style": "--", "label": "Pangu-Weather-ECMWF", "zorder": 65},
     {"name": "PGKM_AI", "color": "#727EF2", "style": "--", "label": "Pangu-Weather-KIM", "zorder": 64},
-    {"name": "PGUM_AI", "color": "#727EF2", "style": "--", "label": "Pangu-Weather-UM", "zorder": 63},
+    {"name": "PGUM_AI", "color": "#8EA2FF", "style": "--", "label": "Pangu-Weather-UM", "zorder": 63},
     {"name": "GCEC_AI", "color": "#4D248D", "style": "--", "label": "GraphCast-ECMWF", "zorder": 68},
     {"name": "GCKM_AI", "color": "#6C33C6", "style": "--", "label": "GraphCast-KIM", "zorder": 67},
     {"name": "GCUM_AI", "color": "#B57AD5", "style": "--", "label": "GraphCast-UM", "zorder": 66},
@@ -2417,7 +2417,7 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str) -
             fontsize=22.5, color="#DCB0E1", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="top", horizontalalignment="right", zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
-    ax.text(0.005, 0.006, "Plotted by WooJin Kim\nUsing KMA APIHUB & NRL ATCF", transform=ax.transAxes,
+    ax.text(0.005, 0.006, "Plotted by WooJin Kim\nData sourced from KMA APIHUB & NRL ATCF", transform=ax.transAxes,
             fontsize=12, color="aliceblue", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="bottom", horizontalalignment="left", zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
