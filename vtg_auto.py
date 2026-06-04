@@ -176,9 +176,59 @@ def parse_kma_csv_lines(text: str, *, fixed_columns: int) -> list[list[str]]:
     return rows
 
 
-def fetch_td_rows(year: int, auth_key: str) -> list[dict]:
+def kma_cache_path(cache_dir: Path, endpoint: str, year: int) -> Path:
+    return cache_dir / f"{Path(endpoint).stem}_{year}.json"
+
+
+def load_cached_kma_rows(cache_dir: Path | None, endpoint: str, year: int) -> list[dict] | None:
+    if cache_dir is None:
+        return None
+    path = kma_cache_path(cache_dir, endpoint, year)
+    payload = load_json(path, None)
+    if not isinstance(payload, dict):
+        return None
+    rows = payload.get("rows")
+    if not isinstance(rows, list):
+        return None
+    print(
+        f"Using cached KMA APIHUB {Path(endpoint).stem} rows for {year} "
+        f"from {path} (updated_at_utc={payload.get('updated_at_utc', '')})."
+    )
+    return rows
+
+
+def write_cached_kma_rows(cache_dir: Path | None, endpoint: str, year: int, rows: list[dict]) -> None:
+    if cache_dir is None:
+        return
+    write_json(kma_cache_path(cache_dir, endpoint, year), {
+        "updated_at_utc": format_utc_stamp(utc_now()),
+        "endpoint": endpoint,
+        "year": year,
+        "rows": rows,
+    })
+
+
+def fetch_kma_list_text(endpoint: str, year: int, auth_key: str, *, cache_dir: Path | None) -> str | None:
+    try:
+        return fetch_text(kma_list_url(endpoint, year, auth_key), timeout=20, retries=2, retry_delay=5.0)
+    except HTTPError as exc:
+        if exc.code < 500:
+            raise
+        print(f"KMA APIHUB {Path(endpoint).stem} {year} failed with HTTP {exc.code}; trying cached rows.")
+        return None
+    except (URLError, TimeoutError) as exc:
+        print(f"KMA APIHUB {Path(endpoint).stem} {year} request failed ({exc}); trying cached rows.")
+        return None
+
+
+def fetch_td_rows(year: int, auth_key: str, *, cache_dir: Path | None = None) -> list[dict]:
     rows = []
-    text = fetch_text(kma_list_url(TD_LIST_ENDPOINT, year, auth_key), timeout=20, retries=2, retry_delay=5.0)
+    text = fetch_kma_list_text(TD_LIST_ENDPOINT, year, auth_key, cache_dir=cache_dir)
+    if text is None:
+        cached = load_cached_kma_rows(cache_dir, TD_LIST_ENDPOINT, year)
+        if cached is not None:
+            return cached
+        raise TimeoutError(f"KMA APIHUB {TD_LIST_ENDPOINT} {year} failed and no cache is available.")
     for row in parse_kma_csv_lines(text, fixed_columns=5):
         rows.append({
             "YY": row[0],
@@ -188,12 +238,18 @@ def fetch_td_rows(year: int, auth_key: str) -> list[dict]:
             "TM_ED": row[4],
             "REM": ",".join(row[5:]).strip(),
         })
+    write_cached_kma_rows(cache_dir, TD_LIST_ENDPOINT, year, rows)
     return rows
 
 
-def fetch_typ_rows(year: int, auth_key: str) -> list[dict]:
+def fetch_typ_rows(year: int, auth_key: str, *, cache_dir: Path | None = None) -> list[dict]:
     rows = []
-    text = fetch_text(kma_list_url(TYP_LIST_ENDPOINT, year, auth_key), timeout=20, retries=2, retry_delay=5.0)
+    text = fetch_kma_list_text(TYP_LIST_ENDPOINT, year, auth_key, cache_dir=cache_dir)
+    if text is None:
+        cached = load_cached_kma_rows(cache_dir, TYP_LIST_ENDPOINT, year)
+        if cached is not None:
+            return cached
+        raise TimeoutError(f"KMA APIHUB {TYP_LIST_ENDPOINT} {year} failed and no cache is available.")
     for row in parse_kma_csv_lines(text, fixed_columns=8):
         rows.append({
             "YY": row[0],
@@ -206,6 +262,7 @@ def fetch_typ_rows(year: int, auth_key: str) -> list[dict]:
             "TYP_EN": row[7],
             "REM": ",".join(row[8:]).strip(),
         })
+    write_cached_kma_rows(cache_dir, TYP_LIST_ENDPOINT, year, rows)
     return rows
 
 
@@ -1021,6 +1078,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run scheduled VTG image generation.")
     parser.add_argument("--now", help="Override current UTC time, YYYYmmddHHMM.")
     parser.add_argument("--output-root", type=Path, default=PROJECT_ROOT / "VTG_IMG")
+    parser.add_argument("--kma-cache-dir", type=Path, default=None)
     parser.add_argument("--auth-key", default=os.getenv("KMA_APIHUB_AUTH_KEY", ""))
     parser.add_argument("--manual-map", type=Path, default=PROJECT_ROOT / "vtg_manual_atcf_map.json")
     parser.add_argument("--status-path", type=Path, default=None)
@@ -1053,6 +1111,7 @@ def main() -> int:
         now = utc_now()
 
     output_root = args.output_root
+    kma_cache_dir = args.kma_cache_dir or output_root / "kma_apihub_cache"
     status_path = args.status_path or output_root / "vtg_auto_status.json"
     manifest_path = args.manifest_path or output_root / "manifest.json"
     windows = active_cycle_windows(now)
@@ -1098,8 +1157,8 @@ def main() -> int:
     td_rows: list[dict] = []
     typ_rows: list[dict] = []
     for year in sorted(years):
-        td_rows.extend(fetch_td_rows(year, args.auth_key))
-        typ_rows.extend(fetch_typ_rows(year, args.auth_key))
+        td_rows.extend(fetch_td_rows(year, args.auth_key, cache_dir=kma_cache_dir))
+        typ_rows.extend(fetch_typ_rows(year, args.auth_key, cache_dir=kma_cache_dir))
 
     run_entries = []
     actual_run_count = 0
