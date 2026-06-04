@@ -478,7 +478,7 @@ let year=String(metadata.storm_year || job.year || dataTime.slice(0,4) || '');
 let stage=(metadata.storm_stage || job.stage || 'TYP').toUpperCase();
 let typNumber=Number(metadata.typ_number || job.typ_number || 0);
 let tdNumber=metadata.linked_td_number || job.linked_td_number || job.td_number || null;
-let typName=metadata.typ_name || job.typ_name || 'NAMELESS';
+let typName=normalizeTyphoonName(metadata.typ_name || job.typ_name || 'NONAME');
 let typNameKo=metadata.typ_name_ko || job.typ_name_ko || koreanTyphoonName(typName);
 let stormKey=[year,stage,typNumber,typName].join('|');
 return applyTyphoonSortKey({
@@ -584,6 +584,7 @@ let metadata=record.metadata || {};
 if(!metadata.data_time){
 metadata={...metadata,data_time:dataTime};
 }
+let typName=normalizeTyphoonName(metadata.typ_name || 'NONAME');
 entries.push({
 job:{
 storm_key:stormKey,
@@ -593,9 +594,9 @@ data_time:dataTime,
 td_number:null,
 linked_td_number:metadata.linked_td_number || null,
 typ_number:metadata.typ_number || 0,
-typ_name:metadata.typ_name || 'NAMELESS',
-typ_name_ko:metadata.typ_name_ko || koreanTyphoonName(metadata.typ_name || ''),
-typ_en:metadata.typ_name || '',
+typ_name:typName,
+typ_name_ko:metadata.typ_name_ko || koreanTyphoonName(typName),
+typ_en:typName,
 atcf_id:metadata.atcf_id || '',
 fcst_hours:metadata.fcst_hours || parseTyphoonFcstHoursFromPath(metadata.image_path || '') || 120,
 skip_atcf:!!metadata.skip_atcf
@@ -1232,10 +1233,15 @@ return result;
 
 function stormDropdownLabel(entry){
 if(entry.stage==='TD'){
-return `TD ${entry.typNumber}호`;
+return `제${entry.typNumber}호 TD`;
 }
 let name=entry.typNameKo || koreanTyphoonName(entry.typName) || entry.typName;
-return `제${entry.typNumber}호 ${name}`.trim();
+return `제${entry.typNumber}호 태풍 ${name}`.trim();
+}
+
+function normalizeTyphoonName(name){
+let text=String(name || '').trim();
+return text.toUpperCase()==='NAMELESS' ? 'NONAME' : text;
 }
 
 function koreanTyphoonName(name){

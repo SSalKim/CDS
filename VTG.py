@@ -854,6 +854,20 @@ def trim_dateline_reflected_tracks(df: pd.DataFrame) -> pd.DataFrame:
 def apply_common_kma_start(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     kma_start = df[(df["SRC"] == "KMA") & (df["TMD"] == 0)].head(1).copy()
     if kma_start.empty or kma_start[["LAT", "LON"]].isna().any(axis=None):
+        model_zero = (
+            df[(df["SRC"] != "KMA") & (df["TMD"] == 0)]
+            .dropna(subset=["LAT", "LON"])
+            .drop_duplicates(subset=["SRC"], keep="first")
+        )
+        if model_zero.empty:
+            print("Warning: KMA 0h is missing and no model 0h points are available.")
+            return df.reset_index(drop=True)
+        lat = float(model_zero["LAT"].mean())
+        lon = float(model_zero["LON"].mean())
+        print(
+            "KMA 0h is missing; using the mean of "
+            f"{len(model_zero)} model 0h start point(s): {lat:.2f}N, {lon:.2f}E."
+        )
         kma_start = pd.DataFrame([{
             "FT": 0,
             "YY": int(settings.data_time[:4]),
@@ -862,10 +876,11 @@ def apply_common_kma_start(df: pd.DataFrame, settings: Settings) -> pd.DataFrame
             "TMD": 0,
             "TYP_TM(UTC)": settings.data_time,
             "FT_TM(UTC)": settings.data_time,
-            "LAT": settings.manual_kma_lat,
-            "LON": settings.manual_kma_lon,
+            "LAT": lat,
+            "LON": lon,
             "WS": 0,
             "SRC": "KMA",
+            DATA_SOURCE_COLUMN: "MODEL_0H_MEAN",
         }])
 
     kma_lat = kma_start.iloc[0]["LAT"]
@@ -1228,7 +1243,7 @@ def output_path(settings: Settings) -> Path:
     year_str = storm_year(settings)
     cyclone_id = tc_id(settings)
     stage = settings.storm_stage.upper()
-    storm_name = settings.typ_name or "NAMELESS"
+    storm_name = settings.typ_name or "NONAME"
     if stage == "TD":
         dir_name = f"TD_{cyclone_id}_{storm_name}"
         file_name = f"TD_{cyclone_id}_{storm_name}_{settings.data_time}_{settings.fcst_hours}h.png"
