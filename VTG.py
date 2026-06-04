@@ -186,6 +186,7 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
+MAP_EXTENT_CACHE_VERSION = 1
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
@@ -1476,8 +1477,8 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
         focus_x = 0.37
         focus_y = 0.37
     else:
-        lon_total = max(39.0, lon_span * 1.78 + 11.0)
-        lat_total = max(16.0, lat_span * 1.82 + 7.0)
+        lon_total = max(48.0, lon_span * 1.90 + 14.0)
+        lat_total = max(24.0, lat_span * 1.95 + 10.0)
         focus_x = 0.43
         focus_y = 0.43
 
@@ -1492,6 +1493,96 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
         lat_min,
         lat_max,
     ]
+
+
+def map_extent_cache_path(settings: Settings) -> Path:
+    year_str = storm_year(settings)
+    return settings.output_root / "metadata" / "map_extent" / f"{year_str}_{settings.typ_number:02d}_{settings.fcst_hours}h.json"
+
+
+def valid_extent(value: object) -> list[float] | None:
+    if not isinstance(value, list) or len(value) != 4:
+        return None
+    try:
+        extent = [float(item) for item in value]
+    except (TypeError, ValueError):
+        return None
+    lon_min, lon_max, lat_min, lat_max = extent
+    if lon_max <= lon_min or lat_max <= lat_min:
+        return None
+    return extent
+
+
+def extent_contains(outer: list[float], inner: list[float], *, slack_ratio: float = 0.06) -> bool:
+    outer_lon_span = outer[1] - outer[0]
+    outer_lat_span = outer[3] - outer[2]
+    lon_slack = outer_lon_span * slack_ratio
+    lat_slack = outer_lat_span * slack_ratio
+    return (
+        inner[0] >= outer[0] - lon_slack
+        and inner[1] <= outer[1] + lon_slack
+        and inner[2] >= outer[2] - lat_slack
+        and inner[3] <= outer[3] + lat_slack
+    )
+
+
+def merged_extent(first: list[float], second: list[float]) -> list[float]:
+    return [
+        min(first[0], second[0]),
+        max(first[1], second[1]),
+        min(first[2], second[2]),
+        max(first[3], second[3]),
+    ]
+
+
+def padded_extent(extent: list[float], *, lon_ratio: float = 0.035, lat_ratio: float = 0.05) -> list[float]:
+    lon_pad = (extent[1] - extent[0]) * lon_ratio
+    lat_pad = (extent[3] - extent[2]) * lat_ratio
+    return [
+        extent[0] - lon_pad,
+        extent[1] + lon_pad,
+        extent[2] - lat_pad,
+        extent[3] + lat_pad,
+    ]
+
+
+def stable_240_map_extent(extent: list[float], settings: Settings) -> list[float]:
+    if settings.fcst_hours != 240:
+        return extent
+
+    path = map_extent_cache_path(settings)
+    cached_extent = None
+    payload = None
+    if path.exists():
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            payload = None
+    if isinstance(payload, dict) and payload.get("version") == MAP_EXTENT_CACHE_VERSION:
+        cached_extent = valid_extent(payload.get("extent"))
+
+    if cached_extent and extent_contains(cached_extent, extent):
+        return cached_extent
+
+    stable_extent = padded_extent(merged_extent(cached_extent, extent)) if cached_extent else padded_extent(extent)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(
+            {
+                "version": MAP_EXTENT_CACHE_VERSION,
+                "updated_at_utc": datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"),
+                "storm_year": storm_year(settings),
+                "typ_number": settings.typ_number,
+                "fcst_hours": settings.fcst_hours,
+                "extent": stable_extent,
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return stable_extent
 
 
 def clamp_west_pacific_extent(
@@ -1617,6 +1708,14 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     )
 
     extent = clamp_west_pacific_extent(extent)
+    extent = stable_240_map_extent(extent, settings)
+    extent = match_extent_to_canvas_aspect(
+        extent,
+        fig_width=fig_width,
+        fig_height=fig_height,
+        east_expand_ratio=0.68 if settings.auto_extent else 0.75,
+    )
+    extent = clamp_west_pacific_extent(extent)
 
     data_crs = ccrs.PlateCarree()
     map_crs = ccrs.Mercator()
@@ -1697,12 +1796,9 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str) -
         zorder=100,
     )
 
-    if display_name:
-        fig.canvas.draw()
-        bbox = title_text.get_window_extent().transformed(ax.transAxes.inverted())
-        storm_x = bbox.x1 + 0.005
-    else:
-        storm_x = 0.185
+    fig.canvas.draw()
+    bbox = title_text.get_window_extent().transformed(ax.transAxes.inverted())
+    storm_x = bbox.x1 + 0.004
 
     if storm_number:
         ax.text(storm_x, 0.966, storm_number, transform=ax.transAxes, fontsize=17.5 if not display_name else 16.5,
