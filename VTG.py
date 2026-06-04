@@ -76,7 +76,7 @@ MODEL_INFO = [
     {"name": "PGUM_AI", "color": "#727EF2", "style": "--", "label": "Pangu-Weather-UM", "zorder": 63},
     {"name": "GCEC_AI", "color": "#4D248D", "style": "--", "label": "GraphCast-ECMWF", "zorder": 68},
     {"name": "GCKM_AI", "color": "#6C33C6", "style": "--", "label": "GraphCast-KIM", "zorder": 67},
-    {"name": "GCUM_AI", "color": "#9866C7", "style": "--", "label": "GraphCast-UM", "zorder": 66},
+    {"name": "GCUM_AI", "color": "#B57AD5", "style": "--", "label": "GraphCast-UM", "zorder": 66},
     {"name": "GENC", "color": "#9866C7", "style": "--", "label": "GenCast", "zorder": 69},
     {"name": "FNV3", "color": "#DA70D6", "style": "--", "label": "FNV3", "zorder": 99},
     {"name": "HKO_AREC", "color": "#1E90FF", "style": "--", "label": "Aurora-ECMWF", "zorder": 66},
@@ -2369,7 +2369,7 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str) -
     title = f"{intensity} {cyclone_id} {display_name}".strip()
     title_text = ax.text(
         0.022,
-        0.982 if display_name else 0.980,
+        0.980,
         title,
         transform=ax.transAxes,
         fontsize=38,

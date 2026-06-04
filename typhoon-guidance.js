@@ -159,6 +159,7 @@ const TYPHOON_MODEL_INFO_COLORS={
 'Pangu-Weather-KIM':'#727EF2',
 'GraphCast-ECMWF':'#4D248D',
 'GraphCast-KIM':'#6C33C6',
+'GraphCast-UM':'#B57AD5',
 'GenCast':'#9866C7',
 'FNV3':'#DA70D6',
 'Aurora-ECMWF':'#1E90FF',
