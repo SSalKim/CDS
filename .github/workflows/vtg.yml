@@ -73,21 +73,38 @@ jobs:
               payload = json.load(handle)
 
           selected = None
+          selected_has_cds_label = False
           for runner in payload.get("runners", []):
               labels = {str(label.get("name", "")).lower() for label in runner.get("labels", [])}
+              name = str(runner.get("name", "")).lower()
+              print(
+                  "runner:",
+                  runner.get("name"),
+                  "status=",
+                  runner.get("status"),
+                  "busy=",
+                  runner.get("busy"),
+                  "labels=",
+                  ",".join(sorted(labels)),
+              )
               if (
                   runner.get("status") == "online"
                   and not runner.get("busy")
-                  and "cds-vtg" in labels
+                  and ("cds-vtg" in labels or name == "cds-vtg-laptop")
               ):
                   selected = runner
+                  selected_has_cds_label = "cds-vtg" in labels
                   break
 
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
               if selected:
                   print(f"Using self-hosted runner: {selected.get('name')}")
                   output.write("runner_kind=self-hosted\n")
-                  output.write('runner_labels=["self-hosted","cds-vtg"]\n')
+                  if selected_has_cds_label:
+                      output.write('runner_labels=["self-hosted","cds-vtg"]\n')
+                  else:
+                      print("Warning: selected runner is missing the cds-vtg label; using generic self-hosted routing.")
+                      output.write('runner_labels=["self-hosted"]\n')
               else:
                   print("No idle cds-vtg self-hosted runner found; using GitHub-hosted.")
                   output.write("runner_kind=github-hosted\n")
