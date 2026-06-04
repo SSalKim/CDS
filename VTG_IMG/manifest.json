@@ -1,99 +1,109 @@
 {
-  "updated_at_utc": "202602042300",
+  "updated_at_utc": "202606042122",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202602041800",
-      "cycle_time_utc": "202602041800",
-      "start_utc": "202602042300",
-      "end_utc": "202602050500"
+      "data_time": "202606041200",
+      "cycle_time_utc": "202606041200",
+      "start_utc": "202606041700",
+      "end_utc": "202606042300"
     }
   ],
   "runs": [
     {
       "job": {
-        "storm_key": "typ_2026_02",
-        "stage": "TYP_LINKED_ATCF_PENDING",
+        "storm_key": "td_2026_11",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202602041800",
-        "td_number": null,
-        "linked_td_number": 3,
-        "typ_number": 2,
-        "typ_name_ko": "페냐",
-        "typ_name": "PENHA",
-        "typ_en": "PENHA",
-        "atcf_id": null,
-        "skip_atcf": true,
-        "atcf_match_method": "",
-        "reason": "ATCF name match not found; generating KMA-only guidance.",
-        "analysis_point": null,
-        "analysis_source": "",
-        "analysis_match_method": "",
-        "analysis_distance_km": null
+        "data_time": "202606041200",
+        "td_number": 11,
+        "linked_td_number": null,
+        "typ_number": 11,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp912026",
+        "skip_atcf": false,
+        "atcf_match_method": "position",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (99 km).",
+        "analysis_point": {
+          "time_utc": "202606041200",
+          "lat": 20.2,
+          "lon": 119.1
+        },
+        "analysis_source": "BDECK",
+        "analysis_match_method": "position",
+        "analysis_distance_km": 99.3420350029941
       },
       "window": {
-        "data_time": "202602041800",
-        "cycle_time_utc": "202602041800",
-        "start_utc": "202602042300",
-        "end_utc": "202602050500"
+        "data_time": "202606041200",
+        "cycle_time_utc": "202606041200",
+        "start_utc": "202606041700",
+        "end_utc": "202606042300"
       },
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602041800_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602041800_240h.png\n",
-        "stderr": "nd will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202602041800_typ_2026_02_120h.json",
+        "stdout": "Using plot font: NanumSquare\nCMC_EPS KNACKWX: trimmed after 120h due to forecast gap to 156h\nECMWF: selected NOAA ATCF by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF, KNACKWX ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nGENC KNACKWX: trimmed after 84h due to forecast gap to 120h\nKMA 0h is missing; using BDECK analysis point: 20.20N, 119.10E.\nFNEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nGCEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nIFEC_AI APIHUB: trimmed 8 point(s) after 186h due to suspected dateline-reflected longitude tail\nIFKM_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nPGEC_AI APIHUB: trimmed 7 point(s) after 192h due to suspected dateline-reflected longitude tail\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png\n240h map extent was too broad; using expanded 120h anchor (97.3 lon x 53.2 lat).\n240h map extent candidate is too broad for stable cache; using uncached extent (127.3 lon x 63.3 lat).\n240h stable map extent was too broad after aspect matching; falling back to expanded 120h anchor.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png\n",
+        "stderr": "",
+        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606041200_td_2026_11_120h.json",
         "metadata": {
-          "generated_at_utc": "20260604210901",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
-          "image_path": "VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602041800_120h.png",
-          "storm_stage": "TYP",
+          "generated_at_utc": "20260604212445",
+          "render_signature": "a4daf4c51c3c7aa4c08992beceb93ff8eca001d89aad1d4d86dbaba802a5b1d5",
+          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png",
+          "storm_stage": "TD",
           "storm_year": "2026",
-          "typ_number": 2,
-          "typ_name": "PENHA",
-          "typ_name_ko": "페냐",
-          "linked_td_number": 3,
-          "atcf_id": "",
+          "typ_number": 11,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "atcf_id": "wp912026",
           "extra_atcf_ids": [],
-          "data_time": "202602041800",
+          "data_time": "202606041200",
           "fcst_hours": 120,
-          "intensity": "TYP",
-          "model_count": 13,
-          "target_model_count": 39,
+          "intensity": "TD",
+          "model_count": 16,
+          "target_model_count": 36,
           "models": [
+            "CMC",
+            "CMC_EPS",
             "ECMWF",
             "ECMWF_AIFS",
+            "ECMWF_AIFS_EPS",
             "ECMWF_EPS",
+            "FNEC_AI",
+            "FNV3",
+            "GCEC_AI",
+            "GENC",
             "GFS",
             "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "TEPS",
-            "UM_GFDL_6h"
+            "IFEC_AI",
+            "IFKM_AI",
+            "NAVGEM",
+            "PGEC_AI"
           ],
           "model_labels": [
+            "CMC",
+            "CMC EPS",
             "ECMWF",
             "ECMWF AIFS",
+            "ECMWF AIFS EPS",
             "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FNV3",
+            "GraphCast-ECMWF",
+            "GenCast",
             "GFS",
             "GFS EPS",
-            "HAFS",
-            "Aurora-ECMWF",
-            "FengWu-ECMWF",
-            "FuXi-ECMWF",
-            "HWRF",
-            "JGSM",
-            "JGSM EPS",
-            "UM"
+            "KMA AIFS-ECMWF",
+            "KMA AIFS-KIM",
+            "NAVGEM",
+            "Pangu-Weather-ECMWF"
           ],
-          "skip_atcf": true
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -101,85 +111,95 @@
     },
     {
       "job": {
-        "storm_key": "typ_2026_02",
-        "stage": "TYP_LINKED_ATCF_PENDING",
+        "storm_key": "td_2026_11",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202602041800",
-        "td_number": null,
-        "linked_td_number": 3,
-        "typ_number": 2,
-        "typ_name_ko": "페냐",
-        "typ_name": "PENHA",
-        "typ_en": "PENHA",
-        "atcf_id": null,
-        "skip_atcf": true,
-        "atcf_match_method": "",
-        "reason": "ATCF name match not found; generating KMA-only guidance.",
-        "analysis_point": null,
-        "analysis_source": "",
-        "analysis_match_method": "",
-        "analysis_distance_km": null
+        "data_time": "202606041200",
+        "td_number": 11,
+        "linked_td_number": null,
+        "typ_number": 11,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp912026",
+        "skip_atcf": false,
+        "atcf_match_method": "position",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (99 km).",
+        "analysis_point": {
+          "time_utc": "202606041200",
+          "lat": 20.2,
+          "lon": 119.1
+        },
+        "analysis_source": "BDECK",
+        "analysis_match_method": "position",
+        "analysis_distance_km": 99.3420350029941
       },
       "window": {
-        "data_time": "202602041800",
-        "cycle_time_utc": "202602041800",
-        "start_utc": "202602042300",
-        "end_utc": "202602050500"
+        "data_time": "202606041200",
+        "cycle_time_utc": "202606041200",
+        "start_utc": "202606041700",
+        "end_utc": "202606042300"
       },
       "result": {
         "status": "ok",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602041800_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602041800_240h.png\n",
-        "stderr": "nd will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202602041800_typ_2026_02_240h.json",
+        "stdout": "Using plot font: NanumSquare\nCMC_EPS KNACKWX: trimmed after 120h due to forecast gap to 156h\nECMWF: selected NOAA ATCF by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF, KNACKWX ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nGENC KNACKWX: trimmed after 84h due to forecast gap to 120h\nKMA 0h is missing; using BDECK analysis point: 20.20N, 119.10E.\nFNEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nGCEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nIFEC_AI APIHUB: trimmed 8 point(s) after 186h due to suspected dateline-reflected longitude tail\nIFKM_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nPGEC_AI APIHUB: trimmed 7 point(s) after 192h due to suspected dateline-reflected longitude tail\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png\n240h map extent was too broad; using expanded 120h anchor (97.3 lon x 53.2 lat).\n240h map extent candidate is too broad for stable cache; using uncached extent (127.3 lon x 63.3 lat).\n240h stable map extent was too broad after aspect matching; falling back to expanded 120h anchor.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png\n",
+        "stderr": "",
+        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606041200_td_2026_11_240h.json",
         "metadata": {
-          "generated_at_utc": "20260604210902",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
-          "image_path": "VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602041800_240h.png",
-          "storm_stage": "TYP",
+          "generated_at_utc": "20260604212447",
+          "render_signature": "a4daf4c51c3c7aa4c08992beceb93ff8eca001d89aad1d4d86dbaba802a5b1d5",
+          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png",
+          "storm_stage": "TD",
           "storm_year": "2026",
-          "typ_number": 2,
-          "typ_name": "PENHA",
-          "typ_name_ko": "페냐",
-          "linked_td_number": 3,
-          "atcf_id": "",
+          "typ_number": 11,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "atcf_id": "wp912026",
           "extra_atcf_ids": [],
-          "data_time": "202602041800",
+          "data_time": "202606041200",
           "fcst_hours": 240,
-          "intensity": "TYP",
-          "model_count": 13,
-          "target_model_count": 39,
+          "intensity": "TD",
+          "model_count": 16,
+          "target_model_count": 36,
           "models": [
+            "CMC",
+            "CMC_EPS",
             "ECMWF",
             "ECMWF_AIFS",
+            "ECMWF_AIFS_EPS",
             "ECMWF_EPS",
+            "FNEC_AI",
+            "FNV3",
+            "GCEC_AI",
+            "GENC",
             "GFS",
             "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "TEPS",
-            "UM_GFDL_6h"
+            "IFEC_AI",
+            "IFKM_AI",
+            "NAVGEM",
+            "PGEC_AI"
           ],
           "model_labels": [
+            "CMC",
+            "CMC EPS",
             "ECMWF",
             "ECMWF AIFS",
+            "ECMWF AIFS EPS",
             "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FNV3",
+            "GraphCast-ECMWF",
+            "GenCast",
             "GFS",
             "GFS EPS",
-            "HAFS",
-            "Aurora-ECMWF",
-            "FengWu-ECMWF",
-            "FuXi-ECMWF",
-            "HWRF",
-            "JGSM",
-            "JGSM EPS",
-            "UM"
+            "KMA AIFS-ECMWF",
+            "KMA AIFS-KIM",
+            "NAVGEM",
+            "Pangu-Weather-ECMWF"
           ],
-          "skip_atcf": true
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -5618,7 +5638,7 @@
     {
       "job": {
         "storm_key": "typ_2026_02",
-        "stage": "TYP_LINKED_ATCF_PENDING",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202602041800",
         "td_number": null,
@@ -5627,27 +5647,15 @@
         "typ_name_ko": "페냐",
         "typ_name": "PENHA",
         "typ_en": "PENHA",
-        "atcf_id": null,
-        "skip_atcf": true,
-        "atcf_match_method": "",
-        "reason": "ATCF name match not found; generating KMA-only guidance.",
-        "analysis_point": null,
-        "analysis_source": "",
-        "analysis_match_method": "",
-        "analysis_distance_km": null
+        "atcf_id": "",
+        "fcst_hours": 120,
+        "skip_atcf": true
       },
       "window": {
-        "data_time": "202602041800",
-        "cycle_time_utc": "202602041800",
-        "start_utc": "202602042300",
-        "end_utc": "202602050500"
+        "data_time": "202602041800"
       },
       "result": {
-        "status": "ok",
-        "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602041800_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602041800_240h.png\n",
-        "stderr": "nd will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202602041800_typ_2026_02_120h.json",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604210901",
           "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
@@ -5698,13 +5706,12 @@
           "skip_atcf": true
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202602041800_typ_2026_02_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_02",
-        "stage": "TYP_LINKED_ATCF_PENDING",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202602041800",
         "td_number": null,
@@ -5713,27 +5720,15 @@
         "typ_name_ko": "페냐",
         "typ_name": "PENHA",
         "typ_en": "PENHA",
-        "atcf_id": null,
-        "skip_atcf": true,
-        "atcf_match_method": "",
-        "reason": "ATCF name match not found; generating KMA-only guidance.",
-        "analysis_point": null,
-        "analysis_source": "",
-        "analysis_match_method": "",
-        "analysis_distance_km": null
+        "atcf_id": "",
+        "fcst_hours": 240,
+        "skip_atcf": true
       },
       "window": {
-        "data_time": "202602041800",
-        "cycle_time_utc": "202602041800",
-        "start_utc": "202602042300",
-        "end_utc": "202602050500"
+        "data_time": "202602041800"
       },
       "result": {
-        "status": "ok",
-        "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602041800_120h.png\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602041800_240h.png\n",
-        "stderr": "nd will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1286: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:1287: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202602041800.0' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202602041800_typ_2026_02_240h.json",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604210902",
           "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
@@ -5784,8 +5779,7 @@
           "skip_atcf": true
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202602041800_typ_2026_02_240h.json"
     },
     {
       "job": {
@@ -8845,7 +8839,7 @@
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606041200",
         "td_number": 11,
@@ -8853,19 +8847,35 @@
         "typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp912026",
-        "fcst_hours": 120,
-        "skip_atcf": false
+        "skip_atcf": false,
+        "atcf_match_method": "position",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (99 km).",
+        "analysis_point": {
+          "time_utc": "202606041200",
+          "lat": 20.2,
+          "lon": 119.1
+        },
+        "analysis_source": "BDECK",
+        "analysis_match_method": "position",
+        "analysis_distance_km": 99.3420350029941
       },
       "window": {
-        "data_time": "202606041200"
+        "data_time": "202606041200",
+        "cycle_time_utc": "202606041200",
+        "start_utc": "202606041700",
+        "end_utc": "202606042300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
+        "returncode": 0,
+        "stdout": "Using plot font: NanumSquare\nCMC_EPS KNACKWX: trimmed after 120h due to forecast gap to 156h\nECMWF: selected NOAA ATCF by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF, KNACKWX ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nGENC KNACKWX: trimmed after 84h due to forecast gap to 120h\nKMA 0h is missing; using BDECK analysis point: 20.20N, 119.10E.\nFNEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nGCEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nIFEC_AI APIHUB: trimmed 8 point(s) after 186h due to suspected dateline-reflected longitude tail\nIFKM_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nPGEC_AI APIHUB: trimmed 7 point(s) after 192h due to suspected dateline-reflected longitude tail\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png\n240h map extent was too broad; using expanded 120h anchor (97.3 lon x 53.2 lat).\n240h map extent candidate is too broad for stable cache; using uncached extent (127.3 lon x 63.3 lat).\n240h stable map extent was too broad after aspect matching; falling back to expanded 120h anchor.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png\n",
+        "stderr": "",
+        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606041200_td_2026_11_120h.json",
         "metadata": {
-          "generated_at_utc": "20260604210503",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
+          "generated_at_utc": "20260604212445",
+          "render_signature": "a4daf4c51c3c7aa4c08992beceb93ff8eca001d89aad1d4d86dbaba802a5b1d5",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -8878,7 +8888,7 @@
           "data_time": "202606041200",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 15,
+          "model_count": 16,
           "target_model_count": 36,
           "models": [
             "CMC",
@@ -8893,6 +8903,7 @@
             "GENC",
             "GFS",
             "GFS_EPS",
+            "IFEC_AI",
             "IFKM_AI",
             "NAVGEM",
             "PGEC_AI"
@@ -8910,6 +8921,7 @@
             "GenCast",
             "GFS",
             "GFS EPS",
+            "KMA AIFS-ECMWF",
             "KMA AIFS-KIM",
             "NAVGEM",
             "Pangu-Weather-ECMWF"
@@ -8917,12 +8929,13 @@
           "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202606041200_td_2026_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606041200",
         "td_number": 11,
@@ -8930,19 +8943,35 @@
         "typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp912026",
-        "fcst_hours": 240,
-        "skip_atcf": false
+        "skip_atcf": false,
+        "atcf_match_method": "position",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (99 km).",
+        "analysis_point": {
+          "time_utc": "202606041200",
+          "lat": 20.2,
+          "lon": 119.1
+        },
+        "analysis_source": "BDECK",
+        "analysis_match_method": "position",
+        "analysis_distance_km": 99.3420350029941
       },
       "window": {
-        "data_time": "202606041200"
+        "data_time": "202606041200",
+        "cycle_time_utc": "202606041200",
+        "start_utc": "202606041700",
+        "end_utc": "202606042300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
+        "returncode": 0,
+        "stdout": "Using plot font: NanumSquare\nCMC_EPS KNACKWX: trimmed after 120h due to forecast gap to 156h\nECMWF: selected NOAA ATCF by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF, KNACKWX ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nGENC KNACKWX: trimmed after 84h due to forecast gap to 120h\nKMA 0h is missing; using BDECK analysis point: 20.20N, 119.10E.\nFNEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nGCEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nIFEC_AI APIHUB: trimmed 8 point(s) after 186h due to suspected dateline-reflected longitude tail\nIFKM_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nPGEC_AI APIHUB: trimmed 7 point(s) after 192h due to suspected dateline-reflected longitude tail\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png\n240h map extent was too broad; using expanded 120h anchor (97.3 lon x 53.2 lat).\n240h map extent candidate is too broad for stable cache; using uncached extent (127.3 lon x 63.3 lat).\n240h stable map extent was too broad after aspect matching; falling back to expanded 120h anchor.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png\n",
+        "stderr": "",
+        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606041200_td_2026_11_240h.json",
         "metadata": {
-          "generated_at_utc": "20260604210505",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
+          "generated_at_utc": "20260604212447",
+          "render_signature": "a4daf4c51c3c7aa4c08992beceb93ff8eca001d89aad1d4d86dbaba802a5b1d5",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -8955,7 +8984,7 @@
           "data_time": "202606041200",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 15,
+          "model_count": 16,
           "target_model_count": 36,
           "models": [
             "CMC",
@@ -8970,6 +8999,7 @@
             "GENC",
             "GFS",
             "GFS_EPS",
+            "IFEC_AI",
             "IFKM_AI",
             "NAVGEM",
             "PGEC_AI"
@@ -8987,6 +9017,7 @@
             "GenCast",
             "GFS",
             "GFS EPS",
+            "KMA AIFS-ECMWF",
             "KMA AIFS-KIM",
             "NAVGEM",
             "Pangu-Weather-ECMWF"
@@ -8994,7 +9025,8 @@
           "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202606041200_td_2026_11_240h.json"
+      "completed": false,
+      "final_check": false
     }
   ]
 }
