@@ -32,6 +32,16 @@ VALID_FCST_HOURS = (120, 240)
 CYCLE_HOURS = (0, 6, 12, 18)
 WINDOW_START_OFFSET_HOURS = 3
 WINDOW_END_OFFSET_HOURS = 12
+REQUEST_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/125.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/csv,text/plain,*/*",
+    "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Connection": "close",
+}
 
 
 @dataclass(frozen=True)
@@ -114,7 +124,7 @@ def active_typ_at(now: datetime, row: dict) -> bool:
 def fetch_text(url: str, *, timeout: float = 12, retries: int = 2, retry_delay: float = 3.0) -> str:
     last_error: Exception | None = None
     for attempt in range(retries + 1):
-        request = Request(url, headers={"User-Agent": "CDS-VTG-Auto/1.0"})
+        request = Request(url, headers=REQUEST_HEADERS)
         try:
             with urlopen(request, timeout=timeout) as response:
                 data = response.read()
@@ -200,7 +210,11 @@ def load_cached_kma_rows(cache_dir: Path | None, endpoint: str, year: int) -> li
 def write_cached_kma_rows(cache_dir: Path | None, endpoint: str, year: int, rows: list[dict]) -> None:
     if cache_dir is None:
         return
-    write_json(kma_cache_path(cache_dir, endpoint, year), {
+    path = kma_cache_path(cache_dir, endpoint, year)
+    previous = load_json(path, None)
+    if isinstance(previous, dict) and previous.get("rows") == rows:
+        return
+    write_json(path, {
         "updated_at_utc": format_utc_stamp(utc_now()),
         "endpoint": endpoint,
         "year": year,
@@ -525,6 +539,17 @@ def write_json(path: Path, payload) -> None:
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
+
+
+def write_github_outputs(path: Path | None, outputs: dict[str, object]) -> None:
+    if path is None:
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        for key, value in outputs.items():
+            if isinstance(value, bool):
+                value = "true" if value else "false"
+            handle.write(f"{key}={value}\n")
 
 
 def load_manual_map(path: Path | None) -> dict:
@@ -1096,6 +1121,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--atcf-position-max-distance-km", type=float, default=DEFAULT_ATCF_POSITION_MAX_DISTANCE_KM)
     parser.add_argument("--atcf-position-min-distance-gap-km", type=float, default=DEFAULT_ATCF_POSITION_MIN_DISTANCE_GAP_KM)
     parser.add_argument("--index-only", action="store_true", help="Rebuild manifest inventory from existing PNG/metadata files and exit.")
+    parser.add_argument("--check-run-needed", action="store_true", help="Only check whether image generation is needed and exit.")
+    parser.add_argument("--github-output", type=Path, default=None, help="Optional GitHub Actions output file for --check-run-needed.")
     parser.add_argument("--force", action="store_true", help="Run even if a previous metadata record met the completion target.")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
@@ -1221,6 +1248,16 @@ def main() -> int:
                     })
                     continue
                 actual_run_count += 1
+                if args.check_run_needed:
+                    run_entries.append({
+                        "job": asdict(job),
+                        "window": asdict(window),
+                        "result": {
+                            "status": "planned",
+                            "final_check_window": final_check_window,
+                        },
+                    })
+                    continue
                 result = run_vtg(
                     job=job,
                     output_root=output_root,
@@ -1254,6 +1291,26 @@ def main() -> int:
                     "completed": completed,
                     "final_check": final_check_window,
                 })
+
+    if args.check_run_needed:
+        run_needed = actual_run_count > 0
+        payload = {
+            "updated_at_utc": format_utc_stamp(now),
+            "run_needed": run_needed,
+            "deps_needed": run_needed,
+            "run_step_needed": run_needed,
+            "planned_run_count": actual_run_count,
+            "active_windows": [asdict(window) for window in windows],
+            "runs": run_entries,
+        }
+        write_github_outputs(args.github_output, {
+            "run_needed": run_needed,
+            "deps_needed": run_needed,
+            "run_step_needed": run_needed,
+            "planned_run_count": actual_run_count,
+        })
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return 0
 
     previous_manifest = load_json(manifest_path, {})
     manifest = {

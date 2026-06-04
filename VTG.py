@@ -242,6 +242,16 @@ KMA_BASE_URL = "https://apihub-pub.kma.go.kr/api/typ01/url/typ_gts_now.php"
 DEFAULT_AUTH_KEY = ""
 VALID_FCST_HOURS = (120, 240)
 PROJECT_ROOT = Path(__file__).resolve().parent
+REQUEST_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/125.0.0.0 Safari/537.36"
+    ),
+    "Accept": "text/csv,text/plain,*/*",
+    "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+    "Connection": "close",
+}
 
 
 @dataclass(frozen=True)
@@ -1861,6 +1871,7 @@ def main() -> None:
     fetch_settings = replace(settings, fcst_hours=max(settings.fcst_hours, 240)) if settings.auto_fcst_hours else settings
 
     with requests.Session() as session:
+        session.headers.update(REQUEST_HEADERS)
         kma_forecast_text = fetch_text(
             session,
             kma_url(fetch_settings, "2"),
