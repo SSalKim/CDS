@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "202606040542",
+  "updated_at_utc": "202606040552",
   "window_start_offset_hours": 3,
   "window_end_offset_hours": 12,
   "complete_model_count": 36,
@@ -45,11 +45,11 @@
       "result": {
         "status": "no_output",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/awp912026.dat (HTTPSConnectionPool(host='www.emc.ncep.noaa.gov', port=443): Max retries exceeded with url: /gc_wmb/vxt/DECKS/awp912026.dat (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.emc.ncep.noaa.gov', port=443) at 0x720b0a0bc690>, 'Connection to www.emc.ncep.noaa.gov timed out. (connect timeout=15)')))\n[attempt 2/2] request failed: https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/awp912026.dat (HTTPSConnectionPool(host='www.emc.ncep.noaa.gov', port=443): Max retries exceeded with url: /gc_wmb/vxt/DECKS/awp912026.dat (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.emc.ncep.noaa.gov', port=443) at 0x720b0a0bcb90>, 'Connection to www.emc.ncep.noaa.gov timed out. (connect timeout=15)')))\nKMA 0h is missing; using the mean of 1 model 0h start point(s): 18.50N, 116.00E.\n120h: No available model forecast points for this storm/time.\n240h: No available model forecast points for this storm/time.\n",
+        "stdout": "Using plot font: NanumSquare\nKMA 0h is missing; using the mean of 1 model 0h start point(s): 18.50N, 116.00E.\n120h: No available model forecast points for this storm/time.\n240h: No available model forecast points for this storm/time.\n",
         "stderr": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:797: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031800' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031800' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
         "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606031800_td_2026_11_120h.json",
         "metadata": {
-          "generated_at_utc": "20260604054802",
+          "generated_at_utc": "20260604055609",
           "render_signature": "2c30f03cfd044741b27d5c477ffcb15138a909c7b2c0c3fab80d403532a42390",
           "image_path": "",
           "storm_stage": "TD",
@@ -73,7 +73,7 @@
         }
       },
       "completed": false,
-      "final_check": false
+      "final_check": true
     },
     {
       "job": {
@@ -101,11 +101,11 @@
       "result": {
         "status": "no_output",
         "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\n[attempt 1/2] request failed: https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/awp912026.dat (HTTPSConnectionPool(host='www.emc.ncep.noaa.gov', port=443): Max retries exceeded with url: /gc_wmb/vxt/DECKS/awp912026.dat (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.emc.ncep.noaa.gov', port=443) at 0x720b0a0bc690>, 'Connection to www.emc.ncep.noaa.gov timed out. (connect timeout=15)')))\n[attempt 2/2] request failed: https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/awp912026.dat (HTTPSConnectionPool(host='www.emc.ncep.noaa.gov', port=443): Max retries exceeded with url: /gc_wmb/vxt/DECKS/awp912026.dat (Caused by ConnectTimeoutError(<HTTPSConnection(host='www.emc.ncep.noaa.gov', port=443) at 0x720b0a0bcb90>, 'Connection to www.emc.ncep.noaa.gov timed out. (connect timeout=15)')))\nKMA 0h is missing; using the mean of 1 model 0h start point(s): 18.50N, 116.00E.\n120h: No available model forecast points for this storm/time.\n240h: No available model forecast points for this storm/time.\n",
+        "stdout": "Using plot font: NanumSquare\nKMA 0h is missing; using the mean of 1 model 0h start point(s): 18.50N, 116.00E.\n120h: No available model forecast points for this storm/time.\n240h: No available model forecast points for this storm/time.\n",
         "stderr": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:797: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031800' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031800' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
         "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606031800_td_2026_11_240h.json",
         "metadata": {
-          "generated_at_utc": "20260604054802",
+          "generated_at_utc": "20260604055609",
           "render_signature": "2c30f03cfd044741b27d5c477ffcb15138a909c7b2c0c3fab80d403532a42390",
           "image_path": "",
           "storm_stage": "TD",
@@ -129,7 +129,7 @@
         }
       },
       "completed": false,
-      "final_check": false
+      "final_check": true
     },
     {
       "job": {
@@ -161,7 +161,7 @@
         "stderr": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:797: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
         "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606040000_td_2026_11_120h.json",
         "metadata": {
-          "generated_at_utc": "20260604054805",
+          "generated_at_utc": "20260604055611",
           "render_signature": "2c30f03cfd044741b27d5c477ffcb15138a909c7b2c0c3fab80d403532a42390",
           "image_path": "",
           "storm_stage": "TD",
@@ -217,7 +217,7 @@
         "stderr": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:797: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:933: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"TYP_TM(UTC)\"] = kma_tm\n/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG.py:934: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
         "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606040000_td_2026_11_240h.json",
         "metadata": {
-          "generated_at_utc": "20260604054805",
+          "generated_at_utc": "20260604055611",
           "render_signature": "2c30f03cfd044741b27d5c477ffcb15138a909c7b2c0c3fab80d403532a42390",
           "image_path": "",
           "storm_stage": "TD",
