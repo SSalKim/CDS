@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "202606040335",
+  "updated_at_utc": "202606040354",
   "window_start_offset_hours": 3,
   "window_end_offset_hours": 12,
   "complete_model_count": 36,
@@ -22,7 +22,7 @@
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606031800",
         "td_number": 11,
@@ -31,10 +31,10 @@
         "typ_name_ko": "",
         "typ_name": "NONAME",
         "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true,
-        "atcf_match_method": "",
-        "reason": "TD has no linked typhoon number yet."
+        "atcf_id": "wp912026",
+        "skip_atcf": false,
+        "atcf_match_method": "position",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (169 km)."
       },
       "window": {
         "data_time": "202606031800",
@@ -43,32 +43,42 @@
         "end_utc": "202606040600"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "returncode": 0,
-        "stdout": "KMA 0h is missing; using the mean of 1 model 0h start point(s): 18.50N, 116.00E.\nNo available model forecast points for this storm/time.\n",
-        "stderr": "/home/runner/work/CDS/CDS/VTG.py:785: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)\n/home/runner/work/CDS/CDS/VTG.py:908: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031800' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
+        "stdout": "KMA 0h is missing; using the mean of 1 model 0h start point(s): 18.50N, 116.00E.\nNo KMA past track data to plot.\nSaved: /home/runner/work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031800_120h.png\n",
+        "stderr": "und.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\n",
         "metadata_path": "/home/runner/work/CDS/CDS/VTG_IMG/metadata/202606031800_td_2026_11_120h.json",
         "metadata": {
-          "generated_at_utc": "20260604033529",
-          "image_path": "",
+          "generated_at_utc": "20260604035640",
+          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 11,
           "typ_name": "NONAME",
           "typ_name_ko": "",
           "linked_td_number": null,
-          "atcf_id": "",
+          "atcf_id": "wp912026",
           "extra_atcf_ids": [],
           "data_time": "202606031800",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 5,
           "target_model_count": 36,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": true,
-          "no_output": true,
-          "no_output_reason": "No available model forecast points for this storm/time."
+          "models": [
+            "ECMWF_EPS",
+            "FNV3",
+            "GENC",
+            "GFS",
+            "GFS_EPS"
+          ],
+          "model_labels": [
+            "ECMWF EPS",
+            "FNV3",
+            "GenCast",
+            "GFS",
+            "GFS EPS"
+          ],
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -77,7 +87,7 @@
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606031800",
         "td_number": 11,
@@ -86,10 +96,10 @@
         "typ_name_ko": "",
         "typ_name": "NONAME",
         "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true,
-        "atcf_match_method": "",
-        "reason": "TD has no linked typhoon number yet."
+        "atcf_id": "wp912026",
+        "skip_atcf": false,
+        "atcf_match_method": "position",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (169 km)."
       },
       "window": {
         "data_time": "202606031800",
@@ -98,32 +108,42 @@
         "end_utc": "202606040600"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "returncode": 0,
-        "stdout": "KMA 0h is missing; using the mean of 1 model 0h start point(s): 18.50N, 116.00E.\nNo available model forecast points for this storm/time.\n",
-        "stderr": "/home/runner/work/CDS/CDS/VTG.py:785: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)\n/home/runner/work/CDS/CDS/VTG.py:908: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606031800' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
+        "stdout": "GENC KNACKWX: trimmed after 96h due to forecast gap to 132h\nKMA 0h is missing; using the mean of 1 model 0h start point(s): 18.50N, 116.00E.\nNo KMA past track data to plot.\nSaved: /home/runner/work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031800_240h.png\n",
+        "stderr": "und.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\n",
         "metadata_path": "/home/runner/work/CDS/CDS/VTG_IMG/metadata/202606031800_td_2026_11_240h.json",
         "metadata": {
-          "generated_at_utc": "20260604033536",
-          "image_path": "",
+          "generated_at_utc": "20260604035732",
+          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 11,
           "typ_name": "NONAME",
           "typ_name_ko": "",
           "linked_td_number": null,
-          "atcf_id": "",
+          "atcf_id": "wp912026",
           "extra_atcf_ids": [],
           "data_time": "202606031800",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 5,
           "target_model_count": 36,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": true,
-          "no_output": true,
-          "no_output_reason": "No available model forecast points for this storm/time."
+          "models": [
+            "ECMWF_EPS",
+            "FNV3",
+            "GENC",
+            "GFS",
+            "GFS_EPS"
+          ],
+          "model_labels": [
+            "ECMWF EPS",
+            "FNV3",
+            "GenCast",
+            "GFS",
+            "GFS EPS"
+          ],
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -159,7 +179,7 @@
         "stderr": "/home/runner/work/CDS/CDS/VTG.py:785: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)\n/home/runner/work/CDS/CDS/VTG.py:908: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
         "metadata_path": "/home/runner/work/CDS/CDS/VTG_IMG/metadata/202606040000_td_2026_11_120h.json",
         "metadata": {
-          "generated_at_utc": "20260604033543",
+          "generated_at_utc": "20260604035739",
           "image_path": "",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -214,7 +234,7 @@
         "stderr": "/home/runner/work/CDS/CDS/VTG.py:785: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)\n/home/runner/work/CDS/CDS/VTG.py:908: FutureWarning: Setting an item of incompatible dtype is deprecated and will raise in a future error of pandas. Value '202606040000' has dtype incompatible with float64, please explicitly cast to a compatible dtype first.\n  model_start.loc[:, \"FT_TM(UTC)\"] = kma_tm\n",
         "metadata_path": "/home/runner/work/CDS/CDS/VTG_IMG/metadata/202606040000_td_2026_11_240h.json",
         "metadata": {
-          "generated_at_utc": "20260604033550",
+          "generated_at_utc": "20260604035743",
           "image_path": "",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -323,7 +343,7 @@
       "result": {
         "status": "inventory",
         "metadata": {
-          "generated_at_utc": "20260604033410",
+          "generated_at_utc": "20260604035246",
           "image_path": "VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202605310000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -2907,6 +2927,136 @@
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606031200_td_2026_11_240h.json"
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_11",
+        "stage": "TD_POSITION_ATCF",
+        "year": 2026,
+        "data_time": "202606031800",
+        "td_number": 11,
+        "linked_td_number": null,
+        "typ_number": 11,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp912026",
+        "skip_atcf": false,
+        "atcf_match_method": "position",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (169 km)."
+      },
+      "window": {
+        "data_time": "202606031800",
+        "cycle_time_utc": "202606031800",
+        "start_utc": "202606032100",
+        "end_utc": "202606040600"
+      },
+      "result": {
+        "status": "ok",
+        "returncode": 0,
+        "stdout": "KMA 0h is missing; using the mean of 1 model 0h start point(s): 18.50N, 116.00E.\nNo KMA past track data to plot.\nSaved: /home/runner/work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031800_120h.png\n",
+        "stderr": "und.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\n",
+        "metadata_path": "/home/runner/work/CDS/CDS/VTG_IMG/metadata/202606031800_td_2026_11_120h.json",
+        "metadata": {
+          "generated_at_utc": "20260604035640",
+          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031800_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 11,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "atcf_id": "wp912026",
+          "extra_atcf_ids": [],
+          "data_time": "202606031800",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 5,
+          "target_model_count": 36,
+          "models": [
+            "ECMWF_EPS",
+            "FNV3",
+            "GENC",
+            "GFS",
+            "GFS_EPS"
+          ],
+          "model_labels": [
+            "ECMWF EPS",
+            "FNV3",
+            "GenCast",
+            "GFS",
+            "GFS EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_11",
+        "stage": "TD_POSITION_ATCF",
+        "year": 2026,
+        "data_time": "202606031800",
+        "td_number": 11,
+        "linked_td_number": null,
+        "typ_number": 11,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp912026",
+        "skip_atcf": false,
+        "atcf_match_method": "position",
+        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (169 km)."
+      },
+      "window": {
+        "data_time": "202606031800",
+        "cycle_time_utc": "202606031800",
+        "start_utc": "202606032100",
+        "end_utc": "202606040600"
+      },
+      "result": {
+        "status": "ok",
+        "returncode": 0,
+        "stdout": "GENC KNACKWX: trimmed after 96h due to forecast gap to 132h\nKMA 0h is missing; using the mean of 1 model 0h start point(s): 18.50N, 116.00E.\nNo KMA past track data to plot.\nSaved: /home/runner/work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031800_240h.png\n",
+        "stderr": "und.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\nfindfont: Font family 'NanumSquare' not found.\n",
+        "metadata_path": "/home/runner/work/CDS/CDS/VTG_IMG/metadata/202606031800_td_2026_11_240h.json",
+        "metadata": {
+          "generated_at_utc": "20260604035732",
+          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031800_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 11,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "atcf_id": "wp912026",
+          "extra_atcf_ids": [],
+          "data_time": "202606031800",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 5,
+          "target_model_count": 36,
+          "models": [
+            "ECMWF_EPS",
+            "FNV3",
+            "GENC",
+            "GFS",
+            "GFS_EPS"
+          ],
+          "model_labels": [
+            "ECMWF EPS",
+            "FNV3",
+            "GenCast",
+            "GFS",
+            "GFS EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
     }
   ]
 }
