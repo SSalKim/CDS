@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 import math
 import os
@@ -1057,10 +1058,28 @@ def metadata_model_count(metadata: dict | None) -> int:
         return 0
 
 
-def previous_completed_for_target(previous: dict, complete_model_count: int) -> bool:
+def current_render_signature() -> str:
+    try:
+        return hashlib.sha256((PROJECT_ROOT / "VTG.py").read_bytes()).hexdigest()
+    except OSError:
+        return ""
+
+
+def previous_render_signature_matches(previous: dict, render_signature: str) -> bool:
+    if not render_signature:
+        return True
+    metadata = previous.get("metadata")
+    if not isinstance(metadata, dict):
+        return False
+    return metadata.get("render_signature") == render_signature
+
+
+def previous_completed_for_target(previous: dict, complete_model_count: int, render_signature: str = "") -> bool:
     if not previous.get("completed"):
         return False
     if previous.get("atcf_match_method") == "position":
+        return False
+    if not previous_render_signature_matches(previous, render_signature):
         return False
     return metadata_model_count(previous.get("metadata")) >= complete_model_count
 
@@ -1258,6 +1277,7 @@ def main() -> int:
 
     run_entries = []
     actual_run_count = 0
+    render_signature = current_render_signature()
     for window in windows:
         cycle_status = status.setdefault("cycles", {}).setdefault(window.data_time, {})
         final_check_window = is_final_check_window(
@@ -1283,7 +1303,12 @@ def main() -> int:
             for fcst_hours in fcst_hours_list:
                 status_key = status_key_for(job, fcst_hours)
                 previous = cycle_status.get(status_key, {})
-                previous_completed = previous_completed_for_target(previous, args.complete_model_count)
+                previous_render_current = previous_render_signature_matches(previous, render_signature)
+                previous_completed = previous_completed_for_target(
+                    previous,
+                    args.complete_model_count,
+                    render_signature,
+                )
                 final_check_due = (
                     previous_completed
                     and final_check_window
@@ -1305,6 +1330,7 @@ def main() -> int:
                     args.min_run_interval_minutes > 0
                     and previous_updated
                     and now - previous_updated < timedelta(minutes=args.min_run_interval_minutes)
+                    and previous_render_current
                     and not args.force
                     and not final_check_due
                 ):

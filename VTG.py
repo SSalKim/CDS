@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import io
 import json
 import math
@@ -1305,6 +1306,13 @@ def metadata_path_for_settings(settings: Settings) -> Path | None:
     return settings.output_root / "metadata" / f"{settings.data_time}_{storm_key}_{settings.fcst_hours}h.json"
 
 
+def render_signature() -> str:
+    try:
+        return hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+    except OSError:
+        return ""
+
+
 def next_available_path(path: Path) -> Path:
     if not path.exists():
         return path
@@ -1333,6 +1341,7 @@ def write_run_metadata(
         pass
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"),
+        "render_signature": render_signature(),
         "image_path": image_path.as_posix(),
         "storm_stage": settings.storm_stage,
         "storm_year": storm_year(settings),
@@ -1367,6 +1376,7 @@ def write_no_output_metadata(
 ) -> None:
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"),
+        "render_signature": render_signature(),
         "image_path": "",
         "storm_stage": settings.storm_stage,
         "storm_year": storm_year(settings),
