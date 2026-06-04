@@ -196,15 +196,16 @@ MAX_DISPLAY_240_NORTH_LAT = 68.0
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
-SOURCE_ORDER = ("APIHUB", "NOAA", "RAW.GITHUB")
+SOURCE_ORDER = ("APIHUB", "NOAA", "RAW.GITHUB", "KNACKWX")
 MODEL_SOURCE_PRIORITY_OVERRIDES = {
-    "GENC": ("RAW.GITHUB", "APIHUB", "NOAA"),
-    "FNV3": ("RAW.GITHUB", "APIHUB", "NOAA"),
+    "GENC": ("RAW.GITHUB", "APIHUB", "NOAA", "KNACKWX"),
+    "FNV3": ("RAW.GITHUB", "APIHUB", "NOAA", "KNACKWX"),
 }
 SOURCE_DISPLAY_NAMES = {
     "APIHUB": "KMA APIHUB",
     "NOAA": "NOAA ATCF",
     "RAW.GITHUB": "GITHUB",
+    "KNACKWX": "KNACKWX ATCF",
 }
 SOURCE_ALIASES = {
     "APIHUB": "APIHUB",
@@ -219,11 +220,14 @@ SOURCE_ALIASES = {
     "RAWGITHUB": "RAW.GITHUB",
     "GITHUB": "RAW.GITHUB",
     "GDM": "RAW.GITHUB",
+    "KNACKWX": "KNACKWX",
+    "KNACKWXATCF": "KNACKWX",
 }
 SOURCE_IDENTIFIER_COLUMNS = {
     "APIHUB": "apihub",
     "NOAA": "noaa",
     "RAW.GITHUB": "raw_github",
+    "KNACKWX": "knackwx",
 }
 SOURCE_MODEL_IDS = {
     source: {
@@ -568,6 +572,16 @@ def storm_numbers(settings: Settings) -> set[int]:
     return {int(atcf_id[2:4]) for atcf_id in ids}
 
 
+def storm_id_from_atcf_id(atcf_id: str) -> str:
+    return f"{atcf_id[2:4].upper()}W"
+
+
+def knackwx_url(settings: Settings, atcf_id: str) -> str:
+    init_time = f"{settings.data_time[8:10]}z"
+    params = urlencode({"stormID": storm_id_from_atcf_id(atcf_id), "cycle": "late", "initTime": init_time})
+    return f"https://api.knackwx.com/atcf/v1/aid/archive?{params}"
+
+
 def raw_github_url(settings: Settings, model: str) -> str:
     data_dt = datetime.strptime(settings.data_time, "%Y%m%d%H%M")
     date_path = data_dt.strftime("%Y_%m_%d")
@@ -586,6 +600,8 @@ def atcf_urls(settings: Settings) -> list[tuple[str, str, int]]:
         ("RAW.GITHUB", raw_github_url(settings, "GENC"), 6),
         ("RAW.GITHUB", raw_github_url(settings, "FNV3"), 6),
     ])
+    for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
+        urls.append(("KNACKWX", knackwx_url(settings, atcf_id), 0))
     return urls
 
 
@@ -600,10 +616,33 @@ def empty_atcf_frame() -> pd.DataFrame:
     return pd.DataFrame(columns=[*ATCF_COLUMNS, DATA_SOURCE_COLUMN])
 
 
+def trim_atcf_line_after_field_space(line: str) -> str:
+    fields = line.split(",")
+    cleaned = []
+    for field in fields:
+        stripped = field.strip()
+        if " " in stripped:
+            stripped = stripped.split()[0]
+        cleaned.append(stripped)
+    return ",".join(cleaned)
+
+
+def sanitize_atcf_text(text: str, *, source: str) -> str:
+    if source != "KNACKWX":
+        return text
+    lines = []
+    for line in text.splitlines():
+        if not line.strip():
+            continue
+        lines.append(trim_atcf_line_after_field_space(line))
+    return "\n".join(lines)
+
+
 def read_atcf_csv(text: str | None, *, source: str, skiprows: int = 0) -> pd.DataFrame:
     empty = empty_atcf_frame()
     if not text or not text.strip():
         return empty
+    text = sanitize_atcf_text(text, source=source)
 
     try:
         df = pd.read_csv(
