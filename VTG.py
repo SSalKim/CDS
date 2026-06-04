@@ -2399,12 +2399,12 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str) -
             fontsize=34, color="white", fontweight="1000", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="top", horizontalalignment="right", zorder=100,
             bbox=dict(boxstyle="square,pad=0.5", facecolor="none", linewidth=0))
-    ax.text(0.022, 0.932, "VORTEX TRACK GUIDANCE", transform=ax.transAxes,
+    ax.text(0.024, 0.932, "VORTEX TRACK GUIDANCE", transform=ax.transAxes,
             fontsize=22.5, color="white", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="top", zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
     fig.canvas.draw()
-    guidance_probe = ax.text(0.022, 0.932, "VORTEX TRACK GUIDANCE", transform=ax.transAxes,
+    guidance_probe = ax.text(0.024, 0.932, "VORTEX TRACK GUIDANCE", transform=ax.transAxes,
                              fontsize=22.5, fontweight="800", fontfamily=PLOT_FONT_FAMILY, alpha=0)
     fig.canvas.draw()
     guidance_bbox = guidance_probe.get_window_extent().transformed(ax.transAxes.inverted())
@@ -2418,7 +2418,7 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str) -
             verticalalignment="top", horizontalalignment="right", zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
     ax.text(0.005, 0.006, "Plotted by WooJin Kim\nUsing KMA APIHUB & NRL ATCF", transform=ax.transAxes,
-            fontsize=11, color="aliceblue", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
+            fontsize=12, color="aliceblue", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="bottom", horizontalalignment="left", zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
 
@@ -2519,8 +2519,8 @@ def draw_model_legend_table(ax, rows: list[dict]) -> None:
     handle_x1 = x0 + pad_x + 0.024
     handle_mid = (handle_x0 + handle_x1) / 2
     label_x = x0 + pad_x + 0.030
-    pressure_x = x1 - pad_x - 0.075
-    lead_x = x1 - pad_x
+    pressure_x = x1 - pad_x - 0.069
+    lead_x = x1 - pad_x + 0.003
     label_font_family = PLOT_FONT_FAMILY
     label_font_weight = "700"
 
