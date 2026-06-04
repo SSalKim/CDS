@@ -1,5 +1,5 @@
 {
-  "updated_at_utc": "202606042222",
+  "updated_at_utc": "202606042233",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
@@ -12,200 +12,7 @@
       "end_utc": "202606042300"
     }
   ],
-  "runs": [
-    {
-      "job": {
-        "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
-        "year": 2026,
-        "data_time": "202606041200",
-        "td_number": 11,
-        "linked_td_number": null,
-        "typ_number": 11,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp912026",
-        "skip_atcf": false,
-        "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (99 km).",
-        "analysis_point": {
-          "time_utc": "202606041200",
-          "lat": 20.2,
-          "lon": 119.1
-        },
-        "analysis_source": "BDECK",
-        "analysis_match_method": "position",
-        "analysis_distance_km": 99.3420350029941
-      },
-      "window": {
-        "data_time": "202606041200",
-        "cycle_time_utc": "202606041200",
-        "start_utc": "202606041700",
-        "end_utc": "202606042300"
-      },
-      "result": {
-        "status": "ok",
-        "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nCMC_EPS KNACKWX: trimmed after 120h due to forecast gap to 156h\nECMWF: selected NOAA ATCF by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF, KNACKWX ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nGENC KNACKWX: trimmed after 84h due to forecast gap to 120h\nKMA 0h is missing; using BDECK analysis point: 20.20N, 119.10E.\nFNEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nGCEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nIFEC_AI APIHUB: trimmed 8 point(s) after 186h due to suspected dateline-reflected longitude tail\nIFKM_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nPGEC_AI APIHUB: trimmed 7 point(s) after 192h due to suspected dateline-reflected longitude tail\nMap extent ignored 143 KNACKWX point(s).\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png\nMap extent ignored 181 KNACKWX point(s).\nMap extent ignored 143 KNACKWX point(s).\n240h map extent was too broad; using expanded 120h anchor (98.7 lon x 53.8 lat).\n240h map extent candidate is too broad for stable cache; using uncached extent (122.8 lon x 62.1 lat).\n240h stable map extent was too broad after aspect matching; falling back to expanded 120h anchor.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png\n",
-        "stderr": "",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606041200_td_2026_11_120h.json",
-        "metadata": {
-          "generated_at_utc": "20260604222523",
-          "render_signature": "520be19cbb2b62ce94384e574e8c458e5857adb7b0d7fb11b16448d55f32aba6",
-          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png",
-          "storm_stage": "TD",
-          "storm_year": "2026",
-          "typ_number": 11,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "atcf_id": "wp912026",
-          "extra_atcf_ids": [],
-          "data_time": "202606041200",
-          "fcst_hours": 120,
-          "intensity": "TD",
-          "model_count": 16,
-          "target_model_count": 36,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "IFEC_AI",
-            "IFKM_AI",
-            "NAVGEM",
-            "PGEC_AI"
-          ],
-          "model_labels": [
-            "CMC",
-            "CMC EPS",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "FourCastNet-ECMWF",
-            "FNV3",
-            "GraphCast-ECMWF",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
-            "KMA AIFS-ECMWF",
-            "KMA AIFS-KIM",
-            "NAVGEM",
-            "Pangu-Weather-ECMWF"
-          ],
-          "skip_atcf": false
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
-        "year": 2026,
-        "data_time": "202606041200",
-        "td_number": 11,
-        "linked_td_number": null,
-        "typ_number": 11,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp912026",
-        "skip_atcf": false,
-        "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (99 km).",
-        "analysis_point": {
-          "time_utc": "202606041200",
-          "lat": 20.2,
-          "lon": 119.1
-        },
-        "analysis_source": "BDECK",
-        "analysis_match_method": "position",
-        "analysis_distance_km": 99.3420350029941
-      },
-      "window": {
-        "data_time": "202606041200",
-        "cycle_time_utc": "202606041200",
-        "start_utc": "202606041700",
-        "end_utc": "202606042300"
-      },
-      "result": {
-        "status": "ok",
-        "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nCMC_EPS KNACKWX: trimmed after 120h due to forecast gap to 156h\nECMWF: selected NOAA ATCF by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF, KNACKWX ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nGENC KNACKWX: trimmed after 84h due to forecast gap to 120h\nKMA 0h is missing; using BDECK analysis point: 20.20N, 119.10E.\nFNEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nGCEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nIFEC_AI APIHUB: trimmed 8 point(s) after 186h due to suspected dateline-reflected longitude tail\nIFKM_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nPGEC_AI APIHUB: trimmed 7 point(s) after 192h due to suspected dateline-reflected longitude tail\nMap extent ignored 143 KNACKWX point(s).\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png\nMap extent ignored 181 KNACKWX point(s).\nMap extent ignored 143 KNACKWX point(s).\n240h map extent was too broad; using expanded 120h anchor (98.7 lon x 53.8 lat).\n240h map extent candidate is too broad for stable cache; using uncached extent (122.8 lon x 62.1 lat).\n240h stable map extent was too broad after aspect matching; falling back to expanded 120h anchor.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png\n",
-        "stderr": "",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606041200_td_2026_11_240h.json",
-        "metadata": {
-          "generated_at_utc": "20260604222525",
-          "render_signature": "520be19cbb2b62ce94384e574e8c458e5857adb7b0d7fb11b16448d55f32aba6",
-          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png",
-          "storm_stage": "TD",
-          "storm_year": "2026",
-          "typ_number": 11,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "atcf_id": "wp912026",
-          "extra_atcf_ids": [],
-          "data_time": "202606041200",
-          "fcst_hours": 240,
-          "intensity": "TD",
-          "model_count": 16,
-          "target_model_count": 36,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "IFEC_AI",
-            "IFKM_AI",
-            "NAVGEM",
-            "PGEC_AI"
-          ],
-          "model_labels": [
-            "CMC",
-            "CMC EPS",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "FourCastNet-ECMWF",
-            "FNV3",
-            "GraphCast-ECMWF",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
-            "KMA AIFS-ECMWF",
-            "KMA AIFS-KIM",
-            "NAVGEM",
-            "Pangu-Weather-ECMWF"
-          ],
-          "skip_atcf": false
-        }
-      },
-      "completed": false,
-      "final_check": false
-    }
-  ],
+  "runs": [],
   "inventory": [
     {
       "job": {
@@ -230,7 +37,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604192938",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601140000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -245,35 +51,6 @@
           "intensity": "TD",
           "model_count": 27,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -303,7 +80,8 @@
             "Pangu-Weather-UM",
             "JGSM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601140000_td_2026_01_120h.json"
@@ -331,7 +109,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604192939",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601140000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -346,35 +123,6 @@
           "intensity": "TD",
           "model_count": 27,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -404,7 +152,8 @@
             "Pangu-Weather-UM",
             "JGSM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601140000_td_2026_01_240h.json"
@@ -432,7 +181,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604193149",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601140600_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -447,22 +195,6 @@
           "intensity": "TD",
           "model_count": 14,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -479,7 +211,8 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601140600_td_2026_01_120h.json"
@@ -507,7 +240,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604193150",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601140600_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -522,22 +254,6 @@
           "intensity": "TD",
           "model_count": 14,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -554,7 +270,8 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601140600_td_2026_01_240h.json"
@@ -582,7 +299,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604193909",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601141200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -597,37 +313,6 @@
           "intensity": "TD",
           "model_count": 29,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -659,7 +344,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601141200_td_2026_01_120h.json"
@@ -687,7 +373,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604193910",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601141200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -702,37 +387,6 @@
           "intensity": "TD",
           "model_count": 29,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -764,7 +418,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601141200_td_2026_01_240h.json"
@@ -792,7 +447,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604194041",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601141800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -807,23 +461,6 @@
           "intensity": "TD",
           "model_count": 15,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -841,7 +478,8 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601141800_td_2026_01_120h.json"
@@ -869,7 +507,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604194042",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601141800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -884,23 +521,6 @@
           "intensity": "TD",
           "model_count": 15,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -918,7 +538,8 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601141800_td_2026_01_240h.json"
@@ -946,7 +567,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604194213",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601150000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -961,40 +581,6 @@
           "intensity": "TD",
           "model_count": 32,
           "target_model_count": 39,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -1029,7 +615,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601150000_td_2026_01_120h.json"
@@ -1057,7 +644,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604194214",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601150000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -1072,40 +658,6 @@
           "intensity": "TD",
           "model_count": 32,
           "target_model_count": 39,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -1140,7 +692,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601150000_td_2026_01_240h.json"
@@ -1168,7 +721,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604194332",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601150600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1183,23 +735,6 @@
           "intensity": "TYP",
           "model_count": 15,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -1217,7 +752,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601150600_typ_2026_01_120h.json"
@@ -1245,7 +781,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604194333",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601150600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1260,23 +795,6 @@
           "intensity": "TYP",
           "model_count": 15,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -1294,7 +812,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601150600_typ_2026_01_240h.json"
@@ -1322,7 +841,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604195112",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601151200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1337,39 +855,6 @@
           "intensity": "TYP",
           "model_count": 31,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC EPS",
@@ -1403,7 +888,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601151200_typ_2026_01_120h.json"
@@ -1431,7 +917,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604195113",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601151200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1446,39 +931,6 @@
           "intensity": "TYP",
           "model_count": 31,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC EPS",
@@ -1512,7 +964,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601151200_typ_2026_01_240h.json"
@@ -1540,7 +993,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604195249",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601151800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1555,25 +1007,6 @@
           "intensity": "TYP",
           "model_count": 17,
           "target_model_count": 39,
-          "models": [
-            "COAMPS_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "COAMPS-TC EPS",
             "ECMWF",
@@ -1593,7 +1026,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601151800_typ_2026_01_120h.json"
@@ -1621,7 +1055,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604195250",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601151800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1636,25 +1069,6 @@
           "intensity": "TYP",
           "model_count": 17,
           "target_model_count": 39,
-          "models": [
-            "COAMPS_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "COAMPS-TC EPS",
             "ECMWF",
@@ -1674,7 +1088,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601151800_typ_2026_01_240h.json"
@@ -1702,7 +1117,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604195842",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1717,41 +1131,6 @@
           "intensity": "TYP",
           "model_count": 33,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -1787,7 +1166,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601160000_typ_2026_01_120h.json"
@@ -1815,7 +1195,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604195843",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1830,41 +1209,6 @@
           "intensity": "TYP",
           "model_count": 33,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -1900,7 +1244,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601160000_typ_2026_01_240h.json"
@@ -1928,7 +1273,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604195953",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1943,23 +1287,6 @@
           "intensity": "TYP",
           "model_count": 15,
           "target_model_count": 39,
-          "models": [
-            "COAMPS_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "COAMPS-TC EPS",
             "ECMWF",
@@ -1977,7 +1304,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601160600_typ_2026_01_120h.json"
@@ -2005,7 +1333,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604195954",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601160600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -2020,23 +1347,6 @@
           "intensity": "TYP",
           "model_count": 15,
           "target_model_count": 39,
-          "models": [
-            "COAMPS_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "COAMPS-TC EPS",
             "ECMWF",
@@ -2054,7 +1364,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601160600_typ_2026_01_240h.json"
@@ -2082,7 +1393,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604200143",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601161200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -2097,44 +1407,6 @@
           "intensity": "TYP",
           "model_count": 36,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -2173,7 +1445,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601161200_typ_2026_01_120h.json"
@@ -2201,7 +1474,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604200144",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601161200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -2216,44 +1488,6 @@
           "intensity": "TYP",
           "model_count": 36,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -2292,7 +1526,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601161200_typ_2026_01_240h.json"
@@ -2320,7 +1555,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604200334",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601161800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -2335,27 +1569,6 @@
           "intensity": "TYP",
           "model_count": 19,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -2377,7 +1590,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601161800_typ_2026_01_120h.json"
@@ -2405,7 +1619,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604200335",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601161800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -2420,27 +1633,6 @@
           "intensity": "TYP",
           "model_count": 19,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -2462,7 +1654,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601161800_typ_2026_01_240h.json"
@@ -2490,7 +1683,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604201113",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601170000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -2505,44 +1697,6 @@
           "intensity": "TYP",
           "model_count": 36,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -2581,7 +1735,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601170000_typ_2026_01_120h.json"
@@ -2609,7 +1764,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604201114",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601170000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -2624,44 +1778,6 @@
           "intensity": "TYP",
           "model_count": 36,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -2700,7 +1816,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601170000_typ_2026_01_240h.json"
@@ -2728,7 +1845,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604201313",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601170600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -2743,26 +1859,6 @@
           "intensity": "TYP",
           "model_count": 18,
           "target_model_count": 39,
-          "models": [
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "COAMPS-TC EPS",
             "COAMPS-TC",
@@ -2783,7 +1879,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601170600_typ_2026_01_120h.json"
@@ -2811,7 +1908,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604201314",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601170600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -2826,26 +1922,6 @@
           "intensity": "TYP",
           "model_count": 18,
           "target_model_count": 39,
-          "models": [
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "COAMPS-TC EPS",
             "COAMPS-TC",
@@ -2866,7 +1942,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601170600_typ_2026_01_240h.json"
@@ -2894,7 +1971,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604201904",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601171200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -2909,43 +1985,6 @@
           "intensity": "TYP",
           "model_count": 35,
           "target_model_count": 39,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -2983,7 +2022,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601171200_typ_2026_01_120h.json"
@@ -3011,7 +2051,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604201905",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601171200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -3026,43 +2065,6 @@
           "intensity": "TYP",
           "model_count": 35,
           "target_model_count": 39,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -3100,7 +2102,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601171200_typ_2026_01_240h.json"
@@ -3128,7 +2131,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604202021",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601171800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -3143,27 +2145,6 @@
           "intensity": "TYP",
           "model_count": 19,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -3185,7 +2166,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601171800_typ_2026_01_120h.json"
@@ -3213,7 +2195,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604202022",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601171800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -3228,27 +2209,6 @@
           "intensity": "TYP",
           "model_count": 19,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -3270,7 +2230,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601171800_typ_2026_01_240h.json"
@@ -3298,7 +2259,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604202153",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601180000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -3313,41 +2273,6 @@
           "intensity": "TYP",
           "model_count": 33,
           "target_model_count": 39,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -3383,7 +2308,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601180000_typ_2026_01_120h.json"
@@ -3411,7 +2337,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604202155",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601180000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -3426,41 +2351,6 @@
           "intensity": "TYP",
           "model_count": 33,
           "target_model_count": 39,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -3496,7 +2386,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601180000_typ_2026_01_240h.json"
@@ -3524,7 +2415,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604202324",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601180600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -3539,23 +2429,6 @@
           "intensity": "TYP",
           "model_count": 15,
           "target_model_count": 39,
-          "models": [
-            "COAMPS_EPS",
-            "ECMWF",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "COAMPS-TC EPS",
             "ECMWF",
@@ -3573,7 +2446,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601180600_typ_2026_01_120h.json"
@@ -3601,7 +2475,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604202325",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601180600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -3616,23 +2489,6 @@
           "intensity": "TYP",
           "model_count": 15,
           "target_model_count": 39,
-          "models": [
-            "COAMPS_EPS",
-            "ECMWF",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "COAMPS-TC EPS",
             "ECMWF",
@@ -3650,7 +2506,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601180600_typ_2026_01_240h.json"
@@ -3678,7 +2535,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604202802",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601181200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -3693,41 +2549,6 @@
           "intensity": "TYP",
           "model_count": 33,
           "target_model_count": 39,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -3763,7 +2584,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601181200_typ_2026_01_120h.json"
@@ -3791,7 +2613,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604202803",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601181200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -3806,41 +2627,6 @@
           "intensity": "TYP",
           "model_count": 33,
           "target_model_count": 39,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -3876,7 +2662,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601181200_typ_2026_01_240h.json"
@@ -3904,7 +2691,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604202933",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601181800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -3919,23 +2705,6 @@
           "intensity": "TYP",
           "model_count": 15,
           "target_model_count": 39,
-          "models": [
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNV3",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "COAMPS-TC EPS",
             "COAMPS-TC",
@@ -3953,7 +2722,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601181800_typ_2026_01_120h.json"
@@ -3981,7 +2751,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604202934",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601181800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -3996,23 +2765,6 @@
           "intensity": "TYP",
           "model_count": 15,
           "target_model_count": 39,
-          "models": [
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNV3",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "COAMPS-TC EPS",
             "COAMPS-TC",
@@ -4030,7 +2782,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601181800_typ_2026_01_240h.json"
@@ -4058,7 +2811,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604203108",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601190000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -4073,43 +2825,6 @@
           "intensity": "TYP",
           "model_count": 35,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -4147,7 +2862,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601190000_typ_2026_01_120h.json"
@@ -4175,7 +2891,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604203109",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601190000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -4190,43 +2905,6 @@
           "intensity": "TYP",
           "model_count": 35,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -4264,7 +2942,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601190000_typ_2026_01_240h.json"
@@ -4292,7 +2971,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604203243",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601190600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -4307,24 +2985,6 @@
           "intensity": "TYP",
           "model_count": 16,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNV3",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -4343,7 +3003,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601190600_typ_2026_01_120h.json"
@@ -4371,7 +3032,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604203244",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601190600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -4386,24 +3046,6 @@
           "intensity": "TYP",
           "model_count": 16,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNV3",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -4422,7 +3064,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601190600_typ_2026_01_240h.json"
@@ -4450,7 +3093,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604203718",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601191200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -4465,42 +3107,6 @@
           "intensity": "TYP",
           "model_count": 34,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -4537,7 +3143,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601191200_typ_2026_01_120h.json"
@@ -4565,7 +3172,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604203719",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601191200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -4580,42 +3186,6 @@
           "intensity": "TYP",
           "model_count": 34,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -4652,7 +3222,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601191200_typ_2026_01_240h.json"
@@ -4680,7 +3251,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604203849",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601191800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -4695,24 +3265,6 @@
           "intensity": "TYP",
           "model_count": 16,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNV3",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -4731,7 +3283,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601191800_typ_2026_01_120h.json"
@@ -4759,7 +3312,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604203850",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601191800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -4774,24 +3326,6 @@
           "intensity": "TYP",
           "model_count": 16,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNV3",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -4810,7 +3344,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601191800_typ_2026_01_240h.json"
@@ -4838,7 +3373,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604204021",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601200000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -4853,41 +3387,6 @@
           "intensity": "TYP",
           "model_count": 33,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -4923,7 +3422,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601200000_typ_2026_01_120h.json"
@@ -4951,7 +3451,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604204022",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601200000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -4966,41 +3465,6 @@
           "intensity": "TYP",
           "model_count": 33,
           "target_model_count": 39,
-          "models": [
-            "AFUM",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -5036,7 +3500,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601200000_typ_2026_01_240h.json"
@@ -5064,7 +3529,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604204155",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601200600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -5079,23 +3543,6 @@
           "intensity": "TYP",
           "model_count": 15,
           "target_model_count": 39,
-          "models": [
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNV3",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "COAMPS-TC EPS",
             "COAMPS-TC",
@@ -5113,7 +3560,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601200600_typ_2026_01_120h.json"
@@ -5141,7 +3589,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604204156",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601200600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -5156,23 +3603,6 @@
           "intensity": "TYP",
           "model_count": 15,
           "target_model_count": 39,
-          "models": [
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNV3",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "COAMPS-TC EPS",
             "COAMPS-TC",
@@ -5190,7 +3620,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601200600_typ_2026_01_240h.json"
@@ -5218,7 +3649,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604204329",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601201200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -5233,40 +3663,6 @@
           "intensity": "TYP",
           "model_count": 32,
           "target_model_count": 39,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -5301,7 +3697,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601201200_typ_2026_01_120h.json"
@@ -5329,7 +3726,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604204331",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2601_NOKAEN/TYP_2601_NOKAEN_202601201200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -5344,40 +3740,6 @@
           "intensity": "TYP",
           "model_count": 32,
           "target_model_count": 39,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -5412,7 +3774,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202601201200_typ_2026_01_240h.json"
@@ -5440,7 +3803,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604212918",
-          "render_signature": "a4daf4c51c3c7aa4c08992beceb93ff8eca001d89aad1d4d86dbaba802a5b1d5",
           "image_path": "VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602041200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -5455,39 +3817,6 @@
           "intensity": "TYP",
           "model_count": 31,
           "target_model_count": 39,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -5521,7 +3850,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": true
+          "skip_atcf": true,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202602041200_typ_2026_02_120h.json"
@@ -5549,7 +3879,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604212919",
-          "render_signature": "a4daf4c51c3c7aa4c08992beceb93ff8eca001d89aad1d4d86dbaba802a5b1d5",
           "image_path": "VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602041200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -5564,39 +3893,6 @@
           "intensity": "TYP",
           "model_count": 31,
           "target_model_count": 39,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNUM_AI",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GCUM_AI",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "PGUM_AI",
-            "TEPS",
-            "UM",
-            "UM_KEPS"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -5630,7 +3926,8 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": true
+          "skip_atcf": true,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202602041200_typ_2026_02_240h.json"
@@ -5658,7 +3955,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604210901",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602041800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -5673,21 +3969,6 @@
           "intensity": "TYP",
           "model_count": 13,
           "target_model_count": 39,
-          "models": [
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "ECMWF",
             "ECMWF AIFS",
@@ -5703,7 +3984,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": true
+          "skip_atcf": true,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202602041800_typ_2026_02_120h.json"
@@ -5731,7 +4013,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604210902",
-          "render_signature": "d278d31ec82d69f7b46e4823674c322beded94af1cf62154b8d9e4e4e12158a0",
           "image_path": "VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602041800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -5746,21 +4027,6 @@
           "intensity": "TYP",
           "model_count": 13,
           "target_model_count": 39,
-          "models": [
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_EPS",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "TEPS",
-            "UM_GFDL_6h"
-          ],
           "model_labels": [
             "ECMWF",
             "ECMWF AIFS",
@@ -5776,7 +4042,8 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": true
+          "skip_atcf": true,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202602041800_typ_2026_02_240h.json"
@@ -5863,7 +4130,7 @@
       "result": {
         "status": "inventory",
         "metadata": {
-          "generated_at_utc": "20260604042225",
+          "generated_at_utc": "20260531091326",
           "image_path": "VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202605310000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -5917,27 +4184,6 @@
           "intensity": "STS",
           "model_count": 19,
           "target_model_count": 33,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -5959,7 +4205,8 @@
             "JGSM TEPS",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202605310600_typ_2026_06_120h.json"
@@ -6001,27 +4248,6 @@
           "intensity": "STS",
           "model_count": 19,
           "target_model_count": 33,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -6043,7 +4269,8 @@
             "JGSM TEPS",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202605310600_typ_2026_06_240h.json"
@@ -6085,41 +4312,6 @@
           "intensity": "STS",
           "model_count": 33,
           "target_model_count": 33,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "TEPS",
-            "UKM",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -6155,7 +4347,8 @@
             "UKMO",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202605311200_typ_2026_06_120h.json"
@@ -6197,41 +4390,6 @@
           "intensity": "STS",
           "model_count": 33,
           "target_model_count": 33,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "IFEC_AI",
-            "IFKM_AI",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "TEPS",
-            "UKM",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -6267,7 +4425,8 @@
             "UKMO",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202605311200_typ_2026_06_240h.json"
@@ -6309,25 +4468,6 @@
           "intensity": "STS",
           "model_count": 17,
           "target_model_count": 33,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "TEPS",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -6347,7 +4487,8 @@
             "JGSM TEPS",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202605311800_typ_2026_06_120h.json"
@@ -6389,25 +4530,6 @@
           "intensity": "STS",
           "model_count": 17,
           "target_model_count": 33,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "TEPS",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -6427,7 +4549,8 @@
             "JGSM TEPS",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202605311800_typ_2026_06_240h.json"
@@ -6469,35 +4592,6 @@
           "intensity": "STS",
           "model_count": 27,
           "target_model_count": 33,
-          "models": [
-            "AGFS",
-            "AIGEFS",
-            "CMC",
-            "CMC_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "PGEC_AI",
-            "PGKM_AI",
-            "TEPS",
-            "UKM",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "AIGFS",
             "AIGEFS",
@@ -6527,7 +4621,8 @@
             "UKMO",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606010000_typ_2026_06_120h.json"
@@ -6569,35 +4664,6 @@
           "intensity": "STS",
           "model_count": 27,
           "target_model_count": 33,
-          "models": [
-            "AGFS",
-            "AIGEFS",
-            "CMC",
-            "CMC_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "PGEC_AI",
-            "PGKM_AI",
-            "TEPS",
-            "UKM",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "AIGFS",
             "AIGEFS",
@@ -6627,7 +4693,8 @@
             "UKMO",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606010000_typ_2026_06_240h.json"
@@ -6669,25 +4736,6 @@
           "intensity": "TY",
           "model_count": 17,
           "target_model_count": 33,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "TEPS",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -6707,7 +4755,8 @@
             "JGSM TEPS",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606010600_typ_2026_06_120h.json"
@@ -6749,25 +4798,6 @@
           "intensity": "TY",
           "model_count": 17,
           "target_model_count": 33,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "TEPS",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -6787,7 +4817,8 @@
             "JGSM TEPS",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606010600_typ_2026_06_240h.json"
@@ -6829,39 +4860,6 @@
           "intensity": "STS",
           "model_count": 31,
           "target_model_count": 33,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "TEPS",
-            "UKM",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -6895,7 +4893,8 @@
             "UKMO",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606011200_typ_2026_06_120h.json"
@@ -6937,39 +4936,6 @@
           "intensity": "STS",
           "model_count": 31,
           "target_model_count": 33,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "TEPS",
-            "UKM",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -7003,7 +4969,8 @@
             "UKMO",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606011200_typ_2026_06_240h.json"
@@ -7045,27 +5012,6 @@
           "intensity": "STS",
           "model_count": 19,
           "target_model_count": 33,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -7087,7 +5033,8 @@
             "JGSM TEPS",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606011800_typ_2026_06_120h.json"
@@ -7129,27 +5076,6 @@
           "intensity": "STS",
           "model_count": 19,
           "target_model_count": 33,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -7171,7 +5097,8 @@
             "JGSM TEPS",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606011800_typ_2026_06_240h.json"
@@ -7213,42 +5140,6 @@
           "intensity": "STS",
           "model_count": 34,
           "target_model_count": 36,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "TEPS",
-            "UKM",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -7285,7 +5176,8 @@
             "UKMO",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606020000_typ_2026_06_120h.json"
@@ -7327,42 +5219,6 @@
           "intensity": "STS",
           "model_count": 34,
           "target_model_count": 36,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "TEPS",
-            "UKM",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -7399,7 +5255,8 @@
             "UKMO",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606020000_typ_2026_06_240h.json"
@@ -7441,30 +5298,6 @@
           "intensity": "TS",
           "model_count": 22,
           "target_model_count": 36,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -7489,7 +5322,8 @@
             "JGSM EPS",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606020600_typ_2026_06_120h.json"
@@ -7531,30 +5365,6 @@
           "intensity": "TS",
           "model_count": 22,
           "target_model_count": 36,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -7579,7 +5389,8 @@
             "JGSM EPS",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606020600_typ_2026_06_240h.json"
@@ -7621,42 +5432,6 @@
           "intensity": "TS",
           "model_count": 34,
           "target_model_count": 36,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "TEPS",
-            "UKM",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -7693,7 +5468,8 @@
             "UKMO",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606021200_typ_2026_06_120h.json"
@@ -7735,42 +5511,6 @@
           "intensity": "TS",
           "model_count": 34,
           "target_model_count": 36,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "TEPS",
-            "UKM",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -7807,7 +5547,8 @@
             "UKMO",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606021200_typ_2026_06_240h.json"
@@ -7849,29 +5590,6 @@
           "intensity": "TS",
           "model_count": 21,
           "target_model_count": 36,
-          "models": [
-            "AGFS",
-            "AIGEFS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "AIGFS",
             "AIGFS EPS",
@@ -7895,7 +5613,8 @@
             "JGSM EPS",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606021800_typ_2026_06_120h.json"
@@ -7937,29 +5656,6 @@
           "intensity": "TS",
           "model_count": 21,
           "target_model_count": 36,
-          "models": [
-            "AGFS",
-            "AIGEFS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "AIGFS",
             "AIGFS EPS",
@@ -7983,7 +5679,8 @@
             "JGSM EPS",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606021800_typ_2026_06_240h.json"
@@ -8025,42 +5722,6 @@
           "intensity": "TS",
           "model_count": 34,
           "target_model_count": 36,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "FNMOC_EPS",
-            "FNV3",
-            "GCEC_AI",
-            "GCKM_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HKO_AREC",
-            "HKO_FWEC",
-            "HKO_FXEC",
-            "HWRF",
-            "JGSM",
-            "KIM_3h",
-            "KIM_EPS",
-            "NAVGEM",
-            "PGEC_AI",
-            "PGKM_AI",
-            "TEPS",
-            "UKM",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -8097,7 +5758,8 @@
             "UKMO",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606030000_typ_2026_06_120h.json"
@@ -8139,30 +5801,6 @@
           "intensity": "TD",
           "model_count": 22,
           "target_model_count": 36,
-          "models": [
-            "AFUM",
-            "AGFS",
-            "AIGEFS",
-            "CMC",
-            "CMC_EPS",
-            "COAMPS_EPS",
-            "CTCX",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "TEPS",
-            "UKM",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "GALWEM",
             "AIGFS",
@@ -8187,7 +5825,8 @@
             "UKMO",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606030000_typ_2026_06_240h.json"
@@ -8229,19 +5868,6 @@
           "intensity": "TS",
           "model_count": 11,
           "target_model_count": 36,
-          "models": [
-            "AIGEFS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "FNV3",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "TEPS"
-          ],
           "model_labels": [
             "AIGFS EPS",
             "ECMWF",
@@ -8255,7 +5881,8 @@
             "JGSM",
             "JGSM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606030600_typ_2026_06_120h.json"
@@ -8297,19 +5924,6 @@
           "intensity": "TS",
           "model_count": 11,
           "target_model_count": 36,
-          "models": [
-            "AIGEFS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "FNV3",
-            "GFS",
-            "GFS_EPS",
-            "HAFS",
-            "HWRF",
-            "JGSM",
-            "TEPS"
-          ],
           "model_labels": [
             "AIGFS EPS",
             "ECMWF",
@@ -8323,7 +5937,8 @@
             "JGSM",
             "JGSM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606030600_typ_2026_06_240h.json"
@@ -8351,7 +5966,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604091410",
-          "render_signature": "87c6f4281a8aea5b5623cbef93331910d7f92839a56290a6b9f3ed17fa17e471",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -8366,18 +5980,6 @@
           "intensity": "TD",
           "model_count": 10,
           "target_model_count": 36,
-          "models": [
-            "CMC_EPS",
-            "ECMWF",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "GCEC_AI",
-            "GCKM_AI",
-            "IFKM_AI",
-            "PGEC_AI",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "CMC EPS",
             "ECMWF",
@@ -8390,7 +5992,8 @@
             "Pangu-Weather-ECMWF",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606031200_td_2026_11_120h.json"
@@ -8418,7 +6021,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604091411",
-          "render_signature": "87c6f4281a8aea5b5623cbef93331910d7f92839a56290a6b9f3ed17fa17e471",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -8433,18 +6035,6 @@
           "intensity": "TD",
           "model_count": 10,
           "target_model_count": 36,
-          "models": [
-            "CMC_EPS",
-            "ECMWF",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNKM_AI",
-            "GCEC_AI",
-            "GCKM_AI",
-            "IFKM_AI",
-            "PGEC_AI",
-            "UKMO_EPS"
-          ],
           "model_labels": [
             "CMC EPS",
             "ECMWF",
@@ -8457,7 +6047,8 @@
             "Pangu-Weather-ECMWF",
             "UKMO EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606031200_td_2026_11_240h.json"
@@ -8485,7 +6076,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604092019",
-          "render_signature": "87c6f4281a8aea5b5623cbef93331910d7f92839a56290a6b9f3ed17fa17e471",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -8500,13 +6090,6 @@
           "intensity": "TD",
           "model_count": 5,
           "target_model_count": 36,
-          "models": [
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS"
-          ],
           "model_labels": [
             "ECMWF EPS",
             "FNV3",
@@ -8514,7 +6097,8 @@
             "GFS",
             "GFS EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606031800_td_2026_11_120h.json"
@@ -8542,7 +6126,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604092021",
-          "render_signature": "87c6f4281a8aea5b5623cbef93331910d7f92839a56290a6b9f3ed17fa17e471",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -8557,13 +6140,6 @@
           "intensity": "TD",
           "model_count": 5,
           "target_model_count": 36,
-          "models": [
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS"
-          ],
           "model_labels": [
             "ECMWF EPS",
             "FNV3",
@@ -8571,7 +6147,8 @@
             "GFS",
             "GFS EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606031800_td_2026_11_240h.json"
@@ -8599,7 +6176,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604105445",
-          "render_signature": "d58377c7eaa73cbecc1e4736e367aa680fc31405944e312d08776e315f08ba6f",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -8614,19 +6190,6 @@
           "intensity": "TD",
           "model_count": 11,
           "target_model_count": 36,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "NAVGEM"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -8640,7 +6203,8 @@
             "GFS EPS",
             "NAVGEM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606040000_td_2026_11_120h.json"
@@ -8668,7 +6232,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604105447",
-          "render_signature": "d58377c7eaa73cbecc1e4736e367aa680fc31405944e312d08776e315f08ba6f",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -8683,19 +6246,6 @@
           "intensity": "TD",
           "model_count": 11,
           "target_model_count": 36,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "NAVGEM"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -8709,7 +6259,8 @@
             "GFS EPS",
             "NAVGEM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606040000_td_2026_11_240h.json"
@@ -8737,7 +6288,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604165825",
-          "render_signature": "dd9aef326ddc9e77a3cd1d2df1dc650e6dc0c1198d7ab8169781bc7b703476c5",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -8752,15 +6302,6 @@
           "intensity": "TD",
           "model_count": 7,
           "target_model_count": 36,
-          "models": [
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS"
-          ],
           "model_labels": [
             "ECMWF",
             "ECMWF AIFS",
@@ -8770,7 +6311,8 @@
             "GenCast",
             "GFS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606040600_td_2026_11_120h.json"
@@ -8798,7 +6340,6 @@
         "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604165826",
-          "render_signature": "dd9aef326ddc9e77a3cd1d2df1dc650e6dc0c1198d7ab8169781bc7b703476c5",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040600_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -8813,15 +6354,6 @@
           "intensity": "TD",
           "model_count": 7,
           "target_model_count": 36,
-          "models": [
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNV3",
-            "GENC",
-            "GFS"
-          ],
           "model_labels": [
             "ECMWF",
             "ECMWF AIFS",
@@ -8831,7 +6363,8 @@
             "GenCast",
             "GFS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
       "metadata_path": "VTG_IMG/metadata/202606040600_td_2026_11_240h.json"
@@ -8839,7 +6372,7 @@
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202606041200",
         "td_number": 11,
@@ -8847,35 +6380,18 @@
         "typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp912026",
-        "skip_atcf": false,
-        "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (99 km).",
-        "analysis_point": {
-          "time_utc": "202606041200",
-          "lat": 20.2,
-          "lon": 119.1
-        },
-        "analysis_source": "BDECK",
-        "analysis_match_method": "position",
-        "analysis_distance_km": 99.3420350029941
+        "fcst_hours": 120,
+        "skip_atcf": false
       },
       "window": {
-        "data_time": "202606041200",
-        "cycle_time_utc": "202606041200",
-        "start_utc": "202606041700",
-        "end_utc": "202606042300"
+        "data_time": "202606041200"
       },
       "result": {
-        "status": "ok",
-        "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nCMC_EPS KNACKWX: trimmed after 120h due to forecast gap to 156h\nECMWF: selected NOAA ATCF by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF, KNACKWX ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nGENC KNACKWX: trimmed after 84h due to forecast gap to 120h\nKMA 0h is missing; using BDECK analysis point: 20.20N, 119.10E.\nFNEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nGCEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nIFEC_AI APIHUB: trimmed 8 point(s) after 186h due to suspected dateline-reflected longitude tail\nIFKM_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nPGEC_AI APIHUB: trimmed 7 point(s) after 192h due to suspected dateline-reflected longitude tail\nMap extent ignored 143 KNACKWX point(s).\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png\nMap extent ignored 181 KNACKWX point(s).\nMap extent ignored 143 KNACKWX point(s).\n240h map extent was too broad; using expanded 120h anchor (98.7 lon x 53.8 lat).\n240h map extent candidate is too broad for stable cache; using uncached extent (122.8 lon x 62.1 lat).\n240h stable map extent was too broad after aspect matching; falling back to expanded 120h anchor.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png\n",
-        "stderr": "",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606041200_td_2026_11_120h.json",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604222523",
-          "render_signature": "520be19cbb2b62ce94384e574e8c458e5857adb7b0d7fb11b16448d55f32aba6",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -8890,24 +6406,6 @@
           "intensity": "TD",
           "model_count": 16,
           "target_model_count": 36,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "IFEC_AI",
-            "IFKM_AI",
-            "NAVGEM",
-            "PGEC_AI"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -8926,16 +6424,16 @@
             "NAVGEM",
             "Pangu-Weather-ECMWF"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202606041200_td_2026_11_120h.json"
     },
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202606041200",
         "td_number": 11,
@@ -8943,35 +6441,18 @@
         "typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp912026",
-        "skip_atcf": false,
-        "atcf_match_method": "position",
-        "reason": "TD has no linked typhoon number yet; using temporary position match wp912026 (99 km).",
-        "analysis_point": {
-          "time_utc": "202606041200",
-          "lat": 20.2,
-          "lon": 119.1
-        },
-        "analysis_source": "BDECK",
-        "analysis_match_method": "position",
-        "analysis_distance_km": 99.3420350029941
+        "fcst_hours": 240,
+        "skip_atcf": false
       },
       "window": {
-        "data_time": "202606041200",
-        "cycle_time_utc": "202606041200",
-        "start_utc": "202606041700",
-        "end_utc": "202606042300"
+        "data_time": "202606041200"
       },
       "result": {
-        "status": "ok",
-        "returncode": 0,
-        "stdout": "Using plot font: NanumSquare\nCMC_EPS KNACKWX: trimmed after 120h due to forecast gap to 156h\nECMWF: selected NOAA ATCF by source priority; skipped KNACKWX ATCF\nECMWF_AIFS: selected KMA APIHUB by source priority; skipped NOAA ATCF, KNACKWX ATCF\nECMWF_EPS: selected KMA APIHUB by source priority; skipped KNACKWX ATCF\nGENC KNACKWX: trimmed after 84h due to forecast gap to 120h\nKMA 0h is missing; using BDECK analysis point: 20.20N, 119.10E.\nFNEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nGCEC_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nIFEC_AI APIHUB: trimmed 8 point(s) after 186h due to suspected dateline-reflected longitude tail\nIFKM_AI APIHUB: trimmed 10 point(s) after 180h due to suspected dateline-reflected longitude tail\nPGEC_AI APIHUB: trimmed 7 point(s) after 192h due to suspected dateline-reflected longitude tail\nMap extent ignored 143 KNACKWX point(s).\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_120h.png\nMap extent ignored 181 KNACKWX point(s).\nMap extent ignored 143 KNACKWX point(s).\n240h map extent was too broad; using expanded 120h anchor (98.7 lon x 53.8 lat).\n240h map extent candidate is too broad for stable cache; using uncached extent (122.8 lon x 62.1 lat).\n240h stable map extent was too broad after aspect matching; falling back to expanded 120h anchor.\nSaved: /home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png\n",
-        "stderr": "",
-        "metadata_path": "/home/woojin/actions-runner/cds-vtg/actions-runner/_work/CDS/CDS/VTG_IMG/metadata/202606041200_td_2026_11_240h.json",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260604222525",
-          "render_signature": "520be19cbb2b62ce94384e574e8c458e5857adb7b0d7fb11b16448d55f32aba6",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606041200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -8986,24 +6467,6 @@
           "intensity": "TD",
           "model_count": 16,
           "target_model_count": 36,
-          "models": [
-            "CMC",
-            "CMC_EPS",
-            "ECMWF",
-            "ECMWF_AIFS",
-            "ECMWF_AIFS_EPS",
-            "ECMWF_EPS",
-            "FNEC_AI",
-            "FNV3",
-            "GCEC_AI",
-            "GENC",
-            "GFS",
-            "GFS_EPS",
-            "IFEC_AI",
-            "IFKM_AI",
-            "NAVGEM",
-            "PGEC_AI"
-          ],
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -9022,11 +6485,11 @@
             "NAVGEM",
             "Pangu-Weather-ECMWF"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202606041200_td_2026_11_240h.json"
     }
   ]
 }

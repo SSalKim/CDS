@@ -1898,7 +1898,7 @@ def longitude_delta(a: float, b: float) -> float:
     return ((a - b + 180) % 360) - 180
 
 
-def exclude_knackwx_extent_points(points: pd.DataFrame) -> pd.DataFrame:
+def exclude_knackwx_extent_points(points: pd.DataFrame, *, log: bool = True) -> pd.DataFrame:
     if DATA_SOURCE_COLUMN not in points:
         return points
 
@@ -1911,7 +1911,8 @@ def exclude_knackwx_extent_points(points: pd.DataFrame) -> pd.DataFrame:
     if filtered.empty:
         return points
 
-    print(f"Map extent ignored {int(knackwx_mask.sum())} KNACKWX point(s).")
+    if log:
+        print(f"Map extent ignored {int(knackwx_mask.sum())} KNACKWX point(s).")
     return filtered
 
 
@@ -2202,6 +2203,55 @@ def current_point_legend_safe_extent(df: pd.DataFrame, extent: list[float]) -> l
     return [lon_min + shift, lon_max + shift, lat_min, lat_max]
 
 
+def trim_excess_240_padding(df: pd.DataFrame, extent: list[float], settings: Settings) -> list[float]:
+    if settings.fcst_hours != 240 or not settings.auto_extent:
+        return extent
+
+    points = numeric_track_points(df)
+    if points.empty:
+        return extent
+
+    points = exclude_knackwx_extent_points(points, log=False)
+    lead_hours = pd.to_numeric(points["TMD"], errors="coerce")
+    points = points[lead_hours.between(0, settings.fcst_hours)].copy()
+    if points.empty:
+        return extent
+
+    lons = pd.to_numeric(points["LON"], errors="coerce").dropna()
+    lats = pd.to_numeric(points["LAT"], errors="coerce").dropna()
+    if lons.empty or lats.empty:
+        return extent
+
+    data_west = float(lons.min())
+    data_east = float(lons.max())
+    data_south = float(lats.min())
+    data_north = float(lats.max())
+
+    lon_min, lon_max, lat_min, lat_max = extent
+    data_lon_span = max(data_east - data_west, 1.0)
+    data_lat_span = max(data_north - data_south, 1.0)
+    max_west_padding = max(10.0, min(24.0, data_lon_span * 0.38))
+    max_north_padding = max(8.0, min(15.0, data_lat_span * 0.38))
+
+    new_lon_min = lon_min
+    new_lat_max = lat_max
+    if data_west - lon_min > max_west_padding:
+        new_lon_min = data_west - max_west_padding
+    if lat_max - data_north > max_north_padding:
+        new_lat_max = data_north + max_north_padding
+
+    if new_lon_min == lon_min and new_lat_max == lat_max:
+        return extent
+
+    compacted = [new_lon_min, lon_max, lat_min, new_lat_max]
+    print(
+        "240h map extent trimmed excessive padding "
+        f"({lon_max - lon_min:.1f}x{lat_max - lat_min:.1f} -> "
+        f"{compacted[1] - compacted[0]:.1f}x{compacted[3] - compacted[2]:.1f})."
+    )
+    return compacted
+
+
 def mercator_figure_size(extent: list[float], *, width: float = 11.2) -> tuple[float, float]:
     projection = ccrs.Mercator()
     lon_min, lon_max, lat_min, lat_max = extent
@@ -2346,6 +2396,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
         extent = clamp_west_pacific_extent(extent)
     extent = current_point_legend_safe_extent(df, extent)
     extent = clamp_west_pacific_extent(extent)
+    extent = trim_excess_240_padding(df, extent, settings)
 
     data_crs = ccrs.PlateCarree()
     map_crs = ccrs.Mercator()

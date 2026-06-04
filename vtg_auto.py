@@ -33,6 +33,30 @@ VALID_FCST_HOURS = (120, 240)
 CYCLE_HOURS = (0, 6, 12, 18)
 WINDOW_START_OFFSET_HOURS = 5
 WINDOW_END_OFFSET_HOURS = 11
+DEFAULT_STATUS_RETENTION_DAYS = 30
+MANIFEST_METADATA_KEYS = (
+    "generated_at_utc",
+    "image_path",
+    "storm_stage",
+    "storm_year",
+    "typ_number",
+    "typ_name",
+    "typ_name_ko",
+    "linked_td_number",
+    "atcf_id",
+    "extra_atcf_ids",
+    "data_time",
+    "fcst_hours",
+    "intensity",
+    "model_count",
+    "target_model_count",
+    "models",
+    "model_labels",
+    "skip_atcf",
+    "no_output",
+    "no_output_reason",
+)
+STATUS_METADATA_KEYS = MANIFEST_METADATA_KEYS + ("render_signature",)
 REQUEST_HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -1175,7 +1199,7 @@ def manifest_entry_from_metadata(path: Path, metadata: dict) -> dict:
             "skip_atcf": bool(metadata.get("skip_atcf")),
         },
         "window": {"data_time": data_time},
-        "result": {"status": "inventory", "metadata": metadata},
+        "result": {"status": "inventory", "metadata": compact_metadata(metadata)},
         "metadata_path": relative_asset_path(path),
     }
 
@@ -1258,6 +1282,125 @@ def metadata_model_count(metadata: dict | None) -> int:
         return int(metadata.get("model_count") or 0)
     except (TypeError, ValueError):
         return 0
+
+
+def compact_metadata(metadata: dict | None, allowed_keys: tuple[str, ...] = MANIFEST_METADATA_KEYS) -> dict:
+    if not isinstance(metadata, dict):
+        return {}
+    compact = {}
+    has_model_labels = bool(metadata.get("model_labels"))
+    for key in allowed_keys:
+        if key == "models" and has_model_labels:
+            continue
+        if key in metadata:
+            compact[key] = metadata[key]
+    return compact
+
+
+def compact_manifest_entry(entry: dict) -> dict:
+    if not isinstance(entry, dict):
+        return {}
+    result = entry.get("result") if isinstance(entry.get("result"), dict) else {}
+    metadata = compact_metadata(result.get("metadata"))
+    job = entry.get("job") if isinstance(entry.get("job"), dict) else {}
+    window = entry.get("window") if isinstance(entry.get("window"), dict) else {}
+
+    compact_job = {}
+    for key in (
+        "storm_key",
+        "stage",
+        "year",
+        "data_time",
+        "td_number",
+        "linked_td_number",
+        "typ_number",
+        "typ_name_ko",
+        "typ_name",
+        "typ_en",
+        "atcf_id",
+        "fcst_hours",
+        "skip_atcf",
+    ):
+        if key in job:
+            compact_job[key] = job[key]
+
+    compact_window = {}
+    for key in ("data_time", "cycle_time_utc", "start_utc", "end_utc"):
+        if key in window:
+            compact_window[key] = window[key]
+
+    compact = {
+        "job": compact_job,
+        "window": compact_window,
+        "result": {
+            "status": result.get("status", "unknown"),
+            "metadata": metadata,
+        },
+    }
+    if "metadata_path" in entry:
+        compact["metadata_path"] = entry["metadata_path"]
+    if "completed" in entry:
+        compact["completed"] = bool(entry.get("completed"))
+    if "final_check" in entry:
+        compact["final_check"] = bool(entry.get("final_check"))
+    return compact
+
+
+def compact_manifest_runs(run_entries: list[dict]) -> list[dict]:
+    return [entry for entry in (compact_manifest_entry(entry) for entry in run_entries) if entry]
+
+
+def compact_status_record(record: dict) -> dict:
+    if not isinstance(record, dict):
+        return {}
+    compact = {}
+    for key in (
+        "updated_at_utc",
+        "completed",
+        "last_status",
+        "atcf_id",
+        "atcf_match_method",
+        "reason",
+        "final_checked_at_utc",
+        "final_check_window_end_utc",
+    ):
+        if key in record:
+            compact[key] = record[key]
+    compact["metadata"] = compact_metadata(record.get("metadata"), STATUS_METADATA_KEYS)
+    return compact
+
+
+def prune_status_for_persistence(
+    status: dict,
+    *,
+    active_data_times: set[str],
+    retention_days: int,
+    reference_time: datetime,
+) -> dict:
+    cycles = status.get("cycles") if isinstance(status, dict) else {}
+    if not isinstance(cycles, dict):
+        return {"cycles": {}}
+
+    cutoff = reference_time - timedelta(days=retention_days) if retention_days > 0 else None
+    pruned_cycles = {}
+    for data_time, storm_records in sorted(cycles.items()):
+        if not isinstance(storm_records, dict):
+            continue
+        keep_cycle = str(data_time) in active_data_times
+        cycle_time = parse_utc_stamp(str(data_time))
+        if cutoff is None or (cycle_time and cycle_time >= cutoff):
+            keep_cycle = True
+        if not keep_cycle:
+            continue
+
+        compact_records = {}
+        for status_key, record in sorted(storm_records.items()):
+            compact_record = compact_status_record(record)
+            if compact_record:
+                compact_records[status_key] = compact_record
+        if compact_records:
+            pruned_cycles[str(data_time)] = compact_records
+    return {"cycles": pruned_cycles}
 
 
 def current_render_signature() -> str:
@@ -1359,7 +1502,7 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
             suppressed_keys.add(key)
             entries_by_key.pop(key, None)
             continue
-        entries_by_key[key] = entry
+        entries_by_key[key] = compact_manifest_entry(entry)
 
     return sorted(
         entries_by_key.values(),
@@ -1414,6 +1557,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--check-run-needed", action="store_true", help="Only check whether image generation is needed and exit.")
     parser.add_argument("--github-output", type=Path, default=None, help="Optional GitHub Actions output file for --check-run-needed.")
     parser.add_argument("--force", action="store_true", help="Run even if a previous metadata record met the completion target.")
+    parser.add_argument("--status-retention-days", type=int, default=DEFAULT_STATUS_RETENTION_DAYS, help="Keep compact automation status for this many days; use 0 to disable pruning.")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
@@ -1448,8 +1592,16 @@ def main() -> int:
             "runs": [],
             "inventory": build_manifest_inventory(output_root, []),
         }
+        status_for_write = prune_status_for_persistence(
+            status,
+            active_data_times={window.data_time for window in windows},
+            retention_days=args.status_retention_days,
+            reference_time=utc_now(),
+        )
         if not args.dry_run:
             write_json(manifest_path, manifest)
+            if status_for_write != status:
+                write_json(status_path, status_for_write)
         print(json.dumps(manifest, ensure_ascii=False, indent=2))
         return 0
 
@@ -1627,6 +1779,8 @@ def main() -> int:
         return 0
 
     previous_manifest = load_json(manifest_path, {})
+    compact_runs = compact_manifest_runs(run_entries)
+    inventory = build_manifest_inventory(output_root, run_entries)
     manifest = {
         "updated_at_utc": format_utc_stamp(now),
         "window_start_offset_hours": WINDOW_START_OFFSET_HOURS,
@@ -1634,17 +1788,24 @@ def main() -> int:
         "complete_model_count": args.complete_model_count,
         "final_check_before_window_end_minutes": args.final_check_before_window_end_minutes,
         "active_windows": [asdict(window) for window in windows],
-        "runs": run_entries,
-        "inventory": build_manifest_inventory(output_root, run_entries),
+        "runs": compact_runs,
+        "inventory": inventory,
     }
+    status_for_write = prune_status_for_persistence(
+        status,
+        active_data_times={window.data_time for window in windows},
+        retention_days=args.status_retention_days,
+        reference_time=utc_now(),
+    )
     should_clear_previous_manifest = not run_entries and bool(previous_manifest.get("runs"))
     inventory_changed = previous_manifest.get("inventory") != manifest.get("inventory")
+    status_changed = status_for_write != status
     should_write_outputs = not args.dry_run and (
-        actual_run_count > 0 or should_clear_previous_manifest or inventory_changed
+        actual_run_count > 0 or should_clear_previous_manifest or inventory_changed or status_changed
     )
     if should_write_outputs:
         write_json(manifest_path, manifest)
-        write_json(status_path, status)
+        write_json(status_path, status_for_write)
     print(json.dumps(manifest, ensure_ascii=False, indent=2))
     return 0
 
