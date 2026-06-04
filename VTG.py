@@ -2519,7 +2519,7 @@ def draw_model_legend_table(ax, rows: list[dict]) -> None:
     handle_x1 = x0 + pad_x + 0.024
     handle_mid = (handle_x0 + handle_x1) / 2
     label_x = x0 + pad_x + 0.030
-    pressure_x = x1 - pad_x - 0.064
+    pressure_x = x1 - pad_x - 0.075
     lead_x = x1 - pad_x
     label_font_family = PLOT_FONT_FAMILY
     label_font_weight = "700"
