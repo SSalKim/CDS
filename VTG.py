@@ -186,9 +186,13 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 2
+MAP_EXTENT_CACHE_VERSION = 3
 MAX_STABLE_240_LON_SPAN = 78.0
 MAX_STABLE_240_LAT_SPAN = 42.0
+MAX_DISPLAY_240_LON_SPAN = 96.0
+MAX_DISPLAY_240_LAT_SPAN = 60.0
+MIN_DISPLAY_240_WEST_LON = 82.0
+MAX_DISPLAY_240_NORTH_LAT = 68.0
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
@@ -1280,7 +1284,7 @@ def storm_number_label(settings: Settings) -> str:
 
 def display_typ_name(settings: Settings) -> str:
     name = str(settings.typ_name or "").strip()
-    return "" if name.upper() in {"NONAME", "NAMELESS"} else name
+    return "" if name.upper() == "NONAME" else name
 
 
 def output_path(settings: Settings) -> Path:
@@ -1370,6 +1374,70 @@ def write_run_metadata(
     )
 
 
+def relative_image_path(target: Path) -> str:
+    image_path = target
+    try:
+        image_path = target.resolve().relative_to(PROJECT_ROOT.resolve())
+    except ValueError:
+        pass
+    return image_path.as_posix()
+
+
+def load_previous_metadata(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def write_preserved_output_metadata(
+    path: Path,
+    *,
+    settings: Settings,
+    intensity: str,
+    reason: str,
+    target: Path,
+) -> None:
+    previous = load_previous_metadata(path)
+    previous_model_count = 0
+    try:
+        previous_model_count = int(previous.get("model_count") or 0)
+    except (TypeError, ValueError):
+        previous_model_count = 0
+
+    payload = {
+        "generated_at_utc": datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"),
+        "render_signature": render_signature(),
+        "image_path": relative_image_path(target),
+        "storm_stage": settings.storm_stage,
+        "storm_year": storm_year(settings),
+        "typ_number": settings.typ_number,
+        "typ_name": settings.typ_name,
+        "typ_name_ko": settings.typ_name_ko,
+        "linked_td_number": settings.linked_td_number,
+        "atcf_id": "" if settings.skip_atcf else settings.atcf_id,
+        "extra_atcf_ids": [] if settings.skip_atcf else list(settings.extra_atcf_ids),
+        "data_time": settings.data_time,
+        "fcst_hours": settings.fcst_hours,
+        "intensity": intensity,
+        "model_count": max(previous_model_count, 1),
+        "target_model_count": active_model_target_count(settings),
+        "models": previous.get("models") if isinstance(previous.get("models"), list) else [],
+        "model_labels": previous.get("model_labels") if isinstance(previous.get("model_labels"), list) else [],
+        "skip_atcf": settings.skip_atcf,
+        "preserved_existing_image": True,
+        "preserve_reason": reason,
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
 def write_no_output_metadata(
     path: Path,
     *,
@@ -1377,6 +1445,18 @@ def write_no_output_metadata(
     intensity: str,
     reason: str,
 ) -> None:
+    existing_target = output_path(settings)
+    if existing_target.exists():
+        write_preserved_output_metadata(
+            path,
+            settings=settings,
+            intensity=intensity,
+            reason=reason,
+            target=existing_target,
+        )
+        print(f"Preserved existing image because no new output was available: {existing_target}")
+        return
+
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"),
         "render_signature": render_signature(),
@@ -1608,6 +1688,34 @@ def reasonable_stable_240_extent(extent: list[float]) -> bool:
     return lon_span <= MAX_STABLE_240_LON_SPAN and lat_span <= MAX_STABLE_240_LAT_SPAN
 
 
+def reasonable_display_240_extent(extent: list[float]) -> bool:
+    lon_span = extent[1] - extent[0]
+    lat_span = extent[3] - extent[2]
+    return (
+        lon_span <= MAX_DISPLAY_240_LON_SPAN
+        and lat_span <= MAX_DISPLAY_240_LAT_SPAN
+        and extent[0] >= MIN_DISPLAY_240_WEST_LON
+        and extent[3] <= MAX_DISPLAY_240_NORTH_LAT
+    )
+
+
+def expanded_120_anchor_for_240(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
+    anchor_settings = replace(settings, fcst_hours=120, fcst_hours_options=(120,))
+    anchor_df = limit_forecast_hours(df, anchor_settings)
+    anchor_extent = auto_map_extent(anchor_df, past_kma, anchor_settings)
+    if anchor_extent is None:
+        return None
+
+    lon_span = max(anchor_extent[1] - anchor_extent[0], 24.0)
+    lat_span = max(anchor_extent[3] - anchor_extent[2], 12.0)
+    return [
+        anchor_extent[0] - lon_span * 0.18,
+        anchor_extent[1] + lon_span * 0.48,
+        anchor_extent[2] - lat_span * 0.22,
+        anchor_extent[3] + lat_span * 0.38,
+    ]
+
+
 def stable_240_map_extent(extent: list[float], settings: Settings) -> list[float]:
     if settings.fcst_hours != 240:
         return extent
@@ -1764,6 +1872,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
         extent = auto_map_extent(df, past_kma, settings)
     else:
         extent = None
+    anchor_240_extent = expanded_120_anchor_for_240(df, past_kma, settings) if settings.fcst_hours == 240 else None
     if extent is None:
         center_lat = df["LAT"].mean() + settings.lat_padding if not df.empty else 25
         center_lon = df["LON"].mean() + settings.lon_padding if not df.empty else 135
@@ -1781,6 +1890,19 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     )
 
     extent = clamp_west_pacific_extent(extent)
+    if settings.fcst_hours == 240 and anchor_240_extent is not None and not reasonable_display_240_extent(extent):
+        print(
+            "240h map extent was too broad; using expanded 120h anchor "
+            f"({extent[1] - extent[0]:.1f} lon x {extent[3] - extent[2]:.1f} lat)."
+        )
+        extent = clamp_west_pacific_extent(anchor_240_extent)
+        extent = match_extent_to_canvas_aspect(
+            extent,
+            fig_width=fig_width,
+            fig_height=fig_height,
+            east_expand_ratio=0.68 if settings.auto_extent else 0.75,
+        )
+        extent = clamp_west_pacific_extent(extent)
     extent = stable_240_map_extent(extent, settings)
     extent = match_extent_to_canvas_aspect(
         extent,
@@ -1789,6 +1911,19 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
         east_expand_ratio=0.68 if settings.auto_extent else 0.75,
     )
     extent = clamp_west_pacific_extent(extent)
+    if settings.fcst_hours == 240 and anchor_240_extent is not None and not reasonable_display_240_extent(extent):
+        print(
+            "240h stable map extent was too broad after aspect matching; "
+            "falling back to expanded 120h anchor."
+        )
+        extent = clamp_west_pacific_extent(anchor_240_extent)
+        extent = match_extent_to_canvas_aspect(
+            extent,
+            fig_width=fig_width,
+            fig_height=fig_height,
+            east_expand_ratio=0.68 if settings.auto_extent else 0.75,
+        )
+        extent = clamp_west_pacific_extent(extent)
 
     data_crs = ccrs.PlateCarree()
     map_crs = ccrs.Mercator()

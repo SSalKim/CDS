@@ -1241,7 +1241,7 @@ return `제${entry.typNumber}호 태풍 ${name}`.trim();
 
 function normalizeTyphoonName(name){
 let text=String(name || '').trim();
-return text.toUpperCase()==='NAMELESS' ? 'NONAME' : text;
+return text;
 }
 
 function koreanTyphoonName(name){
