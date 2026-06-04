@@ -187,7 +187,6 @@ MODEL_ACTIVE_WINDOWS = {
     "UKMO_EPS": ("202604010000", None),
 }
 
-NO_WIND_SUMMARY_MODELS = {"KIM_EPS", "UKMO_EPS"}
 NO_PRESSURE_SUMMARY_MODELS = {"UKMO_EPS"}
 
 PRESSURE_MISSING_COLOR = "#A6A6A6"
@@ -255,7 +254,21 @@ MODEL_SOURCE_ALIASES = {
     for column in SOURCE_IDENTIFIER_COLUMNS.values()
     if row.get(column)
 }
-MODEL_SOURCE_ALIASES.update({"KEPS": "UM_KEPS", "IFEC": "IFEC_AI", "IFKM": "IFKM_AI"})
+for row in MODEL_SOURCES:
+    for source, column in SOURCE_IDENTIFIER_COLUMNS.items():
+        model_id = row.get(column)
+        if not model_id:
+            continue
+
+        alias_ids = []
+        if source == "APIHUB" and model_id == "UM_KEPS":
+            alias_ids.append("KEPS")
+        if model_id.endswith("_AI"):
+            alias_ids.append(model_id[:-3])
+
+        for alias_id in alias_ids:
+            MODEL_SOURCE_ALIASES.setdefault(alias_id, row["name"])
+            SOURCE_MODEL_IDS[source].add(alias_id)
 DATA_SOURCE_COLUMN = "_DATA_SOURCE"
 MS_PER_KT = 0.514444
 KMA_BASE_URL = "https://apihub-pub.kma.go.kr/api/typ01/url/typ_gts_now.php"
@@ -1474,14 +1487,11 @@ def track_intensity_summary(track: pd.DataFrame, model_name: str) -> str:
         model_name not in NO_PRESSURE_SUMMARY_MODELS
         and valid_pressure.notna().any()
     )
-    has_wind = (
-        model_name not in NO_WIND_SUMMARY_MODELS
-        and forecast["WS"].notna().any()
-    )
+    max_lead = int(round(float(forecast["TMD"].max())))
 
     # If pressure is missing, keep the inactive-style summary.
     if not has_pressure:
-        return f"{'----':>4}hPa {'---':>3}KT +000h"
+        return f"{'----':>4}hPa +---/{max_lead:03d}h"
 
     # If pressure exists, summarize the model at its minimum pressure time.
     peak = forecast.loc[valid_pressure.idxmin()]
@@ -1489,23 +1499,18 @@ def track_intensity_summary(track: pd.DataFrame, model_name: str) -> str:
     pressure = peak["PS"]
     pressure_value = str(int(round(float(pressure))))
 
-    wind_value = "---"
-    if has_wind and pd.notna(peak["WS"]):
-        wind_value = str(int(round(float(peak["WS"]) / MS_PER_KT)))
-
     pressure_text = f"{pressure_value:>4}hPa"
-    wind_text = f"{wind_value:>3}KT"
-    lead_text = f"+{int(round(float(peak['TMD']))):03d}h"
-    return f"{pressure_text} {wind_text} {lead_text}"
+    lead_text = f"+{int(round(float(peak['TMD']))):03d}/{max_lead:03d}h"
+    return f"{pressure_text} {lead_text}"
 
 
-def split_intensity_summary(metric: str) -> tuple[str, str, str]:
+def split_intensity_summary(metric: str) -> tuple[str, str]:
     if not metric:
-        return "", "", ""
+        return "", ""
     parts = metric.split()
-    if len(parts) >= 3:
-        return parts[0], parts[1], parts[2]
-    return metric, "", ""
+    if len(parts) >= 2:
+        return parts[0], parts[1]
+    return metric, ""
 
 
 def pressure_value_from_text(pressure_text: str) -> int | None:
@@ -2514,8 +2519,7 @@ def draw_model_legend_table(ax, rows: list[dict]) -> None:
     handle_x1 = x0 + pad_x + 0.024
     handle_mid = (handle_x0 + handle_x1) / 2
     label_x = x0 + pad_x + 0.030
-    pressure_x = x1 - pad_x - 0.080
-    wind_x = x1 - pad_x - 0.040
+    pressure_x = x1 - pad_x - 0.090
     lead_x = x1 - pad_x
     label_font_family = PLOT_FONT_FAMILY
     label_font_weight = "700"
@@ -2562,26 +2566,13 @@ def draw_model_legend_table(ax, rows: list[dict]) -> None:
             va="center",
             zorder=102,
         )
-        pressure_text, wind_text, lead_text = split_intensity_summary(row["metric"])
+        pressure_text, lead_text = split_intensity_summary(row["metric"])
         metric_text_color = pressure_metric_color(pressure_text)
 
         ax.text(
             pressure_x,
             y,
             pressure_text,
-            transform=ax.transAxes,
-            fontfamily=PLOT_FONT_FAMILY,
-            fontsize=font_size,
-            fontweight="700",
-            color=metric_text_color,
-            ha="right",
-            va="center",
-            zorder=102,
-        )
-        ax.text(
-            wind_x,
-            y,
-            wind_text,
             transform=ax.transAxes,
             fontfamily=PLOT_FONT_FAMILY,
             fontsize=font_size,
