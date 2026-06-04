@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       now:
-        description: "Optional UTC override, YYYYmmddHHMM"
+        description: "Optional target cycle UTC, YYYYmmddHH (00/06/12/18)"
         required: false
         type: string
       force:

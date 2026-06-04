@@ -99,6 +99,23 @@ def parse_utc_stamp(value: str) -> datetime | None:
         return None
 
 
+def parse_cycle_override(value: str) -> datetime | None:
+    text = str(value or "").strip()
+    if not re.fullmatch(r"\d{10}", text):
+        return None
+    try:
+        cycle = datetime.strptime(text, "%Y%m%d%H").replace(tzinfo=timezone.utc)
+    except ValueError:
+        return None
+    if cycle.hour not in CYCLE_HOURS:
+        return None
+    return cycle
+
+
+def cycle_probe_time(cycle: datetime) -> datetime:
+    return cycle + timedelta(hours=WINDOW_START_OFFSET_HOURS)
+
+
 def format_utc_stamp(value: datetime) -> str:
     return value.strftime("%Y%m%d%H%M")
 
@@ -1189,7 +1206,7 @@ def parse_fcst_hours(value: str) -> list[int]:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run scheduled VTG image generation.")
-    parser.add_argument("--now", help="Override current UTC time, YYYYmmddHHMM.")
+    parser.add_argument("--now", help="Override target cycle UTC, YYYYmmddHH. HH must be one of 00, 06, 12, 18.")
     parser.add_argument("--output-root", type=Path, default=PROJECT_ROOT / "VTG_IMG")
     parser.add_argument("--kma-cache-dir", type=Path, default=None)
     parser.add_argument("--auth-key", default=os.getenv("KMA_APIHUB_AUTH_KEY", ""))
@@ -1219,9 +1236,11 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     if args.now:
-        now = parse_utc_stamp(args.now)
-        if now is None:
-            raise SystemExit("--now must be YYYYmmddHHMM")
+        cycle = parse_cycle_override(args.now)
+        if cycle is None:
+            raise SystemExit("--now must be target cycle YYYYmmddHH, with HH one of 00, 06, 12, 18.")
+        now = cycle_probe_time(cycle)
+        print(f"Cycle override: {format_utc_stamp(cycle)} -> window probe time {format_utc_stamp(now)}")
     else:
         now = utc_now()
 
