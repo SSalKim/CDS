@@ -40,9 +40,11 @@ MANIFEST_METADATA_KEYS = (
     "storm_stage",
     "storm_year",
     "typ_number",
+    "data_typ_number",
     "typ_name",
     "typ_name_ko",
     "linked_td_number",
+    "linked_typ_number",
     "atcf_id",
     "extra_atcf_ids",
     "data_time",
@@ -85,7 +87,9 @@ class StormJob:
     data_time: str
     td_number: int | None
     linked_td_number: int | None
+    linked_typ_number: int | None
     typ_number: int
+    data_typ_number: int
     typ_name_ko: str
     typ_name: str
     typ_en: str
@@ -769,7 +773,9 @@ def build_storm_jobs(
             data_time=data_time,
             td_number=None,
             linked_td_number=linked_td_number,
+            linked_typ_number=None,
             typ_number=typ_number,
+            data_typ_number=typ_number,
             typ_name_ko=typ_name_ko,
             typ_name=typ_en or typ_name_ko or "NONAME",
             typ_en=typ_en,
@@ -914,8 +920,10 @@ def build_storm_jobs(
             year=year,
             data_time=data_time,
             td_number=td_number,
-            linked_td_number=td_number if typ_number else None,
-            typ_number=typ_number or td_number,
+            linked_td_number=None,
+            linked_typ_number=typ_number or None,
+            typ_number=td_number,
+            data_typ_number=typ_number or td_number,
             typ_name_ko=display_typ_name_ko if typ_number else "",
             typ_name=display_typ_en or display_typ_name_ko or "NONAME",
             typ_en=display_typ_en,
@@ -1039,6 +1047,8 @@ def vtg_command(
         str(PROJECT_ROOT / "VTG.py"),
         "--typ-number",
         str(job.typ_number),
+        "--data-typ-number",
+        str(job.data_typ_number),
         "--typ-name",
         job.typ_name,
         "--typ-name-ko",
@@ -1079,6 +1089,8 @@ def vtg_command(
             command.extend(["--analysis-distance-km", f"{job.analysis_distance_km:.1f}"])
     if job.linked_td_number is not None:
         command.extend(["--linked-td-number", str(job.linked_td_number)])
+    if job.linked_typ_number is not None:
+        command.extend(["--linked-typ-number", str(job.linked_typ_number)])
     if job.skip_atcf:
         command.append("--skip-atcf")
     if auto_fcst_hours:
@@ -1190,7 +1202,9 @@ def manifest_entry_from_metadata(path: Path, metadata: dict) -> dict:
             "data_time": data_time,
             "td_number": metadata.get("typ_number") if stage.upper() == "TD" else None,
             "linked_td_number": metadata.get("linked_td_number"),
+            "linked_typ_number": metadata.get("linked_typ_number"),
             "typ_number": typ_number,
+            "data_typ_number": metadata.get("data_typ_number") or typ_number,
             "typ_name_ko": metadata.get("typ_name_ko") or "",
             "typ_name": metadata.get("typ_name") or "NONAME",
             "typ_en": metadata.get("typ_name") or "",

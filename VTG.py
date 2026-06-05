@@ -299,9 +299,11 @@ ANALYSIS_SOURCE_PRIORITY = {
 @dataclass(frozen=True)
 class Settings:
     typ_number: int = 6
+    data_typ_number: int | None = None
     typ_name: str = "JANGMI"
     typ_name_ko: str = ""
     linked_td_number: int | None = None
+    linked_typ_number: int | None = None
     storm_stage: str = "TYP"
     atcf_id: str = "wp062026"
     extra_atcf_ids: tuple[str, ...] = ()
@@ -430,9 +432,16 @@ def parse_fcst_hours_value(value: str) -> tuple[int, ...]:
 def parse_args() -> Settings:
     parser = argparse.ArgumentParser(description="Plot tropical cyclone track guidance.")
     parser.add_argument("--typ-number", type=int, default=Settings.typ_number)
+    parser.add_argument(
+        "--data-typ-number",
+        type=int,
+        default=Settings.data_typ_number,
+        help="KMA APIHUB TYP number to query when it differs from the displayed TD/TYP number.",
+    )
     parser.add_argument("--typ-name", default=Settings.typ_name)
     parser.add_argument("--typ-name-ko", default=Settings.typ_name_ko)
     parser.add_argument("--linked-td-number", type=int, default=Settings.linked_td_number)
+    parser.add_argument("--linked-typ-number", type=int, default=Settings.linked_typ_number)
     parser.add_argument("--storm-stage", choices=("TYP", "TD"), default=Settings.storm_stage)
     parser.add_argument("--atcf-id", default=Settings.atcf_id)
     parser.add_argument(
@@ -491,9 +500,11 @@ def parse_args() -> Settings:
 
     return Settings(
         typ_number=args.typ_number,
+        data_typ_number=args.data_typ_number,
         typ_name=args.typ_name.strip(),
         typ_name_ko=args.typ_name_ko.strip(),
         linked_td_number=args.linked_td_number,
+        linked_typ_number=args.linked_typ_number,
         storm_stage=args.storm_stage,
         atcf_id=args.atcf_id.lower(),
         extra_atcf_ids=tuple(
@@ -615,7 +626,7 @@ def read_kma_csv(text: str | None, settings: Settings, *, forecast_only: bool) -
     df["LON"] = pd.to_numeric(df["LON"], errors="coerce")
     df["WS"] = pd.to_numeric(df["WS"], errors="coerce")
 
-    mask = df["TYP"].eq(settings.typ_number)
+    mask = df["TYP"].eq(kma_data_typ_number(settings))
     if forecast_only:
         mask &= df["TMD"].le(settings.fcst_hours)
     else:
@@ -626,6 +637,10 @@ def read_kma_csv(text: str | None, settings: Settings, *, forecast_only: bool) -
         df["SRC"] = df["SRC"].replace(MODEL_SOURCE_ALIASES)
     df[DATA_SOURCE_COLUMN] = "APIHUB"
     return df
+
+
+def kma_data_typ_number(settings: Settings) -> int:
+    return settings.data_typ_number or settings.typ_number
 
 
 def canonical_model_name(model_name: str) -> str:
@@ -833,11 +848,15 @@ def storm_history_keys(settings: Settings) -> list[str]:
         if key and key not in keys:
             keys.append(key)
 
-    if settings.linked_td_number:
-        add(f"td_{year}_{settings.linked_td_number:02d}")
-    if settings.storm_stage.upper() == "TD" and not settings.linked_td_number:
+    stage = settings.storm_stage.upper()
+    if stage == "TD":
         add(f"td_{year}_{settings.typ_number:02d}")
-    add(f"typ_{year}_{settings.typ_number:02d}")
+        if settings.linked_typ_number:
+            add(f"typ_{year}_{settings.linked_typ_number:02d}")
+    else:
+        if settings.linked_td_number:
+            add(f"td_{year}_{settings.linked_td_number:02d}")
+        add(f"typ_{year}_{settings.typ_number:02d}")
     return keys
 
 
@@ -1721,9 +1740,11 @@ def write_run_metadata(
         "storm_stage": settings.storm_stage,
         "storm_year": storm_year(settings),
         "typ_number": settings.typ_number,
+        "data_typ_number": kma_data_typ_number(settings),
         "typ_name": settings.typ_name,
         "typ_name_ko": settings.typ_name_ko,
         "linked_td_number": settings.linked_td_number,
+        "linked_typ_number": settings.linked_typ_number,
         "atcf_id": "" if settings.skip_atcf else settings.atcf_id,
         "extra_atcf_ids": [] if settings.skip_atcf else list(settings.extra_atcf_ids),
         "data_time": settings.data_time,
@@ -1791,9 +1812,11 @@ def write_preserved_output_metadata(
         "storm_stage": settings.storm_stage,
         "storm_year": storm_year(settings),
         "typ_number": settings.typ_number,
+        "data_typ_number": kma_data_typ_number(settings),
         "typ_name": settings.typ_name,
         "typ_name_ko": settings.typ_name_ko,
         "linked_td_number": settings.linked_td_number,
+        "linked_typ_number": settings.linked_typ_number,
         "atcf_id": "" if settings.skip_atcf else settings.atcf_id,
         "extra_atcf_ids": [] if settings.skip_atcf else list(settings.extra_atcf_ids),
         "data_time": settings.data_time,
@@ -1840,9 +1863,11 @@ def write_no_output_metadata(
         "storm_stage": settings.storm_stage,
         "storm_year": storm_year(settings),
         "typ_number": settings.typ_number,
+        "data_typ_number": kma_data_typ_number(settings),
         "typ_name": settings.typ_name,
         "typ_name_ko": settings.typ_name_ko,
         "linked_td_number": settings.linked_td_number,
+        "linked_typ_number": settings.linked_typ_number,
         "atcf_id": "" if settings.skip_atcf else settings.atcf_id,
         "extra_atcf_ids": [] if settings.skip_atcf else list(settings.extra_atcf_ids),
         "data_time": settings.data_time,
@@ -1956,8 +1981,14 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
     if points.empty:
         return None
 
-    primary_limit = 120 if settings.fcst_hours <= 120 else settings.fcst_hours
-    primary = points[pd.to_numeric(points["TMD"], errors="coerce").between(0, primary_limit)].copy()
+    lead_hours = pd.to_numeric(points["TMD"], errors="coerce")
+    long_range = pd.DataFrame()
+    if settings.fcst_hours > 120:
+        early = points[lead_hours.between(0, 120)].copy()
+        long_range = points[lead_hours.between(0, settings.fcst_hours)].copy()
+        primary = early if not early.empty else long_range
+    else:
+        primary = points[lead_hours.between(0, settings.fcst_hours)].copy()
     if primary.empty:
         primary = points.copy()
 
@@ -1968,6 +1999,15 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
 
     focus_lat = (lat_min + lat_max) / 2
     focus_lon = (lon_min + lon_max) / 2
+    if settings.fcst_hours > 120 and not long_range.empty:
+        long_lat_min, long_lat_max = robust_bounds(long_range, "LAT", settings)
+        long_lon_min, long_lon_max = robust_bounds(long_range, "LON", settings)
+        long_focus_lat = (long_lat_min + long_lat_max) / 2
+        long_focus_lon = (long_lon_min + long_lon_max) / 2
+        focus_lat = focus_lat * 0.72 + long_focus_lat * 0.28
+        focus_lon = focus_lon * 0.72 + long_focus_lon * 0.28
+        lat_span = max(lat_span, (long_lat_max - long_lat_min) * 0.88)
+        lon_span = max(lon_span, (long_lon_max - long_lon_min) * 0.88)
 
     if settings.fcst_hours > 120 and not past_kma.empty:
         current_dt = pd.to_datetime(settings.data_time, format="%Y%m%d%H%M", errors="coerce")
@@ -1994,7 +2034,7 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
     else:
         lon_total = max(38.0, lon_span * 1.60 + 11.0)
         lat_total = max(22.0, lat_span * 1.80 + 8.0)
-        focus_x = 0.38
+        focus_x = 0.36
         focus_y = 0.405
 
     lon_min = focus_lon - lon_total * focus_x
@@ -2312,6 +2352,14 @@ def match_extent_to_canvas_aspect(
     return extent
 
 
+def canvas_east_expand_ratio(settings: Settings) -> float:
+    if not settings.auto_extent:
+        return 0.75
+    if settings.fcst_hours == 240:
+        return 0.72
+    return 0.68
+
+
 def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, intensity: str) -> Path:
     df = df.copy()
     df["FT_TIME"] = parse_ft_time(df["FT_TM(UTC)"])
@@ -2336,7 +2384,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
         extent,
         fig_width=fig_width,
         fig_height=fig_height,
-        east_expand_ratio=0.68 if settings.auto_extent else 0.75,
+        east_expand_ratio=canvas_east_expand_ratio(settings),
     )
 
     extent = clamp_west_pacific_extent(extent)
@@ -2350,7 +2398,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
             extent,
             fig_width=fig_width,
             fig_height=fig_height,
-            east_expand_ratio=0.68 if settings.auto_extent else 0.75,
+            east_expand_ratio=canvas_east_expand_ratio(settings),
         )
         extent = clamp_west_pacific_extent(extent)
     extent = stable_240_map_extent(extent, settings)
@@ -2358,7 +2406,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
         extent,
         fig_width=fig_width,
         fig_height=fig_height,
-        east_expand_ratio=0.68 if settings.auto_extent else 0.75,
+        east_expand_ratio=canvas_east_expand_ratio(settings),
     )
     extent = clamp_west_pacific_extent(extent)
     if settings.fcst_hours == 240 and anchor_240_extent is not None and not reasonable_display_240_extent(extent):
@@ -2371,7 +2419,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
             extent,
             fig_width=fig_width,
             fig_height=fig_height,
-            east_expand_ratio=0.68 if settings.auto_extent else 0.75,
+            east_expand_ratio=canvas_east_expand_ratio(settings),
         )
         extent = clamp_west_pacific_extent(extent)
     extent = current_point_legend_safe_extent(df, extent)
@@ -2381,7 +2429,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
         extent,
         fig_width=fig_width,
         fig_height=fig_height,
-        east_expand_ratio=0.68 if settings.auto_extent else 0.75,
+        east_expand_ratio=canvas_east_expand_ratio(settings),
     )
     extent = clamp_west_pacific_extent(extent)
 
