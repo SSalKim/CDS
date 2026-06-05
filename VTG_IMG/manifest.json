@@ -1,63 +1,75 @@
 {
-  "updated_at_utc": "202606051832",
+  "updated_at_utc": "202602051100",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202606051200",
-      "cycle_time_utc": "202606051200",
-      "start_utc": "202606051700",
-      "end_utc": "202606052300"
+      "data_time": "202602050600",
+      "cycle_time_utc": "202602050600",
+      "start_utc": "202602051100",
+      "end_utc": "202602051700"
     }
   ],
   "runs": [
     {
       "job": {
-        "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
+        "storm_key": "typ_2026_02",
+        "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202606051200",
-        "td_number": 11,
-        "linked_td_number": null,
-        "typ_number": 11,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp912026",
+        "data_time": "202602050600",
+        "td_number": null,
+        "linked_td_number": 3,
+        "typ_number": 2,
+        "typ_name_ko": "페냐",
+        "typ_name": "PENHA",
+        "typ_en": "PENHA",
+        "atcf_id": "wp022026",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202606051200",
-        "cycle_time_utc": "202606051200",
-        "start_utc": "202606051700",
-        "end_utc": "202606052300"
+        "data_time": "202602050600",
+        "cycle_time_utc": "202602050600",
+        "start_utc": "202602051100",
+        "end_utc": "202602051700"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260605183443",
-          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606051200_120h.png",
-          "storm_stage": "TD",
+          "generated_at_utc": "20260605183543",
+          "image_path": "VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602050600_120h.png",
+          "storm_stage": "TYP",
           "storm_year": "2026",
-          "typ_number": 11,
-          "data_typ_number": 11,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
+          "typ_number": 2,
+          "data_typ_number": 2,
+          "typ_name": "PENHA",
+          "typ_name_ko": "페냐",
+          "linked_td_number": 3,
           "linked_typ_number": null,
-          "atcf_id": "wp912026",
+          "atcf_id": "wp022026",
           "extra_atcf_ids": [],
-          "data_time": "202606051200",
+          "data_time": "202602050600",
           "fcst_hours": 120,
-          "intensity": "TD",
-          "model_count": 3,
-          "target_model_count": 36,
+          "intensity": "TYP",
+          "model_count": 15,
+          "target_model_count": 39,
           "model_labels": [
-            "ECMWF AIFS EPS",
+            "ECMWF",
+            "ECMWF AIFS",
+            "ECMWF EPS",
             "FNV3",
-            "GFS EPS"
+            "GenCast",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "Aurora-ECMWF",
+            "FengWu-ECMWF",
+            "FuXi-ECMWF",
+            "HWRF",
+            "JGSM",
+            "JGSM EPS",
+            "UM"
           ],
           "skip_atcf": false
         }
@@ -67,49 +79,61 @@
     },
     {
       "job": {
-        "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
+        "storm_key": "typ_2026_02",
+        "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202606051200",
-        "td_number": 11,
-        "linked_td_number": null,
-        "typ_number": 11,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp912026",
+        "data_time": "202602050600",
+        "td_number": null,
+        "linked_td_number": 3,
+        "typ_number": 2,
+        "typ_name_ko": "페냐",
+        "typ_name": "PENHA",
+        "typ_en": "PENHA",
+        "atcf_id": "wp022026",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202606051200",
-        "cycle_time_utc": "202606051200",
-        "start_utc": "202606051700",
-        "end_utc": "202606052300"
+        "data_time": "202602050600",
+        "cycle_time_utc": "202602050600",
+        "start_utc": "202602051100",
+        "end_utc": "202602051700"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260605183444",
-          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606051200_240h.png",
-          "storm_stage": "TD",
+          "generated_at_utc": "20260605183544",
+          "image_path": "VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602050600_240h.png",
+          "storm_stage": "TYP",
           "storm_year": "2026",
-          "typ_number": 11,
-          "data_typ_number": 11,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
+          "typ_number": 2,
+          "data_typ_number": 2,
+          "typ_name": "PENHA",
+          "typ_name_ko": "페냐",
+          "linked_td_number": 3,
           "linked_typ_number": null,
-          "atcf_id": "wp912026",
+          "atcf_id": "wp022026",
           "extra_atcf_ids": [],
-          "data_time": "202606051200",
+          "data_time": "202602050600",
           "fcst_hours": 240,
-          "intensity": "TD",
-          "model_count": 3,
-          "target_model_count": 36,
+          "intensity": "TYP",
+          "model_count": 15,
+          "target_model_count": 39,
           "model_labels": [
-            "ECMWF AIFS EPS",
+            "ECMWF",
+            "ECMWF AIFS",
+            "ECMWF EPS",
             "FNV3",
-            "GFS EPS"
+            "GenCast",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "Aurora-ECMWF",
+            "FengWu-ECMWF",
+            "FuXi-ECMWF",
+            "HWRF",
+            "JGSM",
+            "JGSM EPS",
+            "UM"
           ],
           "skip_atcf": false
         }
@@ -4452,28 +4476,28 @@
     {
       "job": {
         "storm_key": "typ_2026_02",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2026,
         "data_time": "202602050600",
         "td_number": null,
         "linked_td_number": 3,
-        "linked_typ_number": null,
         "typ_number": 2,
-        "data_typ_number": 2,
         "typ_name_ko": "페냐",
         "typ_name": "PENHA",
         "typ_en": "PENHA",
         "atcf_id": "wp022026",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202602050600"
+        "data_time": "202602050600",
+        "cycle_time_utc": "202602050600",
+        "start_utc": "202602051100",
+        "end_utc": "202602051700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260605050808",
+          "generated_at_utc": "20260605183543",
           "image_path": "VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602050600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -4507,37 +4531,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202602050600_typ_2026_02_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2026_02",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2026,
         "data_time": "202602050600",
         "td_number": null,
         "linked_td_number": 3,
-        "linked_typ_number": null,
         "typ_number": 2,
-        "data_typ_number": 2,
         "typ_name_ko": "페냐",
         "typ_name": "PENHA",
         "typ_en": "PENHA",
         "atcf_id": "wp022026",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202602050600"
+        "data_time": "202602050600",
+        "cycle_time_utc": "202602050600",
+        "start_utc": "202602051100",
+        "end_utc": "202602051700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260605050810",
+          "generated_at_utc": "20260605183544",
           "image_path": "VTG_IMG/2026/TYP_2602_PENHA/TYP_2602_PENHA_202602050600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -4571,11 +4595,11 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202602050600_typ_2026_02_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
@@ -18949,26 +18973,26 @@
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202606051200",
         "td_number": 11,
         "linked_td_number": null,
+        "linked_typ_number": null,
         "typ_number": 11,
+        "data_typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp912026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202606051200",
-        "cycle_time_utc": "202606051200",
-        "start_utc": "202606051700",
-        "end_utc": "202606052300"
+        "data_time": "202606051200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260605183443",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606051200_120h.png",
@@ -18992,35 +19016,35 @@
             "FNV3",
             "GFS EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202606051200_td_2026_11_120h.json"
     },
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD_POSITION_ATCF",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202606051200",
         "td_number": 11,
         "linked_td_number": null,
+        "linked_typ_number": null,
         "typ_number": 11,
+        "data_typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp912026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202606051200",
-        "cycle_time_utc": "202606051200",
-        "start_utc": "202606051700",
-        "end_utc": "202606052300"
+        "data_time": "202606051200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260605183444",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606051200_240h.png",
@@ -19044,11 +19068,11 @@
             "FNV3",
             "GFS EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202606051200_td_2026_11_240h.json"
     }
   ]
 }
