@@ -842,7 +842,7 @@ def build_storm_jobs(
                     negative_radius=atcf_search_negative_radius,
                 )
         if resolve_atcf and atcf_match is None:
-            reference_typ_number = typ_number or td_number
+            reference_typ_number = td_number
             kma_point = fetch_kma_reference_point(typ_number=reference_typ_number, data_time=data_time, auth_key=auth_key)
             atcf_match = find_atcf_position_match(
                 typ_number=reference_typ_number,
@@ -923,7 +923,7 @@ def build_storm_jobs(
             linked_td_number=None,
             linked_typ_number=typ_number or None,
             typ_number=td_number,
-            data_typ_number=typ_number or td_number,
+            data_typ_number=td_number,
             typ_name_ko=display_typ_name_ko if typ_number else "",
             typ_name=display_typ_en or display_typ_name_ko or "NONAME",
             typ_en=display_typ_en,
