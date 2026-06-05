@@ -197,7 +197,7 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 8
+MAP_EXTENT_CACHE_VERSION = 9
 MAX_STABLE_240_LON_SPAN = 78.0
 MAX_STABLE_240_LAT_SPAN = 42.0
 MAX_DISPLAY_240_LON_SPAN = 96.0
@@ -1510,7 +1510,7 @@ def track_intensity_summary(track: pd.DataFrame, model_name: str) -> str:
 
     # If pressure is missing, keep the inactive-style summary.
     if not has_pressure:
-        return f"{'----':>4}hPa +----/----h"
+        return f"{'----':>4}hPa +-----/----h"
 
     # If pressure exists, summarize the model at its minimum pressure time.
     peak = forecast.loc[valid_pressure.idxmin()]
@@ -1976,19 +1976,221 @@ def robust_bounds(points: pd.DataFrame, column: str, settings: Settings) -> tupl
     return robust_series_bounds(clean)
 
 
+def lead_filtered_points(points: pd.DataFrame, min_hour: float, max_hour: float) -> pd.DataFrame:
+    leads = pd.to_numeric(points["TMD"], errors="coerce")
+    return points[leads.between(min_hour, max_hour)].copy()
+
+
+def latest_points_by_source(points: pd.DataFrame, min_hour: float, max_hour: float) -> pd.DataFrame:
+    if points.empty or "SRC" not in points:
+        return pd.DataFrame(columns=points.columns)
+    subset = lead_filtered_points(points, min_hour, max_hour)
+    if subset.empty:
+        return subset
+    subset["TMD"] = pd.to_numeric(subset["TMD"], errors="coerce")
+    return subset.dropna(subset=["TMD"]).sort_values("TMD").groupby("SRC", dropna=True).tail(1)
+
+
+def closest_points_by_source(points: pd.DataFrame, target_hour: float, tolerance: float = 36.0) -> pd.DataFrame:
+    if points.empty or "SRC" not in points:
+        return pd.DataFrame(columns=points.columns)
+    subset = points.copy()
+    subset["TMD"] = pd.to_numeric(subset["TMD"], errors="coerce")
+    subset = subset.dropna(subset=["TMD"])
+    if subset.empty:
+        return subset
+    subset["_lead_error"] = (subset["TMD"] - target_hour).abs()
+    subset = subset[subset["_lead_error"].le(tolerance)]
+    if subset.empty:
+        return subset.drop(columns=["_lead_error"], errors="ignore")
+    closest = subset.sort_values(["SRC", "_lead_error", "TMD"]).groupby("SRC", dropna=True).head(1)
+    return closest.drop(columns=["_lead_error"], errors="ignore")
+
+
+def bounds_from_frames(frames: list[pd.DataFrame], settings: Settings) -> tuple[float, float, float, float] | None:
+    available = [frame for frame in frames if frame is not None and not frame.empty]
+    if not available:
+        return None
+    merged = pd.concat(available, ignore_index=True)
+    if merged.empty:
+        return None
+    lat_min, lat_max = robust_bounds(merged, "LAT", settings)
+    lon_min, lon_max = robust_bounds(merged, "LON", settings)
+    return lon_min, lon_max, lat_min, lat_max
+
+
+def expand_bounds_with_frame(
+    bounds: tuple[float, float, float, float],
+    frame: pd.DataFrame,
+    *,
+    exact: bool = False,
+) -> tuple[float, float, float, float]:
+    if frame.empty:
+        return bounds
+    lons = pd.to_numeric(frame["LON"], errors="coerce").dropna()
+    lats = pd.to_numeric(frame["LAT"], errors="coerce").dropna()
+    if lons.empty or lats.empty:
+        return bounds
+    lon_min, lon_max, lat_min, lat_max = bounds
+    if exact or len(frame) < 10:
+        return (
+            min(lon_min, float(lons.min())),
+            max(lon_max, float(lons.max())),
+            min(lat_min, float(lats.min())),
+            max(lat_max, float(lats.max())),
+        )
+    return (
+        min(lon_min, float(lons.quantile(0.08))),
+        max(lon_max, float(lons.quantile(0.92))),
+        min(lat_min, float(lats.quantile(0.08))),
+        max(lat_max, float(lats.quantile(0.92))),
+    )
+
+
+def mean_point_frame(frame: pd.DataFrame) -> pd.DataFrame:
+    if frame.empty:
+        return pd.DataFrame(columns=frame.columns)
+    lons = pd.to_numeric(frame["LON"], errors="coerce").dropna()
+    lats = pd.to_numeric(frame["LAT"], errors="coerce").dropna()
+    if lons.empty or lats.empty:
+        return pd.DataFrame(columns=frame.columns)
+    return pd.DataFrame({"LAT": [float(lats.mean())], "LON": [float(lons.mean())]})
+
+
+def expand_extent_to_min_span(
+    extent: list[float],
+    *,
+    min_lon_span: float,
+    min_lat_span: float,
+    east_ratio: float = 0.64,
+    north_ratio: float = 0.56,
+) -> list[float]:
+    lon_min, lon_max, lat_min, lat_max = extent
+    lon_span = lon_max - lon_min
+    if lon_span < min_lon_span:
+        extra = min_lon_span - lon_span
+        lon_min -= extra * (1.0 - east_ratio)
+        lon_max += extra * east_ratio
+
+    lat_span = lat_max - lat_min
+    if lat_span < min_lat_span:
+        extra = min_lat_span - lat_span
+        lat_min -= extra * (1.0 - north_ratio)
+        lat_max += extra * north_ratio
+
+    return [lon_min, lon_max, lat_min, lat_max]
+
+
+def reserve_240_legend_space(points: pd.DataFrame, extent: list[float]) -> list[float]:
+    if points.empty:
+        return extent
+    lon_min, lon_max, lat_min, lat_max = extent
+    lon_span = lon_max - lon_min
+    lat_span = lat_max - lat_min
+    if lon_span <= 0 or lat_span <= 0:
+        return extent
+
+    full = lead_filtered_points(points, 0, 240)
+    endpoints = latest_points_by_source(points, 96, 240)
+    important = pd.concat(
+        [frame for frame in [full, endpoints, mean_point_frame(endpoints)] if not frame.empty],
+        ignore_index=True,
+    )
+    if important.empty:
+        return extent
+
+    east_values = pd.to_numeric(important["LON"], errors="coerce").dropna()
+    north_values = pd.to_numeric(important["LAT"], errors="coerce").dropna()
+    if east_values.empty or north_values.empty:
+        return extent
+
+    important_east = float(east_values.quantile(0.90 if len(east_values) >= 10 else 1.0))
+    important_north = float(north_values.quantile(0.92 if len(north_values) >= 10 else 1.0))
+
+    target_east_x = 0.64
+    current_east_x = (important_east - lon_min) / lon_span
+    if current_east_x > target_east_x:
+        lon_max = max(lon_max, lon_min + (important_east - lon_min) / target_east_x)
+
+    target_north_y = 0.84
+    current_north_y = (important_north - lat_min) / lat_span
+    if current_north_y > target_north_y:
+        lat_max = max(lat_max, lat_min + (important_north - lat_min) / target_north_y)
+
+    return [lon_min, lon_max, lat_min, lat_max]
+
+
+def auto_map_extent_240(points: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
+    full = lead_filtered_points(points, 0, settings.fcst_hours)
+    if full.empty:
+        return None
+
+    early = lead_filtered_points(points, 0, 120)
+    if early.empty:
+        early = full
+    mid = closest_points_by_source(points, 120)
+    endpoints = latest_points_by_source(points, 120, settings.fcst_hours)
+    if len(endpoints) < 4:
+        endpoints = latest_points_by_source(points, 0, settings.fcst_hours)
+
+    starts = lead_filtered_points(points, 0, 0)
+    endpoint_mean = mean_point_frame(endpoints)
+
+    base_bounds = bounds_from_frames([early, mid, endpoints, endpoint_mean], settings)
+    if base_bounds is None:
+        base_bounds = bounds_from_frames([full], settings)
+    if base_bounds is None:
+        return None
+
+    bounds = base_bounds
+    for frame, exact in [
+        (starts, True),
+        (endpoint_mean, True),
+        (mid, False),
+        (endpoints, False),
+        (full, False),
+    ]:
+        bounds = expand_bounds_with_frame(bounds, frame, exact=exact)
+
+    if not past_kma.empty:
+        current_dt = pd.to_datetime(settings.data_time, format="%Y%m%d%H%M", errors="coerce")
+        past_points = past_kma.copy()
+        if "FT_TIME" in past_points and not pd.isna(current_dt):
+            cutoff = current_dt.to_pydatetime() - timedelta(hours=72)
+            past_points = past_points[past_points["FT_TIME"].ge(cutoff)].copy()
+        past_points = numeric_track_points(past_points)
+        if not past_points.empty:
+            bounds = expand_bounds_with_frame(bounds, past_points, exact=False)
+
+    lon_min, lon_max, lat_min, lat_max = bounds
+    lon_span = max(lon_max - lon_min, 1.0)
+    lat_span = max(lat_max - lat_min, 1.0)
+
+    west_pad = max(4.5, min(13.0, lon_span * 0.16 + 2.5))
+    east_pad = max(8.0, min(24.0, lon_span * 0.34 + 4.5))
+    south_pad = max(3.2, min(9.5, lat_span * 0.18 + 2.0))
+    north_pad = max(5.5, min(15.0, lat_span * 0.30 + 3.0))
+
+    extent = [
+        lon_min - west_pad,
+        lon_max + east_pad,
+        lat_min - south_pad,
+        lat_max + north_pad,
+    ]
+    extent = expand_extent_to_min_span(extent, min_lon_span=38.0, min_lat_span=22.0)
+    return reserve_240_legend_space(points, extent)
+
+
 def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
     points = extent_points_for_auto_map(df, settings)
     if points.empty:
         return None
 
-    lead_hours = pd.to_numeric(points["TMD"], errors="coerce")
-    long_range = pd.DataFrame()
     if settings.fcst_hours > 120:
-        early = points[lead_hours.between(0, 120)].copy()
-        long_range = points[lead_hours.between(0, settings.fcst_hours)].copy()
-        primary = early if not early.empty else long_range
-    else:
-        primary = points[lead_hours.between(0, settings.fcst_hours)].copy()
+        return auto_map_extent_240(points, past_kma, settings)
+
+    lead_hours = pd.to_numeric(points["TMD"], errors="coerce")
+    primary = points[lead_hours.between(0, settings.fcst_hours)].copy()
     if primary.empty:
         primary = points.copy()
 
@@ -1999,43 +2201,10 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
 
     focus_lat = (lat_min + lat_max) / 2
     focus_lon = (lon_min + lon_max) / 2
-    if settings.fcst_hours > 120 and not long_range.empty:
-        long_lat_min, long_lat_max = robust_bounds(long_range, "LAT", settings)
-        long_lon_min, long_lon_max = robust_bounds(long_range, "LON", settings)
-        long_focus_lat = (long_lat_min + long_lat_max) / 2
-        long_focus_lon = (long_lon_min + long_lon_max) / 2
-        focus_lat = focus_lat * 0.72 + long_focus_lat * 0.28
-        focus_lon = focus_lon * 0.72 + long_focus_lon * 0.28
-        lat_span = max(lat_span, (long_lat_max - long_lat_min) * 0.88)
-        lon_span = max(lon_span, (long_lon_max - long_lon_min) * 0.88)
-
-    if settings.fcst_hours > 120 and not past_kma.empty:
-        current_dt = pd.to_datetime(settings.data_time, format="%Y%m%d%H%M", errors="coerce")
-        past_points = past_kma.copy()
-        if "FT_TIME" in past_points and not pd.isna(current_dt):
-            cutoff = current_dt.to_pydatetime() - timedelta(hours=96)
-            past_points = past_points[past_points["FT_TIME"].ge(cutoff)].copy()
-        past_points = numeric_track_points(past_points)
-        if not past_points.empty:
-            past_lat_min, past_lat_max = robust_series_bounds(past_points["LAT"])
-            past_lon_min, past_lon_max = robust_series_bounds(past_points["LON"])
-            past_focus_lat = (past_lat_min + past_lat_max) / 2
-            past_focus_lon = (past_lon_min + past_lon_max) / 2
-            focus_lat = focus_lat * 0.86 + past_focus_lat * 0.14
-            focus_lon = focus_lon * 0.86 + past_focus_lon * 0.14
-            lat_span = max(lat_span, (max(lat_max, past_lat_max) - min(lat_min, past_lat_min)) * 0.82)
-            lon_span = max(lon_span, (max(lon_max, past_lon_max) - min(lon_min, past_lon_min)) * 0.82)
-
-    if settings.fcst_hours <= 120:
-        lon_total = max(24.0, lon_span * 1.45 + 7.0)
-        lat_total = max(10.5, lat_span * 1.55 + 4.5)
-        focus_x = 0.37
-        focus_y = 0.37
-    else:
-        lon_total = max(38.0, lon_span * 1.60 + 11.0)
-        lat_total = max(22.0, lat_span * 1.80 + 8.0)
-        focus_x = 0.36
-        focus_y = 0.405
+    lon_total = max(24.0, lon_span * 1.45 + 7.0)
+    lat_total = max(10.5, lat_span * 1.55 + 4.5)
+    focus_x = 0.37
+    focus_y = 0.37
 
     lon_min = focus_lon - lon_total * focus_x
     lon_max = lon_min + lon_total
@@ -2201,7 +2370,7 @@ def clamp_west_pacific_extent(
     return [lon_min, lon_max, lat_min, lat_max]
 
 
-def current_point_legend_safe_extent(df: pd.DataFrame, extent: list[float]) -> list[float]:
+def current_point_legend_safe_extent(df: pd.DataFrame, extent: list[float], settings: Settings) -> list[float]:
     start = df[(df["SRC"] == "KMA") & (pd.to_numeric(df["TMD"], errors="coerce") == 0)].head(1)
     if start.empty:
         return extent
@@ -2216,7 +2385,7 @@ def current_point_legend_safe_extent(df: pd.DataFrame, extent: list[float]) -> l
         return extent
 
     current_x = (lon - lon_min) / lon_span
-    safe_x = 0.625
+    safe_x = 0.655 if settings.fcst_hours == 240 else 0.625
     if current_x <= safe_x:
         return extent
 
@@ -2228,42 +2397,50 @@ def trim_excess_240_padding(df: pd.DataFrame, extent: list[float], settings: Set
     if settings.fcst_hours != 240 or not settings.auto_extent:
         return extent
 
-    points = numeric_track_points(df)
+    points = extent_points_for_auto_map(df, settings)
     if points.empty:
         return extent
 
-    lead_hours = pd.to_numeric(points["TMD"], errors="coerce")
-    points = points[lead_hours.between(0, settings.fcst_hours)].copy()
-    if points.empty:
+    full = lead_filtered_points(points, 0, settings.fcst_hours)
+    early = lead_filtered_points(points, 0, 120)
+    endpoints = latest_points_by_source(points, 120, settings.fcst_hours)
+    important = pd.concat(
+        [frame for frame in [full, early, endpoints, mean_point_frame(endpoints)] if not frame.empty],
+        ignore_index=True,
+    )
+    if important.empty:
         return extent
 
-    lons = pd.to_numeric(points["LON"], errors="coerce").dropna()
-    lats = pd.to_numeric(points["LAT"], errors="coerce").dropna()
-    if lons.empty or lats.empty:
-        return extent
-
-    data_west = float(lons.min())
-    data_east = float(lons.max())
-    data_south = float(lats.min())
-    data_north = float(lats.max())
+    data_lon_min, data_lon_max = robust_bounds(important, "LON", settings)
+    data_lat_min, data_lat_max = robust_bounds(important, "LAT", settings)
+    for frame, exact in [(lead_filtered_points(points, 0, 0), True), (mean_point_frame(endpoints), True)]:
+        data_lon_min, data_lon_max, data_lat_min, data_lat_max = expand_bounds_with_frame(
+            (data_lon_min, data_lon_max, data_lat_min, data_lat_max),
+            frame,
+            exact=exact,
+        )
 
     lon_min, lon_max, lat_min, lat_max = extent
-    data_lon_span = max(data_east - data_west, 1.0)
-    data_lat_span = max(data_north - data_south, 1.0)
-    max_west_padding = max(10.0, min(24.0, data_lon_span * 0.38))
-    max_north_padding = max(8.0, min(15.0, data_lat_span * 0.38))
+    data_lon_span = max(data_lon_max - data_lon_min, 1.0)
+    data_lat_span = max(data_lat_max - data_lat_min, 1.0)
+    max_west_padding = max(5.5, min(16.0, data_lon_span * 0.24 + 2.0))
+    max_south_padding = max(3.8, min(10.0, data_lat_span * 0.24 + 1.5))
+    max_north_padding = max(6.5, min(16.0, data_lat_span * 0.34 + 2.5))
 
     new_lon_min = lon_min
+    new_lat_min = lat_min
     new_lat_max = lat_max
-    if data_west - lon_min > max_west_padding:
-        new_lon_min = data_west - max_west_padding
-    if lat_max - data_north > max_north_padding:
-        new_lat_max = data_north + max_north_padding
+    if data_lon_min - lon_min > max_west_padding:
+        new_lon_min = data_lon_min - max_west_padding
+    if data_lat_min - lat_min > max_south_padding:
+        new_lat_min = data_lat_min - max_south_padding
+    if lat_max - data_lat_max > max_north_padding:
+        new_lat_max = data_lat_max + max_north_padding
 
-    if new_lon_min == lon_min and new_lat_max == lat_max:
+    if new_lon_min == lon_min and new_lat_min == lat_min and new_lat_max == lat_max:
         return extent
 
-    compacted = [new_lon_min, lon_max, lat_min, new_lat_max]
+    compacted = [new_lon_min, lon_max, new_lat_min, new_lat_max]
     print(
         "240h map extent trimmed excessive padding "
         f"({lon_max - lon_min:.1f}x{lat_max - lat_min:.1f} -> "
@@ -2422,7 +2599,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
             east_expand_ratio=canvas_east_expand_ratio(settings),
         )
         extent = clamp_west_pacific_extent(extent)
-    extent = current_point_legend_safe_extent(df, extent)
+    extent = current_point_legend_safe_extent(df, extent, settings)
     extent = clamp_west_pacific_extent(extent)
     extent = trim_excess_240_padding(df, extent, settings)
     extent = match_extent_to_canvas_aspect(
