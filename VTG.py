@@ -3172,14 +3172,28 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
         fig_height=fig_height,
     )
 
+    extent = match_extent_to_canvas_aspect(
+        extent,
+        fig_width=fig_width,
+        fig_height=fig_height,
+        east_expand_ratio=canvas_east_expand_ratio(settings),
+    )
+    extent = clamp_west_pacific_extent(extent)
+
     data_crs = ccrs.PlateCarree()
     map_crs = ccrs.Mercator()
 
-    fig = plt.figure(figsize=(fig_width, fig_height), dpi=settings.figure_dpi)
+    data_crs = ccrs.PlateCarree()
+    map_crs = ccrs.Mercator()
+
+    fig = plt.figure(figsize=(fig_width, fig_height), dpi=settings.figure_dpi, frameon=False)
+    fig.patch.set_facecolor("#262626")
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
 
     ax = fig.add_axes([0, 0, 1, 1], projection=map_crs)
+    ax.set_facecolor("#262626")
     ax.set_extent(extent, crs=data_crs)
+    ax.set_position([0, 0, 1, 1])
 
     ax.add_feature(cfeature.OCEAN.with_scale("10m"), zorder=0, facecolor="#262626", edgecolor="none")
     ax.add_feature(cfeature.LAND.with_scale("10m"), zorder=0, facecolor="#656565")
@@ -3210,8 +3224,11 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     fig.savefig(
         target,
         dpi=settings.figure_dpi,
-        facecolor="#ffffff",
+        facecolor="#262626",
+        edgecolor="none",
         transparent=False,
+        bbox_inches=None,
+        pad_inches=0,
     )
     if settings.show_plot:
         plt.show()
