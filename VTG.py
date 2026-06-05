@@ -1898,30 +1898,11 @@ def longitude_delta(a: float, b: float) -> float:
     return ((a - b + 180) % 360) - 180
 
 
-def exclude_knackwx_extent_points(points: pd.DataFrame, *, log: bool = True) -> pd.DataFrame:
-    if DATA_SOURCE_COLUMN not in points:
-        return points
-
-    sources = points[DATA_SOURCE_COLUMN].astype("string").str.upper()
-    knackwx_mask = sources.eq("KNACKWX")
-    if not knackwx_mask.any():
-        return points
-
-    filtered = points[~knackwx_mask].copy()
-    if filtered.empty:
-        return points
-
-    if log:
-        print(f"Map extent ignored {int(knackwx_mask.sum())} KNACKWX point(s).")
-    return filtered
-
-
 def extent_points_for_auto_map(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     points = numeric_track_points(df)
     if points.empty:
         return points
 
-    points = exclude_knackwx_extent_points(points)
     if settings.fcst_hours <= 120:
         return points
 
@@ -2211,7 +2192,6 @@ def trim_excess_240_padding(df: pd.DataFrame, extent: list[float], settings: Set
     if points.empty:
         return extent
 
-    points = exclude_knackwx_extent_points(points, log=False)
     lead_hours = pd.to_numeric(points["TMD"], errors="coerce")
     points = points[lead_hours.between(0, settings.fcst_hours)].copy()
     if points.empty:
