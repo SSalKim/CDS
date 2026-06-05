@@ -197,13 +197,13 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 10
-MIN_STABLE_240_LON_SPAN = 50.0
-MIN_STABLE_240_LAT_SPAN = 29.0
-MAX_STABLE_240_LON_SPAN = 88.0
-MAX_STABLE_240_LAT_SPAN = 50.0
-MAX_DISPLAY_240_LON_SPAN = 106.0
-MAX_DISPLAY_240_LAT_SPAN = 66.0
+MAP_EXTENT_CACHE_VERSION = 11
+MIN_STABLE_240_LON_SPAN = 56.0
+MIN_STABLE_240_LAT_SPAN = 32.0
+MAX_STABLE_240_LON_SPAN = 96.0
+MAX_STABLE_240_LAT_SPAN = 58.0
+MAX_DISPLAY_240_LON_SPAN = 116.0
+MAX_DISPLAY_240_LAT_SPAN = 72.0
 MIN_DISPLAY_240_WEST_LON = 82.0
 MAX_DISPLAY_240_NORTH_LAT = 68.0
 
@@ -2123,47 +2123,6 @@ def expand_extent_for_screen_bounds(
     return [lon_min, lon_max, lat_min, lat_max]
 
 
-def shift_extent_toward_point(
-    extent: list[float],
-    point: pd.DataFrame,
-    *,
-    target_x: float,
-    target_y: float,
-    min_x: float,
-    max_x: float,
-    min_y: float,
-    max_y: float,
-    max_shift_ratio: float = 0.18,
-) -> list[float]:
-    if point.empty:
-        return extent
-    lons = pd.to_numeric(point["LON"], errors="coerce").dropna()
-    lats = pd.to_numeric(point["LAT"], errors="coerce").dropna()
-    if lons.empty or lats.empty:
-        return extent
-
-    lon = float(lons.iloc[0])
-    lat = float(lats.iloc[0])
-    lon_min, lon_max, lat_min, lat_max = extent
-    lon_span = lon_max - lon_min
-    lat_span = lat_max - lat_min
-    if lon_span <= 0 or lat_span <= 0:
-        return extent
-
-    x = (lon - lon_min) / lon_span
-    y = (lat - lat_min) / lat_span
-    shift_lon = 0.0
-    shift_lat = 0.0
-    if x < min_x or x > max_x:
-        shift_lon = lon - target_x * lon_span - lon_min
-        shift_lon = max(-lon_span * max_shift_ratio, min(lon_span * max_shift_ratio, shift_lon))
-    if y < min_y or y > max_y:
-        shift_lat = lat - target_y * lat_span - lat_min
-        shift_lat = max(-lat_span * max_shift_ratio, min(lat_span * max_shift_ratio, shift_lat))
-
-    return [lon_min + shift_lon, lon_max + shift_lon, lat_min + shift_lat, lat_max + shift_lat]
-
-
 def expand_extent_to_min_span(
     extent: list[float],
     *,
@@ -2211,15 +2170,15 @@ def reserve_240_legend_space(points: pd.DataFrame, extent: list[float]) -> list[
     if east_values.empty or north_values.empty:
         return extent
 
-    important_east = float(east_values.quantile(0.90 if len(east_values) >= 10 else 1.0))
-    important_north = float(north_values.quantile(0.92 if len(north_values) >= 10 else 1.0))
+    important_east = float(east_values.quantile(0.88 if len(east_values) >= 10 else 1.0))
+    important_north = float(north_values.quantile(0.90 if len(north_values) >= 10 else 1.0))
 
-    target_east_x = 0.60
+    target_east_x = 0.66
     current_east_x = (important_east - lon_min) / lon_span
     if current_east_x > target_east_x:
         lon_max = max(lon_max, lon_min + (important_east - lon_min) / target_east_x)
 
-    target_north_y = 0.78
+    target_north_y = 0.82
     current_north_y = (important_north - lat_min) / lat_span
     if current_north_y > target_north_y:
         lat_max = max(lat_max, lat_min + (important_north - lat_min) / target_north_y)
@@ -2231,12 +2190,23 @@ def rebalance_240_forecast_extent(points: pd.DataFrame, extent: list[float], set
     if settings.fcst_hours != 240 or points.empty:
         return extent
 
-    late = lead_filtered_points(points, 120, settings.fcst_hours)
-    if late.empty:
+    full = lead_filtered_points(points, 0, settings.fcst_hours)
+    if full.empty:
         return extent
+    late = lead_filtered_points(points, 120, settings.fcst_hours)
     endpoints = latest_points_by_source(points, 120, settings.fcst_hours)
-    mid = closest_points_by_source(points, 120)
     starts = lead_filtered_points(points, 0, 0)
+
+    full_core_bounds = quantile_frame_bounds(full, lon_low=0.03, lon_high=0.97, lat_low=0.03, lat_high=0.97)
+    if full_core_bounds is not None:
+        extent = expand_extent_for_screen_bounds(
+            extent,
+            full_core_bounds,
+            left=0.08,
+            right=0.64,
+            bottom=0.08,
+            top=0.80,
+        )
 
     late_core = pd.concat(
         [frame for frame in [late, endpoints, mean_point_frame(endpoints)] if not frame.empty],
@@ -2247,24 +2217,11 @@ def rebalance_240_forecast_extent(points: pd.DataFrame, extent: list[float], set
         extent = expand_extent_for_screen_bounds(
             extent,
             core_bounds,
-            left=0.09,
-            right=0.56,
-            bottom=0.09,
-            top=0.72,
+            left=0.07,
+            right=0.66,
+            bottom=0.07,
+            top=0.82,
         )
-
-    late_focus = mean_point_frame(pd.concat([frame for frame in [mid, endpoints] if not frame.empty], ignore_index=True))
-    extent = shift_extent_toward_point(
-        extent,
-        late_focus,
-        target_x=0.52,
-        target_y=0.54,
-        min_x=0.34,
-        max_x=0.56,
-        min_y=0.34,
-        max_y=0.66,
-        max_shift_ratio=0.22,
-    )
 
     anchor_frames = [starts, mean_point_frame(endpoints)]
     anchor = pd.concat([frame for frame in anchor_frames if not frame.empty], ignore_index=True)
@@ -2273,18 +2230,18 @@ def rebalance_240_forecast_extent(points: pd.DataFrame, extent: list[float], set
         extent = expand_extent_for_screen_bounds(
             extent,
             anchor_bounds,
-            left=0.06,
-            right=0.63,
-            bottom=0.06,
-            top=0.80,
+            left=0.05,
+            right=0.68,
+            bottom=0.05,
+            top=0.84,
         )
 
     extent = expand_extent_to_min_span(
         extent,
         min_lon_span=MIN_STABLE_240_LON_SPAN,
         min_lat_span=MIN_STABLE_240_LAT_SPAN,
-        east_ratio=0.66,
-        north_ratio=0.58,
+        east_ratio=0.58,
+        north_ratio=0.56,
     )
     return extent
 
@@ -2294,9 +2251,6 @@ def auto_map_extent_240(points: pd.DataFrame, past_kma: pd.DataFrame, settings: 
     if full.empty:
         return None
 
-    early = lead_filtered_points(points, 0, 120)
-    if early.empty:
-        early = full
     mid = closest_points_by_source(points, 120)
     endpoints = latest_points_by_source(points, 120, settings.fcst_hours)
     if len(endpoints) < 4:
@@ -2305,7 +2259,7 @@ def auto_map_extent_240(points: pd.DataFrame, past_kma: pd.DataFrame, settings: 
     starts = lead_filtered_points(points, 0, 0)
     endpoint_mean = mean_point_frame(endpoints)
 
-    base_bounds = bounds_from_frames([early, mid, endpoints, endpoint_mean], settings)
+    base_bounds = quantile_frame_bounds(full, lon_low=0.03, lon_high=0.97, lat_low=0.03, lat_high=0.97)
     if base_bounds is None:
         base_bounds = bounds_from_frames([full], settings)
     if base_bounds is None:
@@ -2317,7 +2271,6 @@ def auto_map_extent_240(points: pd.DataFrame, past_kma: pd.DataFrame, settings: 
         (endpoint_mean, True),
         (mid, False),
         (endpoints, False),
-        (full, False),
     ]:
         bounds = expand_bounds_with_frame(bounds, frame, exact=exact)
 
@@ -2335,10 +2288,10 @@ def auto_map_extent_240(points: pd.DataFrame, past_kma: pd.DataFrame, settings: 
     lon_span = max(lon_max - lon_min, 1.0)
     lat_span = max(lat_max - lat_min, 1.0)
 
-    west_pad = max(6.0, min(16.0, lon_span * 0.20 + 3.5))
-    east_pad = max(12.0, min(30.0, lon_span * 0.48 + 7.0))
-    south_pad = max(4.5, min(12.0, lat_span * 0.24 + 3.0))
-    north_pad = max(8.0, min(20.0, lat_span * 0.44 + 4.5))
+    west_pad = max(7.0, min(18.0, lon_span * 0.20 + 4.0))
+    east_pad = max(9.0, min(24.0, lon_span * 0.26 + 5.0))
+    south_pad = max(5.0, min(13.0, lat_span * 0.26 + 3.0))
+    north_pad = max(7.5, min(19.0, lat_span * 0.34 + 4.0))
 
     extent = [
         lon_min - west_pad,
@@ -2350,8 +2303,8 @@ def auto_map_extent_240(points: pd.DataFrame, past_kma: pd.DataFrame, settings: 
         extent,
         min_lon_span=MIN_STABLE_240_LON_SPAN,
         min_lat_span=MIN_STABLE_240_LAT_SPAN,
-        east_ratio=0.66,
-        north_ratio=0.58,
+        east_ratio=0.58,
+        north_ratio=0.56,
     )
     extent = reserve_240_legend_space(points, extent)
     return rebalance_240_forecast_extent(points, extent, settings)
@@ -2512,8 +2465,8 @@ def stable_240_map_extent(extent: list[float], settings: Settings) -> list[float
         stable_extent,
         min_lon_span=MIN_STABLE_240_LON_SPAN,
         min_lat_span=MIN_STABLE_240_LAT_SPAN,
-        east_ratio=0.66,
-        north_ratio=0.58,
+        east_ratio=0.58,
+        north_ratio=0.56,
     )
     if not reasonable_stable_240_extent(stable_extent):
         stable_extent = extent
@@ -2607,23 +2560,27 @@ def trim_excess_240_padding(df: pd.DataFrame, extent: list[float], settings: Set
     data_lon_span = max(data_lon_max - data_lon_min, 1.0)
     data_lat_span = max(data_lat_max - data_lat_min, 1.0)
     max_west_padding = max(7.5, min(20.0, data_lon_span * 0.30 + 3.0))
+    max_east_padding = max(8.0, min(22.0, data_lon_span * 0.34 + 4.0))
     max_south_padding = max(5.0, min(12.0, data_lat_span * 0.30 + 2.0))
     max_north_padding = max(8.0, min(19.0, data_lat_span * 0.42 + 3.5))
 
     new_lon_min = lon_min
+    new_lon_max = lon_max
     new_lat_min = lat_min
     new_lat_max = lat_max
     if data_lon_min - lon_min > max_west_padding:
         new_lon_min = data_lon_min - max_west_padding
+    if lon_max - data_lon_max > max_east_padding:
+        new_lon_max = data_lon_max + max_east_padding
     if data_lat_min - lat_min > max_south_padding:
         new_lat_min = data_lat_min - max_south_padding
     if lat_max - data_lat_max > max_north_padding:
         new_lat_max = data_lat_max + max_north_padding
 
-    if new_lon_min == lon_min and new_lat_min == lat_min and new_lat_max == lat_max:
+    if new_lon_min == lon_min and new_lon_max == lon_max and new_lat_min == lat_min and new_lat_max == lat_max:
         return extent
 
-    compacted = [new_lon_min, lon_max, new_lat_min, new_lat_max]
+    compacted = [new_lon_min, new_lon_max, new_lat_min, new_lat_max]
     print(
         "240h map extent trimmed excessive padding "
         f"({lon_max - lon_min:.1f}x{lat_max - lat_min:.1f} -> "
@@ -2716,7 +2673,7 @@ def canvas_east_expand_ratio(settings: Settings) -> float:
     if not settings.auto_extent:
         return 0.75
     if settings.fcst_hours == 240:
-        return 0.72
+        return 0.62
     return 0.68
 
 
