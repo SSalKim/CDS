@@ -1,15 +1,15 @@
 {
-  "updated_at_utc": "202602040500",
+  "updated_at_utc": "202602041100",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202602040000",
-      "cycle_time_utc": "202602040000",
-      "start_utc": "202602040500",
-      "end_utc": "202602041100"
+      "data_time": "202602040600",
+      "cycle_time_utc": "202602040600",
+      "start_utc": "202602041100",
+      "end_utc": "202602041700"
     }
   ],
   "runs": [
@@ -18,7 +18,7 @@
         "storm_key": "td_2026_03_typ_02",
         "stage": "TD_PRE_TYP",
         "year": 2026,
-        "data_time": "202602040000",
+        "data_time": "202602040600",
         "td_number": 3,
         "linked_td_number": null,
         "typ_number": 3,
@@ -29,10 +29,10 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202602040000",
-        "cycle_time_utc": "202602040000",
-        "start_utc": "202602040500",
-        "end_utc": "202602041100"
+        "data_time": "202602040600",
+        "cycle_time_utc": "202602040600",
+        "start_utc": "202602041100",
+        "end_utc": "202602041700"
       },
       "result": {
         "status": "failed",
@@ -46,7 +46,7 @@
         "storm_key": "td_2026_03_typ_02",
         "stage": "TD_PRE_TYP",
         "year": 2026,
-        "data_time": "202602040000",
+        "data_time": "202602040600",
         "td_number": 3,
         "linked_td_number": null,
         "typ_number": 3,
@@ -57,10 +57,10 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202602040000",
-        "cycle_time_utc": "202602040000",
-        "start_utc": "202602040500",
-        "end_utc": "202602041100"
+        "data_time": "202602040600",
+        "cycle_time_utc": "202602040600",
+        "start_utc": "202602041100",
+        "end_utc": "202602041700"
       },
       "result": {
         "status": "failed",
@@ -4551,7 +4551,7 @@
         "linked_td_number": null,
         "linked_typ_number": 2,
         "typ_number": 3,
-        "data_typ_number": 2,
+        "data_typ_number": 3,
         "typ_name_ko": "",
         "typ_name": "NONAME",
         "typ_en": "NONAME",
@@ -4565,12 +4565,12 @@
       "result": {
         "status": "inventory",
         "metadata": {
-          "generated_at_utc": "20260605045105",
+          "generated_at_utc": "20260605050111",
           "image_path": "VTG_IMG/2026/TD_2603_NONAME/TD_2603_NONAME_202602040600_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 3,
-          "data_typ_number": 2,
+          "data_typ_number": 3,
           "typ_name": "NONAME",
           "typ_name_ko": "",
           "linked_td_number": null,
@@ -4580,11 +4580,20 @@
           "data_time": "202602040600",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 2,
+          "model_count": 11,
           "target_model_count": 39,
           "model_labels": [
+            "ECMWF",
+            "ECMWF AIFS",
+            "ECMWF EPS",
             "FNV3",
-            "GenCast"
+            "GenCast",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "HWRF",
+            "JGSM",
+            "JGSM EPS"
           ],
           "skip_atcf": false,
           "models": []
@@ -4602,7 +4611,7 @@
         "linked_td_number": null,
         "linked_typ_number": 2,
         "typ_number": 3,
-        "data_typ_number": 2,
+        "data_typ_number": 3,
         "typ_name_ko": "",
         "typ_name": "NONAME",
         "typ_en": "NONAME",
@@ -4616,12 +4625,12 @@
       "result": {
         "status": "inventory",
         "metadata": {
-          "generated_at_utc": "20260605045106",
+          "generated_at_utc": "20260605050112",
           "image_path": "VTG_IMG/2026/TD_2603_NONAME/TD_2603_NONAME_202602040600_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 3,
-          "data_typ_number": 2,
+          "data_typ_number": 3,
           "typ_name": "NONAME",
           "typ_name_ko": "",
           "linked_td_number": null,
@@ -4631,11 +4640,20 @@
           "data_time": "202602040600",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 2,
+          "model_count": 11,
           "target_model_count": 39,
           "model_labels": [
+            "ECMWF",
+            "ECMWF AIFS",
+            "ECMWF EPS",
             "FNV3",
-            "GenCast"
+            "GenCast",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "HWRF",
+            "JGSM",
+            "JGSM EPS"
           ],
           "skip_atcf": false,
           "models": []
