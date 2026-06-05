@@ -1491,7 +1491,7 @@ def track_intensity_summary(track: pd.DataFrame, model_name: str) -> str:
 
     # If pressure is missing, keep the inactive-style summary.
     if not has_pressure:
-        return f"{'----':>4}hPa +---/{max_lead:03d}h"
+        return f"{'----':>4}hPa +----/----h"
 
     # If pressure exists, summarize the model at its minimum pressure time.
     peak = forecast.loc[valid_pressure.idxmin()]
