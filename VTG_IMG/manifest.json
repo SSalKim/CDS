@@ -1,70 +1,130 @@
 {
-  "updated_at_utc": "202603101100",
+  "updated_at_utc": "202606051844",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202603100600",
-      "cycle_time_utc": "202603100600",
-      "start_utc": "202603101100",
-      "end_utc": "202603101700"
+      "data_time": "202606051200",
+      "cycle_time_utc": "202606051200",
+      "start_utc": "202606051700",
+      "end_utc": "202606052300"
     }
   ],
   "runs": [
     {
       "job": {
-        "storm_key": "td_2026_05_typ_03",
-        "stage": "TD_PRE_TYP_POSITION_ATCF",
+        "storm_key": "td_2026_11",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202603100600",
-        "td_number": 5,
+        "data_time": "202606051200",
+        "td_number": 11,
         "linked_td_number": null,
-        "typ_number": 5,
+        "typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
         "typ_en": "",
-        "atcf_id": "wp032026",
+        "atcf_id": "wp912026",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202603100600",
-        "cycle_time_utc": "202603100600",
-        "start_utc": "202603101100",
-        "end_utc": "202603101700"
+        "data_time": "202606051200",
+        "cycle_time_utc": "202606051200",
+        "start_utc": "202606051700",
+        "end_utc": "202606052300"
       },
       "result": {
-        "status": "failed",
-        "metadata": {}
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260605184845",
+          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606051200_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 11,
+          "data_typ_number": 11,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": null,
+          "atcf_id": "wp912026",
+          "extra_atcf_ids": [],
+          "data_time": "202606051200",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 9,
+          "target_model_count": 36,
+          "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "ECMWF",
+            "ECMWF AIFS",
+            "ECMWF AIFS EPS",
+            "FNV3",
+            "GFS EPS",
+            "KIM",
+            "KIM EPS"
+          ],
+          "skip_atcf": false
+        }
       },
       "completed": false,
       "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2026_05_typ_03",
-        "stage": "TD_PRE_TYP_POSITION_ATCF",
+        "storm_key": "td_2026_11",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202603100600",
-        "td_number": 5,
+        "data_time": "202606051200",
+        "td_number": 11,
         "linked_td_number": null,
-        "typ_number": 5,
+        "typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
         "typ_en": "",
-        "atcf_id": "wp032026",
+        "atcf_id": "wp912026",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202603100600",
-        "cycle_time_utc": "202603100600",
-        "start_utc": "202603101100",
-        "end_utc": "202603101700"
+        "data_time": "202606051200",
+        "cycle_time_utc": "202606051200",
+        "start_utc": "202606051700",
+        "end_utc": "202606052300"
       },
       "result": {
-        "status": "failed",
-        "metadata": {}
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260605184846",
+          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606051200_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 11,
+          "data_typ_number": 11,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": null,
+          "atcf_id": "wp912026",
+          "extra_atcf_ids": [],
+          "data_time": "202606051200",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 9,
+          "target_model_count": 36,
+          "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "ECMWF",
+            "ECMWF AIFS",
+            "ECMWF AIFS EPS",
+            "FNV3",
+            "GFS EPS",
+            "KIM",
+            "KIM EPS"
+          ],
+          "skip_atcf": false
+        }
       },
       "completed": false,
       "final_check": false
@@ -19023,28 +19083,28 @@
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606051200",
         "td_number": 11,
         "linked_td_number": null,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp912026",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202606051200"
+        "data_time": "202606051200",
+        "cycle_time_utc": "202606051200",
+        "start_utc": "202606051700",
+        "end_utc": "202606052300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260605183443",
+          "generated_at_utc": "20260605184845",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606051200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -19059,44 +19119,50 @@
           "data_time": "202606051200",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 3,
+          "model_count": 9,
           "target_model_count": 36,
           "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "ECMWF",
+            "ECMWF AIFS",
             "ECMWF AIFS EPS",
             "FNV3",
-            "GFS EPS"
+            "GFS EPS",
+            "KIM",
+            "KIM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202606051200_td_2026_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606051200",
         "td_number": 11,
         "linked_td_number": null,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp912026",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202606051200"
+        "data_time": "202606051200",
+        "cycle_time_utc": "202606051200",
+        "start_utc": "202606051700",
+        "end_utc": "202606052300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260605183444",
+          "generated_at_utc": "20260605184846",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606051200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -19111,18 +19177,24 @@
           "data_time": "202606051200",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 3,
+          "model_count": 9,
           "target_model_count": 36,
           "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "ECMWF",
+            "ECMWF AIFS",
             "ECMWF AIFS EPS",
             "FNV3",
-            "GFS EPS"
+            "GFS EPS",
+            "KIM",
+            "KIM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202606051200_td_2026_11_240h.json"
+      "completed": false,
+      "final_check": false
     }
   ]
 }
