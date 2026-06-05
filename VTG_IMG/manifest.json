@@ -1,15 +1,15 @@
 {
-  "updated_at_utc": "202604090500",
+  "updated_at_utc": "202604091100",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202604090000",
-      "cycle_time_utc": "202604090000",
-      "start_utc": "202604090500",
-      "end_utc": "202604091100"
+      "data_time": "202604090600",
+      "cycle_time_utc": "202604090600",
+      "start_utc": "202604091100",
+      "end_utc": "202604091700"
     }
   ],
   "runs": [
@@ -18,7 +18,7 @@
         "storm_key": "td_2026_07_typ_04",
         "stage": "TD_PRE_TYP_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202604090000",
+        "data_time": "202604090600",
         "td_number": 7,
         "linked_td_number": null,
         "typ_number": 7,
@@ -29,10 +29,10 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202604090000",
-        "cycle_time_utc": "202604090000",
-        "start_utc": "202604090500",
-        "end_utc": "202604091100"
+        "data_time": "202604090600",
+        "cycle_time_utc": "202604090600",
+        "start_utc": "202604091100",
+        "end_utc": "202604091700"
       },
       "result": {
         "status": "failed",
@@ -46,7 +46,7 @@
         "storm_key": "td_2026_07_typ_04",
         "stage": "TD_PRE_TYP_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202604090000",
+        "data_time": "202604090600",
         "td_number": 7,
         "linked_td_number": null,
         "typ_number": 7,
@@ -57,10 +57,10 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202604090000",
-        "cycle_time_utc": "202604090000",
-        "start_utc": "202604090500",
-        "end_utc": "202604091100"
+        "data_time": "202604090600",
+        "cycle_time_utc": "202604090600",
+        "start_utc": "202604091100",
+        "end_utc": "202604091700"
       },
       "result": {
         "status": "failed",
@@ -8645,6 +8645,138 @@
         }
       },
       "metadata_path": "VTG_IMG/metadata/202604090000_td_2026_07_240h.json"
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_07",
+        "stage": "TD",
+        "year": 2026,
+        "data_time": "202604090600",
+        "td_number": 7,
+        "linked_td_number": null,
+        "linked_typ_number": 4,
+        "typ_number": 7,
+        "data_typ_number": 7,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "NONAME",
+        "atcf_id": "wp042026",
+        "fcst_hours": 120,
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202604090600"
+      },
+      "result": {
+        "status": "inventory",
+        "metadata": {
+          "generated_at_utc": "20260605053227",
+          "image_path": "VTG_IMG/2026/TD_2607_NONAME/TD_2607_NONAME_202604090600_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 4,
+          "atcf_id": "wp042026",
+          "extra_atcf_ids": [],
+          "data_time": "202604090600",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 17,
+          "target_model_count": 36,
+          "model_labels": [
+            "GALWEM",
+            "AIGFS",
+            "AIGFS EPS",
+            "COAMPS-TC EPS",
+            "COAMPS-TC",
+            "ECMWF",
+            "ECMWF AIFS",
+            "ECMWF EPS",
+            "FNV3",
+            "GenCast",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false,
+          "models": []
+        }
+      },
+      "metadata_path": "VTG_IMG/metadata/202604090600_td_2026_07_120h.json"
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_07",
+        "stage": "TD",
+        "year": 2026,
+        "data_time": "202604090600",
+        "td_number": 7,
+        "linked_td_number": null,
+        "linked_typ_number": 4,
+        "typ_number": 7,
+        "data_typ_number": 7,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "NONAME",
+        "atcf_id": "wp042026",
+        "fcst_hours": 240,
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202604090600"
+      },
+      "result": {
+        "status": "inventory",
+        "metadata": {
+          "generated_at_utc": "20260605053235",
+          "image_path": "VTG_IMG/2026/TD_2607_NONAME/TD_2607_NONAME_202604090600_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 4,
+          "atcf_id": "wp042026",
+          "extra_atcf_ids": [],
+          "data_time": "202604090600",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 17,
+          "target_model_count": 36,
+          "model_labels": [
+            "GALWEM",
+            "AIGFS",
+            "AIGFS EPS",
+            "COAMPS-TC EPS",
+            "COAMPS-TC",
+            "ECMWF",
+            "ECMWF AIFS",
+            "ECMWF EPS",
+            "FNV3",
+            "GenCast",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false,
+          "models": []
+        }
+      },
+      "metadata_path": "VTG_IMG/metadata/202604090600_td_2026_07_240h.json"
     },
     {
       "job": {
