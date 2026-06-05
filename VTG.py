@@ -2397,6 +2397,13 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     extent = current_point_legend_safe_extent(df, extent)
     extent = clamp_west_pacific_extent(extent)
     extent = trim_excess_240_padding(df, extent, settings)
+    extent = match_extent_to_canvas_aspect(
+        extent,
+        fig_width=fig_width,
+        fig_height=fig_height,
+        east_expand_ratio=0.68 if settings.auto_extent else 0.75,
+    )
+    extent = clamp_west_pacific_extent(extent)
 
     data_crs = ccrs.PlateCarree()
     map_crs = ccrs.Mercator()
