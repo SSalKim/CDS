@@ -197,7 +197,7 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 12
+MAP_EXTENT_CACHE_VERSION = 13
 MIN_STABLE_240_LON_SPAN = 56.0
 MIN_STABLE_240_LAT_SPAN = 32.0
 MAX_STABLE_240_LON_SPAN = 96.0
@@ -2123,6 +2123,167 @@ def expand_extent_for_screen_bounds(
     return [lon_min, lon_max, lat_min, lat_max]
 
 
+def _mercator_extent_xy(extent: list[float]) -> tuple[float, float, float, float] | None:
+    projection = ccrs.Mercator()
+    data_crs = ccrs.PlateCarree()
+    lon_min, lon_max, lat_min, lat_max = extent
+    center_lon = (lon_min + lon_max) / 2
+    center_lat = (lat_min + lat_max) / 2
+
+    x0, _ = projection.transform_point(lon_min, center_lat, data_crs)
+    x1, _ = projection.transform_point(lon_max, center_lat, data_crs)
+    _, y0 = projection.transform_point(center_lon, lat_min, data_crs)
+    _, y1 = projection.transform_point(center_lon, lat_max, data_crs)
+    if not all(math.isfinite(value) for value in [x0, x1, y0, y1]):
+        return None
+    if x1 <= x0 or y1 <= y0:
+        return None
+    return x0, x1, y0, y1
+
+
+def _extent_from_mercator_xy(
+    x0: float,
+    x1: float,
+    y0: float,
+    y1: float,
+    reference_extent: list[float],
+) -> list[float]:
+    projection = ccrs.Mercator()
+    data_crs = ccrs.PlateCarree()
+    lon_min, lon_max, lat_min, lat_max = reference_extent
+    center_x = (x0 + x1) / 2
+    center_y = (y0 + y1) / 2
+
+    new_lon_min, _ = data_crs.transform_point(x0, center_y, projection)
+    new_lon_max, _ = data_crs.transform_point(x1, center_y, projection)
+    _, new_lat_min = data_crs.transform_point(center_x, y0, projection)
+    _, new_lat_max = data_crs.transform_point(center_x, y1, projection)
+
+    result = [new_lon_min, new_lon_max, new_lat_min, new_lat_max]
+    if not all(math.isfinite(value) for value in result):
+        return [lon_min, lon_max, lat_min, lat_max]
+    return result
+
+
+def _projected_bounds_xy(bounds: tuple[float, float, float, float]) -> tuple[float, float, float, float] | None:
+    projection = ccrs.Mercator()
+    data_crs = ccrs.PlateCarree()
+    data_west, data_east, data_south, data_north = bounds
+    center_lon = (data_west + data_east) / 2
+    center_lat = (data_south + data_north) / 2
+
+    x_west, _ = projection.transform_point(data_west, center_lat, data_crs)
+    x_east, _ = projection.transform_point(data_east, center_lat, data_crs)
+    _, y_south = projection.transform_point(center_lon, data_south, data_crs)
+    _, y_north = projection.transform_point(center_lon, data_north, data_crs)
+    values = [x_west, x_east, y_south, y_north]
+    if not all(math.isfinite(value) for value in values):
+        return None
+    if x_east <= x_west or y_north <= y_south:
+        return None
+    return x_west, x_east, y_south, y_north
+
+
+def expand_extent_for_projected_screen_bounds(
+    extent: list[float],
+    bounds: tuple[float, float, float, float],
+    *,
+    left: float,
+    right: float,
+    bottom: float,
+    top: float,
+) -> list[float]:
+    """Expand extent so lon/lat bounds fall inside the actual Mercator screen box."""
+    extent_xy = _mercator_extent_xy(extent)
+    bounds_xy = _projected_bounds_xy(bounds)
+    if extent_xy is None or bounds_xy is None:
+        return expand_extent_for_screen_bounds(extent, bounds, left=left, right=right, bottom=bottom, top=top)
+
+    x0, x1, y0, y1 = extent_xy
+    data_west_x, data_east_x, data_south_y, data_north_y = bounds_xy
+    left = max(0.0, min(left, 0.95))
+    right = max(left + 0.05, min(right, 0.99))
+    bottom = max(0.0, min(bottom, 0.95))
+    top = max(bottom + 0.05, min(top, 0.99))
+
+    for _ in range(3):
+        x_span = x1 - x0
+        y_span = y1 - y0
+        if x_span <= 0 or y_span <= 0:
+            return extent
+
+        west_x = (data_west_x - x0) / x_span
+        east_x = (data_east_x - x0) / x_span
+        south_y = (data_south_y - y0) / y_span
+        north_y = (data_north_y - y0) / y_span
+
+        if west_x < left:
+            x0 = (data_west_x - left * x1) / (1.0 - left)
+        if east_x > right:
+            x1 = (data_east_x - right * x0) / (1.0 - right)
+        if south_y < bottom:
+            y0 = (data_south_y - bottom * y1) / (1.0 - bottom)
+        if north_y > top:
+            y1 = (data_north_y - top * y0) / (1.0 - top)
+
+    return _extent_from_mercator_xy(x0, x1, y0, y1, extent)
+
+
+def recenter_extent_for_projected_screen_bounds(
+    extent: list[float],
+    bounds: tuple[float, float, float, float],
+    *,
+    left: float,
+    right: float,
+    bottom: float,
+    top: float,
+    target_center_x: float,
+    target_center_y: float,
+    max_shift_ratio: float = 0.18,
+) -> list[float]:
+    """Shift, not zoom, so the main 240h plume sits in the visible map box."""
+    extent_xy = _mercator_extent_xy(extent)
+    bounds_xy = _projected_bounds_xy(bounds)
+    if extent_xy is None or bounds_xy is None:
+        return extent
+
+    x0, x1, y0, y1 = extent_xy
+    data_west_x, data_east_x, data_south_y, data_north_y = bounds_xy
+    x_span = x1 - x0
+    y_span = y1 - y0
+    if x_span <= 0 or y_span <= 0:
+        return extent
+
+    west_x = (data_west_x - x0) / x_span
+    east_x = (data_east_x - x0) / x_span
+    south_y = (data_south_y - y0) / y_span
+    north_y = (data_north_y - y0) / y_span
+
+    lower_dx = (east_x - right) * x_span
+    upper_dx = (west_x - left) * x_span
+    desired_dx = (((west_x + east_x) / 2) - target_center_x) * x_span
+    max_dx = abs(x_span * max_shift_ratio)
+    desired_dx = max(-max_dx, min(max_dx, desired_dx))
+    if lower_dx <= upper_dx:
+        dx = max(lower_dx, min(upper_dx, desired_dx))
+    else:
+        dx = 0.0
+
+    lower_dy = (north_y - top) * y_span
+    upper_dy = (south_y - bottom) * y_span
+    desired_dy = (((south_y + north_y) / 2) - target_center_y) * y_span
+    max_dy = abs(y_span * max_shift_ratio)
+    desired_dy = max(-max_dy, min(max_dy, desired_dy))
+    if lower_dy <= upper_dy:
+        dy = max(lower_dy, min(upper_dy, desired_dy))
+    else:
+        dy = 0.0
+
+    if abs(dx) < 1e-6 and abs(dy) < 1e-6:
+        return extent
+    return _extent_from_mercator_xy(x0 + dx, x1 + dx, y0 + dy, y1 + dy, extent)
+
+
 def extent_from_screen_bounds(
     bounds: tuple[float, float, float, float],
     *,
@@ -2560,18 +2721,61 @@ def title_safe_240_extent(df: pd.DataFrame, extent: list[float], settings: Setti
         [frame for frame in [full, late, endpoints, mean_point_frame(endpoints)] if not frame.empty],
         ignore_index=True,
     )
-    bounds = quantile_frame_bounds(important, lon_low=0.025, lon_high=0.975, lat_low=0.025, lat_high=0.985)
-    if bounds is None:
+    if important.empty:
         return extent
 
-    return expand_extent_for_screen_bounds(
-        extent,
-        bounds,
-        left=0.040,
-        right=0.665,
-        bottom=0.050,
-        top=0.855,
+    # The header and right legend are drawn in axes coordinates, while the map itself is Mercator.
+    # A plain lon/lat ratio underestimates how close high-latitude 240h points are to the top edge.
+    safe_bounds = quantile_frame_bounds(
+        important,
+        lon_low=0.025,
+        lon_high=0.975,
+        lat_low=0.025,
+        lat_high=0.985,
     )
+    if safe_bounds is None:
+        return extent
+
+    extent = expand_extent_for_projected_screen_bounds(
+        extent,
+        safe_bounds,
+        left=0.045,
+        right=0.660,
+        bottom=0.055,
+        top=0.835,
+    )
+
+    # After the safety expansion, shift the main plume toward the center of the usable yellow-box area.
+    # This removes unnecessary west/south dead space without forcing every outlier into the frame.
+    core_bounds = quantile_frame_bounds(
+        important,
+        lon_low=0.055,
+        lon_high=0.945,
+        lat_low=0.055,
+        lat_high=0.955,
+    )
+    if core_bounds is not None:
+        extent = recenter_extent_for_projected_screen_bounds(
+            extent,
+            core_bounds,
+            left=0.060,
+            right=0.635,
+            bottom=0.070,
+            top=0.790,
+            target_center_x=0.345,
+            target_center_y=0.425,
+            max_shift_ratio=0.16,
+        )
+        extent = expand_extent_for_projected_screen_bounds(
+            extent,
+            safe_bounds,
+            left=0.045,
+            right=0.660,
+            bottom=0.055,
+            top=0.835,
+        )
+
+    return extent
 
 
 def trim_excess_240_padding(df: pd.DataFrame, extent: list[float], settings: Settings) -> list[float]:
