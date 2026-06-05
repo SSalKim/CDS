@@ -197,7 +197,7 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 11
+MAP_EXTENT_CACHE_VERSION = 12
 MIN_STABLE_240_LON_SPAN = 56.0
 MIN_STABLE_240_LAT_SPAN = 32.0
 MAX_STABLE_240_LON_SPAN = 96.0
@@ -2123,6 +2123,27 @@ def expand_extent_for_screen_bounds(
     return [lon_min, lon_max, lat_min, lat_max]
 
 
+def extent_from_screen_bounds(
+    bounds: tuple[float, float, float, float],
+    *,
+    left: float,
+    right: float,
+    bottom: float,
+    top: float,
+) -> list[float] | None:
+    data_west, data_east, data_south, data_north = bounds
+    x_span = max(right - left, 0.10)
+    y_span = max(top - bottom, 0.10)
+    data_lon_span = max(data_east - data_west, 1.0)
+    data_lat_span = max(data_north - data_south, 1.0)
+
+    lon_span = data_lon_span / x_span
+    lat_span = data_lat_span / y_span
+    lon_min = data_west - left * lon_span
+    lat_min = data_south - bottom * lat_span
+    return [lon_min, lon_min + lon_span, lat_min, lat_min + lat_span]
+
+
 def expand_extent_to_min_span(
     extent: list[float],
     *,
@@ -2284,27 +2305,22 @@ def auto_map_extent_240(points: pd.DataFrame, past_kma: pd.DataFrame, settings: 
         if not past_points.empty:
             bounds = expand_bounds_with_frame(bounds, past_points, exact=False)
 
-    lon_min, lon_max, lat_min, lat_max = bounds
-    lon_span = max(lon_max - lon_min, 1.0)
-    lat_span = max(lat_max - lat_min, 1.0)
-
-    west_pad = max(7.0, min(18.0, lon_span * 0.20 + 4.0))
-    east_pad = max(9.0, min(24.0, lon_span * 0.26 + 5.0))
-    south_pad = max(5.0, min(13.0, lat_span * 0.26 + 3.0))
-    north_pad = max(7.5, min(19.0, lat_span * 0.34 + 4.0))
-
-    extent = [
-        lon_min - west_pad,
-        lon_max + east_pad,
-        lat_min - south_pad,
-        lat_max + north_pad,
-    ]
+    extent = extent_from_screen_bounds(
+        bounds,
+        left=0.045,
+        right=0.665,
+        bottom=0.055,
+        top=0.860,
+    )
+    if extent is None:
+        lon_min, lon_max, lat_min, lat_max = bounds
+        extent = [lon_min, lon_max, lat_min, lat_max]
     extent = expand_extent_to_min_span(
         extent,
         min_lon_span=MIN_STABLE_240_LON_SPAN,
         min_lat_span=MIN_STABLE_240_LAT_SPAN,
-        east_ratio=0.58,
-        north_ratio=0.56,
+        east_ratio=0.56,
+        north_ratio=0.60,
     )
     extent = reserve_240_legend_space(points, extent)
     return rebalance_240_forecast_extent(points, extent, settings)
@@ -2529,6 +2545,35 @@ def current_point_legend_safe_extent(df: pd.DataFrame, extent: list[float], sett
     return [lon_min + shift, lon_max + shift, lat_min, lat_max]
 
 
+def title_safe_240_extent(df: pd.DataFrame, extent: list[float], settings: Settings) -> list[float]:
+    if settings.fcst_hours != 240 or not settings.auto_extent:
+        return extent
+
+    points = extent_points_for_auto_map(df, settings)
+    if points.empty:
+        return extent
+
+    full = lead_filtered_points(points, 0, settings.fcst_hours)
+    late = lead_filtered_points(points, 96, settings.fcst_hours)
+    endpoints = latest_points_by_source(points, 120, settings.fcst_hours)
+    important = pd.concat(
+        [frame for frame in [full, late, endpoints, mean_point_frame(endpoints)] if not frame.empty],
+        ignore_index=True,
+    )
+    bounds = quantile_frame_bounds(important, lon_low=0.025, lon_high=0.975, lat_low=0.025, lat_high=0.985)
+    if bounds is None:
+        return extent
+
+    return expand_extent_for_screen_bounds(
+        extent,
+        bounds,
+        left=0.040,
+        right=0.665,
+        bottom=0.050,
+        top=0.855,
+    )
+
+
 def trim_excess_240_padding(df: pd.DataFrame, extent: list[float], settings: Settings) -> list[float]:
     if settings.fcst_hours != 240 or not settings.auto_extent:
         return extent
@@ -2741,13 +2786,19 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
         extent = clamp_west_pacific_extent(extent)
     extent = current_point_legend_safe_extent(df, extent, settings)
     extent = clamp_west_pacific_extent(extent)
+    extent = title_safe_240_extent(df, extent, settings)
+    extent = clamp_west_pacific_extent(extent)
     extent = trim_excess_240_padding(df, extent, settings)
+    extent = title_safe_240_extent(df, extent, settings)
+    extent = clamp_west_pacific_extent(extent)
     extent = match_extent_to_canvas_aspect(
         extent,
         fig_width=fig_width,
         fig_height=fig_height,
         east_expand_ratio=canvas_east_expand_ratio(settings),
     )
+    extent = clamp_west_pacific_extent(extent)
+    extent = title_safe_240_extent(df, extent, settings)
     extent = clamp_west_pacific_extent(extent)
 
     data_crs = ccrs.PlateCarree()
