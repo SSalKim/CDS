@@ -197,7 +197,7 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 13
+MAP_EXTENT_CACHE_VERSION = 14
 MIN_STABLE_240_LON_SPAN = 56.0
 MIN_STABLE_240_LAT_SPAN = 32.0
 MAX_STABLE_240_LON_SPAN = 96.0
@@ -206,6 +206,8 @@ MAX_DISPLAY_240_LON_SPAN = 116.0
 MAX_DISPLAY_240_LAT_SPAN = 72.0
 MIN_DISPLAY_240_WEST_LON = 82.0
 MAX_DISPLAY_240_NORTH_LAT = 68.0
+MAX_CAMERA_240_LON_DISTANCE = 92.0
+MAX_CAMERA_240_LAT_DISTANCE = 62.0
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
@@ -1925,6 +1927,50 @@ def longitude_delta(a: float, b: float) -> float:
     return ((a - b + 180) % 360) - 180
 
 
+def filter_240_camera_points(points: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    if settings.fcst_hours <= 120 or points.empty:
+        return points
+
+    camera_points = numeric_track_points(points)
+    if camera_points.empty:
+        return points
+
+    lat_values = pd.to_numeric(camera_points["LAT"], errors="coerce")
+    camera_points = camera_points[lat_values.between(-12.0, 72.0)].copy()
+    if camera_points.empty or "TMD" not in camera_points:
+        return points
+
+    leads = pd.to_numeric(camera_points["TMD"], errors="coerce")
+    startish = camera_points[leads.between(0, 24)].copy()
+    if startish.empty:
+        startish = camera_points[leads.between(0, 120)].copy()
+    if startish.empty:
+        startish = camera_points.copy()
+
+    anchor_lons = pd.to_numeric(startish["LON"], errors="coerce").dropna()
+    anchor_lats = pd.to_numeric(startish["LAT"], errors="coerce").dropna()
+    if anchor_lons.empty or anchor_lats.empty:
+        return camera_points
+
+    anchor_lon = float(anchor_lons.median())
+    anchor_lat = float(anchor_lats.median())
+    lon_distance = camera_points["LON"].map(lambda lon: abs(longitude_delta(float(lon), anchor_lon)))
+    lat_distance = (camera_points["LAT"] - anchor_lat).abs()
+    filtered = camera_points[
+        lon_distance.le(MAX_CAMERA_240_LON_DISTANCE)
+        & lat_distance.le(MAX_CAMERA_240_LAT_DISTANCE)
+    ].copy()
+
+    min_rows = max(5, math.ceil(len(camera_points) * 0.55))
+    if len(filtered) < min_rows:
+        return camera_points
+
+    removed_count = len(camera_points) - len(filtered)
+    if removed_count:
+        print(f"240h map extent ignored {removed_count} distant camera point(s).")
+    return filtered
+
+
 def extent_points_for_auto_map(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     points = numeric_track_points(df)
     if points.empty:
@@ -1933,9 +1979,9 @@ def extent_points_for_auto_map(df: pd.DataFrame, settings: Settings) -> pd.DataF
     if settings.fcst_hours <= 120:
         return points
 
-    points = points[pd.to_numeric(points["LAT"], errors="coerce").between(-5, 62)].copy()
+    points = points[pd.to_numeric(points["LAT"], errors="coerce").between(-8, 68)].copy()
     if points.empty or "SRC" not in points:
-        return points
+        return filter_240_camera_points(points, settings)
 
     centers = (
         points[points["SRC"].ne("KMA")]
@@ -1944,7 +1990,7 @@ def extent_points_for_auto_map(df: pd.DataFrame, settings: Settings) -> pd.DataF
         .dropna()
     )
     if len(centers) < 4:
-        return points
+        return filter_240_camera_points(points, settings)
 
     center_lat = float(centers["LAT"].median())
     center_lon = float(centers["LON"].median())
@@ -1956,7 +2002,7 @@ def extent_points_for_auto_map(df: pd.DataFrame, settings: Settings) -> pd.DataF
             keep_models.add(model_name)
 
     if len(keep_models) < max(3, math.ceil(len(centers) * 0.45)):
-        return points
+        return filter_240_camera_points(points, settings)
 
     keep_mask = points["SRC"].eq("KMA") | points["SRC"].isin(keep_models)
     filtered = points[keep_mask].copy()
@@ -1966,7 +2012,7 @@ def extent_points_for_auto_map(df: pd.DataFrame, settings: Settings) -> pd.DataF
             "240h map extent ignored distant model cluster(s): "
             + ", ".join(str(name) for name in removed_models)
         )
-    return filtered if not filtered.empty else points
+    return filter_240_camera_points(filtered if not filtered.empty else points, settings)
 
 
 def robust_bounds(points: pd.DataFrame, column: str, settings: Settings) -> tuple[float, float]:
@@ -2073,13 +2119,13 @@ def quantile_frame_bounds(
     lats = pd.to_numeric(frame["LAT"], errors="coerce").dropna()
     if lons.empty or lats.empty:
         return None
-    if len(lons) < 10:
+    if len(lons) < 4:
         lon_min = float(lons.min())
         lon_max = float(lons.max())
     else:
         lon_min = float(lons.quantile(lon_low))
         lon_max = float(lons.quantile(lon_high))
-    if len(lats) < 10:
+    if len(lats) < 4:
         lat_min = float(lats.min())
         lat_max = float(lats.max())
     else:
@@ -2161,6 +2207,8 @@ def _extent_from_mercator_xy(
 
     result = [new_lon_min, new_lon_max, new_lat_min, new_lat_max]
     if not all(math.isfinite(value) for value in result):
+        return [lon_min, lon_max, lat_min, lat_max]
+    if new_lon_max <= new_lon_min or new_lat_max <= new_lat_min:
         return [lon_min, lon_max, lat_min, lat_max]
     return result
 
@@ -2579,16 +2627,24 @@ def padded_extent(extent: list[float], *, lon_ratio: float = 0.035, lat_ratio: f
 def reasonable_stable_240_extent(extent: list[float]) -> bool:
     lon_span = extent[1] - extent[0]
     lat_span = extent[3] - extent[2]
-    return lon_span <= MAX_STABLE_240_LON_SPAN and lat_span <= MAX_STABLE_240_LAT_SPAN
+    return (
+        lon_span > 0
+        and lat_span > 0
+        and lon_span <= MAX_STABLE_240_LON_SPAN
+        and lat_span <= MAX_STABLE_240_LAT_SPAN
+    )
 
 
 def reasonable_display_240_extent(extent: list[float]) -> bool:
     lon_span = extent[1] - extent[0]
     lat_span = extent[3] - extent[2]
     return (
-        lon_span <= MAX_DISPLAY_240_LON_SPAN
+        lon_span > 0
+        and lat_span > 0
+        and lon_span <= MAX_DISPLAY_240_LON_SPAN
         and lat_span <= MAX_DISPLAY_240_LAT_SPAN
         and extent[0] >= MIN_DISPLAY_240_WEST_LON
+        and extent[2] >= -18.0
         and extent[3] <= MAX_DISPLAY_240_NORTH_LAT
     )
 
@@ -2674,6 +2730,8 @@ def clamp_west_pacific_extent(
 ) -> list[float]:
 
     lon_min, lon_max, lat_min, lat_max = extent
+    if lon_max <= lon_min or lat_max <= lat_min:
+        return extent
 
     if lon_max > max_east_lon:
         over = lon_max - max_east_lon
@@ -2926,6 +2984,106 @@ def canvas_east_expand_ratio(settings: Settings) -> float:
     return 0.68
 
 
+def compact_240_extent_from_points(points: pd.DataFrame, settings: Settings) -> list[float] | None:
+    full = lead_filtered_points(points, 0, settings.fcst_hours)
+    if full.empty:
+        return None
+
+    endpoints = latest_points_by_source(points, 120, settings.fcst_hours)
+    if endpoints.empty:
+        endpoints = latest_points_by_source(points, 0, settings.fcst_hours)
+    starts = lead_filtered_points(points, 0, 0)
+    mid = closest_points_by_source(points, 120)
+
+    core = pd.concat(
+        [frame for frame in [full, mid, endpoints, mean_point_frame(endpoints)] if not frame.empty],
+        ignore_index=True,
+    )
+    bounds = quantile_frame_bounds(core, lon_low=0.08, lon_high=0.92, lat_low=0.08, lat_high=0.94)
+    if bounds is None:
+        return None
+
+    for frame, exact in [
+        (starts, True),
+        (mean_point_frame(endpoints), True),
+        (closest_points_by_source(points, 240), False),
+    ]:
+        bounds = expand_bounds_with_frame(bounds, frame, exact=exact)
+
+    extent = extent_from_screen_bounds(
+        bounds,
+        left=0.060,
+        right=0.650,
+        bottom=0.065,
+        top=0.825,
+    )
+    if extent is None:
+        lon_min, lon_max, lat_min, lat_max = bounds
+        extent = [lon_min, lon_max, lat_min, lat_max]
+
+    extent = expand_extent_to_min_span(
+        extent,
+        min_lon_span=MIN_STABLE_240_LON_SPAN,
+        min_lat_span=MIN_STABLE_240_LAT_SPAN,
+        east_ratio=0.58,
+        north_ratio=0.58,
+    )
+    return reserve_240_legend_space(points, extent)
+
+
+def final_safe_240_extent(
+    df: pd.DataFrame,
+    past_kma: pd.DataFrame,
+    settings: Settings,
+    extent: list[float],
+    anchor_240_extent: list[float] | None,
+    *,
+    fig_width: float,
+    fig_height: float,
+) -> list[float]:
+    if settings.fcst_hours != 240 or reasonable_display_240_extent(extent):
+        return extent
+
+    print(
+        "240h final map extent failed safety guard; rebuilding from filtered camera points "
+        f"({extent[1] - extent[0]:.1f} lon x {extent[3] - extent[2]:.1f} lat, west={extent[0]:.1f})."
+    )
+
+    points = extent_points_for_auto_map(df, settings)
+    candidates = [
+        auto_map_extent_240(points, past_kma, settings) if not points.empty else None,
+        compact_240_extent_from_points(points, settings) if not points.empty else None,
+        anchor_240_extent,
+    ]
+
+    best_candidate = None
+    for candidate in candidates:
+        if candidate is None:
+            continue
+        if candidate[1] <= candidate[0] or candidate[3] <= candidate[2]:
+            continue
+        candidate = clamp_west_pacific_extent(candidate)
+        candidate = match_extent_to_canvas_aspect(
+            candidate,
+            fig_width=fig_width,
+            fig_height=fig_height,
+            east_expand_ratio=canvas_east_expand_ratio(settings),
+        )
+        candidate = clamp_west_pacific_extent(candidate)
+        if candidate[1] <= candidate[0] or candidate[3] <= candidate[2]:
+            continue
+        if best_candidate is None:
+            best_candidate = candidate
+        if reasonable_display_240_extent(candidate):
+            return candidate
+
+    if best_candidate is not None:
+        print("240h final map extent used best available fallback despite safety guard limits.")
+        return best_candidate
+
+    return extent
+
+
 def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, intensity: str) -> Path:
     df = df.copy()
     df["FT_TIME"] = parse_ft_time(df["FT_TM(UTC)"])
@@ -3004,6 +3162,15 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     extent = clamp_west_pacific_extent(extent)
     extent = title_safe_240_extent(df, extent, settings)
     extent = clamp_west_pacific_extent(extent)
+    extent = final_safe_240_extent(
+        df,
+        past_kma,
+        settings,
+        extent,
+        anchor_240_extent,
+        fig_width=fig_width,
+        fig_height=fig_height,
+    )
 
     data_crs = ccrs.PlateCarree()
     map_crs = ccrs.Mercator()
