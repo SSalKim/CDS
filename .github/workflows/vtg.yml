@@ -223,7 +223,8 @@ jobs:
         if: ${{ steps.vtg_precheck.outputs.deps_needed == 'true' && env.RUNNER_KIND != 'self-hosted' }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libgeos-dev libproj-dev proj-bin proj-data
+          sudo apt-get install -y --no-install-recommends libgeos-dev libproj-dev proj-bin proj-data fonts-nanum
+          fc-cache -f
 
       - name: Install Python dependencies
         if: ${{ steps.vtg_precheck.outputs.deps_needed == 'true' }}
