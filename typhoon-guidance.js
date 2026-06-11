@@ -483,6 +483,7 @@ let year=String(metadata.storm_year || job.year || dataTime.slice(0,4) || '');
 let stage=(metadata.storm_stage || job.stage || 'TYP').toUpperCase();
 let typNumber=Number(metadata.typ_number || job.typ_number || 0);
 let tdNumber=metadata.linked_td_number || job.linked_td_number || job.td_number || null;
+let linkedTypNumber=metadata.linked_typ_number || job.linked_typ_number || null;
 let typName=normalizeTyphoonName(metadata.typ_name || job.typ_name || 'NONAME');
 let typNameKo=metadata.typ_name_ko || job.typ_name_ko || koreanTyphoonName(typName);
 let stormKey=[year,stage,typNumber,typName].join('|');
@@ -500,6 +501,7 @@ year,
 stage,
 typNumber,
 tdNumber,
+linkedTypNumber,
 typNameKo,
 typName,
 stormKey
@@ -526,14 +528,21 @@ return run;
 
 function linkTdEntriesToTyphoons(entries){
 let tdLinks=new Map();
+let typLinks=new Map();
 entries.forEach(entry=>{
 if(entry.stage==='TD' || !entry.tdNumber){
+if(entry.stage!=='TD' && entry.typNumber){
+typLinks.set(`${entry.year}|${Number(entry.typNumber)}`,entry);
+}
 return;
 }
 tdLinks.set(`${entry.year}|${Number(entry.tdNumber)}`,entry);
+if(entry.typNumber){
+typLinks.set(`${entry.year}|${Number(entry.typNumber)}`,entry);
+}
 });
 
-if(!tdLinks.size){
+if(!tdLinks.size && !typLinks.size){
 return entries;
 }
 
@@ -542,6 +551,9 @@ if(entry.stage!=='TD'){
 return entry;
 }
 let linked=tdLinks.get(`${entry.year}|${entry.typNumber}`);
+if(!linked && entry.linkedTypNumber){
+linked=typLinks.get(`${entry.year}|${Number(entry.linkedTypNumber)}`);
+}
 if(!linked){
 return entry;
 }
@@ -553,6 +565,7 @@ typNumber:linked.typNumber,
 typName:linked.typName,
 typNameKo:linked.typNameKo,
 tdNumber:entry.typNumber,
+linkedTypNumber:entry.linkedTypNumber,
 stormKey:linked.stormKey
 });
 });
@@ -598,6 +611,7 @@ year:Number(metadata.storm_year || String(dataTime).slice(0,4)),
 data_time:dataTime,
 td_number:null,
 linked_td_number:metadata.linked_td_number || null,
+linked_typ_number:metadata.linked_typ_number || null,
 typ_number:metadata.typ_number || 0,
 typ_name:typName,
 typ_name_ko:metadata.typ_name_ko || koreanTyphoonName(typName),

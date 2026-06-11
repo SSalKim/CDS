@@ -628,16 +628,29 @@ def load_json(path: Path, fallback):
         return fallback
     try:
         return json.loads(path.read_text(encoding="utf-8"))
-    except (json.JSONDecodeError, OSError):
+    except json.JSONDecodeError as exc:
+        print(f"Warning: failed to parse JSON {path}: {exc}", file=sys.stderr)
+        return fallback
+    except OSError as exc:
+        print(f"Warning: failed to read JSON {path}: {exc}", file=sys.stderr)
         return fallback
 
 
 def write_json(path: Path, payload) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    tmp_path = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    try:
+        tmp_path.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        tmp_path.replace(path)
+    finally:
+        try:
+            if tmp_path.exists():
+                tmp_path.unlink()
+        except OSError:
+            pass
 
 
 def write_github_outputs(path: Path | None, outputs: dict[str, object]) -> None:
@@ -1276,6 +1289,32 @@ def manifest_inventory_key(metadata: dict) -> str:
     )
 
 
+def normalized_image_path(value: object) -> str:
+    return str(value or "").strip().replace("\\", "/")
+
+
+def manifest_identity_key(metadata: dict) -> str:
+    return (
+        f"{manifest_inventory_key(metadata)}|"
+        f"{metadata.get('data_typ_number') or ''}|"
+        f"{metadata.get('linked_td_number') or ''}|"
+        f"{metadata.get('linked_typ_number') or ''}|"
+        f"{metadata.get('typ_name') or ''}"
+    )
+
+
+def manifest_suppression_tokens(metadata: dict) -> set[str]:
+    tokens = {f"identity|{manifest_identity_key(metadata)}"}
+    image_path = normalized_image_path(metadata.get("image_path"))
+    if image_path:
+        tokens.add(f"path|{image_path}")
+    return tokens
+
+
+def metadata_matches_suppression(metadata: dict, suppressed_tokens: set[str]) -> bool:
+    return bool(manifest_suppression_tokens(metadata) & suppressed_tokens)
+
+
 def metadata_has_output_image(metadata: dict) -> bool:
     if metadata.get("no_output"):
         return False
@@ -1462,7 +1501,7 @@ def previous_final_check_done(previous: dict, window: CycleWindow) -> bool:
 
 def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list[dict]:
     entries_by_key: dict[str, dict] = {}
-    suppressed_keys: set[str] = set()
+    suppressed_tokens: set[str] = set()
     metadata_dir = output_root / "metadata"
     if metadata_dir.exists():
         for path in sorted(metadata_dir.glob("*.json")):
@@ -1477,8 +1516,12 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
                 continue
             key = manifest_inventory_key(metadata)
             if not metadata_has_output_image(metadata):
-                suppressed_keys.add(key)
-                entries_by_key.pop(key, None)
+                tokens = manifest_suppression_tokens(metadata)
+                suppressed_tokens.update(tokens)
+                existing = entries_by_key.get(key)
+                existing_metadata = existing.get("result", {}).get("metadata", {}) if isinstance(existing, dict) else {}
+                if isinstance(existing_metadata, dict) and metadata_matches_suppression(existing_metadata, tokens):
+                    entries_by_key.pop(key, None)
                 continue
             entry = manifest_entry_from_metadata(path, metadata)
             entries_by_key[key] = entry
@@ -1489,12 +1532,15 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
             if not metadata:
                 continue
             key = manifest_inventory_key(metadata)
-            if key in suppressed_keys:
+            if metadata_matches_suppression(metadata, suppressed_tokens):
                 continue
             if key in entries_by_key:
                 existing_metadata = entries_by_key[key].get("result", {}).get("metadata", {})
                 if isinstance(existing_metadata, dict):
-                    existing_metadata["image_path"] = metadata["image_path"]
+                    existing_path = normalized_image_path(existing_metadata.get("image_path"))
+                    scanned_path = normalized_image_path(metadata.get("image_path"))
+                    if not existing_path or existing_path == scanned_path:
+                        existing_metadata["image_path"] = metadata["image_path"]
                     existing_metadata.setdefault("generated_at_utc", metadata.get("generated_at_utc"))
                     existing_metadata.setdefault("target_model_count", metadata.get("target_model_count"))
                     existing_metadata.setdefault("models", metadata.get("models"))
@@ -1513,8 +1559,12 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
             continue
         key = manifest_inventory_key(metadata)
         if not metadata_has_output_image(metadata):
-            suppressed_keys.add(key)
-            entries_by_key.pop(key, None)
+            tokens = manifest_suppression_tokens(metadata)
+            suppressed_tokens.update(tokens)
+            existing = entries_by_key.get(key)
+            existing_metadata = existing.get("result", {}).get("metadata", {}) if isinstance(existing, dict) else {}
+            if isinstance(existing_metadata, dict) and metadata_matches_suppression(existing_metadata, tokens):
+                entries_by_key.pop(key, None)
             continue
         entries_by_key[key] = compact_manifest_entry(entry)
 

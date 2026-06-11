@@ -1848,22 +1848,11 @@ def write_no_output_metadata(
     intensity: str,
     reason: str,
 ) -> None:
-    existing_target = output_path(settings)
-    if existing_target.exists():
-        write_preserved_output_metadata(
-            path,
-            settings=settings,
-            intensity=intensity,
-            reason=reason,
-            target=existing_target,
-        )
-        print(f"Preserved existing image because no new output was available: {existing_target}")
-        return
-
+    target = output_path(settings)
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"),
         "render_signature": render_signature(),
-        "image_path": "",
+        "image_path": relative_image_path(target),
         "storm_stage": settings.storm_stage,
         "storm_year": storm_year(settings),
         "typ_number": settings.typ_number,
@@ -3084,6 +3073,106 @@ def final_safe_240_extent(
     return extent
 
 
+def aspect_match_and_clamp_extent(
+    extent: list[float],
+    settings: Settings,
+    *,
+    fig_width: float,
+    fig_height: float,
+) -> list[float]:
+    extent = match_extent_to_canvas_aspect(
+        extent,
+        fig_width=fig_width,
+        fig_height=fig_height,
+        east_expand_ratio=canvas_east_expand_ratio(settings),
+    )
+    return clamp_west_pacific_extent(extent)
+
+
+def fallback_to_240_anchor_if_needed(
+    extent: list[float],
+    anchor_240_extent: list[float] | None,
+    settings: Settings,
+    *,
+    fig_width: float,
+    fig_height: float,
+    message: str,
+) -> list[float]:
+    if settings.fcst_hours != 240 or anchor_240_extent is None or reasonable_display_240_extent(extent):
+        return extent
+
+    print(message)
+    return aspect_match_and_clamp_extent(
+        clamp_west_pacific_extent(anchor_240_extent),
+        settings,
+        fig_width=fig_width,
+        fig_height=fig_height,
+    )
+
+
+def finalize_map_extent(
+    df: pd.DataFrame,
+    past_kma: pd.DataFrame,
+    settings: Settings,
+    extent: list[float],
+    anchor_240_extent: list[float] | None,
+    *,
+    fig_width: float,
+    fig_height: float,
+) -> list[float]:
+    """Run the map camera adjustments in one fixed order.
+
+    The 240h camera is intentionally guarded at the end; do not apply any
+    extra aspect or padding transform after the final safety check.
+    """
+    extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
+    extent = fallback_to_240_anchor_if_needed(
+        extent,
+        anchor_240_extent,
+        settings,
+        fig_width=fig_width,
+        fig_height=fig_height,
+        message=(
+            "240h map extent was too broad after initial aspect matching; "
+            "using expanded 120h anchor."
+        ),
+    )
+
+    extent = stable_240_map_extent(extent, settings)
+    extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
+    extent = fallback_to_240_anchor_if_needed(
+        extent,
+        anchor_240_extent,
+        settings,
+        fig_width=fig_width,
+        fig_height=fig_height,
+        message=(
+            "240h stable map extent was too broad after aspect matching; "
+            "falling back to expanded 120h anchor."
+        ),
+    )
+
+    extent = current_point_legend_safe_extent(df, extent, settings)
+    extent = clamp_west_pacific_extent(extent)
+    extent = title_safe_240_extent(df, extent, settings)
+    extent = clamp_west_pacific_extent(extent)
+    extent = trim_excess_240_padding(df, extent, settings)
+    extent = title_safe_240_extent(df, extent, settings)
+    extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
+    extent = title_safe_240_extent(df, extent, settings)
+    extent = clamp_west_pacific_extent(extent)
+
+    return final_safe_240_extent(
+        df,
+        past_kma,
+        settings,
+        extent,
+        anchor_240_extent,
+        fig_width=fig_width,
+        fig_height=fig_height,
+    )
+
+
 def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, intensity: str) -> Path:
     df = df.copy()
     df["FT_TIME"] = parse_ft_time(df["FT_TM(UTC)"])
@@ -3104,65 +3193,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     fig_width = settings.figure_width
     fig_height = settings.figure_height
 
-    extent = match_extent_to_canvas_aspect(
-        extent,
-        fig_width=fig_width,
-        fig_height=fig_height,
-        east_expand_ratio=canvas_east_expand_ratio(settings),
-    )
-
-    extent = clamp_west_pacific_extent(extent)
-    if settings.fcst_hours == 240 and anchor_240_extent is not None and not reasonable_display_240_extent(extent):
-        print(
-            "240h map extent was too broad; using expanded 120h anchor "
-            f"({extent[1] - extent[0]:.1f} lon x {extent[3] - extent[2]:.1f} lat)."
-        )
-        extent = clamp_west_pacific_extent(anchor_240_extent)
-        extent = match_extent_to_canvas_aspect(
-            extent,
-            fig_width=fig_width,
-            fig_height=fig_height,
-            east_expand_ratio=canvas_east_expand_ratio(settings),
-        )
-        extent = clamp_west_pacific_extent(extent)
-    extent = stable_240_map_extent(extent, settings)
-    extent = match_extent_to_canvas_aspect(
-        extent,
-        fig_width=fig_width,
-        fig_height=fig_height,
-        east_expand_ratio=canvas_east_expand_ratio(settings),
-    )
-    extent = clamp_west_pacific_extent(extent)
-    if settings.fcst_hours == 240 and anchor_240_extent is not None and not reasonable_display_240_extent(extent):
-        print(
-            "240h stable map extent was too broad after aspect matching; "
-            "falling back to expanded 120h anchor."
-        )
-        extent = clamp_west_pacific_extent(anchor_240_extent)
-        extent = match_extent_to_canvas_aspect(
-            extent,
-            fig_width=fig_width,
-            fig_height=fig_height,
-            east_expand_ratio=canvas_east_expand_ratio(settings),
-        )
-        extent = clamp_west_pacific_extent(extent)
-    extent = current_point_legend_safe_extent(df, extent, settings)
-    extent = clamp_west_pacific_extent(extent)
-    extent = title_safe_240_extent(df, extent, settings)
-    extent = clamp_west_pacific_extent(extent)
-    extent = trim_excess_240_padding(df, extent, settings)
-    extent = title_safe_240_extent(df, extent, settings)
-    extent = clamp_west_pacific_extent(extent)
-    extent = match_extent_to_canvas_aspect(
-        extent,
-        fig_width=fig_width,
-        fig_height=fig_height,
-        east_expand_ratio=canvas_east_expand_ratio(settings),
-    )
-    extent = clamp_west_pacific_extent(extent)
-    extent = title_safe_240_extent(df, extent, settings)
-    extent = clamp_west_pacific_extent(extent)
-    extent = final_safe_240_extent(
+    extent = finalize_map_extent(
         df,
         past_kma,
         settings,
@@ -3171,17 +3202,6 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
         fig_width=fig_width,
         fig_height=fig_height,
     )
-
-    extent = match_extent_to_canvas_aspect(
-        extent,
-        fig_width=fig_width,
-        fig_height=fig_height,
-        east_expand_ratio=canvas_east_expand_ratio(settings),
-    )
-    extent = clamp_west_pacific_extent(extent)
-
-    data_crs = ccrs.PlateCarree()
-    map_crs = ccrs.Mercator()
 
     data_crs = ccrs.PlateCarree()
     map_crs = ccrs.Mercator()
