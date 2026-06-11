@@ -197,9 +197,9 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 14
-MIN_STABLE_240_LON_SPAN = 56.0
-MIN_STABLE_240_LAT_SPAN = 32.0
+MAP_EXTENT_CACHE_VERSION = 15
+MIN_STABLE_240_LON_SPAN = 62.0
+MIN_STABLE_240_LAT_SPAN = 36.0
 MAX_STABLE_240_LON_SPAN = 96.0
 MAX_STABLE_240_LAT_SPAN = 58.0
 MAX_DISPLAY_240_LON_SPAN = 116.0
@@ -2366,130 +2366,252 @@ def expand_extent_to_min_span(
     return [lon_min, lon_max, lat_min, lat_max]
 
 
-def reserve_240_legend_space(points: pd.DataFrame, extent: list[float]) -> list[float]:
-    if points.empty:
-        return extent
-    lon_min, lon_max, lat_min, lat_max = extent
-    lon_span = lon_max - lon_min
-    lat_span = lat_max - lat_min
-    if lon_span <= 0 or lat_span <= 0:
-        return extent
+def concat_track_frames(frames: list[pd.DataFrame]) -> pd.DataFrame:
+    available = [frame for frame in frames if frame is not None and not frame.empty]
+    if not available:
+        return pd.DataFrame()
+    return pd.concat(available, ignore_index=True)
 
-    full = lead_filtered_points(points, 0, 240)
-    endpoints = latest_points_by_source(points, 96, 240)
-    important = pd.concat(
-        [frame for frame in [full, endpoints, mean_point_frame(endpoints)] if not frame.empty],
-        ignore_index=True,
+
+def build_240_camera_frames(points: pd.DataFrame, settings: Settings) -> dict[str, pd.DataFrame]:
+    full = lead_filtered_points(points, 0, settings.fcst_hours)
+    early = lead_filtered_points(points, 0, 120)
+    late = lead_filtered_points(points, 120, settings.fcst_hours)
+    starts = lead_filtered_points(points, 0, 0)
+    mid = closest_points_by_source(points, 120, tolerance=42.0)
+    late_180 = closest_points_by_source(points, 180, tolerance=48.0)
+    late_240 = closest_points_by_source(points, min(settings.fcst_hours, 240), tolerance=54.0)
+    endpoints = latest_points_by_source(points, 120, settings.fcst_hours)
+    if len(endpoints) < 3:
+        endpoints = latest_points_by_source(points, 0, settings.fcst_hours)
+
+    endpoint_cluster = concat_track_frames([late_180, late_240, endpoints])
+    return {
+        "full": full,
+        "early": early,
+        "late": late,
+        "starts": starts,
+        "mid": mid,
+        "late_180": late_180,
+        "late_240": late_240,
+        "endpoints": endpoints,
+        "start_mean": mean_point_frame(starts),
+        "mid_mean": mean_point_frame(mid),
+        "endpoint_mean": mean_point_frame(endpoints),
+        "late_mean": mean_point_frame(endpoint_cluster),
+    }
+
+
+def projected_bounds_inside_screen(
+    extent: list[float],
+    bounds: tuple[float, float, float, float] | None,
+    *,
+    left: float,
+    right: float,
+    bottom: float,
+    top: float,
+    slack: float = 0.015,
+) -> bool:
+    if bounds is None:
+        return True
+    extent_xy = _mercator_extent_xy(extent)
+    bounds_xy = _projected_bounds_xy(bounds)
+    if extent_xy is None or bounds_xy is None:
+        return True
+
+    x0, x1, y0, y1 = extent_xy
+    data_west_x, data_east_x, data_south_y, data_north_y = bounds_xy
+    x_span = x1 - x0
+    y_span = y1 - y0
+    if x_span <= 0 or y_span <= 0:
+        return False
+
+    west_x = (data_west_x - x0) / x_span
+    east_x = (data_east_x - x0) / x_span
+    south_y = (data_south_y - y0) / y_span
+    north_y = (data_north_y - y0) / y_span
+    return (
+        west_x >= left - slack
+        and east_x <= right + slack
+        and south_y >= bottom - slack
+        and north_y <= top + slack
     )
-    if important.empty:
-        return extent
-
-    east_values = pd.to_numeric(important["LON"], errors="coerce").dropna()
-    north_values = pd.to_numeric(important["LAT"], errors="coerce").dropna()
-    if east_values.empty or north_values.empty:
-        return extent
-
-    important_east = float(east_values.quantile(0.88 if len(east_values) >= 10 else 1.0))
-    important_north = float(north_values.quantile(0.90 if len(north_values) >= 10 else 1.0))
-
-    target_east_x = 0.66
-    current_east_x = (important_east - lon_min) / lon_span
-    if current_east_x > target_east_x:
-        lon_max = max(lon_max, lon_min + (important_east - lon_min) / target_east_x)
-
-    target_north_y = 0.82
-    current_north_y = (important_north - lat_min) / lat_span
-    if current_north_y > target_north_y:
-        lat_max = max(lat_max, lat_min + (important_north - lat_min) / target_north_y)
-
-    return [lon_min, lon_max, lat_min, lat_max]
 
 
-def rebalance_240_forecast_extent(points: pd.DataFrame, extent: list[float], settings: Settings) -> list[float]:
+def direction_aware_240_target(frames: dict[str, pd.DataFrame]) -> tuple[float, float]:
+    target_x = 0.37
+    target_y = 0.43
+    start_mean = frames.get("start_mean", pd.DataFrame())
+    late_mean = frames.get("late_mean", pd.DataFrame())
+    if start_mean.empty or late_mean.empty:
+        return target_x, target_y
+
+    try:
+        start_lon = float(start_mean["LON"].iloc[0])
+        start_lat = float(start_mean["LAT"].iloc[0])
+        late_lon = float(late_mean["LON"].iloc[0])
+        late_lat = float(late_mean["LAT"].iloc[0])
+    except (KeyError, IndexError, TypeError, ValueError):
+        return target_x, target_y
+
+    dlon = longitude_delta(late_lon, start_lon)
+    dlat = late_lat - start_lat
+    target_x -= max(-0.06, min(0.06, dlon / 90.0))
+    target_y -= max(-0.06, min(0.06, dlat / 65.0))
+    return max(0.31, min(0.43, target_x)), max(0.36, min(0.49, target_y))
+
+
+def fit_240_extent_to_tracks(
+    points: pd.DataFrame,
+    extent: list[float],
+    settings: Settings,
+    *,
+    recenter: bool,
+) -> list[float]:
     if settings.fcst_hours != 240 or points.empty:
         return extent
 
-    full = lead_filtered_points(points, 0, settings.fcst_hours)
-    if full.empty:
+    frames = build_240_camera_frames(points, settings)
+    if frames["full"].empty:
         return extent
-    late = lead_filtered_points(points, 120, settings.fcst_hours)
-    endpoints = latest_points_by_source(points, 120, settings.fcst_hours)
-    starts = lead_filtered_points(points, 0, 0)
 
-    full_core_bounds = quantile_frame_bounds(full, lon_low=0.03, lon_high=0.97, lat_low=0.03, lat_high=0.97)
-    if full_core_bounds is not None:
-        extent = expand_extent_for_screen_bounds(
-            extent,
-            full_core_bounds,
-            left=0.08,
-            right=0.64,
-            bottom=0.08,
-            top=0.80,
-        )
-
-    late_core = pd.concat(
-        [frame for frame in [late, endpoints, mean_point_frame(endpoints)] if not frame.empty],
-        ignore_index=True,
+    full_core = quantile_frame_bounds(frames["full"], lon_low=0.025, lon_high=0.975, lat_low=0.025, lat_high=0.975)
+    early_core = quantile_frame_bounds(frames["early"], lon_low=0.035, lon_high=0.965, lat_low=0.035, lat_high=0.965)
+    late_core_frame = concat_track_frames([frames["late"], frames["endpoints"], frames["late_mean"]])
+    late_core = quantile_frame_bounds(
+        late_core_frame,
+        lon_low=0.025,
+        lon_high=0.975,
+        lat_low=0.025,
+        lat_high=0.985,
     )
-    core_bounds = quantile_frame_bounds(late_core, lon_low=0.04, lon_high=0.96, lat_low=0.04, lat_high=0.96)
-    if core_bounds is not None:
-        extent = expand_extent_for_screen_bounds(
-            extent,
-            core_bounds,
-            left=0.07,
-            right=0.66,
-            bottom=0.07,
-            top=0.82,
+    endpoint_core_frame = concat_track_frames(
+        [frames["late_180"], frames["late_240"], frames["endpoints"], frames["endpoint_mean"], frames["late_mean"]]
+    )
+    endpoint_core = quantile_frame_bounds(
+        endpoint_core_frame,
+        lon_low=0.035,
+        lon_high=0.965,
+        lat_low=0.035,
+        lat_high=0.975,
+    )
+    anchor_bounds = quantile_frame_bounds(
+        concat_track_frames(
+            [
+                frames["start_mean"],
+                frames["mid_mean"],
+                frames["endpoint_mean"],
+                frames["late_mean"],
+            ]
         )
+    )
 
-    anchor_frames = [starts, mean_point_frame(endpoints)]
-    anchor = pd.concat([frame for frame in anchor_frames if not frame.empty], ignore_index=True)
-    anchor_bounds = quantile_frame_bounds(anchor)
-    if anchor_bounds is not None:
-        extent = expand_extent_for_screen_bounds(
+    if recenter:
+        focus_bounds = quantile_frame_bounds(
+            concat_track_frames([frames["early"], frames["late"], frames["mid"], frames["endpoints"]]),
+            lon_low=0.055,
+            lon_high=0.945,
+            lat_low=0.055,
+            lat_high=0.955,
+        )
+        if focus_bounds is not None:
+            target_x, target_y = direction_aware_240_target(frames)
+            extent = recenter_extent_for_projected_screen_bounds(
+                extent,
+                focus_bounds,
+                left=0.045,
+                right=0.650,
+                bottom=0.055,
+                top=0.805,
+                target_center_x=target_x,
+                target_center_y=target_y,
+                max_shift_ratio=0.22,
+            )
+
+    for bounds, box in [
+        (full_core, (0.035, 0.675, 0.050, 0.840)),
+        (early_core, (0.035, 0.690, 0.050, 0.850)),
+        (late_core, (0.035, 0.650, 0.060, 0.805)),
+        (endpoint_core, (0.045, 0.635, 0.070, 0.790)),
+        (anchor_bounds, (0.045, 0.665, 0.055, 0.825)),
+    ]:
+        if bounds is None:
+            continue
+        left, right, bottom, top = box
+        extent = expand_extent_for_projected_screen_bounds(
             extent,
-            anchor_bounds,
-            left=0.05,
-            right=0.68,
-            bottom=0.05,
-            top=0.84,
+            bounds,
+            left=left,
+            right=right,
+            bottom=bottom,
+            top=top,
         )
 
     extent = expand_extent_to_min_span(
         extent,
         min_lon_span=MIN_STABLE_240_LON_SPAN,
         min_lat_span=MIN_STABLE_240_LAT_SPAN,
-        east_ratio=0.58,
-        north_ratio=0.56,
+        east_ratio=0.56,
+        north_ratio=0.58,
     )
-    return extent
+    return clamp_west_pacific_extent(extent)
+
+
+def has_240_track_visibility(points: pd.DataFrame, extent: list[float], settings: Settings) -> bool:
+    if settings.fcst_hours != 240 or points.empty:
+        return True
+    if not reasonable_display_240_extent(extent):
+        return False
+
+    frames = build_240_camera_frames(points, settings)
+    late_core = quantile_frame_bounds(
+        concat_track_frames([frames["late"], frames["endpoints"], frames["late_mean"]]),
+        lon_low=0.03,
+        lon_high=0.97,
+        lat_low=0.03,
+        lat_high=0.98,
+    )
+    endpoint_core = quantile_frame_bounds(
+        concat_track_frames([frames["late_180"], frames["late_240"], frames["endpoints"], frames["endpoint_mean"]]),
+        lon_low=0.04,
+        lon_high=0.96,
+        lat_low=0.04,
+        lat_high=0.97,
+    )
+    anchor_bounds = quantile_frame_bounds(
+        concat_track_frames([frames["start_mean"], frames["mid_mean"], frames["endpoint_mean"], frames["late_mean"]])
+    )
+    return (
+        projected_bounds_inside_screen(extent, late_core, left=0.020, right=0.690, bottom=0.035, top=0.855)
+        and projected_bounds_inside_screen(extent, endpoint_core, left=0.030, right=0.675, bottom=0.045, top=0.840)
+        and projected_bounds_inside_screen(extent, anchor_bounds, left=0.025, right=0.700, bottom=0.040, top=0.860)
+    )
 
 
 def auto_map_extent_240(points: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
-    full = lead_filtered_points(points, 0, settings.fcst_hours)
-    if full.empty:
+    frames = build_240_camera_frames(points, settings)
+    if frames["full"].empty:
         return None
 
-    mid = closest_points_by_source(points, 120)
-    endpoints = latest_points_by_source(points, 120, settings.fcst_hours)
-    if len(endpoints) < 4:
-        endpoints = latest_points_by_source(points, 0, settings.fcst_hours)
-
-    starts = lead_filtered_points(points, 0, 0)
-    endpoint_mean = mean_point_frame(endpoints)
-
-    base_bounds = quantile_frame_bounds(full, lon_low=0.03, lon_high=0.97, lat_low=0.03, lat_high=0.97)
+    base_bounds = quantile_frame_bounds(
+        concat_track_frames([frames["full"], frames["mid"], frames["endpoints"]]),
+        lon_low=0.035,
+        lon_high=0.965,
+        lat_low=0.035,
+        lat_high=0.965,
+    )
     if base_bounds is None:
-        base_bounds = bounds_from_frames([full], settings)
+        base_bounds = bounds_from_frames([frames["full"]], settings)
     if base_bounds is None:
         return None
 
     bounds = base_bounds
     for frame, exact in [
-        (starts, True),
-        (endpoint_mean, True),
-        (mid, False),
-        (endpoints, False),
+        (frames["start_mean"], True),
+        (frames["endpoint_mean"], True),
+        (frames["late_mean"], True),
+        (frames["mid"], False),
+        (frames["endpoints"], False),
     ]:
         bounds = expand_bounds_with_frame(bounds, frame, exact=exact)
 
@@ -2508,7 +2630,7 @@ def auto_map_extent_240(points: pd.DataFrame, past_kma: pd.DataFrame, settings: 
         left=0.045,
         right=0.665,
         bottom=0.055,
-        top=0.860,
+        top=0.845,
     )
     if extent is None:
         lon_min, lon_max, lat_min, lat_max = bounds
@@ -2520,8 +2642,7 @@ def auto_map_extent_240(points: pd.DataFrame, past_kma: pd.DataFrame, settings: 
         east_ratio=0.56,
         north_ratio=0.60,
     )
-    extent = reserve_240_legend_space(points, extent)
-    return rebalance_240_forecast_extent(points, extent, settings)
+    return fit_240_extent_to_tracks(points, extent, settings, recenter=True)
 
 
 def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
@@ -2753,136 +2874,74 @@ def current_point_legend_safe_extent(df: pd.DataFrame, extent: list[float], sett
     return [lon_min + shift, lon_max + shift, lat_min, lat_max]
 
 
-def title_safe_240_extent(df: pd.DataFrame, extent: list[float], settings: Settings) -> list[float]:
-    if settings.fcst_hours != 240 or not settings.auto_extent:
-        return extent
-
+def finalize_240_map_extent(
+    df: pd.DataFrame,
+    past_kma: pd.DataFrame,
+    settings: Settings,
+    extent: list[float],
+    anchor_240_extent: list[float] | None,
+    *,
+    fig_width: float,
+    fig_height: float,
+) -> list[float]:
     points = extent_points_for_auto_map(df, settings)
     if points.empty:
+        return aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
+
+    def normalize(candidate: list[float], *, recenter: bool) -> list[float]:
+        candidate = clamp_west_pacific_extent(candidate)
+        for index in range(4):
+            candidate = fit_240_extent_to_tracks(points, candidate, settings, recenter=recenter and index == 0)
+            candidate = aspect_match_and_clamp_extent(
+                candidate,
+                settings,
+                fig_width=fig_width,
+                fig_height=fig_height,
+            )
+            if index >= 1 and has_240_track_visibility(points, candidate, settings):
+                break
+        candidate = current_point_legend_safe_extent(df, candidate, settings)
+        for _ in range(3):
+            candidate = fit_240_extent_to_tracks(points, candidate, settings, recenter=False)
+            candidate = aspect_match_and_clamp_extent(
+                candidate,
+                settings,
+                fig_width=fig_width,
+                fig_height=fig_height,
+            )
+            if has_240_track_visibility(points, candidate, settings):
+                break
+        return clamp_west_pacific_extent(candidate)
+
+    extent = normalize(extent, recenter=True)
+    if reasonable_stable_240_extent(extent):
+        extent = stable_240_map_extent(extent, settings)
+        extent = normalize(extent, recenter=False)
+
+    if reasonable_display_240_extent(extent) and has_240_track_visibility(points, extent, settings):
         return extent
 
-    full = lead_filtered_points(points, 0, settings.fcst_hours)
-    late = lead_filtered_points(points, 96, settings.fcst_hours)
-    endpoints = latest_points_by_source(points, 120, settings.fcst_hours)
-    important = pd.concat(
-        [frame for frame in [full, late, endpoints, mean_point_frame(endpoints)] if not frame.empty],
-        ignore_index=True,
-    )
-    if important.empty:
-        return extent
-
-    # The header and right legend are drawn in axes coordinates, while the map itself is Mercator.
-    # A plain lon/lat ratio underestimates how close high-latitude 240h points are to the top edge.
-    safe_bounds = quantile_frame_bounds(
-        important,
-        lon_low=0.025,
-        lon_high=0.975,
-        lat_low=0.025,
-        lat_high=0.985,
-    )
-    if safe_bounds is None:
-        return extent
-
-    extent = expand_extent_for_projected_screen_bounds(
-        extent,
-        safe_bounds,
-        left=0.045,
-        right=0.660,
-        bottom=0.055,
-        top=0.835,
-    )
-
-    # After the safety expansion, shift the main plume toward the center of the usable yellow-box area.
-    # This removes unnecessary west/south dead space without forcing every outlier into the frame.
-    core_bounds = quantile_frame_bounds(
-        important,
-        lon_low=0.055,
-        lon_high=0.945,
-        lat_low=0.055,
-        lat_high=0.955,
-    )
-    if core_bounds is not None:
-        extent = recenter_extent_for_projected_screen_bounds(
-            extent,
-            core_bounds,
-            left=0.060,
-            right=0.635,
-            bottom=0.070,
-            top=0.790,
-            target_center_x=0.345,
-            target_center_y=0.425,
-            max_shift_ratio=0.16,
-        )
-        extent = expand_extent_for_projected_screen_bounds(
-            extent,
-            safe_bounds,
-            left=0.045,
-            right=0.660,
-            bottom=0.055,
-            top=0.835,
-        )
-
-    return extent
-
-
-def trim_excess_240_padding(df: pd.DataFrame, extent: list[float], settings: Settings) -> list[float]:
-    if settings.fcst_hours != 240 or not settings.auto_extent:
-        return extent
-
-    points = extent_points_for_auto_map(df, settings)
-    if points.empty:
-        return extent
-
-    full = lead_filtered_points(points, 0, settings.fcst_hours)
-    early = lead_filtered_points(points, 0, 120)
-    endpoints = latest_points_by_source(points, 120, settings.fcst_hours)
-    important = pd.concat(
-        [frame for frame in [full, early, endpoints, mean_point_frame(endpoints)] if not frame.empty],
-        ignore_index=True,
-    )
-    if important.empty:
-        return extent
-
-    data_lon_min, data_lon_max = robust_bounds(important, "LON", settings)
-    data_lat_min, data_lat_max = robust_bounds(important, "LAT", settings)
-    for frame, exact in [(lead_filtered_points(points, 0, 0), True), (mean_point_frame(endpoints), True)]:
-        data_lon_min, data_lon_max, data_lat_min, data_lat_max = expand_bounds_with_frame(
-            (data_lon_min, data_lon_max, data_lat_min, data_lat_max),
-            frame,
-            exact=exact,
-        )
-
-    lon_min, lon_max, lat_min, lat_max = extent
-    data_lon_span = max(data_lon_max - data_lon_min, 1.0)
-    data_lat_span = max(data_lat_max - data_lat_min, 1.0)
-    max_west_padding = max(7.5, min(20.0, data_lon_span * 0.30 + 3.0))
-    max_east_padding = max(8.0, min(22.0, data_lon_span * 0.34 + 4.0))
-    max_south_padding = max(5.0, min(12.0, data_lat_span * 0.30 + 2.0))
-    max_north_padding = max(8.0, min(19.0, data_lat_span * 0.42 + 3.5))
-
-    new_lon_min = lon_min
-    new_lon_max = lon_max
-    new_lat_min = lat_min
-    new_lat_max = lat_max
-    if data_lon_min - lon_min > max_west_padding:
-        new_lon_min = data_lon_min - max_west_padding
-    if lon_max - data_lon_max > max_east_padding:
-        new_lon_max = data_lon_max + max_east_padding
-    if data_lat_min - lat_min > max_south_padding:
-        new_lat_min = data_lat_min - max_south_padding
-    if lat_max - data_lat_max > max_north_padding:
-        new_lat_max = data_lat_max + max_north_padding
-
-    if new_lon_min == lon_min and new_lon_max == lon_max and new_lat_min == lat_min and new_lat_max == lat_max:
-        return extent
-
-    compacted = [new_lon_min, new_lon_max, new_lat_min, new_lat_max]
     print(
-        "240h map extent trimmed excessive padding "
-        f"({lon_max - lon_min:.1f}x{lat_max - lat_min:.1f} -> "
-        f"{compacted[1] - compacted[0]:.1f}x{compacted[3] - compacted[2]:.1f})."
+        "240h map extent failed final visibility guard; rebuilding from current cycle points "
+        f"({extent[1] - extent[0]:.1f} lon x {extent[3] - extent[2]:.1f} lat, west={extent[0]:.1f})."
     )
-    return compacted
+
+    candidates = [
+        auto_map_extent_240(points, past_kma, settings),
+        anchor_240_extent,
+        extent,
+    ]
+    best_candidate = extent
+    for candidate in candidates:
+        if candidate is None or candidate[1] <= candidate[0] or candidate[3] <= candidate[2]:
+            continue
+        candidate = normalize(candidate, recenter=False)
+        if reasonable_display_240_extent(candidate):
+            best_candidate = candidate
+        if reasonable_display_240_extent(candidate) and has_240_track_visibility(points, candidate, settings):
+            return candidate
+
+    return best_candidate
 
 
 def mercator_figure_size(extent: list[float], *, width: float = 11.2) -> tuple[float, float]:
@@ -2973,106 +3032,6 @@ def canvas_east_expand_ratio(settings: Settings) -> float:
     return 0.68
 
 
-def compact_240_extent_from_points(points: pd.DataFrame, settings: Settings) -> list[float] | None:
-    full = lead_filtered_points(points, 0, settings.fcst_hours)
-    if full.empty:
-        return None
-
-    endpoints = latest_points_by_source(points, 120, settings.fcst_hours)
-    if endpoints.empty:
-        endpoints = latest_points_by_source(points, 0, settings.fcst_hours)
-    starts = lead_filtered_points(points, 0, 0)
-    mid = closest_points_by_source(points, 120)
-
-    core = pd.concat(
-        [frame for frame in [full, mid, endpoints, mean_point_frame(endpoints)] if not frame.empty],
-        ignore_index=True,
-    )
-    bounds = quantile_frame_bounds(core, lon_low=0.08, lon_high=0.92, lat_low=0.08, lat_high=0.94)
-    if bounds is None:
-        return None
-
-    for frame, exact in [
-        (starts, True),
-        (mean_point_frame(endpoints), True),
-        (closest_points_by_source(points, 240), False),
-    ]:
-        bounds = expand_bounds_with_frame(bounds, frame, exact=exact)
-
-    extent = extent_from_screen_bounds(
-        bounds,
-        left=0.060,
-        right=0.650,
-        bottom=0.065,
-        top=0.825,
-    )
-    if extent is None:
-        lon_min, lon_max, lat_min, lat_max = bounds
-        extent = [lon_min, lon_max, lat_min, lat_max]
-
-    extent = expand_extent_to_min_span(
-        extent,
-        min_lon_span=MIN_STABLE_240_LON_SPAN,
-        min_lat_span=MIN_STABLE_240_LAT_SPAN,
-        east_ratio=0.58,
-        north_ratio=0.58,
-    )
-    return reserve_240_legend_space(points, extent)
-
-
-def final_safe_240_extent(
-    df: pd.DataFrame,
-    past_kma: pd.DataFrame,
-    settings: Settings,
-    extent: list[float],
-    anchor_240_extent: list[float] | None,
-    *,
-    fig_width: float,
-    fig_height: float,
-) -> list[float]:
-    if settings.fcst_hours != 240 or reasonable_display_240_extent(extent):
-        return extent
-
-    print(
-        "240h final map extent failed safety guard; rebuilding from filtered camera points "
-        f"({extent[1] - extent[0]:.1f} lon x {extent[3] - extent[2]:.1f} lat, west={extent[0]:.1f})."
-    )
-
-    points = extent_points_for_auto_map(df, settings)
-    candidates = [
-        auto_map_extent_240(points, past_kma, settings) if not points.empty else None,
-        compact_240_extent_from_points(points, settings) if not points.empty else None,
-        anchor_240_extent,
-    ]
-
-    best_candidate = None
-    for candidate in candidates:
-        if candidate is None:
-            continue
-        if candidate[1] <= candidate[0] or candidate[3] <= candidate[2]:
-            continue
-        candidate = clamp_west_pacific_extent(candidate)
-        candidate = match_extent_to_canvas_aspect(
-            candidate,
-            fig_width=fig_width,
-            fig_height=fig_height,
-            east_expand_ratio=canvas_east_expand_ratio(settings),
-        )
-        candidate = clamp_west_pacific_extent(candidate)
-        if candidate[1] <= candidate[0] or candidate[3] <= candidate[2]:
-            continue
-        if best_candidate is None:
-            best_candidate = candidate
-        if reasonable_display_240_extent(candidate):
-            return candidate
-
-    if best_candidate is not None:
-        print("240h final map extent used best available fallback despite safety guard limits.")
-        return best_candidate
-
-    return extent
-
-
 def aspect_match_and_clamp_extent(
     extent: list[float],
     settings: Settings,
@@ -3087,27 +3046,6 @@ def aspect_match_and_clamp_extent(
         east_expand_ratio=canvas_east_expand_ratio(settings),
     )
     return clamp_west_pacific_extent(extent)
-
-
-def fallback_to_240_anchor_if_needed(
-    extent: list[float],
-    anchor_240_extent: list[float] | None,
-    settings: Settings,
-    *,
-    fig_width: float,
-    fig_height: float,
-    message: str,
-) -> list[float]:
-    if settings.fcst_hours != 240 or anchor_240_extent is None or reasonable_display_240_extent(extent):
-        return extent
-
-    print(message)
-    return aspect_match_and_clamp_extent(
-        clamp_west_pacific_extent(anchor_240_extent),
-        settings,
-        fig_width=fig_width,
-        fig_height=fig_height,
-    )
 
 
 def finalize_map_extent(
@@ -3125,52 +3063,22 @@ def finalize_map_extent(
     The 240h camera is intentionally guarded at the end; do not apply any
     extra aspect or padding transform after the final safety check.
     """
-    extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
-    extent = fallback_to_240_anchor_if_needed(
-        extent,
-        anchor_240_extent,
-        settings,
-        fig_width=fig_width,
-        fig_height=fig_height,
-        message=(
-            "240h map extent was too broad after initial aspect matching; "
-            "using expanded 120h anchor."
-        ),
-    )
+    if settings.fcst_hours == 240 and settings.auto_extent:
+        return finalize_240_map_extent(
+            df,
+            past_kma,
+            settings,
+            extent,
+            anchor_240_extent,
+            fig_width=fig_width,
+            fig_height=fig_height,
+        )
 
-    extent = stable_240_map_extent(extent, settings)
     extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
-    extent = fallback_to_240_anchor_if_needed(
-        extent,
-        anchor_240_extent,
-        settings,
-        fig_width=fig_width,
-        fig_height=fig_height,
-        message=(
-            "240h stable map extent was too broad after aspect matching; "
-            "falling back to expanded 120h anchor."
-        ),
-    )
-
-    extent = current_point_legend_safe_extent(df, extent, settings)
-    extent = clamp_west_pacific_extent(extent)
-    extent = title_safe_240_extent(df, extent, settings)
-    extent = clamp_west_pacific_extent(extent)
-    extent = trim_excess_240_padding(df, extent, settings)
-    extent = title_safe_240_extent(df, extent, settings)
-    extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
-    extent = title_safe_240_extent(df, extent, settings)
-    extent = clamp_west_pacific_extent(extent)
-
-    return final_safe_240_extent(
-        df,
-        past_kma,
-        settings,
-        extent,
-        anchor_240_extent,
-        fig_width=fig_width,
-        fig_height=fig_height,
-    )
+    if settings.fcst_hours == 240:
+        extent = current_point_legend_safe_extent(df, extent, settings)
+        extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
+    return extent
 
 
 def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, intensity: str) -> Path:
