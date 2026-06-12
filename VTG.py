@@ -197,7 +197,6 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 20
 MIN_STABLE_240_LON_SPAN = 62.0
 MIN_STABLE_240_LAT_SPAN = 36.0
 MAX_STABLE_240_LON_SPAN = 96.0
@@ -2250,125 +2249,6 @@ def _extent_from_mercator_xy(
     return result
 
 
-def _projected_bounds_xy(bounds: tuple[float, float, float, float]) -> tuple[float, float, float, float] | None:
-    projection = ccrs.Mercator()
-    data_crs = ccrs.PlateCarree()
-    data_west, data_east, data_south, data_north = bounds
-    center_lon = (data_west + data_east) / 2
-    center_lat = (data_south + data_north) / 2
-
-    x_west, _ = projection.transform_point(data_west, center_lat, data_crs)
-    x_east, _ = projection.transform_point(data_east, center_lat, data_crs)
-    _, y_south = projection.transform_point(center_lon, data_south, data_crs)
-    _, y_north = projection.transform_point(center_lon, data_north, data_crs)
-    values = [x_west, x_east, y_south, y_north]
-    if not all(math.isfinite(value) for value in values):
-        return None
-    if x_east <= x_west or y_north <= y_south:
-        return None
-    return x_west, x_east, y_south, y_north
-
-
-def expand_extent_for_projected_screen_bounds(
-    extent: list[float],
-    bounds: tuple[float, float, float, float],
-    *,
-    left: float,
-    right: float,
-    bottom: float,
-    top: float,
-) -> list[float]:
-    """Expand extent so lon/lat bounds fall inside the actual Mercator screen box."""
-    extent_xy = _mercator_extent_xy(extent)
-    bounds_xy = _projected_bounds_xy(bounds)
-    if extent_xy is None or bounds_xy is None:
-        return expand_extent_for_screen_bounds(extent, bounds, left=left, right=right, bottom=bottom, top=top)
-
-    x0, x1, y0, y1 = extent_xy
-    data_west_x, data_east_x, data_south_y, data_north_y = bounds_xy
-    left = max(0.0, min(left, 0.95))
-    right = max(left + 0.05, min(right, 0.99))
-    bottom = max(0.0, min(bottom, 0.95))
-    top = max(bottom + 0.05, min(top, 0.99))
-
-    for _ in range(3):
-        x_span = x1 - x0
-        y_span = y1 - y0
-        if x_span <= 0 or y_span <= 0:
-            return extent
-
-        west_x = (data_west_x - x0) / x_span
-        east_x = (data_east_x - x0) / x_span
-        south_y = (data_south_y - y0) / y_span
-        north_y = (data_north_y - y0) / y_span
-
-        if west_x < left:
-            x0 = (data_west_x - left * x1) / (1.0 - left)
-        if east_x > right:
-            x1 = (data_east_x - right * x0) / (1.0 - right)
-        if south_y < bottom:
-            y0 = (data_south_y - bottom * y1) / (1.0 - bottom)
-        if north_y > top:
-            y1 = (data_north_y - top * y0) / (1.0 - top)
-
-    return _extent_from_mercator_xy(x0, x1, y0, y1, extent)
-
-
-def recenter_extent_for_projected_screen_bounds(
-    extent: list[float],
-    bounds: tuple[float, float, float, float],
-    *,
-    left: float,
-    right: float,
-    bottom: float,
-    top: float,
-    target_center_x: float,
-    target_center_y: float,
-    max_shift_ratio: float = 0.18,
-) -> list[float]:
-    """Shift, not zoom, so the main 240h plume sits in the visible map box."""
-    extent_xy = _mercator_extent_xy(extent)
-    bounds_xy = _projected_bounds_xy(bounds)
-    if extent_xy is None or bounds_xy is None:
-        return extent
-
-    x0, x1, y0, y1 = extent_xy
-    data_west_x, data_east_x, data_south_y, data_north_y = bounds_xy
-    x_span = x1 - x0
-    y_span = y1 - y0
-    if x_span <= 0 or y_span <= 0:
-        return extent
-
-    west_x = (data_west_x - x0) / x_span
-    east_x = (data_east_x - x0) / x_span
-    south_y = (data_south_y - y0) / y_span
-    north_y = (data_north_y - y0) / y_span
-
-    lower_dx = (east_x - right) * x_span
-    upper_dx = (west_x - left) * x_span
-    desired_dx = (((west_x + east_x) / 2) - target_center_x) * x_span
-    max_dx = abs(x_span * max_shift_ratio)
-    desired_dx = max(-max_dx, min(max_dx, desired_dx))
-    if lower_dx <= upper_dx:
-        dx = max(lower_dx, min(upper_dx, desired_dx))
-    else:
-        dx = 0.0
-
-    lower_dy = (north_y - top) * y_span
-    upper_dy = (south_y - bottom) * y_span
-    desired_dy = (((south_y + north_y) / 2) - target_center_y) * y_span
-    max_dy = abs(y_span * max_shift_ratio)
-    desired_dy = max(-max_dy, min(max_dy, desired_dy))
-    if lower_dy <= upper_dy:
-        dy = max(lower_dy, min(upper_dy, desired_dy))
-    else:
-        dy = 0.0
-
-    if abs(dx) < 1e-6 and abs(dy) < 1e-6:
-        return extent
-    return _extent_from_mercator_xy(x0 + dx, x1 + dx, y0 + dy, y1 + dy, extent)
-
-
 def extent_from_screen_bounds(
     bounds: tuple[float, float, float, float],
     *,
@@ -2450,437 +2330,27 @@ def build_240_camera_frames(points: pd.DataFrame, settings: Settings) -> dict[st
     }
 
 
-def projected_bounds_inside_screen(
-    extent: list[float],
-    bounds: tuple[float, float, float, float] | None,
-    *,
-    left: float,
-    right: float,
-    bottom: float,
-    top: float,
-    slack: float = 0.015,
-) -> bool:
-    if bounds is None:
-        return True
-    extent_xy = _mercator_extent_xy(extent)
-    bounds_xy = _projected_bounds_xy(bounds)
-    if extent_xy is None or bounds_xy is None:
-        return True
-
-    x0, x1, y0, y1 = extent_xy
-    data_west_x, data_east_x, data_south_y, data_north_y = bounds_xy
-    x_span = x1 - x0
-    y_span = y1 - y0
-    if x_span <= 0 or y_span <= 0:
-        return False
-
-    west_x = (data_west_x - x0) / x_span
-    east_x = (data_east_x - x0) / x_span
-    south_y = (data_south_y - y0) / y_span
-    north_y = (data_north_y - y0) / y_span
-    return (
-        west_x >= left - slack
-        and east_x <= right + slack
-        and south_y >= bottom - slack
-        and north_y <= top + slack
-    )
-
-
-def projected_bounds_screen_fractions(
-    extent: list[float],
-    bounds: tuple[float, float, float, float] | None,
-) -> tuple[float, float, float, float] | None:
-    if bounds is None:
-        return None
-    extent_xy = _mercator_extent_xy(extent)
-    bounds_xy = _projected_bounds_xy(bounds)
-    if extent_xy is None or bounds_xy is None:
-        return None
-
-    x0, x1, y0, y1 = extent_xy
-    data_west_x, data_east_x, data_south_y, data_north_y = bounds_xy
-    x_span = x1 - x0
-    y_span = y1 - y0
-    if x_span <= 0 or y_span <= 0:
-        return None
-
-    return (
-        (data_west_x - x0) / x_span,
-        (data_east_x - x0) / x_span,
-        (data_south_y - y0) / y_span,
-        (data_north_y - y0) / y_span,
-    )
-
-
-def projected_bounds_uses_240_screen_space(
-    extent: list[float],
-    bounds: tuple[float, float, float, float] | None,
-    *,
-    max_west_blank: float,
-    max_south_blank: float,
-) -> bool:
-    fractions = projected_bounds_screen_fractions(extent, bounds)
-    if fractions is None:
-        return True
-    west_x, _east_x, south_y, _north_y = fractions
-    return west_x <= max_west_blank and south_y <= max_south_blank
-
-
-def shift_extent_to_reduce_projected_blank_space(
-    extent: list[float],
-    bounds: tuple[float, float, float, float] | None,
-    *,
-    target_west_x: float,
-    target_south_y: float,
-    max_shift_ratio: float,
-) -> list[float]:
-    """Keep the zoom level but trim excessive empty west/south space."""
-    extent_xy = _mercator_extent_xy(extent)
-    bounds_xy = _projected_bounds_xy(bounds) if bounds is not None else None
-    if extent_xy is None or bounds_xy is None:
-        return extent
-
-    x0, x1, y0, y1 = extent_xy
-    data_west_x, _data_east_x, data_south_y, _data_north_y = bounds_xy
-    x_span = x1 - x0
-    y_span = y1 - y0
-    if x_span <= 0 or y_span <= 0:
-        return extent
-
-    west_x = (data_west_x - x0) / x_span
-    south_y = (data_south_y - y0) / y_span
-    max_dx = x_span * max_shift_ratio
-    max_dy = y_span * max_shift_ratio
-    dx = max(0.0, min(max_dx, (west_x - target_west_x) * x_span))
-    dy = max(0.0, min(max_dy, (south_y - target_south_y) * y_span))
-    if dx <= 1e-6 and dy <= 1e-6:
-        return extent
-    return _extent_from_mercator_xy(x0 + dx, x1 + dx, y0 + dy, y1 + dy, extent)
-
-
-def good_240_camera_composition(points: pd.DataFrame, extent: list[float], settings: Settings) -> bool:
-    if settings.fcst_hours != 240 or points.empty:
-        return True
-    if not has_240_track_visibility(points, extent, settings):
-        return False
-
+def auto_map_extent_long_range_seed(points: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
     frames = build_240_camera_frames(points, settings)
-    focus_bounds = quantile_frame_bounds(
-        concat_track_frames([frames["early"], frames["mid"], frames["late"], frames["endpoints"]]),
-        lon_low=0.045,
-        lon_high=0.955,
-        lat_low=0.045,
-        lat_high=0.970,
-    )
-    tail_bounds = quantile_frame_bounds(
-        concat_track_frames([frames["late_180"], frames["late_240"], frames["endpoints"], frames["late_mean"]]),
-        lon_low=0.045,
-        lon_high=0.965,
-        lat_low=0.045,
-        lat_high=0.985,
-    )
-    anchor_bounds = quantile_frame_bounds(
-        concat_track_frames([frames["start_mean"], frames["mid_mean"], frames["endpoint_mean"], frames["late_mean"]])
-    )
-    return (
-        projected_bounds_inside_screen(extent, focus_bounds, left=0.020, right=0.650, bottom=0.040, top=0.790, slack=0.004)
-        and projected_bounds_inside_screen(extent, tail_bounds, left=0.030, right=0.625, bottom=0.055, top=0.755, slack=0.004)
-        and projected_bounds_inside_screen(extent, anchor_bounds, left=0.030, right=0.655, bottom=0.050, top=0.790, slack=0.004)
-        and projected_bounds_uses_240_screen_space(extent, focus_bounds, max_west_blank=0.310, max_south_blank=0.285)
-        and projected_bounds_uses_240_screen_space(extent, anchor_bounds, max_west_blank=0.420, max_south_blank=0.360)
-    )
+    if frames["full"].empty:
+        return None
 
-
-def rebalance_240_camera_composition(
-    points: pd.DataFrame,
-    extent: list[float],
-    settings: Settings,
-    *,
-    allow_shift: bool,
-) -> list[float]:
-    if settings.fcst_hours != 240 or points.empty:
-        return extent
-    if good_240_camera_composition(points, extent, settings):
-        return extent
-
-    frames = build_240_camera_frames(points, settings)
-    focus_bounds = quantile_frame_bounds(
-        concat_track_frames([frames["early"], frames["mid"], frames["late"], frames["endpoints"]]),
-        lon_low=0.045,
-        lon_high=0.955,
-        lat_low=0.045,
-        lat_high=0.970,
-    )
-    tail_bounds = quantile_frame_bounds(
-        concat_track_frames([frames["late_180"], frames["late_240"], frames["endpoints"], frames["late_mean"]]),
-        lon_low=0.040,
-        lon_high=0.970,
-        lat_low=0.040,
-        lat_high=0.985,
-    )
-    endpoint_bounds = quantile_frame_bounds(
-        concat_track_frames([frames["late_240"], frames["endpoints"], frames["endpoint_mean"]]),
-        lon_low=0.055,
-        lon_high=0.965,
-        lat_low=0.055,
-        lat_high=0.980,
-    )
-    anchor_bounds = quantile_frame_bounds(
-        concat_track_frames([frames["start_mean"], frames["mid_mean"], frames["endpoint_mean"], frames["late_mean"]])
-    )
-    full_bounds = quantile_frame_bounds(
+    seed_frame = concat_track_frames([
         frames["full"],
-        lon_low=0.020,
-        lon_high=0.980,
-        lat_low=0.020,
-        lat_high=0.985,
-    )
-
-    for bounds, box in [
-        (focus_bounds, (0.020, 0.665, 0.040, 0.805)),
-        (tail_bounds, (0.030, 0.635, 0.055, 0.760)),
-        (endpoint_bounds, (0.035, 0.620, 0.060, 0.745)),
-        (full_bounds, (0.010, 0.700, 0.025, 0.825)),
-    ]:
-        if bounds is None:
-            continue
-        left, right, bottom, top = box
-        extent = expand_extent_for_projected_screen_bounds(
-            extent,
-            bounds,
-            left=left,
-            right=right,
-            bottom=bottom,
-            top=top,
-        )
-
-    if allow_shift and focus_bounds is not None:
-        target_x, target_y = direction_aware_240_target(frames)
-        extent = recenter_extent_for_projected_screen_bounds(
-            extent,
-            focus_bounds,
-            left=0.025,
-            right=0.650,
-            bottom=0.045,
-            top=0.785,
-            target_center_x=min(target_x, 0.34),
-            target_center_y=min(target_y, 0.40),
-            max_shift_ratio=0.16,
-        )
-    if allow_shift and tail_bounds is not None:
-        extent = recenter_extent_for_projected_screen_bounds(
-            extent,
-            tail_bounds,
-            left=0.030,
-            right=0.625,
-            bottom=0.055,
-            top=0.755,
-            target_center_x=0.33,
-            target_center_y=0.38,
-            max_shift_ratio=0.14,
-        )
-
-    extent = shift_extent_to_reduce_projected_blank_space(
-        extent,
-        focus_bounds,
-        target_west_x=0.115,
-        target_south_y=0.105,
-        max_shift_ratio=0.30,
-    )
-    extent = shift_extent_to_reduce_projected_blank_space(
-        extent,
-        anchor_bounds,
-        target_west_x=0.145,
-        target_south_y=0.115,
-        max_shift_ratio=0.18,
-    )
-
-    extent = expand_extent_to_min_span(
-        extent,
-        min_lon_span=MIN_STABLE_240_LON_SPAN,
-        min_lat_span=MIN_STABLE_240_LAT_SPAN,
-        east_ratio=0.56,
-        north_ratio=0.58,
-    )
-    return clamp_west_pacific_extent(extent)
-
-
-def direction_aware_240_target(frames: dict[str, pd.DataFrame]) -> tuple[float, float]:
-    target_x = 0.36
-    target_y = 0.42
-    start_mean = frames.get("start_mean", pd.DataFrame())
-    late_mean = frames.get("late_mean", pd.DataFrame())
-    if start_mean.empty or late_mean.empty:
-        return target_x, target_y
-
-    try:
-        start_lon = float(start_mean["LON"].iloc[0])
-        start_lat = float(start_mean["LAT"].iloc[0])
-        late_lon = float(late_mean["LON"].iloc[0])
-        late_lat = float(late_mean["LAT"].iloc[0])
-    except (KeyError, IndexError, TypeError, ValueError):
-        return target_x, target_y
-
-    dlon = longitude_delta(late_lon, start_lon)
-    dlat = late_lat - start_lat
-    target_x -= max(-0.09, min(0.09, dlon / 70.0))
-    target_y -= max(-0.09, min(0.09, dlat / 52.0))
-    return max(0.27, min(0.43, target_x)), max(0.31, min(0.49, target_y))
-
-
-def fit_240_extent_to_tracks(
-    points: pd.DataFrame,
-    extent: list[float],
-    settings: Settings,
-    *,
-    recenter: bool,
-) -> list[float]:
-    if settings.fcst_hours != 240 or points.empty:
-        return extent
-
-    frames = build_240_camera_frames(points, settings)
-    if frames["full"].empty:
-        return extent
-
-    full_core = quantile_frame_bounds(frames["full"], lon_low=0.025, lon_high=0.975, lat_low=0.025, lat_high=0.975)
-    early_core = quantile_frame_bounds(frames["early"], lon_low=0.035, lon_high=0.965, lat_low=0.035, lat_high=0.965)
-    late_core_frame = concat_track_frames([frames["late"], frames["endpoints"], frames["late_mean"]])
-    late_core = quantile_frame_bounds(
-        late_core_frame,
-        lon_low=0.025,
-        lon_high=0.975,
-        lat_low=0.025,
-        lat_high=0.985,
-    )
-    endpoint_core_frame = concat_track_frames(
-        [frames["late_180"], frames["late_240"], frames["endpoints"], frames["endpoint_mean"], frames["late_mean"]]
-    )
-    endpoint_core = quantile_frame_bounds(
-        endpoint_core_frame,
-        lon_low=0.035,
-        lon_high=0.965,
-        lat_low=0.035,
-        lat_high=0.975,
-    )
-    anchor_bounds = quantile_frame_bounds(
-        concat_track_frames(
-            [
-                frames["start_mean"],
-                frames["mid_mean"],
-                frames["endpoint_mean"],
-                frames["late_mean"],
-            ]
-        )
-    )
-
-    if recenter:
-        focus_bounds = quantile_frame_bounds(
-            concat_track_frames([frames["early"], frames["late"], frames["mid"], frames["endpoints"]]),
-            lon_low=0.055,
-            lon_high=0.945,
-            lat_low=0.055,
-            lat_high=0.955,
-        )
-        if focus_bounds is not None:
-            target_x, target_y = direction_aware_240_target(frames)
-            extent = recenter_extent_for_projected_screen_bounds(
-                extent,
-                focus_bounds,
-                left=0.045,
-                right=0.620,
-                bottom=0.055,
-                top=0.770,
-                target_center_x=target_x,
-                target_center_y=target_y,
-                max_shift_ratio=0.30,
-            )
-
-    for bounds, box in [
-        (full_core, (0.035, 0.650, 0.050, 0.815)),
-        (early_core, (0.035, 0.680, 0.050, 0.835)),
-        (late_core, (0.035, 0.615, 0.060, 0.765)),
-        (endpoint_core, (0.045, 0.600, 0.070, 0.745)),
-        (anchor_bounds, (0.045, 0.650, 0.055, 0.805)),
-    ]:
-        if bounds is None:
-            continue
-        left, right, bottom, top = box
-        extent = expand_extent_for_projected_screen_bounds(
-            extent,
-            bounds,
-            left=left,
-            right=right,
-            bottom=bottom,
-            top=top,
-        )
-
-    extent = expand_extent_to_min_span(
-        extent,
-        min_lon_span=MIN_STABLE_240_LON_SPAN,
-        min_lat_span=MIN_STABLE_240_LAT_SPAN,
-        east_ratio=0.56,
-        north_ratio=0.58,
-    )
-    return clamp_west_pacific_extent(extent)
-
-
-def has_240_track_visibility(points: pd.DataFrame, extent: list[float], settings: Settings) -> bool:
-    if settings.fcst_hours != 240 or points.empty:
-        return True
-    if not reasonable_display_240_extent(extent):
-        return False
-
-    frames = build_240_camera_frames(points, settings)
-    late_core = quantile_frame_bounds(
-        concat_track_frames([frames["late"], frames["endpoints"], frames["late_mean"]]),
-        lon_low=0.03,
-        lon_high=0.97,
-        lat_low=0.03,
-        lat_high=0.98,
-    )
-    endpoint_core = quantile_frame_bounds(
-        concat_track_frames([frames["late_180"], frames["late_240"], frames["endpoints"], frames["endpoint_mean"]]),
-        lon_low=0.04,
-        lon_high=0.96,
-        lat_low=0.04,
-        lat_high=0.97,
-    )
-    anchor_bounds = quantile_frame_bounds(
-        concat_track_frames([frames["start_mean"], frames["mid_mean"], frames["endpoint_mean"], frames["late_mean"]])
-    )
-    return (
-        projected_bounds_inside_screen(extent, late_core, left=0.020, right=0.655, bottom=0.035, top=0.800)
-        and projected_bounds_inside_screen(extent, endpoint_core, left=0.030, right=0.640, bottom=0.045, top=0.780)
-        and projected_bounds_inside_screen(extent, anchor_bounds, left=0.025, right=0.670, bottom=0.040, top=0.815)
-    )
-
-
-def auto_map_extent_240(points: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
-    frames = build_240_camera_frames(points, settings)
-    if frames["full"].empty:
+        frames["mid"],
+        frames["late_180"],
+        frames["late_240"],
+        frames["endpoints"],
+        frames["start_mean"],
+        frames["mid_mean"],
+        frames["endpoint_mean"],
+        frames["late_mean"],
+    ])
+    bounds = quantile_frame_bounds(seed_frame, lon_low=0.030, lon_high=0.970, lat_low=0.030, lat_high=0.975)
+    if bounds is None:
+        bounds = bounds_from_frames([frames["full"]], settings)
+    if bounds is None:
         return None
-
-    base_bounds = quantile_frame_bounds(
-        concat_track_frames([frames["full"], frames["mid"], frames["endpoints"]]),
-        lon_low=0.035,
-        lon_high=0.965,
-        lat_low=0.035,
-        lat_high=0.965,
-    )
-    if base_bounds is None:
-        base_bounds = bounds_from_frames([frames["full"]], settings)
-    if base_bounds is None:
-        return None
-
-    bounds = base_bounds
-    for frame, exact in [
-        (frames["start_mean"], True),
-        (frames["endpoint_mean"], True),
-        (frames["late_mean"], True),
-        (frames["mid"], False),
-        (frames["endpoints"], False),
-    ]:
-        bounds = expand_bounds_with_frame(bounds, frame, exact=exact)
 
     if not past_kma.empty:
         current_dt = pd.to_datetime(settings.data_time, format="%Y%m%d%H%M", errors="coerce")
@@ -2890,14 +2360,15 @@ def auto_map_extent_240(points: pd.DataFrame, past_kma: pd.DataFrame, settings: 
             past_points = past_points[past_points["FT_TIME"].ge(cutoff)].copy()
         past_points = numeric_track_points(past_points)
         if not past_points.empty:
+            past_points = normalize_240_camera_longitudes(past_points)
             bounds = expand_bounds_with_frame(bounds, past_points, exact=False)
 
     extent = extent_from_screen_bounds(
         bounds,
         left=0.045,
-        right=0.635,
+        right=0.690,
         bottom=0.055,
-        top=0.805,
+        top=0.860,
     )
     if extent is None:
         lon_min, lon_max, lat_min, lat_max = bounds
@@ -2907,9 +2378,9 @@ def auto_map_extent_240(points: pd.DataFrame, past_kma: pd.DataFrame, settings: 
         min_lon_span=MIN_STABLE_240_LON_SPAN,
         min_lat_span=MIN_STABLE_240_LAT_SPAN,
         east_ratio=0.56,
-        north_ratio=0.60,
+        north_ratio=0.58,
     )
-    return fit_240_extent_to_tracks(points, extent, settings, recenter=True)
+    return clamp_west_pacific_extent(extent)
 
 
 def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
@@ -2918,7 +2389,7 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
         return None
 
     if settings.fcst_hours > 120:
-        return auto_map_extent_240(points, past_kma, settings)
+        return auto_map_extent_long_range_seed(points, past_kma, settings)
 
     lead_hours = pd.to_numeric(points["TMD"], errors="coerce")
     primary = points[lead_hours.between(0, settings.fcst_hours)].copy()
@@ -2948,72 +2419,6 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
         lat_min,
         lat_max,
     ]
-
-
-def map_extent_cache_path(settings: Settings) -> Path:
-    year_str = storm_year(settings)
-    return settings.output_root / "metadata" / "map_extent" / f"{year_str}_{settings.typ_number:02d}_{settings.fcst_hours}h.json"
-
-
-def valid_extent(value: object) -> list[float] | None:
-    if not isinstance(value, list) or len(value) != 4:
-        return None
-    try:
-        extent = [float(item) for item in value]
-    except (TypeError, ValueError):
-        return None
-    lon_min, lon_max, lat_min, lat_max = extent
-    if lon_max <= lon_min or lat_max <= lat_min:
-        return None
-    return extent
-
-
-def extent_contains(outer: list[float], inner: list[float], *, slack_ratio: float = 0.06) -> bool:
-    outer_lon_span = outer[1] - outer[0]
-    outer_lat_span = outer[3] - outer[2]
-    lon_slack = outer_lon_span * slack_ratio
-    lat_slack = outer_lat_span * slack_ratio
-    return (
-        inner[0] >= outer[0] - lon_slack
-        and inner[1] <= outer[1] + lon_slack
-        and inner[2] >= outer[2] - lat_slack
-        and inner[3] <= outer[3] + lat_slack
-    )
-
-
-def merged_extent(first: list[float], second: list[float]) -> list[float]:
-    return [
-        min(first[0], second[0]),
-        max(first[1], second[1]),
-        min(first[2], second[2]),
-        max(first[3], second[3]),
-    ]
-
-
-def padded_extent(extent: list[float], *, lon_ratio: float = 0.035, lat_ratio: float = 0.05) -> list[float]:
-    lon_pad = (extent[1] - extent[0]) * lon_ratio
-    lat_pad = (extent[3] - extent[2]) * lat_ratio
-    return [
-        extent[0] - lon_pad,
-        extent[1] + lon_pad,
-        extent[2] - lat_pad,
-        extent[3] + lat_pad,
-    ]
-
-
-def reasonable_stable_240_extent(extent: list[float]) -> bool:
-    lon_span = extent[1] - extent[0]
-    lat_span = extent[3] - extent[2]
-    return (
-        lon_span > 0
-        and lat_span > 0
-        and lon_span <= MAX_STABLE_240_LON_SPAN
-        and lat_span <= MAX_STABLE_240_LAT_SPAN
-        and extent[0] >= MIN_DISPLAY_240_WEST_LON
-        and extent[1] <= MAX_DISPLAY_240_EAST_LON
-        and extent[2] >= MIN_DISPLAY_240_SOUTH_LAT
-        and extent[3] <= MAX_DISPLAY_240_NORTH_LAT
-    )
 
 
 def reasonable_display_240_extent(extent: list[float]) -> bool:
@@ -3056,77 +2461,6 @@ def expanded_120_anchor_for_240(df: pd.DataFrame, past_kma: pd.DataFrame, settin
         anchor_extent[2] - lat_span * 0.22,
         anchor_extent[3] + lat_span * 0.38,
     ]
-
-
-def stable_240_map_extent(
-    extent: list[float],
-    settings: Settings,
-    *,
-    points: pd.DataFrame | None = None,
-) -> list[float]:
-    if settings.fcst_hours != 240:
-        return extent
-
-    if not reasonable_stable_240_extent(extent):
-        print(
-            "240h map extent candidate is too broad for stable cache; "
-            f"using uncached extent ({extent[1] - extent[0]:.1f} lon x {extent[3] - extent[2]:.1f} lat)."
-        )
-        return extent
-
-    path = map_extent_cache_path(settings)
-    cached_extent = None
-    payload = None
-    if path.exists():
-        try:
-            payload = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            payload = None
-    if isinstance(payload, dict) and payload.get("version") == MAP_EXTENT_CACHE_VERSION:
-        cached_extent = valid_extent(payload.get("extent"))
-        if cached_extent and not reasonable_stable_240_extent(cached_extent):
-            cached_extent = None
-
-    if cached_extent:
-        if points is None:
-            if extent_contains(cached_extent, extent):
-                return cached_extent
-        elif good_240_camera_composition(points, cached_extent, settings):
-            return cached_extent
-        else:
-            print(
-                "240h cached map extent no longer keeps current tracks in the safe/balanced screen area; "
-                "refreshing stable camera."
-            )
-
-    stable_extent = padded_extent(extent)
-    stable_extent = expand_extent_to_min_span(
-        stable_extent,
-        min_lon_span=MIN_STABLE_240_LON_SPAN,
-        min_lat_span=MIN_STABLE_240_LAT_SPAN,
-        east_ratio=0.58,
-        north_ratio=0.56,
-    )
-    if not reasonable_stable_240_extent(stable_extent):
-        stable_extent = extent
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(
-            {
-                "version": MAP_EXTENT_CACHE_VERSION,
-                "updated_at_utc": datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"),
-                "storm_year": storm_year(settings),
-                "typ_number": settings.typ_number,
-                "fcst_hours": settings.fcst_hours,
-                "extent": stable_extent,
-            },
-            ensure_ascii=False,
-            indent=2,
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    return stable_extent
 
 
 def clamp_west_pacific_extent(
@@ -3479,11 +2813,9 @@ def dedupe_240_candidates(candidates: list[list[float] | None]) -> list[list[flo
 
 
 def build_240_extent_candidates(
-    df: pd.DataFrame,
     camera_points: pd.DataFrame,
     render_points: pd.DataFrame,
     protected_points: pd.DataFrame,
-    past_kma: pd.DataFrame,
     settings: Settings,
     seed_extent: list[float],
     anchor_240_extent: list[float] | None,
@@ -3515,7 +2847,6 @@ def build_240_extent_candidates(
     raw_candidates: list[list[float] | None] = [
         seed_extent,
         anchor_240_extent,
-        auto_map_extent_240(camera_points, past_kma, settings) if not camera_points.empty else None,
     ]
 
     candidate_specs = [
@@ -3544,9 +2875,9 @@ def build_240_extent_candidates(
 
     expanded: list[list[float] | None] = []
     for candidate in normalized:
-        for scale in (0.92, 1.00, 1.08, 1.18, 1.32, 1.50):
-            for shift_x in (-0.22, -0.14, -0.07, 0.0, 0.07, 0.14, 0.22):
-                for shift_y in (-0.18, -0.10, -0.04, 0.0, 0.06, 0.12, 0.18):
+        for scale in (0.96, 1.00, 1.10, 1.24, 1.40):
+            for shift_x in (-0.18, -0.09, 0.0, 0.09, 0.18):
+                for shift_y in (-0.14, -0.06, 0.0, 0.08, 0.16):
                     expanded.append(scale_shift_240_extent(
                         candidate,
                         settings,
@@ -3739,11 +3070,9 @@ def finalize_240_map_extent(
         endpoint_points = protected_points.copy()
 
     candidates = build_240_extent_candidates(
-        df,
         camera_points,
         render_points,
         protected_points,
-        past_kma,
         settings,
         extent,
         anchor_240_extent,
