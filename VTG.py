@@ -197,7 +197,7 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 15
+MAP_EXTENT_CACHE_VERSION = 16
 MIN_STABLE_240_LON_SPAN = 62.0
 MIN_STABLE_240_LAT_SPAN = 36.0
 MAX_STABLE_240_LON_SPAN = 96.0
@@ -2439,8 +2439,8 @@ def projected_bounds_inside_screen(
 
 
 def direction_aware_240_target(frames: dict[str, pd.DataFrame]) -> tuple[float, float]:
-    target_x = 0.37
-    target_y = 0.43
+    target_x = 0.36
+    target_y = 0.42
     start_mean = frames.get("start_mean", pd.DataFrame())
     late_mean = frames.get("late_mean", pd.DataFrame())
     if start_mean.empty or late_mean.empty:
@@ -2456,9 +2456,9 @@ def direction_aware_240_target(frames: dict[str, pd.DataFrame]) -> tuple[float, 
 
     dlon = longitude_delta(late_lon, start_lon)
     dlat = late_lat - start_lat
-    target_x -= max(-0.06, min(0.06, dlon / 90.0))
-    target_y -= max(-0.06, min(0.06, dlat / 65.0))
-    return max(0.31, min(0.43, target_x)), max(0.36, min(0.49, target_y))
+    target_x -= max(-0.09, min(0.09, dlon / 70.0))
+    target_y -= max(-0.09, min(0.09, dlat / 52.0))
+    return max(0.27, min(0.43, target_x)), max(0.31, min(0.49, target_y))
 
 
 def fit_240_extent_to_tracks(
@@ -2520,20 +2520,20 @@ def fit_240_extent_to_tracks(
                 extent,
                 focus_bounds,
                 left=0.045,
-                right=0.650,
+                right=0.620,
                 bottom=0.055,
-                top=0.805,
+                top=0.770,
                 target_center_x=target_x,
                 target_center_y=target_y,
-                max_shift_ratio=0.22,
+                max_shift_ratio=0.30,
             )
 
     for bounds, box in [
-        (full_core, (0.035, 0.675, 0.050, 0.840)),
-        (early_core, (0.035, 0.690, 0.050, 0.850)),
-        (late_core, (0.035, 0.650, 0.060, 0.805)),
-        (endpoint_core, (0.045, 0.635, 0.070, 0.790)),
-        (anchor_bounds, (0.045, 0.665, 0.055, 0.825)),
+        (full_core, (0.035, 0.650, 0.050, 0.815)),
+        (early_core, (0.035, 0.680, 0.050, 0.835)),
+        (late_core, (0.035, 0.615, 0.060, 0.765)),
+        (endpoint_core, (0.045, 0.600, 0.070, 0.745)),
+        (anchor_bounds, (0.045, 0.650, 0.055, 0.805)),
     ]:
         if bounds is None:
             continue
@@ -2582,9 +2582,9 @@ def has_240_track_visibility(points: pd.DataFrame, extent: list[float], settings
         concat_track_frames([frames["start_mean"], frames["mid_mean"], frames["endpoint_mean"], frames["late_mean"]])
     )
     return (
-        projected_bounds_inside_screen(extent, late_core, left=0.020, right=0.690, bottom=0.035, top=0.855)
-        and projected_bounds_inside_screen(extent, endpoint_core, left=0.030, right=0.675, bottom=0.045, top=0.840)
-        and projected_bounds_inside_screen(extent, anchor_bounds, left=0.025, right=0.700, bottom=0.040, top=0.860)
+        projected_bounds_inside_screen(extent, late_core, left=0.020, right=0.650, bottom=0.035, top=0.815)
+        and projected_bounds_inside_screen(extent, endpoint_core, left=0.030, right=0.635, bottom=0.045, top=0.800)
+        and projected_bounds_inside_screen(extent, anchor_bounds, left=0.025, right=0.675, bottom=0.040, top=0.835)
     )
 
 
@@ -2628,9 +2628,9 @@ def auto_map_extent_240(points: pd.DataFrame, past_kma: pd.DataFrame, settings: 
     extent = extent_from_screen_bounds(
         bounds,
         left=0.045,
-        right=0.665,
+        right=0.635,
         bottom=0.055,
-        top=0.845,
+        top=0.805,
     )
     if extent is None:
         lon_min, lon_max, lat_min, lat_max = bounds
@@ -2776,7 +2776,12 @@ def expanded_120_anchor_for_240(df: pd.DataFrame, past_kma: pd.DataFrame, settin
     ]
 
 
-def stable_240_map_extent(extent: list[float], settings: Settings) -> list[float]:
+def stable_240_map_extent(
+    extent: list[float],
+    settings: Settings,
+    *,
+    points: pd.DataFrame | None = None,
+) -> list[float]:
     if settings.fcst_hours != 240:
         return extent
 
@@ -2800,10 +2805,19 @@ def stable_240_map_extent(extent: list[float], settings: Settings) -> list[float
         if cached_extent and not reasonable_stable_240_extent(cached_extent):
             cached_extent = None
 
-    if cached_extent and extent_contains(cached_extent, extent):
-        return cached_extent
+    if cached_extent:
+        if points is None:
+            if extent_contains(cached_extent, extent):
+                return cached_extent
+        elif has_240_track_visibility(points, cached_extent, settings):
+            return cached_extent
+        else:
+            print(
+                "240h cached map extent no longer keeps current tracks in the safe screen area; "
+                "refreshing stable camera."
+            )
 
-    stable_extent = padded_extent(merged_extent(cached_extent, extent)) if cached_extent else padded_extent(extent)
+    stable_extent = padded_extent(extent)
     stable_extent = expand_extent_to_min_span(
         stable_extent,
         min_lon_span=MIN_STABLE_240_LON_SPAN,
@@ -2915,7 +2929,7 @@ def finalize_240_map_extent(
 
     extent = normalize(extent, recenter=True)
     if reasonable_stable_240_extent(extent):
-        extent = stable_240_map_extent(extent, settings)
+        extent = stable_240_map_extent(extent, settings, points=points)
         extent = normalize(extent, recenter=False)
 
     if reasonable_display_240_extent(extent) and has_240_track_visibility(points, extent, settings):
