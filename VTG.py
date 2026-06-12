@@ -2301,166 +2301,130 @@ def concat_track_frames(frames: list[pd.DataFrame]) -> pd.DataFrame:
     return pd.concat(available, ignore_index=True)
 
 
-def build_240_camera_frames(points: pd.DataFrame, settings: Settings) -> dict[str, pd.DataFrame]:
-    full = lead_filtered_points(points, 0, settings.fcst_hours)
-    early = lead_filtered_points(points, 0, 120)
-    late = lead_filtered_points(points, 120, settings.fcst_hours)
-    starts = lead_filtered_points(points, 0, 0)
-    mid = closest_points_by_source(points, 120, tolerance=42.0)
-    late_180 = closest_points_by_source(points, 180, tolerance=48.0)
-    late_240 = closest_points_by_source(points, min(settings.fcst_hours, 240), tolerance=54.0)
-    endpoints = latest_points_by_source(points, 120, settings.fcst_hours)
-    if len(endpoints) < 3:
-        endpoints = latest_points_by_source(points, 0, settings.fcst_hours)
-
-    endpoint_cluster = concat_track_frames([late_180, late_240, endpoints])
-    return {
-        "full": full,
-        "early": early,
-        "late": late,
-        "starts": starts,
-        "mid": mid,
-        "late_180": late_180,
-        "late_240": late_240,
-        "endpoints": endpoints,
-        "start_mean": mean_point_frame(starts),
-        "mid_mean": mean_point_frame(mid),
-        "endpoint_mean": mean_point_frame(endpoints),
-        "late_mean": mean_point_frame(endpoint_cluster),
-    }
-
-
-def auto_map_extent_long_range_seed(points: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
-    frames = build_240_camera_frames(points, settings)
-    if frames["full"].empty:
-        return None
-
-    seed_frame = concat_track_frames([
-        frames["full"],
-        frames["mid"],
-        frames["late_180"],
-        frames["late_240"],
-        frames["endpoints"],
-        frames["start_mean"],
-        frames["mid_mean"],
-        frames["endpoint_mean"],
-        frames["late_mean"],
-    ])
-    bounds = quantile_frame_bounds(seed_frame, lon_low=0.030, lon_high=0.970, lat_low=0.030, lat_high=0.975)
-    if bounds is None:
-        bounds = bounds_from_frames([frames["full"]], settings)
-    if bounds is None:
-        return None
-
-    if not past_kma.empty:
-        current_dt = pd.to_datetime(settings.data_time, format="%Y%m%d%H%M", errors="coerce")
-        past_points = past_kma.copy()
-        if "FT_TIME" in past_points and not pd.isna(current_dt):
-            cutoff = current_dt.to_pydatetime() - timedelta(hours=72)
-            past_points = past_points[past_points["FT_TIME"].ge(cutoff)].copy()
-        past_points = numeric_track_points(past_points)
-        if not past_points.empty:
-            past_points = normalize_240_camera_longitudes(past_points, settings)
-            bounds = expand_bounds_with_frame(bounds, past_points, exact=False)
-
-    extent = extent_from_screen_bounds(
-        bounds,
-        left=0.045,
-        right=0.690,
-        bottom=0.055,
-        top=0.860,
-    )
-    if extent is None:
-        lon_min, lon_max, lat_min, lat_max = bounds
-        extent = [lon_min, lon_max, lat_min, lat_max]
-    extent = expand_extent_to_min_span(
-        extent,
-        min_lon_span=MIN_STABLE_240_LON_SPAN,
-        min_lat_span=MIN_STABLE_240_LAT_SPAN,
-        east_ratio=0.56,
-        north_ratio=0.58,
-    )
-    return clamp_west_pacific_extent(extent)
+@dataclass(frozen=True)
+class CameraProfile:
+    name: str
+    horizon: int
+    min_lon_span: float
+    min_lat_span: float
+    preferred_lon_span: float
+    preferred_lat_span: float
+    max_lon_span: float
+    max_lat_span: float
+    min_west_lon: float
+    max_east_lon: float
+    min_south_lat: float
+    max_north_lat: float
+    screen_specs: tuple[tuple[float, float, float, float], ...]
+    scales: tuple[float, ...]
+    shift_xs: tuple[float, ...]
+    shift_ys: tuple[float, ...]
+    key_hours: tuple[float, ...]
+    endpoint_start_hour: float
+    past_hours: int
+    center_x: float
+    center_y: float
+    min_core_width: float
+    min_core_height: float
+    span_weight_lon: float
+    span_weight_lat: float
+    excessive_span_weight: float
+    tight_span_weight: float
+    blend_alpha: float
+    reuse_score_limit: float
+    max_full_outside_ratio: float
+    max_endpoint_outside: int
+    template_extent: tuple[float, float, float, float] | None = None
+    final_zoom_scale: float = 1.0
 
 
-def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
-    points = extent_points_for_auto_map(df, settings)
-    if points.empty:
-        return None
+CAMERA_EXTENT_CACHE_VERSION = 3
 
-    if settings.fcst_hours > 120:
-        return auto_map_extent_long_range_seed(points, past_kma, settings)
+CAMERA_PROFILES = {
+    120: CameraProfile(
+        name="120h",
+        horizon=120,
+        min_lon_span=22.0,
+        min_lat_span=13.5,
+        preferred_lon_span=30.0,
+        preferred_lat_span=18.0,
+        max_lon_span=72.0,
+        max_lat_span=48.0,
+        min_west_lon=92.0,
+        max_east_lon=179.8,
+        min_south_lat=-12.0,
+        max_north_lat=62.0,
+        screen_specs=(
+            (0.040, 0.665, 0.055, 0.855),
+            (0.050, 0.695, 0.060, 0.875),
+            (0.060, 0.635, 0.070, 0.830),
+            (0.035, 0.725, 0.050, 0.885),
+        ),
+        scales=(0.96, 1.06, 1.16, 1.28),
+        shift_xs=(-0.12, 0.0, 0.12),
+        shift_ys=(-0.10, 0.0, 0.10),
+        key_hours=(48, 72, 96, 120),
+        endpoint_start_hour=60,
+        past_hours=48,
+        center_x=0.395,
+        center_y=0.430,
+        min_core_width=0.440,
+        min_core_height=0.500,
+        span_weight_lon=2.2,
+        span_weight_lat=3.0,
+        excessive_span_weight=20.0,
+        tight_span_weight=35.0,
+        blend_alpha=0.45,
+        reuse_score_limit=22_000.0,
+        max_full_outside_ratio=0.012,
+        max_endpoint_outside=0,
+        final_zoom_scale=1.0,
+    ),
+    240: CameraProfile(
+        name="240h",
+        horizon=240,
+        min_lon_span=54.0,
+        min_lat_span=32.0,
+        preferred_lon_span=74.0,
+        preferred_lat_span=44.0,
+        max_lon_span=112.0,
+        max_lat_span=70.0,
+        min_west_lon=82.0,
+        max_east_lon=179.8,
+        min_south_lat=-18.0,
+        max_north_lat=68.0,
+        screen_specs=(
+            (0.040, 0.655, 0.055, 0.850),
+            (0.050, 0.690, 0.060, 0.870),
+            (0.060, 0.635, 0.070, 0.825),
+            (0.035, 0.725, 0.050, 0.885),
+        ),
+        scales=(0.98, 1.10, 1.24, 1.40),
+        shift_xs=(-0.14, 0.0, 0.14),
+        shift_ys=(-0.12, 0.0, 0.12),
+        key_hours=(120, 168, 192, 216, 240),
+        endpoint_start_hour=120,
+        past_hours=72,
+        center_x=0.385,
+        center_y=0.455,
+        min_core_width=0.390,
+        min_core_height=0.470,
+        span_weight_lon=0.65,
+        span_weight_lat=1.00,
+        excessive_span_weight=8.0,
+        tight_span_weight=55.0,
+        blend_alpha=0.32,
+        reuse_score_limit=32_000.0,
+        max_full_outside_ratio=0.020,
+        max_endpoint_outside=0,
+        template_extent=(100.0, 179.8, 0.0, 50.0),
+        final_zoom_scale=1.0,
+    ),
+}
 
-    lead_hours = pd.to_numeric(points["TMD"], errors="coerce")
-    primary = points[lead_hours.between(0, settings.fcst_hours)].copy()
-    if primary.empty:
-        primary = points.copy()
 
-    lat_min, lat_max = robust_bounds(primary, "LAT", settings)
-    lon_min, lon_max = robust_bounds(primary, "LON", settings)
-    lat_span = max(lat_max - lat_min, 7.5 if settings.fcst_hours <= 120 else 10.0)
-    lon_span = max(lon_max - lon_min, 10.0 if settings.fcst_hours <= 120 else 14.0)
-
-    focus_lat = (lat_min + lat_max) / 2
-    focus_lon = (lon_min + lon_max) / 2
-    lon_total = max(24.0, lon_span * 1.45 + 7.0)
-    lat_total = max(10.5, lat_span * 1.55 + 4.5)
-    focus_x = 0.37
-    focus_y = 0.37
-
-    lon_min = focus_lon - lon_total * focus_x
-    lon_max = lon_min + lon_total
-    lat_min = focus_lat - lat_total * focus_y
-    lat_max = lat_min + lat_total
-
-    return [
-        lon_min,
-        lon_max,
-        lat_min,
-        lat_max,
-    ]
-
-
-def reasonable_display_240_extent(extent: list[float]) -> bool:
-    lon_span = extent[1] - extent[0]
-    lat_span = extent[3] - extent[2]
-    return (
-        lon_span > 0
-        and lat_span > 0
-        and lon_span <= MAX_DISPLAY_240_LON_SPAN
-        and lat_span <= MAX_DISPLAY_240_LAT_SPAN
-        and extent[0] >= MIN_DISPLAY_240_WEST_LON
-        and extent[1] <= MAX_DISPLAY_240_EAST_LON
-        and extent[2] >= MIN_DISPLAY_240_SOUTH_LAT
-        and extent[3] <= MAX_DISPLAY_240_NORTH_LAT
-    )
-
-
-def broad_display_240_extent(extent: list[float]) -> bool:
-    lon_span = extent[1] - extent[0]
-    lat_span = extent[3] - extent[2]
-    return (
-        lon_span > MAX_STABLE_240_LON_SPAN
-        or lat_span > MAX_STABLE_240_LAT_SPAN
-        or (extent[0] <= MIN_DISPLAY_240_WEST_LON + 0.1 and extent[1] >= MAX_DISPLAY_240_EAST_LON - 0.1)
-    )
-
-
-def expanded_120_anchor_for_240(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
-    anchor_settings = replace(settings, fcst_hours=120, fcst_hours_options=(120,))
-    anchor_df = limit_forecast_hours(df, anchor_settings)
-    anchor_extent = auto_map_extent(anchor_df, past_kma, anchor_settings)
-    if anchor_extent is None:
-        return None
-
-    lon_span = max(anchor_extent[1] - anchor_extent[0], 24.0)
-    lat_span = max(anchor_extent[3] - anchor_extent[2], 12.0)
-    return [
-        anchor_extent[0] - lon_span * 0.18,
-        anchor_extent[1] + lon_span * 0.48,
-        anchor_extent[2] - lat_span * 0.22,
-        anchor_extent[3] + lat_span * 0.38,
-    ]
+def camera_profile(settings: Settings) -> CameraProfile:
+    return CAMERA_PROFILES[240] if settings.fcst_hours > 120 else CAMERA_PROFILES[120]
 
 
 def clamp_west_pacific_extent(
@@ -2469,11 +2433,9 @@ def clamp_west_pacific_extent(
     min_west_lon: float = MIN_DISPLAY_240_WEST_LON,
     max_east_lon: float = MAX_DISPLAY_240_EAST_LON,
 ) -> list[float]:
-
     lon_min, lon_max, lat_min, lat_max = extent
     if lon_max <= lon_min or lat_max <= lat_min:
         return extent
-
     max_lon_span = max_east_lon - min_west_lon
     lon_span = lon_max - lon_min
     if lon_span >= max_lon_span:
@@ -2488,92 +2450,210 @@ def clamp_west_pacific_extent(
             shift = min_west_lon - lon_min
             lon_min += shift
             lon_max += shift
-
     return [float(lon_min), float(lon_max), float(lat_min), float(lat_max)]
 
 
-def clamp_240_display_extent(extent: list[float]) -> list[float]:
-    lon_min, lon_max, lat_min, lat_max = clamp_west_pacific_extent(extent)
+def clamp_display_extent_for_profile(extent: list[float], profile: CameraProfile) -> list[float]:
+    lon_min, lon_max, lat_min, lat_max = clamp_west_pacific_extent(
+        extent,
+        min_west_lon=profile.min_west_lon,
+        max_east_lon=profile.max_east_lon,
+    )
     if lon_max <= lon_min or lat_max <= lat_min:
         return extent
 
     lon_span = lon_max - lon_min
-    max_lon_span = min(MAX_DISPLAY_240_LON_SPAN, MAX_DISPLAY_240_EAST_LON - MIN_DISPLAY_240_WEST_LON)
+    max_lon_span = min(profile.max_lon_span, profile.max_east_lon - profile.min_west_lon)
     if lon_span > max_lon_span:
         center_lon = (lon_min + lon_max) / 2
         lon_min = center_lon - max_lon_span / 2
         lon_max = center_lon + max_lon_span / 2
-        lon_min, lon_max, lat_min, lat_max = clamp_west_pacific_extent([lon_min, lon_max, lat_min, lat_max])
+        lon_min, lon_max, lat_min, lat_max = clamp_west_pacific_extent(
+            [lon_min, lon_max, lat_min, lat_max],
+            min_west_lon=profile.min_west_lon,
+            max_east_lon=profile.max_east_lon,
+        )
 
     lat_span = lat_max - lat_min
-    max_lat_span = min(MAX_DISPLAY_240_LAT_SPAN, MAX_DISPLAY_240_NORTH_LAT - MIN_DISPLAY_240_SOUTH_LAT)
+    max_lat_span = min(profile.max_lat_span, profile.max_north_lat - profile.min_south_lat)
     if lat_span > max_lat_span:
         center_lat = (lat_min + lat_max) / 2
         lat_min = center_lat - max_lat_span / 2
         lat_max = center_lat + max_lat_span / 2
 
-    if lat_max > MAX_DISPLAY_240_NORTH_LAT:
-        shift = lat_max - MAX_DISPLAY_240_NORTH_LAT
+    if lat_max > profile.max_north_lat:
+        shift = lat_max - profile.max_north_lat
         lat_min -= shift
         lat_max -= shift
-    if lat_min < MIN_DISPLAY_240_SOUTH_LAT:
-        shift = MIN_DISPLAY_240_SOUTH_LAT - lat_min
+    if lat_min < profile.min_south_lat:
+        shift = profile.min_south_lat - lat_min
         lat_min += shift
         lat_max += shift
-
-    if lat_max > MAX_DISPLAY_240_NORTH_LAT:
-        lat_max = MAX_DISPLAY_240_NORTH_LAT
-    if lat_min < MIN_DISPLAY_240_SOUTH_LAT:
-        lat_min = MIN_DISPLAY_240_SOUTH_LAT
-
+    lat_min = max(lat_min, profile.min_south_lat)
+    lat_max = min(lat_max, profile.max_north_lat)
     return [float(lon_min), float(lon_max), float(lat_min), float(lat_max)]
 
 
-
-def current_point_legend_safe_extent(df: pd.DataFrame, extent: list[float], settings: Settings) -> list[float]:
-    """Lightweight fallback for manually supplied 240h extents.
-
-    The auto-extent path no longer uses this as a hard post-processor.  It only
-    nudges a manual/fallback extent when the current analyzed point is buried
-    under the legend area.
-    """
-    if settings.fcst_hours != 240:
-        return extent
-    start = df[(df["SRC"] == "KMA") & (pd.to_numeric(df["TMD"], errors="coerce") == 0)].head(1)
-    if start.empty:
-        return extent
-    lon_values = pd.to_numeric(start["LON"], errors="coerce").dropna()
-    if lon_values.empty:
-        return extent
-
-    lon = float(lon_values.iloc[0])
-    lon_min, lon_max, lat_min, lat_max = extent
-    lon_span = lon_max - lon_min
-    if lon_span <= 0:
-        return extent
-
-    current_x = (lon - lon_min) / lon_span
-    safe_x = 0.640
-    if current_x <= safe_x:
-        return extent
-
-    shift = (current_x - safe_x) * lon_span * 0.55
-    return [lon_min + shift, lon_max + shift, lat_min, lat_max]
+def reasonable_display_extent(extent: list[float], profile: CameraProfile) -> bool:
+    lon_span = extent[1] - extent[0]
+    lat_span = extent[3] - extent[2]
+    return (
+        lon_span > 0
+        and lat_span > 0
+        and lon_span <= profile.max_lon_span + 0.05
+        and lat_span <= profile.max_lat_span + 0.05
+        and extent[0] >= profile.min_west_lon - 0.05
+        and extent[1] <= profile.max_east_lon + 0.05
+        and extent[2] >= profile.min_south_lat - 0.05
+        and extent[3] <= profile.max_north_lat + 0.05
+    )
 
 
-def legend_row_count_for(df: pd.DataFrame, settings: Settings) -> int:
-    excluded = excluded_models_for(df)
-    active = active_model_names(settings)
-    return len([model for model in MODEL_INFO if model["name"] in active and model["name"] not in excluded])
+def build_camera_frames(points: pd.DataFrame, settings: Settings, profile: CameraProfile) -> dict[str, pd.DataFrame]:
+    full = lead_filtered_points(points, 0, profile.horizon)
+    starts = lead_filtered_points(points, 0, 0)
+    mid_hour = min(120, profile.horizon)
+    mid = closest_points_by_source(points, mid_hour, tolerance=36.0 if profile.horizon <= 120 else 42.0)
+    late_frames = [
+        closest_points_by_source(points, hour, tolerance=36.0 if profile.horizon <= 120 else 54.0)
+        for hour in profile.key_hours
+    ]
+    endpoints = latest_points_by_source(points, profile.endpoint_start_hour, profile.horizon)
+    if len(endpoints) < 3:
+        endpoints = latest_points_by_source(points, 0, profile.horizon)
+    endpoint_cluster = concat_track_frames([*late_frames, endpoints])
+    return {
+        "full": full,
+        "starts": starts,
+        "mid": mid,
+        "late_frames": concat_track_frames(late_frames),
+        "endpoints": endpoints,
+        "start_mean": mean_point_frame(starts),
+        "mid_mean": mean_point_frame(mid),
+        "endpoint_mean": mean_point_frame(endpoints),
+        "late_mean": mean_point_frame(endpoint_cluster),
+    }
 
 
-def overlay_obstacle_boxes_240(df: pd.DataFrame, settings: Settings) -> dict[str, tuple[float, float, float, float]]:
-    """Return map-overlay boxes in axes-fraction coordinates.
+def normalize_camera_points(points: pd.DataFrame, settings: Settings, profile: CameraProfile) -> pd.DataFrame:
+    points = numeric_track_points(points)
+    if points.empty:
+        return points
+    if profile.horizon > 120:
+        points = normalize_240_camera_longitudes(points, settings)
+    if "TMD" in points:
+        leads = pd.to_numeric(points["TMD"], errors="coerce")
+        points = points[leads.between(0, profile.horizon)].copy()
+    lats = pd.to_numeric(points["LAT"], errors="coerce")
+    points = points[lats.between(profile.min_south_lat - 4.0, profile.max_north_lat + 4.0)].copy()
+    return points.dropna(subset=["LAT", "LON"])
 
-    Values mirror draw_header() and draw_model_legend_table().  The scoring
-    camera treats these as soft obstacles instead of shrinking the whole usable
-    map into one hard rectangle.
-    """
+
+def normalized_render_points(df: pd.DataFrame, settings: Settings, profile: CameraProfile) -> pd.DataFrame:
+    return normalize_camera_points(df, settings, profile)
+
+
+def protected_camera_points(
+    df: pd.DataFrame,
+    camera_points: pd.DataFrame,
+    render_points: pd.DataFrame,
+    past_kma: pd.DataFrame,
+    settings: Settings,
+    profile: CameraProfile,
+) -> pd.DataFrame:
+    frames: list[pd.DataFrame] = []
+    if not camera_points.empty:
+        frames.append(camera_points)
+    if not render_points.empty:
+        render_frames = build_camera_frames(render_points, settings, profile)
+        frames.extend([
+            render_frames["starts"],
+            render_frames["mid"],
+            render_frames["late_frames"],
+            render_frames["endpoints"],
+            render_frames["start_mean"],
+            render_frames["mid_mean"],
+            render_frames["endpoint_mean"],
+            render_frames["late_mean"],
+        ])
+    if not past_kma.empty:
+        past_points = past_kma.copy()
+        current_dt = pd.to_datetime(settings.data_time, format="%Y%m%d%H%M", errors="coerce")
+        if "FT_TIME" in past_points and not pd.isna(current_dt):
+            cutoff = current_dt.to_pydatetime() - timedelta(hours=profile.past_hours)
+            past_points = past_points[past_points["FT_TIME"].ge(cutoff)].copy()
+        past_points = normalize_camera_points(past_points, settings, profile)
+        if not past_points.empty:
+            frames.append(past_points)
+    protected = concat_track_frames(frames)
+    if protected.empty:
+        return render_points
+    return protected.dropna(subset=["LAT", "LON"])
+
+
+def auto_map_extent_seed(points: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, profile: CameraProfile) -> list[float] | None:
+    points = normalize_camera_points(points, settings, profile)
+    if points.empty:
+        return None
+    frames = build_camera_frames(points, settings, profile)
+    seed_frame = concat_track_frames([
+        frames["full"],
+        frames["mid"],
+        frames["late_frames"],
+        frames["endpoints"],
+        frames["start_mean"],
+        frames["mid_mean"],
+        frames["endpoint_mean"],
+        frames["late_mean"],
+    ])
+    bounds = quantile_frame_bounds(seed_frame, lon_low=0.025, lon_high=0.975, lat_low=0.025, lat_high=0.975)
+    if bounds is None:
+        bounds = bounds_from_frames([frames["full"]], settings)
+    if bounds is None:
+        return None
+    if not past_kma.empty:
+        past_points = protected_camera_points(pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), past_kma, settings, profile)
+        if not past_points.empty:
+            bounds = expand_bounds_with_frame(bounds, past_points, exact=False)
+    left, right, bottom, top = profile.screen_specs[1]
+    extent = extent_from_screen_bounds(bounds, left=left, right=right, bottom=bottom, top=top)
+    if extent is None:
+        lon_min, lon_max, lat_min, lat_max = bounds
+        extent = [lon_min, lon_max, lat_min, lat_max]
+    extent = expand_extent_to_min_span(
+        extent,
+        min_lon_span=profile.min_lon_span,
+        min_lat_span=profile.min_lat_span,
+        east_ratio=0.58,
+        north_ratio=0.56,
+    )
+    return clamp_display_extent_for_profile(extent, profile)
+
+
+def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
+    points = extent_points_for_auto_map(df, settings)
+    if points.empty:
+        return None
+    return auto_map_extent_seed(points, past_kma, settings, camera_profile(settings))
+
+
+def expanded_120_anchor_for_240(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings) -> list[float] | None:
+    anchor_settings = replace(settings, fcst_hours=120, fcst_hours_options=(120,))
+    anchor_df = limit_forecast_hours(df, anchor_settings)
+    anchor_extent = auto_map_extent(anchor_df, past_kma, anchor_settings)
+    if anchor_extent is None:
+        return None
+    lon_span = max(anchor_extent[1] - anchor_extent[0], 24.0)
+    lat_span = max(anchor_extent[3] - anchor_extent[2], 12.0)
+    return [
+        anchor_extent[0] - lon_span * 0.18,
+        anchor_extent[1] + lon_span * 0.48,
+        anchor_extent[2] - lat_span * 0.22,
+        anchor_extent[3] + lat_span * 0.38,
+    ]
+
+
+def overlay_obstacle_boxes(df: pd.DataFrame, settings: Settings) -> dict[str, tuple[float, float, float, float]]:
     row_count = max(1, legend_row_count_for(df, settings))
     legend_x0, legend_x1 = 0.670, 0.995
     legend_y0 = 0.005
@@ -2585,55 +2665,10 @@ def overlay_obstacle_boxes_240(df: pd.DataFrame, settings: Settings) -> dict[str
     }
 
 
-def normalize_240_render_points(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
-    points = numeric_track_points(df)
-    if points.empty:
-        return points
-    points = normalize_240_camera_longitudes(points, settings)
-    if "TMD" in points:
-        leads = pd.to_numeric(points["TMD"], errors="coerce")
-        points = points[leads.between(0, settings.fcst_hours)].copy()
-    lats = pd.to_numeric(points["LAT"], errors="coerce")
-    points = points[lats.between(MIN_DISPLAY_240_SOUTH_LAT - 4.0, MAX_DISPLAY_240_NORTH_LAT + 4.0)].copy()
-    return points.dropna(subset=["LAT", "LON"])
-
-
-def protected_240_points(
-    df: pd.DataFrame,
-    camera_points: pd.DataFrame,
-    render_points: pd.DataFrame,
-    past_kma: pd.DataFrame,
-    settings: Settings,
-) -> pd.DataFrame:
-    frames: list[pd.DataFrame] = []
-    if not camera_points.empty:
-        frames.append(camera_points)
-    if not render_points.empty:
-        render_frames = build_240_camera_frames(render_points, settings)
-        frames.extend([
-            render_frames["starts"],
-            render_frames["mid"],
-            render_frames["late_180"],
-            render_frames["late_240"],
-            render_frames["endpoints"],
-            render_frames["start_mean"],
-            render_frames["mid_mean"],
-            render_frames["endpoint_mean"],
-            render_frames["late_mean"],
-        ])
-    if not past_kma.empty:
-        past_points = past_kma.copy()
-        current_dt = pd.to_datetime(settings.data_time, format="%Y%m%d%H%M", errors="coerce")
-        if "FT_TIME" in past_points and not pd.isna(current_dt):
-            cutoff = current_dt.to_pydatetime() - timedelta(hours=72)
-            past_points = past_points[past_points["FT_TIME"].ge(cutoff)].copy()
-        past_points = normalize_240_camera_longitudes(numeric_track_points(past_points), settings)
-        if not past_points.empty:
-            frames.append(past_points)
-    protected = concat_track_frames(frames)
-    if protected.empty:
-        return render_points
-    return protected.dropna(subset=["LAT", "LON"])
+def legend_row_count_for(df: pd.DataFrame, settings: Settings) -> int:
+    excluded = excluded_models_for(df)
+    active = active_model_names(settings)
+    return len([model for model in MODEL_INFO if model["name"] in active and model["name"] not in excluded])
 
 
 def point_screen_fractions(extent: list[float], points: pd.DataFrame) -> list[tuple[float, float]]:
@@ -2647,7 +2682,6 @@ def point_screen_fractions(extent: list[float], points: pd.DataFrame) -> list[tu
     y_span = y1 - y0
     if x_span <= 0 or y_span <= 0:
         return []
-
     projection = ccrs.Mercator()
     data_crs = ccrs.PlateCarree()
     fractions: list[tuple[float, float]] = []
@@ -2662,11 +2696,7 @@ def point_screen_fractions(extent: list[float], points: pd.DataFrame) -> list[tu
 
 
 def count_points_outside_screen(fractions: list[tuple[float, float]], *, margin: float = 0.0) -> int:
-    return sum(
-        1
-        for x, y in fractions
-        if x < -margin or x > 1.0 + margin or y < -margin or y > 1.0 + margin
-    )
+    return sum(1 for x, y in fractions if x < -margin or x > 1.0 + margin or y < -margin or y > 1.0 + margin)
 
 
 def count_points_in_box(
@@ -2676,11 +2706,7 @@ def count_points_in_box(
     padding: float = 0.0,
 ) -> int:
     x0, x1, y0, y1 = box
-    return sum(
-        1
-        for x, y in fractions
-        if x0 - padding <= x <= x1 + padding and y0 - padding <= y <= y1 + padding
-    )
+    return sum(1 for x, y in fractions if x0 - padding <= x <= x1 + padding and y0 - padding <= y <= y1 + padding)
 
 
 def screen_bounds_from_fractions(fractions: list[tuple[float, float]]) -> tuple[float, float, float, float] | None:
@@ -2719,9 +2745,34 @@ def quantile_bounds_for_frame(
     )
 
 
-def candidate_extent_from_240_bounds(
+def normalize_candidate_extent(
+    extent: list[float] | None,
+    settings: Settings,
+    profile: CameraProfile,
+    *,
+    fig_width: float,
+    fig_height: float,
+) -> list[float] | None:
+    if extent is None or len(extent) != 4:
+        return None
+    if extent[1] <= extent[0] or extent[3] <= extent[2]:
+        return None
+    candidate = match_extent_to_canvas_aspect(
+        extent,
+        fig_width=fig_width,
+        fig_height=fig_height,
+        east_expand_ratio=0.62 if profile.horizon > 120 else 0.68,
+    )
+    candidate = clamp_display_extent_for_profile(candidate, profile)
+    if candidate[1] <= candidate[0] or candidate[3] <= candidate[2]:
+        return None
+    return [float(value) for value in candidate]
+
+
+def candidate_extent_from_bounds(
     bounds: tuple[float, float, float, float] | None,
     settings: Settings,
+    profile: CameraProfile,
     *,
     left: float,
     right: float,
@@ -2729,8 +2780,6 @@ def candidate_extent_from_240_bounds(
     top: float,
     fig_width: float,
     fig_height: float,
-    min_lon_span: float = 42.0,
-    min_lat_span: float = 26.0,
 ) -> list[float] | None:
     if bounds is None:
         return None
@@ -2740,35 +2789,18 @@ def candidate_extent_from_240_bounds(
         extent = [lon_min, lon_max, lat_min, lat_max]
     extent = expand_extent_to_min_span(
         extent,
-        min_lon_span=min_lon_span,
-        min_lat_span=min_lat_span,
+        min_lon_span=profile.min_lon_span,
+        min_lat_span=profile.min_lat_span,
         east_ratio=0.58,
         north_ratio=0.56,
     )
-    return normalize_240_candidate_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
+    return normalize_candidate_extent(extent, settings, profile, fig_width=fig_width, fig_height=fig_height)
 
 
-def normalize_240_candidate_extent(
-    extent: list[float] | None,
-    settings: Settings,
-    *,
-    fig_width: float,
-    fig_height: float,
-) -> list[float] | None:
-    if extent is None or len(extent) != 4:
-        return None
-    if extent[1] <= extent[0] or extent[3] <= extent[2]:
-        return None
-    candidate = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
-    candidate = clamp_240_display_extent(candidate)
-    if candidate[1] <= candidate[0] or candidate[3] <= candidate[2]:
-        return None
-    return [float(value) for value in candidate]
-
-
-def scale_shift_240_extent(
+def scale_shift_extent(
     extent: list[float],
     settings: Settings,
+    profile: CameraProfile,
     *,
     scale: float,
     shift_x: float,
@@ -2786,19 +2818,17 @@ def scale_shift_240_extent(
         return None
     cx = (x0 + x1) / 2 + shift_x * x_span
     cy = (y0 + y1) / 2 + shift_y * y_span
-    new_x_span = x_span * scale
-    new_y_span = y_span * scale
     candidate = _extent_from_mercator_xy(
-        cx - new_x_span / 2,
-        cx + new_x_span / 2,
-        cy - new_y_span / 2,
-        cy + new_y_span / 2,
+        cx - x_span * scale / 2,
+        cx + x_span * scale / 2,
+        cy - y_span * scale / 2,
+        cy + y_span * scale / 2,
         extent,
     )
-    return normalize_240_candidate_extent(candidate, settings, fig_width=fig_width, fig_height=fig_height)
+    return normalize_candidate_extent(candidate, settings, profile, fig_width=fig_width, fig_height=fig_height)
 
 
-def dedupe_240_candidates(candidates: list[list[float] | None]) -> list[list[float]]:
+def dedupe_candidates(candidates: list[list[float] | None]) -> list[list[float]]:
     result: list[list[float]] = []
     seen: set[tuple[float, float, float, float]] = set()
     for candidate in candidates:
@@ -2812,54 +2842,53 @@ def dedupe_240_candidates(candidates: list[list[float] | None]) -> list[list[flo
     return result
 
 
-def build_240_extent_candidates(
+def build_extent_candidates(
     camera_points: pd.DataFrame,
     render_points: pd.DataFrame,
     protected_points: pd.DataFrame,
     settings: Settings,
+    profile: CameraProfile,
     seed_extent: list[float],
-    anchor_240_extent: list[float] | None,
+    anchor_extent: list[float] | None,
     *,
     fig_width: float,
     fig_height: float,
 ) -> list[list[float]]:
-    frames = build_240_camera_frames(camera_points, settings) if not camera_points.empty else {}
-    render_frames = build_240_camera_frames(render_points, settings) if not render_points.empty else {}
-    base_frames = [
+    frames = build_camera_frames(camera_points, settings, profile) if not camera_points.empty else {}
+    render_frames = build_camera_frames(render_points, settings, profile) if not render_points.empty else {}
+    base_frame = concat_track_frames([
         camera_points,
         protected_points,
         render_frames.get("mid", pd.DataFrame()),
-        render_frames.get("late_180", pd.DataFrame()),
-        render_frames.get("late_240", pd.DataFrame()),
+        render_frames.get("late_frames", pd.DataFrame()),
         render_frames.get("endpoints", pd.DataFrame()),
         frames.get("late_mean", pd.DataFrame()) if frames else pd.DataFrame(),
-    ]
-    base_frame = concat_track_frames(base_frames)
+    ])
     endpoint_frame = concat_track_frames([
-        render_frames.get("late_180", pd.DataFrame()),
-        render_frames.get("late_240", pd.DataFrame()),
+        render_frames.get("late_frames", pd.DataFrame()),
         render_frames.get("endpoints", pd.DataFrame()),
         render_frames.get("endpoint_mean", pd.DataFrame()),
         render_frames.get("late_mean", pd.DataFrame()),
     ]) if render_frames else pd.DataFrame()
     full_core_frame = concat_track_frames([camera_points, render_points])
 
-    raw_candidates: list[list[float] | None] = [
-        seed_extent,
-        anchor_240_extent,
-    ]
+    raw_candidates: list[list[float] | None] = [seed_extent, anchor_extent]
+    if profile.template_extent is not None:
+        raw_candidates.append(list(profile.template_extent))
 
     candidate_specs = [
-        (quantile_bounds_for_frame(base_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.985), 0.040, 0.655, 0.055, 0.850),
-        (quantile_bounds_for_frame(base_frame, settings, lon_low=0.030, lon_high=0.970, lat_low=0.030, lat_high=0.975), 0.045, 0.680, 0.060, 0.870),
-        (quantile_bounds_for_frame(endpoint_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.990), 0.060, 0.635, 0.070, 0.820),
-        (quantile_bounds_for_frame(full_core_frame, settings, lon_low=0.035, lon_high=0.965, lat_low=0.035, lat_high=0.975), 0.035, 0.720, 0.050, 0.880),
-        (bounds_from_frames([protected_points], settings), 0.045, 0.700, 0.055, 0.865),
+        (quantile_bounds_for_frame(base_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.985), profile.screen_specs[0]),
+        (quantile_bounds_for_frame(base_frame, settings, lon_low=0.030, lon_high=0.970, lat_low=0.030, lat_high=0.975), profile.screen_specs[1]),
+        (quantile_bounds_for_frame(endpoint_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.990), profile.screen_specs[2]),
+        (quantile_bounds_for_frame(full_core_frame, settings, lon_low=0.035, lon_high=0.965, lat_low=0.035, lat_high=0.975), profile.screen_specs[3]),
+        (bounds_from_frames([protected_points], settings), profile.screen_specs[1]),
     ]
-    for bounds, left, right, bottom, top in candidate_specs:
-        raw_candidates.append(candidate_extent_from_240_bounds(
+    for bounds, spec in candidate_specs:
+        left, right, bottom, top = spec
+        raw_candidates.append(candidate_extent_from_bounds(
             bounds,
             settings,
+            profile,
             left=left,
             right=right,
             bottom=bottom,
@@ -2868,119 +2897,55 @@ def build_240_extent_candidates(
             fig_height=fig_height,
         ))
 
-    normalized = dedupe_240_candidates([
-        normalize_240_candidate_extent(candidate, settings, fig_width=fig_width, fig_height=fig_height)
+    normalized = dedupe_candidates([
+        normalize_candidate_extent(candidate, settings, profile, fig_width=fig_width, fig_height=fig_height)
         for candidate in raw_candidates
     ])
-
     expanded: list[list[float] | None] = []
     for candidate in normalized:
-        for scale in (0.96, 1.00, 1.10, 1.24, 1.40):
-            for shift_x in (-0.18, -0.09, 0.0, 0.09, 0.18):
-                for shift_y in (-0.14, -0.06, 0.0, 0.08, 0.16):
-                    expanded.append(scale_shift_240_extent(
+        for scale in profile.scales:
+            for shift_x in profile.shift_xs:
+                for shift_y in profile.shift_ys:
+                    expanded.append(scale_shift_extent(
                         candidate,
                         settings,
+                        profile,
                         scale=scale,
                         shift_x=shift_x,
                         shift_y=shift_y,
                         fig_width=fig_width,
                         fig_height=fig_height,
                     ))
-    return dedupe_240_candidates(normalized + expanded)
+    return dedupe_candidates(normalized + expanded)
 
 
-def mercator_extent_canvas_ratio(extent: list[float]) -> float | None:
-    extent_xy = _mercator_extent_xy(extent)
-    if extent_xy is None:
-        return None
-    x0, x1, y0, y1 = extent_xy
-    x_span = x1 - x0
-    y_span = y1 - y0
-    if x_span <= 0 or y_span <= 0:
-        return None
-    return x_span / y_span
-
-
-def extent_matches_canvas_aspect(
-    extent: list[float],
-    *,
-    fig_width: float,
-    fig_height: float,
-    tolerance: float = 0.18,
-) -> bool:
-    ratio = mercator_extent_canvas_ratio(extent)
-    if ratio is None:
-        return False
-    canvas_ratio = fig_width / fig_height
-    if canvas_ratio <= 0:
-        return False
-    return abs(math.log(ratio / canvas_ratio)) <= tolerance
-
-
-def zoom_out_240_extent_uniform(
-    extent: list[float],
-    settings: Settings,
-    *,
-    fig_width: float,
-    fig_height: float,
-    preferred_scale: float = 1.06,
-) -> list[float]:
-    """Slightly zoom out while preserving the map/canvas aspect.
-
-    The previous degree-based margin could make the final Mercator extent too
-    tall after clamping, which caused Cartopy to shrink the GeoAxes and leave
-    large side margins.  This version expands in projected Mercator x/y space
-    and rejects candidates whose aspect no longer matches the canvas.
-    """
-    for scale in (preferred_scale, 1.045, 1.030):
-        candidate = scale_shift_240_extent(
-            extent,
-            settings,
-            scale=scale,
-            shift_x=0.0,
-            shift_y=0.0,
-            fig_width=fig_width,
-            fig_height=fig_height,
-        )
-        if candidate is None:
-            continue
-        if extent_matches_canvas_aspect(candidate, fig_width=fig_width, fig_height=fig_height):
-            return candidate
-
-    # Do not risk a malformed final extent.  The collision-scored candidate is
-    # known to be layout-safe, so keep it if the extra zoom-out cannot be done
-    # without breaking the canvas aspect.
-    return extent
-
-
-def score_240_extent(
+def score_extent(
     extent: list[float],
     *,
     df: pd.DataFrame,
-    camera_points: pd.DataFrame,
     render_points: pd.DataFrame,
     protected_points: pd.DataFrame,
     endpoint_points: pd.DataFrame,
     settings: Settings,
-) -> float:
-    if not reasonable_display_240_extent(extent):
-        return 1_000_000_000.0
+    profile: CameraProfile,
+) -> tuple[float, dict[str, float]]:
+    if not reasonable_display_extent(extent, profile):
+        return 1_000_000_000.0, {"invalid": 1}
 
     full_fractions = point_screen_fractions(extent, render_points)
     protected_fractions = point_screen_fractions(extent, protected_points)
     endpoint_fractions = point_screen_fractions(extent, endpoint_points)
     if not protected_fractions:
-        return 900_000_000.0
+        return 900_000_000.0, {"invalid": 1}
 
-    score = 0.0
     full_count = max(1, len(full_fractions))
     protected_count = max(1, len(protected_fractions))
     endpoint_count = max(1, len(endpoint_fractions))
-
     full_outside = count_points_outside_screen(full_fractions, margin=0.006)
     protected_outside = count_points_outside_screen(protected_fractions, margin=0.003)
     endpoint_outside = count_points_outside_screen(endpoint_fractions, margin=0.003)
+
+    score = 0.0
     score += full_outside * 350.0
     score += protected_outside * 7_500.0
     score += endpoint_outside * 25_000.0
@@ -2988,11 +2953,10 @@ def score_240_extent(
     score += (protected_outside / protected_count) * 80_000.0
     score += (endpoint_outside / endpoint_count) * 120_000.0
 
-    boxes = overlay_obstacle_boxes_240(df, settings)
+    boxes = overlay_obstacle_boxes(df, settings)
     legend_box = boxes["legend"]
     header_box = boxes["header"]
     credit_box = boxes["credit"]
-
     legend_full = count_points_in_box(full_fractions, legend_box, padding=0.004)
     legend_protected = count_points_in_box(protected_fractions, legend_box, padding=0.006)
     legend_endpoint = count_points_in_box(endpoint_fractions, legend_box, padding=0.008)
@@ -3017,51 +2981,145 @@ def score_240_extent(
         score += max(0.0, west_x - 0.180) * 1_800.0
         score += max(0.0, south_y - 0.120) * 1_600.0
         score += max(0.0, (1.0 - north_y) - 0.220) * 1_000.0
-        score += max(0.0, 0.410 - core_width) * 1_200.0
-        score += max(0.0, 0.520 - core_height) * 900.0
-        center_x = (west_x + east_x) / 2
-        center_y = (south_y + north_y) / 2
-        score += abs(center_x - 0.385) * 650.0
-        score += abs(center_y - 0.455) * 450.0
+        score += max(0.0, profile.min_core_width - core_width) * 1_200.0
+        score += max(0.0, profile.min_core_height - core_height) * 900.0
+        score += abs(((west_x + east_x) / 2) - profile.center_x) * 650.0
+        score += abs(((south_y + north_y) / 2) - profile.center_y) * 450.0
 
     lon_span = extent[1] - extent[0]
     lat_span = extent[3] - extent[2]
-    score += lon_span * 2.5 + lat_span * 3.8
-    score += max(0.0, lon_span - 84.0) * 20.0
-    score += max(0.0, lat_span - 52.0) * 22.0
-    if broad_display_240_extent(extent):
-        score += 450.0
+    score += lon_span * profile.span_weight_lon + lat_span * profile.span_weight_lat
+    score += max(0.0, lon_span - profile.preferred_lon_span) * profile.excessive_span_weight
+    score += max(0.0, lat_span - profile.preferred_lat_span) * profile.excessive_span_weight
+    score += max(0.0, profile.preferred_lon_span - lon_span) * profile.tight_span_weight
+    score += max(0.0, profile.preferred_lat_span - lat_span) * profile.tight_span_weight
 
-    return score
+    metrics = {
+        "score": score,
+        "full_outside": full_outside,
+        "protected_outside": protected_outside,
+        "endpoint_outside": endpoint_outside,
+        "full_outside_ratio": full_outside / full_count,
+        "legend_endpoint": legend_endpoint,
+        "legend_protected": legend_protected,
+        "header_protected": header_protected,
+    }
+    return score, metrics
 
 
-def finalize_240_map_extent(
+def extent_is_reusable(score: float, metrics: dict[str, float], profile: CameraProfile) -> bool:
+    return (
+        score <= profile.reuse_score_limit
+        and metrics.get("protected_outside", 1) <= 0
+        and metrics.get("endpoint_outside", 1) <= profile.max_endpoint_outside
+        and metrics.get("full_outside_ratio", 1.0) <= profile.max_full_outside_ratio
+        and metrics.get("header_protected", 1) <= 0
+    )
+
+
+def camera_cache_key(settings: Settings) -> str:
+    year = storm_year(settings)
+    if not settings.skip_atcf and settings.atcf_id:
+        system_key = settings.atcf_id.lower().replace("/", "_")
+    else:
+        stage = settings.storm_stage.lower()
+        system_key = f"{stage}_{settings.typ_number:02d}"
+    return f"{year}_{system_key}_{settings.fcst_hours}h"
+
+
+def camera_cache_path(settings: Settings) -> Path:
+    return settings.output_root / "metadata" / "camera_extent" / f"{camera_cache_key(settings)}.json"
+
+
+def load_camera_cache(settings: Settings, profile: CameraProfile) -> list[float] | None:
+    path = camera_cache_path(settings)
+    if not path.exists():
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    if not isinstance(payload, dict):
+        return None
+    if payload.get("version") != CAMERA_EXTENT_CACHE_VERSION or payload.get("profile") != profile.name:
+        return None
+    cached_time = str(payload.get("data_time") or "")
+    if cached_time and settings.data_time and cached_time > settings.data_time:
+        return None
+    extent = payload.get("extent")
+    if not isinstance(extent, list) or len(extent) != 4:
+        return None
+    try:
+        return [float(value) for value in extent]
+    except (TypeError, ValueError):
+        return None
+
+
+def write_camera_cache(
+    settings: Settings,
+    profile: CameraProfile,
+    extent: list[float],
+    *,
+    score: float,
+    reused_previous: bool,
+    blended: bool,
+    model_count: int,
+) -> None:
+    payload = {
+        "version": CAMERA_EXTENT_CACHE_VERSION,
+        "profile": profile.name,
+        "storm_key": camera_cache_key(settings),
+        "data_time": settings.data_time,
+        "fcst_hours": settings.fcst_hours,
+        "extent": [round(float(value), 4) for value in extent],
+        "score": round(float(score), 3),
+        "reused_previous": bool(reused_previous),
+        "blended": bool(blended),
+        "model_count": int(model_count),
+        "updated_at_utc": datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"),
+    }
+    path = camera_cache_path(settings)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def blend_extents_in_mercator(previous: list[float], new: list[float], alpha: float) -> list[float] | None:
+    prev_xy = _mercator_extent_xy(previous)
+    new_xy = _mercator_extent_xy(new)
+    if prev_xy is None or new_xy is None:
+        return None
+    blended_xy = tuple((1.0 - alpha) * a + alpha * b for a, b in zip(prev_xy, new_xy))
+    return _extent_from_mercator_xy(*blended_xy, reference_extent=new)
+
+
+def finalize_scored_map_extent(
     df: pd.DataFrame,
     past_kma: pd.DataFrame,
     settings: Settings,
     extent: list[float],
-    anchor_240_extent: list[float] | None,
+    anchor_extent: list[float] | None,
     *,
     fig_width: float,
     fig_height: float,
 ) -> list[float]:
+    profile = camera_profile(settings)
     camera_points = extent_points_for_auto_map(df, settings)
-    render_points = normalize_240_render_points(df, settings)
+    camera_points = normalize_camera_points(camera_points, settings, profile)
+    render_points = normalized_render_points(df, settings, profile)
     if camera_points.empty and render_points.empty:
-        fallback = normalize_240_candidate_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
-        return clamp_240_display_extent(fallback or extent)
+        fallback = normalize_candidate_extent(extent, settings, profile, fig_width=fig_width, fig_height=fig_height)
+        return clamp_display_extent_for_profile(fallback or extent, profile)
     if camera_points.empty:
         camera_points = render_points.copy()
     if render_points.empty:
         render_points = camera_points.copy()
 
-    protected_points = protected_240_points(df, camera_points, render_points, past_kma, settings)
+    protected_points = protected_camera_points(df, camera_points, render_points, past_kma, settings, profile)
     if protected_points.empty:
         protected_points = camera_points.copy()
-    render_frames = build_240_camera_frames(render_points, settings)
+    render_frames = build_camera_frames(render_points, settings, profile)
     endpoint_points = concat_track_frames([
-        render_frames["late_180"],
-        render_frames["late_240"],
+        render_frames["late_frames"],
         render_frames["endpoints"],
         render_frames["endpoint_mean"],
         render_frames["late_mean"],
@@ -3069,56 +3127,131 @@ def finalize_240_map_extent(
     if endpoint_points.empty:
         endpoint_points = protected_points.copy()
 
-    candidates = build_240_extent_candidates(
+    previous_extent = load_camera_cache(settings, profile)
+    if previous_extent is not None:
+        previous_extent = normalize_candidate_extent(previous_extent, settings, profile, fig_width=fig_width, fig_height=fig_height)
+    if previous_extent is not None:
+        prev_score, prev_metrics = score_extent(
+            previous_extent,
+            df=df,
+            render_points=render_points,
+            protected_points=protected_points,
+            endpoint_points=endpoint_points,
+            settings=settings,
+            profile=profile,
+        )
+        if extent_is_reusable(prev_score, prev_metrics, profile):
+            print(f"{profile.name} map extent reused from camera cache (score={prev_score:.1f}).")
+            write_camera_cache(
+                settings,
+                profile,
+                previous_extent,
+                score=prev_score,
+                reused_previous=True,
+                blended=False,
+                model_count=len(plotted_model_names(df, settings)),
+            )
+            return previous_extent
+        print(
+            f"{profile.name} cached extent rejected "
+            f"(score={prev_score:.1f}, outside={prev_metrics.get('full_outside_ratio', 0):.1%}, "
+            f"endpoint_outside={int(prev_metrics.get('endpoint_outside', 0))})."
+        )
+
+    candidates = build_extent_candidates(
         camera_points,
         render_points,
         protected_points,
         settings,
+        profile,
         extent,
-        anchor_240_extent,
+        anchor_extent,
         fig_width=fig_width,
         fig_height=fig_height,
     )
     if not candidates:
-        fallback = normalize_240_candidate_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
-        return clamp_240_display_extent(fallback or extent)
+        fallback = normalize_candidate_extent(extent, settings, profile, fig_width=fig_width, fig_height=fig_height)
+        return clamp_display_extent_for_profile(fallback or extent, profile)
 
     scored = [
         (
-            score_240_extent(
+            score_extent(
                 candidate,
                 df=df,
-                camera_points=camera_points,
                 render_points=render_points,
                 protected_points=protected_points,
                 endpoint_points=endpoint_points,
                 settings=settings,
-            ),
+                profile=profile,
+            )[0],
             candidate,
         )
         for candidate in candidates
     ]
     best_score, best_candidate = min(scored, key=lambda item: item[0])
-    print(
-        "240h map extent selected by collision scoring "
-        f"({len(candidates)} candidates, score={best_score:.1f}, "
-        f"span={best_candidate[1] - best_candidate[0]:.1f} lon x {best_candidate[3] - best_candidate[2]:.1f} lat)."
-    )
-    widened = zoom_out_240_extent_uniform(
-        best_candidate,
-        settings,
-        fig_width=fig_width,
-        fig_height=fig_height,
-        preferred_scale=1.06,
-    )
-    if widened != best_candidate:
-        print(
-            "240h map extent widened slightly in Mercator space "
-            f"(span={widened[1] - widened[0]:.1f} lon x {widened[3] - widened[2]:.1f} lat)."
+    blended = False
+    final_extent = best_candidate
+    final_score = best_score
+
+    if previous_extent is not None:
+        merged = blend_extents_in_mercator(previous_extent, best_candidate, profile.blend_alpha)
+        merged = normalize_candidate_extent(merged, settings, profile, fig_width=fig_width, fig_height=fig_height)
+        if merged is not None:
+            merged_score, merged_metrics = score_extent(
+                merged,
+                df=df,
+                render_points=render_points,
+                protected_points=protected_points,
+                endpoint_points=endpoint_points,
+                settings=settings,
+                profile=profile,
+            )
+            if extent_is_reusable(merged_score, merged_metrics, profile):
+                final_extent = merged
+                final_score = merged_score
+                blended = True
+
+    if profile.final_zoom_scale > 1.0:
+        zoomed = scale_shift_extent(
+            final_extent,
+            settings,
+            profile,
+            scale=profile.final_zoom_scale,
+            shift_x=0.0,
+            shift_y=0.0,
+            fig_width=fig_width,
+            fig_height=fig_height,
         )
-    else:
-        print("240h extra zoom-out skipped to preserve canvas aspect.")
-    return widened
+        if zoomed is not None:
+            zoomed_score, zoomed_metrics = score_extent(
+                zoomed,
+                df=df,
+                render_points=render_points,
+                protected_points=protected_points,
+                endpoint_points=endpoint_points,
+                settings=settings,
+                profile=profile,
+            )
+            if extent_is_reusable(zoomed_score, zoomed_metrics, profile):
+                final_extent = zoomed
+                final_score = zoomed_score
+
+    print(
+        f"{profile.name} map extent selected by scoring "
+        f"({len(candidates)} candidates, score={final_score:.1f}, "
+        f"span={final_extent[1] - final_extent[0]:.1f} lon x {final_extent[3] - final_extent[2]:.1f} lat"
+        f"{', blended with previous' if blended else ''})."
+    )
+    write_camera_cache(
+        settings,
+        profile,
+        final_extent,
+        score=final_score,
+        reused_previous=False,
+        blended=blended,
+        model_count=len(plotted_model_names(df, settings)),
+    )
+    return final_extent
 
 
 def mercator_figure_size(extent: list[float], *, width: float = 11.2) -> tuple[float, float]:
@@ -3235,13 +3368,13 @@ def finalize_map_extent(
     fig_width: float,
     fig_height: float,
 ) -> list[float]:
-    """Run the map camera adjustments in one fixed order.
+    """Finalize map extent.
 
-    The 240h camera is intentionally guarded at the end; do not apply any
-    extra aspect or padding transform after the final safety check.
+    Auto mode now uses one scored camera engine for both 120h and 240h.
+    Manual/fallback mode keeps the old simple aspect matching path.
     """
-    if settings.fcst_hours == 240 and settings.auto_extent:
-        return finalize_240_map_extent(
+    if settings.auto_extent and settings.fcst_hours in (120, 240):
+        return finalize_scored_map_extent(
             df,
             past_kma,
             settings,
@@ -3251,11 +3384,7 @@ def finalize_map_extent(
             fig_height=fig_height,
         )
 
-    extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
-    if settings.fcst_hours == 240:
-        extent = current_point_legend_safe_extent(df, extent, settings)
-        extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
-    return extent
+    return aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
 
 
 def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, intensity: str) -> Path:
