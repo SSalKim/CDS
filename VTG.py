@@ -210,6 +210,12 @@ MAX_DISPLAY_240_NORTH_LAT = 74.0
 MAX_CAMERA_240_LON_DISTANCE = 92.0
 MAX_CAMERA_240_LAT_DISTANCE = 62.0
 
+# 240h output now uses a stable fixed West-Pacific view. Keep the east
+# boundary below 180E because the current PlateCarree/Mercator path wraps
+# values above 180E into a near-global extent.
+FIXED_240_MAP_EXTENT = [100.0, 179.8, 0.0, 60.0]
+
+
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
 SOURCE_ORDER = ("APIHUB", "NOAA", "RAW.GITHUB", "KNACKWX")
@@ -2567,6 +2573,86 @@ def legend_row_count_for(df: pd.DataFrame, settings: Settings) -> int:
     return len([model for model in MODEL_INFO if model["name"] in active and model["name"] not in excluded])
 
 
+
+
+def fixed_240_map_extent(settings: Settings) -> list[float]:
+    """Stable 240h West-Pacific view used instead of dynamic 240h camera fitting."""
+    return list(FIXED_240_MAP_EXTENT)
+
+
+def legend_box_for_side(
+    row_count: int,
+    side: str = "right",
+    *,
+    padded: bool = False,
+) -> tuple[float, float, float, float]:
+    """Legend box in axes-fraction coordinates."""
+    row_count = max(1, int(row_count))
+    width = 0.325
+    if side == "left":
+        x0, x1 = 0.005, 0.005 + width
+    else:
+        x0, x1, y0, _ = legend_box_for_side(len(rows), side, padded=False)
+    y1 = y0 + 0.005 * 2 + 0.019 * row_count
+    if not padded:
+        return x0, x1, y0, y1
+    return (
+        max(0.0, x0 - 0.014),
+        min(1.0, x1 + 0.010),
+        0.000,
+        min(0.900, y1 + 0.020),
+    )
+
+
+def track_points_for_legend_collision(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    points = numeric_track_points(df)
+    if points.empty:
+        return points
+    if "TMD" in points:
+        leads = pd.to_numeric(points["TMD"], errors="coerce")
+        points = points[leads.between(0, settings.fcst_hours)].copy()
+    return points.dropna(subset=["LAT", "LON"])
+
+
+def legend_collision_score(
+    df: pd.DataFrame,
+    settings: Settings,
+    extent: list[float],
+    *,
+    side: str,
+) -> tuple[float, int, int]:
+    row_count = legend_row_count_for(df, settings)
+    box = legend_box_for_side(row_count, side, padded=True)
+    points = track_points_for_legend_collision(df, settings)
+    if points.empty:
+        return 0.0, 0, 0
+    fractions = point_screen_fractions(extent, points)
+    segments = track_screen_segments(extent, points)
+    point_hits = count_points_in_box(fractions, box, padding=0.002)
+    segment_hits = count_segments_in_box(segments, box, padding=0.004)
+    return float(point_hits + segment_hits * 4), point_hits, segment_hits
+
+
+def choose_legend_side_for_map(df: pd.DataFrame, settings: Settings, extent: list[float]) -> str:
+    """Choose legend side for 240h fixed map using point/segment obstacle hits."""
+    if settings.fcst_hours != 240:
+        return "right"
+    right_score, right_points, right_segments = legend_collision_score(df, settings, extent, side="right")
+    left_score, left_points, left_segments = legend_collision_score(df, settings, extent, side="left")
+    if right_score >= 8.0 and left_score + 2.0 < right_score:
+        print(
+            "240h legend moved left "
+            f"(right obstacle score={right_score:.1f}, points={right_points}, segments={right_segments}; "
+            f"left score={left_score:.1f}, points={left_points}, segments={left_segments})."
+        )
+        return "left"
+    print(
+        "240h legend kept right "
+        f"(right obstacle score={right_score:.1f}, points={right_points}, segments={right_segments}; "
+        f"left score={left_score:.1f}, points={left_points}, segments={left_segments})."
+    )
+    return "right"
+
 def overlay_obstacle_boxes_240(df: pd.DataFrame, settings: Settings) -> dict[str, tuple[float, float, float, float]]:
     """Return map-overlay boxes in axes-fraction coordinates.
 
@@ -3511,12 +3597,16 @@ def finalize_map_extent(
     fig_width: float,
     fig_height: float,
 ) -> list[float]:
-    """Run the map camera adjustments in one fixed order.
+    """Finalize map extent.
 
-    The 240h camera is intentionally guarded at the end; do not apply any
-    extra aspect or padding transform after the final safety check.
+    240h intentionally uses a fixed West-Pacific view for stability. The old
+    dynamic 240h camera path is no longer invoked. 120h keeps the existing
+    automatic collision-scored camera for now.
     """
-    if settings.auto_extent and settings.fcst_hours in (120, 240):
+    if settings.fcst_hours == 240:
+        return fixed_240_map_extent(settings)
+
+    if settings.auto_extent and settings.fcst_hours == 120:
         return finalize_240_map_extent(
             df,
             past_kma,
@@ -3528,9 +3618,6 @@ def finalize_map_extent(
         )
 
     extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
-    if settings.fcst_hours == 240:
-        extent = current_point_legend_safe_extent(df, extent, settings)
-        extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
     return extent
 
 
@@ -3540,16 +3627,21 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     current_dt = pd.to_datetime(settings.data_time, format="%Y%m%d%H%M", errors="coerce")
     current_dt = None if pd.isna(current_dt) else current_dt.to_pydatetime()
 
-    if settings.auto_extent:
-        extent = auto_map_extent(df, past_kma, settings)
+    if settings.fcst_hours == 240:
+        # 240h uses a fixed view; skip the old dynamic camera seed/anchor work.
+        extent = fixed_240_map_extent(settings)
+        anchor_240_extent = None
     else:
-        extent = None
-    anchor_240_extent = expanded_120_anchor_for_240(df, past_kma, settings) if settings.fcst_hours == 240 else None
-    if extent is None:
-        center_lat = df["LAT"].mean() + settings.lat_padding if not df.empty else 25
-        center_lon = df["LON"].mean() + settings.lon_padding if not df.empty else 135
-        extent = map_extent(settings, center_lat, center_lon)
-    extent = clamp_west_pacific_extent(extent)
+        if settings.auto_extent:
+            extent = auto_map_extent(df, past_kma, settings)
+        else:
+            extent = None
+        anchor_240_extent = None
+        if extent is None:
+            center_lat = df["LAT"].mean() + settings.lat_padding if not df.empty else 25
+            center_lon = df["LON"].mean() + settings.lon_padding if not df.empty else 135
+            extent = map_extent(settings, center_lat, center_lon)
+        extent = clamp_west_pacific_extent(extent)
 
     fig_width = settings.figure_width
     fig_height = settings.figure_height
@@ -3590,9 +3682,11 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     gl.xlocator = mticker.MultipleLocator(5)
     gl.ylocator = mticker.MultipleLocator(5)
 
+    legend_side = choose_legend_side_for_map(df, settings, extent)
+
     plot_past_track(ax, past_kma, current_dt)
-    draw_header(ax, fig, df, settings, intensity)
-    draw_model_tracks(ax, df, settings)
+    draw_header(ax, fig, df, settings, intensity, legend_side=legend_side)
+    draw_model_tracks(ax, df, settings, legend_side=legend_side)
 
     kma_start = df[(df["SRC"] == "KMA") & (df["TMD"] == 0)].head(1)
     if not kma_start.empty:
@@ -3618,7 +3712,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     return target
 
 
-def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str) -> None:
+def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str, *, legend_side: str = "right") -> None:
     ax.add_patch(mpatches.FancyBboxPatch(
         (0.03, 0.915),
         1.0 - 0.03 - 0.024,
@@ -3686,13 +3780,15 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str) -
             fontsize=22.5, color="#DCB0E1", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="top", horizontalalignment="right", zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
-    ax.text(0.005, 0.006, "Plotted by WooJin Kim\nData sourced from KMA APIHUB & NRL ATCF", transform=ax.transAxes,
+    credit_x = 0.995 if legend_side == "left" else 0.005
+    credit_ha = "right" if legend_side == "left" else "left"
+    ax.text(credit_x, 0.006, "Plotted by WooJin Kim\nData sourced from KMA APIHUB & NRL ATCF", transform=ax.transAxes,
             fontsize=12, color="aliceblue", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
-            verticalalignment="bottom", horizontalalignment="left", zorder=100,
+            verticalalignment="bottom", horizontalalignment=credit_ha, zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
 
 
-def draw_model_tracks(ax, df: pd.DataFrame, settings: Settings) -> None:
+def draw_model_tracks(ax, df: pd.DataFrame, settings: Settings, *, legend_side: str = "right") -> None:
     excluded = excluded_models_for(df)
     active = active_model_names(settings)
     legend_rows = []
@@ -3754,10 +3850,10 @@ def draw_model_tracks(ax, df: pd.DataFrame, settings: Settings) -> None:
             "markersize": style["markersize"],
         })
 
-    draw_model_legend_table(ax, legend_rows)
+    draw_model_legend_table(ax, legend_rows, side=legend_side)
 
 
-def draw_model_legend_table(ax, rows: list[dict]) -> None:
+def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> None:
     if not rows:
         return
 
