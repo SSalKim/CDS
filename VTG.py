@@ -213,7 +213,7 @@ MAX_CAMERA_240_LAT_DISTANCE = 62.0
 # 240h output now uses a stable fixed West-Pacific view. Keep the east
 # boundary below 180E because the current PlateCarree/Mercator path wraps
 # values above 180E into a near-global extent.
-FIXED_240_MAP_EXTENT = [100.0, 179.9, 0.0, 51.28]
+FIXED_240_MAP_EXTENT = [100.0, 179.9, 0.0, 51.4]
 
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
