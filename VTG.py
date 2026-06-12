@@ -3559,6 +3559,36 @@ def build_240_extent_candidates(
     return dedupe_240_candidates(normalized + expanded)
 
 
+def expand_240_extent_margin(
+    extent: list[float],
+    settings: Settings,
+    *,
+    lon_fraction: float = 0.035,
+    lat_fraction: float = 0.045,
+    fig_width: float,
+    fig_height: float,
+) -> list[float]:
+    """Apply a small symmetric zoom-out margin to the selected 240h extent.
+
+    This runs *after* the collision-scoring selection so we preserve the chosen
+    composition while exposing slightly more area around the plotted tracks.
+    """
+    lon_span = max(1e-6, extent[1] - extent[0])
+    lat_span = max(1e-6, extent[3] - extent[2])
+    lon_pad = lon_span * lon_fraction
+    lat_pad = lat_span * lat_fraction
+    expanded = [
+        extent[0] - lon_pad,
+        extent[1] + lon_pad,
+        extent[2] - lat_pad,
+        extent[3] + lat_pad,
+    ]
+    normalized = normalize_240_candidate_extent(
+        expanded, settings, fig_width=fig_width, fig_height=fig_height
+    )
+    return clamp_240_display_extent(normalized or expanded)
+
+
 def score_240_extent(
     extent: list[float],
     *,
@@ -3711,7 +3741,19 @@ def finalize_240_map_extent(
         f"({len(candidates)} candidates, score={best_score:.1f}, "
         f"span={best_candidate[1] - best_candidate[0]:.1f} lon x {best_candidate[3] - best_candidate[2]:.1f} lat)."
     )
-    return clamp_240_display_extent(best_candidate)
+    widened = expand_240_extent_margin(
+        best_candidate,
+        settings,
+        lon_fraction=0.035,
+        lat_fraction=0.045,
+        fig_width=fig_width,
+        fig_height=fig_height,
+    )
+    print(
+        "240h map extent widened slightly for extra framing "
+        f"(span={widened[1] - widened[0]:.1f} lon x {widened[3] - widened[2]:.1f} lat)."
+    )
+    return widened
 
 
 def mercator_figure_size(extent: list[float], *, width: float = 11.2) -> tuple[float, float]:
