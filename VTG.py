@@ -199,12 +199,12 @@ PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
 MIN_STABLE_240_LON_SPAN = 44.0
 MIN_STABLE_240_LAT_SPAN = 28.0
-MAX_STABLE_240_LON_SPAN = 112.0
-MAX_STABLE_240_LAT_SPAN = 66.0
-MAX_DISPLAY_240_LON_SPAN = 136.0
-MAX_DISPLAY_240_LAT_SPAN = 82.0
-MIN_DISPLAY_240_WEST_LON = 70.0
-MAX_DISPLAY_240_EAST_LON = 195.0
+MAX_STABLE_240_LON_SPAN = 100.0
+MAX_STABLE_240_LAT_SPAN = 64.0
+MAX_DISPLAY_240_LON_SPAN = 112.0
+MAX_DISPLAY_240_LAT_SPAN = 70.0
+MIN_DISPLAY_240_WEST_LON = 80.0
+MAX_DISPLAY_240_EAST_LON = 179.8
 MIN_DISPLAY_240_SOUTH_LAT = -22.0
 MAX_DISPLAY_240_NORTH_LAT = 74.0
 MAX_CAMERA_240_LON_DISTANCE = 92.0
@@ -3287,11 +3287,12 @@ def broad_west_pacific_fallback_extent(
 ) -> list[float] | None:
     if settings.fcst_hours <= 120:
         return None
-    # True last-resort view, not a normal candidate.  Bounds are allowed to go a
-    # little beyond 180E so tracks near/over the dateline are not immediately
-    # rejected by the display clamp.
+    # True last-resort view, not a normal candidate.  Keep the final longitude
+    # range below 180E because the current PlateCarree set_extent path wraps
+    # longitudes greater than 180E into a near-global view.  Dateline-crossing
+    # support should be handled separately with a shifted central_longitude map.
     return normalize_240_candidate_extent(
-        [100.0, 190.0, 0.0, 50.0],
+        [100.0, 179.8, 0.0, 50.0],
         settings,
         fig_width=fig_width,
         fig_height=fig_height,
@@ -3363,7 +3364,10 @@ def finalize_240_map_extent(
     ]
     best_score, best_candidate = min(scored, key=lambda item: item[0])
 
-    if settings.fcst_hours > 120 and best_score > 45_000.0:
+    # Last-resort only.  A broad West-Pacific view is readable but defeats the
+    # automatic camera goal, so do not let it beat a merely imperfect dynamic
+    # candidate.  Use it only when the dynamic result is catastrophically bad.
+    if settings.fcst_hours > 120 and best_score > 180_000.0:
         fallback = broad_west_pacific_fallback_extent(settings, fig_width=fig_width, fig_height=fig_height)
         if fallback is not None:
             fallback_score = score_240_extent(
@@ -3375,10 +3379,10 @@ def finalize_240_map_extent(
                 endpoint_points=endpoint_points,
                 settings=settings,
             )
-            if fallback_score < best_score:
+            if fallback_score < best_score * 0.75:
                 print(
                     f"{settings.fcst_hours}h broad West-Pacific fallback selected "
-                    f"(score={fallback_score:.1f} < dynamic={best_score:.1f})."
+                    f"(score={fallback_score:.1f} vs dynamic={best_score:.1f})."
                 )
                 best_score, best_candidate = fallback_score, fallback
 
