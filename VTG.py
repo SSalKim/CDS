@@ -2854,27 +2854,33 @@ def build_240_extent_candidates(
         # profile than 240h.  More east/north shift candidates help keep recurving
         # tracks away from the in-map legend and top title band.
         min_lon_span, min_lat_span = 30.0, 17.5
-        scales = (0.96, 1.04, 1.14, 1.26, 1.38)
-        shift_xs = (-0.08, 0.0, 0.12, 0.24, 0.34)
-        shift_ys = (-0.08, 0.0, 0.10, 0.20, 0.30)
+        scales = (0.98, 1.06, 1.18, 1.32)
+        # Include stronger eastward camera shifts.  This moves the plotted plume
+        # left on the canvas, reducing both legend overlap and excessive empty
+        # space on the west/left side in recurving cases.
+        shift_xs = (-0.06, 0.0, 0.12, 0.24, 0.36, 0.48)
+        shift_ys = (-0.04, 0.0, 0.12, 0.24, 0.36)
         candidate_specs = [
-            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.985), 0.050, 0.610, 0.085, 0.805),
-            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.030, lon_high=0.970, lat_low=0.030, lat_high=0.975), 0.055, 0.630, 0.095, 0.825),
-            (quantile_bounds_for_frame(endpoint_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.990), 0.070, 0.600, 0.100, 0.780),
-            (quantile_bounds_for_frame(full_core_frame, settings, lon_low=0.035, lon_high=0.965, lat_low=0.035, lat_high=0.975), 0.045, 0.655, 0.080, 0.835),
-            (bounds_from_frames([protected_points], settings), 0.055, 0.640, 0.090, 0.815),
+            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.985), 0.055, 0.585, 0.085, 0.805),
+            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.030, lon_high=0.970, lat_low=0.030, lat_high=0.975), 0.060, 0.605, 0.095, 0.825),
+            (quantile_bounds_for_frame(endpoint_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.990), 0.075, 0.575, 0.100, 0.780),
+            (quantile_bounds_for_frame(full_core_frame, settings, lon_low=0.035, lon_high=0.965, lat_low=0.035, lat_high=0.975), 0.050, 0.625, 0.080, 0.835),
+            (bounds_from_frames([protected_points], settings), 0.060, 0.610, 0.090, 0.815),
         ]
     else:
         min_lon_span, min_lat_span = 48.0, 30.0
         scales = (1.04, 1.16, 1.30, 1.46, 1.62)
-        shift_xs = (-0.08, 0.0, 0.12, 0.24, 0.36)
+        # Stronger eastward camera shifts are needed for long recurving plumes:
+        # they pull the plume leftward on the image, which reduces legend
+        # intersections without forcing a huge west-Pacific view every time.
+        shift_xs = (-0.04, 0.0, 0.12, 0.24, 0.36, 0.50)
         shift_ys = (-0.14, -0.06, 0.0, 0.10, 0.20)
         candidate_specs = [
-            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.985), 0.045, 0.630, 0.080, 0.835),
-            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.030, lon_high=0.970, lat_low=0.030, lat_high=0.975), 0.050, 0.650, 0.085, 0.850),
-            (quantile_bounds_for_frame(endpoint_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.990), 0.070, 0.600, 0.095, 0.805),
-            (quantile_bounds_for_frame(full_core_frame, settings, lon_low=0.035, lon_high=0.965, lat_low=0.035, lat_high=0.975), 0.040, 0.685, 0.075, 0.860),
-            (bounds_from_frames([protected_points], settings), 0.055, 0.665, 0.085, 0.845),
+            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.985), 0.050, 0.590, 0.080, 0.835),
+            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.030, lon_high=0.970, lat_low=0.030, lat_high=0.975), 0.055, 0.610, 0.085, 0.850),
+            (quantile_bounds_for_frame(endpoint_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.990), 0.075, 0.570, 0.095, 0.805),
+            (quantile_bounds_for_frame(full_core_frame, settings, lon_low=0.035, lon_high=0.965, lat_low=0.035, lat_high=0.975), 0.045, 0.640, 0.075, 0.860),
+            (bounds_from_frames([protected_points], settings), 0.060, 0.625, 0.085, 0.845),
         ]
         # A broad West-Pacific semi-fixed candidate.  It is not forced; it is
         # simply scored with the other candidates and selected only if it is
@@ -3024,10 +3030,12 @@ def score_240_extent(
         legend_padding = (0.014, 0.020, 0.024)
         legend_weights = (420.0, 2_600.0, 11_000.0)
         header_weights = (1_400.0, 9_500.0)
-        east_limit = 0.610
+        east_limit = 0.590
         north_limit = 0.835
         south_limit = 0.085
-        target_center_x = 0.350
+        west_empty_limit = 0.255
+        west_empty_weight = 7_500.0
+        target_center_x = 0.315
         target_center_y = 0.430
         compact_width = 0.360
         compact_height = 0.440
@@ -3037,10 +3045,12 @@ def score_240_extent(
         legend_padding = (0.014, 0.022, 0.028)
         legend_weights = (380.0, 2_500.0, 11_000.0)
         header_weights = (1_100.0, 7_500.0)
-        east_limit = 0.625
+        east_limit = 0.595
         north_limit = 0.865
         south_limit = 0.090
-        target_center_x = 0.350
+        west_empty_limit = 0.260
+        west_empty_weight = 8_000.0
+        target_center_x = 0.315
         target_center_y = 0.460
         compact_width = 0.430
         compact_height = 0.500
@@ -3075,7 +3085,10 @@ def score_240_extent(
         score += max(0.0, east_x - east_limit) * 6_500.0
         score += max(0.0, north_y - north_limit) * 8_000.0
         score += max(0.0, south_limit - south_y) * 3_500.0
-        score += max(0.0, west_x - 0.170) * 2_400.0
+        # Penalize excessive west/left blank space.  In screen coordinates,
+        # a high west_x means the left edge of the important plume sits too far
+        # to the right, leaving too much empty map on the west side.
+        score += max(0.0, west_x - west_empty_limit) * west_empty_weight
         score += max(0.0, south_y - 0.180) * 900.0
         score += max(0.0, (1.0 - north_y) - 0.230) * 700.0
         score += max(0.0, compact_width - core_width) * 1_200.0
