@@ -3559,34 +3559,68 @@ def build_240_extent_candidates(
     return dedupe_240_candidates(normalized + expanded)
 
 
-def expand_240_extent_margin(
+def mercator_extent_canvas_ratio(extent: list[float]) -> float | None:
+    extent_xy = _mercator_extent_xy(extent)
+    if extent_xy is None:
+        return None
+    x0, x1, y0, y1 = extent_xy
+    x_span = x1 - x0
+    y_span = y1 - y0
+    if x_span <= 0 or y_span <= 0:
+        return None
+    return x_span / y_span
+
+
+def extent_matches_canvas_aspect(
+    extent: list[float],
+    *,
+    fig_width: float,
+    fig_height: float,
+    tolerance: float = 0.18,
+) -> bool:
+    ratio = mercator_extent_canvas_ratio(extent)
+    if ratio is None:
+        return False
+    canvas_ratio = fig_width / fig_height
+    if canvas_ratio <= 0:
+        return False
+    return abs(math.log(ratio / canvas_ratio)) <= tolerance
+
+
+def zoom_out_240_extent_uniform(
     extent: list[float],
     settings: Settings,
     *,
-    lon_fraction: float = 0.035,
-    lat_fraction: float = 0.045,
     fig_width: float,
     fig_height: float,
+    preferred_scale: float = 1.06,
 ) -> list[float]:
-    """Apply a small symmetric zoom-out margin to the selected 240h extent.
+    """Slightly zoom out while preserving the map/canvas aspect.
 
-    This runs *after* the collision-scoring selection so we preserve the chosen
-    composition while exposing slightly more area around the plotted tracks.
+    The previous degree-based margin could make the final Mercator extent too
+    tall after clamping, which caused Cartopy to shrink the GeoAxes and leave
+    large side margins.  This version expands in projected Mercator x/y space
+    and rejects candidates whose aspect no longer matches the canvas.
     """
-    lon_span = max(1e-6, extent[1] - extent[0])
-    lat_span = max(1e-6, extent[3] - extent[2])
-    lon_pad = lon_span * lon_fraction
-    lat_pad = lat_span * lat_fraction
-    expanded = [
-        extent[0] - lon_pad,
-        extent[1] + lon_pad,
-        extent[2] - lat_pad,
-        extent[3] + lat_pad,
-    ]
-    normalized = normalize_240_candidate_extent(
-        expanded, settings, fig_width=fig_width, fig_height=fig_height
-    )
-    return clamp_240_display_extent(normalized or expanded)
+    for scale in (preferred_scale, 1.045, 1.030):
+        candidate = scale_shift_240_extent(
+            extent,
+            settings,
+            scale=scale,
+            shift_x=0.0,
+            shift_y=0.0,
+            fig_width=fig_width,
+            fig_height=fig_height,
+        )
+        if candidate is None:
+            continue
+        if extent_matches_canvas_aspect(candidate, fig_width=fig_width, fig_height=fig_height):
+            return candidate
+
+    # Do not risk a malformed final extent.  The collision-scored candidate is
+    # known to be layout-safe, so keep it if the extra zoom-out cannot be done
+    # without breaking the canvas aspect.
+    return extent
 
 
 def score_240_extent(
@@ -3741,18 +3775,20 @@ def finalize_240_map_extent(
         f"({len(candidates)} candidates, score={best_score:.1f}, "
         f"span={best_candidate[1] - best_candidate[0]:.1f} lon x {best_candidate[3] - best_candidate[2]:.1f} lat)."
     )
-    widened = expand_240_extent_margin(
+    widened = zoom_out_240_extent_uniform(
         best_candidate,
         settings,
-        lon_fraction=0.035,
-        lat_fraction=0.045,
         fig_width=fig_width,
         fig_height=fig_height,
+        preferred_scale=1.06,
     )
-    print(
-        "240h map extent widened slightly for extra framing "
-        f"(span={widened[1] - widened[0]:.1f} lon x {widened[3] - widened[2]:.1f} lat)."
-    )
+    if widened != best_candidate:
+        print(
+            "240h map extent widened slightly in Mercator space "
+            f"(span={widened[1] - widened[0]:.1f} lon x {widened[3] - widened[2]:.1f} lat)."
+        )
+    else:
+        print("240h extra zoom-out skipped to preserve canvas aspect.")
     return widened
 
 
