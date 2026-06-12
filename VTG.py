@@ -213,7 +213,7 @@ MAX_CAMERA_240_LAT_DISTANCE = 62.0
 # 240h output now uses a stable fixed West-Pacific view. Keep the east
 # boundary below 180E because the current PlateCarree/Mercator path wraps
 # values above 180E into a near-global extent.
-FIXED_240_MAP_EXTENT = [100.0, 179.9, 0.0, 51.4]
+FIXED_240_MAP_EXTENT = [100.0, 179.8, 0.0, 51.5]
 
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
@@ -3671,14 +3671,31 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     data_crs = ccrs.PlateCarree()
     map_crs = ccrs.Mercator()
 
-    fig = plt.figure(figsize=(fig_width, fig_height), dpi=settings.figure_dpi, frameon=False)
+    legend_ax = None
+    header_ax = None
+
+    # Put the model legend outside the map for both 120h and 240h.
+    # Keep the map panel itself at the original figure aspect so the existing
+    # automatic 120h camera logic and the fixed 240h extent are not distorted.
+    legend_extra_width_ratio = 0.325
+    total_fig_width = fig_width * (1.0 + legend_extra_width_ratio)
+    map_panel_frac = fig_width / total_fig_width
+    fig = plt.figure(figsize=(total_fig_width, fig_height), dpi=settings.figure_dpi, frameon=False)
     fig.patch.set_facecolor("#262626")
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
 
-    ax = fig.add_axes([0, 0, 1, 1], projection=map_crs)
+    ax = fig.add_axes([0, 0, map_panel_frac, 1], projection=map_crs)
     ax.set_facecolor("#262626")
     ax.set_extent(extent, crs=data_crs)
-    ax.set_position([0, 0, 1, 1])
+    ax.set_position([0, 0, map_panel_frac, 1])
+
+    legend_ax = fig.add_axes([map_panel_frac, 0, 1 - map_panel_frac, 1], frameon=False)
+    legend_ax.set_axis_off()
+    legend_ax.set_facecolor("none")
+
+    header_ax = fig.add_axes([0, 0, 1, 1], frameon=False)
+    header_ax.set_axis_off()
+    header_ax.set_facecolor("none")
 
     ax.add_feature(cfeature.OCEAN.with_scale("10m"), zorder=0, facecolor="#262626", edgecolor="none")
     ax.add_feature(cfeature.LAND.with_scale("10m"), zorder=0, facecolor="#656565")
@@ -3694,11 +3711,11 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     gl.xlocator = mticker.MultipleLocator(5)
     gl.ylocator = mticker.MultipleLocator(5)
 
-    legend_side = choose_legend_side_for_map(df, settings, extent)
+    legend_side = "panel"
 
     plot_past_track(ax, past_kma, current_dt)
-    draw_header(ax, fig, df, settings, intensity, legend_side=legend_side)
-    draw_model_tracks(ax, df, settings, legend_side=legend_side)
+    draw_header(header_ax, fig, df, settings, intensity, legend_side=legend_side)
+    draw_model_tracks(ax, df, settings, legend_side=legend_side, legend_ax=legend_ax)
 
     kma_start = df[(df["SRC"] == "KMA") & (df["TMD"] == 0)].head(1)
     if not kma_start.empty:
@@ -3800,7 +3817,7 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str, *
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
 
 
-def draw_model_tracks(ax, df: pd.DataFrame, settings: Settings, *, legend_side: str = "right") -> None:
+def draw_model_tracks(ax, df: pd.DataFrame, settings: Settings, *, legend_side: str = "right", legend_ax=None) -> None:
     excluded = excluded_models_for(df)
     active = active_model_names(settings)
     legend_rows = []
@@ -3862,7 +3879,7 @@ def draw_model_tracks(ax, df: pd.DataFrame, settings: Settings, *, legend_side: 
             "markersize": style["markersize"],
         })
 
-    draw_model_legend_table(ax, legend_rows, side=legend_side)
+    draw_model_legend_table(legend_ax if legend_ax is not None else ax, legend_rows, side=legend_side)
 
 
 def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> None:
@@ -3871,6 +3888,8 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
 
     if side == "left":
         x0, x1 = 0.005, 0.330
+    elif side == "panel":
+        x0, x1 = 0.035, 0.965
     else:
         x0, x1 = 0.670, 0.995
     y0 = 0.005
