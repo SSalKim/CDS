@@ -197,16 +197,16 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MIN_STABLE_240_LON_SPAN = 62.0
-MIN_STABLE_240_LAT_SPAN = 36.0
-MAX_STABLE_240_LON_SPAN = 96.0
-MAX_STABLE_240_LAT_SPAN = 58.0
-MAX_DISPLAY_240_LON_SPAN = 116.0
-MAX_DISPLAY_240_LAT_SPAN = 72.0
-MIN_DISPLAY_240_WEST_LON = 82.0
-MAX_DISPLAY_240_EAST_LON = 179.8
-MIN_DISPLAY_240_SOUTH_LAT = -18.0
-MAX_DISPLAY_240_NORTH_LAT = 68.0
+MIN_STABLE_240_LON_SPAN = 44.0
+MIN_STABLE_240_LAT_SPAN = 28.0
+MAX_STABLE_240_LON_SPAN = 112.0
+MAX_STABLE_240_LAT_SPAN = 66.0
+MAX_DISPLAY_240_LON_SPAN = 136.0
+MAX_DISPLAY_240_LAT_SPAN = 82.0
+MIN_DISPLAY_240_WEST_LON = 70.0
+MAX_DISPLAY_240_EAST_LON = 195.0
+MIN_DISPLAY_240_SOUTH_LAT = -22.0
+MAX_DISPLAY_240_NORTH_LAT = 74.0
 MAX_CAMERA_240_LON_DISTANCE = 92.0
 MAX_CAMERA_240_LAT_DISTANCE = 62.0
 
@@ -2683,6 +2683,150 @@ def count_points_in_box(
     )
 
 
+
+
+def box_contains_point(
+    x: float,
+    y: float,
+    box: tuple[float, float, float, float],
+    *,
+    padding: float = 0.0,
+) -> bool:
+    x0, x1, y0, y1 = box
+    return x0 - padding <= x <= x1 + padding and y0 - padding <= y <= y1 + padding
+
+
+def _orientation(ax: float, ay: float, bx: float, by: float, cx: float, cy: float) -> float:
+    return (by - ay) * (cx - bx) - (bx - ax) * (cy - by)
+
+
+def _on_segment(ax: float, ay: float, bx: float, by: float, cx: float, cy: float) -> bool:
+    return min(ax, cx) - 1e-12 <= bx <= max(ax, cx) + 1e-12 and min(ay, cy) - 1e-12 <= by <= max(ay, cy) + 1e-12
+
+
+def screen_segments_intersect(
+    a: tuple[float, float],
+    b: tuple[float, float],
+    c: tuple[float, float],
+    d: tuple[float, float],
+) -> bool:
+    ax, ay = a
+    bx, by = b
+    cx, cy = c
+    dx, dy = d
+    o1 = _orientation(ax, ay, bx, by, cx, cy)
+    o2 = _orientation(ax, ay, bx, by, dx, dy)
+    o3 = _orientation(cx, cy, dx, dy, ax, ay)
+    o4 = _orientation(cx, cy, dx, dy, bx, by)
+
+    if o1 * o2 < 0 and o3 * o4 < 0:
+        return True
+    if abs(o1) < 1e-12 and _on_segment(ax, ay, cx, cy, bx, by):
+        return True
+    if abs(o2) < 1e-12 and _on_segment(ax, ay, dx, dy, bx, by):
+        return True
+    if abs(o3) < 1e-12 and _on_segment(cx, cy, ax, ay, dx, dy):
+        return True
+    if abs(o4) < 1e-12 and _on_segment(cx, cy, bx, by, dx, dy):
+        return True
+    return False
+
+
+def screen_segment_intersects_box(
+    segment: tuple[float, float, float, float],
+    box: tuple[float, float, float, float],
+    *,
+    padding: float = 0.0,
+) -> bool:
+    x0, y0, x1, y1 = segment
+    bx0, bx1, by0, by1 = box
+    bx0 -= padding
+    bx1 += padding
+    by0 -= padding
+    by1 += padding
+    padded_box = (bx0, bx1, by0, by1)
+
+    if box_contains_point(x0, y0, padded_box) or box_contains_point(x1, y1, padded_box):
+        return True
+
+    # Quick reject by bounding boxes.
+    if max(x0, x1) < bx0 or min(x0, x1) > bx1 or max(y0, y1) < by0 or min(y0, y1) > by1:
+        return False
+
+    corners = [(bx0, by0), (bx1, by0), (bx1, by1), (bx0, by1)]
+    edges = list(zip(corners, corners[1:] + corners[:1]))
+    return any(screen_segments_intersect((x0, y0), (x1, y1), a, b) for a, b in edges)
+
+
+def track_screen_segments(extent: list[float], points: pd.DataFrame) -> list[tuple[float, float, float, float]]:
+    if points.empty:
+        return []
+    extent_xy = _mercator_extent_xy(extent)
+    if extent_xy is None:
+        return []
+    ex0, ex1, ey0, ey1 = extent_xy
+    x_span = ex1 - ex0
+    y_span = ey1 - ey0
+    if x_span <= 0 or y_span <= 0:
+        return []
+
+    projection = ccrs.Mercator()
+    data_crs = ccrs.PlateCarree()
+    frame = points.dropna(subset=["LON", "LAT"]).copy()
+    if frame.empty:
+        return []
+
+    source_col = "SRC" if "SRC" in frame.columns else ("MODEL" if "MODEL" in frame.columns else None)
+    order_cols = [col for col in ("TMD", "FTM", "FT_TIME") if col in frame.columns]
+    if not order_cols:
+        order_cols = ["LON", "LAT"]
+
+    segments: list[tuple[float, float, float, float]] = []
+    groups = frame.groupby(source_col, sort=False) if source_col else [("__all__", frame)]
+    for _, group in groups:
+        group = group.sort_values(order_cols)
+        previous: tuple[float, float] | None = None
+        for lon, lat in zip(group["LON"], group["LAT"]):
+            try:
+                x, y = projection.transform_point(float(lon), float(lat), data_crs)
+            except (TypeError, ValueError):
+                previous = None
+                continue
+            if not (math.isfinite(x) and math.isfinite(y)):
+                previous = None
+                continue
+            current = ((x - ex0) / x_span, (y - ey0) / y_span)
+            if previous is not None:
+                segments.append((previous[0], previous[1], current[0], current[1]))
+            previous = current
+    return segments
+
+
+def count_segments_in_box(
+    segments: list[tuple[float, float, float, float]],
+    box: tuple[float, float, float, float],
+    *,
+    padding: float = 0.0,
+) -> int:
+    return sum(1 for segment in segments if screen_segment_intersects_box(segment, box, padding=padding))
+
+
+def weighted_screen_centroid(
+    weighted_fraction_sets: list[tuple[list[tuple[float, float]], float]],
+) -> tuple[float, float] | None:
+    total_weight = 0.0
+    sx = 0.0
+    sy = 0.0
+    for fractions, weight in weighted_fraction_sets:
+        for x, y in fractions:
+            if math.isfinite(x) and math.isfinite(y):
+                sx += x * weight
+                sy += y * weight
+                total_weight += weight
+    if total_weight <= 0:
+        return None
+    return sx / total_weight, sy / total_weight
+
 def screen_bounds_from_fractions(fractions: list[tuple[float, float]]) -> tuple[float, float, float, float] | None:
     if not fractions:
         return None
@@ -2853,39 +2997,36 @@ def build_240_extent_candidates(
         # 120h also uses the collision-scored camera now, but with a tighter
         # profile than 240h.  More east/north shift candidates help keep recurving
         # tracks away from the in-map legend and top title band.
-        min_lon_span, min_lat_span = 30.0, 17.5
-        scales = (0.98, 1.06, 1.18, 1.32)
-        # Include stronger eastward camera shifts.  This moves the plotted plume
-        # left on the canvas, reducing both legend overlap and excessive empty
-        # space on the west/left side in recurving cases.
-        shift_xs = (-0.06, 0.0, 0.12, 0.24, 0.36, 0.48)
-        shift_ys = (-0.04, 0.0, 0.12, 0.24, 0.36)
+        min_lon_span, min_lat_span = 24.0, 14.5
+        scales = (0.86, 0.94, 1.00, 1.10, 1.24, 1.38)
+        # Include zoom-in and eastward-camera candidates.  Eastward camera shift
+        # pulls the plotted plume left on the canvas, away from the in-map legend.
+        shift_xs = (-0.08, 0.0, 0.12, 0.24, 0.38, 0.54)
+        shift_ys = (-0.08, 0.0, 0.12, 0.24, 0.36)
         candidate_specs = [
-            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.985), 0.055, 0.585, 0.085, 0.805),
-            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.030, lon_high=0.970, lat_low=0.030, lat_high=0.975), 0.060, 0.605, 0.095, 0.825),
-            (quantile_bounds_for_frame(endpoint_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.990), 0.075, 0.575, 0.100, 0.780),
-            (quantile_bounds_for_frame(full_core_frame, settings, lon_low=0.035, lon_high=0.965, lat_low=0.035, lat_high=0.975), 0.050, 0.625, 0.080, 0.835),
-            (bounds_from_frames([protected_points], settings), 0.060, 0.610, 0.090, 0.815),
+            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.985), 0.095, 0.600, 0.090, 0.800),
+            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.030, lon_high=0.970, lat_low=0.030, lat_high=0.975), 0.115, 0.620, 0.100, 0.820),
+            (quantile_bounds_for_frame(endpoint_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.990), 0.115, 0.585, 0.105, 0.780),
+            (quantile_bounds_for_frame(full_core_frame, settings, lon_low=0.035, lon_high=0.965, lat_low=0.035, lat_high=0.975), 0.090, 0.640, 0.085, 0.835),
+            (bounds_from_frames([protected_points], settings), 0.105, 0.625, 0.095, 0.815),
         ]
     else:
-        min_lon_span, min_lat_span = 48.0, 30.0
-        scales = (1.04, 1.16, 1.30, 1.46, 1.62)
-        # Stronger eastward camera shifts are needed for long recurving plumes:
-        # they pull the plume leftward on the image, which reduces legend
-        # intersections without forcing a huge west-Pacific view every time.
-        shift_xs = (-0.04, 0.0, 0.12, 0.24, 0.36, 0.50)
+        min_lon_span, min_lat_span = 38.0, 24.0
+        # Include zoom-in candidates.  A long 240h plume can still have no data
+        # west of 140E, so forcing only zoom-out candidates leaves empty space.
+        scales = (0.80, 0.88, 0.96, 1.04, 1.16, 1.32, 1.50)
+        shift_xs = (-0.06, 0.0, 0.12, 0.24, 0.38, 0.54)
         shift_ys = (-0.14, -0.06, 0.0, 0.10, 0.20)
         candidate_specs = [
-            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.985), 0.050, 0.590, 0.080, 0.835),
-            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.030, lon_high=0.970, lat_low=0.030, lat_high=0.975), 0.055, 0.610, 0.085, 0.850),
-            (quantile_bounds_for_frame(endpoint_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.990), 0.075, 0.570, 0.095, 0.805),
-            (quantile_bounds_for_frame(full_core_frame, settings, lon_low=0.035, lon_high=0.965, lat_low=0.035, lat_high=0.975), 0.045, 0.640, 0.075, 0.860),
-            (bounds_from_frames([protected_points], settings), 0.060, 0.625, 0.085, 0.845),
+            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.985), 0.095, 0.610, 0.080, 0.835),
+            (quantile_bounds_for_frame(base_frame, settings, lon_low=0.030, lon_high=0.970, lat_low=0.030, lat_high=0.975), 0.110, 0.630, 0.085, 0.850),
+            (quantile_bounds_for_frame(endpoint_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.990), 0.125, 0.590, 0.095, 0.805),
+            (quantile_bounds_for_frame(full_core_frame, settings, lon_low=0.035, lon_high=0.965, lat_low=0.035, lat_high=0.975), 0.085, 0.655, 0.075, 0.860),
+            (bounds_from_frames([protected_points], settings), 0.105, 0.640, 0.085, 0.845),
         ]
-        # A broad West-Pacific semi-fixed candidate.  It is not forced; it is
-        # simply scored with the other candidates and selected only if it is
-        # actually safer/cleaner for the current cycle.
-        raw_candidates.append([100.0, 179.8, 0.0, 50.0])
+        # Do not add the broad West-Pacific template to the normal candidate set.
+        # It is reserved as a last-resort fallback after the dynamic candidates
+        # are scored.
 
     for bounds, left, right, bottom, top in candidate_specs:
         raw_candidates.append(candidate_extent_from_240_bounds(
@@ -3030,13 +3171,17 @@ def score_240_extent(
         legend_padding = (0.014, 0.020, 0.024)
         legend_weights = (420.0, 2_600.0, 11_000.0)
         header_weights = (1_400.0, 9_500.0)
-        east_limit = 0.590
+        east_limit = 0.600
         north_limit = 0.835
         south_limit = 0.085
-        west_empty_limit = 0.255
-        west_empty_weight = 7_500.0
-        target_center_x = 0.315
-        target_center_y = 0.430
+        west_empty_limit = 0.235
+        west_empty_weight = 4_500.0
+        centroid_target_x = 0.355
+        centroid_target_y = 0.455
+        centroid_weight_x = 9_000.0
+        centroid_weight_y = 4_500.0
+        target_center_x = 0.350
+        target_center_y = 0.440
         compact_width = 0.360
         compact_height = 0.440
         span_weight = (1.4, 2.2)
@@ -3045,13 +3190,17 @@ def score_240_extent(
         legend_padding = (0.014, 0.022, 0.028)
         legend_weights = (380.0, 2_500.0, 11_000.0)
         header_weights = (1_100.0, 7_500.0)
-        east_limit = 0.595
+        east_limit = 0.615
         north_limit = 0.865
         south_limit = 0.090
-        west_empty_limit = 0.260
-        west_empty_weight = 8_000.0
-        target_center_x = 0.315
-        target_center_y = 0.460
+        west_empty_limit = 0.235
+        west_empty_weight = 5_500.0
+        centroid_target_x = 0.360
+        centroid_target_y = 0.475
+        centroid_weight_x = 10_000.0
+        centroid_weight_y = 5_000.0
+        target_center_x = 0.350
+        target_center_y = 0.465
         compact_width = 0.430
         compact_height = 0.500
         span_weight = (0.9, 1.3)
@@ -3065,13 +3214,23 @@ def score_240_extent(
     credit_full = count_points_in_box(full_fractions, credit_box, padding=0.000)
     credit_protected = count_points_in_box(protected_fractions, credit_box, padding=0.002)
 
+    render_segments = track_screen_segments(extent, render_points)
+    legend_segments = count_segments_in_box(render_segments, legend_box, padding=legend_padding[1])
+    header_segments = count_segments_in_box(render_segments, header_box, padding=0.006)
+    credit_segments = count_segments_in_box(render_segments, credit_box, padding=0.002)
+
     score += legend_full * legend_weights[0]
     score += legend_protected * legend_weights[1]
     score += legend_endpoint * legend_weights[2]
+    # Segment-box intersections catch the visually obvious case where no vertex
+    # is inside the legend, but a track line still crosses through it.
+    score += legend_segments * (4_800.0 if settings.fcst_hours <= 120 else 5_500.0)
     score += header_full * header_weights[0]
     score += header_protected * header_weights[1]
+    score += header_segments * (5_500.0 if settings.fcst_hours <= 120 else 5_000.0)
     score += credit_full * 80.0
     score += credit_protected * 450.0
+    score += credit_segments * 350.0
 
     core_bounds = screen_bounds_from_fractions(protected_fractions)
     if core_bounds is not None:
@@ -3079,9 +3238,18 @@ def score_240_extent(
         core_width = max(0.0, east_x - west_x)
         core_height = max(0.0, north_y - south_y)
 
-        # Prefer a cleaner left-of-legend composition.  The hard obstacle boxes
-        # catch direct point hits; these soft limits keep lines from riding the
-        # title/legend edges even when no vertex is technically inside a box.
+        centroid = weighted_screen_centroid([
+            (protected_fractions, 1.0),
+            (endpoint_fractions, 2.0 if settings.fcst_hours <= 120 else 2.8),
+        ])
+        if centroid is not None:
+            centroid_x, centroid_y = centroid
+            score += abs(centroid_x - centroid_target_x) * centroid_weight_x
+            score += abs(centroid_y - centroid_target_y) * centroid_weight_y
+
+        # Prefer a cleaner composition inside the usable viewport, excluding the
+        # title band and the in-map legend.  Direct box hits and segment
+        # intersections are scored above; these soft limits avoid crowding.
         score += max(0.0, east_x - east_limit) * 6_500.0
         score += max(0.0, north_y - north_limit) * 8_000.0
         score += max(0.0, south_limit - south_y) * 3_500.0
@@ -3107,6 +3275,27 @@ def score_240_extent(
         score += 180.0
 
     return score
+
+
+
+
+def broad_west_pacific_fallback_extent(
+    settings: Settings,
+    *,
+    fig_width: float,
+    fig_height: float,
+) -> list[float] | None:
+    if settings.fcst_hours <= 120:
+        return None
+    # True last-resort view, not a normal candidate.  Bounds are allowed to go a
+    # little beyond 180E so tracks near/over the dateline are not immediately
+    # rejected by the display clamp.
+    return normalize_240_candidate_extent(
+        [100.0, 190.0, 0.0, 50.0],
+        settings,
+        fig_width=fig_width,
+        fig_height=fig_height,
+    )
 
 
 def finalize_240_map_extent(
@@ -3173,26 +3362,35 @@ def finalize_240_map_extent(
         for candidate in candidates
     ]
     best_score, best_candidate = min(scored, key=lambda item: item[0])
+
+    if settings.fcst_hours > 120 and best_score > 45_000.0:
+        fallback = broad_west_pacific_fallback_extent(settings, fig_width=fig_width, fig_height=fig_height)
+        if fallback is not None:
+            fallback_score = score_240_extent(
+                fallback,
+                df=df,
+                camera_points=camera_points,
+                render_points=render_points,
+                protected_points=protected_points,
+                endpoint_points=endpoint_points,
+                settings=settings,
+            )
+            if fallback_score < best_score:
+                print(
+                    f"{settings.fcst_hours}h broad West-Pacific fallback selected "
+                    f"(score={fallback_score:.1f} < dynamic={best_score:.1f})."
+                )
+                best_score, best_candidate = fallback_score, fallback
+
     print(
         f"{settings.fcst_hours}h map extent selected by collision scoring "
         f"({len(candidates)} candidates, score={best_score:.1f}, "
         f"span={best_candidate[1] - best_candidate[0]:.1f} lon x {best_candidate[3] - best_candidate[2]:.1f} lat)."
     )
-    widened = zoom_out_240_extent_uniform(
-        best_candidate,
-        settings,
-        fig_width=fig_width,
-        fig_height=fig_height,
-        preferred_scale=1.02 if settings.fcst_hours <= 120 else 1.06,
-    )
-    if widened != best_candidate:
-        print(
-            f"{settings.fcst_hours}h map extent widened slightly in Mercator space "
-            f"(span={widened[1] - widened[0]:.1f} lon x {widened[3] - widened[2]:.1f} lat)."
-        )
-    else:
-        print(f"{settings.fcst_hours}h extra zoom-out skipped to preserve canvas aspect.")
-    return widened
+    # Important: no post-selection zoom-out.  Any zoom-in/zoom-out must compete
+    # in the scored candidate set; otherwise the final image is not actually the
+    # lowest-score layout.
+    return best_candidate
 
 
 def mercator_figure_size(extent: list[float], *, width: float = 11.2) -> tuple[float, float]:
