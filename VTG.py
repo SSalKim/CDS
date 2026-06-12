@@ -197,7 +197,7 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 16
+MAP_EXTENT_CACHE_VERSION = 17
 MIN_STABLE_240_LON_SPAN = 62.0
 MIN_STABLE_240_LAT_SPAN = 36.0
 MAX_STABLE_240_LON_SPAN = 96.0
@@ -205,6 +205,8 @@ MAX_STABLE_240_LAT_SPAN = 58.0
 MAX_DISPLAY_240_LON_SPAN = 116.0
 MAX_DISPLAY_240_LAT_SPAN = 72.0
 MIN_DISPLAY_240_WEST_LON = 82.0
+MAX_DISPLAY_240_EAST_LON = 179.8
+MIN_DISPLAY_240_SOUTH_LAT = -18.0
 MAX_DISPLAY_240_NORTH_LAT = 68.0
 MAX_CAMERA_240_LON_DISTANCE = 92.0
 MAX_CAMERA_240_LAT_DISTANCE = 62.0
@@ -1916,11 +1918,54 @@ def longitude_delta(a: float, b: float) -> float:
     return ((a - b + 180) % 360) - 180
 
 
+def anchor_lonlat_from_points(points: pd.DataFrame) -> tuple[float, float] | None:
+    if points.empty:
+        return None
+
+    if "TMD" in points:
+        leads = pd.to_numeric(points["TMD"], errors="coerce")
+    else:
+        leads = pd.Series(float("nan"), index=points.index)
+    for subset in [
+        points[leads.between(0, 24)].copy(),
+        points[leads.between(0, 120)].copy(),
+        points.copy(),
+    ]:
+        if subset.empty:
+            continue
+        lons = pd.to_numeric(subset["LON"], errors="coerce").dropna()
+        lats = pd.to_numeric(subset["LAT"], errors="coerce").dropna()
+        if lons.empty or lats.empty:
+            continue
+        raw_anchor_lon = float(lons.median())
+        normalized_lons = lons.map(lambda lon: raw_anchor_lon + longitude_delta(float(lon), raw_anchor_lon))
+        return float(normalized_lons.median()), float(lats.median())
+    return None
+
+
+def normalize_240_camera_longitudes(points: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    if settings.fcst_hours <= 120 or points.empty:
+        return points
+
+    normalized = numeric_track_points(points)
+    if normalized.empty:
+        return points
+
+    anchor = anchor_lonlat_from_points(normalized)
+    if anchor is None:
+        return normalized
+
+    anchor_lon, _ = anchor
+    normalized = normalized.copy()
+    normalized["LON"] = normalized["LON"].map(lambda lon: anchor_lon + longitude_delta(float(lon), anchor_lon))
+    return normalized
+
+
 def filter_240_camera_points(points: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     if settings.fcst_hours <= 120 or points.empty:
         return points
 
-    camera_points = numeric_track_points(points)
+    camera_points = normalize_240_camera_longitudes(points, settings)
     if camera_points.empty:
         return points
 
@@ -1929,20 +1974,11 @@ def filter_240_camera_points(points: pd.DataFrame, settings: Settings) -> pd.Dat
     if camera_points.empty or "TMD" not in camera_points:
         return points
 
-    leads = pd.to_numeric(camera_points["TMD"], errors="coerce")
-    startish = camera_points[leads.between(0, 24)].copy()
-    if startish.empty:
-        startish = camera_points[leads.between(0, 120)].copy()
-    if startish.empty:
-        startish = camera_points.copy()
-
-    anchor_lons = pd.to_numeric(startish["LON"], errors="coerce").dropna()
-    anchor_lats = pd.to_numeric(startish["LAT"], errors="coerce").dropna()
-    if anchor_lons.empty or anchor_lats.empty:
+    anchor = anchor_lonlat_from_points(camera_points)
+    if anchor is None:
         return camera_points
 
-    anchor_lon = float(anchor_lons.median())
-    anchor_lat = float(anchor_lats.median())
+    anchor_lon, anchor_lat = anchor
     lon_distance = camera_points["LON"].map(lambda lon: abs(longitude_delta(float(lon), anchor_lon)))
     lat_distance = (camera_points["LAT"] - anchor_lat).abs()
     filtered = camera_points[
@@ -1952,6 +1988,17 @@ def filter_240_camera_points(points: pd.DataFrame, settings: Settings) -> pd.Dat
 
     min_rows = max(5, math.ceil(len(camera_points) * 0.55))
     if len(filtered) < min_rows:
+        raw_lon_span = float(camera_points["LON"].max() - camera_points["LON"].min())
+        raw_lat_span = float(camera_points["LAT"].max() - camera_points["LAT"].min())
+        if len(filtered) >= 5 and (
+            raw_lon_span > MAX_DISPLAY_240_LON_SPAN or raw_lat_span > MAX_DISPLAY_240_LAT_SPAN
+        ):
+            print(
+                "240h map extent kept distant-point filter despite sparse retention "
+                f"({len(filtered)}/{len(camera_points)} points, "
+                f"{raw_lon_span:.1f} lon x {raw_lat_span:.1f} lat raw span)."
+            )
+            return filtered
         return camera_points
 
     removed_count = len(camera_points) - len(filtered)
@@ -1968,6 +2015,7 @@ def extent_points_for_auto_map(df: pd.DataFrame, settings: Settings) -> pd.DataF
     if settings.fcst_hours <= 120:
         return points
 
+    points = normalize_240_camera_longitudes(points, settings)
     points = points[pd.to_numeric(points["LAT"], errors="coerce").between(-8, 68)].copy()
     if points.empty or "SRC" not in points:
         return filter_240_camera_points(points, settings)
@@ -2742,6 +2790,10 @@ def reasonable_stable_240_extent(extent: list[float]) -> bool:
         and lat_span > 0
         and lon_span <= MAX_STABLE_240_LON_SPAN
         and lat_span <= MAX_STABLE_240_LAT_SPAN
+        and extent[0] >= MIN_DISPLAY_240_WEST_LON
+        and extent[1] <= MAX_DISPLAY_240_EAST_LON
+        and extent[2] >= MIN_DISPLAY_240_SOUTH_LAT
+        and extent[3] <= MAX_DISPLAY_240_NORTH_LAT
     )
 
 
@@ -2754,8 +2806,19 @@ def reasonable_display_240_extent(extent: list[float]) -> bool:
         and lon_span <= MAX_DISPLAY_240_LON_SPAN
         and lat_span <= MAX_DISPLAY_240_LAT_SPAN
         and extent[0] >= MIN_DISPLAY_240_WEST_LON
-        and extent[2] >= -18.0
+        and extent[1] <= MAX_DISPLAY_240_EAST_LON
+        and extent[2] >= MIN_DISPLAY_240_SOUTH_LAT
         and extent[3] <= MAX_DISPLAY_240_NORTH_LAT
+    )
+
+
+def broad_display_240_extent(extent: list[float]) -> bool:
+    lon_span = extent[1] - extent[0]
+    lat_span = extent[3] - extent[2]
+    return (
+        lon_span > MAX_STABLE_240_LON_SPAN
+        or lat_span > MAX_STABLE_240_LAT_SPAN
+        or (extent[0] <= MIN_DISPLAY_240_WEST_LON + 0.1 and extent[1] >= MAX_DISPLAY_240_EAST_LON - 0.1)
     )
 
 
@@ -2850,19 +2913,67 @@ def stable_240_map_extent(
 def clamp_west_pacific_extent(
     extent: list[float],
     *,
-    max_east_lon: float = 179.8,
+    min_west_lon: float = MIN_DISPLAY_240_WEST_LON,
+    max_east_lon: float = MAX_DISPLAY_240_EAST_LON,
 ) -> list[float]:
 
     lon_min, lon_max, lat_min, lat_max = extent
     if lon_max <= lon_min or lat_max <= lat_min:
         return extent
 
-    if lon_max > max_east_lon:
-        over = lon_max - max_east_lon
-        lon_min -= over
+    max_lon_span = max_east_lon - min_west_lon
+    lon_span = lon_max - lon_min
+    if lon_span >= max_lon_span:
+        lon_min = min_west_lon
         lon_max = max_east_lon
+    else:
+        if lon_max > max_east_lon:
+            shift = lon_max - max_east_lon
+            lon_min -= shift
+            lon_max -= shift
+        if lon_min < min_west_lon:
+            shift = min_west_lon - lon_min
+            lon_min += shift
+            lon_max += shift
 
-    return [lon_min, lon_max, lat_min, lat_max]
+    return [float(lon_min), float(lon_max), float(lat_min), float(lat_max)]
+
+
+def clamp_240_display_extent(extent: list[float]) -> list[float]:
+    lon_min, lon_max, lat_min, lat_max = clamp_west_pacific_extent(extent)
+    if lon_max <= lon_min or lat_max <= lat_min:
+        return extent
+
+    lon_span = lon_max - lon_min
+    max_lon_span = min(MAX_DISPLAY_240_LON_SPAN, MAX_DISPLAY_240_EAST_LON - MIN_DISPLAY_240_WEST_LON)
+    if lon_span > max_lon_span:
+        center_lon = (lon_min + lon_max) / 2
+        lon_min = center_lon - max_lon_span / 2
+        lon_max = center_lon + max_lon_span / 2
+        lon_min, lon_max, lat_min, lat_max = clamp_west_pacific_extent([lon_min, lon_max, lat_min, lat_max])
+
+    lat_span = lat_max - lat_min
+    max_lat_span = min(MAX_DISPLAY_240_LAT_SPAN, MAX_DISPLAY_240_NORTH_LAT - MIN_DISPLAY_240_SOUTH_LAT)
+    if lat_span > max_lat_span:
+        center_lat = (lat_min + lat_max) / 2
+        lat_min = center_lat - max_lat_span / 2
+        lat_max = center_lat + max_lat_span / 2
+
+    if lat_max > MAX_DISPLAY_240_NORTH_LAT:
+        shift = lat_max - MAX_DISPLAY_240_NORTH_LAT
+        lat_min -= shift
+        lat_max -= shift
+    if lat_min < MIN_DISPLAY_240_SOUTH_LAT:
+        shift = MIN_DISPLAY_240_SOUTH_LAT - lat_min
+        lat_min += shift
+        lat_max += shift
+
+    if lat_max > MAX_DISPLAY_240_NORTH_LAT:
+        lat_max = MAX_DISPLAY_240_NORTH_LAT
+    if lat_min < MIN_DISPLAY_240_SOUTH_LAT:
+        lat_min = MIN_DISPLAY_240_SOUTH_LAT
+
+    return [float(lon_min), float(lon_max), float(lat_min), float(lat_max)]
 
 
 def current_point_legend_safe_extent(df: pd.DataFrame, extent: list[float], settings: Settings) -> list[float]:
@@ -2900,10 +3011,18 @@ def finalize_240_map_extent(
 ) -> list[float]:
     points = extent_points_for_auto_map(df, settings)
     if points.empty:
-        return aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
+        extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
+        return clamp_240_display_extent(extent)
 
     def normalize(candidate: list[float], *, recenter: bool) -> list[float]:
-        candidate = clamp_west_pacific_extent(candidate)
+        candidate = clamp_240_display_extent(candidate)
+        if (
+            not recenter
+            and reasonable_display_240_extent(candidate)
+            and has_240_track_visibility(points, candidate, settings)
+            and not broad_display_240_extent(candidate)
+        ):
+            return candidate
         for index in range(4):
             candidate = fit_240_extent_to_tracks(points, candidate, settings, recenter=recenter and index == 0)
             candidate = aspect_match_and_clamp_extent(
@@ -2912,9 +3031,11 @@ def finalize_240_map_extent(
                 fig_width=fig_width,
                 fig_height=fig_height,
             )
+            candidate = clamp_240_display_extent(candidate)
             if index >= 1 and has_240_track_visibility(points, candidate, settings):
                 break
         candidate = current_point_legend_safe_extent(df, candidate, settings)
+        candidate = clamp_240_display_extent(candidate)
         for _ in range(3):
             candidate = fit_240_extent_to_tracks(points, candidate, settings, recenter=False)
             candidate = aspect_match_and_clamp_extent(
@@ -2923,16 +3044,21 @@ def finalize_240_map_extent(
                 fig_width=fig_width,
                 fig_height=fig_height,
             )
+            candidate = clamp_240_display_extent(candidate)
             if has_240_track_visibility(points, candidate, settings):
                 break
-        return clamp_west_pacific_extent(candidate)
+        return clamp_240_display_extent(candidate)
 
     extent = normalize(extent, recenter=True)
     if reasonable_stable_240_extent(extent):
         extent = stable_240_map_extent(extent, settings, points=points)
         extent = normalize(extent, recenter=False)
 
-    if reasonable_display_240_extent(extent) and has_240_track_visibility(points, extent, settings):
+    if (
+        reasonable_display_240_extent(extent)
+        and has_240_track_visibility(points, extent, settings)
+        and not broad_display_240_extent(extent)
+    ):
         return extent
 
     print(
@@ -2946,16 +3072,36 @@ def finalize_240_map_extent(
         extent,
     ]
     best_candidate = extent
+    best_score = float("inf")
     for candidate in candidates:
         if candidate is None or candidate[1] <= candidate[0] or candidate[3] <= candidate[2]:
             continue
         candidate = normalize(candidate, recenter=False)
         if reasonable_display_240_extent(candidate):
+            lon_span = candidate[1] - candidate[0]
+            lat_span = candidate[3] - candidate[2]
+            visible = has_240_track_visibility(points, candidate, settings)
+            score = lon_span + lat_span * 1.25
+            if not visible:
+                score += 220.0
+            if broad_display_240_extent(candidate):
+                score += 420.0
+            if score < best_score:
+                best_score = score
+                best_candidate = candidate
+        if (
+            reasonable_display_240_extent(candidate)
+            and has_240_track_visibility(points, candidate, settings)
+            and not broad_display_240_extent(candidate)
+        ):
             best_candidate = candidate
-        if reasonable_display_240_extent(candidate) and has_240_track_visibility(points, candidate, settings):
             return candidate
 
-    return best_candidate
+    if not reasonable_display_240_extent(best_candidate):
+        fallback = auto_map_extent_240(points, past_kma, settings)
+        if fallback is not None:
+            best_candidate = normalize(fallback, recenter=False)
+    return clamp_240_display_extent(best_candidate)
 
 
 def mercator_figure_size(extent: list[float], *, width: float = 11.2) -> tuple[float, float]:
