@@ -197,7 +197,7 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 18
+MAP_EXTENT_CACHE_VERSION = 19
 MIN_STABLE_240_LON_SPAN = 62.0
 MIN_STABLE_240_LAT_SPAN = 36.0
 MAX_STABLE_240_LON_SPAN = 96.0
@@ -2486,6 +2486,78 @@ def projected_bounds_inside_screen(
     )
 
 
+def projected_bounds_screen_fractions(
+    extent: list[float],
+    bounds: tuple[float, float, float, float] | None,
+) -> tuple[float, float, float, float] | None:
+    if bounds is None:
+        return None
+    extent_xy = _mercator_extent_xy(extent)
+    bounds_xy = _projected_bounds_xy(bounds)
+    if extent_xy is None or bounds_xy is None:
+        return None
+
+    x0, x1, y0, y1 = extent_xy
+    data_west_x, data_east_x, data_south_y, data_north_y = bounds_xy
+    x_span = x1 - x0
+    y_span = y1 - y0
+    if x_span <= 0 or y_span <= 0:
+        return None
+
+    return (
+        (data_west_x - x0) / x_span,
+        (data_east_x - x0) / x_span,
+        (data_south_y - y0) / y_span,
+        (data_north_y - y0) / y_span,
+    )
+
+
+def projected_bounds_uses_240_screen_space(
+    extent: list[float],
+    bounds: tuple[float, float, float, float] | None,
+    *,
+    max_west_blank: float,
+    max_south_blank: float,
+) -> bool:
+    fractions = projected_bounds_screen_fractions(extent, bounds)
+    if fractions is None:
+        return True
+    west_x, _east_x, south_y, _north_y = fractions
+    return west_x <= max_west_blank and south_y <= max_south_blank
+
+
+def shift_extent_to_reduce_projected_blank_space(
+    extent: list[float],
+    bounds: tuple[float, float, float, float] | None,
+    *,
+    target_west_x: float,
+    target_south_y: float,
+    max_shift_ratio: float,
+) -> list[float]:
+    """Keep the zoom level but trim excessive empty west/south space."""
+    extent_xy = _mercator_extent_xy(extent)
+    bounds_xy = _projected_bounds_xy(bounds) if bounds is not None else None
+    if extent_xy is None or bounds_xy is None:
+        return extent
+
+    x0, x1, y0, y1 = extent_xy
+    data_west_x, _data_east_x, data_south_y, _data_north_y = bounds_xy
+    x_span = x1 - x0
+    y_span = y1 - y0
+    if x_span <= 0 or y_span <= 0:
+        return extent
+
+    west_x = (data_west_x - x0) / x_span
+    south_y = (data_south_y - y0) / y_span
+    max_dx = x_span * max_shift_ratio
+    max_dy = y_span * max_shift_ratio
+    dx = max(0.0, min(max_dx, (west_x - target_west_x) * x_span))
+    dy = max(0.0, min(max_dy, (south_y - target_south_y) * y_span))
+    if dx <= 1e-6 and dy <= 1e-6:
+        return extent
+    return _extent_from_mercator_xy(x0 + dx, x1 + dx, y0 + dy, y1 + dy, extent)
+
+
 def good_240_camera_composition(points: pd.DataFrame, extent: list[float], settings: Settings) -> bool:
     if settings.fcst_hours != 240 or points.empty:
         return True
@@ -2514,6 +2586,8 @@ def good_240_camera_composition(points: pd.DataFrame, extent: list[float], setti
         projected_bounds_inside_screen(extent, focus_bounds, left=0.020, right=0.650, bottom=0.040, top=0.790, slack=0.004)
         and projected_bounds_inside_screen(extent, tail_bounds, left=0.030, right=0.625, bottom=0.055, top=0.755, slack=0.004)
         and projected_bounds_inside_screen(extent, anchor_bounds, left=0.030, right=0.655, bottom=0.050, top=0.790, slack=0.004)
+        and projected_bounds_uses_240_screen_space(extent, focus_bounds, max_west_blank=0.310, max_south_blank=0.285)
+        and projected_bounds_uses_240_screen_space(extent, anchor_bounds, max_west_blank=0.420, max_south_blank=0.360)
     )
 
 
@@ -2602,6 +2676,21 @@ def rebalance_240_camera_composition(
             target_center_y=0.38,
             max_shift_ratio=0.14,
         )
+
+    extent = shift_extent_to_reduce_projected_blank_space(
+        extent,
+        focus_bounds,
+        target_west_x=0.115,
+        target_south_y=0.105,
+        max_shift_ratio=0.30,
+    )
+    extent = shift_extent_to_reduce_projected_blank_space(
+        extent,
+        anchor_bounds,
+        target_west_x=0.145,
+        target_south_y=0.115,
+        max_shift_ratio=0.18,
+    )
 
     extent = expand_extent_to_min_span(
         extent,
