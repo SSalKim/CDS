@@ -2360,7 +2360,7 @@ def auto_map_extent_long_range_seed(points: pd.DataFrame, past_kma: pd.DataFrame
             past_points = past_points[past_points["FT_TIME"].ge(cutoff)].copy()
         past_points = numeric_track_points(past_points)
         if not past_points.empty:
-            past_points = normalize_240_camera_longitudes(past_points)
+            past_points = normalize_240_camera_longitudes(past_points, settings)
             bounds = expand_bounds_with_frame(bounds, past_points, exact=False)
 
     extent = extent_from_screen_bounds(
