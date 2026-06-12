@@ -2625,6 +2625,9 @@ def rebalance_240_camera_composition(
         lat_low=0.055,
         lat_high=0.980,
     )
+    anchor_bounds = quantile_frame_bounds(
+        concat_track_frames([frames["start_mean"], frames["mid_mean"], frames["endpoint_mean"], frames["late_mean"]])
+    )
     full_bounds = quantile_frame_bounds(
         frames["full"],
         lon_low=0.020,
