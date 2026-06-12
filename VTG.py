@@ -2586,16 +2586,28 @@ def legend_box_for_side(
     *,
     padded: bool = False,
 ) -> tuple[float, float, float, float]:
-    """Legend box in axes-fraction coordinates."""
+    """Legend box in axes-fraction coordinates.
+
+    This mirrors draw_model_legend_table().  Do not reference the actual
+    legend row list here because this function is also used before the legend
+    rows are built, when deciding whether the legend should move left.
+    """
     row_count = max(1, int(row_count))
     width = 0.325
+    y0 = 0.005
+    pad_y = 0.005
+    row_h = 0.019
+
     if side == "left":
         x0, x1 = 0.005, 0.005 + width
     else:
-        x0, x1, y0, _ = legend_box_for_side(len(rows), side, padded=False)
-    y1 = y0 + 0.005 * 2 + 0.019 * row_count
+        x0, x1 = 0.670, 0.995
+
+    y1 = y0 + pad_y * 2 + row_h * row_count
+
     if not padded:
         return x0, x1, y0, y1
+
     return (
         max(0.0, x0 - 0.014),
         min(1.0, x1 + 0.010),
@@ -3857,7 +3869,10 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
     if not rows:
         return
 
-    x0, x1 = 0.670, 0.995
+    if side == "left":
+        x0, x1 = 0.005, 0.330
+    else:
+        x0, x1 = 0.670, 0.995
     y0 = 0.005
     pad_x = 0.008
     pad_y = 0.005
