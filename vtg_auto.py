@@ -973,11 +973,12 @@ def stage_existing_outputs_for_forced_rerun(
     output_root: Path,
     job: StormJob,
     fcst_hours_list: list[int],
-) -> tuple[dict[int, tuple[Path, Path]], Path | None]:
+    metadata_paths: dict[int, Path] | None = None,
+) -> tuple[dict[int, dict[str, Path]], Path | None]:
     root = output_root.resolve()
     backup_root = Path(os.environ.get("RUNNER_TEMP") or tempfile.gettempdir())
     backup_root = backup_root / f"vtg_force_backup_{os.getpid()}_{int(time.time())}"
-    backups: dict[int, tuple[Path, Path]] = {}
+    backups: dict[int, dict[str, Path]] = {}
     for fcst_hours in dict.fromkeys(fcst_hours_list):
         target = deterministic_output_path_for(output_root, job, fcst_hours)
         try:
@@ -991,27 +992,59 @@ def stage_existing_outputs_for_forced_rerun(
             backup_path = backup_root / relative_target
             backup_path.parent.mkdir(parents=True, exist_ok=True)
             shutil.move(str(target), str(backup_path))
-            backups[fcst_hours] = (target, backup_path)
+            backups.setdefault(fcst_hours, {})
+            backups[fcst_hours]["target"] = target
+            backups[fcst_hours]["target_backup"] = backup_path
             print(f"Staged existing deterministic output before forced rerun: {target}")
+        metadata_path = metadata_paths.get(fcst_hours) if metadata_paths else None
+        if metadata_path and metadata_path.exists():
+            try:
+                resolved_metadata = metadata_path.resolve()
+            except OSError:
+                resolved_metadata = metadata_path.absolute()
+            if not str(resolved_metadata).lower().startswith(str(root).lower()):
+                raise RuntimeError(f"Refusing to move metadata outside {root}: {resolved_metadata}")
+            relative_metadata = metadata_path.relative_to(output_root)
+            metadata_backup_path = backup_root / relative_metadata
+            metadata_backup_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(metadata_path), str(metadata_backup_path))
+            backups.setdefault(fcst_hours, {})
+            backups[fcst_hours]["metadata"] = metadata_path
+            backups[fcst_hours]["metadata_backup"] = metadata_backup_path
+            print(f"Staged existing metadata before forced rerun: {metadata_path}")
     return backups, backup_root if backups else None
 
 
 def finish_forced_output_backups(
-    backups: dict[int, tuple[Path, Path]],
+    backups: dict[int, dict[str, Path]],
     backup_root: Path | None,
     failed_hours: set[int],
 ) -> None:
-    for fcst_hours, (target, backup_path) in backups.items():
-        if not backup_path.exists():
-            continue
+    for fcst_hours, paths in backups.items():
         if fcst_hours in failed_hours:
-            target.parent.mkdir(parents=True, exist_ok=True)
-            if target.exists():
-                target.unlink()
-            shutil.move(str(backup_path), str(target))
-            print(f"Restored previous deterministic output after failed forced rerun: {target}")
+            target = paths.get("target")
+            backup_path = paths.get("target_backup")
+            if target and backup_path and backup_path.exists():
+                target.parent.mkdir(parents=True, exist_ok=True)
+                if target.exists():
+                    target.unlink()
+                shutil.move(str(backup_path), str(target))
+                print(f"Restored previous deterministic output after failed forced rerun: {target}")
+            metadata_path = paths.get("metadata")
+            metadata_backup_path = paths.get("metadata_backup")
+            if metadata_path and metadata_backup_path and metadata_backup_path.exists():
+                metadata_path.parent.mkdir(parents=True, exist_ok=True)
+                if metadata_path.exists():
+                    metadata_path.unlink()
+                shutil.move(str(metadata_backup_path), str(metadata_path))
+                print(f"Restored previous metadata after failed forced rerun: {metadata_path}")
         else:
-            backup_path.unlink()
+            backup_path = paths.get("target_backup")
+            if backup_path and backup_path.exists():
+                backup_path.unlink()
+            metadata_backup_path = paths.get("metadata_backup")
+            if metadata_backup_path and metadata_backup_path.exists():
+                metadata_backup_path.unlink()
     if backup_root and backup_root.exists():
         shutil.rmtree(backup_root, ignore_errors=True)
 
@@ -1219,13 +1252,14 @@ def run_vtg_batch(
             for fcst_hours, metadata_path in metadata_paths.items()
         }
 
-    forced_backups: dict[int, tuple[Path, Path]] = {}
+    forced_backups: dict[int, dict[str, Path]] = {}
     forced_backup_root: Path | None = None
     if clear_existing:
         forced_backups, forced_backup_root = stage_existing_outputs_for_forced_rerun(
             output_root,
             job,
             fcst_hours_list,
+            metadata_paths,
         )
 
     command_started_at = time.time()
@@ -1269,9 +1303,23 @@ def run_vtg_batch(
         failed_hours = {
             fcst_hours
             for fcst_hours, result in results.items()
-            if result.get("status") == "failed"
+            if result.get("status") in {"failed", "no_output"}
         }
         finish_forced_output_backups(forced_backups, forced_backup_root, failed_hours)
+        for fcst_hours in failed_hours:
+            paths = forced_backups.get(fcst_hours, {})
+            metadata_path = paths.get("metadata")
+            if not metadata_path:
+                continue
+            restored_metadata = load_json(metadata_path, None)
+            if isinstance(restored_metadata, dict) and metadata_output_image_exists(output_root, restored_metadata):
+                results[fcst_hours]["status"] = "restored_previous"
+                results[fcst_hours]["metadata"] = restored_metadata
+                results[fcst_hours]["metadata_current"] = False
+                results[fcst_hours]["stderr"] = (
+                    str(results[fcst_hours].get("stderr") or "")
+                    + "\nRestored previous metadata/image after forced rerun produced no replacement output."
+                )[-4000:]
     return results
 
 
