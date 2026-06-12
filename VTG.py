@@ -197,7 +197,7 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 19
+MAP_EXTENT_CACHE_VERSION = 20
 MIN_STABLE_240_LON_SPAN = 62.0
 MIN_STABLE_240_LAT_SPAN = 36.0
 MAX_STABLE_240_LON_SPAN = 96.0
@@ -3195,7 +3195,16 @@ def clamp_240_display_extent(extent: list[float]) -> list[float]:
     return [float(lon_min), float(lon_max), float(lat_min), float(lat_max)]
 
 
+
 def current_point_legend_safe_extent(df: pd.DataFrame, extent: list[float], settings: Settings) -> list[float]:
+    """Lightweight fallback for manually supplied 240h extents.
+
+    The auto-extent path no longer uses this as a hard post-processor.  It only
+    nudges a manual/fallback extent when the current analyzed point is buried
+    under the legend area.
+    """
+    if settings.fcst_hours != 240:
+        return extent
     start = df[(df["SRC"] == "KMA") & (pd.to_numeric(df["TMD"], errors="coerce") == 0)].head(1)
     if start.empty:
         return extent
@@ -3210,12 +3219,425 @@ def current_point_legend_safe_extent(df: pd.DataFrame, extent: list[float], sett
         return extent
 
     current_x = (lon - lon_min) / lon_span
-    safe_x = 0.655 if settings.fcst_hours == 240 else 0.625
+    safe_x = 0.640
     if current_x <= safe_x:
         return extent
 
-    shift = (current_x - safe_x) * lon_span
+    shift = (current_x - safe_x) * lon_span * 0.55
     return [lon_min + shift, lon_max + shift, lat_min, lat_max]
+
+
+def legend_row_count_for(df: pd.DataFrame, settings: Settings) -> int:
+    excluded = excluded_models_for(df)
+    active = active_model_names(settings)
+    return len([model for model in MODEL_INFO if model["name"] in active and model["name"] not in excluded])
+
+
+def overlay_obstacle_boxes_240(df: pd.DataFrame, settings: Settings) -> dict[str, tuple[float, float, float, float]]:
+    """Return map-overlay boxes in axes-fraction coordinates.
+
+    Values mirror draw_header() and draw_model_legend_table().  The scoring
+    camera treats these as soft obstacles instead of shrinking the whole usable
+    map into one hard rectangle.
+    """
+    row_count = max(1, legend_row_count_for(df, settings))
+    legend_x0, legend_x1 = 0.670, 0.995
+    legend_y0 = 0.005
+    legend_y1 = legend_y0 + 0.005 * 2 + 0.019 * row_count
+    return {
+        "header": (0.000, 1.000, 0.905, 1.000),
+        "legend": (max(0.0, legend_x0 - 0.012), min(1.0, legend_x1 + 0.006), 0.000, min(0.900, legend_y1 + 0.018)),
+        "credit": (0.000, 0.280, 0.000, 0.052),
+    }
+
+
+def normalize_240_render_points(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    points = numeric_track_points(df)
+    if points.empty:
+        return points
+    points = normalize_240_camera_longitudes(points, settings)
+    if "TMD" in points:
+        leads = pd.to_numeric(points["TMD"], errors="coerce")
+        points = points[leads.between(0, settings.fcst_hours)].copy()
+    lats = pd.to_numeric(points["LAT"], errors="coerce")
+    points = points[lats.between(MIN_DISPLAY_240_SOUTH_LAT - 4.0, MAX_DISPLAY_240_NORTH_LAT + 4.0)].copy()
+    return points.dropna(subset=["LAT", "LON"])
+
+
+def protected_240_points(
+    df: pd.DataFrame,
+    camera_points: pd.DataFrame,
+    render_points: pd.DataFrame,
+    past_kma: pd.DataFrame,
+    settings: Settings,
+) -> pd.DataFrame:
+    frames: list[pd.DataFrame] = []
+    if not camera_points.empty:
+        frames.append(camera_points)
+    if not render_points.empty:
+        render_frames = build_240_camera_frames(render_points, settings)
+        frames.extend([
+            render_frames["starts"],
+            render_frames["mid"],
+            render_frames["late_180"],
+            render_frames["late_240"],
+            render_frames["endpoints"],
+            render_frames["start_mean"],
+            render_frames["mid_mean"],
+            render_frames["endpoint_mean"],
+            render_frames["late_mean"],
+        ])
+    if not past_kma.empty:
+        past_points = past_kma.copy()
+        current_dt = pd.to_datetime(settings.data_time, format="%Y%m%d%H%M", errors="coerce")
+        if "FT_TIME" in past_points and not pd.isna(current_dt):
+            cutoff = current_dt.to_pydatetime() - timedelta(hours=72)
+            past_points = past_points[past_points["FT_TIME"].ge(cutoff)].copy()
+        past_points = normalize_240_camera_longitudes(numeric_track_points(past_points), settings)
+        if not past_points.empty:
+            frames.append(past_points)
+    protected = concat_track_frames(frames)
+    if protected.empty:
+        return render_points
+    return protected.dropna(subset=["LAT", "LON"])
+
+
+def point_screen_fractions(extent: list[float], points: pd.DataFrame) -> list[tuple[float, float]]:
+    if points.empty:
+        return []
+    extent_xy = _mercator_extent_xy(extent)
+    if extent_xy is None:
+        return []
+    x0, x1, y0, y1 = extent_xy
+    x_span = x1 - x0
+    y_span = y1 - y0
+    if x_span <= 0 or y_span <= 0:
+        return []
+
+    projection = ccrs.Mercator()
+    data_crs = ccrs.PlateCarree()
+    fractions: list[tuple[float, float]] = []
+    for lon, lat in zip(points["LON"], points["LAT"]):
+        try:
+            x, y = projection.transform_point(float(lon), float(lat), data_crs)
+        except (TypeError, ValueError):
+            continue
+        if math.isfinite(x) and math.isfinite(y):
+            fractions.append(((x - x0) / x_span, (y - y0) / y_span))
+    return fractions
+
+
+def count_points_outside_screen(fractions: list[tuple[float, float]], *, margin: float = 0.0) -> int:
+    return sum(
+        1
+        for x, y in fractions
+        if x < -margin or x > 1.0 + margin or y < -margin or y > 1.0 + margin
+    )
+
+
+def count_points_in_box(
+    fractions: list[tuple[float, float]],
+    box: tuple[float, float, float, float],
+    *,
+    padding: float = 0.0,
+) -> int:
+    x0, x1, y0, y1 = box
+    return sum(
+        1
+        for x, y in fractions
+        if x0 - padding <= x <= x1 + padding and y0 - padding <= y <= y1 + padding
+    )
+
+
+def screen_bounds_from_fractions(fractions: list[tuple[float, float]]) -> tuple[float, float, float, float] | None:
+    if not fractions:
+        return None
+    xs = [item[0] for item in fractions if math.isfinite(item[0])]
+    ys = [item[1] for item in fractions if math.isfinite(item[1])]
+    if not xs or not ys:
+        return None
+    return min(xs), max(xs), min(ys), max(ys)
+
+
+def quantile_bounds_for_frame(
+    frame: pd.DataFrame,
+    settings: Settings,
+    *,
+    lon_low: float = 0.02,
+    lon_high: float = 0.98,
+    lat_low: float = 0.02,
+    lat_high: float = 0.98,
+    exact_when_small: int = 6,
+) -> tuple[float, float, float, float] | None:
+    if frame.empty:
+        return None
+    lons = pd.to_numeric(frame["LON"], errors="coerce").dropna()
+    lats = pd.to_numeric(frame["LAT"], errors="coerce").dropna()
+    if lons.empty or lats.empty:
+        return None
+    if len(frame) <= exact_when_small:
+        return float(lons.min()), float(lons.max()), float(lats.min()), float(lats.max())
+    return (
+        float(lons.quantile(lon_low)),
+        float(lons.quantile(lon_high)),
+        float(lats.quantile(lat_low)),
+        float(lats.quantile(lat_high)),
+    )
+
+
+def candidate_extent_from_240_bounds(
+    bounds: tuple[float, float, float, float] | None,
+    settings: Settings,
+    *,
+    left: float,
+    right: float,
+    bottom: float,
+    top: float,
+    fig_width: float,
+    fig_height: float,
+    min_lon_span: float = 42.0,
+    min_lat_span: float = 26.0,
+) -> list[float] | None:
+    if bounds is None:
+        return None
+    extent = extent_from_screen_bounds(bounds, left=left, right=right, bottom=bottom, top=top)
+    if extent is None:
+        lon_min, lon_max, lat_min, lat_max = bounds
+        extent = [lon_min, lon_max, lat_min, lat_max]
+    extent = expand_extent_to_min_span(
+        extent,
+        min_lon_span=min_lon_span,
+        min_lat_span=min_lat_span,
+        east_ratio=0.58,
+        north_ratio=0.56,
+    )
+    return normalize_240_candidate_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
+
+
+def normalize_240_candidate_extent(
+    extent: list[float] | None,
+    settings: Settings,
+    *,
+    fig_width: float,
+    fig_height: float,
+) -> list[float] | None:
+    if extent is None or len(extent) != 4:
+        return None
+    if extent[1] <= extent[0] or extent[3] <= extent[2]:
+        return None
+    candidate = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
+    candidate = clamp_240_display_extent(candidate)
+    if candidate[1] <= candidate[0] or candidate[3] <= candidate[2]:
+        return None
+    return [float(value) for value in candidate]
+
+
+def scale_shift_240_extent(
+    extent: list[float],
+    settings: Settings,
+    *,
+    scale: float,
+    shift_x: float,
+    shift_y: float,
+    fig_width: float,
+    fig_height: float,
+) -> list[float] | None:
+    extent_xy = _mercator_extent_xy(extent)
+    if extent_xy is None:
+        return None
+    x0, x1, y0, y1 = extent_xy
+    x_span = x1 - x0
+    y_span = y1 - y0
+    if x_span <= 0 or y_span <= 0:
+        return None
+    cx = (x0 + x1) / 2 + shift_x * x_span
+    cy = (y0 + y1) / 2 + shift_y * y_span
+    new_x_span = x_span * scale
+    new_y_span = y_span * scale
+    candidate = _extent_from_mercator_xy(
+        cx - new_x_span / 2,
+        cx + new_x_span / 2,
+        cy - new_y_span / 2,
+        cy + new_y_span / 2,
+        extent,
+    )
+    return normalize_240_candidate_extent(candidate, settings, fig_width=fig_width, fig_height=fig_height)
+
+
+def dedupe_240_candidates(candidates: list[list[float] | None]) -> list[list[float]]:
+    result: list[list[float]] = []
+    seen: set[tuple[float, float, float, float]] = set()
+    for candidate in candidates:
+        if candidate is None:
+            continue
+        key = tuple(round(float(value), 3) for value in candidate)
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(candidate)
+    return result
+
+
+def build_240_extent_candidates(
+    df: pd.DataFrame,
+    camera_points: pd.DataFrame,
+    render_points: pd.DataFrame,
+    protected_points: pd.DataFrame,
+    past_kma: pd.DataFrame,
+    settings: Settings,
+    seed_extent: list[float],
+    anchor_240_extent: list[float] | None,
+    *,
+    fig_width: float,
+    fig_height: float,
+) -> list[list[float]]:
+    frames = build_240_camera_frames(camera_points, settings) if not camera_points.empty else {}
+    render_frames = build_240_camera_frames(render_points, settings) if not render_points.empty else {}
+    base_frames = [
+        camera_points,
+        protected_points,
+        render_frames.get("mid", pd.DataFrame()),
+        render_frames.get("late_180", pd.DataFrame()),
+        render_frames.get("late_240", pd.DataFrame()),
+        render_frames.get("endpoints", pd.DataFrame()),
+        frames.get("late_mean", pd.DataFrame()) if frames else pd.DataFrame(),
+    ]
+    base_frame = concat_track_frames(base_frames)
+    endpoint_frame = concat_track_frames([
+        render_frames.get("late_180", pd.DataFrame()),
+        render_frames.get("late_240", pd.DataFrame()),
+        render_frames.get("endpoints", pd.DataFrame()),
+        render_frames.get("endpoint_mean", pd.DataFrame()),
+        render_frames.get("late_mean", pd.DataFrame()),
+    ]) if render_frames else pd.DataFrame()
+    full_core_frame = concat_track_frames([camera_points, render_points])
+
+    raw_candidates: list[list[float] | None] = [
+        seed_extent,
+        anchor_240_extent,
+        auto_map_extent_240(camera_points, past_kma, settings) if not camera_points.empty else None,
+    ]
+
+    candidate_specs = [
+        (quantile_bounds_for_frame(base_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.985), 0.040, 0.655, 0.055, 0.850),
+        (quantile_bounds_for_frame(base_frame, settings, lon_low=0.030, lon_high=0.970, lat_low=0.030, lat_high=0.975), 0.045, 0.680, 0.060, 0.870),
+        (quantile_bounds_for_frame(endpoint_frame, settings, lon_low=0.015, lon_high=0.985, lat_low=0.015, lat_high=0.990), 0.060, 0.635, 0.070, 0.820),
+        (quantile_bounds_for_frame(full_core_frame, settings, lon_low=0.035, lon_high=0.965, lat_low=0.035, lat_high=0.975), 0.035, 0.720, 0.050, 0.880),
+        (bounds_from_frames([protected_points], settings), 0.045, 0.700, 0.055, 0.865),
+    ]
+    for bounds, left, right, bottom, top in candidate_specs:
+        raw_candidates.append(candidate_extent_from_240_bounds(
+            bounds,
+            settings,
+            left=left,
+            right=right,
+            bottom=bottom,
+            top=top,
+            fig_width=fig_width,
+            fig_height=fig_height,
+        ))
+
+    normalized = dedupe_240_candidates([
+        normalize_240_candidate_extent(candidate, settings, fig_width=fig_width, fig_height=fig_height)
+        for candidate in raw_candidates
+    ])
+
+    expanded: list[list[float] | None] = []
+    for candidate in normalized:
+        for scale in (0.92, 1.00, 1.08, 1.18, 1.32, 1.50):
+            for shift_x in (-0.22, -0.14, -0.07, 0.0, 0.07, 0.14, 0.22):
+                for shift_y in (-0.18, -0.10, -0.04, 0.0, 0.06, 0.12, 0.18):
+                    expanded.append(scale_shift_240_extent(
+                        candidate,
+                        settings,
+                        scale=scale,
+                        shift_x=shift_x,
+                        shift_y=shift_y,
+                        fig_width=fig_width,
+                        fig_height=fig_height,
+                    ))
+    return dedupe_240_candidates(normalized + expanded)
+
+
+def score_240_extent(
+    extent: list[float],
+    *,
+    df: pd.DataFrame,
+    camera_points: pd.DataFrame,
+    render_points: pd.DataFrame,
+    protected_points: pd.DataFrame,
+    endpoint_points: pd.DataFrame,
+    settings: Settings,
+) -> float:
+    if not reasonable_display_240_extent(extent):
+        return 1_000_000_000.0
+
+    full_fractions = point_screen_fractions(extent, render_points)
+    protected_fractions = point_screen_fractions(extent, protected_points)
+    endpoint_fractions = point_screen_fractions(extent, endpoint_points)
+    if not protected_fractions:
+        return 900_000_000.0
+
+    score = 0.0
+    full_count = max(1, len(full_fractions))
+    protected_count = max(1, len(protected_fractions))
+    endpoint_count = max(1, len(endpoint_fractions))
+
+    full_outside = count_points_outside_screen(full_fractions, margin=0.006)
+    protected_outside = count_points_outside_screen(protected_fractions, margin=0.003)
+    endpoint_outside = count_points_outside_screen(endpoint_fractions, margin=0.003)
+    score += full_outside * 350.0
+    score += protected_outside * 7_500.0
+    score += endpoint_outside * 25_000.0
+    score += (full_outside / full_count) * 25_000.0
+    score += (protected_outside / protected_count) * 80_000.0
+    score += (endpoint_outside / endpoint_count) * 120_000.0
+
+    boxes = overlay_obstacle_boxes_240(df, settings)
+    legend_box = boxes["legend"]
+    header_box = boxes["header"]
+    credit_box = boxes["credit"]
+
+    legend_full = count_points_in_box(full_fractions, legend_box, padding=0.004)
+    legend_protected = count_points_in_box(protected_fractions, legend_box, padding=0.006)
+    legend_endpoint = count_points_in_box(endpoint_fractions, legend_box, padding=0.008)
+    header_full = count_points_in_box(full_fractions, header_box, padding=0.000)
+    header_protected = count_points_in_box(protected_fractions, header_box, padding=0.002)
+    credit_full = count_points_in_box(full_fractions, credit_box, padding=0.000)
+    credit_protected = count_points_in_box(protected_fractions, credit_box, padding=0.002)
+
+    score += legend_full * 220.0
+    score += legend_protected * 1_700.0
+    score += legend_endpoint * 8_000.0
+    score += header_full * 900.0
+    score += header_protected * 6_000.0
+    score += credit_full * 80.0
+    score += credit_protected * 450.0
+
+    core_bounds = screen_bounds_from_fractions(protected_fractions)
+    if core_bounds is not None:
+        west_x, east_x, south_y, north_y = core_bounds
+        core_width = max(0.0, east_x - west_x)
+        core_height = max(0.0, north_y - south_y)
+        score += max(0.0, west_x - 0.180) * 1_800.0
+        score += max(0.0, south_y - 0.120) * 1_600.0
+        score += max(0.0, (1.0 - north_y) - 0.220) * 1_000.0
+        score += max(0.0, 0.410 - core_width) * 1_200.0
+        score += max(0.0, 0.520 - core_height) * 900.0
+        center_x = (west_x + east_x) / 2
+        center_y = (south_y + north_y) / 2
+        score += abs(center_x - 0.385) * 650.0
+        score += abs(center_y - 0.455) * 450.0
+
+    lon_span = extent[1] - extent[0]
+    lat_span = extent[3] - extent[2]
+    score += lon_span * 2.5 + lat_span * 3.8
+    score += max(0.0, lon_span - 84.0) * 20.0
+    score += max(0.0, lat_span - 52.0) * 22.0
+    if broad_display_240_extent(extent):
+        score += 450.0
+
+    return score
 
 
 def finalize_240_map_extent(
@@ -3228,140 +3650,67 @@ def finalize_240_map_extent(
     fig_width: float,
     fig_height: float,
 ) -> list[float]:
-    points = extent_points_for_auto_map(df, settings)
-    if points.empty:
-        extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
-        return clamp_240_display_extent(extent)
+    camera_points = extent_points_for_auto_map(df, settings)
+    render_points = normalize_240_render_points(df, settings)
+    if camera_points.empty and render_points.empty:
+        fallback = normalize_240_candidate_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
+        return clamp_240_display_extent(fallback or extent)
+    if camera_points.empty:
+        camera_points = render_points.copy()
+    if render_points.empty:
+        render_points = camera_points.copy()
 
-    def normalize(candidate: list[float], *, recenter: bool) -> list[float]:
-        candidate = clamp_240_display_extent(candidate)
-        if (
-            not recenter
-            and reasonable_display_240_extent(candidate)
-            and good_240_camera_composition(points, candidate, settings)
-            and not broad_display_240_extent(candidate)
-        ):
-            return candidate
-        for index in range(4):
-            candidate = fit_240_extent_to_tracks(points, candidate, settings, recenter=recenter and index == 0)
-            candidate = aspect_match_and_clamp_extent(
-                candidate,
-                settings,
-                fig_width=fig_width,
-                fig_height=fig_height,
-            )
-            candidate = clamp_240_display_extent(candidate)
-            candidate = rebalance_240_camera_composition(
-                points,
-                candidate,
-                settings,
-                allow_shift=True,
-            )
-            candidate = aspect_match_and_clamp_extent(
-                candidate,
-                settings,
-                fig_width=fig_width,
-                fig_height=fig_height,
-            )
-            candidate = clamp_240_display_extent(candidate)
-            if index >= 1 and good_240_camera_composition(points, candidate, settings):
-                break
-        candidate = current_point_legend_safe_extent(df, candidate, settings)
-        candidate = clamp_240_display_extent(candidate)
-        candidate = rebalance_240_camera_composition(
-            points,
-            candidate,
-            settings,
-            allow_shift=True,
-        )
-        candidate = aspect_match_and_clamp_extent(
-            candidate,
-            settings,
-            fig_width=fig_width,
-            fig_height=fig_height,
-        )
-        candidate = clamp_240_display_extent(candidate)
-        for _ in range(3):
-            candidate = fit_240_extent_to_tracks(points, candidate, settings, recenter=False)
-            candidate = aspect_match_and_clamp_extent(
-                candidate,
-                settings,
-                fig_width=fig_width,
-                fig_height=fig_height,
-            )
-            candidate = clamp_240_display_extent(candidate)
-            candidate = rebalance_240_camera_composition(
-                points,
-                candidate,
-                settings,
-                allow_shift=True,
-            )
-            candidate = aspect_match_and_clamp_extent(
-                candidate,
-                settings,
-                fig_width=fig_width,
-                fig_height=fig_height,
-            )
-            candidate = clamp_240_display_extent(candidate)
-            if good_240_camera_composition(points, candidate, settings):
-                break
-        return clamp_240_display_extent(candidate)
+    protected_points = protected_240_points(df, camera_points, render_points, past_kma, settings)
+    if protected_points.empty:
+        protected_points = camera_points.copy()
+    render_frames = build_240_camera_frames(render_points, settings)
+    endpoint_points = concat_track_frames([
+        render_frames["late_180"],
+        render_frames["late_240"],
+        render_frames["endpoints"],
+        render_frames["endpoint_mean"],
+        render_frames["late_mean"],
+    ])
+    if endpoint_points.empty:
+        endpoint_points = protected_points.copy()
 
-    extent = normalize(extent, recenter=True)
-    if reasonable_stable_240_extent(extent):
-        extent = stable_240_map_extent(extent, settings, points=points)
-        extent = normalize(extent, recenter=False)
-
-    if (
-        reasonable_display_240_extent(extent)
-        and good_240_camera_composition(points, extent, settings)
-        and not broad_display_240_extent(extent)
-    ):
-        return extent
-
-    print(
-        "240h map extent failed final visibility guard; rebuilding from current cycle points "
-        f"({extent[1] - extent[0]:.1f} lon x {extent[3] - extent[2]:.1f} lat, west={extent[0]:.1f})."
-    )
-
-    candidates = [
-        auto_map_extent_240(points, past_kma, settings),
-        anchor_240_extent,
+    candidates = build_240_extent_candidates(
+        df,
+        camera_points,
+        render_points,
+        protected_points,
+        past_kma,
+        settings,
         extent,
-    ]
-    best_candidate = extent
-    best_score = float("inf")
-    for candidate in candidates:
-        if candidate is None or candidate[1] <= candidate[0] or candidate[3] <= candidate[2]:
-            continue
-        candidate = normalize(candidate, recenter=False)
-        if reasonable_display_240_extent(candidate):
-            lon_span = candidate[1] - candidate[0]
-            lat_span = candidate[3] - candidate[2]
-            visible = has_240_track_visibility(points, candidate, settings)
-            balanced = good_240_camera_composition(points, candidate, settings)
-            score = lon_span + lat_span * 1.25
-            if not visible:
-                score += 220.0
-            if not balanced:
-                score += 80.0
-            if broad_display_240_extent(candidate):
-                score += 420.0
-            if score < best_score:
-                best_score = score
-                best_candidate = candidate
-        if (
-            reasonable_display_240_extent(candidate)
-            and good_240_camera_composition(points, candidate, settings)
-            and not broad_display_240_extent(candidate)
-        ):
-            best_candidate = candidate
-            return candidate
+        anchor_240_extent,
+        fig_width=fig_width,
+        fig_height=fig_height,
+    )
+    if not candidates:
+        fallback = normalize_240_candidate_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
+        return clamp_240_display_extent(fallback or extent)
 
-    if not reasonable_display_240_extent(best_candidate):
-        fallback = auto_map_extent_240(points, past_kma, settings)
-        if fallback is not None:
-            best_candidate = normalize(fallback, recenter=False)
+    scored = [
+        (
+            score_240_extent(
+                candidate,
+                df=df,
+                camera_points=camera_points,
+                render_points=render_points,
+                protected_points=protected_points,
+                endpoint_points=endpoint_points,
+                settings=settings,
+            ),
+            candidate,
+        )
+        for candidate in candidates
+    ]
+    best_score, best_candidate = min(scored, key=lambda item: item[0])
+    print(
+        "240h map extent selected by collision scoring "
+        f"({len(candidates)} candidates, score={best_score:.1f}, "
+        f"span={best_candidate[1] - best_candidate[0]:.1f} lon x {best_candidate[3] - best_candidate[2]:.1f} lat)."
+    )
     return clamp_240_display_extent(best_candidate)
 
 
