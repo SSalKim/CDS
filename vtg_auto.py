@@ -7,8 +7,10 @@ import json
 import math
 import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
@@ -967,8 +969,15 @@ def deterministic_output_path_for(output_root: Path, job: StormJob, fcst_hours: 
     return output_root / year_str / dir_name / file_name
 
 
-def clear_existing_outputs(output_root: Path, job: StormJob, fcst_hours_list: list[int]) -> None:
+def stage_existing_outputs_for_forced_rerun(
+    output_root: Path,
+    job: StormJob,
+    fcst_hours_list: list[int],
+) -> tuple[dict[int, tuple[Path, Path]], Path | None]:
     root = output_root.resolve()
+    backup_root = Path(os.environ.get("RUNNER_TEMP") or tempfile.gettempdir())
+    backup_root = backup_root / f"vtg_force_backup_{os.getpid()}_{int(time.time())}"
+    backups: dict[int, tuple[Path, Path]] = {}
     for fcst_hours in dict.fromkeys(fcst_hours_list):
         target = deterministic_output_path_for(output_root, job, fcst_hours)
         try:
@@ -978,8 +987,73 @@ def clear_existing_outputs(output_root: Path, job: StormJob, fcst_hours_list: li
         if not str(resolved).lower().startswith(str(root).lower()):
             raise RuntimeError(f"Refusing to delete output outside {root}: {resolved}")
         if target.exists():
-            target.unlink()
-            print(f"Removed stale deterministic output before forced rerun: {target}")
+            relative_target = target.relative_to(output_root)
+            backup_path = backup_root / relative_target
+            backup_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(target), str(backup_path))
+            backups[fcst_hours] = (target, backup_path)
+            print(f"Staged existing deterministic output before forced rerun: {target}")
+    return backups, backup_root if backups else None
+
+
+def finish_forced_output_backups(
+    backups: dict[int, tuple[Path, Path]],
+    backup_root: Path | None,
+    failed_hours: set[int],
+) -> None:
+    for fcst_hours, (target, backup_path) in backups.items():
+        if not backup_path.exists():
+            continue
+        if fcst_hours in failed_hours:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if target.exists():
+                target.unlink()
+            shutil.move(str(backup_path), str(target))
+            print(f"Restored previous deterministic output after failed forced rerun: {target}")
+        else:
+            backup_path.unlink()
+    if backup_root and backup_root.exists():
+        shutil.rmtree(backup_root, ignore_errors=True)
+
+
+def log_failed_vtg_result(job: StormJob, fcst_hours: int, result: dict) -> None:
+    status = result.get("status")
+    if status != "failed":
+        return
+    print(
+        "VTG generation failed: "
+        f"storm={job.storm_key} data_time={job.data_time} "
+        f"fcst_hours={fcst_hours} returncode={result.get('returncode', 'unknown')}",
+        file=sys.stderr,
+    )
+    stderr = str(result.get("stderr") or "").strip()
+    stdout = str(result.get("stdout") or "").strip()
+    if stderr:
+        print("--- VTG stderr tail ---", file=sys.stderr)
+        print(stderr, file=sys.stderr)
+    if stdout:
+        print("--- VTG stdout tail ---", file=sys.stderr)
+        print(stdout, file=sys.stderr)
+
+
+def is_current_file(path: Path, started_at: float) -> bool:
+    try:
+        return path.exists() and path.stat().st_mtime >= started_at - 1.0
+    except OSError:
+        return False
+
+
+def metadata_output_image_exists(output_root: Path, metadata: dict) -> bool:
+    image_path = metadata.get("image_path")
+    if not image_path:
+        return False
+    path = Path(str(image_path))
+    if not path.is_absolute():
+        path = PROJECT_ROOT / path
+    if path.exists():
+        return True
+    fallback = output_root / Path(str(image_path))
+    return fallback.exists()
 
 
 def status_key_for(job: StormJob, fcst_hours: int) -> str:
@@ -1145,9 +1219,16 @@ def run_vtg_batch(
             for fcst_hours, metadata_path in metadata_paths.items()
         }
 
+    forced_backups: dict[int, tuple[Path, Path]] = {}
+    forced_backup_root: Path | None = None
     if clear_existing:
-        clear_existing_outputs(output_root, job, fcst_hours_list)
+        forced_backups, forced_backup_root = stage_existing_outputs_for_forced_rerun(
+            output_root,
+            job,
+            fcst_hours_list,
+        )
 
+    command_started_at = time.time()
     completed = run_command_with_network_retry(
         command,
         cwd=PROJECT_ROOT,
@@ -1156,6 +1237,7 @@ def run_vtg_batch(
     )
     results: dict[int, dict] = {}
     for fcst_hours, metadata_path in metadata_paths.items():
+        metadata_is_current = is_current_file(metadata_path, command_started_at)
         result = {
             "status": "ok" if completed.returncode == 0 else "failed",
             "returncode": completed.returncode,
@@ -1166,14 +1248,30 @@ def run_vtg_batch(
         metadata = load_json(metadata_path, None)
         if metadata:
             result["metadata"] = metadata
-            if metadata.get("no_output"):
+            if metadata_is_current:
+                result["metadata_current"] = True
+            if metadata_is_current and metadata.get("no_output"):
                 result["status"] = "no_output"
+            elif metadata_is_current and metadata_output_image_exists(output_root, metadata):
+                result["status"] = "ok"
+            elif completed.returncode != 0:
+                result["stderr"] = (
+                    result["stderr"]
+                    + f"\nMetadata was not refreshed for {fcst_hours}h or its image is missing: {metadata_path}"
+                )[-4000:]
         elif completed.returncode == 0:
             result["status"] = "failed"
             result["stderr"] = (
                 result["stderr"] + f"\nMetadata was not written for {fcst_hours}h: {metadata_path}"
             )[-4000:]
         results[fcst_hours] = result
+    if forced_backups:
+        failed_hours = {
+            fcst_hours
+            for fcst_hours, result in results.items()
+            if result.get("status") == "failed"
+        }
+        finish_forced_output_backups(forced_backups, forced_backup_root, failed_hours)
     return results
 
 
@@ -1798,6 +1896,7 @@ def main() -> int:
                     "metadata_path": str(metadata_path_for(output_root, job, fcst_hours)),
                     "stderr": "VTG batch run did not return a result for this forecast hour.",
                 })
+                log_failed_vtg_result(job, fcst_hours, result)
                 metadata = result.get("metadata") or {}
                 model_count = metadata_model_count(metadata)
                 completed = model_count >= args.complete_model_count
