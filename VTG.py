@@ -197,7 +197,7 @@ PRESSURE_950_970_COLOR = "#FF1493"
 PRESSURE_930_950_COLOR = "#B00020"
 PRESSURE_900_930_COLOR = "#6A00A8"
 PRESSURE_UNDER_900_COLOR = "#1F00FF"
-MAP_EXTENT_CACHE_VERSION = 17
+MAP_EXTENT_CACHE_VERSION = 18
 MIN_STABLE_240_LON_SPAN = 62.0
 MIN_STABLE_240_LAT_SPAN = 36.0
 MAX_STABLE_240_LON_SPAN = 96.0
@@ -2486,6 +2486,133 @@ def projected_bounds_inside_screen(
     )
 
 
+def good_240_camera_composition(points: pd.DataFrame, extent: list[float], settings: Settings) -> bool:
+    if settings.fcst_hours != 240 or points.empty:
+        return True
+    if not has_240_track_visibility(points, extent, settings):
+        return False
+
+    frames = build_240_camera_frames(points, settings)
+    focus_bounds = quantile_frame_bounds(
+        concat_track_frames([frames["early"], frames["mid"], frames["late"], frames["endpoints"]]),
+        lon_low=0.045,
+        lon_high=0.955,
+        lat_low=0.045,
+        lat_high=0.970,
+    )
+    tail_bounds = quantile_frame_bounds(
+        concat_track_frames([frames["late_180"], frames["late_240"], frames["endpoints"], frames["late_mean"]]),
+        lon_low=0.045,
+        lon_high=0.965,
+        lat_low=0.045,
+        lat_high=0.985,
+    )
+    anchor_bounds = quantile_frame_bounds(
+        concat_track_frames([frames["start_mean"], frames["mid_mean"], frames["endpoint_mean"], frames["late_mean"]])
+    )
+    return (
+        projected_bounds_inside_screen(extent, focus_bounds, left=0.020, right=0.650, bottom=0.040, top=0.790, slack=0.004)
+        and projected_bounds_inside_screen(extent, tail_bounds, left=0.030, right=0.625, bottom=0.055, top=0.755, slack=0.004)
+        and projected_bounds_inside_screen(extent, anchor_bounds, left=0.030, right=0.655, bottom=0.050, top=0.790, slack=0.004)
+    )
+
+
+def rebalance_240_camera_composition(
+    points: pd.DataFrame,
+    extent: list[float],
+    settings: Settings,
+    *,
+    allow_shift: bool,
+) -> list[float]:
+    if settings.fcst_hours != 240 or points.empty:
+        return extent
+    if good_240_camera_composition(points, extent, settings):
+        return extent
+
+    frames = build_240_camera_frames(points, settings)
+    focus_bounds = quantile_frame_bounds(
+        concat_track_frames([frames["early"], frames["mid"], frames["late"], frames["endpoints"]]),
+        lon_low=0.045,
+        lon_high=0.955,
+        lat_low=0.045,
+        lat_high=0.970,
+    )
+    tail_bounds = quantile_frame_bounds(
+        concat_track_frames([frames["late_180"], frames["late_240"], frames["endpoints"], frames["late_mean"]]),
+        lon_low=0.040,
+        lon_high=0.970,
+        lat_low=0.040,
+        lat_high=0.985,
+    )
+    endpoint_bounds = quantile_frame_bounds(
+        concat_track_frames([frames["late_240"], frames["endpoints"], frames["endpoint_mean"]]),
+        lon_low=0.055,
+        lon_high=0.965,
+        lat_low=0.055,
+        lat_high=0.980,
+    )
+    full_bounds = quantile_frame_bounds(
+        frames["full"],
+        lon_low=0.020,
+        lon_high=0.980,
+        lat_low=0.020,
+        lat_high=0.985,
+    )
+
+    for bounds, box in [
+        (focus_bounds, (0.020, 0.665, 0.040, 0.805)),
+        (tail_bounds, (0.030, 0.635, 0.055, 0.760)),
+        (endpoint_bounds, (0.035, 0.620, 0.060, 0.745)),
+        (full_bounds, (0.010, 0.700, 0.025, 0.825)),
+    ]:
+        if bounds is None:
+            continue
+        left, right, bottom, top = box
+        extent = expand_extent_for_projected_screen_bounds(
+            extent,
+            bounds,
+            left=left,
+            right=right,
+            bottom=bottom,
+            top=top,
+        )
+
+    if allow_shift and focus_bounds is not None:
+        target_x, target_y = direction_aware_240_target(frames)
+        extent = recenter_extent_for_projected_screen_bounds(
+            extent,
+            focus_bounds,
+            left=0.025,
+            right=0.650,
+            bottom=0.045,
+            top=0.785,
+            target_center_x=min(target_x, 0.34),
+            target_center_y=min(target_y, 0.40),
+            max_shift_ratio=0.16,
+        )
+    if allow_shift and tail_bounds is not None:
+        extent = recenter_extent_for_projected_screen_bounds(
+            extent,
+            tail_bounds,
+            left=0.030,
+            right=0.625,
+            bottom=0.055,
+            top=0.755,
+            target_center_x=0.33,
+            target_center_y=0.38,
+            max_shift_ratio=0.14,
+        )
+
+    extent = expand_extent_to_min_span(
+        extent,
+        min_lon_span=MIN_STABLE_240_LON_SPAN,
+        min_lat_span=MIN_STABLE_240_LAT_SPAN,
+        east_ratio=0.56,
+        north_ratio=0.58,
+    )
+    return clamp_west_pacific_extent(extent)
+
+
 def direction_aware_240_target(frames: dict[str, pd.DataFrame]) -> tuple[float, float]:
     target_x = 0.36
     target_y = 0.42
@@ -2630,9 +2757,9 @@ def has_240_track_visibility(points: pd.DataFrame, extent: list[float], settings
         concat_track_frames([frames["start_mean"], frames["mid_mean"], frames["endpoint_mean"], frames["late_mean"]])
     )
     return (
-        projected_bounds_inside_screen(extent, late_core, left=0.020, right=0.650, bottom=0.035, top=0.815)
-        and projected_bounds_inside_screen(extent, endpoint_core, left=0.030, right=0.635, bottom=0.045, top=0.800)
-        and projected_bounds_inside_screen(extent, anchor_bounds, left=0.025, right=0.675, bottom=0.040, top=0.835)
+        projected_bounds_inside_screen(extent, late_core, left=0.020, right=0.655, bottom=0.035, top=0.800)
+        and projected_bounds_inside_screen(extent, endpoint_core, left=0.030, right=0.640, bottom=0.045, top=0.780)
+        and projected_bounds_inside_screen(extent, anchor_bounds, left=0.025, right=0.670, bottom=0.040, top=0.815)
     )
 
 
@@ -2872,11 +2999,11 @@ def stable_240_map_extent(
         if points is None:
             if extent_contains(cached_extent, extent):
                 return cached_extent
-        elif has_240_track_visibility(points, cached_extent, settings):
+        elif good_240_camera_composition(points, cached_extent, settings):
             return cached_extent
         else:
             print(
-                "240h cached map extent no longer keeps current tracks in the safe screen area; "
+                "240h cached map extent no longer keeps current tracks in the safe/balanced screen area; "
                 "refreshing stable camera."
             )
 
@@ -3019,7 +3146,7 @@ def finalize_240_map_extent(
         if (
             not recenter
             and reasonable_display_240_extent(candidate)
-            and has_240_track_visibility(points, candidate, settings)
+            and good_240_camera_composition(points, candidate, settings)
             and not broad_display_240_extent(candidate)
         ):
             return candidate
@@ -3032,9 +3159,35 @@ def finalize_240_map_extent(
                 fig_height=fig_height,
             )
             candidate = clamp_240_display_extent(candidate)
-            if index >= 1 and has_240_track_visibility(points, candidate, settings):
+            candidate = rebalance_240_camera_composition(
+                points,
+                candidate,
+                settings,
+                allow_shift=True,
+            )
+            candidate = aspect_match_and_clamp_extent(
+                candidate,
+                settings,
+                fig_width=fig_width,
+                fig_height=fig_height,
+            )
+            candidate = clamp_240_display_extent(candidate)
+            if index >= 1 and good_240_camera_composition(points, candidate, settings):
                 break
         candidate = current_point_legend_safe_extent(df, candidate, settings)
+        candidate = clamp_240_display_extent(candidate)
+        candidate = rebalance_240_camera_composition(
+            points,
+            candidate,
+            settings,
+            allow_shift=True,
+        )
+        candidate = aspect_match_and_clamp_extent(
+            candidate,
+            settings,
+            fig_width=fig_width,
+            fig_height=fig_height,
+        )
         candidate = clamp_240_display_extent(candidate)
         for _ in range(3):
             candidate = fit_240_extent_to_tracks(points, candidate, settings, recenter=False)
@@ -3045,7 +3198,20 @@ def finalize_240_map_extent(
                 fig_height=fig_height,
             )
             candidate = clamp_240_display_extent(candidate)
-            if has_240_track_visibility(points, candidate, settings):
+            candidate = rebalance_240_camera_composition(
+                points,
+                candidate,
+                settings,
+                allow_shift=True,
+            )
+            candidate = aspect_match_and_clamp_extent(
+                candidate,
+                settings,
+                fig_width=fig_width,
+                fig_height=fig_height,
+            )
+            candidate = clamp_240_display_extent(candidate)
+            if good_240_camera_composition(points, candidate, settings):
                 break
         return clamp_240_display_extent(candidate)
 
@@ -3056,7 +3222,7 @@ def finalize_240_map_extent(
 
     if (
         reasonable_display_240_extent(extent)
-        and has_240_track_visibility(points, extent, settings)
+        and good_240_camera_composition(points, extent, settings)
         and not broad_display_240_extent(extent)
     ):
         return extent
@@ -3081,9 +3247,12 @@ def finalize_240_map_extent(
             lon_span = candidate[1] - candidate[0]
             lat_span = candidate[3] - candidate[2]
             visible = has_240_track_visibility(points, candidate, settings)
+            balanced = good_240_camera_composition(points, candidate, settings)
             score = lon_span + lat_span * 1.25
             if not visible:
                 score += 220.0
+            if not balanced:
+                score += 80.0
             if broad_display_240_extent(candidate):
                 score += 420.0
             if score < best_score:
@@ -3091,7 +3260,7 @@ def finalize_240_map_extent(
                 best_candidate = candidate
         if (
             reasonable_display_240_extent(candidate)
-            and has_240_track_visibility(points, candidate, settings)
+            and good_240_camera_composition(points, candidate, settings)
             and not broad_display_240_extent(candidate)
         ):
             best_candidate = candidate
