@@ -1051,22 +1051,23 @@ def finish_forced_output_backups(
 
 def log_failed_vtg_result(job: StormJob, fcst_hours: int, result: dict) -> None:
     status = result.get("status")
-    if status != "failed":
+    if status not in {"failed", "restored_previous"}:
         return
+    if status == "restored_previous":
+        headline = "VTG forced rerun failed; previous output was restored"
+    else:
+        headline = "VTG generation failed"
     print(
-        "VTG generation failed: "
+        f"{headline}: "
         f"storm={job.storm_key} data_time={job.data_time} "
         f"fcst_hours={fcst_hours} returncode={result.get('returncode', 'unknown')}",
         file=sys.stderr,
     )
-    stderr = str(result.get("stderr") or "").strip()
-    stdout = str(result.get("stdout") or "").strip()
-    if stderr:
-        print("--- VTG stderr tail ---", file=sys.stderr)
-        print(stderr, file=sys.stderr)
-    if stdout:
-        print("--- VTG stdout tail ---", file=sys.stderr)
-        print(stdout, file=sys.stderr)
+    print_process_output_tail(
+        stdout=result.get("stdout"),
+        stderr=result.get("stderr"),
+        prefix=f"VTG {fcst_hours}h {status}",
+    )
 
 
 def is_current_file(path: Path, started_at: float) -> bool:
@@ -1099,6 +1100,30 @@ def redacted_command(command: list[str]) -> list[str]:
         if value == "--auth-key":
             redacted[index + 1] = "***"
     return redacted
+
+
+def text_tail(value: str | None, limit: int = 4000) -> str:
+    text = str(value or "")
+    if len(text) <= limit:
+        return text
+    return text[-limit:]
+
+
+def print_process_output_tail(
+    *,
+    stdout: str | None,
+    stderr: str | None,
+    prefix: str,
+    limit: int = 4000,
+) -> None:
+    stderr_tail = text_tail(stderr, limit).strip()
+    stdout_tail = text_tail(stdout, limit).strip()
+    if stderr_tail:
+        print(f"--- {prefix} stderr tail ---", file=sys.stderr)
+        print(stderr_tail, file=sys.stderr)
+    if stdout_tail:
+        print(f"--- {prefix} stdout tail ---", file=sys.stderr)
+        print(stdout_tail, file=sys.stderr)
 
 
 def looks_like_transient_network_error(text: str) -> bool:
@@ -1142,7 +1167,14 @@ def run_command_with_network_retry(
 
         print(
             "VTG.py failed with a transient network-looking error; "
-            f"retrying in {retry_delay_seconds}s ({attempt + 1}/{retries})."
+            f"retrying in {retry_delay_seconds}s ({attempt + 1}/{retries}).",
+            file=sys.stderr,
+        )
+        print_process_output_tail(
+            stdout=completed.stdout,
+            stderr=completed.stderr,
+            prefix="VTG transient failure",
+            limit=3000,
         )
         time.sleep(retry_delay_seconds)
 
