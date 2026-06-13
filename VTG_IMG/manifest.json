@@ -1,15 +1,15 @@
 {
-  "updated_at_utc": "202606032300",
+  "updated_at_utc": "202606040500",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202606031800",
-      "cycle_time_utc": "202606031800",
-      "start_utc": "202606032300",
-      "end_utc": "202606040500"
+      "data_time": "202606040000",
+      "cycle_time_utc": "202606040000",
+      "start_utc": "202606040500",
+      "end_utc": "202606041100"
     }
   ],
   "runs": [
@@ -18,7 +18,7 @@
         "storm_key": "td_2026_11",
         "stage": "TD_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202606031800",
+        "data_time": "202606040000",
         "td_number": 11,
         "linked_td_number": null,
         "typ_number": 11,
@@ -29,16 +29,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202606031800",
-        "cycle_time_utc": "202606031800",
-        "start_utc": "202606032300",
-        "end_utc": "202606040500"
+        "data_time": "202606040000",
+        "cycle_time_utc": "202606040000",
+        "start_utc": "202606040500",
+        "end_utc": "202606041100"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260613181355",
-          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031800_120h.png",
+          "generated_at_utc": "20260613181835",
+          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 11,
@@ -49,16 +49,17 @@
           "linked_typ_number": null,
           "atcf_id": "wp912026",
           "extra_atcf_ids": [],
-          "data_time": "202606031800",
+          "data_time": "202606040000",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 3,
           "target_model_count": 36,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": false,
-          "no_output": true,
-          "no_output_reason": "No available model forecast points for this storm/time."
+          "model_labels": [
+            "ECMWF",
+            "ECMWF AIFS",
+            "ECMWF EPS"
+          ],
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -69,7 +70,7 @@
         "storm_key": "td_2026_11",
         "stage": "TD_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202606031800",
+        "data_time": "202606040000",
         "td_number": 11,
         "linked_td_number": null,
         "typ_number": 11,
@@ -80,16 +81,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202606031800",
-        "cycle_time_utc": "202606031800",
-        "start_utc": "202606032300",
-        "end_utc": "202606040500"
+        "data_time": "202606040000",
+        "cycle_time_utc": "202606040000",
+        "start_utc": "202606040500",
+        "end_utc": "202606041100"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260613181355",
-          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606031800_240h.png",
+          "generated_at_utc": "20260613181836",
+          "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 11,
@@ -100,16 +101,17 @@
           "linked_typ_number": null,
           "atcf_id": "wp912026",
           "extra_atcf_ids": [],
-          "data_time": "202606031800",
+          "data_time": "202606040000",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 3,
           "target_model_count": 36,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": false,
-          "no_output": true,
-          "no_output_reason": "No available model forecast points for this storm/time."
+          "model_labels": [
+            "ECMWF",
+            "ECMWF AIFS",
+            "ECMWF EPS"
+          ],
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -21032,118 +21034,106 @@
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606040000",
         "td_number": 11,
         "linked_td_number": null,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp912026",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202606040000"
+        "data_time": "202606040000",
+        "cycle_time_utc": "202606040000",
+        "start_utc": "202606040500",
+        "end_utc": "202606041100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260604105445",
+          "generated_at_utc": "20260613181835",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 11,
+          "data_typ_number": 11,
           "typ_name": "NONAME",
           "typ_name_ko": "",
           "linked_td_number": null,
+          "linked_typ_number": null,
           "atcf_id": "wp912026",
           "extra_atcf_ids": [],
           "data_time": "202606040000",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 11,
+          "model_count": 3,
           "target_model_count": 36,
           "model_labels": [
-            "CMC",
-            "CMC EPS",
             "ECMWF",
             "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "FNV3",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
-            "NAVGEM"
+            "ECMWF EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202606040000_td_2026_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606040000",
         "td_number": 11,
         "linked_td_number": null,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp912026",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202606040000"
+        "data_time": "202606040000",
+        "cycle_time_utc": "202606040000",
+        "start_utc": "202606040500",
+        "end_utc": "202606041100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260604105447",
+          "generated_at_utc": "20260613181836",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606040000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 11,
+          "data_typ_number": 11,
           "typ_name": "NONAME",
           "typ_name_ko": "",
           "linked_td_number": null,
+          "linked_typ_number": null,
           "atcf_id": "wp912026",
           "extra_atcf_ids": [],
           "data_time": "202606040000",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 11,
+          "model_count": 3,
           "target_model_count": 36,
           "model_labels": [
-            "CMC",
-            "CMC EPS",
             "ECMWF",
             "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "FNV3",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
-            "NAVGEM"
+            "ECMWF EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202606040000_td_2026_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
