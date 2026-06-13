@@ -61,31 +61,44 @@ jobs:
         run: |
           from datetime import datetime, timedelta
           from pathlib import Path
-          import os
+          import re
 
           ranges_text = """${{ inputs.ranges }}"""
           start_from = "${{ inputs.start_from }}".strip()
 
+          pairs = re.findall(r"(\d{10})\s*-\s*(\d{10})", ranges_text)
+
+          if not pairs:
+              raise SystemExit(
+                  "No valid ranges found. Use format like 2026011400-2026012012"
+              )
+
           cycles = []
-          for raw in ranges_text.splitlines():
-              line = raw.strip()
-              if not line:
-                  continue
-              if "-" not in line:
-                  raise SystemExit(f"Invalid range line: {line}")
-              start, end = [x.strip() for x in line.split("-", 1)]
+          for start, end in pairs:
               dt = datetime.strptime(start, "%Y%m%d%H")
               ed = datetime.strptime(end, "%Y%m%d%H")
+
+              if ed < dt:
+                  raise SystemExit(f"Invalid range: {start}-{end}")
+
               while dt <= ed:
                   cycle = dt.strftime("%Y%m%d%H")
                   if not start_from or cycle >= start_from:
                       cycles.append(cycle)
                   dt += timedelta(hours=6)
 
-          Path("vtg_backfill_cycles.txt").write_text("\n".join(cycles) + "\n", encoding="utf-8")
+          if not cycles:
+              raise SystemExit("No cycles generated.")
+
+          Path("vtg_backfill_cycles.txt").write_text(
+              "\n".join(cycles) + "\n",
+              encoding="utf-8",
+          )
+
+          print(f"range_pairs={len(pairs)}")
           print(f"cycles={len(cycles)}")
-          print(f"first={cycles[0] if cycles else 'NONE'}")
-          print(f"last={cycles[-1] if cycles else 'NONE'}")
+          print(f"first={cycles[0]}")
+          print(f"last={cycles[-1]}")
 
       - name: Run VTG backfill sequentially
         shell: bash
