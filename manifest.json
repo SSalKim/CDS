@@ -1,15 +1,15 @@
 {
-  "updated_at_utc": "202601150500",
+  "updated_at_utc": "202601140500",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202601150000",
-      "cycle_time_utc": "202601150000",
-      "start_utc": "202601150500",
-      "end_utc": "202601151100"
+      "data_time": "202601140000",
+      "cycle_time_utc": "202601140000",
+      "start_utc": "202601140500",
+      "end_utc": "202601141100"
     }
   ],
   "runs": [
@@ -18,84 +18,26 @@
         "storm_key": "td_2026_01_typ_01",
         "stage": "TD_PRE_TYP_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202601150000",
-        "td_number": 1,
-        "linked_td_number": null,
-        "typ_number": 1,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp012026",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202601150000",
-        "cycle_time_utc": "202601150000",
-        "start_utc": "202601150500",
-        "end_utc": "202601151100"
-      },
-      "result": {
-        "status": "failed",
-        "metadata": {}
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "td_2026_01_typ_01",
-        "stage": "TD_PRE_TYP_POSITION_ATCF",
-        "year": 2026,
-        "data_time": "202601150000",
-        "td_number": 1,
-        "linked_td_number": null,
-        "typ_number": 1,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp012026",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202601150000",
-        "cycle_time_utc": "202601150000",
-        "start_utc": "202601150500",
-        "end_utc": "202601151100"
-      },
-      "result": {
-        "status": "failed",
-        "metadata": {}
-      },
-      "completed": false,
-      "final_check": false
-    }
-  ],
-  "inventory": [
-    {
-      "job": {
-        "storm_key": "td_2026_01",
-        "stage": "TD",
-        "year": 2026,
         "data_time": "202601140000",
         "td_number": 1,
         "linked_td_number": null,
-        "linked_typ_number": 1,
         "typ_number": 1,
-        "data_typ_number": 1,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp012026",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202601140000"
+        "data_time": "202601140000",
+        "cycle_time_utc": "202601140000",
+        "start_utc": "202601140500",
+        "end_utc": "202601141100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260613102242",
+          "generated_at_utc": "20260613103822",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601140000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -141,37 +83,37 @@
             "Pangu-Weather-UM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202601140000_td_2026_01_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2026_01",
-        "stage": "TD",
+        "storm_key": "td_2026_01_typ_01",
+        "stage": "TD_PRE_TYP_POSITION_ATCF",
         "year": 2026,
         "data_time": "202601140000",
         "td_number": 1,
         "linked_td_number": null,
-        "linked_typ_number": 1,
         "typ_number": 1,
-        "data_typ_number": 1,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp012026",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202601140000"
+        "data_time": "202601140000",
+        "cycle_time_utc": "202601140000",
+        "start_utc": "202601140500",
+        "end_utc": "202601141100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260613094946",
+          "generated_at_utc": "20260613103825",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601140000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -217,11 +159,165 @@
             "Pangu-Weather-UM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202601140000_td_2026_01_240h.json"
+      "completed": false,
+      "final_check": false
+    }
+  ],
+  "inventory": [
+    {
+      "job": {
+        "storm_key": "td_2026_01_typ_01",
+        "stage": "TD_PRE_TYP_POSITION_ATCF",
+        "year": 2026,
+        "data_time": "202601140000",
+        "td_number": 1,
+        "linked_td_number": null,
+        "typ_number": 1,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp012026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202601140000",
+        "cycle_time_utc": "202601140000",
+        "start_utc": "202601140500",
+        "end_utc": "202601141100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260613103822",
+          "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601140000_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 1,
+          "data_typ_number": 1,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 1,
+          "atcf_id": "wp012026",
+          "extra_atcf_ids": [],
+          "data_time": "202601140000",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 27,
+          "target_model_count": 39,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC EPS",
+            "COAMPS-TC",
+            "ECMWF AIFS",
+            "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "NAVGEM EPS",
+            "FourCastNet-UM",
+            "FNV3",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "GraphCast-UM",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "HWRF",
+            "KMA AIFS-ECMWF",
+            "KMA AIFS-KIM",
+            "JGSM",
+            "NAVGEM",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "Pangu-Weather-UM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_01_typ_01",
+        "stage": "TD_PRE_TYP_POSITION_ATCF",
+        "year": 2026,
+        "data_time": "202601140000",
+        "td_number": 1,
+        "linked_td_number": null,
+        "typ_number": 1,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp012026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202601140000",
+        "cycle_time_utc": "202601140000",
+        "start_utc": "202601140500",
+        "end_utc": "202601141100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260613103825",
+          "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601140000_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 1,
+          "data_typ_number": 1,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 1,
+          "atcf_id": "wp012026",
+          "extra_atcf_ids": [],
+          "data_time": "202601140000",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 27,
+          "target_model_count": 39,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC EPS",
+            "COAMPS-TC",
+            "ECMWF AIFS",
+            "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "NAVGEM EPS",
+            "FourCastNet-UM",
+            "FNV3",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "GraphCast-UM",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "HWRF",
+            "KMA AIFS-ECMWF",
+            "KMA AIFS-KIM",
+            "JGSM",
+            "NAVGEM",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "Pangu-Weather-UM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
