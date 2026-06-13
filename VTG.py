@@ -2550,13 +2550,13 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         x0, x1 = 0.022, 0.978
         pad_x = 0.016
         pad_y = 0.004
-        row_h = 0.021
+        row_h = 0.0215
         font_size = 14
-        handle_len = 0.088
-        label_gap = 0.100
+        handle_len = 0.092
+        label_gap = 0.106
         width = x1 - x0
-        pressure_x = x0 + width * 0.770
-        lead_x = x0 + width * 0.982
+        pressure_x = x0 + width * 0.768
+        lead_x = x0 + width * 0.986
     else:
         x0, x1 = 0.670, 0.995
         pad_x = 0.008
@@ -2584,7 +2584,7 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         linewidth=0.8,
         edgecolor="#DDDDDD",
         facecolor="white",
-        alpha=0.92,
+        alpha=1.0,
         zorder=100,
     )
     ax.add_patch(box)
@@ -2601,26 +2601,40 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         handle_y = y + handle_y_offset
         color = row["color"]
         gap = 0.011 if side == "panel" else 0.006
-        left_line = mlines.Line2D(
-            [handle_x0, handle_mid - gap],
-            [handle_y, handle_y],
-            transform=ax.transAxes,
-            color=color,
-            linestyle=row["linestyle"],
-            linewidth=2.0,
-            zorder=101,
-            clip_on=False,
-        )
-        right_line = mlines.Line2D(
-            [handle_mid + gap, handle_x1],
-            [handle_y, handle_y],
-            transform=ax.transAxes,
-            color=color,
-            linestyle=row["linestyle"],
-            linewidth=2.0,
-            zorder=101,
-            clip_on=False,
-        )
+        handle_segments: list[tuple[float, float, str]] = []
+        if side == "panel" and row["linestyle"] in {"--", "dashed"}:
+            dash_len = 0.013
+            dash_gap = 0.006
+            marker_gap = 0.012
+            left_near_end = handle_mid - marker_gap
+            left_far_start = left_near_end - dash_len * 2 - dash_gap
+            left_near_start = left_far_start + dash_len + dash_gap
+            right_near_start = handle_mid + marker_gap
+            right_far_start = right_near_start + dash_len + dash_gap
+            handle_segments = [
+                (left_far_start, left_far_start + dash_len, "-"),
+                (left_near_start, left_near_end, "-"),
+                (right_near_start, right_near_start + dash_len, "-"),
+                (right_far_start, right_far_start + dash_len, "-"),
+            ]
+        else:
+            handle_segments = [
+                (handle_x0, handle_mid - gap, row["linestyle"]),
+                (handle_mid + gap, handle_x1, row["linestyle"]),
+            ]
+        for segment_x0, segment_x1, segment_style in handle_segments:
+            ax.add_line(
+                mlines.Line2D(
+                    [segment_x0, segment_x1],
+                    [handle_y, handle_y],
+                    transform=ax.transAxes,
+                    color=color,
+                    linestyle=segment_style,
+                    linewidth=2.0,
+                    zorder=101,
+                    clip_on=False,
+                )
+            )
         marker = mlines.Line2D(
             [handle_mid],
             [handle_y],
@@ -2634,8 +2648,6 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
             zorder=102,
             clip_on=False,
         )
-        ax.add_line(left_line)
-        ax.add_line(right_line)
         ax.add_line(marker)
         ax.text(
             label_x,
