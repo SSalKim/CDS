@@ -1,69 +1,93 @@
 {
-  "updated_at_utc": "202605262300",
+  "updated_at_utc": "202605270500",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202605261800",
-      "cycle_time_utc": "202605261800",
-      "start_utc": "202605262300",
-      "end_utc": "202605270500"
+      "data_time": "202605270000",
+      "cycle_time_utc": "202605270000",
+      "start_utc": "202605270500",
+      "end_utc": "202605271100"
     }
   ],
   "runs": [
     {
       "job": {
-        "storm_key": "td_2026_10_typ_06",
-        "stage": "TD_PRE_TYP",
+        "storm_key": "typ_2026_06",
+        "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202605261800",
-        "td_number": 10,
-        "linked_td_number": null,
-        "typ_number": 10,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true
+        "data_time": "202605270000",
+        "td_number": null,
+        "linked_td_number": 10,
+        "typ_number": 6,
+        "typ_name_ko": "장미",
+        "typ_name": "JANGMI",
+        "typ_en": "JANGMI",
+        "atcf_id": "wp062026",
+        "skip_atcf": false
       },
       "window": {
-        "data_time": "202605261800",
-        "cycle_time_utc": "202605261800",
-        "start_utc": "202605262300",
-        "end_utc": "202605270500"
+        "data_time": "202605270000",
+        "cycle_time_utc": "202605270000",
+        "start_utc": "202605270500",
+        "end_utc": "202605271100"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260613161954",
-          "image_path": "VTG_IMG/2026/TD_2610_NONAME/TD_2610_NONAME_202605261800_120h.png",
-          "storm_stage": "TD",
+          "generated_at_utc": "20260613162245",
+          "image_path": "VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202605270000_120h.png",
+          "storm_stage": "TYP",
           "storm_year": "2026",
-          "typ_number": 10,
-          "data_typ_number": 10,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": 6,
-          "atcf_id": "",
+          "typ_number": 6,
+          "data_typ_number": 6,
+          "typ_name": "JANGMI",
+          "typ_name_ko": "장미",
+          "linked_td_number": 10,
+          "linked_typ_number": null,
+          "atcf_id": "wp062026",
           "extra_atcf_ids": [],
-          "data_time": "202605261800",
+          "data_time": "202605270000",
           "fcst_hours": 120,
-          "intensity": "TD",
-          "model_count": 7,
+          "intensity": "TYP",
+          "model_count": 31,
           "target_model_count": 36,
           "model_labels": [
+            "GALWEM",
+            "AIGFS",
+            "AIGFS EPS",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "ECMWF",
             "ECMWF AIFS",
+            "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "NAVGEM EPS",
+            "FNV3",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
             "GFS",
             "GFS EPS",
             "HAFS",
+            "Aurora-ECMWF",
+            "FengWu-ECMWF",
+            "FuXi-ECMWF",
             "HWRF",
+            "KMA AIFS-ECMWF",
+            "KMA AIFS-KIM",
             "JGSM",
-            "JGSM EPS"
+            "KIM",
+            "KIM EPS",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "JGSM EPS",
+            "UKMO EPS"
           ],
-          "skip_atcf": true
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -71,55 +95,79 @@
     },
     {
       "job": {
-        "storm_key": "td_2026_10_typ_06",
-        "stage": "TD_PRE_TYP",
+        "storm_key": "typ_2026_06",
+        "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202605261800",
-        "td_number": 10,
-        "linked_td_number": null,
-        "typ_number": 10,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true
+        "data_time": "202605270000",
+        "td_number": null,
+        "linked_td_number": 10,
+        "typ_number": 6,
+        "typ_name_ko": "장미",
+        "typ_name": "JANGMI",
+        "typ_en": "JANGMI",
+        "atcf_id": "wp062026",
+        "skip_atcf": false
       },
       "window": {
-        "data_time": "202605261800",
-        "cycle_time_utc": "202605261800",
-        "start_utc": "202605262300",
-        "end_utc": "202605270500"
+        "data_time": "202605270000",
+        "cycle_time_utc": "202605270000",
+        "start_utc": "202605270500",
+        "end_utc": "202605271100"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260613161956",
-          "image_path": "VTG_IMG/2026/TD_2610_NONAME/TD_2610_NONAME_202605261800_240h.png",
-          "storm_stage": "TD",
+          "generated_at_utc": "20260613162247",
+          "image_path": "VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202605270000_240h.png",
+          "storm_stage": "TYP",
           "storm_year": "2026",
-          "typ_number": 10,
-          "data_typ_number": 10,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": 6,
-          "atcf_id": "",
+          "typ_number": 6,
+          "data_typ_number": 6,
+          "typ_name": "JANGMI",
+          "typ_name_ko": "장미",
+          "linked_td_number": 10,
+          "linked_typ_number": null,
+          "atcf_id": "wp062026",
           "extra_atcf_ids": [],
-          "data_time": "202605261800",
+          "data_time": "202605270000",
           "fcst_hours": 240,
-          "intensity": "TD",
-          "model_count": 7,
+          "intensity": "TYP",
+          "model_count": 31,
           "target_model_count": 36,
           "model_labels": [
+            "GALWEM",
+            "AIGFS",
+            "AIGFS EPS",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "ECMWF",
             "ECMWF AIFS",
+            "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "NAVGEM EPS",
+            "FNV3",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
             "GFS",
             "GFS EPS",
             "HAFS",
+            "Aurora-ECMWF",
+            "FengWu-ECMWF",
+            "FuXi-ECMWF",
             "HWRF",
+            "KMA AIFS-ECMWF",
+            "KMA AIFS-KIM",
             "JGSM",
-            "JGSM EPS"
+            "KIM",
+            "KIM EPS",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "JGSM EPS",
+            "UKMO EPS"
           ],
-          "skip_atcf": true
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -14970,28 +15018,28 @@
     {
       "job": {
         "storm_key": "typ_2026_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2026,
         "data_time": "202605270000",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "장미",
         "typ_name": "JANGMI",
         "typ_en": "JANGMI",
         "atcf_id": "wp062026",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202605270000"
+        "data_time": "202605270000",
+        "cycle_time_utc": "202605270000",
+        "start_utc": "202605270500",
+        "end_utc": "202605271100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260613110718",
+          "generated_at_utc": "20260613162245",
           "image_path": "VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202605270000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -15041,37 +15089,37 @@
             "JGSM EPS",
             "UKMO EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202605270000_typ_2026_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2026_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2026,
         "data_time": "202605270000",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "장미",
         "typ_name": "JANGMI",
         "typ_en": "JANGMI",
         "atcf_id": "wp062026",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202605270000"
+        "data_time": "202605270000",
+        "cycle_time_utc": "202605270000",
+        "start_utc": "202605270500",
+        "end_utc": "202605271100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260613110720",
+          "generated_at_utc": "20260613162247",
           "image_path": "VTG_IMG/2026/TYP_2606_JANGMI/TYP_2606_JANGMI_202605270000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -15121,11 +15169,11 @@
             "JGSM EPS",
             "UKMO EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202605270000_typ_2026_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
@@ -20495,27 +20543,27 @@
     },
     {
       "job": {
-        "storm_key": "td_2026_10_typ_06",
-        "stage": "TD_PRE_TYP",
+        "storm_key": "td_2026_10",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202605261800",
         "td_number": 10,
         "linked_td_number": null,
+        "linked_typ_number": 6,
         "typ_number": 10,
+        "data_typ_number": 10,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": null,
+        "typ_en": "NONAME",
+        "atcf_id": "",
+        "fcst_hours": 120,
         "skip_atcf": true
       },
       "window": {
-        "data_time": "202605261800",
-        "cycle_time_utc": "202605261800",
-        "start_utc": "202605262300",
-        "end_utc": "202605270500"
+        "data_time": "202605261800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260613161954",
           "image_path": "VTG_IMG/2026/TD_2610_NONAME/TD_2610_NONAME_202605261800_120h.png",
@@ -20543,35 +20591,35 @@
             "JGSM",
             "JGSM EPS"
           ],
-          "skip_atcf": true
+          "skip_atcf": true,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202605261800_td_2026_10_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2026_10_typ_06",
-        "stage": "TD_PRE_TYP",
+        "storm_key": "td_2026_10",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202605261800",
         "td_number": 10,
         "linked_td_number": null,
+        "linked_typ_number": 6,
         "typ_number": 10,
+        "data_typ_number": 10,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": null,
+        "typ_en": "NONAME",
+        "atcf_id": "",
+        "fcst_hours": 240,
         "skip_atcf": true
       },
       "window": {
-        "data_time": "202605261800",
-        "cycle_time_utc": "202605261800",
-        "start_utc": "202605262300",
-        "end_utc": "202605270500"
+        "data_time": "202605261800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260613161956",
           "image_path": "VTG_IMG/2026/TD_2610_NONAME/TD_2610_NONAME_202605261800_240h.png",
@@ -20599,11 +20647,11 @@
             "JGSM",
             "JGSM EPS"
           ],
-          "skip_atcf": true
+          "skip_atcf": true,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202605261800_td_2026_10_240h.json"
     },
     {
       "job": {
