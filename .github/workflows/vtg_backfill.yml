@@ -53,8 +53,20 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libgeos-dev \
+            libproj-dev \
+            proj-bin \
+            proj-data \
+            fonts-nanum
+          fc-cache -f
+
           python -m pip install --upgrade pip
           pip install pandas requests matplotlib cartopy
+
+          echo "Installed Korean fonts:"
+          fc-list | grep -i "nanum" || true
 
       - name: Generate cycle list
         shell: python
