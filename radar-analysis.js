@@ -632,7 +632,7 @@ const RADAR_LIGHTNING_TYPES=[
 {value:'C',label:'구름'}
 ];
 
-const RADAR_ZOOM_LEVELS=[1,2,4,8];
+const RADAR_ZOOM_LEVELS=[1,2.5,5,8,16,64];
 const RADAR_SIZE_STEP=25;
 const RADAR_MIN_IMAGE_SIZE=250;
 const RADAR_MAX_IMAGE_SIZE=1500;
