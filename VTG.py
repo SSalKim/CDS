@@ -2549,11 +2549,11 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
     elif side == "panel":
         x0, x1 = 0.035, 0.965
         pad_x = 0.018
-        pad_y = 0.007
+        pad_y = 0.004
         row_h = 0.021
         font_size = 14
-        handle_len = 0.060
-        label_gap = 0.069
+        handle_len = 0.074
+        label_gap = 0.083
         width = x1 - x0
         pressure_x = x0 + width * 0.748
         lead_x = x0 + width * 0.984
@@ -2569,7 +2569,7 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         lead_x = x1 - pad_x + 0.003
 
     if side == "panel":
-        y0 = 0.022
+        y0 = 0.012
     else:
         y0 = 0.005
     y1 = y0 + pad_y * 2 + row_h * len(rows)
@@ -2600,13 +2600,13 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         y = y1 - pad_y - row_h * (idx + 0.5)
         handle_y = y + handle_y_offset
         color = row["color"]
-        gap = 0.010 if side == "panel" else 0.006
+        gap = 0.008 if side == "panel" else 0.006
         left_line = mlines.Line2D(
             [handle_x0, handle_mid - gap],
             [handle_y, handle_y],
             transform=ax.transAxes,
             color=color,
-            linestyle="-",
+            linestyle=row["linestyle"],
             linewidth=2.0,
             zorder=101,
             clip_on=False,
@@ -2616,7 +2616,7 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
             [handle_y, handle_y],
             transform=ax.transAxes,
             color=color,
-            linestyle="-",
+            linestyle=row["linestyle"],
             linewidth=2.0,
             zorder=101,
             clip_on=False,
