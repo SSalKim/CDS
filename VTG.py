@@ -3707,7 +3707,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     header_ax.set_axis_off()
     header_ax.set_facecolor("none")
 
-    ax.add_feature(cfeature.OCEAN.with_scale("10m"), zorder=0, facecolor="black", edgecolor="none")
+    ax.add_feature(cfeature.OCEAN.with_scale("10m"), zorder=0, facecolor="#262626", edgecolor="none")
     ax.add_feature(cfeature.LAND.with_scale("10m"), zorder=0, facecolor="#656565")
     ax.add_feature(cfeature.BORDERS.with_scale("10m"), edgecolor="gray", linestyle="-", linewidth=1)
 
@@ -3760,7 +3760,7 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str, *
         boxstyle="square,pad=0.03",
         linewidth=0,
         edgecolor="none",
-        facecolor="#262626",
+        facecolor="black",
         alpha=0.8,
         zorder=100,
     ))
