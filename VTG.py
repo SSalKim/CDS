@@ -2397,24 +2397,32 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
     if settings.fcst_hours > 120:
         return auto_map_extent_long_range_seed(points, past_kma, settings)
 
+    # For 120h, the old KMA past track no longer needs to drive the camera.
+    # Use the forecast spread plus the current KMA position only.
     lead_hours = pd.to_numeric(points["TMD"], errors="coerce")
-    primary = points[lead_hours.between(0, settings.fcst_hours)].copy()
+    forecast_points = points[lead_hours.between(0, settings.fcst_hours)].copy()
+    if forecast_points.empty:
+        forecast_points = points.copy()
+
+    current_kma = points[points["SRC"].eq("KMA") & lead_hours.eq(0)].copy()
+    non_kma_forecast = forecast_points[forecast_points["SRC"].ne("KMA")].copy()
+    primary = pd.concat([non_kma_forecast, current_kma], ignore_index=True)
     if primary.empty:
-        primary = points.copy()
+        primary = forecast_points.copy()
 
     lat_min, lat_max = robust_bounds(primary, "LAT", settings)
     lon_min, lon_max = robust_bounds(primary, "LON", settings)
-    lat_span = max(lat_max - lat_min, 7.5 if settings.fcst_hours <= 120 else 10.0)
-    lon_span = max(lon_max - lon_min, 10.0 if settings.fcst_hours <= 120 else 14.0)
+    lat_span = max(lat_max - lat_min, 7.0)
+    lon_span = max(lon_max - lon_min, 9.0)
 
     focus_lat = (lat_min + lat_max) / 2
     focus_lon = (lon_min + lon_max) / 2
-    lon_total = max(24.0, lon_span * 1.45 + 7.0)
-    lat_total = max(10.5, lat_span * 1.55 + 4.5)
-    # The legend is now outside the map, so the 120h camera no longer needs
-    # to bias the track cluster left to reserve in-map legend space.
-    focus_x = 0.50
-    focus_y = 0.37
+    lon_total = max(21.0, lon_span * 1.18 + 4.2)
+    lat_total = max(9.2, lat_span * 1.28 + 3.0)
+
+    # Mild westward framing bias so the forecast fan appears closer to center.
+    focus_x = 0.57
+    focus_y = 0.40
 
     lon_min = focus_lon - lon_total * focus_x
     lon_max = lon_min + lon_total
@@ -3699,7 +3707,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     header_ax.set_axis_off()
     header_ax.set_facecolor("none")
 
-    ax.add_feature(cfeature.OCEAN.with_scale("10m"), zorder=0, facecolor="#262626", edgecolor="none")
+    ax.add_feature(cfeature.OCEAN.with_scale("10m"), zorder=0, facecolor="black", edgecolor="none")
     ax.add_feature(cfeature.LAND.with_scale("10m"), zorder=0, facecolor="#656565")
     ax.add_feature(cfeature.BORDERS.with_scale("10m"), edgecolor="gray", linestyle="-", linewidth=1)
 
@@ -3916,8 +3924,8 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         pad_y = 0.007
         row_h = 0.021
         font_size = 14
-        handle_len = 0.066
-        label_gap = 0.074
+        handle_len = 0.060
+        label_gap = 0.069
         width = x1 - x0
         pressure_x = x0 + width * 0.748
         lead_x = x0 + width * 0.984
@@ -3964,12 +3972,23 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         y = y1 - pad_y - row_h * (idx + 0.5)
         handle_y = y + handle_y_offset
         color = row["color"]
-        line = mlines.Line2D(
-            [handle_x0, handle_x1],
+        gap = 0.010 if side == "panel" else 0.006
+        left_line = mlines.Line2D(
+            [handle_x0, handle_mid - gap],
             [handle_y, handle_y],
             transform=ax.transAxes,
             color=color,
-            linestyle=row["linestyle"],
+            linestyle="-",
+            linewidth=2.0,
+            zorder=101,
+            clip_on=False,
+        )
+        right_line = mlines.Line2D(
+            [handle_mid + gap, handle_x1],
+            [handle_y, handle_y],
+            transform=ax.transAxes,
+            color=color,
+            linestyle="-",
             linewidth=2.0,
             zorder=101,
             clip_on=False,
@@ -3987,7 +4006,8 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
             zorder=102,
             clip_on=False,
         )
-        ax.add_line(line)
+        ax.add_line(left_line)
+        ax.add_line(right_line)
         ax.add_line(marker)
         ax.text(
             label_x,
