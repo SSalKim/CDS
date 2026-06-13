@@ -2411,7 +2411,9 @@ def auto_map_extent(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings
     focus_lon = (lon_min + lon_max) / 2
     lon_total = max(24.0, lon_span * 1.45 + 7.0)
     lat_total = max(10.5, lat_span * 1.55 + 4.5)
-    focus_x = 0.37
+    # The legend is now outside the map, so the 120h camera no longer needs
+    # to bias the track cluster left to reserve in-map legend space.
+    focus_x = 0.50
     focus_y = 0.37
 
     lon_min = focus_lon - lon_total * focus_x
@@ -3750,7 +3752,7 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str, *
         boxstyle="square,pad=0.03",
         linewidth=0,
         edgecolor="none",
-        facecolor="black",
+        facecolor="#262626",
         alpha=0.8,
         zorder=100,
     ))
@@ -3892,7 +3894,7 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
             1,
             1,
             transform=ax.transAxes,
-            facecolor="#1F1F1F",
+            facecolor="#E6E6E6",
             edgecolor="none",
             zorder=0,
         )
@@ -3914,11 +3916,11 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         pad_y = 0.007
         row_h = 0.021
         font_size = 14
-        handle_len = 0.072
-        label_gap = 0.080
+        handle_len = 0.066
+        label_gap = 0.074
         width = x1 - x0
-        pressure_x = x0 + width * 0.742
-        lead_x = x0 + width * 0.978
+        pressure_x = x0 + width * 0.748
+        lead_x = x0 + width * 0.984
     else:
         x0, x1 = 0.670, 0.995
         pad_x = 0.008
@@ -3930,7 +3932,10 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         pressure_x = x1 - pad_x - 0.069
         lead_x = x1 - pad_x + 0.003
 
-    y0 = 0.005
+    if side == "panel":
+        y0 = 0.022
+    else:
+        y0 = 0.005
     y1 = y0 + pad_y * 2 + row_h * len(rows)
     handle_y_offset = row_h * 0.07
 
@@ -3943,7 +3948,7 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         linewidth=0.8,
         edgecolor="#DDDDDD",
         facecolor="white",
-        alpha=0.88,
+        alpha=0.92,
         zorder=100,
     )
     ax.add_patch(box)
