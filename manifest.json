@@ -1,15 +1,15 @@
 {
-  "updated_at_utc": "202601141700",
+  "updated_at_utc": "202601142300",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202601141200",
-      "cycle_time_utc": "202601141200",
-      "start_utc": "202601141700",
-      "end_utc": "202601142300"
+      "data_time": "202601141800",
+      "cycle_time_utc": "202601141800",
+      "start_utc": "202601142300",
+      "end_utc": "202601150500"
     }
   ],
   "runs": [
@@ -18,7 +18,7 @@
         "storm_key": "td_2026_01_typ_01",
         "stage": "TD_PRE_TYP_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202601141200",
+        "data_time": "202601141800",
         "td_number": 1,
         "linked_td_number": null,
         "typ_number": 1,
@@ -29,10 +29,10 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202601141200",
-        "cycle_time_utc": "202601141200",
-        "start_utc": "202601141700",
-        "end_utc": "202601142300"
+        "data_time": "202601141800",
+        "cycle_time_utc": "202601141800",
+        "start_utc": "202601142300",
+        "end_utc": "202601150500"
       },
       "result": {
         "status": "failed",
@@ -46,7 +46,7 @@
         "storm_key": "td_2026_01_typ_01",
         "stage": "TD_PRE_TYP_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202601141200",
+        "data_time": "202601141800",
         "td_number": 1,
         "linked_td_number": null,
         "typ_number": 1,
@@ -57,10 +57,10 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202601141200",
-        "cycle_time_utc": "202601141200",
-        "start_utc": "202601141700",
-        "end_utc": "202601142300"
+        "data_time": "202601141800",
+        "cycle_time_utc": "202601141800",
+        "start_utc": "202601142300",
+        "end_utc": "202601150500"
       },
       "result": {
         "status": "failed",
@@ -508,8 +508,8 @@
         "year": 2026,
         "data_time": "202601141800",
         "td_number": 1,
-        "linked_td_number": 1,
-        "linked_typ_number": null,
+        "linked_td_number": null,
+        "linked_typ_number": 1,
         "typ_number": 1,
         "data_typ_number": 1,
         "typ_name_ko": "",
@@ -525,14 +525,16 @@
       "result": {
         "status": "inventory",
         "metadata": {
-          "generated_at_utc": "20260604194041",
+          "generated_at_utc": "20260613102543",
           "image_path": "VTG_IMG/2026/TD_2601_NONAME/TD_2601_NONAME_202601141800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 1,
+          "data_typ_number": 1,
           "typ_name": "NONAME",
           "typ_name_ko": "",
-          "linked_td_number": 1,
+          "linked_td_number": null,
+          "linked_typ_number": 1,
           "atcf_id": "wp012026",
           "extra_atcf_ids": [],
           "data_time": "202601141800",
