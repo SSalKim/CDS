@@ -1,0 +1,134 @@
+name: Backfill VTG images
+
+on:
+  workflow_dispatch:
+    inputs:
+      ranges:
+        description: "UTC ranges, one per line: YYYYMMDDHH-YYYYMMDDHH"
+        required: true
+        type: string
+        default: |
+          2026011400-2026012012
+          2026020400-2026020618
+          2026031000-2026031212
+          2026040818-2026041918
+          2026050512-2026051018
+          2026052606-2026060312
+          2026060318-2026060518
+          
+      commit_every:
+        description: "Commit after N cycles"
+        required: true
+        default: "1"
+      start_from:
+        description: "Optional cycle to resume from, e.g. 2026041106"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vtg-backfill
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    env:
+      KMA_APIHUB_AUTH_KEY: ${{ secrets.KMA_APIHUB_AUTH_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas requests matplotlib cartopy
+
+      - name: Generate cycle list
+        shell: python
+        run: |
+          from datetime import datetime, timedelta
+          from pathlib import Path
+          import os
+
+          ranges_text = """${{ inputs.ranges }}"""
+          start_from = "${{ inputs.start_from }}".strip()
+
+          cycles = []
+          for raw in ranges_text.splitlines():
+              line = raw.strip()
+              if not line:
+                  continue
+              if "-" not in line:
+                  raise SystemExit(f"Invalid range line: {line}")
+              start, end = [x.strip() for x in line.split("-", 1)]
+              dt = datetime.strptime(start, "%Y%m%d%H")
+              ed = datetime.strptime(end, "%Y%m%d%H")
+              while dt <= ed:
+                  cycle = dt.strftime("%Y%m%d%H")
+                  if not start_from or cycle >= start_from:
+                      cycles.append(cycle)
+                  dt += timedelta(hours=6)
+
+          Path("vtg_backfill_cycles.txt").write_text("\n".join(cycles) + "\n", encoding="utf-8")
+          print(f"cycles={len(cycles)}")
+          print(f"first={cycles[0] if cycles else 'NONE'}")
+          print(f"last={cycles[-1] if cycles else 'NONE'}")
+
+      - name: Run VTG backfill sequentially
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          COMMIT_EVERY="${{ inputs.commit_every }}"
+          COUNT=0
+
+          while IFS= read -r CYCLE; do
+            [ -z "$CYCLE" ] && continue
+
+            echo "::group::VTG cycle $CYCLE"
+
+            python vtg_auto.py \
+              --now "$CYCLE" \
+              --force \
+              --output-root VTG_IMG \
+              --status-path vtg_auto_status.json \
+              --manifest-path manifest.json \
+              --fcst-hours 120,240 \
+              --auto-fcst-hours \
+              --min-run-interval-minutes 0
+
+            COUNT=$((COUNT + 1))
+
+            git add VTG_IMG manifest.json vtg_auto_status.json || true
+
+            if ! git diff --cached --quiet; then
+              git commit -m "Backfill VTG images $CYCLE"
+              git pull --rebase origin main
+              git push
+            else
+              echo "No changes for $CYCLE"
+            fi
+
+            echo "::endgroup::"
+
+            if [ "$COMMIT_EVERY" != "1" ]; then
+              echo "commit_every is currently handled as commit-per-cycle for safety."
+            fi
+
+          done < vtg_backfill_cycles.txt
