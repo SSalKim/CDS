@@ -2425,6 +2425,8 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str, *
     start_hour = start_time[8:10]
 
     model_nums = len(plotted_model_names(df, settings))
+    total_model_nums = legend_row_count_for(df, settings)
+    model_count_text = f"{model_nums} / {total_model_nums} MODELS @ {settings.fcst_hours} HOURS"
     ax.text(0.978, 0.978, f"{start_date} {start_hour}UTC", transform=ax.transAxes,
             fontsize=34, color="white", fontweight="1000", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="top", horizontalalignment="right", zorder=100,
@@ -2443,7 +2445,7 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str, *
             fontsize=22.5, color="white", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="top", zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
-    ax.text(0.978, 0.932, f"{model_nums} MODELS @ {settings.fcst_hours} HOURS", transform=ax.transAxes,
+    ax.text(0.978, 0.932, model_count_text, transform=ax.transAxes,
             fontsize=22.5, color="#DCB0E1", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="top", horizontalalignment="right", zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
@@ -2601,21 +2603,24 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         handle_y = y + handle_y_offset
         color = row["color"]
         gap = 0.011 if side == "panel" else 0.006
-        handle_segments: list[tuple[float, float, str]] = []
+        handle_segments = []
         if side == "panel" and row["linestyle"] in {"--", "dashed"}:
-            dash_len = 0.013
-            dash_gap = 0.006
             marker_gap = 0.012
-            left_near_end = handle_mid - marker_gap
-            left_far_start = left_near_end - dash_len * 2 - dash_gap
-            left_near_start = left_far_start + dash_len + dash_gap
-            right_near_start = handle_mid + marker_gap
-            right_far_start = right_near_start + dash_len + dash_gap
+            dash_len = 0.014
+            dash_gap = 0.004
+            left_inner_end = handle_mid - marker_gap
+            left_inner_start = left_inner_end - dash_len
+            left_outer_end = left_inner_start - dash_gap
+            left_outer_start = left_outer_end - dash_len
+            right_inner_start = handle_mid + marker_gap
+            right_inner_end = right_inner_start + dash_len
+            right_outer_start = right_inner_end + dash_gap
+            right_outer_end = right_outer_start + dash_len
             handle_segments = [
-                (left_far_start, left_far_start + dash_len, "-"),
-                (left_near_start, left_near_end, "-"),
-                (right_near_start, right_near_start + dash_len, "-"),
-                (right_far_start, right_far_start + dash_len, "-"),
+                (left_outer_start, left_outer_end, "-"),
+                (left_inner_start, left_inner_end, "-"),
+                (right_inner_start, right_inner_end, "-"),
+                (right_outer_start, right_outer_end, "-"),
             ]
         else:
             handle_segments = [
@@ -2631,6 +2636,8 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
                     color=color,
                     linestyle=segment_style,
                     linewidth=2.0,
+                    solid_capstyle="butt",
+                    dash_capstyle="butt",
                     zorder=101,
                     clip_on=False,
                 )
