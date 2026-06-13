@@ -3886,6 +3886,18 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
     if not rows:
         return
 
+    if side == "panel":
+        bg = mpatches.Rectangle(
+            (0, 0),
+            1,
+            1,
+            transform=ax.transAxes,
+            facecolor="#1F1F1F",
+            edgecolor="none",
+            zorder=0,
+        )
+        ax.add_patch(bg)
+
     if side == "left":
         x0, x1 = 0.005, 0.330
         pad_x = 0.008
@@ -3899,14 +3911,14 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
     elif side == "panel":
         x0, x1 = 0.035, 0.965
         pad_x = 0.018
-        pad_y = 0.010
+        pad_y = 0.007
         row_h = 0.021
         font_size = 14
-        handle_len = 0.050
-        label_gap = 0.058
+        handle_len = 0.072
+        label_gap = 0.080
         width = x1 - x0
-        pressure_x = x0 + width * 0.73
-        lead_x = x0 + width * 0.965
+        pressure_x = x0 + width * 0.742
+        lead_x = x0 + width * 0.978
     else:
         x0, x1 = 0.670, 0.995
         pad_x = 0.008
