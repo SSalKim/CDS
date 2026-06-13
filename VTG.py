@@ -2547,16 +2547,16 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         pressure_x = x1 - pad_x - 0.069
         lead_x = x1 - pad_x + 0.003
     elif side == "panel":
-        x0, x1 = 0.035, 0.965
-        pad_x = 0.018
+        x0, x1 = 0.022, 0.978
+        pad_x = 0.016
         pad_y = 0.004
         row_h = 0.021
         font_size = 14
-        handle_len = 0.074
-        label_gap = 0.083
+        handle_len = 0.088
+        label_gap = 0.100
         width = x1 - x0
-        pressure_x = x0 + width * 0.748
-        lead_x = x0 + width * 0.984
+        pressure_x = x0 + width * 0.770
+        lead_x = x0 + width * 0.982
     else:
         x0, x1 = 0.670, 0.995
         pad_x = 0.008
@@ -2600,7 +2600,7 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         y = y1 - pad_y - row_h * (idx + 0.5)
         handle_y = y + handle_y_offset
         color = row["color"]
-        gap = 0.008 if side == "panel" else 0.006
+        gap = 0.011 if side == "panel" else 0.006
         left_line = mlines.Line2D(
             [handle_x0, handle_mid - gap],
             [handle_y, handle_y],
