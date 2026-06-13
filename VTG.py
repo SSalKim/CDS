@@ -2352,7 +2352,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     legend_side = "panel"
 
     plot_past_track(ax, past_kma, current_dt)
-    draw_header(header_ax, fig, df, settings, intensity, legend_side=legend_side)
+    draw_header(header_ax, fig, df, settings, intensity, legend_side=legend_side, panel_left=map_panel_frac)
     draw_model_tracks(ax, df, settings, legend_side=legend_side, legend_ax=legend_ax)
 
     kma_start = df[(df["SRC"] == "KMA") & (df["TMD"] == 0)].head(1)
@@ -2379,7 +2379,16 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     return target
 
 
-def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str, *, legend_side: str = "right") -> None:
+def draw_header(
+    ax,
+    fig,
+    df: pd.DataFrame,
+    settings: Settings,
+    intensity: str,
+    *,
+    legend_side: str = "right",
+    panel_left: float | None = None,
+) -> None:
     ax.add_patch(mpatches.FancyBboxPatch(
         (0.03, 0.915),
         1.0 - 0.03 - 0.024,
@@ -2427,9 +2436,16 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str, *
     model_nums = len(plotted_model_names(df, settings))
     total_model_nums = legend_row_count_for(df, settings)
     model_count_text = f"{model_nums} / {total_model_nums} MODELS @ {settings.fcst_hours} HOURS"
-    ax.text(0.978, 0.978, f"{start_date} {start_hour}UTC", transform=ax.transAxes,
+
+    right_header_x = 0.978
+    right_header_ha = "right"
+    if legend_side == "panel" and panel_left is not None:
+        right_header_x = panel_left + (1.0 - panel_left) / 2.0
+        right_header_ha = "center"
+
+    ax.text(right_header_x, 0.978, f"{start_date} {start_hour}UTC", transform=ax.transAxes,
             fontsize=34, color="white", fontweight="1000", fontfamily=PLOT_FONT_FAMILY,
-            verticalalignment="top", horizontalalignment="right", zorder=100,
+            verticalalignment="top", horizontalalignment=right_header_ha, zorder=100,
             bbox=dict(boxstyle="square,pad=0.5", facecolor="none", linewidth=0))
     ax.text(0.024, 0.932, "VORTEX TRACK GUIDANCE", transform=ax.transAxes,
             fontsize=22.5, color="white", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
@@ -2445,9 +2461,9 @@ def draw_header(ax, fig, df: pd.DataFrame, settings: Settings, intensity: str, *
             fontsize=22.5, color="white", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="top", zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
-    ax.text(0.978, 0.932, model_count_text, transform=ax.transAxes,
+    ax.text(right_header_x, 0.932, model_count_text, transform=ax.transAxes,
             fontsize=22.5, color="#DCB0E1", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
-            verticalalignment="top", horizontalalignment="right", zorder=100,
+            verticalalignment="top", horizontalalignment=right_header_ha, zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
     credit_x = 0.995 if legend_side == "left" else 0.005
     credit_ha = "right" if legend_side == "left" else "left"
@@ -2570,11 +2586,13 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         pressure_x = x1 - pad_x - 0.069
         lead_x = x1 - pad_x + 0.003
 
+    box_h = pad_y * 2 + row_h * len(rows)
     if side == "panel":
-        y0 = 0.012
+        y1 = 0.885
+        y0 = max(0.012, y1 - box_h)
     else:
         y0 = 0.005
-    y1 = y0 + pad_y * 2 + row_h * len(rows)
+        y1 = y0 + box_h
     handle_y_offset = row_h * 0.07
 
     box = mpatches.FancyBboxPatch(
