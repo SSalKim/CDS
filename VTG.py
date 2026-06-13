@@ -287,6 +287,7 @@ DEFAULT_AUTH_KEY = ""
 VALID_FCST_HOURS = (120, 240)
 PROJECT_ROOT = Path(__file__).resolve().parent
 PLOT_FONT_FAMILY = "DejaVu Sans"
+PREFERRED_PLOT_FONT_FILE = PROJECT_ROOT / "fonts" / "NanumSquareB.ttf"
 REQUEST_HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -564,6 +565,20 @@ def configure_plot_fonts() -> None:
         str(Path.home() / "AppData/Local/Microsoft/Windows/Fonts"),
         "C:/Windows/Fonts",
     ]
+
+    preferred_font = PREFERRED_PLOT_FONT_FILE
+    if preferred_font.exists():
+        try:
+            fm.fontManager.addfont(str(preferred_font))
+            PLOT_FONT_FAMILY = fm.FontProperties(fname=str(preferred_font)).get_name()
+            plt.rcParams["font.family"] = [PLOT_FONT_FAMILY]
+            plt.rcParams["font.sans-serif"] = [PLOT_FONT_FAMILY]
+            plt.rcParams["axes.unicode_minus"] = False
+            print(f"Using plot font: {PLOT_FONT_FAMILY} ({preferred_font})")
+            return
+        except RuntimeError as exc:
+            print(f"Preferred font could not be loaded: {preferred_font} ({exc})")
+
     for font_file in fm.findSystemFonts(fontpaths=[p for p in font_dirs if Path(p).exists()]):
         try:
             fm.fontManager.addfont(font_file)
@@ -576,6 +591,7 @@ def configure_plot_fonts() -> None:
             break
     print(f"Using plot font: {PLOT_FONT_FAMILY}")
     plt.rcParams["font.family"] = [PLOT_FONT_FAMILY, "DejaVu Sans"]
+    plt.rcParams["font.sans-serif"] = [PLOT_FONT_FAMILY, "DejaVu Sans"]
     plt.rcParams["axes.unicode_minus"] = False
 
 
