@@ -213,7 +213,7 @@ MAX_CAMERA_240_LAT_DISTANCE = 62.0
 # 240h output now uses a stable fixed West-Pacific view. Keep the east
 # boundary below 180E because the current PlateCarree/Mercator path wraps
 # values above 180E into a near-global extent.
-FIXED_240_MAP_EXTENT = [100.0, 179.8, 0.0, 51.5]
+FIXED_240_MAP_EXTENT = [100.0, 179.9, 0.0, 51.45]
 
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
@@ -1587,13 +1587,13 @@ def model_visual_style(model_name: str, model: dict) -> dict:
     return {
         "color": color,
         "linestyle": "--" if is_ai else "-",
-        "linewidth": 1.0 if is_ensemble else 1.7,
-        "alpha": 0.78 if is_ensemble else 1.0,
+        "linewidth": 1.7,
+        "alpha": 1.0,
         "marker": "o",
         "markerfacecolor": color,
         "markeredgecolor": color,
         "markeredgewidth": 0.8,
-        "markersize": 4.6 if is_ensemble else 5,
+        "markersize": 5,
         "basis": basis,
         "forecast_type": forecast_type,
     }
@@ -3888,16 +3888,38 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
 
     if side == "left":
         x0, x1 = 0.005, 0.330
+        pad_x = 0.008
+        pad_y = 0.005
+        row_h = 0.019
+        font_size = 14
+        handle_len = 0.024
+        label_gap = 0.030
+        pressure_x = x1 - pad_x - 0.069
+        lead_x = x1 - pad_x + 0.003
     elif side == "panel":
         x0, x1 = 0.035, 0.965
+        pad_x = 0.018
+        pad_y = 0.010
+        row_h = 0.021
+        font_size = 14
+        handle_len = 0.050
+        label_gap = 0.058
+        width = x1 - x0
+        pressure_x = x0 + width * 0.73
+        lead_x = x0 + width * 0.965
     else:
         x0, x1 = 0.670, 0.995
+        pad_x = 0.008
+        pad_y = 0.005
+        row_h = 0.019
+        font_size = 14
+        handle_len = 0.024
+        label_gap = 0.030
+        pressure_x = x1 - pad_x - 0.069
+        lead_x = x1 - pad_x + 0.003
+
     y0 = 0.005
-    pad_x = 0.008
-    pad_y = 0.005
-    row_h = 0.019
     y1 = y0 + pad_y * 2 + row_h * len(rows)
-    font_size = 14
     handle_y_offset = row_h * 0.07
 
     box = mpatches.FancyBboxPatch(
@@ -3905,7 +3927,7 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         x1 - x0,
         y1 - y0,
         transform=ax.transAxes,
-        boxstyle="round,pad=0.002,rounding_size=0.006",
+        boxstyle="round,pad=0.004,rounding_size=0.014",
         linewidth=0.8,
         edgecolor="#DDDDDD",
         facecolor="white",
@@ -3915,11 +3937,9 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
     ax.add_patch(box)
 
     handle_x0 = x0 + pad_x
-    handle_x1 = x0 + pad_x + 0.024
+    handle_x1 = x0 + pad_x + handle_len
     handle_mid = (handle_x0 + handle_x1) / 2
-    label_x = x0 + pad_x + 0.030
-    pressure_x = x1 - pad_x - 0.069
-    lead_x = x1 - pad_x + 0.003
+    label_x = x0 + pad_x + label_gap
     label_font_family = PLOT_FONT_FAMILY
     label_font_weight = "700"
 
