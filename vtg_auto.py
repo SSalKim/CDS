@@ -955,8 +955,14 @@ def build_storm_jobs(
     return jobs
 
 
+def metadata_storm_key_for(job: StormJob) -> str:
+    prefix = "td" if job.stage.startswith("TD_") else "typ"
+    return f"{prefix}_{job.year}_{job.typ_number:02d}"
+
+
 def metadata_path_for(output_root: Path, job: StormJob, fcst_hours: int) -> Path:
-    return output_root / "metadata" / f"{job.data_time}_{job.storm_key}_{fcst_hours}h.json"
+    storm_key = metadata_storm_key_for(job)
+    return output_root / "metadata" / f"{job.data_time}_{storm_key}_{fcst_hours}h.json"
 
 
 def deterministic_output_path_for(output_root: Path, job: StormJob, fcst_hours: int) -> Path:

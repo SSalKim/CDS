@@ -123,7 +123,7 @@ jobs:
               --status-path vtg_auto_status.json \
               --manifest-path manifest.json \
               --fcst-hours 120,240 \
-              --auto-fcst-hours \
+              --no-auto-fcst-hours \
               --min-run-interval-minutes 0
 
             COUNT=$((COUNT + 1))
