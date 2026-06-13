@@ -2569,7 +2569,7 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         pad_x = 0.016
         pad_y = 0.004
         row_h = 0.0215
-        font_size = 14
+        font_size = 14.1
         handle_len = 0.092
         label_gap = 0.106
         width = x1 - x0
@@ -2588,7 +2588,8 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
 
     box_h = pad_y * 2 + row_h * len(rows)
     if side == "panel":
-        y1 = 0.885
+        panel_top = 0.885
+        y1 = panel_top - x0
         y0 = max(0.012, y1 - box_h)
     else:
         y0 = 0.005
