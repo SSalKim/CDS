@@ -2554,6 +2554,19 @@ def draw_model_tracks(ax, df: pd.DataFrame, settings: Settings, *, legend_side: 
     draw_model_legend_table(legend_ax if legend_ax is not None else ax, legend_rows, side=legend_side)
 
 
+def snap_axes_point_to_pixel(ax, x: float, y: float) -> tuple[float, float]:
+    """Snap an axes-coordinate anchor to the display pixel grid.
+
+    This is mainly for small legend text: when repeated rows land on
+    slightly different sub-pixel baselines, glyph antialiasing can make
+    identical labels look uneven.
+    """
+    px, py = ax.transAxes.transform((x, y))
+    px = round(px) + 0.5
+    py = round(py) + 0.5
+    return tuple(ax.transAxes.inverted().transform((px, py)))
+
+
 def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> None:
     if not rows:
         return
@@ -2589,7 +2602,7 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         handle_len = 0.092
         label_gap = 0.106
         width = x1 - x0
-        pressure_x = x0 + width * 0.768
+        pressure_x = x0 + width * 0.760
         lead_x = x0 + width * 0.986
     else:
         x0, x1 = 0.670, 0.995
@@ -2691,9 +2704,10 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
             clip_on=False,
         )
         ax.add_line(marker)
+        label_text_x, label_text_y = snap_axes_point_to_pixel(ax, label_x, y)
         ax.text(
-            label_x,
-            y,
+            label_text_x,
+            label_text_y,
             row["label"],
             transform=ax.transAxes,
             fontfamily=label_font_family,
@@ -2707,9 +2721,11 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         pressure_text, lead_text = split_intensity_summary(row["metric"])
         metric_text_color = pressure_metric_color(pressure_text)
 
+        pressure_text_x, pressure_text_y = snap_axes_point_to_pixel(ax, pressure_x, y)
+        lead_text_x, lead_text_y = snap_axes_point_to_pixel(ax, lead_x, y)
         ax.text(
-            pressure_x,
-            y,
+            pressure_text_x,
+            pressure_text_y,
             pressure_text,
             transform=ax.transAxes,
             fontfamily=PLOT_FONT_FAMILY,
@@ -2721,8 +2737,8 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
             zorder=102,
         )
         ax.text(
-            lead_x,
-            y,
+            lead_text_x,
+            lead_text_y,
             lead_text,
             transform=ax.transAxes,
             fontfamily=PLOT_FONT_FAMILY,
