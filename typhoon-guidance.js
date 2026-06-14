@@ -345,7 +345,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "가변형 둥지격차 (4-36km)",
     "연직층수": "40층",
     "기반": "역학코어",
-    "참고사항": ""
+    "참고사항": "COAMPS-TC 실험버전(CTCX), GFS 초기장 활용"
   },
   {
     "표출명칭": "COAMPS-TC EPS",
@@ -791,7 +791,7 @@ let detailButton=document.createElement('button');
 detailButton.type='button';
 detailButton.className='typhoon-model-detail-button';
 detailButton.title='모델 상세 설명 열기';
-detailButton.innerHTML='<span class="typhoon-model-detail-button-icon">▦</span><span>모델 상세 설명</span>';
+detailButton.innerHTML='<span class="typhoon-model-detail-button-icon">▦</span><span>상세보기</span>';
 detailButton.onclick=()=>openTyphoonModelDetailModal(detailButton);
 
 actions.appendChild(detailButton);
@@ -844,16 +844,15 @@ align-items:center;
 gap:6px;
 box-shadow:0 8px 18px rgba(37,99,235,.22), inset 0 1px 0 rgba(255,255,255,.22);
 cursor:pointer;
-transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;
+transition:box-shadow .15s ease,filter .15s ease,background .15s ease;
 }
 .typhoon-model-detail-button:hover{
-transform:translateY(-1px);
-box-shadow:0 11px 24px rgba(37,99,235,.28), inset 0 1px 0 rgba(255,255,255,.26);
-filter:saturate(1.06);
+box-shadow:0 8px 18px rgba(37,99,235,.22), inset 0 1px 0 rgba(255,255,255,.26);
+filter:saturate(1.06) brightness(1.03);
 }
 .typhoon-model-detail-button:active{
-transform:translateY(0);
 box-shadow:0 6px 14px rgba(37,99,235,.2), inset 0 1px 0 rgba(255,255,255,.2);
+filter:brightness(.98);
 }
 .typhoon-model-detail-button:focus-visible{
 outline:3px solid rgba(56,189,248,.45);
@@ -877,8 +876,8 @@ backdrop-filter:blur(8px) saturate(1.05);
 animation:typhoonDetailOverlayIn .16s ease-out;
 }
 .typhoon-model-detail-dialog{
-width:min(1180px,calc(100vw - 44px));
-max-height:min(820px,calc(100vh - 44px));
+width:min(1680px,calc(100vw - 28px));
+max-height:min(860px,calc(100vh - 28px));
 background:linear-gradient(180deg,#ffffff,#f8fafc);
 border:1px solid rgba(148,163,184,.34);
 border-radius:22px;
@@ -939,7 +938,7 @@ background:rgba(255,255,255,.22);
 transform:translateY(-1px);
 }
 .typhoon-model-detail-body{
-padding:18px 20px 20px;
+padding:16px 18px 18px;
 min-height:0;
 display:flex;
 flex-direction:column;
@@ -962,7 +961,8 @@ box-shadow:0 2px 8px rgba(15,23,42,.04);
 }
 .typhoon-model-detail-table-wrap{
 min-height:0;
-overflow:auto;
+overflow-y:auto;
+overflow-x:hidden;
 border:1px solid rgba(148,163,184,.28);
 border-radius:16px;
 background:#fff;
@@ -972,9 +972,9 @@ box-shadow:0 8px 24px rgba(15,23,42,.06);
 width:100%;
 border-collapse:separate;
 border-spacing:0;
-font-size:12.5px;
+font-size:11.7px;
 color:#1e293b;
-min-width:1060px;
+table-layout:auto;
 }
 .typhoon-model-detail-table thead th{
 position:sticky;
@@ -985,15 +985,16 @@ color:#0f172a;
 font-weight:850;
 text-align:left;
 white-space:nowrap;
-padding:11px 10px;
+padding:10px 8px;
 border-bottom:1px solid rgba(148,163,184,.42);
 box-shadow:0 1px 0 rgba(255,255,255,.7) inset;
 }
 .typhoon-model-detail-table tbody td{
-padding:10px 10px;
+padding:9px 8px;
 vertical-align:top;
 border-bottom:1px solid rgba(226,232,240,.9);
-line-height:1.42;
+line-height:1.34;
+white-space:nowrap;
 }
 .typhoon-model-detail-table tbody tr:nth-child(even) td{
 background:#f8fafc;
@@ -1005,9 +1006,9 @@ background:#eef6ff;
 border-bottom:0;
 }
 .typhoon-model-detail-name{
-font-weight:850;
+font-weight:900;
 white-space:nowrap;
-color:#0f172a;
+color:var(--typhoon-model-detail-color,#0f172a);
 }
 .typhoon-model-detail-basis{
 display:inline-flex;
@@ -1029,7 +1030,6 @@ color:#075985;
 }
 .typhoon-model-detail-note{
 color:#475569;
-min-width:170px;
 }
 @keyframes typhoonDetailOverlayIn{
 from{opacity:0;}
@@ -1039,13 +1039,19 @@ to{opacity:1;}
 from{opacity:0;transform:translateY(10px) scale(.985);}
 to{opacity:1;transform:translateY(0) scale(1);}
 }
+@media (max-width: 1280px){
+.typhoon-model-detail-table{font-size:11.5px;}
+.typhoon-model-detail-table thead th,
+.typhoon-model-detail-table tbody td{white-space:normal;}
+.typhoon-model-detail-note{min-width:0;}
+}
 @media (max-width: 900px){
 .typhoon-model-detail-overlay{padding:14px;align-items:stretch;}
 .typhoon-model-detail-dialog{width:100%;max-height:calc(100vh - 28px);border-radius:18px;}
 .typhoon-model-detail-header{padding:18px 18px 15px;}
 .typhoon-model-detail-title{font-size:20px;}
 .typhoon-model-detail-body{padding:14px;}
-.typhoon-model-detail-table{font-size:12px;}
+.typhoon-model-detail-table{font-size:11.5px;}
 }
 `;
 document.head.appendChild(style);
@@ -1133,9 +1139,8 @@ let aiCount=TYPHOON_MODEL_DETAIL_ROWS.filter(row=>String(row['기반'] || '').to
 let dynamicalCount=total-aiCount;
 [
 `전체 ${total}개 모델`,
-`역학코어 ${dynamicalCount}개`,
-`AI ${aiCount}개`,
-'가로 스크롤 지원'
+`역학코어 기반 ${dynamicalCount}개 모델`,
+`AI 기반 ${aiCount}개 모델`
 ].forEach(text=>{
 let chip=document.createElement('span');
 chip.className='typhoon-model-detail-chip';
@@ -1170,6 +1175,7 @@ let td=document.createElement('td');
 let value=row[column] || '';
 if(column==='표출명칭'){
 td.className='typhoon-model-detail-name';
+td.style.setProperty('--typhoon-model-detail-color',TYPHOON_MODEL_INFO_COLORS[value] || '#0f172a');
 td.textContent=value;
 }
 else if(column==='기반'){
