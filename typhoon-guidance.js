@@ -168,6 +168,418 @@ const TYPHOON_MODEL_INFO_COLORS={
 'FengWu-ECMWF':'#A6C875'
 };
 
+
+const TYPHOON_MODEL_DETAIL_COLUMNS=[
+'표출명칭',
+'운영기관',
+'모델명',
+'도메인',
+'구분',
+'격자체계 (분해능)',
+'연직층수',
+'기반',
+'참고사항'
+];
+
+const TYPHOON_MODEL_DETAIL_ROWS=[
+  {
+    "표출명칭": "ECMWF",
+    "운영기관": "유럽중기예보센터(ECMWF)",
+    "모델명": "IFS",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "TCo1279 (~9km)",
+    "연직층수": "137층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "ECMWF EPS",
+    "운영기관": "유럽중기예보센터(ECMWF)",
+    "모델명": "EPS",
+    "도메인": "전지구",
+    "구분": "앙상블 모델 평균 (M51)",
+    "격자체계 (분해능)": "TCo1279 (~9km)",
+    "연직층수": "137층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "KIM",
+    "운영기관": "기상청(KMA)",
+    "모델명": "KIM (GDAPS)",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "NE570NP3 (~8km)",
+    "연직층수": "91층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "KIM EPS",
+    "운영기관": "기상청(KMA)",
+    "모델명": "KIM (GENS)",
+    "도메인": "전지구",
+    "구분": "앙상블 모델 평균 (M26)",
+    "격자체계 (분해능)": "NE192NP3 (~24km)",
+    "연직층수": "91층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "UKMO",
+    "운영기관": "영국기상청(UKMO)",
+    "모델명": "UM",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "N1280 (~10km)",
+    "연직층수": "70층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "UKMO EPS",
+    "운영기관": "영국기상청(UKMO)",
+    "모델명": "UM (MOGREPS-G)",
+    "도메인": "전지구",
+    "구분": "앙상블 모델 평균 (M25)",
+    "격자체계 (분해능)": "N400 (~32km)",
+    "연직층수": "70층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "GFS",
+    "운영기관": "미해양대기청(NOAA) 국립환경예측센터(NCEP)",
+    "모델명": "GFS",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "C768 (~12.5km)",
+    "연직층수": "127층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "GFS EPS",
+    "운영기관": "미해양대기청(NOAA) 국립환경예측센터(NCEP)",
+    "모델명": "GEFS",
+    "도메인": "전지구",
+    "구분": "앙상블 모델 평균 (M31)",
+    "격자체계 (분해능)": "C384 (~25km)",
+    "연직층수": "64층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "CMC",
+    "운영기관": "캐나다기상센터(CMC)",
+    "모델명": "GEM (GDPS)",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.135° (~15km)",
+    "연직층수": "84층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "CMC EPS",
+    "운영기관": "캐나다기상센터(CMC)",
+    "모델명": "GEM (GEPS)",
+    "도메인": "전지구",
+    "구분": "앙상블 모델 평균 (M20)",
+    "격자체계 (분해능)": "0.23° (~26km)",
+    "연직층수": "84층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "NAVGEM",
+    "운영기관": "미해군수치기상해양센터(FNMOC)",
+    "모델명": "NAVGEM",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "T681 (~19km)",
+    "연직층수": "60층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "NAVGEM EPS",
+    "운영기관": "미해군수치기상해양센터(FNMOC)",
+    "모델명": "NAVGEM",
+    "도메인": "전지구",
+    "구분": "앙상블 모델 평균 (M21)",
+    "격자체계 (분해능)": "T359 (~35km)",
+    "연직층수": "60층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "JGSM",
+    "운영기관": "일본기상청(JMA)",
+    "모델명": "GSM",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "TQ959 (~13km)",
+    "연직층수": "128층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "JGSM EPS",
+    "운영기관": "일본기상청(JMA)",
+    "모델명": "GEPS",
+    "도메인": "전지구",
+    "구분": "앙상블 모델 평균 (M51)",
+    "격자체계 (분해능)": "TQ479 (~27km)",
+    "연직층수": "128층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "COAMPS-TC",
+    "운영기관": "미해군연구소(NRL)",
+    "모델명": "COAMPS-TC",
+    "도메인": "태풍영역",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "가변형 둥지격차 (4-36km)",
+    "연직층수": "40층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "COAMPS-TC EPS",
+    "운영기관": "미해군연구소(NRL)",
+    "모델명": "COAMPS-TC",
+    "도메인": "태풍영역",
+    "구분": "앙상블 모델 평균 (M11)",
+    "격자체계 (분해능)": "가변형 둥지격차 (4-36km)",
+    "연직층수": "40층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "GALWEM",
+    "운영기관": "미공군(USAF)",
+    "모델명": "UM (GALWEM)",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "N768 (~17km)",
+    "연직층수": "70층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "HAFS",
+    "운영기관": "미해양대기청(NOAA) 환경모델링센터(EMC)",
+    "모델명": "HAFS-A",
+    "도메인": "태풍영역",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "가변형 둥지격차 (1.8-5.4km)",
+    "연직층수": "81층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "HWRF",
+    "운영기관": "미해양대기청(NOAA) 환경모델링센터(EMC)",
+    "모델명": "HWRF",
+    "도메인": "태풍영역",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "가변형 둥지격차 (1.5-13.5km)",
+    "연직층수": "75층",
+    "기반": "역학코어",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "ECMWF AIFS",
+    "운영기관": "유럽중기예보센터(ECMWF)",
+    "모델명": "AIFS-Single",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "14층",
+    "기반": "AI",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "ECMWF AIFS EPS",
+    "운영기관": "유럽중기예보센터(ECMWF)",
+    "모델명": "AIFS-ENS",
+    "도메인": "전지구",
+    "구분": "앙상블 모델 평균 (M51)",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "14층",
+    "기반": "AI",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "KMA AIFS-ECMWF",
+    "운영기관": "기상청(KMA)",
+    "모델명": "AIFS-Single",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "14층",
+    "기반": "AI",
+    "참고사항": "ECMWF AIFS 기상청 자체 수행, ECMWF 초기장 활용"
+  },
+  {
+    "표출명칭": "KMA AIFS-KIM",
+    "운영기관": "기상청(KMA)",
+    "모델명": "AIFS-Single",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "14층",
+    "기반": "AI",
+    "참고사항": "ECMWF AIFS 기상청 자체 수행, KIM 초기장 활용"
+  },
+  {
+    "표출명칭": "AIGFS",
+    "운영기관": "미해양대기청(NOAA) 국립환경예측센터(NCEP)",
+    "모델명": "AIGFS",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "AIGEFS",
+    "운영기관": "미해양대기청(NOAA) 국립환경예측센터(NCEP)",
+    "모델명": "AIGEFS",
+    "도메인": "전지구",
+    "구분": "앙상블 모델 평균 (M31)",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "FourCastNet-ECMWF",
+    "운영기관": "기상청(KMA)",
+    "모델명": "FourCastNet",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": "NVIDIA AI모델 FourCastNet 기상청 자체 수행, ECMWF 초기장 활용"
+  },
+  {
+    "표출명칭": "FourCastNet-KIM",
+    "운영기관": "기상청(KMA)",
+    "모델명": "FourCastNet",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": "NVIDIA AI모델 FourCastNet 기상청 자체 수행, KIM 초기장 활용"
+  },
+  {
+    "표출명칭": "Pangu-Weather-ECMWF",
+    "운영기관": "기상청(KMA)",
+    "모델명": "Pangu-Weather",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": "HUAWEI AI모델 Pangu-Weather 기상청 자체 수행, ECMWF 초기장 활용"
+  },
+  {
+    "표출명칭": "Pangu-Weather-KIM",
+    "운영기관": "기상청(KMA)",
+    "모델명": "Pangu-Weather",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": "HUAWEI AI모델 Pangu-Weather 기상청 자체 수행, KIM 초기장 활용"
+  },
+  {
+    "표출명칭": "GraphCast-ECMWF",
+    "운영기관": "기상청(KMA)",
+    "모델명": "GraphCast",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": "Google DeepMind AI모델 GraphCast 기상청 자체 수행, ECMWF 초기장 활용"
+  },
+  {
+    "표출명칭": "GraphCast-KIM",
+    "운영기관": "기상청(KMA)",
+    "모델명": "GraphCast",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": "Google DeepMind AI모델 GraphCast 기상청 자체 수행, KIM 초기장 활용"
+  },
+  {
+    "표출명칭": "GenCast",
+    "운영기관": "구글 딥마인드(Google DeepMind)",
+    "모델명": "GenCast",
+    "도메인": "전지구",
+    "구분": "앙상블 모델 평균 (M50)",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "FNV3",
+    "운영기관": "구글 딥마인드(Google DeepMind)",
+    "모델명": "FNV3",
+    "도메인": "전지구",
+    "구분": "앙상블 모델 평균 (M50)",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": ""
+  },
+  {
+    "표출명칭": "Aurora-ECMWF",
+    "운영기관": "홍콩기상청(HKO)",
+    "모델명": "Aurora",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": "Microsoft AI모델 Aurora 홍콩기상청 자체 수행, ECMWF 초기장 활용"
+  },
+  {
+    "표출명칭": "FuXi-ECMWF",
+    "운영기관": "홍콩기상청(HKO)",
+    "모델명": "FuXi",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": "중국 푸단 대학교 AI모델 FuXi 홍콩기상청 자체 수행, ECMWF 초기장 활용"
+  },
+  {
+    "표출명칭": "FengWu-ECMWF",
+    "운영기관": "홍콩기상청(HKO)",
+    "모델명": "FengWu",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": "상하이 AI연구소 AI모델 FengWu 홍콩기상청 자체 수행, ECMWF 초기장 활용"
+  }
+];
+
 const typhoonState={
 root:null,
 manifest:null,
@@ -182,7 +594,8 @@ selectedFcstHours:120,
 timer:null,
 keyboardBound:false,
 imageCache:new Map(),
-imageRequestSeq:0
+imageRequestSeq:0,
+modelDetailLastFocus:null
 };
 
 function openTyphoonGuidancePage(){
@@ -217,6 +630,7 @@ return;
 }
 
 typhoonState.root=root;
+ensureTyphoonModelDetailStyles();
 renderTyphoonShell();
 loadTyphoonManifest();
 
@@ -370,8 +784,417 @@ row.appendChild(description);
 list.appendChild(row);
 });
 
+let actions=document.createElement('div');
+actions.className='typhoon-model-info-actions';
+
+let detailButton=document.createElement('button');
+detailButton.type='button';
+detailButton.className='typhoon-model-detail-button';
+detailButton.title='모델 상세 설명 열기';
+detailButton.innerHTML='<span class="typhoon-model-detail-button-icon">▦</span><span>모델 상세 설명</span>';
+detailButton.onclick=()=>openTyphoonModelDetailModal(detailButton);
+
+actions.appendChild(detailButton);
 panel.appendChild(list);
+panel.appendChild(actions);
 return panel;
+}
+
+function ensureTyphoonModelDetailStyles(){
+if(document.getElementById('typhoonModelDetailStyles')){
+return;
+}
+let style=document.createElement('style');
+style.id='typhoonModelDetailStyles';
+style.textContent=`
+.typhoon-model-info-panel{
+position:relative;
+display:flex;
+flex-direction:column;
+min-height:0;
+}
+.typhoon-model-info-list{
+min-height:0;
+}
+.typhoon-model-info-actions{
+display:flex;
+justify-content:flex-end;
+padding:10px 10px 12px;
+margin-top:auto;
+border-top:1px solid rgba(15,23,42,.08);
+background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(248,250,252,.96));
+position:sticky;
+bottom:0;
+z-index:2;
+}
+.typhoon-model-detail-button{
+appearance:none;
+border:1px solid rgba(37,99,235,.22);
+background:linear-gradient(135deg,rgba(37,99,235,.95),rgba(14,165,233,.88));
+color:#fff;
+border-radius:999px;
+padding:8px 13px;
+font-family:inherit;
+font-size:12px;
+font-weight:800;
+letter-spacing:-.01em;
+line-height:1;
+display:inline-flex;
+align-items:center;
+gap:6px;
+box-shadow:0 8px 18px rgba(37,99,235,.22), inset 0 1px 0 rgba(255,255,255,.22);
+cursor:pointer;
+transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;
+}
+.typhoon-model-detail-button:hover{
+transform:translateY(-1px);
+box-shadow:0 11px 24px rgba(37,99,235,.28), inset 0 1px 0 rgba(255,255,255,.26);
+filter:saturate(1.06);
+}
+.typhoon-model-detail-button:active{
+transform:translateY(0);
+box-shadow:0 6px 14px rgba(37,99,235,.2), inset 0 1px 0 rgba(255,255,255,.2);
+}
+.typhoon-model-detail-button:focus-visible{
+outline:3px solid rgba(56,189,248,.45);
+outline-offset:2px;
+}
+.typhoon-model-detail-button-icon{
+font-size:13px;
+line-height:1;
+}
+.typhoon-model-detail-overlay{
+position:fixed;
+inset:0;
+z-index:10000;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:28px;
+background:rgba(15,23,42,.34);
+backdrop-filter:blur(8px) saturate(1.05);
+-webkit-backdrop-filter:blur(8px) saturate(1.05);
+animation:typhoonDetailOverlayIn .16s ease-out;
+}
+.typhoon-model-detail-dialog{
+width:min(1180px,calc(100vw - 44px));
+max-height:min(820px,calc(100vh - 44px));
+background:linear-gradient(180deg,#ffffff,#f8fafc);
+border:1px solid rgba(148,163,184,.34);
+border-radius:22px;
+box-shadow:0 26px 70px rgba(2,6,23,.34),0 2px 10px rgba(15,23,42,.10);
+display:flex;
+flex-direction:column;
+overflow:hidden;
+animation:typhoonDetailDialogIn .18s cubic-bezier(.2,.8,.2,1);
+}
+.typhoon-model-detail-header{
+display:flex;
+align-items:flex-start;
+justify-content:space-between;
+gap:18px;
+padding:22px 24px 18px;
+background:linear-gradient(135deg,#0f172a,#1e3a8a 55%,#0369a1);
+color:#fff;
+}
+.typhoon-model-detail-title-wrap{
+display:flex;
+flex-direction:column;
+gap:7px;
+min-width:0;
+}
+.typhoon-model-detail-title{
+margin:0;
+font-size:23px;
+font-weight:850;
+letter-spacing:-.035em;
+line-height:1.12;
+}
+.typhoon-model-detail-subtitle{
+margin:0;
+font-size:13px;
+font-weight:600;
+color:rgba(219,234,254,.88);
+line-height:1.45;
+}
+.typhoon-model-detail-close{
+appearance:none;
+border:1px solid rgba(255,255,255,.22);
+background:rgba(255,255,255,.12);
+color:#fff;
+width:36px;
+height:36px;
+border-radius:12px;
+font-size:24px;
+line-height:1;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+transition:background .15s ease,transform .15s ease;
+flex:0 0 auto;
+}
+.typhoon-model-detail-close:hover{
+background:rgba(255,255,255,.22);
+transform:translateY(-1px);
+}
+.typhoon-model-detail-body{
+padding:18px 20px 20px;
+min-height:0;
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+.typhoon-model-detail-summary{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+font-size:12px;
+font-weight:800;
+color:#334155;
+}
+.typhoon-model-detail-chip{
+border:1px solid rgba(148,163,184,.32);
+background:#fff;
+border-radius:999px;
+padding:6px 10px;
+box-shadow:0 2px 8px rgba(15,23,42,.04);
+}
+.typhoon-model-detail-table-wrap{
+min-height:0;
+overflow:auto;
+border:1px solid rgba(148,163,184,.28);
+border-radius:16px;
+background:#fff;
+box-shadow:0 8px 24px rgba(15,23,42,.06);
+}
+.typhoon-model-detail-table{
+width:100%;
+border-collapse:separate;
+border-spacing:0;
+font-size:12.5px;
+color:#1e293b;
+min-width:1060px;
+}
+.typhoon-model-detail-table thead th{
+position:sticky;
+top:0;
+z-index:1;
+background:#eaf2ff;
+color:#0f172a;
+font-weight:850;
+text-align:left;
+white-space:nowrap;
+padding:11px 10px;
+border-bottom:1px solid rgba(148,163,184,.42);
+box-shadow:0 1px 0 rgba(255,255,255,.7) inset;
+}
+.typhoon-model-detail-table tbody td{
+padding:10px 10px;
+vertical-align:top;
+border-bottom:1px solid rgba(226,232,240,.9);
+line-height:1.42;
+}
+.typhoon-model-detail-table tbody tr:nth-child(even) td{
+background:#f8fafc;
+}
+.typhoon-model-detail-table tbody tr:hover td{
+background:#eef6ff;
+}
+.typhoon-model-detail-table tbody tr:last-child td{
+border-bottom:0;
+}
+.typhoon-model-detail-name{
+font-weight:850;
+white-space:nowrap;
+color:#0f172a;
+}
+.typhoon-model-detail-basis{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+border-radius:999px;
+padding:3px 8px;
+font-weight:850;
+font-size:11.5px;
+white-space:nowrap;
+}
+.typhoon-model-detail-basis.is-ai{
+background:#f5e8ff;
+color:#7e22ce;
+}
+.typhoon-model-detail-basis.is-dynamical{
+background:#e0f2fe;
+color:#075985;
+}
+.typhoon-model-detail-note{
+color:#475569;
+min-width:170px;
+}
+@keyframes typhoonDetailOverlayIn{
+from{opacity:0;}
+to{opacity:1;}
+}
+@keyframes typhoonDetailDialogIn{
+from{opacity:0;transform:translateY(10px) scale(.985);}
+to{opacity:1;transform:translateY(0) scale(1);}
+}
+@media (max-width: 900px){
+.typhoon-model-detail-overlay{padding:14px;align-items:stretch;}
+.typhoon-model-detail-dialog{width:100%;max-height:calc(100vh - 28px);border-radius:18px;}
+.typhoon-model-detail-header{padding:18px 18px 15px;}
+.typhoon-model-detail-title{font-size:20px;}
+.typhoon-model-detail-body{padding:14px;}
+.typhoon-model-detail-table{font-size:12px;}
+}
+`;
+document.head.appendChild(style);
+}
+
+function openTyphoonModelDetailModal(triggerElement=null){
+ensureTyphoonModelDetailStyles();
+closeTyphoonModelDetailModal({restoreFocus:false});
+typhoonState.modelDetailLastFocus=triggerElement || document.activeElement;
+
+let overlay=document.createElement('div');
+overlay.className='typhoon-model-detail-overlay';
+overlay.dataset.role='modelDetailOverlay';
+overlay.setAttribute('aria-hidden','false');
+
+let dialog=document.createElement('section');
+dialog.className='typhoon-model-detail-dialog';
+dialog.setAttribute('role','dialog');
+dialog.setAttribute('aria-modal','true');
+dialog.setAttribute('aria-labelledby','typhoonModelDetailTitle');
+dialog.tabIndex=-1;
+
+let header=document.createElement('div');
+header.className='typhoon-model-detail-header';
+
+let titleWrap=document.createElement('div');
+titleWrap.className='typhoon-model-detail-title-wrap';
+
+let title=document.createElement('h2');
+title.id='typhoonModelDetailTitle';
+title.className='typhoon-model-detail-title';
+title.textContent='모델 상세 설명';
+
+let subtitle=document.createElement('p');
+subtitle.className='typhoon-model-detail-subtitle';
+subtitle.textContent='표출 모델의 운영기관, 모델명, 도메인, 해상도, 연직층수와 기반 정보를 정리한 표입니다.';
+
+titleWrap.appendChild(title);
+titleWrap.appendChild(subtitle);
+
+let closeButton=document.createElement('button');
+closeButton.type='button';
+closeButton.className='typhoon-model-detail-close';
+closeButton.setAttribute('aria-label','모델 상세 설명 닫기');
+closeButton.innerHTML='×';
+closeButton.onclick=()=>closeTyphoonModelDetailModal();
+
+header.appendChild(titleWrap);
+header.appendChild(closeButton);
+
+let body=document.createElement('div');
+body.className='typhoon-model-detail-body';
+body.appendChild(createTyphoonModelDetailSummary());
+body.appendChild(createTyphoonModelDetailTable());
+
+dialog.appendChild(header);
+dialog.appendChild(body);
+overlay.appendChild(dialog);
+overlay.addEventListener('click',event=>{
+if(event.target===overlay){
+closeTyphoonModelDetailModal();
+}
+});
+
+document.body.appendChild(overlay);
+dialog.focus({preventScroll:true});
+}
+
+function closeTyphoonModelDetailModal({restoreFocus=true}={}){
+let overlay=document.querySelector('[data-role="modelDetailOverlay"]');
+if(overlay){
+overlay.remove();
+}
+if(restoreFocus && typhoonState.modelDetailLastFocus && typeof typhoonState.modelDetailLastFocus.focus==='function'){
+typhoonState.modelDetailLastFocus.focus({preventScroll:true});
+}
+typhoonState.modelDetailLastFocus=null;
+}
+
+function createTyphoonModelDetailSummary(){
+let summary=document.createElement('div');
+summary.className='typhoon-model-detail-summary';
+let total=TYPHOON_MODEL_DETAIL_ROWS.length;
+let aiCount=TYPHOON_MODEL_DETAIL_ROWS.filter(row=>String(row['기반'] || '').toUpperCase()==='AI').length;
+let dynamicalCount=total-aiCount;
+[
+`전체 ${total}개 모델`,
+`역학코어 ${dynamicalCount}개`,
+`AI ${aiCount}개`,
+'가로 스크롤 지원'
+].forEach(text=>{
+let chip=document.createElement('span');
+chip.className='typhoon-model-detail-chip';
+chip.textContent=text;
+summary.appendChild(chip);
+});
+return summary;
+}
+
+function createTyphoonModelDetailTable(){
+let wrap=document.createElement('div');
+wrap.className='typhoon-model-detail-table-wrap';
+
+let table=document.createElement('table');
+table.className='typhoon-model-detail-table';
+
+let thead=document.createElement('thead');
+let headRow=document.createElement('tr');
+TYPHOON_MODEL_DETAIL_COLUMNS.forEach(column=>{
+let th=document.createElement('th');
+th.scope='col';
+th.textContent=column;
+headRow.appendChild(th);
+});
+thead.appendChild(headRow);
+
+let tbody=document.createElement('tbody');
+TYPHOON_MODEL_DETAIL_ROWS.forEach(row=>{
+let tr=document.createElement('tr');
+TYPHOON_MODEL_DETAIL_COLUMNS.forEach(column=>{
+let td=document.createElement('td');
+let value=row[column] || '';
+if(column==='표출명칭'){
+td.className='typhoon-model-detail-name';
+td.textContent=value;
+}
+else if(column==='기반'){
+let chip=document.createElement('span');
+let isAi=String(value).toUpperCase()==='AI';
+chip.className='typhoon-model-detail-basis '+(isAi?'is-ai':'is-dynamical');
+chip.textContent=value || '-';
+td.appendChild(chip);
+}
+else if(column==='참고사항'){
+td.className='typhoon-model-detail-note';
+td.textContent=value || '-';
+}
+else{
+td.textContent=value || '-';
+}
+tr.appendChild(td);
+});
+tbody.appendChild(tr);
+});
+
+table.appendChild(thead);
+table.appendChild(tbody);
+wrap.appendChild(table);
+return wrap;
 }
 
 function createTyphoonFcstSelector(){
@@ -658,15 +1481,20 @@ byKey.set(entry.stormKey,{
 key:entry.stormKey,
 typNumber:entry.typNumber,
 label:stormDropdownLabel(entry),
+first:entry.dataTime,
 latest:entry.dataTime
 });
 }
 let storm=byKey.get(entry.stormKey);
+if(entry.dataTime<storm.first){
+storm.first=entry.dataTime;
+}
 if(entry.dataTime>storm.latest){
 storm.latest=entry.dataTime;
 }
 });
 return [...byKey.values()].sort((a,b)=>
+String(b.first || '').localeCompare(String(a.first || '')) ||
 String(b.latest || '').localeCompare(String(a.latest || '')) ||
 Number(b.typNumber || 0)-Number(a.typNumber || 0) ||
 a.label.localeCompare(b.label)
@@ -972,6 +1800,15 @@ window.addEventListener('mouseup',handleUp);
 }
 
 function handleTyphoonKeydown(event){
+let modalOverlay=document.querySelector('[data-role="modelDetailOverlay"]');
+if(modalOverlay){
+if(event.key==='Escape'){
+event.preventDefault();
+closeTyphoonModelDetailModal();
+}
+return;
+}
+
 let active=document.activeElement;
 let tag=active?.tagName;
 
