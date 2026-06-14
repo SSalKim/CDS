@@ -291,6 +291,11 @@ jobs:
 
             echo "::group::VTG cycle $CYCLE"
 
+
+
+            CHANGED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths.txt"
+            rm -f "$CHANGED_PATHS_FILE"
+
             run_with_retry python vtg_auto.py \
               --now "$CYCLE" \
               --force \
@@ -298,22 +303,37 @@ jobs:
               --fcst-hours "120,240" \
               --no-auto-fcst-hours \
               --min-run-interval-minutes 0 \
-              --changed-paths-file vtg_changed_paths.txt
+              --changed-paths-file "$CHANGED_PATHS_FILE"
 
             COUNT=$((COUNT + 1))
 
-            if [ -f vtg_changed_paths.txt ] && [ -s vtg_changed_paths.txt ]; then
-              sort -u vtg_changed_paths.txt -o vtg_changed_paths.txt
-              git add --pathspec-from-file=vtg_changed_paths.txt || true
+            touch "$CHANGED_PATHS_FILE"
+
+            # vtg_auto.py가 알려준 경로 + Git이 실제 감지한 VTG_IMG 변경분을 합침
+            git diff --name-only -- VTG_IMG >> "$CHANGED_PATHS_FILE" || true
+            git ls-files --others --exclude-standard -- VTG_IMG >> "$CHANGED_PATHS_FILE" || true
+            sort -u "$CHANGED_PATHS_FILE" -o "$CHANGED_PATHS_FILE"
+
+            if [ -s "$CHANGED_PATHS_FILE" ]; then
+              git add --pathspec-from-file="$CHANGED_PATHS_FILE" || true
             else
-              echo "Changed-path list is empty or missing; falling back to VTG_IMG status check."
-              git add VTG_IMG || true
+              echo "No changed VTG paths found."
             fi
 
             if git diff --cached --quiet; then
               echo "No VTG asset changes for $CYCLE."
             else
               git commit -m "Backfill VTG images $CYCLE"
+
+              # Safety net: if any VTG_IMG changes were missed by changed-paths-file,
+              # include them in the just-created commit before rebasing.
+              if [ -n "$(git status --porcelain -- VTG_IMG)" ]; then
+                echo "Unexpected unstaged/untracked VTG_IMG changes before rebase:"
+                git status --short -- VTG_IMG
+                git add -A VTG_IMG
+                git commit --amend --no-edit
+              fi
+
               for attempt in 1 2 3; do
                 git fetch origin main
                 git rebase origin/main
