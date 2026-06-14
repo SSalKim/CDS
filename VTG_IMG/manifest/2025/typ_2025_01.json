@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202506121700",
+  "updated_at_utc": "202506122300",
   "storm_key": "typ_2025_01",
   "stage": "TYP",
   "year": 2025,
@@ -1039,28 +1039,28 @@
     {
       "job": {
         "storm_key": "typ_2025_01",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2025,
         "data_time": "202506121800",
         "td_number": null,
         "linked_td_number": 1,
-        "linked_typ_number": null,
         "typ_number": 1,
-        "data_typ_number": 1,
         "typ_name_ko": "우딥",
         "typ_name": "WUTIP",
         "typ_en": "WUTIP",
         "atcf_id": "wp012025",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202506121800"
+        "data_time": "202506121800",
+        "cycle_time_utc": "202506121800",
+        "start_utc": "202506122300",
+        "end_utc": "202506130500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614024310",
+          "generated_at_utc": "20260614055313",
           "image_path": "VTG_IMG/2025/TYP_2501_WUTIP/TYP_2501_WUTIP_202506121800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2025",
@@ -1076,7 +1076,7 @@
           "fcst_hours": 120,
           "intensity": "TYP",
           "model_count": 16,
-          "target_model_count": 39,
+          "target_model_count": 33,
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -1095,37 +1095,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202506121800_typ_2025_01_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2025_01",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2025,
         "data_time": "202506121800",
         "td_number": null,
         "linked_td_number": 1,
-        "linked_typ_number": null,
         "typ_number": 1,
-        "data_typ_number": 1,
         "typ_name_ko": "우딥",
         "typ_name": "WUTIP",
         "typ_en": "WUTIP",
         "atcf_id": "wp012025",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202506121800"
+        "data_time": "202506121800",
+        "cycle_time_utc": "202506121800",
+        "start_utc": "202506122300",
+        "end_utc": "202506130500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614024311",
+          "generated_at_utc": "20260614055315",
           "image_path": "VTG_IMG/2025/TYP_2501_WUTIP/TYP_2501_WUTIP_202506121800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2025",
@@ -1141,7 +1141,7 @@
           "fcst_hours": 240,
           "intensity": "TYP",
           "model_count": 16,
-          "target_model_count": 39,
+          "target_model_count": 33,
           "model_labels": [
             "GALWEM",
             "COAMPS-TC EPS",
@@ -1160,11 +1160,11 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202506121800_typ_2025_01_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
