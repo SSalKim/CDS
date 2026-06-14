@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202408151100",
+  "updated_at_utc": "202606142108",
   "storm_key": "td_2024_16",
-  "stage": "TD_LINKED_TYP",
+  "stage": "TD",
   "year": 2024,
   "typ_number": 16,
   "linked_td_number": null,
@@ -14,27 +14,27 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2024_16_typ_08",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2024_16",
+        "stage": "TD",
         "year": 2024,
         "data_time": "202408150600",
         "td_number": 16,
         "linked_td_number": null,
+        "linked_typ_number": 8,
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "우쿵",
         "typ_name": "WUKONG",
         "typ_en": "WUKONG",
         "atcf_id": "wp092024",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202408150600",
-        "cycle_time_utc": "202408150600",
-        "start_utc": "202408151100",
-        "end_utc": "202408151700"
+        "data_time": "202408150600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260614170423",
           "image_path": "VTG_IMG/2024/TD_2416_WUKONG/TD_2416_WUKONG_202408150600_120h.png",
@@ -60,35 +60,35 @@
             "KIM",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202408150600_td_2024_16_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2024_16_typ_08",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2024_16",
+        "stage": "TD",
         "year": 2024,
         "data_time": "202408150600",
         "td_number": 16,
         "linked_td_number": null,
+        "linked_typ_number": 8,
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "우쿵",
         "typ_name": "WUKONG",
         "typ_en": "WUKONG",
         "atcf_id": "wp092024",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202408150600",
-        "cycle_time_utc": "202408150600",
-        "start_utc": "202408151100",
-        "end_utc": "202408151700"
+        "data_time": "202408150600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260614170425",
           "image_path": "VTG_IMG/2024/TD_2416_WUKONG/TD_2416_WUKONG_202408150600_240h.png",
@@ -114,11 +114,11 @@
             "KIM",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202408150600_td_2024_16_240h.json"
     }
   ]
 }

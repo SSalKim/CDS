@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202411090500",
+  "updated_at_utc": "202606142108",
   "storm_key": "td_2024_50",
-  "stage": "TD_PRE_TYP",
+  "stage": "TD",
   "year": 2024,
   "typ_number": 50,
   "linked_td_number": null,
@@ -14,27 +14,27 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2024_50_typ_24",
-        "stage": "TD_PRE_TYP",
+        "storm_key": "td_2024_50",
+        "stage": "TD",
         "year": 2024,
         "data_time": "202411090000",
         "td_number": 50,
         "linked_td_number": null,
+        "linked_typ_number": 24,
         "typ_number": 50,
+        "data_typ_number": 50,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp252024",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202411090000",
-        "cycle_time_utc": "202411090000",
-        "start_utc": "202411090500",
-        "end_utc": "202411091100"
+        "data_time": "202411090000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260614201718",
           "image_path": "VTG_IMG/2024/TD_2450_NONAME/TD_2450_NONAME_202411090000_120h.png",
@@ -69,35 +69,35 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202411090000_td_2024_50_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2024_50_typ_24",
-        "stage": "TD_PRE_TYP",
+        "storm_key": "td_2024_50",
+        "stage": "TD",
         "year": 2024,
         "data_time": "202411090000",
         "td_number": 50,
         "linked_td_number": null,
+        "linked_typ_number": 24,
         "typ_number": 50,
+        "data_typ_number": 50,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp252024",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202411090000",
-        "cycle_time_utc": "202411090000",
-        "start_utc": "202411090500",
-        "end_utc": "202411091100"
+        "data_time": "202411090000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260614201728",
           "image_path": "VTG_IMG/2024/TD_2450_NONAME/TD_2450_NONAME_202411090000_240h.png",
@@ -132,11 +132,11 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202411090000_td_2024_50_240h.json"
     }
   ]
 }

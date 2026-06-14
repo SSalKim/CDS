@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202409151100",
+  "updated_at_utc": "202606142108",
   "storm_key": "td_2024_30",
-  "stage": "TD_PRE_TYP",
+  "stage": "TD",
   "year": 2024,
   "typ_number": 30,
   "linked_td_number": null,
@@ -14,27 +14,27 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2024_30_typ_14",
-        "stage": "TD_PRE_TYP",
+        "storm_key": "td_2024_30",
+        "stage": "TD",
         "year": 2024,
         "data_time": "202409150600",
         "td_number": 30,
         "linked_td_number": null,
+        "linked_typ_number": 14,
         "typ_number": 30,
+        "data_typ_number": 30,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp152024",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202409150600",
-        "cycle_time_utc": "202409150600",
-        "start_utc": "202409151100",
-        "end_utc": "202409151700"
+        "data_time": "202409150600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260614182450",
           "image_path": "VTG_IMG/2024/TD_2430_NONAME/TD_2430_NONAME_202409150600_120h.png",
@@ -64,35 +64,35 @@
             "HAFS",
             "JGSM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202409150600_td_2024_30_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2024_30_typ_14",
-        "stage": "TD_PRE_TYP",
+        "storm_key": "td_2024_30",
+        "stage": "TD",
         "year": 2024,
         "data_time": "202409150600",
         "td_number": 30,
         "linked_td_number": null,
+        "linked_typ_number": 14,
         "typ_number": 30,
+        "data_typ_number": 30,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp152024",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202409150600",
-        "cycle_time_utc": "202409150600",
-        "start_utc": "202409151100",
-        "end_utc": "202409151700"
+        "data_time": "202409150600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260614182452",
           "image_path": "VTG_IMG/2024/TD_2430_NONAME/TD_2430_NONAME_202409150600_240h.png",
@@ -122,11 +122,11 @@
             "HAFS",
             "JGSM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202409150600_td_2024_30_240h.json"
     }
   ]
 }
