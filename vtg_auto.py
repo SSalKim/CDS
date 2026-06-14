@@ -72,6 +72,8 @@ BDECK_FETCH_STATS = {
     "missing": 0,
     "errors": 0,
 }
+DEFAULT_ATCF_POSITION_PARALLEL_WORKERS = max(1, int(os.getenv("ATCF_POSITION_PARALLEL_WORKERS", "6")))
+DEFAULT_ATCF_POSITION_BDECK_TIMEOUT = float(os.getenv("ATCF_POSITION_BDECK_TIMEOUT", "10"))
 
 REQUEST_HEADERS = {
     "User-Agent": (
@@ -523,33 +525,49 @@ def candidate_atcf_ids(*, typ_number: int, year: int, positive_radius: int, nega
     )
 
 
-def candidate_td_atcf_ids(*, td_number: int, year: int) -> list[str]:
-    # For KMA TD systems, the best regular-ID first guess is TD/2 rounded up.
-    # TD can still be an invest in JTWC, so scan wp90..wp99 between the tight
-    # regular-ID band and the wider regular-ID band.
-    first_offsets, second_offsets = ordered_regular_atcf_offsets()
-    base_number = max(1, min(89, math.ceil(td_number / 2)))
-    ids = make_atcf_ids_from_offsets(
-        base_number=base_number,
-        year=year,
-        offsets=first_offsets,
-        regular_only=True,
+def candidate_td_atcf_ids(*, td_number: int, year: int, linked_typ_number: int | None = None) -> list[str]:
+    # For KMA TD systems, prefer the linked future/active TYP number when it is
+    # already known. Otherwise, the best regular-ID first guess is TD/2 rounded
+    # up. TD can still be an invest in JTWC, so scan wp90..wp99 before looking
+    # at lower regular numbers.
+    base_number = linked_typ_number if linked_typ_number else math.ceil(td_number / 2)
+    base_number = max(1, min(89, int(base_number)))
+
+    groups = (
+        make_atcf_ids_from_offsets(
+            base_number=base_number,
+            year=year,
+            offsets=[0, 1, 2, 3, 4, 5],
+            regular_only=True,
+        ),
+        [f"wp{candidate_number:02d}{year}" for candidate_number in range(90, 100)],
+        make_atcf_ids_from_offsets(
+            base_number=base_number,
+            year=year,
+            offsets=[-1, -2, -3],
+            regular_only=True,
+        ),
+        make_atcf_ids_from_offsets(
+            base_number=base_number,
+            year=year,
+            offsets=[6, 7, 8, 9, 10],
+            regular_only=True,
+        ),
+        make_atcf_ids_from_offsets(
+            base_number=base_number,
+            year=year,
+            offsets=[-4, -5],
+            regular_only=True,
+        ),
     )
-    seen = set(ids)
-    for candidate_number in range(90, 100):
-        atcf_id = f"wp{candidate_number:02d}{year}"
-        if atcf_id not in seen:
-            seen.add(atcf_id)
-            ids.append(atcf_id)
-    for atcf_id in make_atcf_ids_from_offsets(
-        base_number=base_number,
-        year=year,
-        offsets=second_offsets,
-        regular_only=True,
-    ):
-        if atcf_id not in seen:
-            seen.add(atcf_id)
-            ids.append(atcf_id)
+
+    ids: list[str] = []
+    seen: set[str] = set()
+    for group in groups:
+        for atcf_id in group:
+            if atcf_id not in seen:
+                seen.add(atcf_id)
+                ids.append(atcf_id)
     return ids
 
 
@@ -729,6 +747,44 @@ def find_atcf_match(
     return None
 
 
+def fetch_bdeck_texts_parallel(
+    atcf_ids: list[str],
+    *,
+    timeout: float = DEFAULT_ATCF_POSITION_BDECK_TIMEOUT,
+    max_workers: int = DEFAULT_ATCF_POSITION_PARALLEL_WORKERS,
+) -> dict[str, str | None]:
+    unique_ids: list[str] = []
+    seen: set[str] = set()
+    for atcf_id in atcf_ids:
+        normalized = str(atcf_id or "").strip().lower()
+        if not normalized or normalized in seen:
+            continue
+        seen.add(normalized)
+        unique_ids.append(normalized)
+
+    if not unique_ids:
+        return {}
+    if max_workers <= 1 or len(unique_ids) == 1:
+        return {atcf_id: fetch_bdeck_text(atcf_id, timeout=timeout) for atcf_id in unique_ids}
+
+    results: dict[str, str | None] = {}
+    worker_count = min(max_workers, len(unique_ids))
+    with ThreadPoolExecutor(max_workers=worker_count) as executor:
+        futures = {
+            executor.submit(fetch_bdeck_text, atcf_id, timeout=timeout): atcf_id
+            for atcf_id in unique_ids
+        }
+        for future in as_completed(futures):
+            atcf_id = futures[future]
+            try:
+                results[atcf_id] = future.result()
+            except Exception as exc:
+                BDECK_FETCH_STATS["errors"] = BDECK_FETCH_STATS.get("errors", 0) + 1
+                print(f"Warning: parallel BDECK fetch failed for {atcf_id}: {exc}", file=sys.stderr)
+                results[atcf_id] = None
+    return results
+
+
 def find_atcf_position_match(
     *,
     typ_number: int,
@@ -755,9 +811,22 @@ def find_atcf_position_match(
             negative_radius=negative_radius,
         )
 
-    candidates: list[AtcfMatch] = []
+    ordered_ids: list[str] = []
+    seen_ids: set[str] = set()
     for atcf_id in atcf_ids:
-        text = fetch_bdeck_text(atcf_id, timeout=15)
+        normalized = str(atcf_id or "").strip().lower()
+        if normalized and normalized not in seen_ids:
+            seen_ids.add(normalized)
+            ordered_ids.append(normalized)
+
+    # Name matching already stores successful/missing BDECKs in memory, so this
+    # parallel fetch reuses those cached results immediately and only downloads
+    # candidates that were not opened earlier in this same workflow run.
+    bdeck_texts = fetch_bdeck_texts_parallel(ordered_ids)
+
+    candidates: list[AtcfMatch] = []
+    for atcf_id in ordered_ids:
+        text = bdeck_texts.get(atcf_id)
         if not text:
             continue
         for point in bdeck_track_points(text, reference_time=kma_point.time_utc):
@@ -806,7 +875,6 @@ def find_atcf_position_match(
                     return preferred_candidate
             return None
     return candidates[0]
-
 
 def active_cycle_windows(now: datetime) -> list[CycleWindow]:
     windows = []
@@ -941,14 +1009,67 @@ def manual_atcf_id(manual_map: dict, *, year: int, td_number: int | None, typ_nu
     return None
 
 
-def linked_td_number_for_typ(td_rows: list[dict], *, year: int, typ_number: int) -> int | None:
+def linked_td_number_for_typ(
+    td_rows: list[dict],
+    *,
+    year: int,
+    typ_number: int,
+    data_time: str = "",
+) -> int | None:
+    candidates: list[tuple[int, datetime | None, datetime | None]] = []
     for row in td_rows:
         try:
-            if int(row.get("YY", 0)) == year and int(row.get("TYP", -1)) == typ_number:
-                return int(row.get("TD", 0))
+            row_year = int(row.get("YY", 0))
+            row_typ_number = int(row.get("TYP", -1))
+            row_td_number = int(row.get("TD", 0))
         except (TypeError, ValueError):
             continue
-    return None
+        if row_year != year or row_typ_number != typ_number:
+            continue
+        candidates.append((
+            row_td_number,
+            parse_utc_stamp(str(row.get("TM_ST") or "")),
+            parse_utc_stamp(str(row.get("TM_ED") or "")),
+        ))
+
+    if not candidates:
+        return None
+
+    target_time = parse_utc_stamp(data_time) if data_time else None
+    if target_time is not None:
+        active_candidates = [
+            item for item in candidates
+            if (item[1] is None or item[1] <= target_time)
+            and (item[2] is None or target_time <= item[2])
+        ]
+        if active_candidates:
+            return max(active_candidates, key=lambda item: item[1] or datetime.min.replace(tzinfo=timezone.utc))[0]
+
+        previous_candidates = [
+            item for item in candidates
+            if item[1] is not None and item[1] <= target_time
+        ]
+        if previous_candidates:
+            return max(previous_candidates, key=lambda item: item[1] or datetime.min.replace(tzinfo=timezone.utc))[0]
+
+    return min(candidates, key=lambda item: item[1] or datetime.max.replace(tzinfo=timezone.utc))[0]
+
+
+def active_linked_td_rows_by_typ(td_rows: list[dict], *, now: datetime) -> dict[tuple[int, int], list[dict]]:
+    active_rows: dict[tuple[int, int], list[dict]] = {}
+    for row in td_rows:
+        try:
+            year = int(row.get("YY", 0))
+            td_number = int(row.get("TD", 0))
+            typ_number = int(row.get("TYP", 0))
+        except (TypeError, ValueError):
+            continue
+        if typ_number <= 0:
+            continue
+        if not active_at(now, row.get("TM_ST", ""), row.get("TM_ED", "")):
+            continue
+        active_rows.setdefault((year, typ_number), []).append(row)
+    return active_rows
 
 
 def build_storm_jobs(
@@ -979,21 +1100,42 @@ def build_storm_jobs(
     if not data_dt:
         return jobs
 
+    # KMA can list one named typhoon period broadly in typ_lst.php while td_lst.php
+    # contains intermittent weakening/redevelopment TD episodes linked to the same
+    # TYP number. In those intervals, prefer the active TD row and suppress the
+    # broad TYP row to avoid rendering the system as TYP during a TD phase.
+    active_td_links = active_linked_td_rows_by_typ(td_rows, now=now)
+
     active_typhoons: list[tuple[int, int]] = []
+    seen_typ_keys: set[tuple[int, int]] = set()
     for row in typ_rows:
         try:
             typ_number = int(row["SEQ"])
             year = int(row["YY"])
         except (TypeError, ValueError):
             continue
+        typ_key = (year, typ_number)
+        if typ_key in seen_typ_keys:
+            continue
         is_active = active_typ_at(now, row)
         if not is_active:
             continue
         if parse_utc_stamp(row.get("TM_ST", "")) and data_dt < parse_utc_stamp(row.get("TM_ST", "")):
             continue
+        if typ_key in active_td_links:
+            td_labels = ", ".join(
+                f"TD{safe_int(item.get('TD')) or 0:02d}"
+                for item in active_td_links.get(typ_key, [])
+            )
+            print(
+                f"Suppressing broad TYP{typ_number:02d} row at {data_time}; "
+                f"active linked TD phase detected: {td_labels}."
+            )
+            continue
+        seen_typ_keys.add(typ_key)
         typ_en = row.get("TYP_EN", "").strip().upper()
         typ_name_ko = row.get("TYP_NAME", "").strip()
-        linked_td_number = linked_td_number_for_typ(td_rows, year=year, typ_number=typ_number)
+        linked_td_number = linked_td_number_for_typ(td_rows, year=year, typ_number=typ_number, data_time=data_time)
         typ_atcf_ids = candidate_atcf_ids(
             typ_number=typ_number,
             year=year,
@@ -1115,8 +1257,8 @@ def build_storm_jobs(
         display_typ_en = linked_typ_en if linked_typ_has_started else ""
         display_typ_name_ko = linked_typ_name_ko if linked_typ_has_started else ""
 
-        td_atcf_ids = candidate_td_atcf_ids(td_number=td_number, year=year)
-        td_base_atcf_number = max(1, min(89, math.ceil(td_number / 2)))
+        td_atcf_ids = candidate_td_atcf_ids(td_number=td_number, year=year, linked_typ_number=(typ_number or None))
+        td_base_atcf_number = max(1, min(89, typ_number or math.ceil(td_number / 2)))
         manual_id = None
         atcf_match = None
         if resolve_atcf:

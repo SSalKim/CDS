@@ -93,7 +93,7 @@ MODEL_SOURCES = [
     {"name": "UM", "apihub": "UM", "noaa": None, "knackwx": None},
     {"name": "UM_GFDL_6h", "apihub": "UM_GFDL_6h", "noaa": None, "knackwx": None},
     {"name": "UM_KEPS", "apihub": "UM_KEPS", "noaa": None, "knackwx": None},
-    {"name": "UKM", "apihub": None, "noaa": "UKM", "knackwx": "UKM"},
+    {"name": "UKM", "apihub": "UKX", "noaa": "UKM", "knackwx": "UKM"},
     {"name": "UKMO_EPS", "apihub": None, "noaa": "UEMN", "knackwx": "UEMN"},
     {"name": "GFS", "apihub": "GFS", "noaa": "AVNO", "knackwx": "AVNO"},
     {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "knackwx": "AEMN"},
@@ -177,14 +177,37 @@ MODEL_CATEGORIES = {
 }
 
 MODEL_ACTIVE_WINDOWS = {
-    "UM": (None, "202603312359"),
-    "UM_GFDL_6h": (None, "202603312359"),
-    "UM_KEPS": (None, "202603312359"),
-    "FNUM_AI": (None, "202603312359"),
-    "PGUM_AI": (None, "202603312359"),
-    "GCUM_AI": (None, "202603312359"),
-    "UKM": ("202604010000", None),
-    "UKMO_EPS": ("202604010000", None),
+    "ECMWF_AIFS": ("202408010000", None),           # ECMWF AIFS 예측자료 신규 추가(2024.8.19.~)
+
+    "FNEC_AI": ("202405150000", None),              # 기상청(KMA) AI 예측자료 신규 추가(2025.3.17.~)
+    "FNKM_AI": ("202405150000", None),              # 기상청(KMA) AI 예측자료 신규 추가(2025.3.17.~)  
+    "PGEC_AI": ("202405150000", None),              # 기상청(KMA) AI 예측자료 신규 추가(2025.3.17.~)
+    "PGKM_AI": ("202405150000", None),              # 기상청(KMA) AI 예측자료 신규 추가(2025.3.17.~)
+    "GCEC_AI": ("202405150000", None),              # 기상청(KMA) AI 예측자료 신규 추가(2025.3.17.~)
+    "GCKM_AI": ("202405150000", None),              # 기상청(KMA) AI 예측자료 신규 추가(2025.3.17.~)
+
+    "GENC": ("202506010000", None),                 # Google DeeepMind Ensemble 예측자료 신규 추가(2025.6.1.~)
+    "FNV3": ("202506010000", None),                 # Google DeeepMind Ensemble 예측자료 신규 추가(2025.6.1.~)
+
+    "HKO_AREC": ("202507210000", None),             # 홍콩기상청(HKO) AI 예측자료 신규 추가(2025.8.12.~)
+    "HKO_FXEC": ("202507210000", None),             # 홍콩기상청(HKO) AI 예측자료 신규 추가(2025.8.12.~)
+    "HKO_FWEC": ("202507210000", None),             # 홍콩기상청(HKO) AI 예측자료 신규 추가(2025.8.12.~)
+
+    "UM": (None, "202603312359"),                   # 기상청(KMA) UM 기반 수치예보시스템 종료(2026.3.31.),
+    "UM_GFDL_6h": (None, "202603312359"),           # 기상청(KMA) UM 기반 수치예보시스템 종료(2026.3.31.),
+    "UM_KEPS": (None, "202603312359"),              # 기상청(KMA) UM 기반 수치예보시스템 종료(2026.3.31.),
+    "FNUM_AI": ("202405150000", "202603312359"),    # 기상청(KMA) UM 기반 수치예보시스템 종료(2026.3.31.),
+    "PGUM_AI": ("202405150000", "202603312359"),    # 기상청(KMA) UM 기반 수치예보시스템 종료(2026.3.31.),
+    "GCUM_AI": ("202405150000", "202603312359"),    # 기상청(KMA) UM 기반 수치예보시스템 종료(2026.3.31.),
+
+    "UKM": ("202604010000", None),                  # 영국기상청(UKMO) UM 예측자료 신규 추가(2026.4.1.~)
+    "UKMO_EPS": ("202604010000", None),             # 영국기상청(UKMO) UM 예측자료 신규 추가(2026.4.1.~)
+
+    "AIGFS": ("202601010000", None),                # 미해양대기청(NOAA) AI 예측자료 신규 추가(2026.4.1.~)
+    "AIGEFS": ("202601010000", None),               # 미해양대기청(NOAA) AI 예측자료 신규 추가(2026.4.1.~)
+
+    "IFEC_AI": ("202601010000", None),              # 기상청(KMA) AIFS 예측자료 신규 추가(2026.4.28.~)
+    "IFKM_AI": ("202601010000", None),              # 기상청(KMA) AIFS 예측자료 신규 추가(2026.4.28.~)
 }
 
 NO_PRESSURE_SUMMARY_MODELS = {"UKMO_EPS"}
@@ -274,12 +297,27 @@ for row in MODEL_SOURCES:
         alias_ids = []
         if source == "APIHUB" and model_id == "UM_KEPS":
             alias_ids.append("KEPS")
+        if source == "APIHUB" and model_id == "NAVGEM":
+            alias_ids.append("NOGAPS")
+
         if model_id.endswith("_AI"):
             alias_ids.append(model_id[:-3])
+        if source == "APIHUB" and model_id == "GCEC_AI":
+            alias_ids.extend(["GPEC"])
+        if source == "APIHUB" and model_id == "GCKM_AI":
+            alias_ids.extend(["GPKM"])
+        if source == "APIHUB" and model_id == "GCUM_AI":
+            alias_ids.extend(["GPUM"])
+
+        if source == "APIHUB" and model_id == "ECMWF_AIFS":
+            alias_ids.extend(["ECMWF_AIFS", "ECMF_AIFS"])
+        if source == "NOAA" and model_id == "ECMWF":
+            alias_ids.extend(["ECMF", "ECMO"])
 
         for alias_id in alias_ids:
             MODEL_SOURCE_ALIASES.setdefault(alias_id, row["name"])
             SOURCE_MODEL_IDS[source].add(alias_id)
+
 DATA_SOURCE_COLUMN = "_DATA_SOURCE"
 MS_PER_KT = 0.514444
 KMA_BASE_URL = "https://apihub-pub.kma.go.kr/api/typ01/url/typ_gts_now.php"
