@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202606140300",
+  "updated_at_utc": "202606051700",
   "storm_key": "td_2026_11",
   "stage": "TD",
   "year": 2026,
@@ -791,28 +791,28 @@
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606051200",
         "td_number": 11,
         "linked_td_number": null,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
-        "atcf_id": "",
-        "fcst_hours": 120,
-        "skip_atcf": true
+        "typ_en": "",
+        "atcf_id": "wp912026",
+        "skip_atcf": false
       },
       "window": {
-        "data_time": "202606051200"
+        "data_time": "202606051200",
+        "cycle_time_utc": "202606051200",
+        "start_utc": "202606051700",
+        "end_utc": "202606052300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614000436",
+          "generated_at_utc": "20260614035059",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606051200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -822,15 +822,17 @@
           "typ_name_ko": "",
           "linked_td_number": null,
           "linked_typ_number": null,
-          "atcf_id": "",
+          "atcf_id": "wp912026",
           "extra_atcf_ids": [],
           "data_time": "202606051200",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 12,
+          "model_count": 14,
           "target_model_count": 36,
           "model_labels": [
+            "ECMWF",
             "ECMWF AIFS",
+            "ECMWF AIFS EPS",
             "ECMWF EPS",
             "FourCastNet-ECMWF",
             "FourCastNet-KIM",
@@ -843,37 +845,37 @@
             "Pangu-Weather-ECMWF",
             "Pangu-Weather-KIM"
           ],
-          "skip_atcf": true,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202606051200_td_2026_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2026_11",
-        "stage": "TD",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606051200",
         "td_number": 11,
         "linked_td_number": null,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
-        "atcf_id": "",
-        "fcst_hours": 240,
-        "skip_atcf": true
+        "typ_en": "",
+        "atcf_id": "wp912026",
+        "skip_atcf": false
       },
       "window": {
-        "data_time": "202606051200"
+        "data_time": "202606051200",
+        "cycle_time_utc": "202606051200",
+        "start_utc": "202606051700",
+        "end_utc": "202606052300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614000438",
+          "generated_at_utc": "20260614035100",
           "image_path": "VTG_IMG/2026/TD_2611_NONAME/TD_2611_NONAME_202606051200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -883,15 +885,17 @@
           "typ_name_ko": "",
           "linked_td_number": null,
           "linked_typ_number": null,
-          "atcf_id": "",
+          "atcf_id": "wp912026",
           "extra_atcf_ids": [],
           "data_time": "202606051200",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 12,
+          "model_count": 14,
           "target_model_count": 36,
           "model_labels": [
+            "ECMWF",
             "ECMWF AIFS",
+            "ECMWF AIFS EPS",
             "ECMWF EPS",
             "FourCastNet-ECMWF",
             "FourCastNet-KIM",
@@ -904,11 +908,11 @@
             "Pangu-Weather-ECMWF",
             "Pangu-Weather-KIM"
           ],
-          "skip_atcf": true,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202606051200_td_2026_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
