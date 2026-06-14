@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202506111100",
+  "updated_at_utc": "202506111700",
   "storm_key": "td_2025_02",
   "stage": "TD",
   "year": 2025,
@@ -115,28 +115,28 @@
     {
       "job": {
         "storm_key": "td_2025_02",
-        "stage": "TD",
+        "stage": "TD_UNLINKED",
         "year": 2025,
         "data_time": "202506111200",
         "td_number": 2,
         "linked_td_number": null,
-        "linked_typ_number": null,
         "typ_number": 2,
-        "data_typ_number": 2,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
-        "atcf_id": "",
-        "fcst_hours": 120,
+        "typ_en": "",
+        "atcf_id": null,
         "skip_atcf": true
       },
       "window": {
-        "data_time": "202506111200"
+        "data_time": "202506111200",
+        "cycle_time_utc": "202506111200",
+        "start_utc": "202506111700",
+        "end_utc": "202506112300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614015554",
+          "generated_at_utc": "20260614054922",
           "image_path": "VTG_IMG/2025/TD_2502_NONAME/TD_2502_NONAME_202506111200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -152,7 +152,7 @@
           "fcst_hours": 120,
           "intensity": "TD",
           "model_count": 10,
-          "target_model_count": 39,
+          "target_model_count": 33,
           "model_labels": [
             "FourCastNet-ECMWF",
             "FourCastNet-KIM",
@@ -165,37 +165,37 @@
             "Pangu-Weather-UM",
             "UM"
           ],
-          "skip_atcf": true,
-          "models": []
+          "skip_atcf": true
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202506111200_td_2025_02_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2025_02",
-        "stage": "TD",
+        "stage": "TD_UNLINKED",
         "year": 2025,
         "data_time": "202506111200",
         "td_number": 2,
         "linked_td_number": null,
-        "linked_typ_number": null,
         "typ_number": 2,
-        "data_typ_number": 2,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
-        "atcf_id": "",
-        "fcst_hours": 240,
+        "typ_en": "",
+        "atcf_id": null,
         "skip_atcf": true
       },
       "window": {
-        "data_time": "202506111200"
+        "data_time": "202506111200",
+        "cycle_time_utc": "202506111200",
+        "start_utc": "202506111700",
+        "end_utc": "202506112300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614015556",
+          "generated_at_utc": "20260614054924",
           "image_path": "VTG_IMG/2025/TD_2502_NONAME/TD_2502_NONAME_202506111200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -211,7 +211,7 @@
           "fcst_hours": 240,
           "intensity": "TD",
           "model_count": 10,
-          "target_model_count": 39,
+          "target_model_count": 33,
           "model_labels": [
             "FourCastNet-ECMWF",
             "FourCastNet-KIM",
@@ -224,11 +224,11 @@
             "Pangu-Weather-UM",
             "UM"
           ],
-          "skip_atcf": true,
-          "models": []
+          "skip_atcf": true
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202506111200_td_2025_02_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
