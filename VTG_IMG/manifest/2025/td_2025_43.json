@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202509291700",
+  "updated_at_utc": "202606141528",
   "storm_key": "td_2025_43",
-  "stage": "TD_LINKED_TYP",
+  "stage": "TD",
   "year": 2025,
   "typ_number": 43,
   "linked_td_number": null,
@@ -14,27 +14,27 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2025_43_typ_20",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2025_43",
+        "stage": "TD",
         "year": 2025,
         "data_time": "202509291200",
         "td_number": 43,
         "linked_td_number": null,
+        "linked_typ_number": 20,
         "typ_number": 43,
+        "data_typ_number": 43,
         "typ_name_ko": "부알로이",
         "typ_name": "BUALOI",
         "typ_en": "BUALOI",
         "atcf_id": "wp262025",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202509291200",
-        "cycle_time_utc": "202509291200",
-        "start_utc": "202509291700",
-        "end_utc": "202509292300"
+        "data_time": "202509291200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260614131122",
           "image_path": "VTG_IMG/2025/TD_2543_BUALOI/TD_2543_BUALOI_202509291200_120h.png",
@@ -66,35 +66,35 @@
             "Pangu-Weather-UM",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202509291200_td_2025_43_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2025_43_typ_20",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2025_43",
+        "stage": "TD",
         "year": 2025,
         "data_time": "202509291200",
         "td_number": 43,
         "linked_td_number": null,
+        "linked_typ_number": 20,
         "typ_number": 43,
+        "data_typ_number": 43,
         "typ_name_ko": "부알로이",
         "typ_name": "BUALOI",
         "typ_en": "BUALOI",
         "atcf_id": "wp262025",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202509291200",
-        "cycle_time_utc": "202509291200",
-        "start_utc": "202509291700",
-        "end_utc": "202509292300"
+        "data_time": "202509291200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260614131125",
           "image_path": "VTG_IMG/2025/TD_2543_BUALOI/TD_2543_BUALOI_202509291200_240h.png",
@@ -126,11 +126,11 @@
             "Pangu-Weather-UM",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202509291200_td_2025_43_240h.json"
     }
   ]
 }
