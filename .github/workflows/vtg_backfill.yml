@@ -297,14 +297,22 @@ jobs:
               --output-root VTG_IMG \
               --fcst-hours "120,240" \
               --no-auto-fcst-hours \
-              --min-run-interval-minutes 0
+              --min-run-interval-minutes 0 \
+              --changed-paths-file vtg_changed_paths.txt
 
             COUNT=$((COUNT + 1))
 
-            if [ -z "$(git status --porcelain -- VTG_IMG)" ]; then
+            if [ -f vtg_changed_paths.txt ] && [ -s vtg_changed_paths.txt ]; then
+              sort -u vtg_changed_paths.txt -o vtg_changed_paths.txt
+              git add --pathspec-from-file=vtg_changed_paths.txt || true
+            else
+              echo "Changed-path list is empty or missing; falling back to VTG_IMG status check."
+              git add VTG_IMG || true
+            fi
+
+            if git diff --cached --quiet; then
               echo "No VTG asset changes for $CYCLE."
             else
-              git add VTG_IMG
               git commit -m "Backfill VTG images $CYCLE"
               for attempt in 1 2 3; do
                 git fetch origin main
@@ -327,4 +335,39 @@ jobs:
               echo "commit_every is currently handled as commit-per-cycle for safety."
             fi
 
+
           done < vtg_backfill_cycles.txt
+
+          echo "::group::Rebuild split/full VTG manifest index"
+          python vtg_auto.py \
+            --index-only \
+            --output-root VTG_IMG \
+            --changed-paths-file vtg_changed_paths.txt
+
+          if [ -f vtg_changed_paths.txt ] && [ -s vtg_changed_paths.txt ]; then
+            sort -u vtg_changed_paths.txt -o vtg_changed_paths.txt
+            git add --pathspec-from-file=vtg_changed_paths.txt || true
+          else
+            git add VTG_IMG/manifest.json VTG_IMG/manifest || true
+          fi
+
+          if git diff --cached --quiet; then
+            echo "No manifest index changes after backfill."
+          else
+            git commit -m "Rebuild VTG manifest index"
+            for attempt in 1 2 3; do
+              git fetch origin main
+              git rebase origin/main
+              if git push origin HEAD:main; then
+                break
+              fi
+              if [ "$attempt" -eq 3 ]; then
+                echo "Failed to push rebuilt VTG manifest index after retries."
+                exit 1
+              fi
+              echo "Push failed after rebase; retrying ($attempt/3)."
+              sleep $((attempt * 5))
+            done
+          fi
+          echo "::endgroup::"
+

@@ -142,6 +142,11 @@ def normalize_kma_list_stamp_year(value: str, year: int) -> str:
     stamp_year = int(text[:4])
     if stamp_year in (2100, 9999):
         return text
+    # KMA list rows are keyed by season year (YY), but storms can cross
+    # calendar years. Preserve adjacent-year timestamps such as YY=2025
+    # with TM_ED=202601010000 instead of forcing them back to 2025.
+    if abs(stamp_year - year) <= 1:
+        return text
     if stamp_year != year:
         return f"{year:04d}{text[4:]}"
     return text
@@ -762,7 +767,7 @@ def build_storm_jobs(
     if not data_dt:
         return jobs
 
-    active_typhoons = []
+    active_typhoons: list[tuple[int, int]] = []
     for row in typ_rows:
         try:
             typ_number = int(row["SEQ"])
@@ -824,7 +829,7 @@ def build_storm_jobs(
             )
         else:
             reason = "" if atcf_id else "ATCF name match not found; generating KMA-only guidance."
-        active_typhoons.append(typ_number)
+        active_typhoons.append((year, typ_number))
         jobs.append(StormJob(
             storm_key=f"typ_{year}_{typ_number:02d}",
             stage="TYP_LINKED" if atcf_id else "TYP_LINKED_ATCF_PENDING",
@@ -858,7 +863,7 @@ def build_storm_jobs(
             continue
         if not active_at(now, row.get("TM_ST", ""), row.get("TM_ED", "")):
             continue
-        if typ_number in active_typhoon_set:
+        if (year, typ_number) in active_typhoon_set:
             continue
 
         linked_typ_row = None
@@ -1260,6 +1265,8 @@ def vtg_command(
         "TD" if job.stage.startswith("TD_") else "TYP",
         "--data-time",
         job.data_time,
+        "--storm-year",
+        str(job.year),
         "--fcst-hours",
         ",".join(str(fcst_hours) for fcst_hours in unique_hours),
         "--output-root",
@@ -1808,6 +1815,306 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
     )
 
 
+def sort_manifest_inventory(entries: list[dict]) -> list[dict]:
+    return sorted(
+        entries,
+        key=lambda item: (
+            item.get("job", {}).get("year") or 0,
+            item.get("job", {}).get("typ_number") or 0,
+            item.get("job", {}).get("data_time") or "",
+            item.get("result", {}).get("metadata", {}).get("fcst_hours") or 0,
+        ),
+    )
+
+
+def manifest_storm_key_from_metadata(metadata: dict) -> str:
+    data_time = str(metadata.get("data_time") or "")
+    year_text = str(metadata.get("storm_year") or data_time[:4] or "0")
+    try:
+        year = int(year_text)
+    except (TypeError, ValueError):
+        year = 0
+    try:
+        typ_number = int(metadata.get("typ_number") or 0)
+    except (TypeError, ValueError):
+        typ_number = 0
+    stage = str(metadata.get("storm_stage") or "TYP").upper()
+    prefix = "td" if stage == "TD" else "typ"
+    return f"{prefix}_{year}_{typ_number:02d}" if year and typ_number else "unknown"
+
+
+def manifest_storm_key_from_entry(entry: dict) -> str:
+    metadata = entry.get("result", {}).get("metadata") if isinstance(entry, dict) else None
+    if isinstance(metadata, dict) and metadata:
+        return manifest_storm_key_from_metadata(metadata)
+    job = entry.get("job") if isinstance(entry, dict) else None
+    if isinstance(job, dict) and job.get("storm_key"):
+        return str(job.get("storm_key"))
+    return "unknown"
+
+
+def storm_manifest_path(output_root: Path, year: int | str, storm_key: str) -> Path:
+    return output_root / "manifest" / str(year) / f"{storm_key}.json"
+
+
+def year_manifest_index_path(output_root: Path, year: int | str) -> Path:
+    return output_root / "manifest" / str(year) / "index.json"
+
+
+def entry_from_existing_manifest_item(item: dict) -> dict:
+    if not isinstance(item, dict):
+        return {}
+    # Existing items are already compact manifest entries.
+    return item
+
+
+def merge_manifest_inventory(existing_inventory: list[dict], run_entries: list[dict]) -> list[dict]:
+    entries_by_key: dict[str, dict] = {}
+    suppressed_tokens: set[str] = set()
+
+    for entry in existing_inventory or []:
+        entry = entry_from_existing_manifest_item(entry)
+        metadata = entry.get("result", {}).get("metadata") if isinstance(entry, dict) else None
+        if not isinstance(metadata, dict) or not metadata:
+            continue
+        try:
+            fcst_hours = int(metadata.get("fcst_hours") or 0)
+        except (TypeError, ValueError):
+            continue
+        if fcst_hours not in VALID_FCST_HOURS:
+            continue
+        if metadata_matches_suppression(metadata, suppressed_tokens):
+            continue
+        entries_by_key[manifest_inventory_key(metadata)] = entry
+
+    for entry in run_entries:
+        metadata = entry.get("result", {}).get("metadata") if isinstance(entry, dict) else None
+        if not isinstance(metadata, dict) or not metadata:
+            continue
+        try:
+            fcst_hours = int(metadata.get("fcst_hours") or 0)
+        except (TypeError, ValueError):
+            continue
+        if fcst_hours not in VALID_FCST_HOURS:
+            continue
+        key = manifest_inventory_key(metadata)
+        if not metadata_has_output_image(metadata):
+            tokens = manifest_suppression_tokens(metadata)
+            suppressed_tokens.update(tokens)
+            existing = entries_by_key.get(key)
+            existing_metadata = existing.get("result", {}).get("metadata", {}) if isinstance(existing, dict) else {}
+            if isinstance(existing_metadata, dict) and metadata_matches_suppression(existing_metadata, tokens):
+                entries_by_key.pop(key, None)
+            continue
+        entries_by_key[key] = compact_manifest_entry(entry)
+
+    return sort_manifest_inventory(list(entries_by_key.values()))
+
+
+def storm_summary_from_inventory(storm_key: str, inventory: list[dict]) -> dict:
+    latest_entry = None
+    for entry in inventory:
+        metadata = entry.get("result", {}).get("metadata", {}) if isinstance(entry, dict) else {}
+        if not isinstance(metadata, dict):
+            continue
+        if latest_entry is None or str(metadata.get("data_time") or "") >= str(latest_entry.get("result", {}).get("metadata", {}).get("data_time") or ""):
+            latest_entry = entry
+    metadata = latest_entry.get("result", {}).get("metadata", {}) if isinstance(latest_entry, dict) else {}
+    job = latest_entry.get("job", {}) if isinstance(latest_entry, dict) else {}
+    return {
+        "storm_key": storm_key,
+        "stage": job.get("stage") or metadata.get("storm_stage") or "",
+        "year": job.get("year") or metadata.get("storm_year") or "",
+        "typ_number": job.get("typ_number") or metadata.get("typ_number") or 0,
+        "linked_td_number": job.get("linked_td_number") or metadata.get("linked_td_number"),
+        "linked_typ_number": job.get("linked_typ_number") or metadata.get("linked_typ_number"),
+        "typ_name": job.get("typ_name") or metadata.get("typ_name") or "NONAME",
+        "typ_name_ko": job.get("typ_name_ko") or metadata.get("typ_name_ko") or "",
+        "latest_data_time": metadata.get("data_time") or "",
+        "item_count": len(inventory),
+    }
+
+
+def write_split_manifest_files(output_root: Path, run_entries: list[dict], *, updated_at_utc: str) -> list[Path]:
+    changed_paths: list[Path] = []
+    entries_by_storm: dict[tuple[str, str], list[dict]] = {}
+    for entry in run_entries:
+        metadata = entry.get("result", {}).get("metadata") if isinstance(entry, dict) else None
+        if not isinstance(metadata, dict) or not metadata:
+            continue
+        year = str(metadata.get("storm_year") or metadata.get("data_time", "")[:4] or "0")
+        storm_key = manifest_storm_key_from_entry(entry)
+        if not year or storm_key == "unknown":
+            continue
+        entries_by_storm.setdefault((year, storm_key), []).append(entry)
+
+    touched_years: set[str] = set()
+    touched_systems: dict[str, list[dict]] = {}
+    for (year, storm_key), entries in sorted(entries_by_storm.items()):
+        path = storm_manifest_path(output_root, year, storm_key)
+        previous = load_json(path, {})
+        previous_inventory = previous.get("inventory") if isinstance(previous, dict) else []
+        if not isinstance(previous_inventory, list):
+            previous_inventory = []
+        inventory = merge_manifest_inventory(previous_inventory, entries)
+        summary = storm_summary_from_inventory(storm_key, inventory)
+        payload = {
+            "version": 2,
+            "updated_at_utc": updated_at_utc,
+            **summary,
+            "inventory": inventory,
+        }
+        if previous != payload:
+            write_json(path, payload)
+            changed_paths.append(path)
+        touched_years.add(str(year))
+        summary["manifest_path"] = relative_asset_path(path)
+        touched_systems.setdefault(str(year), []).append(summary)
+
+    for year in sorted(touched_years):
+        path = year_manifest_index_path(output_root, year)
+        previous = load_json(path, {})
+        systems = previous.get("systems") if isinstance(previous, dict) else []
+        if not isinstance(systems, list):
+            systems = []
+        by_key = {
+            str(item.get("storm_key")): item
+            for item in systems
+            if isinstance(item, dict) and item.get("storm_key")
+        }
+        for item in touched_systems.get(year, []):
+            by_key[str(item["storm_key"])] = item
+        payload = {
+            "version": 2,
+            "updated_at_utc": updated_at_utc,
+            "year": int(year) if str(year).isdigit() else year,
+            "systems": sorted(by_key.values(), key=lambda item: (item.get("typ_number") or 0, item.get("storm_key") or "")),
+        }
+        if previous != payload:
+            write_json(path, payload)
+            changed_paths.append(path)
+
+    return changed_paths
+
+
+def rebuild_split_manifest_files(output_root: Path, inventory: list[dict], *, updated_at_utc: str) -> list[Path]:
+    changed_paths: list[Path] = []
+    grouped: dict[tuple[str, str], list[dict]] = {}
+    for entry in inventory:
+        metadata = entry.get("result", {}).get("metadata") if isinstance(entry, dict) else None
+        if not isinstance(metadata, dict) or not metadata:
+            continue
+        year = str(metadata.get("storm_year") or metadata.get("data_time", "")[:4] or "0")
+        storm_key = manifest_storm_key_from_metadata(metadata)
+        if not year or storm_key == "unknown":
+            continue
+        grouped.setdefault((year, storm_key), []).append(entry)
+
+    systems_by_year: dict[str, list[dict]] = {}
+    for (year, storm_key), entries in sorted(grouped.items()):
+        path = storm_manifest_path(output_root, year, storm_key)
+        storm_inventory = sort_manifest_inventory(entries)
+        summary = storm_summary_from_inventory(storm_key, storm_inventory)
+        payload = {
+            "version": 2,
+            "updated_at_utc": updated_at_utc,
+            **summary,
+            "inventory": storm_inventory,
+        }
+        previous = load_json(path, {})
+        if previous != payload:
+            write_json(path, payload)
+            changed_paths.append(path)
+        summary["manifest_path"] = relative_asset_path(path)
+        systems_by_year.setdefault(str(year), []).append(summary)
+
+    for year, systems in sorted(systems_by_year.items()):
+        path = year_manifest_index_path(output_root, year)
+        payload = {
+            "version": 2,
+            "updated_at_utc": updated_at_utc,
+            "year": int(year) if str(year).isdigit() else year,
+            "systems": sorted(systems, key=lambda item: (item.get("typ_number") or 0, item.get("storm_key") or "")),
+        }
+        previous = load_json(path, {})
+        if previous != payload:
+            write_json(path, payload)
+            changed_paths.append(path)
+    return changed_paths
+
+
+def root_manifest_indexes(output_root: Path) -> list[dict]:
+    root = output_root / "manifest"
+    indexes = []
+    if not root.exists():
+        return indexes
+    for path in sorted(root.glob("[0-9][0-9][0-9][0-9]/index.json")):
+        year = path.parent.name
+        indexes.append({"year": int(year), "path": relative_asset_path(path)})
+    return indexes
+
+
+def relative_changed_path(path: Path) -> str:
+    try:
+        return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
+def collect_changed_asset_paths(
+    *,
+    run_entries: list[dict],
+    manifest_path: Path,
+    status_path: Path,
+    split_manifest_paths: list[Path],
+    include_manifest: bool = True,
+    include_status: bool = True,
+) -> list[str]:
+    paths: set[str] = set()
+    if include_manifest:
+        paths.add(relative_changed_path(manifest_path))
+    if include_status:
+        paths.add(relative_changed_path(status_path))
+    for path in split_manifest_paths:
+        paths.add(relative_changed_path(path))
+    for entry in run_entries:
+        result = entry.get("result") if isinstance(entry, dict) else {}
+        if isinstance(result, dict):
+            metadata_path = result.get("metadata_path")
+            if metadata_path:
+                paths.add(relative_changed_path(Path(str(metadata_path))))
+            metadata = result.get("metadata")
+            if isinstance(metadata, dict):
+                image_path = str(metadata.get("image_path") or "").strip()
+                if image_path:
+                    paths.add(relative_changed_path(PROJECT_ROOT / image_path))
+    return sorted(paths)
+
+
+def write_changed_paths(path: Path | None, paths: list[str]) -> None:
+    if path is None:
+        return
+    unique_paths = sorted({str(item).strip() for item in paths if str(item).strip()})
+    path.write_text("\n".join(unique_paths) + ("\n" if unique_paths else ""), encoding="utf-8")
+
+
+def print_manifest_or_summary(manifest: dict, *, verbose: bool, changed_paths: list[str] | None = None) -> None:
+    if verbose:
+        print(json.dumps(manifest, ensure_ascii=False, indent=2))
+        return
+    summary = {
+        "updated_at_utc": manifest.get("updated_at_utc"),
+        "active_windows": manifest.get("active_windows", []),
+        "run_count": len(manifest.get("runs", []) or []),
+        "inventory_count": len(manifest.get("inventory", []) or []),
+        "manifest_indexes": manifest.get("manifest_indexes", []),
+    }
+    if changed_paths is not None:
+        summary["changed_path_count"] = len(changed_paths)
+        summary["changed_paths_preview"] = changed_paths[:30]
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+
+
 def parse_fcst_hours(value: str) -> list[int]:
     hours: list[int] = []
     for token in str(value or "").replace(",", " ").split():
@@ -1851,6 +2158,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--github-output", type=Path, default=None, help="Optional GitHub Actions output file for --check-run-needed.")
     parser.add_argument("--force", action="store_true", help="Run even if a previous metadata record met the completion target.")
     parser.add_argument("--status-retention-days", type=int, default=DEFAULT_STATUS_RETENTION_DAYS, help="Keep compact automation status for this many days; use 0 to disable pruning.")
+    parser.add_argument("--changed-paths-file", type=Path, default=None, help="Write generated/updated asset paths for git add --pathspec-from-file.")
+    parser.add_argument("--verbose-manifest", action="store_true", help="Print full manifest JSON instead of a compact summary.")
+    parser.add_argument("--full-manifest-scan", action="store_true", help="Scan all VTG_IMG assets on every run. Default uses incremental manifest updates.")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
@@ -1875,15 +2185,20 @@ def main() -> int:
     manual_map = load_manual_map(args.manual_map)
 
     if args.index_only:
+        updated_at_utc = format_utc_stamp(now)
+        inventory = build_manifest_inventory(output_root, [])
+        split_paths = [] if args.dry_run else rebuild_split_manifest_files(output_root, inventory, updated_at_utc=updated_at_utc)
         manifest = {
-            "updated_at_utc": format_utc_stamp(now),
+            "version": 2,
+            "updated_at_utc": updated_at_utc,
             "window_start_offset_hours": WINDOW_START_OFFSET_HOURS,
             "window_end_offset_hours": WINDOW_END_OFFSET_HOURS,
             "complete_model_count": args.complete_model_count,
             "final_check_before_window_end_minutes": args.final_check_before_window_end_minutes,
             "active_windows": [asdict(window) for window in windows],
             "runs": [],
-            "inventory": build_manifest_inventory(output_root, []),
+            "inventory": inventory,
+            "manifest_indexes": root_manifest_indexes(output_root),
         }
         status_for_write = prune_status_for_persistence(
             status,
@@ -1891,11 +2206,20 @@ def main() -> int:
             retention_days=args.status_retention_days,
             reference_time=utc_now(),
         )
+        changed_paths = collect_changed_asset_paths(
+            run_entries=[],
+            manifest_path=manifest_path,
+            status_path=status_path,
+            split_manifest_paths=split_paths,
+            include_manifest=True,
+            include_status=status_for_write != status,
+        )
         if not args.dry_run:
             write_json(manifest_path, manifest)
             if status_for_write != status:
                 write_json(status_path, status_for_write)
-        print(json.dumps(manifest, ensure_ascii=False, indent=2))
+        write_changed_paths(args.changed_paths_file, changed_paths)
+        print_manifest_or_summary(manifest, verbose=args.verbose_manifest, changed_paths=changed_paths)
         return 0
 
     if not args.auth_key:
@@ -1913,10 +2237,12 @@ def main() -> int:
         else args.atcf_search_negative_radius
     )
 
-    years = {now.year}
+    years: set[int] = set()
     for window in windows:
         year = int(window.data_time[:4])
-        years.add(year)
+        years.update({year - 1, year, year + 1})
+    if not years:
+        years.add(now.year)
 
     td_rows: list[dict] = []
     typ_rows: list[dict] = []
@@ -2074,9 +2400,18 @@ def main() -> int:
 
     previous_manifest = load_json(manifest_path, {})
     compact_runs = compact_manifest_runs(run_entries)
-    inventory = build_manifest_inventory(output_root, run_entries)
+    updated_at_utc = format_utc_stamp(now)
+    if args.full_manifest_scan:
+        inventory = build_manifest_inventory(output_root, run_entries)
+    else:
+        previous_inventory = previous_manifest.get("inventory") if isinstance(previous_manifest, dict) else []
+        if not isinstance(previous_inventory, list):
+            previous_inventory = []
+        inventory = merge_manifest_inventory(previous_inventory, run_entries)
+    split_paths = [] if args.dry_run else write_split_manifest_files(output_root, run_entries, updated_at_utc=updated_at_utc)
     manifest = {
-        "updated_at_utc": format_utc_stamp(now),
+        "version": 2,
+        "updated_at_utc": updated_at_utc,
         "window_start_offset_hours": WINDOW_START_OFFSET_HOURS,
         "window_end_offset_hours": WINDOW_END_OFFSET_HOURS,
         "complete_model_count": args.complete_model_count,
@@ -2084,6 +2419,7 @@ def main() -> int:
         "active_windows": [asdict(window) for window in windows],
         "runs": compact_runs,
         "inventory": inventory,
+        "manifest_indexes": root_manifest_indexes(output_root),
     }
     status_for_write = prune_status_for_persistence(
         status,
@@ -2093,14 +2429,25 @@ def main() -> int:
     )
     should_clear_previous_manifest = not run_entries and bool(previous_manifest.get("runs"))
     inventory_changed = previous_manifest.get("inventory") != manifest.get("inventory")
+    index_changed = previous_manifest.get("manifest_indexes") != manifest.get("manifest_indexes")
     status_changed = status_for_write != status
     should_write_outputs = not args.dry_run and (
-        actual_run_count > 0 or should_clear_previous_manifest or inventory_changed or status_changed
+        actual_run_count > 0 or should_clear_previous_manifest or inventory_changed or index_changed or status_changed or bool(split_paths)
+    )
+    changed_paths = collect_changed_asset_paths(
+        run_entries=run_entries,
+        manifest_path=manifest_path,
+        status_path=status_path,
+        split_manifest_paths=split_paths,
+        include_manifest=should_write_outputs,
+        include_status=status_changed,
     )
     if should_write_outputs:
         write_json(manifest_path, manifest)
-        write_json(status_path, status_for_write)
-    print(json.dumps(manifest, ensure_ascii=False, indent=2))
+        if status_changed or actual_run_count > 0:
+            write_json(status_path, status_for_write)
+    write_changed_paths(args.changed_paths_file, changed_paths)
+    print_manifest_or_summary(manifest, verbose=args.verbose_manifest, changed_paths=changed_paths)
     return 0
 
 

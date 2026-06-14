@@ -320,6 +320,7 @@ class Settings:
     atcf_id: str = "wp062026"
     extra_atcf_ids: tuple[str, ...] = ()
     data_time: str = "202605301200"
+    storm_year: str = ""
     fcst_hours: int = 120
     fcst_hours_options: tuple[int, ...] = ()
     auto_fcst_hours: bool = False
@@ -462,6 +463,7 @@ def parse_args() -> Settings:
         help="Comma-separated extra ATCF IDs to merge as the same storm, e.g. wp992026.",
     )
     parser.add_argument("--data-time", default=Settings.data_time)
+    parser.add_argument("--storm-year", default=Settings.storm_year, help="Storm season year used for output folders and TC IDs.")
     parser.add_argument("--fcst-hours", default=str(Settings.fcst_hours))
     parser.add_argument("--auto-fcst-hours", action="store_true", help="Choose 120 or 240h automatically.")
     parser.add_argument("--margin-lat", type=float, default=Settings.margin_lat)
@@ -525,6 +527,7 @@ def parse_args() -> Settings:
             if item.strip()
         ),
         data_time=args.data_time,
+        storm_year=args.storm_year.strip(),
         fcst_hours=fcst_hours_options[0],
         fcst_hours_options=fcst_hours_options,
         auto_fcst_hours=args.auto_fcst_hours,
@@ -1680,10 +1683,13 @@ def tc_id(settings: Settings) -> str:
 
 
 def storm_year(settings: Settings) -> str:
-    if len(settings.data_time) >= 4 and settings.data_time[:4].isdigit():
-        return settings.data_time[:4]
+    explicit_year = str(getattr(settings, "storm_year", "") or "").strip()
+    if len(explicit_year) == 4 and explicit_year.isdigit():
+        return explicit_year
     if len(settings.atcf_id) >= 8 and settings.atcf_id[4:].isdigit():
         return settings.atcf_id[4:]
+    if len(settings.data_time) >= 4 and settings.data_time[:4].isdigit():
+        return settings.data_time[:4]
     return datetime.utcnow().strftime("%Y")
 
 

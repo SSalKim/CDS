@@ -280,20 +280,26 @@ jobs:
               run_with_retry python vtg_manual_run.py --vtg-args "$MANUAL_VTG_ARGS"
             fi
           else
-            args+=(--fcst-hours "120,240" --no-auto-fcst-hours --min-run-interval-minutes 8)
+            args+=(--fcst-hours "120,240" --no-auto-fcst-hours --min-run-interval-minutes 8 --changed-paths-file vtg_changed_paths.txt)
             run_with_retry python vtg_auto.py "${args[@]}"
           fi
 
       - name: Commit generated VTG assets
         if: ${{ env.DRY_RUN_INPUT != 'true' }}
         run: |
-          if [ -z "$(git status --porcelain -- VTG_IMG)" ]; then
+          if [ -f vtg_changed_paths.txt ] && [ -s vtg_changed_paths.txt ]; then
+            sort -u vtg_changed_paths.txt -o vtg_changed_paths.txt
+            git add --pathspec-from-file=vtg_changed_paths.txt || true
+          else
+            echo "Changed-path list is empty or missing; falling back to VTG_IMG status check."
+            git add VTG_IMG || true
+          fi
+          if git diff --cached --quiet; then
             echo "No VTG asset changes to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add VTG_IMG
           git commit -m "Update VTG images"
           for attempt in 1 2 3; do
             git fetch origin main
