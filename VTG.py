@@ -1374,7 +1374,11 @@ def excluded_models_for(df: pd.DataFrame) -> set[str]:
 
     excluded = {"KMA"}
 
-    if has_kim_3h or not has_kim_6h:
+    if has_kim_3h:
+        excluded.add("KIM_6h")
+    elif has_kim_6h:
+        excluded.add("KIM_3h")
+    else:
         excluded.add("KIM_6h")
 
     if has_um:
