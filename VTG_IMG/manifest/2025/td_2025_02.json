@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202506111700",
+  "updated_at_utc": "202506112300",
   "storm_key": "td_2025_02",
   "stage": "TD",
   "year": 2025,
@@ -233,28 +233,28 @@
     {
       "job": {
         "storm_key": "td_2025_02",
-        "stage": "TD",
+        "stage": "TD_UNLINKED",
         "year": 2025,
         "data_time": "202506111800",
         "td_number": 2,
         "linked_td_number": null,
-        "linked_typ_number": null,
         "typ_number": 2,
-        "data_typ_number": 2,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
-        "atcf_id": "",
-        "fcst_hours": 120,
+        "typ_en": "",
+        "atcf_id": null,
         "skip_atcf": true
       },
       "window": {
-        "data_time": "202506111800"
+        "data_time": "202506111800",
+        "cycle_time_utc": "202506111800",
+        "start_utc": "202506112300",
+        "end_utc": "202506120500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614020210",
+          "generated_at_utc": "20260614055000",
           "image_path": "VTG_IMG/2025/TD_2502_NONAME/TD_2502_NONAME_202506111800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -270,41 +270,41 @@
           "fcst_hours": 120,
           "intensity": "TD",
           "model_count": 1,
-          "target_model_count": 39,
+          "target_model_count": 33,
           "model_labels": [
             "ECMWF EPS"
           ],
-          "skip_atcf": true,
-          "models": []
+          "skip_atcf": true
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202506111800_td_2025_02_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2025_02",
-        "stage": "TD",
+        "stage": "TD_UNLINKED",
         "year": 2025,
         "data_time": "202506111800",
         "td_number": 2,
         "linked_td_number": null,
-        "linked_typ_number": null,
         "typ_number": 2,
-        "data_typ_number": 2,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
-        "atcf_id": "",
-        "fcst_hours": 240,
+        "typ_en": "",
+        "atcf_id": null,
         "skip_atcf": true
       },
       "window": {
-        "data_time": "202506111800"
+        "data_time": "202506111800",
+        "cycle_time_utc": "202506111800",
+        "start_utc": "202506112300",
+        "end_utc": "202506120500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614020211",
+          "generated_at_utc": "20260614055002",
           "image_path": "VTG_IMG/2025/TD_2502_NONAME/TD_2502_NONAME_202506111800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -320,15 +320,15 @@
           "fcst_hours": 240,
           "intensity": "TD",
           "model_count": 1,
-          "target_model_count": 39,
+          "target_model_count": 33,
           "model_labels": [
             "ECMWF EPS"
           ],
-          "skip_atcf": true,
-          "models": []
+          "skip_atcf": true
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202506111800_td_2025_02_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
