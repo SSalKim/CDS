@@ -9,13 +9,19 @@ on:
         required: true
         type: string
         default: |
-          2026011400-2026012012
-          2026020400-2026020618
-          2026031000-2026031212
-          2026040818-2026041918
-          2026050512-2026051018
-          2026052606-2026060312
-          2026060318-2026060518
+          2025062118-2025062700
+          2025070106-2025070800
+          2025070900-2025070912
+          2025071100-2025071500
+          2025071600-2025081500
+          2025081700-2025082612
+          2025082700-2025083100
+          2025090212-2025090906
+          2025091606-2025092918
+          2025100100-2025101418
+          2025101600-2025102312
+          2025103106-2025111300
+          2025112312-2025120106
       commit_every:
         description: "Commit after N cycles. For rendering consistency/safety, this workflow currently commits every cycle."
         required: true
@@ -313,7 +319,7 @@ jobs:
 
             # vtg_auto.py가 알려준 경로 + Git이 실제 감지한 VTG_IMG 변경분을 합침
             git diff --name-only -- VTG_IMG >> "$CHANGED_PATHS_FILE" || true
-            git ls-files --others --exclude-standard -- VTG_IMG >> "$CHANGED_PATHS_FILE" || true
+            git ls-files --others --exclude-standard -- VTG_IMG >> "$CHANGED_PATHS_FILE" || trueg
             sort -u "$CHANGED_PATHS_FILE" -o "$CHANGED_PATHS_FILE"
 
             if [ -s "$CHANGED_PATHS_FILE" ]; then
