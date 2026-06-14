@@ -280,7 +280,7 @@ jobs:
               run_with_retry python vtg_manual_run.py --vtg-args "$MANUAL_VTG_ARGS"
             fi
           else
-            args+=(--fcst-hours "120,240" --no-auto-fcst-hours --min-run-interval-minutes 8 --changed-paths-file vtg_changed_paths.txt)
+            args+=(--fcst-hours "120,240" --no-auto-fcst-hours --min-run-interval-minutes 8 --changed-paths-file vtg_changed_paths.txt --http-cache-dir "$RUNNER_TEMP/vtg_http_cache" --parallel-jobs 2)
             run_with_retry python vtg_auto.py "${args[@]}"
           fi
 

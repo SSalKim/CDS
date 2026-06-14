@@ -12,6 +12,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -61,6 +62,9 @@ MANIFEST_METADATA_KEYS = (
     "no_output_reason",
 )
 STATUS_METADATA_KEYS = MANIFEST_METADATA_KEYS + ("render_signature",)
+HTTP_FETCH_CACHE_DIR: Path | None = None
+HTTP_FETCH_CACHE_TTL_SECONDS = 6 * 3600
+
 REQUEST_HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -206,7 +210,43 @@ def active_typ_at(now: datetime, row: dict) -> bool:
     return active_at(now, row.get("TM_ST", ""), row.get("TM_ED", ""))
 
 
+
+def fetch_text_cache_path(url: str) -> Path | None:
+    if HTTP_FETCH_CACHE_DIR is None:
+        return None
+    digest = hashlib.sha256(url.encode("utf-8")).hexdigest()
+    return HTTP_FETCH_CACHE_DIR / "http" / f"{digest}.txt"
+
+
+def read_fetch_text_cache(path: Path | None) -> str | None:
+    if path is None or not path.exists():
+        return None
+    try:
+        if HTTP_FETCH_CACHE_TTL_SECONDS > 0 and time.time() - path.stat().st_mtime > HTTP_FETCH_CACHE_TTL_SECONDS:
+            return None
+        return path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+
+def write_fetch_text_cache(path: Path | None, text: str) -> None:
+    if path is None:
+        return
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp_path = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+        tmp_path.write_text(text, encoding="utf-8")
+        tmp_path.replace(path)
+    except OSError as exc:
+        print(f"Warning: failed to write HTTP text cache {path}: {exc}")
+
+
 def fetch_text(url: str, *, timeout: float = 12, retries: int = 2, retry_delay: float = 3.0) -> str:
+    cache_path = fetch_text_cache_path(url)
+    cached = read_fetch_text_cache(cache_path)
+    if cached is not None:
+        return cached
+
     last_error: Exception | None = None
     for attempt in range(retries + 1):
         request = Request(url, headers=REQUEST_HEADERS)
@@ -228,10 +268,14 @@ def fetch_text(url: str, *, timeout: float = 12, retries: int = 2, retry_delay: 
 
     for encoding in ("utf-8", "cp949", "euc-kr"):
         try:
-            return data.decode(encoding)
+            text = data.decode(encoding)
+            write_fetch_text_cache(cache_path, text)
+            return text
         except UnicodeDecodeError:
             continue
-    return data.decode("utf-8", errors="replace")
+    text = data.decode("utf-8", errors="replace")
+    write_fetch_text_cache(cache_path, text)
+    return text
 
 
 def kma_list_url(endpoint: str, year: int, auth_key: str) -> str:
@@ -380,11 +424,20 @@ def safe_float(value) -> float | None:
         return None
 
 
-def fetch_kma_reference_point(*, typ_number: int, data_time: str, auth_key: str) -> TrackPoint | None:
-    try:
-        text = fetch_text(kma_gts_now_url(data_time, auth_key), timeout=15, retries=1, retry_delay=3.0)
-    except (HTTPError, URLError, TimeoutError):
-        return None
+def fetch_kma_reference_point(
+    *,
+    typ_number: int,
+    data_time: str,
+    auth_key: str,
+    gts_text: str | None = None,
+) -> TrackPoint | None:
+    if gts_text is None:
+        try:
+            text = fetch_text(kma_gts_now_url(data_time, auth_key), timeout=15, retries=1, retry_delay=3.0)
+        except (HTTPError, URLError, TimeoutError):
+            return None
+    else:
+        text = gts_text
 
     candidates: list[TrackPoint] = []
     for row in parse_kma_csv_lines(text, fixed_columns=18):
@@ -703,6 +756,51 @@ def write_json(path: Path, payload) -> None:
             pass
 
 
+
+def log_timing(label: str, started_at: float) -> None:
+    print(f"[timing] {label}: {time.monotonic() - started_at:.1f}s")
+
+
+def kma_gts_now_cache_path(cache_dir: Path, data_time: str, mode: str) -> Path:
+    return cache_dir / "kma_gts_now" / f"{data_time}_mode{mode}.txt"
+
+
+def ensure_kma_gts_now_cache(
+    *,
+    data_time: str,
+    auth_key: str,
+    cache_dir: Path | None,
+    mode: str,
+) -> Path | None:
+    if cache_dir is None:
+        return None
+    path = kma_gts_now_cache_path(cache_dir, data_time, mode)
+    if path.exists():
+        return path
+    started_at = time.monotonic()
+    try:
+        text = fetch_text(kma_gts_now_url(data_time, auth_key, mode=mode), timeout=20, retries=1, retry_delay=3.0)
+    except (HTTPError, URLError, TimeoutError) as exc:
+        print(f"Warning: failed to prefetch KMA typ_gts_now mode={mode} {data_time}: {exc}")
+        return None
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    tmp_path.write_text(text, encoding="utf-8")
+    tmp_path.replace(path)
+    log_timing(f"prefetch KMA typ_gts_now mode={mode} {data_time}", started_at)
+    return path
+
+
+def read_optional_text(path: Path | None) -> str | None:
+    if path is None:
+        return None
+    try:
+        return path.read_text(encoding="utf-8")
+    except OSError as exc:
+        print(f"Warning: failed to read cached text {path}: {exc}")
+        return None
+
+
 def write_github_outputs(path: Path | None, outputs: dict[str, object]) -> None:
     if path is None:
         return
@@ -761,6 +859,7 @@ def build_storm_jobs(
     atcf_position_max_distance_km: float,
     atcf_position_min_distance_gap_km: float,
     resolve_atcf: bool = True,
+    kma_gts_now_text: str | None = None,
 ) -> list[StormJob]:
     jobs: list[StormJob] = []
     data_dt = parse_utc_stamp(data_time)
@@ -800,7 +899,7 @@ def build_storm_jobs(
                 negative_radius=atcf_search_negative_radius,
             )
         if resolve_atcf and atcf_match is None and typ_en:
-            kma_point = fetch_kma_reference_point(typ_number=typ_number, data_time=data_time, auth_key=auth_key)
+            kma_point = fetch_kma_reference_point(typ_number=typ_number, data_time=data_time, auth_key=auth_key, gts_text=kma_gts_now_text)
             atcf_match = find_atcf_position_match(
                 typ_number=typ_number,
                 year=year,
@@ -907,7 +1006,7 @@ def build_storm_jobs(
                 )
         if resolve_atcf and atcf_match is None:
             reference_typ_number = td_number
-            kma_point = fetch_kma_reference_point(typ_number=reference_typ_number, data_time=data_time, auth_key=auth_key)
+            kma_point = fetch_kma_reference_point(typ_number=reference_typ_number, data_time=data_time, auth_key=auth_key, gts_text=kma_gts_now_text)
             atcf_match = find_atcf_position_match(
                 typ_number=reference_typ_number,
                 year=year,
@@ -1247,6 +1346,9 @@ def vtg_command(
     fcst_hours_list: list[int],
     auto_fcst_hours: bool,
     source_overrides: list[str],
+    kma_forecast_text_path: Path | None = None,
+    kma_past_text_path: Path | None = None,
+    http_cache_dir: Path | None = None,
 ) -> tuple[list[str], dict[int, Path]]:
     unique_hours = list(dict.fromkeys(fcst_hours_list))
     metadata_paths = {fcst_hours: metadata_path_for(output_root, job, fcst_hours) for fcst_hours in unique_hours}
@@ -1276,6 +1378,12 @@ def vtg_command(
         "--overwrite",
         "--no-show",
     ]
+    if kma_forecast_text_path is not None:
+        command.extend(["--kma-forecast-text-path", str(kma_forecast_text_path)])
+    if kma_past_text_path is not None:
+        command.extend(["--kma-past-text-path", str(kma_past_text_path)])
+    if http_cache_dir is not None:
+        command.extend(["--http-cache-dir", str(http_cache_dir)])
     if len(unique_hours) == 1:
         command.extend(["--metadata-path", str(metadata_paths[unique_hours[0]])])
     if job.atcf_id:
@@ -1321,6 +1429,9 @@ def run_vtg_batch(
     source_overrides: list[str],
     dry_run: bool,
     clear_existing: bool = False,
+    kma_forecast_text_path: Path | None = None,
+    kma_past_text_path: Path | None = None,
+    http_cache_dir: Path | None = None,
 ) -> dict[int, dict]:
     command, metadata_paths = vtg_command(
         job=job,
@@ -1330,6 +1441,9 @@ def run_vtg_batch(
         fcst_hours_list=fcst_hours_list,
         auto_fcst_hours=auto_fcst_hours,
         source_overrides=source_overrides,
+        kma_forecast_text_path=kma_forecast_text_path,
+        kma_past_text_path=kma_past_text_path,
+        http_cache_dir=http_cache_dir,
     )
 
     if dry_run:
@@ -1353,12 +1467,14 @@ def run_vtg_batch(
         )
 
     command_started_at = time.time()
+    timing_started_at = time.monotonic()
     completed = run_command_with_network_retry(
         command,
         cwd=PROJECT_ROOT,
         retries=1,
         retry_delay_seconds=60,
     )
+    log_timing(f"VTG.py {job.storm_key} hours={','.join(str(item) for item in metadata_paths)}", timing_started_at)
     results: dict[int, dict] = {}
     for fcst_hours, metadata_path in metadata_paths.items():
         metadata_is_current = is_current_file(metadata_path, command_started_at)
@@ -1434,6 +1550,53 @@ def run_vtg(
         source_overrides=source_overrides,
         dry_run=dry_run,
     )[fcst_hours]
+
+
+
+def record_batch_results(
+    *,
+    job: StormJob,
+    window: CycleWindow,
+    due_hours: list[int],
+    batch_results: dict[int, dict],
+    output_root: Path,
+    cycle_status: dict,
+    run_entries: list[dict],
+    complete_model_count: int,
+    final_check_window: bool,
+    now: datetime,
+) -> None:
+    for fcst_hours in due_hours:
+        status_key = status_key_for(job, fcst_hours)
+        result = batch_results.get(fcst_hours, {
+            "status": "failed",
+            "metadata_path": str(metadata_path_for(output_root, job, fcst_hours)),
+            "stderr": "VTG batch run did not return a result for this forecast hour.",
+        })
+        log_failed_vtg_result(job, fcst_hours, result)
+        metadata = result.get("metadata") or {}
+        model_count = metadata_model_count(metadata)
+        completed = model_count >= complete_model_count
+        status_record = {
+            "updated_at_utc": format_utc_stamp(now),
+            "completed": completed,
+            "metadata": metadata,
+            "last_status": result.get("status"),
+            "atcf_id": job.atcf_id,
+            "atcf_match_method": job.atcf_match_method,
+            "reason": job.reason,
+        }
+        if final_check_window:
+            status_record["final_checked_at_utc"] = format_utc_stamp(now)
+            status_record["final_check_window_end_utc"] = window.end_utc
+        cycle_status[status_key] = status_record
+        run_entries.append({
+            "job": asdict(job),
+            "window": asdict(window),
+            "result": result,
+            "completed": completed,
+            "final_check": final_check_window,
+        })
 
 
 def manifest_entry_from_metadata(path: Path, metadata: dict) -> dict:
@@ -2161,6 +2324,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--changed-paths-file", type=Path, default=None, help="Write generated/updated asset paths for git add --pathspec-from-file.")
     parser.add_argument("--verbose-manifest", action="store_true", help="Print full manifest JSON instead of a compact summary.")
     parser.add_argument("--full-manifest-scan", action="store_true", help="Scan all VTG_IMG assets on every run. Default uses incremental manifest updates.")
+    parser.add_argument("--http-cache-dir", type=Path, default=None, help="Shared workflow-local HTTP/KMA cache directory for VTG.py subprocesses.")
+    parser.add_argument("--parallel-jobs", type=int, default=int(os.getenv("VTG_PARALLEL_JOBS", "2")), help="Maximum active storm VTG.py subprocesses per cycle.")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
@@ -2180,6 +2345,11 @@ def main() -> int:
     kma_cache_dir = args.kma_cache_dir or output_root / "kma_apihub_cache"
     status_path = args.status_path or output_root / "vtg_auto_status.json"
     manifest_path = args.manifest_path or output_root / "manifest.json"
+    http_cache_dir = args.http_cache_dir or Path(tempfile.gettempdir()) / "vtg_http_cache"
+    http_cache_dir.mkdir(parents=True, exist_ok=True)
+    global HTTP_FETCH_CACHE_DIR
+    HTTP_FETCH_CACHE_DIR = http_cache_dir
+    parallel_jobs = max(1, int(args.parallel_jobs or 1))
     windows = active_cycle_windows(now)
     status = load_json(status_path, {"cycles": {}})
     manual_map = load_manual_map(args.manual_map)
@@ -2254,12 +2424,27 @@ def main() -> int:
     actual_run_count = 0
     render_signature = current_render_signature()
     for window in windows:
+        window_started_at = time.monotonic()
         cycle_status = status.setdefault("cycles", {}).setdefault(window.data_time, {})
         final_check_window = is_final_check_window(
             now,
             window,
             args.final_check_before_window_end_minutes,
         )
+
+        kma_forecast_text_path = None
+        kma_past_text_path = None
+        kma_forecast_text = None
+        if not args.check_run_needed:
+            kma_forecast_text_path = ensure_kma_gts_now_cache(
+                data_time=window.data_time,
+                auth_key=args.auth_key,
+                cache_dir=http_cache_dir,
+                mode="2",
+            )
+            kma_forecast_text = read_optional_text(kma_forecast_text_path)
+
+        job_started_at = time.monotonic()
         jobs = build_storm_jobs(
             now=now,
             data_time=window.data_time,
@@ -2272,7 +2457,11 @@ def main() -> int:
             atcf_position_max_distance_km=args.atcf_position_max_distance_km,
             atcf_position_min_distance_gap_km=args.atcf_position_min_distance_gap_km,
             resolve_atcf=not args.check_run_needed,
+            kma_gts_now_text=kma_forecast_text,
         )
+        log_timing(f"build storm jobs {window.data_time} jobs={len(jobs)}", job_started_at)
+
+        pending_batches: list[tuple[StormJob, list[int], bool]] = []
         for job in jobs:
             due_hours: list[int] = []
             for fcst_hours in fcst_hours_list:
@@ -2334,49 +2523,99 @@ def main() -> int:
 
             if args.check_run_needed or not due_hours:
                 continue
+            pending_batches.append((job, due_hours, final_check_window))
 
-            batch_results = run_vtg_batch(
-                job=job,
-                output_root=output_root,
+        if pending_batches:
+            kma_past_text_path = ensure_kma_gts_now_cache(
+                data_time=window.data_time,
                 auth_key=args.auth_key,
-                python=args.python,
-                fcst_hours_list=due_hours,
-                auto_fcst_hours=args.auto_fcst_hours,
-                source_overrides=args.source_override,
-                dry_run=args.dry_run,
-                clear_existing=args.force,
+                cache_dir=http_cache_dir,
+                mode="0",
             )
-            for fcst_hours in due_hours:
-                status_key = status_key_for(job, fcst_hours)
-                result = batch_results.get(fcst_hours, {
-                    "status": "failed",
-                    "metadata_path": str(metadata_path_for(output_root, job, fcst_hours)),
-                    "stderr": "VTG batch run did not return a result for this forecast hour.",
-                })
-                log_failed_vtg_result(job, fcst_hours, result)
-                metadata = result.get("metadata") or {}
-                model_count = metadata_model_count(metadata)
-                completed = model_count >= args.complete_model_count
-                status_record = {
-                    "updated_at_utc": format_utc_stamp(now),
-                    "completed": completed,
-                    "metadata": metadata,
-                    "last_status": result.get("status"),
-                    "atcf_id": job.atcf_id,
-                    "atcf_match_method": job.atcf_match_method,
-                    "reason": job.reason,
-                }
-                if final_check_window:
-                    status_record["final_checked_at_utc"] = format_utc_stamp(now)
-                    status_record["final_check_window_end_utc"] = window.end_utc
-                cycle_status[status_key] = status_record
-                run_entries.append({
-                    "job": asdict(job),
-                    "window": asdict(window),
-                    "result": result,
-                    "completed": completed,
-                    "final_check": final_check_window,
-                })
+
+            worker_count = min(parallel_jobs, len(pending_batches))
+            print(
+                f"Running {len(pending_batches)} active storm job(s) for {window.data_time} "
+                f"with parallel_jobs={worker_count}."
+            )
+            render_started_at = time.monotonic()
+
+            if worker_count == 1:
+                for job, due_hours, batch_final_check_window in pending_batches:
+                    batch_results = run_vtg_batch(
+                        job=job,
+                        output_root=output_root,
+                        auth_key=args.auth_key,
+                        python=args.python,
+                        fcst_hours_list=due_hours,
+                        auto_fcst_hours=args.auto_fcst_hours,
+                        source_overrides=args.source_override,
+                        dry_run=args.dry_run,
+                        clear_existing=args.force,
+                        kma_forecast_text_path=kma_forecast_text_path,
+                        kma_past_text_path=kma_past_text_path,
+                        http_cache_dir=http_cache_dir,
+                    )
+                    record_batch_results(
+                        job=job,
+                        window=window,
+                        due_hours=due_hours,
+                        batch_results=batch_results,
+                        output_root=output_root,
+                        cycle_status=cycle_status,
+                        run_entries=run_entries,
+                        complete_model_count=args.complete_model_count,
+                        final_check_window=batch_final_check_window,
+                        now=now,
+                    )
+            else:
+                with ThreadPoolExecutor(max_workers=worker_count) as executor:
+                    futures = {
+                        executor.submit(
+                            run_vtg_batch,
+                            job=job,
+                            output_root=output_root,
+                            auth_key=args.auth_key,
+                            python=args.python,
+                            fcst_hours_list=due_hours,
+                            auto_fcst_hours=args.auto_fcst_hours,
+                            source_overrides=args.source_override,
+                            dry_run=args.dry_run,
+                            clear_existing=args.force,
+                            kma_forecast_text_path=kma_forecast_text_path,
+                            kma_past_text_path=kma_past_text_path,
+                            http_cache_dir=http_cache_dir,
+                        ): (job, due_hours, batch_final_check_window)
+                        for job, due_hours, batch_final_check_window in pending_batches
+                    }
+                    for future in as_completed(futures):
+                        job, due_hours, batch_final_check_window = futures[future]
+                        try:
+                            batch_results = future.result()
+                        except Exception as exc:
+                            batch_results = {
+                                fcst_hours: {
+                                    "status": "failed",
+                                    "metadata_path": str(metadata_path_for(output_root, job, fcst_hours)),
+                                    "stderr": f"VTG batch raised an exception: {exc}",
+                                }
+                                for fcst_hours in due_hours
+                            }
+                        record_batch_results(
+                            job=job,
+                            window=window,
+                            due_hours=due_hours,
+                            batch_results=batch_results,
+                            output_root=output_root,
+                            cycle_status=cycle_status,
+                            run_entries=run_entries,
+                            complete_model_count=args.complete_model_count,
+                            final_check_window=batch_final_check_window,
+                            now=now,
+                        )
+
+            log_timing(f"render active storm batches {window.data_time}", render_started_at)
+        log_timing(f"cycle total before manifest {window.data_time}", window_started_at)
 
     if args.check_run_needed:
         run_needed = actual_run_count > 0

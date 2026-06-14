@@ -97,7 +97,7 @@ MODEL_SOURCES = [
     {"name": "UKMO_EPS", "apihub": None, "noaa": "UEMN", "knackwx": "UEMN"},
     {"name": "GFS", "apihub": "GFS", "noaa": "AVNO", "knackwx": "AVNO"},
     {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "knackwx": "AEMN"},
-    {"name": "CMC", "apihub": "CMC", "noaa": None, "knackwx": "CMC"},
+    {"name": "CMC", "apihub": "CMC", "noaa": "CMC", "knackwx": "CMC"},
     {"name": "CMC_EPS", "apihub": "CMC_EPS", "noaa": "CEMN", "knackwx": "CEMN"},
     {"name": "JGSM", "apihub": "JGSM", "noaa": "JGSM", "knackwx": "JGSM"},
     {"name": "TEPS", "apihub": "TEPS", "noaa": "JENS", "knackwx": "JENS"},
@@ -341,6 +341,10 @@ class Settings:
     metadata_path: Path | None = None
     auth_key: str = os.getenv("KMA_APIHUB_AUTH_KEY", DEFAULT_AUTH_KEY)
     base_url: str = KMA_BASE_URL
+    kma_forecast_text_path: Path | None = None
+    kma_past_text_path: Path | None = None
+    http_cache_dir: Path | None = None
+    http_cache_ttl_seconds: int = 6 * 3600
     source_overrides: tuple[tuple[str, str], ...] = ()
     skip_atcf: bool = False
     analysis_lat: float | None = None
@@ -488,6 +492,30 @@ def parse_args() -> Settings:
     parser.add_argument("--metadata-path", type=Path, default=Settings.metadata_path)
     parser.add_argument("--auth-key", default=os.getenv("KMA_APIHUB_AUTH_KEY", DEFAULT_AUTH_KEY))
     parser.add_argument(
+        "--kma-forecast-text-path",
+        type=Path,
+        default=Settings.kma_forecast_text_path,
+        help="Read pre-fetched KMA APIHUB mode=2 typ_gts_now text from this file.",
+    )
+    parser.add_argument(
+        "--kma-past-text-path",
+        type=Path,
+        default=Settings.kma_past_text_path,
+        help="Read pre-fetched KMA APIHUB mode=0 typ_gts_now text from this file.",
+    )
+    parser.add_argument(
+        "--http-cache-dir",
+        type=Path,
+        default=Settings.http_cache_dir,
+        help="Directory for reusable per-URL HTTP response cache during a workflow run.",
+    )
+    parser.add_argument(
+        "--http-cache-ttl-seconds",
+        type=int,
+        default=Settings.http_cache_ttl_seconds,
+        help="Maximum age for --http-cache-dir entries.",
+    )
+    parser.add_argument(
         "--source-override",
         action="append",
         default=[],
@@ -545,6 +573,10 @@ def parse_args() -> Settings:
         output_root=args.output_root,
         metadata_path=args.metadata_path,
         auth_key=args.auth_key,
+        kma_forecast_text_path=args.kma_forecast_text_path,
+        kma_past_text_path=args.kma_past_text_path,
+        http_cache_dir=args.http_cache_dir,
+        http_cache_ttl_seconds=max(0, int(args.http_cache_ttl_seconds)),
         source_overrides=source_overrides,
         skip_atcf=args.skip_atcf,
         analysis_lat=args.analysis_lat,
@@ -610,6 +642,47 @@ def kma_url(settings: Settings, mode: str) -> str:
     return f"{settings.base_url}?{urlencode(params)}"
 
 
+
+def http_cache_path(cache_dir: Path | None, url: str) -> Path | None:
+    if cache_dir is None:
+        return None
+    digest = hashlib.sha256(url.encode("utf-8")).hexdigest()
+    return cache_dir / "http" / f"{digest}.txt"
+
+
+def read_cached_text(cache_path: Path | None, *, ttl_seconds: int) -> str | None:
+    if cache_path is None or not cache_path.exists():
+        return None
+    try:
+        if ttl_seconds > 0 and time.time() - cache_path.stat().st_mtime > ttl_seconds:
+            return None
+        return cache_path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+
+def write_cached_text(cache_path: Path | None, text: str) -> None:
+    if cache_path is None:
+        return
+    try:
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        tmp_path = cache_path.with_name(f".{cache_path.name}.{os.getpid()}.tmp")
+        tmp_path.write_text(text, encoding="utf-8")
+        tmp_path.replace(cache_path)
+    except OSError as exc:
+        print(f"Warning: failed to write HTTP cache {cache_path}: {exc}")
+
+
+def read_text_file(path: Path | None) -> str | None:
+    if path is None:
+        return None
+    try:
+        return path.read_text(encoding="utf-8")
+    except OSError as exc:
+        print(f"Warning: failed to read pre-fetched text {path}: {exc}")
+        return None
+
+
 def fetch_text(
     session: requests.Session,
     url: str,
@@ -618,14 +691,24 @@ def fetch_text(
     timeout: float = 8,
     retry_delay: float = 1.0,
     encoding: str | None = None,
+    cache_dir: Path | None = None,
+    cache_ttl_seconds: int = 6 * 3600,
 ) -> str | None:
+    cache_path = http_cache_path(cache_dir, url)
+    cached = read_cached_text(cache_path, ttl_seconds=cache_ttl_seconds)
+    if cached is not None:
+        print(f"Using cached HTTP response: {url}")
+        return cached
+
     for attempt in range(1, retries + 1):
         try:
             response = session.get(url, timeout=timeout)
             response.raise_for_status()
             if encoding:
                 response.encoding = encoding
-            return response.text
+            text = response.text
+            write_cached_text(cache_path, text)
+            return text
         except requests.exceptions.RequestException as exc:
             print(f"[attempt {attempt}/{retries}] request failed: {url} ({exc})")
             if attempt < retries:
@@ -784,7 +867,15 @@ def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFra
     frames: list[pd.DataFrame] = []
     with ThreadPoolExecutor(max_workers=4) as executor:
         futures = {
-            executor.submit(fetch_text, session, url, retries=2, timeout=15): (source, url, skiprows)
+            executor.submit(
+                fetch_text,
+                session,
+                url,
+                retries=2,
+                timeout=15,
+                cache_dir=settings.http_cache_dir,
+                cache_ttl_seconds=settings.http_cache_ttl_seconds,
+            ): (source, url, skiprows)
             for source, url, skiprows in atcf_urls(settings)
         }
         for future in as_completed(futures):
@@ -2773,26 +2864,34 @@ def main() -> None:
 
     with requests.Session() as session:
         session.headers.update(REQUEST_HEADERS)
-        kma_forecast_text = fetch_text(
-            session,
-            kma_url(fetch_settings, "2"),
-            retries=5,
-            timeout=8,
-            retry_delay=3,
-            encoding="cp949",
-        )
+        kma_forecast_text = read_text_file(fetch_settings.kma_forecast_text_path)
+        if kma_forecast_text is None:
+            kma_forecast_text = fetch_text(
+                session,
+                kma_url(fetch_settings, "2"),
+                retries=5,
+                timeout=8,
+                retry_delay=3,
+                encoding="cp949",
+                cache_dir=fetch_settings.http_cache_dir,
+                cache_ttl_seconds=fetch_settings.http_cache_ttl_seconds,
+            )
         kma_df = read_kma_csv(kma_forecast_text, fetch_settings, forecast_only=True)
         atcf_df = empty_atcf_frame() if fetch_settings.skip_atcf else fetch_atcf_data(session, fetch_settings)
         df = normalize_track_data(kma_df, atcf_df, fetch_settings)
 
-        kma_past_text = fetch_text(
-            session,
-            kma_url(fetch_settings, "0"),
-            retries=3,
-            timeout=10,
-            retry_delay=3,
-            encoding="cp949",
-        )
+        kma_past_text = read_text_file(fetch_settings.kma_past_text_path)
+        if kma_past_text is None:
+            kma_past_text = fetch_text(
+                session,
+                kma_url(fetch_settings, "0"),
+                retries=3,
+                timeout=10,
+                retry_delay=3,
+                encoding="cp949",
+                cache_dir=fetch_settings.http_cache_dir,
+                cache_ttl_seconds=fetch_settings.http_cache_ttl_seconds,
+            )
         past_kma = build_past_kma_track(read_kma_csv(kma_past_text, fetch_settings, forecast_only=False))
 
     past_kma = update_and_merge_past_track(

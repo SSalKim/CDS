@@ -7,8 +7,8 @@ const TYPHOON_IMAGE_PRELOAD_RADIUS=4;
 const TYPHOON_IMAGE_CACHE_LIMIT=80;
 const TYPHOON_IMAGE_TIMEOUT_MS=20000;
 const TYPHOON_FCST_OPTIONS=[
-{hours:120,label:'5일'},
-{hours:240,label:'10일'}
+{hours:120,label:'5일예측'},
+{hours:240,label:'10일예측'}
 ];
 
 const TYPHOON_KO_NAME_FALLBACK={
@@ -76,8 +76,8 @@ const TYPHOON_MODEL_INFO=[
 {name:'NAVGEM',description:'미해군수치기상해양센터(FNMOC) 전구모델(NAVGEM)'},
 {name:'NAVGEM EPS',description:'미해군수치기상해양센터(FNMOC) 앙상블모델(NAVGEM EPS) 평균'},
 {name:'JGSM',description:'일본기상청(JMA) 전구모델(GSM)'},
-{name:'JGSM EPS',description:'일본기상청(JMA) 태풍앙상블모델(TEPS)'},
-{name:'COAMPS-TC',description:'미해군연구소(NRL) 전구모델(COAMPS-TC) (GFS 초기장)'},
+{name:'JGSM EPS',description:'일본기상청(JMA) 앙상블모델(GEPS)'},
+{name:'COAMPS-TC',description:'미해군연구소(NRL) 태풍모델(COAMPS-TC) (GFS 초기장)'},
 {name:'COAMPS-TC EPS',description:'미해군연구소(NRL) 앙상블모델(COAMPS-TC EPS) 평균'},
 {name:'GALWEM',description:'미공군(USAF) 전구모델(UM)'},
 {name:'HAFS',description:'미해양대기청(NOAA EMC) 태풍모델(HAFS-A)'},
@@ -96,9 +96,9 @@ const TYPHOON_MODEL_INFO=[
 {name:'GraphCast-KIM',description:'[AI] 기상청 수치예보센터 수행 GraphCast (KIM 초기장)'},
 {name:'GenCast',description:'[AI] 구글 딥마인드(GDM) 앙상블모델(GenCast) 평균'},
 {name:'FNV3',description:'[AI] 구글 딥마인드(GDM) 앙상블 실험모델(FNV3) 평균'},
-{name:'Aurora-ECMWF',description:'[AI] 홍콩기상청 수행 Aurora (ECMWF 초기장)'},
-{name:'FuXi-ECMWF',description:'[AI] 홍콩기상청 수행 FuXi (ECMWF 초기장)'},
-{name:'FengWu-ECMWF',description:'[AI] 홍콩기상청 수행 FengWu (ECMWF 초기장)'},
+{name:'Aurora-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 Aurora (ECMWF 초기장)'},
+{name:'FuXi-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FuXi (ECMWF 초기장)'},
+{name:'FengWu-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FengWu (ECMWF 초기장)'},
 ];
 
 const TYPHOON_DEFAULT_MODEL_TARGET=TYPHOON_MODEL_INFO.length;

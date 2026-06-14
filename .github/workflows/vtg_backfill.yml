@@ -303,6 +303,8 @@ jobs:
               --fcst-hours "120,240" \
               --no-auto-fcst-hours \
               --min-run-interval-minutes 0 \
+              --http-cache-dir "$RUNNER_TEMP/vtg_http_cache" \
+              --parallel-jobs 2 \
               --changed-paths-file "$CHANGED_PATHS_FILE"
 
             COUNT=$((COUNT + 1))
@@ -359,14 +361,16 @@ jobs:
           done < vtg_backfill_cycles.txt
 
           echo "::group::Rebuild split/full VTG manifest index"
+          FINAL_CHANGED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths_final.txt"
+          rm -f "$FINAL_CHANGED_PATHS_FILE"
           python vtg_auto.py \
             --index-only \
             --output-root VTG_IMG \
-            --changed-paths-file vtg_changed_paths.txt
+            --changed-paths-file "$FINAL_CHANGED_PATHS_FILE"
 
-          if [ -f vtg_changed_paths.txt ] && [ -s vtg_changed_paths.txt ]; then
-            sort -u vtg_changed_paths.txt -o vtg_changed_paths.txt
-            git add --pathspec-from-file=vtg_changed_paths.txt || true
+          if [ -f "$FINAL_CHANGED_PATHS_FILE" ] && [ -s "$FINAL_CHANGED_PATHS_FILE" ]; then
+            sort -u "$FINAL_CHANGED_PATHS_FILE" -o "$FINAL_CHANGED_PATHS_FILE"
+            git add --pathspec-from-file="$FINAL_CHANGED_PATHS_FILE" || true
           else
             git add VTG_IMG/manifest.json VTG_IMG/manifest || true
           fi
