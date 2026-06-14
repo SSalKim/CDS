@@ -280,16 +280,22 @@ jobs:
               run_with_retry python vtg_manual_run.py --vtg-args "$MANUAL_VTG_ARGS"
             fi
           else
-            args+=(--fcst-hours "120,240" --no-auto-fcst-hours --min-run-interval-minutes 8 --changed-paths-file vtg_changed_paths.txt --http-cache-dir "$RUNNER_TEMP/vtg_http_cache" --parallel-jobs 2)
+            CHANGED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths.txt"
+            rm -f "$CHANGED_PATHS_FILE"
+            args+=(--fcst-hours "120,240" --no-auto-fcst-hours --min-run-interval-minutes 8 --changed-paths-file "$CHANGED_PATHS_FILE" --http-cache-dir "$RUNNER_TEMP/vtg_http_cache" --parallel-jobs 2)
             run_with_retry python vtg_auto.py "${args[@]}"
           fi
 
       - name: Commit generated VTG assets
         if: ${{ env.DRY_RUN_INPUT != 'true' }}
         run: |
-          if [ -f vtg_changed_paths.txt ] && [ -s vtg_changed_paths.txt ]; then
-            sort -u vtg_changed_paths.txt -o vtg_changed_paths.txt
-            git add --pathspec-from-file=vtg_changed_paths.txt || true
+          CHANGED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths.txt"
+          touch "$CHANGED_PATHS_FILE"
+          git diff --name-only -- VTG_IMG >> "$CHANGED_PATHS_FILE" || true
+          git ls-files --others --exclude-standard -- VTG_IMG >> "$CHANGED_PATHS_FILE" || true
+          sort -u "$CHANGED_PATHS_FILE" -o "$CHANGED_PATHS_FILE"
+          if [ -s "$CHANGED_PATHS_FILE" ]; then
+            git add --pathspec-from-file="$CHANGED_PATHS_FILE" || true
           else
             echo "Changed-path list is empty or missing; falling back to VTG_IMG status check."
             git add VTG_IMG || true
@@ -301,11 +307,40 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Update VTG images"
+
+          if [ -n "$(git status --porcelain -- VTG_IMG)" ]; then
+            echo "Unexpected unstaged/untracked VTG_IMG changes before rebase:"
+            git status --short -- VTG_IMG
+            git add -A VTG_IMG
+            git commit --amend --no-edit
+          fi
+
+          if [ -n "$(git status --porcelain -- VTG_IMG)" ]; then
+            echo "Working tree is still dirty after amend; refusing to rebase."
+            git status --short -- VTG_IMG
+            exit 1
+          fi
+
           for attempt in 1 2 3; do
             git fetch origin main
-            git rebase origin/main
+            if ! git rebase origin/main; then
+              echo "Rebase failed. Current git status:"
+              git status --short
+              git rebase --abort || true
+              if [ "$attempt" -eq 3 ]; then
+                echo "Failed to rebase generated VTG assets after retries."
+                exit 1
+              fi
+              echo "Rebase failed; retrying ($attempt/3)."
+              sleep $((attempt * 5))
+              continue
+            fi
             if git push origin HEAD:main; then
               exit 0
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "Failed to push generated VTG assets after retries."
+              exit 1
             fi
             echo "Push failed after rebase; retrying ($attempt/3)."
             sleep $((attempt * 5))

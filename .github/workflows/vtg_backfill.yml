@@ -336,9 +336,26 @@ jobs:
                 git commit --amend --no-edit
               fi
 
+              if [ -n "$(git status --porcelain -- VTG_IMG)" ]; then
+                echo "Working tree is still dirty after amend; refusing to rebase."
+                git status --short -- VTG_IMG
+                exit 1
+              fi
+
               for attempt in 1 2 3; do
                 git fetch origin main
-                git rebase origin/main
+                if ! git rebase origin/main; then
+                  echo "Rebase failed for $CYCLE. Current git status:"
+                  git status --short
+                  git rebase --abort || true
+                  if [ "$attempt" -eq 3 ]; then
+                    echo "Failed to rebase generated VTG assets after retries."
+                    exit 1
+                  fi
+                  echo "Rebase failed; retrying ($attempt/3)."
+                  sleep $((attempt * 5))
+                  continue
+                fi
                 if git push origin HEAD:main; then
                   break
                 fi
