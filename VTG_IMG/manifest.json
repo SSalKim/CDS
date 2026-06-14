@@ -1,16 +1,16 @@
 {
   "version": 2,
-  "updated_at_utc": "202506142300",
+  "updated_at_utc": "202506150500",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202506141800",
-      "cycle_time_utc": "202506141800",
-      "start_utc": "202506142300",
-      "end_utc": "202506150500"
+      "data_time": "202506150000",
+      "cycle_time_utc": "202506150000",
+      "start_utc": "202506150500",
+      "end_utc": "202506151100"
     }
   ],
   "runs": [
@@ -19,7 +19,7 @@
         "storm_key": "td_2025_03_typ_01",
         "stage": "TD_LINKED_TYP",
         "year": 2025,
-        "data_time": "202506141800",
+        "data_time": "202506150000",
         "td_number": 3,
         "linked_td_number": null,
         "typ_number": 3,
@@ -30,16 +30,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202506141800",
-        "cycle_time_utc": "202506141800",
-        "start_utc": "202506142300",
-        "end_utc": "202506150500"
+        "data_time": "202506150000",
+        "cycle_time_utc": "202506150000",
+        "start_utc": "202506150500",
+        "end_utc": "202506151100"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614055835",
-          "image_path": "VTG_IMG/2025/TD_2503_WUTIP/TD_2503_WUTIP_202506141800_120h.png",
+          "generated_at_utc": "20260614055916",
+          "image_path": "VTG_IMG/2025/TD_2503_WUTIP/TD_2503_WUTIP_202506150000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
           "typ_number": 3,
@@ -50,17 +50,28 @@
           "linked_typ_number": 1,
           "atcf_id": "wp012025",
           "extra_atcf_ids": [],
-          "data_time": "202506141800",
+          "data_time": "202506150000",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 5,
+          "model_count": 16,
           "target_model_count": 33,
           "model_labels": [
             "ECMWF",
             "ECMWF AIFS",
             "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "FourCastNet-UM",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "GraphCast-UM",
             "KIM",
-            "UM"
+            "KIM EPS",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "Pangu-Weather-UM",
+            "UM",
+            "UM EPS"
           ],
           "skip_atcf": false
         }
@@ -73,7 +84,7 @@
         "storm_key": "td_2025_03_typ_01",
         "stage": "TD_LINKED_TYP",
         "year": 2025,
-        "data_time": "202506141800",
+        "data_time": "202506150000",
         "td_number": 3,
         "linked_td_number": null,
         "typ_number": 3,
@@ -84,16 +95,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202506141800",
-        "cycle_time_utc": "202506141800",
-        "start_utc": "202506142300",
-        "end_utc": "202506150500"
+        "data_time": "202506150000",
+        "cycle_time_utc": "202506150000",
+        "start_utc": "202506150500",
+        "end_utc": "202506151100"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614055837",
-          "image_path": "VTG_IMG/2025/TD_2503_WUTIP/TD_2503_WUTIP_202506141800_240h.png",
+          "generated_at_utc": "20260614055918",
+          "image_path": "VTG_IMG/2025/TD_2503_WUTIP/TD_2503_WUTIP_202506150000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
           "typ_number": 3,
@@ -104,17 +115,28 @@
           "linked_typ_number": 1,
           "atcf_id": "wp012025",
           "extra_atcf_ids": [],
-          "data_time": "202506141800",
+          "data_time": "202506150000",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 5,
+          "model_count": 16,
           "target_model_count": 33,
           "model_labels": [
             "ECMWF",
             "ECMWF AIFS",
             "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "FourCastNet-UM",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "GraphCast-UM",
             "KIM",
-            "UM"
+            "KIM EPS",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "Pangu-Weather-UM",
+            "UM",
+            "UM EPS"
           ],
           "skip_atcf": false
         }
@@ -4074,29 +4096,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2025_03",
-        "stage": "TD",
+        "storm_key": "td_2025_03_typ_01",
+        "stage": "TD_LINKED_TYP",
         "year": 2025,
         "data_time": "202506150000",
         "td_number": 3,
         "linked_td_number": null,
-        "linked_typ_number": 1,
         "typ_number": 3,
-        "data_typ_number": 3,
         "typ_name_ko": "우딥",
         "typ_name": "WUTIP",
         "typ_en": "WUTIP",
         "atcf_id": "wp012025",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202506150000"
+        "data_time": "202506150000",
+        "cycle_time_utc": "202506150000",
+        "start_utc": "202506150500",
+        "end_utc": "202506151100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614025909",
+          "generated_at_utc": "20260614055916",
           "image_path": "VTG_IMG/2025/TD_2503_WUTIP/TD_2503_WUTIP_202506150000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -4112,7 +4134,7 @@
           "fcst_hours": 120,
           "intensity": "TD",
           "model_count": 16,
-          "target_model_count": 39,
+          "target_model_count": 33,
           "model_labels": [
             "ECMWF",
             "ECMWF AIFS",
@@ -4131,37 +4153,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202506150000_td_2025_03_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2025_03",
-        "stage": "TD",
+        "storm_key": "td_2025_03_typ_01",
+        "stage": "TD_LINKED_TYP",
         "year": 2025,
         "data_time": "202506150000",
         "td_number": 3,
         "linked_td_number": null,
-        "linked_typ_number": 1,
         "typ_number": 3,
-        "data_typ_number": 3,
         "typ_name_ko": "우딥",
         "typ_name": "WUTIP",
         "typ_en": "WUTIP",
         "atcf_id": "wp012025",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202506150000"
+        "data_time": "202506150000",
+        "cycle_time_utc": "202506150000",
+        "start_utc": "202506150500",
+        "end_utc": "202506151100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614025911",
+          "generated_at_utc": "20260614055918",
           "image_path": "VTG_IMG/2025/TD_2503_WUTIP/TD_2503_WUTIP_202506150000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -4177,7 +4199,7 @@
           "fcst_hours": 240,
           "intensity": "TD",
           "model_count": 16,
-          "target_model_count": 39,
+          "target_model_count": 33,
           "model_labels": [
             "ECMWF",
             "ECMWF AIFS",
@@ -4196,11 +4218,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202506150000_td_2025_03_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
