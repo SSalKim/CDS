@@ -10,8 +10,7 @@ on:
         type: string
         default: |
           2025062118-2025062700
-          2025070106-2025070800
-          2025070900-2025070912
+          2025070106-2025070912
           2025071100-2025071500
           2025071600-2025081500
           2025081700-2025082612
@@ -23,9 +22,9 @@ on:
           2025103106-2025111300
           2025112312-2025120106
       commit_every:
-        description: "Commit after N cycles. For rendering consistency/safety, this workflow currently commits every cycle."
+        description: "Deprecated. Backfill now commits once at the end of each input range/system."
         required: true
-        default: "1"
+        default: "range"
       start_from:
         description: "Optional cycle to resume from, e.g. 2026041106"
         required: false
@@ -232,38 +231,39 @@ jobs:
           start_from = "${{ inputs.start_from }}".strip()
 
           pairs = re.findall(r"(\d{10})\s*-\s*(\d{10})", ranges_text)
-
           if not pairs:
-              raise SystemExit(
-                  "No valid ranges found. Use format like 2026011400-2026012012"
-              )
+              raise SystemExit("No valid ranges found. Use format like 2026011400-2026012012")
 
-          cycles = []
-          for start, end in pairs:
+          records = []
+          for range_index, (start, end) in enumerate(pairs, start=1):
               dt = datetime.strptime(start, "%Y%m%d%H")
               ed = datetime.strptime(end, "%Y%m%d%H")
-
               if ed < dt:
                   raise SystemExit(f"Invalid range: {start}-{end}")
 
+              range_cycles = []
               while dt <= ed:
                   cycle = dt.strftime("%Y%m%d%H")
                   if not start_from or cycle >= start_from:
-                      cycles.append(cycle)
+                      range_cycles.append(cycle)
                   dt += timedelta(hours=6)
 
-          if not cycles:
+              for idx, cycle in enumerate(range_cycles):
+                  is_last = "1" if idx == len(range_cycles) - 1 else "0"
+                  records.append((str(range_index), f"{start}-{end}", cycle, is_last))
+
+          if not records:
               raise SystemExit("No cycles generated.")
 
-          Path("vtg_backfill_cycles.txt").write_text(
-              "\n".join(cycles) + "\n",
+          Path("vtg_backfill_cycles.tsv").write_text(
+              "\n".join("\t".join(item) for item in records) + "\n",
               encoding="utf-8",
           )
 
           print(f"range_pairs={len(pairs)}")
-          print(f"cycles={len(cycles)}")
-          print(f"first={cycles[0]}")
-          print(f"last={cycles[-1]}")
+          print(f"cycles={len(records)}")
+          print(f"first={records[0][2]}")
+          print(f"last={records[-1][2]}")
 
       - name: Run VTG backfill sequentially
         shell: bash
@@ -286,21 +286,107 @@ jobs:
             done
           }
 
+          filter_changed_paths() {
+            local input_file="$1"
+            local output_file="$2"
+            touch "$input_file"
+            sort -u "$input_file" -o "$input_file"
+            : > "$output_file"
+            while IFS= read -r path; do
+              [ -z "$path" ] && continue
+              if [ -e "$path" ] || git ls-files --error-unmatch "$path" >/dev/null 2>&1; then
+                echo "$path" >> "$output_file"
+              else
+                echo "Skipping missing untracked changed path: $path"
+              fi
+            done < "$input_file"
+            sort -u "$output_file" -o "$output_file"
+          }
+
+          commit_and_push() {
+            local message="$1"
+            local changed_file="$2"
+            local filtered_file="$RUNNER_TEMP/vtg_changed_paths_filtered.txt"
+
+            git diff --name-only -- VTG_IMG >> "$changed_file" || true
+            git ls-files --others --exclude-standard -- VTG_IMG >> "$changed_file" || true
+            filter_changed_paths "$changed_file" "$filtered_file"
+
+            if [ -s "$filtered_file" ]; then
+              git add --pathspec-from-file="$filtered_file" || true
+            fi
+            # Final safety net: include every actual VTG_IMG change once per range.
+            git add -A VTG_IMG || true
+
+            if git diff --cached --quiet; then
+              echo "No VTG asset changes to commit for: $message"
+              return 0
+            fi
+
+            git commit -m "$message"
+
+            if [ -n "$(git status --porcelain -- VTG_IMG)" ]; then
+              echo "Unexpected unstaged/untracked VTG_IMG changes before rebase:"
+              git status --short -- VTG_IMG
+              git add -A VTG_IMG
+              git commit --amend --no-edit
+            fi
+
+            if [ -n "$(git status --porcelain -- VTG_IMG)" ]; then
+              echo "Working tree is still dirty after amend; refusing to rebase."
+              git status --short -- VTG_IMG
+              exit 1
+            fi
+
+            for attempt in 1 2 3; do
+              git fetch origin main
+              if ! git rebase origin/main; then
+                echo "Rebase failed for: $message"
+                git status --short
+                git rebase --abort || true
+                if [ "$attempt" -eq 3 ]; then
+                  echo "Failed to rebase generated VTG assets after retries."
+                  exit 1
+                fi
+                echo "Rebase failed; retrying ($attempt/3)."
+                sleep $((attempt * 5))
+                continue
+              fi
+              if git push origin HEAD:main; then
+                return 0
+              fi
+              if [ "$attempt" -eq 3 ]; then
+                echo "Failed to push generated VTG assets after retries."
+                exit 1
+              fi
+              echo "Push failed after rebase; retrying ($attempt/3)."
+              sleep $((attempt * 5))
+            done
+          }
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          COMMIT_EVERY="${{ inputs.commit_every }}"
+          CURRENT_RANGE_INDEX=""
+          CURRENT_RANGE_LABEL=""
+          RANGE_CHANGED_PATHS_FILE=""
           COUNT=0
 
-          while IFS= read -r CYCLE; do
+          while IFS=$'\t' read -r RANGE_INDEX RANGE_LABEL CYCLE IS_LAST_IN_RANGE; do
             [ -z "$CYCLE" ] && continue
 
+            if [ "$CURRENT_RANGE_INDEX" != "$RANGE_INDEX" ]; then
+              CURRENT_RANGE_INDEX="$RANGE_INDEX"
+              CURRENT_RANGE_LABEL="$RANGE_LABEL"
+              RANGE_CHANGED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths_range_${RANGE_INDEX}.txt"
+              rm -f "$RANGE_CHANGED_PATHS_FILE"
+              touch "$RANGE_CHANGED_PATHS_FILE"
+              echo "::group::VTG range $RANGE_LABEL"
+            fi
+
             echo "::group::VTG cycle $CYCLE"
-
-
-
-            CHANGED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths.txt"
-            rm -f "$CHANGED_PATHS_FILE"
+            CYCLE_CHANGED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths_${CYCLE}.txt"
+            rm -f "$CYCLE_CHANGED_PATHS_FILE"
 
             run_with_retry python vtg_auto.py \
               --now "$CYCLE" \
@@ -311,77 +397,25 @@ jobs:
               --min-run-interval-minutes 0 \
               --http-cache-dir "$RUNNER_TEMP/vtg_http_cache" \
               --parallel-jobs 2 \
-              --changed-paths-file "$CHANGED_PATHS_FILE"
+              --changed-paths-file "$CYCLE_CHANGED_PATHS_FILE"
 
             COUNT=$((COUNT + 1))
-
-            touch "$CHANGED_PATHS_FILE"
-
-            # vtg_auto.py가 알려준 경로 + Git이 실제 감지한 VTG_IMG 변경분을 합침
-            git diff --name-only -- VTG_IMG >> "$CHANGED_PATHS_FILE" || true
-            git ls-files --others --exclude-standard -- VTG_IMG >> "$CHANGED_PATHS_FILE" || trueg
-            sort -u "$CHANGED_PATHS_FILE" -o "$CHANGED_PATHS_FILE"
-
-            if [ -s "$CHANGED_PATHS_FILE" ]; then
-              git add --pathspec-from-file="$CHANGED_PATHS_FILE" || true
-            else
-              echo "No changed VTG paths found."
-            fi
-
-            if git diff --cached --quiet; then
-              echo "No VTG asset changes for $CYCLE."
-            else
-              git commit -m "Backfill VTG images $CYCLE"
-
-              # Safety net: if any VTG_IMG changes were missed by changed-paths-file,
-              # include them in the just-created commit before rebasing.
-              if [ -n "$(git status --porcelain -- VTG_IMG)" ]; then
-                echo "Unexpected unstaged/untracked VTG_IMG changes before rebase:"
-                git status --short -- VTG_IMG
-                git add -A VTG_IMG
-                git commit --amend --no-edit
-              fi
-
-              if [ -n "$(git status --porcelain -- VTG_IMG)" ]; then
-                echo "Working tree is still dirty after amend; refusing to rebase."
-                git status --short -- VTG_IMG
-                exit 1
-              fi
-
-              for attempt in 1 2 3; do
-                git fetch origin main
-                if ! git rebase origin/main; then
-                  echo "Rebase failed for $CYCLE. Current git status:"
-                  git status --short
-                  git rebase --abort || true
-                  if [ "$attempt" -eq 3 ]; then
-                    echo "Failed to rebase generated VTG assets after retries."
-                    exit 1
-                  fi
-                  echo "Rebase failed; retrying ($attempt/3)."
-                  sleep $((attempt * 5))
-                  continue
-                fi
-                if git push origin HEAD:main; then
-                  break
-                fi
-                if [ "$attempt" -eq 3 ]; then
-                  echo "Failed to push generated VTG assets after retries."
-                  exit 1
-                fi
-                echo "Push failed after rebase; retrying ($attempt/3)."
-                sleep $((attempt * 5))
-              done
-            fi
-
+            touch "$CYCLE_CHANGED_PATHS_FILE"
+            cat "$CYCLE_CHANGED_PATHS_FILE" >> "$RANGE_CHANGED_PATHS_FILE" || true
+            git diff --name-only -- VTG_IMG >> "$RANGE_CHANGED_PATHS_FILE" || true
+            git ls-files --others --exclude-standard -- VTG_IMG >> "$RANGE_CHANGED_PATHS_FILE" || true
+            sort -u "$RANGE_CHANGED_PATHS_FILE" -o "$RANGE_CHANGED_PATHS_FILE"
             echo "::endgroup::"
 
-            if [ "$COMMIT_EVERY" != "1" ]; then
-              echo "commit_every is currently handled as commit-per-cycle for safety."
+            if [ "$IS_LAST_IN_RANGE" = "1" ]; then
+              echo "Committing completed VTG range/system: $CURRENT_RANGE_LABEL"
+              commit_and_push "Backfill VTG images $CURRENT_RANGE_LABEL" "$RANGE_CHANGED_PATHS_FILE"
+              echo "::endgroup::"
+              CURRENT_RANGE_INDEX=""
+              CURRENT_RANGE_LABEL=""
+              RANGE_CHANGED_PATHS_FILE=""
             fi
-
-
-          done < vtg_backfill_cycles.txt
+          done < vtg_backfill_cycles.tsv
 
           echo "::group::Rebuild split/full VTG manifest index"
           FINAL_CHANGED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths_final.txt"
@@ -392,29 +426,13 @@ jobs:
             --changed-paths-file "$FINAL_CHANGED_PATHS_FILE"
 
           if [ -f "$FINAL_CHANGED_PATHS_FILE" ] && [ -s "$FINAL_CHANGED_PATHS_FILE" ]; then
-            sort -u "$FINAL_CHANGED_PATHS_FILE" -o "$FINAL_CHANGED_PATHS_FILE"
-            git add --pathspec-from-file="$FINAL_CHANGED_PATHS_FILE" || true
+            commit_and_push "Rebuild VTG manifest index" "$FINAL_CHANGED_PATHS_FILE"
           else
             git add VTG_IMG/manifest.json VTG_IMG/manifest || true
-          fi
-
-          if git diff --cached --quiet; then
-            echo "No manifest index changes after backfill."
-          else
-            git commit -m "Rebuild VTG manifest index"
-            for attempt in 1 2 3; do
-              git fetch origin main
-              git rebase origin/main
-              if git push origin HEAD:main; then
-                break
-              fi
-              if [ "$attempt" -eq 3 ]; then
-                echo "Failed to push rebuilt VTG manifest index after retries."
-                exit 1
-              fi
-              echo "Push failed after rebase; retrying ($attempt/3)."
-              sleep $((attempt * 5))
-            done
+            if git diff --cached --quiet; then
+              echo "No manifest index changes after backfill."
+            else
+              commit_and_push "Rebuild VTG manifest index" "$FINAL_CHANGED_PATHS_FILE"
+            fi
           fi
           echo "::endgroup::"
-

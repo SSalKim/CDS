@@ -93,16 +93,16 @@ MODEL_SOURCES = [
     {"name": "UM", "apihub": "UM", "noaa": None, "knackwx": None},
     {"name": "UM_GFDL_6h", "apihub": "UM_GFDL_6h", "noaa": None, "knackwx": None},
     {"name": "UM_KEPS", "apihub": "UM_KEPS", "noaa": None, "knackwx": None},
-    {"name": "UKM", "apihub": "UKX", "noaa": "UKM", "knackwx": "UKM"},
+    {"name": "UKM", "apihub": "UKX", "noaa": "UKM", "ral_ucar": "UKM", "knackwx": "UKM"},
     {"name": "UKMO_EPS", "apihub": None, "noaa": "UEMN", "knackwx": "UEMN"},
     {"name": "GFS", "apihub": "GFS", "noaa": "AVNO", "knackwx": "AVNO"},
-    {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "knackwx": "AEMN"},
-    {"name": "CMC", "apihub": "CMC", "noaa": "CMC", "knackwx": "CMC"},
-    {"name": "CMC_EPS", "apihub": "CMC_EPS", "noaa": "CEMN", "knackwx": "CEMN"},
+    {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "ral_ucar": "AEMN", "knackwx": "AEMN"},
+    {"name": "CMC", "apihub": "CMC", "noaa": "CMC", "ral_ucar": "CMC", "knackwx": "CMC"},
+    {"name": "CMC_EPS", "apihub": "CMC_EPS", "noaa": "CEMN", "ral_ucar": "CEMN", "knackwx": "CEMN"},
     {"name": "JGSM", "apihub": "JGSM", "noaa": "JGSM", "knackwx": "JGSM"},
     {"name": "TEPS", "apihub": "TEPS", "noaa": "JENS", "knackwx": "JENS"},
     {"name": "NAVGEM", "apihub": "NAVGEM", "noaa": "NVGM", "knackwx": "NVGM"},
-    {"name": "FNMOC_EPS", "apihub": "FNMOC_EPS", "noaa": "NEMN", "knackwx": "NMEN"},
+    {"name": "FNMOC_EPS", "apihub": "FNMOC_EPS", "noaa": "NEMN", "ral_ucar": "NEMN", "knackwx": "NMEN"},
     {"name": "CTCX", "apihub": None, "noaa": "CTCX", "knackwx": "CTCX"},
     {"name": "COAMPS_EPS", "apihub": None, "noaa": "CTMN", "knackwx": "CTMN"},
     {"name": "AFUM", "apihub": None, "noaa": "AFUM", "knackwx": None},
@@ -203,11 +203,13 @@ MODEL_ACTIVE_WINDOWS = {
     "UKM": ("202604010000", None),                  # 영국기상청(UKMO) UM 예측자료 신규 추가(2026.4.1.~)
     "UKMO_EPS": ("202604010000", None),             # 영국기상청(UKMO) UM 예측자료 신규 추가(2026.4.1.~)
 
-    "AIGFS": ("202601010000", None),                # 미해양대기청(NOAA) AI 예측자료 신규 추가(2026.4.1.~)
+    "AGFS": ("202601010000", None),                # 미해양대기청(NOAA) AI 예측자료 신규 추가(2026.4.1.~)
     "AIGEFS": ("202601010000", None),               # 미해양대기청(NOAA) AI 예측자료 신규 추가(2026.4.1.~)
 
     "IFEC_AI": ("202601010000", None),              # 기상청(KMA) AIFS 예측자료 신규 추가(2026.4.28.~)
     "IFKM_AI": ("202601010000", None),              # 기상청(KMA) AIFS 예측자료 신규 추가(2026.4.28.~)
+
+    "ECMWF_AIFS_EPS": ("202605150000", None),       # ECMWF AIFS-ENS 예측자료 신규 추가(2026.5.26.~)
 }
 
 NO_PRESSURE_SUMMARY_MODELS = {"UKMO_EPS"}
@@ -241,7 +243,7 @@ FIXED_240_MAP_EXTENT = [100.0, 179.9, 0.0, 51.45]
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
-SOURCE_ORDER = ("APIHUB", "NOAA", "RAW.GITHUB", "KNACKWX")
+SOURCE_ORDER = ("APIHUB", "NOAA", "RAL.UCAR", "RAW.GITHUB", "KNACKWX")
 MODEL_SOURCE_PRIORITY_OVERRIDES = {
     "GENC": ("RAW.GITHUB", "APIHUB", "NOAA", "KNACKWX"),
     "FNV3": ("RAW.GITHUB", "APIHUB", "NOAA", "KNACKWX"),
@@ -249,6 +251,7 @@ MODEL_SOURCE_PRIORITY_OVERRIDES = {
 SOURCE_DISPLAY_NAMES = {
     "APIHUB": "KMA APIHUB",
     "NOAA": "NOAA ATCF",
+    "RAL.UCAR": "RAL UCAR ATCF",
     "RAW.GITHUB": "GITHUB",
     "KNACKWX": "KNACKWX ATCF",
 }
@@ -259,6 +262,9 @@ SOURCE_ALIASES = {
     "ATCF": "NOAA",
     "NCEP": "NOAA",
     "NOAAATCF": "NOAA",
+    "RALUCAR": "RAL.UCAR",
+    "UCAR": "RAL.UCAR",
+    "RAL": "RAL.UCAR",
     "EMCNCEP": "NOAA",
     "NCEPATCF": "NOAA",
     "EMCNCEPATCF": "NOAA",
@@ -271,6 +277,7 @@ SOURCE_ALIASES = {
 SOURCE_IDENTIFIER_COLUMNS = {
     "APIHUB": "apihub",
     "NOAA": "noaa",
+    "RAL.UCAR": "ral_ucar",
     "RAW.GITHUB": "raw_github",
     "KNACKWX": "knackwx",
 }
@@ -823,10 +830,21 @@ def raw_github_url(settings: Settings, model: str) -> str:
     )
 
 
+def ral_ucar_url(atcf_id: str) -> str:
+    atcf_id = str(atcf_id or "").strip().lower()
+    year = atcf_id[-4:]
+    return (
+        "https://hurricanes.ral.ucar.edu/realtime/plots/"
+        f"northwestpacific/{year}/{atcf_id}/a{atcf_id}.dat"
+    )
+
+
 def atcf_urls(settings: Settings) -> list[tuple[str, str, int]]:
     urls = []
     for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
         urls.append(("NOAA", f"https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/a{atcf_id}.dat", 0))
+    for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
+        urls.append(("RAL.UCAR", ral_ucar_url(atcf_id), 0))
     urls.extend([
         ("RAW.GITHUB", raw_github_url(settings, "GENC"), 6),
         ("RAW.GITHUB", raw_github_url(settings, "FNV3"), 6),
@@ -1046,22 +1064,50 @@ def empty_track_history(settings: Settings) -> dict:
 
 def load_track_history(settings: Settings) -> dict:
     history = empty_track_history(settings)
-    for path in track_history_paths(settings):
-        if not path.exists():
-            continue
+    requested_aliases = set(history_aliases(settings))
+    loaded_paths: set[Path] = set()
+
+    def merge_payload(path: Path, *, require_alias_match: bool) -> None:
+        if path in loaded_paths or not path.exists():
+            return
         try:
             payload = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
-            continue
+            return
         if not isinstance(payload, dict):
-            continue
+            return
+
+        payload_aliases = {str(path.stem).strip()}
+        primary_key = str(payload.get("primary_key") or "").strip()
+        if primary_key:
+            payload_aliases.add(primary_key)
         for alias in payload.get("aliases", []):
             alias = str(alias or "").strip()
+            if alias:
+                payload_aliases.add(alias)
+
+        if require_alias_match and not (requested_aliases & payload_aliases):
+            return
+
+        loaded_paths.add(path)
+        for alias in payload_aliases:
             if alias and alias not in history["aliases"]:
                 history["aliases"].append(alias)
         for point in payload.get("points", []):
             if isinstance(point, dict):
                 upsert_history_point(history, point)
+
+    for path in track_history_paths(settings):
+        merge_payload(path, require_alias_match=False)
+
+    # Backward compatibility: older runs wrote linked TYP history only to the
+    # linked TD file, or vice versa. Scan sibling history files by alias so a
+    # TYP -> TD or TD -> TYP phase transition keeps the old past track.
+    base = settings.output_root / "metadata" / "track_history" / storm_year(settings)
+    if base.exists():
+        for path in sorted(base.glob("*.json")):
+            merge_payload(path, require_alias_match=True)
+
     return history
 
 
@@ -1119,15 +1165,13 @@ def save_track_history(settings: Settings, history: dict, *, original: dict) -> 
     if history == original:
         return
     history["updated_at_utc"] = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    payload = json.dumps(history, ensure_ascii=False, indent=2) + "\n"
     paths = track_history_paths(settings)
     if not paths:
         return
-    primary = paths[0]
-    primary.parent.mkdir(parents=True, exist_ok=True)
-    primary.write_text(
-        json.dumps(history, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    for path in paths:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(payload, encoding="utf-8")
 
 
 def cli_analysis_point(settings: Settings) -> AnalysisPoint | None:

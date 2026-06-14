@@ -289,61 +289,79 @@ jobs:
       - name: Commit generated VTG assets
         if: ${{ env.DRY_RUN_INPUT != 'true' }}
         run: |
+          set -euo pipefail
+
+          commit_and_push() {
+            local message="$1"
+            if git diff --cached --quiet; then
+              echo "No VTG asset changes to commit."
+              return 0
+            fi
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "$message"
+
+            if [ -n "$(git status --porcelain -- VTG_IMG)" ]; then
+              echo "Unexpected unstaged/untracked VTG_IMG changes before rebase:"
+              git status --short -- VTG_IMG
+              git add -A VTG_IMG
+              git commit --amend --no-edit
+            fi
+
+            if [ -n "$(git status --porcelain -- VTG_IMG)" ]; then
+              echo "Working tree is still dirty after amend; refusing to rebase."
+              git status --short -- VTG_IMG
+              exit 1
+            fi
+
+            for attempt in 1 2 3; do
+              git fetch origin main
+              if ! git rebase origin/main; then
+                echo "Rebase failed. Current git status:"
+                git status --short
+                git rebase --abort || true
+                if [ "$attempt" -eq 3 ]; then
+                  echo "Failed to rebase generated VTG assets after retries."
+                  exit 1
+                fi
+                echo "Rebase failed; retrying ($attempt/3)."
+                sleep $((attempt * 5))
+                continue
+              fi
+              if git push origin HEAD:main; then
+                return 0
+              fi
+              if [ "$attempt" -eq 3 ]; then
+                echo "Failed to push generated VTG assets after retries."
+                exit 1
+              fi
+              echo "Push failed after rebase; retrying ($attempt/3)."
+              sleep $((attempt * 5))
+            done
+          }
+
           CHANGED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths.txt"
+          FILTERED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths_existing.txt"
           touch "$CHANGED_PATHS_FILE"
           git diff --name-only -- VTG_IMG >> "$CHANGED_PATHS_FILE" || true
           git ls-files --others --exclude-standard -- VTG_IMG >> "$CHANGED_PATHS_FILE" || true
           sort -u "$CHANGED_PATHS_FILE" -o "$CHANGED_PATHS_FILE"
-          if [ -s "$CHANGED_PATHS_FILE" ]; then
-            git add --pathspec-from-file="$CHANGED_PATHS_FILE" || true
+
+          : > "$FILTERED_PATHS_FILE"
+          while IFS= read -r path; do
+            [ -z "$path" ] && continue
+            if [ -e "$path" ] || git ls-files --error-unmatch "$path" >/dev/null 2>&1; then
+              echo "$path" >> "$FILTERED_PATHS_FILE"
+            else
+              echo "Skipping missing untracked changed path: $path"
+            fi
+          done < "$CHANGED_PATHS_FILE"
+          sort -u "$FILTERED_PATHS_FILE" -o "$FILTERED_PATHS_FILE"
+
+          if [ -s "$FILTERED_PATHS_FILE" ]; then
+            git add --pathspec-from-file="$FILTERED_PATHS_FILE" || true
           else
-            echo "Changed-path list is empty or missing; falling back to VTG_IMG status check."
-            git add VTG_IMG || true
+            echo "Changed-path list is empty or all paths are missing; falling back to VTG_IMG status check."
           fi
-          if git diff --cached --quiet; then
-            echo "No VTG asset changes to commit."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Update VTG images"
-
-          if [ -n "$(git status --porcelain -- VTG_IMG)" ]; then
-            echo "Unexpected unstaged/untracked VTG_IMG changes before rebase:"
-            git status --short -- VTG_IMG
-            git add -A VTG_IMG
-            git commit --amend --no-edit
-          fi
-
-          if [ -n "$(git status --porcelain -- VTG_IMG)" ]; then
-            echo "Working tree is still dirty after amend; refusing to rebase."
-            git status --short -- VTG_IMG
-            exit 1
-          fi
-
-          for attempt in 1 2 3; do
-            git fetch origin main
-            if ! git rebase origin/main; then
-              echo "Rebase failed. Current git status:"
-              git status --short
-              git rebase --abort || true
-              if [ "$attempt" -eq 3 ]; then
-                echo "Failed to rebase generated VTG assets after retries."
-                exit 1
-              fi
-              echo "Rebase failed; retrying ($attempt/3)."
-              sleep $((attempt * 5))
-              continue
-            fi
-            if git push origin HEAD:main; then
-              exit 0
-            fi
-            if [ "$attempt" -eq 3 ]; then
-              echo "Failed to push generated VTG assets after retries."
-              exit 1
-            fi
-            echo "Push failed after rebase; retrying ($attempt/3)."
-            sleep $((attempt * 5))
-          done
-          echo "Failed to push generated VTG assets after retries."
-          exit 1
+          git add -A VTG_IMG || true
+          commit_and_push "Update VTG images"
