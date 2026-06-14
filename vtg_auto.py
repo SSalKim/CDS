@@ -466,6 +466,22 @@ def candidate_td_atcf_ids(*, td_number: int, year: int) -> list[str]:
     return ids
 
 
+def atcf_storm_number(atcf_id: str) -> int | None:
+    match = re.fullmatch(r"[a-z]{2}(\d{2})\d{4}", str(atcf_id or "").strip().lower())
+    if not match:
+        return None
+    return int(match.group(1))
+
+
+def is_invest_atcf_id(atcf_id: str) -> bool:
+    number = atcf_storm_number(atcf_id)
+    return number is not None and 90 <= number <= 99
+
+
+def atcf_match_distance(match: AtcfMatch) -> float:
+    return match.distance_km if match.distance_km is not None else float("inf")
+
+
 def parse_atcf_coord(value: str) -> float | None:
     text = str(value or "").strip().upper()
     if len(text) < 2:
@@ -562,6 +578,7 @@ def find_atcf_position_match(
     positive_radius: int | None = None,
     negative_radius: int | None = None,
     atcf_ids: list[str] | None = None,
+    preferred_atcf_id: str | None = None,
     max_distance_km: float,
     min_distance_gap_km: float,
 ) -> AtcfMatch | None:
@@ -597,11 +614,37 @@ def find_atcf_position_match(
 
     if not candidates:
         return None
-    candidates.sort(key=lambda item: item.distance_km or float("inf"))
+    candidates.sort(key=atcf_match_distance)
     if len(candidates) >= 2:
-        best_distance = candidates[0].distance_km or float("inf")
-        next_distance = candidates[1].distance_km or float("inf")
+        best_distance = atcf_match_distance(candidates[0])
+        next_distance = atcf_match_distance(candidates[1])
         if next_distance - best_distance < min_distance_gap_km:
+            preferred_id = str(preferred_atcf_id or "").strip().lower()
+            preferred_candidate = next(
+                (item for item in candidates if item.atcf_id.lower() == preferred_id),
+                None,
+            )
+            if preferred_candidate is not None:
+                ambiguous_candidates = [
+                    item for item in candidates
+                    if atcf_match_distance(item) - best_distance < min_distance_gap_km
+                ]
+                nonpreferred_regular_candidates = [
+                    item for item in ambiguous_candidates
+                    if item.atcf_id.lower() != preferred_id and not is_invest_atcf_id(item.atcf_id)
+                ]
+                if not nonpreferred_regular_candidates:
+                    competitors = ", ".join(
+                        f"{item.atcf_id}:{item.distance_km:.1f}km"
+                        for item in ambiguous_candidates
+                        if item.atcf_id.lower() != preferred_id and item.distance_km is not None
+                    )
+                    print(
+                        "ATCF position ambiguity resolved by preferred regular ID: "
+                        f"{preferred_candidate.atcf_id} ({preferred_candidate.distance_km:.1f} km)"
+                        + (f" over {competitors}." if competitors else ".")
+                    )
+                    return preferred_candidate
             return None
     return candidates[0]
 
@@ -760,6 +803,7 @@ def build_storm_jobs(
                 kma_point=kma_point,
                 positive_radius=atcf_search_positive_radius,
                 negative_radius=atcf_search_negative_radius,
+                preferred_atcf_id=f"wp{typ_number:02d}{year}",
                 max_distance_km=atcf_position_max_distance_km,
                 min_distance_gap_km=atcf_position_min_distance_gap_km,
             )
@@ -874,6 +918,7 @@ def build_storm_jobs(
                     if typ_number
                     else candidate_td_atcf_ids(td_number=td_number, year=year)
                 ),
+                preferred_atcf_id=(f"wp{typ_number:02d}{year}" if typ_number else None),
                 max_distance_km=atcf_position_max_distance_km,
                 min_distance_gap_km=atcf_position_min_distance_gap_km,
             )
