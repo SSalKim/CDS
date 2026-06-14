@@ -1087,7 +1087,7 @@ title.textContent='모델 상세 설명';
 
 let subtitle=document.createElement('p');
 subtitle.className='typhoon-model-detail-subtitle';
-subtitle.textContent='표출 모델의 운영기관, 모델명, 도메인, 해상도, 연직층수와 기반 정보를 정리한 표입니다.';
+subtitle.textContent='표출 가능 모델 정보(2026.6. 기준)';
 
 titleWrap.appendChild(title);
 titleWrap.appendChild(subtitle);

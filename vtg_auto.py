@@ -268,7 +268,7 @@ def fetch_text(url: str, *, timeout: float = 12, retries: int = 2, retry_delay: 
             last_error = exc
             if exc.code < 500 or attempt >= retries:
                 raise
-        except (URLError, TimeoutError) as exc:
+        except (URLError, TimeoutError, OSError) as exc:
             last_error = exc
             if attempt >= retries:
                 raise
@@ -370,7 +370,7 @@ def fetch_kma_list_text(endpoint: str, year: int, auth_key: str, *, cache_dir: P
             raise
         print(f"KMA APIHUB {Path(endpoint).stem} {year} failed with HTTP {exc.code}; trying cached rows.")
         return None
-    except (URLError, TimeoutError) as exc:
+    except (URLError, TimeoutError, OSError) as exc:
         print(f"KMA APIHUB {Path(endpoint).stem} {year} request failed ({exc}); trying cached rows.")
         return None
 
@@ -444,7 +444,7 @@ def fetch_kma_reference_point(
     if gts_text is None:
         try:
             text = fetch_text(kma_gts_now_url(data_time, auth_key), timeout=15, retries=1, retry_delay=3.0)
-        except (HTTPError, URLError, TimeoutError):
+        except (HTTPError, URLError, TimeoutError, OSError):
             return None
     else:
         text = gts_text
@@ -472,6 +472,106 @@ def fetch_kma_reference_point(
     lat = sum(point.lat for point in candidates) / len(candidates)
     lon = sum(point.lon for point in candidates) / len(candidates)
     return TrackPoint(time_utc=f"{data_time[:10]}00", lat=lat, lon=lon)
+
+
+
+def kma_typ_number_has_rows(*, typ_number: int, data_time: str, gts_text: str | None) -> bool:
+    if not gts_text:
+        return False
+    for row in parse_kma_csv_lines(gts_text, fixed_columns=18):
+        if safe_int(row[2]) != typ_number:
+            continue
+        ft_time = row[6].strip() if len(row) > 6 else ""
+        if ft_time[:10] == data_time[:10]:
+            return True
+    return False
+
+
+def select_kma_data_typ_number(
+    *,
+    candidates: list[int],
+    data_time: str,
+    gts_text: str | None,
+    fallback: int,
+) -> int:
+    seen: set[int] = set()
+    for candidate in candidates:
+        if not candidate or candidate in seen:
+            continue
+        seen.add(candidate)
+        if kma_typ_number_has_rows(typ_number=candidate, data_time=data_time, gts_text=gts_text):
+            return candidate
+    return fallback
+
+
+def fetch_kma_reference_point_any(
+    *,
+    typ_numbers: list[int],
+    data_time: str,
+    auth_key: str,
+    gts_text: str | None = None,
+) -> tuple[TrackPoint | None, int | None]:
+    seen: set[int] = set()
+    for typ_number in typ_numbers:
+        if not typ_number or typ_number in seen:
+            continue
+        seen.add(typ_number)
+        point = fetch_kma_reference_point(
+            typ_number=typ_number,
+            data_time=data_time,
+            auth_key=auth_key,
+            gts_text=gts_text,
+        )
+        if point is not None:
+            return point, typ_number
+    return None, None
+
+
+def previous_atcf_match_from_status(
+    status: dict | None,
+    *,
+    storm_key: str = "",
+    storm_keys: list[str] | None = None,
+    data_time: str,
+) -> AtcfMatch | None:
+    if not isinstance(status, dict):
+        return None
+    cycles = status.get("cycles")
+    if not isinstance(cycles, dict):
+        return None
+
+    keys: list[str] = []
+    for key in (storm_keys or []):
+        key = str(key or "").strip()
+        if key and key not in keys:
+            keys.append(key)
+    storm_key = str(storm_key or "").strip()
+    if storm_key and storm_key not in keys:
+        keys.append(storm_key)
+    if not keys:
+        return None
+
+    prefixes = tuple(f"{key}_" for key in keys)
+    for cycle_time in sorted((str(key) for key in cycles.keys() if str(key) < data_time), reverse=True):
+        records = cycles.get(cycle_time)
+        if not isinstance(records, dict):
+            continue
+        for record_key, record in records.items():
+            if not str(record_key).startswith(prefixes) or not isinstance(record, dict):
+                continue
+            metadata = record.get("metadata") if isinstance(record.get("metadata"), dict) else {}
+            atcf_id = str(record.get("atcf_id") or metadata.get("atcf_id") or "").strip().lower()
+            if not atcf_id:
+                continue
+            method = str(
+                record.get("atcf_match_method")
+                or metadata.get("analysis_match_method")
+                or "previous_status"
+            ).strip()
+            if method and not method.startswith("previous_"):
+                method = f"previous_{method}"
+            return AtcfMatch(atcf_id=atcf_id, method=method or "previous_status")
+    return None
 
 
 def normalize_name(value: str) -> str:
@@ -699,6 +799,46 @@ def bdeck_stats_delta(before: dict[str, int]) -> dict[str, int]:
     return {key: BDECK_FETCH_STATS.get(key, 0) - before.get(key, 0) for key in BDECK_FETCH_STATS}
 
 
+
+def bdeck_nearest_track_point(
+    text: str,
+    *,
+    reference_time: str,
+    max_offset_hours: float = 12.0,
+) -> tuple[TrackPoint, float] | None:
+    target = parse_utc_stamp(f"{reference_time[:10]}00")
+    if target is None:
+        return None
+
+    best: tuple[TrackPoint, float] | None = None
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        try:
+            row = [item.strip() for item in next(csv.reader([line]))]
+        except csv.Error:
+            continue
+        if len(row) < 8:
+            continue
+        if safe_int(row[5]) != 0:
+            continue
+        valid_time = parse_utc_stamp(f"{row[2]}00")
+        if valid_time is None:
+            continue
+        offset_hours = abs((valid_time - target).total_seconds()) / 3600.0
+        if offset_hours > max_offset_hours:
+            continue
+        lat = parse_atcf_coord(row[6])
+        lon = parse_atcf_coord(row[7])
+        if lat is None or lon is None:
+            continue
+        point = TrackPoint(time_utc=f"{reference_time[:10]}00", lat=lat, lon=lon)
+        if best is None or offset_hours < best[1]:
+            best = (point, offset_hours)
+    return best
+
+
 def fetch_bdeck_analysis_point(atcf_id: str, *, data_time: str) -> TrackPoint | None:
     text = fetch_bdeck_text(atcf_id, timeout=15)
     if not text:
@@ -829,12 +969,20 @@ def find_atcf_position_match(
         text = bdeck_texts.get(atcf_id)
         if not text:
             continue
-        for point in bdeck_track_points(text, reference_time=kma_point.time_utc):
+        exact_points = bdeck_track_points(text, reference_time=kma_point.time_utc)
+        candidate_points = [(point, "position", max_distance_km) for point in exact_points]
+        if not candidate_points:
+            nearest = bdeck_nearest_track_point(text, reference_time=kma_point.time_utc, max_offset_hours=12.0)
+            if nearest is not None:
+                point, offset_hours = nearest
+                relaxed_distance_km = max_distance_km + min(360.0, offset_hours * 60.0)
+                candidate_points.append((point, f"position_nearest_{offset_hours:.0f}h", relaxed_distance_km))
+        for point, method, distance_limit_km in candidate_points:
             distance = haversine_km(kma_point.lat, kma_point.lon, point.lat, point.lon)
-            if distance <= max_distance_km:
+            if distance <= distance_limit_km:
                 candidates.append(AtcfMatch(
                     atcf_id=atcf_id,
-                    method="position",
+                    method=method,
                     distance_km=distance,
                     point=point,
                     reference_point=kma_point,
@@ -953,7 +1101,7 @@ def ensure_kma_gts_now_cache(
     started_at = time.monotonic()
     try:
         text = fetch_text(kma_gts_now_url(data_time, auth_key, mode=mode), timeout=20, retries=1, retry_delay=3.0)
-    except (HTTPError, URLError, TimeoutError) as exc:
+    except (HTTPError, URLError, TimeoutError, OSError) as exc:
         print(f"Warning: failed to prefetch KMA typ_gts_now mode={mode} {data_time}: {exc}")
         return None
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -1086,6 +1234,7 @@ def build_storm_jobs(
     atcf_position_min_distance_gap_km: float,
     resolve_atcf: bool = True,
     kma_gts_now_text: str | None = None,
+    status: dict | None = None,
 ) -> list[StormJob]:
     total_started_at = time.monotonic()
     timing_stats: dict[str, float] = {
@@ -1154,7 +1303,19 @@ def build_storm_jobs(
             )
             if manual_id:
                 atcf_match = AtcfMatch(manual_id, "manual")
-            else:
+            if atcf_match is None:
+                previous_keys = [f"typ_{year}_{typ_number:02d}"]
+                if linked_td_number:
+                    previous_keys.extend([
+                        f"td_{year}_{linked_td_number:02d}_typ_{typ_number:02d}",
+                        f"td_{year}_{linked_td_number:02d}",
+                    ])
+                atcf_match = previous_atcf_match_from_status(
+                    status,
+                    storm_keys=previous_keys,
+                    data_time=data_time,
+                )
+            if atcf_match is None:
                 started_at = time.monotonic()
                 atcf_match = find_atcf_match(
                     typ_en=typ_en,
@@ -1183,7 +1344,7 @@ def build_storm_jobs(
             add_timing_elapsed(timing_stats, "atcf_position", started_at)
         atcf_id = atcf_match.atcf_id if atcf_match else None
         atcf_method = atcf_match.method if atcf_match else ""
-        analysis_point = atcf_match.point if atcf_match and atcf_match.method == "position" else None
+        analysis_point = atcf_match.point if atcf_match and atcf_match.method.startswith("position") else None
         if analysis_point is None and atcf_id:
             started_at = time.monotonic()
             analysis_point = fetch_bdeck_analysis_point(atcf_id, data_time=data_time)
@@ -1193,7 +1354,7 @@ def build_storm_jobs(
         analysis_distance_km = atcf_match.distance_km if analysis_point and atcf_match else None
         if not resolve_atcf:
             reason = "ATCF matching skipped for lightweight precheck."
-        elif atcf_match and atcf_match.method == "position":
+        elif atcf_match and atcf_match.method.startswith("position"):
             reason = (
                 "ATCF name match not found; using temporary position match "
                 f"{atcf_match.atcf_id} ({atcf_match.distance_km:.0f} km)."
@@ -1256,6 +1417,18 @@ def build_storm_jobs(
         linked_typ_has_started = bool(typ_number and linked_typ_start and data_dt >= linked_typ_start)
         display_typ_en = linked_typ_en if linked_typ_has_started else ""
         display_typ_name_ko = linked_typ_name_ko if linked_typ_has_started else ""
+        matching_typ_en = linked_typ_en if typ_number else ""
+        td_data_typ_number = select_kma_data_typ_number(
+            candidates=[td_number, typ_number],
+            data_time=data_time,
+            gts_text=kma_gts_now_text,
+            fallback=td_number,
+        )
+        td_storm_key = (
+            f"td_{year}_{td_number:02d}_typ_{typ_number:02d}"
+            if typ_number
+            else f"td_{year}_{td_number:02d}"
+        )
 
         td_atcf_ids = candidate_td_atcf_ids(td_number=td_number, year=year, linked_typ_number=(typ_number or None))
         td_base_atcf_number = max(1, min(89, typ_number or math.ceil(td_number / 2)))
@@ -1267,13 +1440,22 @@ def build_storm_jobs(
                 year=year,
                 td_number=td_number,
                 typ_number=typ_number or td_number,
-                typ_en=display_typ_en,
+                typ_en=matching_typ_en or display_typ_en,
             )
             atcf_match = AtcfMatch(manual_id, "manual") if manual_id else None
-            if atcf_match is None and display_typ_en:
+            if atcf_match is None:
+                previous_keys = [td_storm_key, f"td_{year}_{td_number:02d}"]
+                if typ_number:
+                    previous_keys.append(f"typ_{year}_{typ_number:02d}")
+                atcf_match = previous_atcf_match_from_status(
+                    status,
+                    storm_keys=previous_keys,
+                    data_time=data_time,
+                )
+            if atcf_match is None and matching_typ_en:
                 started_at = time.monotonic()
                 atcf_match = find_atcf_match(
-                    typ_en=display_typ_en,
+                    typ_en=matching_typ_en,
                     typ_number=td_base_atcf_number,
                     year=year,
                     positive_radius=atcf_search_positive_radius,
@@ -1282,9 +1464,17 @@ def build_storm_jobs(
                 )
                 add_timing_elapsed(timing_stats, "atcf_name", started_at)
         if resolve_atcf and atcf_match is None:
-            reference_typ_number = td_number
+            reference_typ_number = td_data_typ_number
             started_at = time.monotonic()
-            kma_point = fetch_kma_reference_point(typ_number=reference_typ_number, data_time=data_time, auth_key=auth_key, gts_text=kma_gts_now_text)
+            kma_point, matched_kma_typ_number = fetch_kma_reference_point_any(
+                typ_numbers=[td_data_typ_number, td_number, typ_number],
+                data_time=data_time,
+                auth_key=auth_key,
+                gts_text=kma_gts_now_text,
+            )
+            if matched_kma_typ_number:
+                reference_typ_number = matched_kma_typ_number
+                td_data_typ_number = matched_kma_typ_number
             add_timing_elapsed(timing_stats, "kma_reference", started_at)
             started_at = time.monotonic()
             atcf_match = find_atcf_position_match(
@@ -1300,7 +1490,7 @@ def build_storm_jobs(
             add_timing_elapsed(timing_stats, "atcf_position", started_at)
         atcf_id = atcf_match.atcf_id if atcf_match else None
         atcf_method = atcf_match.method if atcf_match else ""
-        analysis_point = atcf_match.point if atcf_match and atcf_match.method == "position" else None
+        analysis_point = atcf_match.point if atcf_match and atcf_match.method.startswith("position") else None
         if analysis_point is None and atcf_id:
             started_at = time.monotonic()
             analysis_point = fetch_bdeck_analysis_point(atcf_id, data_time=data_time)
@@ -1311,7 +1501,7 @@ def build_storm_jobs(
         if not resolve_atcf:
             stage = "TD_UNLINKED"
             reason = "ATCF matching skipped for lightweight precheck."
-        elif typ_number != 0 and atcf_match and atcf_match.method == "position":
+        elif typ_number != 0 and atcf_match and atcf_match.method.startswith("position"):
             if linked_typ_has_started:
                 stage = "TD_LINKED_TYP_POSITION_ATCF"
                 reason = (
@@ -1336,7 +1526,7 @@ def build_storm_jobs(
                     if atcf_id
                     else f"TD is linked to future typhoon {typ_number}; name withheld until typhoon start; ATCF match not found."
                 )
-        elif atcf_match and atcf_match.method == "position":
+        elif atcf_match and atcf_match.method.startswith("position"):
             stage = "TD_POSITION_ATCF"
             reason = (
                 "TD has no linked typhoon number yet; using temporary position match "
@@ -1349,11 +1539,7 @@ def build_storm_jobs(
             stage = "TD_UNLINKED"
             reason = "TD has no linked typhoon number yet."
         jobs.append(StormJob(
-            storm_key=(
-                f"td_{year}_{td_number:02d}_typ_{typ_number:02d}"
-                if typ_number
-                else f"td_{year}_{td_number:02d}"
-            ),
+            storm_key=td_storm_key,
             stage=stage,
             year=year,
             data_time=data_time,
@@ -1361,7 +1547,7 @@ def build_storm_jobs(
             linked_td_number=None,
             linked_typ_number=typ_number or None,
             typ_number=td_number,
-            data_typ_number=td_number,
+            data_typ_number=td_data_typ_number,
             typ_name_ko=display_typ_name_ko if typ_number else "",
             typ_name=display_typ_en or display_typ_name_ko or "NONAME",
             typ_en=display_typ_en,
@@ -2749,6 +2935,7 @@ def main() -> int:
             atcf_position_min_distance_gap_km=args.atcf_position_min_distance_gap_km,
             resolve_atcf=not args.check_run_needed,
             kma_gts_now_text=kma_forecast_text,
+            status=status,
         )
         log_timing(f"build storm jobs {window.data_time} jobs={len(jobs)}", job_started_at)
 

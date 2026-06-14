@@ -101,7 +101,7 @@ MODEL_SOURCES = [
     {"name": "CMC_EPS", "apihub": "CMC_EPS", "noaa": "CEMN", "ral_ucar": "CEMN", "knackwx": "CEMN"},
     {"name": "JGSM", "apihub": "JGSM", "noaa": "JGSM", "knackwx": "JGSM"},
     {"name": "TEPS", "apihub": "TEPS", "noaa": "JENS", "knackwx": "JENS"},
-    {"name": "NAVGEM", "apihub": "NAVGEM", "noaa": "NVGM", "knackwx": "NVGM"},
+    {"name": "NAVGEM", "apihub": "NAVGEM", "noaa": "NVGM", "ral_ucar": "NVGM", "knackwx": "NVGM"},
     {"name": "FNMOC_EPS", "apihub": "FNMOC_EPS", "noaa": "NEMN", "ral_ucar": "NEMN", "knackwx": "NMEN"},
     {"name": "CTCX", "apihub": None, "noaa": "CTCX", "knackwx": "CTCX"},
     {"name": "COAMPS_EPS", "apihub": None, "noaa": "CTMN", "knackwx": "CTMN"},
@@ -832,7 +832,7 @@ def raw_github_url(settings: Settings, model: str) -> str:
 
 def ral_ucar_url(atcf_id: str) -> str:
     atcf_id = str(atcf_id or "").strip().lower()
-    year = atcf_id[-4:]
+    year = atcf_id[-4:] if len(atcf_id) >= 4 else ""
     return (
         "https://hurricanes.ral.ucar.edu/realtime/plots/"
         f"northwestpacific/{year}/{atcf_id}/a{atcf_id}.dat"
@@ -841,15 +841,16 @@ def ral_ucar_url(atcf_id: str) -> str:
 
 def atcf_urls(settings: Settings) -> list[tuple[str, str, int]]:
     urls = []
-    for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
+    atcf_ids = list(dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)))
+    for atcf_id in atcf_ids:
         urls.append(("NOAA", f"https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/a{atcf_id}.dat", 0))
-    for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
+    for atcf_id in atcf_ids:
         urls.append(("RAL.UCAR", ral_ucar_url(atcf_id), 0))
     urls.extend([
         ("RAW.GITHUB", raw_github_url(settings, "GENC"), 6),
         ("RAW.GITHUB", raw_github_url(settings, "FNV3"), 6),
     ])
-    for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
+    for atcf_id in atcf_ids:
         urls.append(("KNACKWX", knackwx_url(settings, atcf_id), 0))
     return urls
 

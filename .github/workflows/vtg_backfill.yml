@@ -122,7 +122,7 @@ jobs:
   backfill:
     needs: decide-runner
     runs-on: ${{ fromJson(needs.decide-runner.outputs.runner_labels) }}
-    timeout-minutes: 360
+    timeout-minutes: 720
     env:
       RUNNER_KIND: ${{ needs.decide-runner.outputs.runner_kind }}
       KMA_APIHUB_AUTH_KEY: ${{ secrets.KMA_APIHUB_AUTH_KEY }}
@@ -371,6 +371,45 @@ jobs:
           CURRENT_RANGE_LABEL=""
           RANGE_CHANGED_PATHS_FILE=""
           COUNT=0
+          PARTIAL_COMMIT_ATTEMPTED=0
+
+          partial_commit_on_exit() {
+            local status="$1"
+            trap - EXIT
+            if [ "$status" -eq 0 ]; then
+              return 0
+            fi
+            if [ "$PARTIAL_COMMIT_ATTEMPTED" = "1" ]; then
+              exit "$status"
+            fi
+            PARTIAL_COMMIT_ATTEMPTED=1
+            echo "Backfill interrupted or failed with exit code $status; attempting to preserve current VTG_IMG changes."
+
+            local partial_changed_file
+            if [ -n "${RANGE_CHANGED_PATHS_FILE:-}" ] && [ -f "$RANGE_CHANGED_PATHS_FILE" ]; then
+              partial_changed_file="$RANGE_CHANGED_PATHS_FILE"
+            else
+              partial_changed_file="$RUNNER_TEMP/vtg_changed_paths_partial.txt"
+              rm -f "$partial_changed_file"
+              touch "$partial_changed_file"
+            fi
+
+            git diff --name-only -- VTG_IMG >> "$partial_changed_file" || true
+            git ls-files --others --exclude-standard -- VTG_IMG >> "$partial_changed_file" || true
+            sort -u "$partial_changed_file" -o "$partial_changed_file"
+
+            if [ -s "$partial_changed_file" ] || [ -n "$(git status --porcelain -- VTG_IMG)" ]; then
+              local label="${CURRENT_RANGE_LABEL:-interrupted}"
+              if ! commit_and_push "Partial backfill VTG images $label" "$partial_changed_file"; then
+                echo "Partial commit/push failed during exit cleanup."
+              fi
+            else
+              echo "No VTG_IMG changes to preserve during exit cleanup."
+            fi
+            exit "$status"
+          }
+
+          trap 'partial_commit_on_exit $?' EXIT
 
           while IFS=$'\t' read -r RANGE_INDEX RANGE_LABEL CYCLE IS_LAST_IN_RANGE; do
             [ -z "$CYCLE" ] && continue
