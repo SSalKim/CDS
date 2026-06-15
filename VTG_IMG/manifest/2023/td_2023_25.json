@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202606151244",
+  "updated_at_utc": "202309051700",
   "storm_key": "td_2023_25",
   "stage": "TD",
   "year": 2023,
@@ -230,29 +230,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2023_25",
-        "stage": "TD",
+        "storm_key": "td_2023_25_typ_11",
+        "stage": "TD_LINKED_TYP",
         "year": 2023,
         "data_time": "202309051200",
         "td_number": 25,
         "linked_td_number": null,
-        "linked_typ_number": 11,
         "typ_number": 25,
-        "data_typ_number": 25,
         "typ_name_ko": "하이쿠이",
         "typ_name": "HAIKUI",
         "typ_en": "HAIKUI",
         "atcf_id": "wp102023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202309051200"
+        "data_time": "202309051200",
+        "cycle_time_utc": "202309051200",
+        "start_utc": "202309051700",
+        "end_utc": "202309052300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615071751",
+          "generated_at_utc": "20260615150628",
           "image_path": "VTG_IMG/2023/TD_2325_HAIKUI/TD_2325_HAIKUI_202309051200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2023",
@@ -273,37 +273,37 @@
             "ECMWF",
             "ECMWF EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202309051200_td_2023_25_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2023_25",
-        "stage": "TD",
+        "storm_key": "td_2023_25_typ_11",
+        "stage": "TD_LINKED_TYP",
         "year": 2023,
         "data_time": "202309051200",
         "td_number": 25,
         "linked_td_number": null,
-        "linked_typ_number": 11,
         "typ_number": 25,
-        "data_typ_number": 25,
         "typ_name_ko": "하이쿠이",
         "typ_name": "HAIKUI",
         "typ_en": "HAIKUI",
         "atcf_id": "wp102023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202309051200"
+        "data_time": "202309051200",
+        "cycle_time_utc": "202309051200",
+        "start_utc": "202309051700",
+        "end_utc": "202309052300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615071754",
+          "generated_at_utc": "20260615150631",
           "image_path": "VTG_IMG/2023/TD_2325_HAIKUI/TD_2325_HAIKUI_202309051200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2023",
@@ -324,11 +324,11 @@
             "ECMWF",
             "ECMWF EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202309051200_td_2023_25_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
