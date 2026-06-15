@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202209231100",
+  "updated_at_utc": "202209260500",
   "storm_key": "typ_2022_16",
   "stage": "TYP",
   "year": 2022,
@@ -1417,28 +1417,28 @@
     {
       "job": {
         "storm_key": "typ_2022_16",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209260000",
         "td_number": null,
         "linked_td_number": 28,
-        "linked_typ_number": null,
         "typ_number": 16,
-        "data_typ_number": 16,
         "typ_name_ko": "노루",
         "typ_name": "NORU",
         "typ_en": "NORU",
         "atcf_id": "wp182022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209260000"
+        "data_time": "202209260000",
+        "cycle_time_utc": "202209260000",
+        "start_utc": "202209260500",
+        "end_utc": "202209261100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615112532",
+          "generated_at_utc": "20260615144322",
           "image_path": "VTG_IMG/2022/TYP_2216_NORU/TYP_2216_NORU_202209260000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -1475,37 +1475,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209260000_typ_2022_16_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_16",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209260000",
         "td_number": null,
         "linked_td_number": 28,
-        "linked_typ_number": null,
         "typ_number": 16,
-        "data_typ_number": 16,
         "typ_name_ko": "노루",
         "typ_name": "NORU",
         "typ_en": "NORU",
         "atcf_id": "wp182022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209260000"
+        "data_time": "202209260000",
+        "cycle_time_utc": "202209260000",
+        "start_utc": "202209260500",
+        "end_utc": "202209261100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615112535",
+          "generated_at_utc": "20260615144323",
           "image_path": "VTG_IMG/2022/TYP_2216_NORU/TYP_2216_NORU_202209260000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -1542,11 +1542,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209260000_typ_2022_16_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
