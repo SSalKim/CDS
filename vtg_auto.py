@@ -32,6 +32,12 @@ DEFAULT_ATCF_SEARCH_POSITIVE_RADIUS = 10
 DEFAULT_ATCF_SEARCH_NEGATIVE_RADIUS = 5
 DEFAULT_ATCF_POSITION_MAX_DISTANCE_KM = 600.0
 DEFAULT_ATCF_POSITION_MIN_DISTANCE_GAP_KM = 250.0
+# Rare cross-basin systems or known KMA/JTWC mapping exceptions.
+# User manual map values still override these defaults.
+BUILTIN_MANUAL_ATCF_MAP = {
+    "2023:TYP08": "ep052023",  # Dora crossed the date line from the eastern Pacific.
+    "DORA": "ep052023",
+}
 VALID_FCST_HOURS = (120, 240)
 CYCLE_HOURS = (0, 6, 12, 18)
 WINDOW_START_OFFSET_HOURS = 5
@@ -1075,9 +1081,13 @@ def write_github_outputs(path: Path | None, outputs: dict[str, object]) -> None:
 
 
 def load_manual_map(path: Path | None) -> dict:
+    merged = dict(BUILTIN_MANUAL_ATCF_MAP)
     if not path:
-        return {}
-    return load_json(path, {})
+        return merged
+    user_map = load_json(path, {})
+    if isinstance(user_map, dict):
+        merged.update(user_map)
+    return merged
 
 
 def manual_atcf_id(manual_map: dict, *, year: int, td_number: int | None, typ_number: int, typ_en: str) -> str | None:
@@ -1250,9 +1260,10 @@ def build_storm_jobs(
         is_active = row_active_for_time(row, probe_time=now, cycle_time=activity_cycle_time)
         if not is_active:
             continue
-        if parse_utc_stamp(row.get("TM_ST", "")) and data_dt < parse_utc_stamp(row.get("TM_ST", "")):
+        typ_start_time = parse_utc_stamp(row.get("TM_ST", ""))
+        if typ_start_time and data_dt < typ_start_time:
             continue
-        if typ_key in active_td_links:
+        if typ_key in active_td_links and not (typ_start_time and data_dt >= typ_start_time):
             td_labels = ", ".join(
                 f"TD{safe_int(item.get('TD')) or 0:02d}"
                 for item in active_td_links.get(typ_key, [])
@@ -1368,11 +1379,6 @@ def build_storm_jobs(
             year = int(row["YY"])
         except (TypeError, ValueError):
             continue
-        if not row_active_for_time(row, probe_time=now, cycle_time=activity_cycle_time):
-            continue
-        if (year, typ_number) in active_typhoon_set:
-            continue
-
         linked_typ_row = None
         linked_typ_en = ""
         linked_typ_name_ko = ""
@@ -1389,6 +1395,25 @@ def build_storm_jobs(
                 linked_typ_en = str(linked_typ_row.get("TYP_EN") or "").strip().upper()
                 linked_typ_name_ko = str(linked_typ_row.get("TYP_NAME") or "").strip()
                 linked_typ_start = parse_utc_stamp(str(linked_typ_row.get("TM_ST") or ""))
+
+        td_is_active = row_active_for_time(row, probe_time=now, cycle_time=activity_cycle_time)
+        # KMA td_lst sometimes ends the pre-typhoon TD row before typ_lst starts,
+        # although typ_gts_now still has usable forecast rows in the gap. Keep the
+        # linked TD job alive until the named TYP cycle starts so manual/backfill
+        # cycles such as 2023101712/18 and 2023101800 are not skipped.
+        if not td_is_active and typ_number and linked_typ_start and data_dt < linked_typ_start:
+            td_start = parse_utc_stamp(str(row.get("TM_ST") or ""))
+            if td_start and data_dt >= ceil_to_cycle_boundary(td_start):
+                td_is_active = True
+                print(
+                    f"Extending linked TD{td_number:02d}->TYP{typ_number:02d} activity "
+                    f"through pre-TYP gap at {data_time}."
+                )
+        if not td_is_active:
+            continue
+        if (year, typ_number) in active_typhoon_set:
+            continue
+
         linked_typ_has_started = bool(typ_number and linked_typ_start and data_dt >= linked_typ_start)
         display_typ_en = linked_typ_en if linked_typ_has_started else ""
         display_typ_name_ko = linked_typ_name_ko if linked_typ_has_started else ""

@@ -239,6 +239,14 @@ MAX_CAMERA_240_LAT_DISTANCE = 62.0
 # boundary below 180E because the current PlateCarree/Mercator path wraps
 # values above 180E into a near-global extent.
 FIXED_240_MAP_EXTENT = [100.0, 179.9, 0.0, 51.45]
+# For 120h products, keep the operational view inside the western North Pacific
+# interest domain. Points outside this box are clipped after the first boundary
+# crossing per model track so the final line segment remains visually connected.
+DISPLAY_120_LON_MIN = 0.0
+DISPLAY_120_LON_MAX = 180.0
+DISPLAY_120_LAT_MIN = 0.0
+DISPLAY_120_LAT_MAX = 50.0
+APIHUB_MODEL_START_MAX_DISTANCE_KM = float(os.getenv("VTG_APIHUB_START_MAX_DISTANCE_KM", "850"))
 
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
@@ -332,7 +340,7 @@ for row in MODEL_SOURCES:
             alias_ids.extend(["GPUM"])
 
         if source == "APIHUB" and model_id == "ECMWF_AIFS":
-            alias_ids.extend(["ECMF_AIFS"])
+            alias_ids.extend(["ECMF_AIFS", "AIFS_ECM"])
 
 
         for alias_priority, alias_id in enumerate(alias_ids, start=1):
@@ -1434,6 +1442,112 @@ def source_priority_for_model(model_name: str, settings: Settings) -> tuple[str,
     return tuple(priority)
 
 
+
+def row_inside_120_domain(row: pd.Series) -> bool:
+    try:
+        lon = float(row["LON"])
+        lat = float(row["LAT"])
+    except (KeyError, TypeError, ValueError):
+        return False
+    return (
+        DISPLAY_120_LON_MIN <= lon <= DISPLAY_120_LON_MAX
+        and DISPLAY_120_LAT_MIN <= lat <= DISPLAY_120_LAT_MAX
+    )
+
+
+def clip_track_to_120_domain(track: pd.DataFrame) -> pd.DataFrame:
+    if track.empty:
+        return track
+    clean = track.copy()
+    clean["TMD"] = pd.to_numeric(clean["TMD"], errors="coerce")
+    clean = clean.sort_values(["TMD", "FT_TM(UTC)", "SEQ"], kind="stable")
+    keep_indices: list[int] = []
+    has_inside = False
+    crossed_out = False
+    for idx, row in clean.iterrows():
+        inside = row_inside_120_domain(row)
+        if inside:
+            if not crossed_out:
+                keep_indices.append(idx)
+                has_inside = True
+            continue
+        if has_inside and not crossed_out:
+            # Keep the first point outside the display domain to draw the final
+            # line segment to the boundary/outflow direction, then drop the tail.
+            keep_indices.append(idx)
+            crossed_out = True
+            continue
+        if not has_inside and not keep_indices:
+            keep_indices.append(idx)
+            crossed_out = True
+    return clean.loc[keep_indices].copy() if keep_indices else clean.iloc[0:0].copy()
+
+
+def clip_120_domain_tracks(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    if df.empty or settings.fcst_hours != 120:
+        return df
+    frames: list[pd.DataFrame] = []
+    for (model_name, source_name), track in df.groupby(["SRC", DATA_SOURCE_COLUMN], dropna=False):
+        clipped = clip_track_to_120_domain(track)
+        removed = len(track) - len(clipped)
+        if removed > 0:
+            print(
+                f"{model_name} {source_display_name(str(source_name))}: "
+                f"clipped {removed} point(s) outside 120h display domain "
+                f"({DISPLAY_120_LON_MIN:g}-{DISPLAY_120_LON_MAX:g}E, "
+                f"{DISPLAY_120_LAT_MIN:g}-{DISPLAY_120_LAT_MAX:g}N)."
+            )
+        if not clipped.empty:
+            frames.append(clipped)
+    return pd.concat(frames, ignore_index=True) if frames else df.iloc[0:0].copy()
+
+
+def analysis_reference_point_from_df(df: pd.DataFrame, settings: Settings) -> tuple[float, float, str] | None:
+    override = cli_analysis_point(settings)
+    if override is not None:
+        return override.lat, override.lon, override.source
+    if df.empty:
+        return None
+    kma = df[(df["SRC"].eq("KMA")) & (pd.to_numeric(df["TMD"], errors="coerce").eq(0))]
+    kma = kma.dropna(subset=["LAT", "LON"])
+    if not kma.empty:
+        row = kma.iloc[0]
+        return float(row["LAT"]), float(row["LON"]), "KMA"
+    return None
+
+
+def filter_suspicious_apihub_model_starts(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    if df.empty or DATA_SOURCE_COLUMN not in df.columns:
+        return df
+    reference = analysis_reference_point_from_df(df, settings)
+    if reference is None:
+        return df
+    ref_lat, ref_lon, ref_source = reference
+    keep_mask = pd.Series(True, index=df.index)
+    removed: list[str] = []
+    for model_name, model_df in df[df[DATA_SOURCE_COLUMN].eq("APIHUB")].groupby("SRC", dropna=True):
+        if model_name == "KMA":
+            continue
+        clean = model_df.copy()
+        clean["TMD"] = pd.to_numeric(clean["TMD"], errors="coerce")
+        start = clean[clean["TMD"].eq(0)].dropna(subset=["LAT", "LON"]).head(1)
+        if start.empty:
+            start = clean[clean["TMD"].gt(0)].dropna(subset=["LAT", "LON"]).sort_values(["TMD", "FT_TM(UTC)", "SEQ"]).head(1)
+        if start.empty:
+            continue
+        row = start.iloc[0]
+        distance = haversine_km(ref_lat, ref_lon, float(row["LAT"]), float(row["LON"]))
+        if distance <= APIHUB_MODEL_START_MAX_DISTANCE_KM:
+            continue
+        keep_mask.loc[model_df.index] = False
+        removed.append(f"{model_name} ({distance:.0f} km from {ref_source})")
+    if removed:
+        print(
+            "Dropped suspicious KMA APIHUB model source(s) due to excessive start-position distance; "
+            "falling back to lower-priority ATCF source when available: " + ", ".join(removed)
+        )
+    return df.loc[keep_mask].copy()
+
 def select_model_sources_by_priority(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     """Keep one source per model using fixed provider priority."""
     if df.empty or DATA_SOURCE_COLUMN not in df.columns:
@@ -1477,6 +1591,7 @@ def normalize_track_data(kma_df: pd.DataFrame, atcf_df: pd.DataFrame, settings: 
     if df.empty:
         return df
 
+    df = filter_suspicious_apihub_model_starts(df, settings)
     df = select_model_sources_by_priority(df, settings)
 
     if MODEL_ALIAS_PRIORITY_COLUMN not in df.columns:
@@ -1498,7 +1613,8 @@ def normalize_track_data(kma_df: pd.DataFrame, atcf_df: pd.DataFrame, settings: 
             df[col] = pd.to_numeric(df[col], errors="coerce")
     df = df.dropna(subset=["LAT", "LON"])
     df = apply_common_kma_start(df, settings)
-    return trim_dateline_reflected_tracks(df)
+    df = trim_dateline_reflected_tracks(df)
+    return clip_120_domain_tracks(df, settings)
 
 
 def suspected_dateline_reflection_cutoff(track: pd.DataFrame) -> float | None:
@@ -2603,6 +2719,17 @@ def finalize_map_extent(
         return fixed_240_map_extent(settings)
 
     extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
+    if settings.fcst_hours == 120:
+        lon_min, lon_max, lat_min, lat_max = extent
+        lon_min = max(DISPLAY_120_LON_MIN, lon_min)
+        lon_max = min(DISPLAY_120_LON_MAX, lon_max)
+        lat_min = max(DISPLAY_120_LAT_MIN, lat_min)
+        lat_max = min(DISPLAY_120_LAT_MAX, lat_max)
+        if lon_max <= lon_min:
+            lon_min, lon_max = DISPLAY_120_LON_MIN, DISPLAY_120_LON_MAX
+        if lat_max <= lat_min:
+            lat_min, lat_max = DISPLAY_120_LAT_MIN, DISPLAY_120_LAT_MAX
+        extent = [lon_min, lon_max, lat_min, lat_max]
     return extent
 
 

@@ -825,7 +825,7 @@ min-height:0;
 .typhoon-model-info-actions{
 display:flex;
 align-items:center;
-justify-content:space-between;
+justify-content:flex-start;
 gap:12px;
 padding:10px 10px 12px;
 margin-top:auto;
@@ -836,6 +836,7 @@ bottom:0;
 z-index:2;
 }
 .typhoon-model-info-actions .typhoon-updated-time{
+flex:1 1 auto;
 min-width:0;
 margin-right:auto;
 text-align:left;
@@ -1556,14 +1557,26 @@ storm.active=true;
 return [...byKey.values()]
 .map(storm=>({
 ...storm,
-sortTime:(storm.stage==='TD' ? storm.first : (storm.typFirst || storm.first)) || storm.first
+sortTime:(storm.stage==='TD' ? storm.first : (storm.typFirst || storm.first)) || storm.first,
+sortTypNumber:Number(storm.typNumber || 0)
 }))
-.sort((a,b)=>
-String(b.sortTime || '').localeCompare(String(a.sortTime || '')) ||
-String(b.latest || '').localeCompare(String(a.latest || '')) ||
+.sort((a,b)=>{
+let timeCompare=String(b.sortTime || '').localeCompare(String(a.sortTime || ''));
+if(timeCompare!==0){
+return timeCompare;
+}
+// If two named typhoons share the same effective start cycle, put the later
+// named/larger typhoon number first. This fixes cases like 2022 TYP10/TYP09.
+if(a.stage!=='TD' && b.stage!=='TD'){
+let numberCompare=Number(b.sortTypNumber || 0)-Number(a.sortTypNumber || 0);
+if(numberCompare!==0){
+return numberCompare;
+}
+}
+return String(b.latest || '').localeCompare(String(a.latest || '')) ||
 Number(b.typNumber || 0)-Number(a.typNumber || 0) ||
-a.label.localeCompare(b.label)
-);
+a.label.localeCompare(b.label);
+});
 }
 
 function typhoonActiveWindowDataTimes(){
