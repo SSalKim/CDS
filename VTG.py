@@ -2650,14 +2650,19 @@ def fit_extent_inside_bounds_by_zoom(
     focus_x: float = 0.57,
     focus_y: float = 0.40,
 ) -> list[float]:
-    """Fit a 120h extent inside hard bounds by zooming in, not by counter-shifting.
+    """Fit a 120h extent inside hard bounds by zooming in with aspect preserved.
 
-    When the auto camera reaches the northern/southern hard bounds, the old
-    logic preserved the requested span and shifted the whole window in the
-    opposite direction. That keeps the aspect stable, but can create a large
-    empty area on the opposite side of the map. Instead, keep the constrained
-    edge fixed and zoom in so the matched extent fits inside the available
-    domain while preserving the canvas aspect in Mercator projected space.
+    The previous forced-bound logic moved an aspect-matched window back inside
+    the 120h domain while preserving its span. When the north edge hit 50N,
+    that created excess empty space on the opposite side. This helper instead
+    computes the largest Mercator-projected box that:
+
+    * keeps the same physical aspect ratio as the map panel,
+    * stays inside the 120h hard bounds, and
+    * preserves the existing focus bias as much as possible.
+
+    Because the final box is built directly in projected coordinates with the
+    target aspect ratio, Cartopy does not letterbox the GeoAxes.
     """
     lon_min, lon_max, lat_min, lat_max = [float(value) for value in extent]
     values = (lon_min, lon_max, lat_min, lat_max)
@@ -2668,6 +2673,9 @@ def fit_extent_inside_bounds_by_zoom(
 
     projection = ccrs.Mercator()
     data_crs = ccrs.PlateCarree()
+    canvas_aspect = fig_width / fig_height if fig_height else 1.0
+    if not math.isfinite(canvas_aspect) or canvas_aspect <= 0:
+        canvas_aspect = 1.0
 
     center_lon = (lon_min + lon_max) / 2.0
     center_lat = (lat_min + lat_max) / 2.0
@@ -2677,19 +2685,12 @@ def fit_extent_inside_bounds_by_zoom(
     _, y0 = projection.transform_point(center_lon, lat_min, data_crs)
     _, y1 = projection.transform_point(center_lon, lat_max, data_crs)
 
-    current_width = abs(x1 - x0)
-    current_height = abs(y1 - y0)
-    if current_width == 0 or current_height == 0:
-        return extent
-
     bx0, _ = projection.transform_point(min_lon, center_lat, data_crs)
     bx1, _ = projection.transform_point(max_lon, center_lat, data_crs)
     _, by0 = projection.transform_point(center_lon, min_lat, data_crs)
     _, by1 = projection.transform_point(center_lon, max_lat, data_crs)
 
-    domain_width = abs(bx1 - bx0)
-    domain_height = abs(by1 - by0)
-    if domain_width == 0 or domain_height == 0:
+    if x1 <= x0 or y1 <= y0 or bx1 <= bx0 or by1 <= by0:
         return shift_extent_to_bounds(
             extent,
             min_lon=min_lon,
@@ -2698,113 +2699,72 @@ def fit_extent_inside_bounds_by_zoom(
             max_lat=max_lat,
         )
 
-    overflow_top = lat_max > max_lat
-    overflow_bottom = lat_min < min_lat
-    overflow_east = lon_max > max_lon
-    overflow_west = lon_min < min_lon
-
-    height_limit = current_height
-    if overflow_top and not overflow_bottom:
-        height_limit = max(1e-6, by1 - y0)
-    elif overflow_bottom and not overflow_top:
-        height_limit = max(1e-6, y1 - by0)
-    elif overflow_top and overflow_bottom:
-        height_limit = max(1e-6, domain_height)
-
-    width_limit = current_width
-    if overflow_east and not overflow_west:
-        width_limit = max(1e-6, bx1 - x0)
-    elif overflow_west and not overflow_east:
-        width_limit = max(1e-6, x1 - bx0)
-    elif overflow_east and overflow_west:
-        width_limit = max(1e-6, domain_width)
-
-    scale = min(1.0, width_limit / current_width, height_limit / current_height)
-
-    # If the current aspect-matched box still exceeds the full hard domain, use
-    # the largest box with the canvas aspect that can fit inside the domain.
-    canvas_aspect = fig_width / fig_height if fig_height else current_width / current_height
-    if current_width * scale > domain_width + 1e-6 or current_height * scale > domain_height + 1e-6:
-        scale = min(scale, domain_width / current_width, domain_height / current_height)
-    new_width = current_width * scale
-    new_height = current_height * scale
-
-    # Guard against floating-point drift by constraining to the full domain box.
-    if new_width > domain_width:
-        new_width = domain_width
-        new_height = new_width / canvas_aspect if canvas_aspect else new_height
-    if new_height > domain_height:
-        new_height = domain_height
-        new_width = new_height * canvas_aspect
-        if new_width > domain_width:
-            new_width = domain_width
-            new_height = new_width / canvas_aspect if canvas_aspect else new_height
-
     focus_x = min(0.9, max(0.1, float(focus_x)))
     focus_y = min(0.9, max(0.1, float(focus_y)))
-    x_focus = x0 + current_width * focus_x
-    y_focus = y0 + current_height * focus_y
 
-    if overflow_east and not overflow_west:
-        new_x1 = bx1
-        new_x0 = new_x1 - new_width
-    elif overflow_west and not overflow_east:
-        new_x0 = bx0
-        new_x1 = new_x0 + new_width
-    elif overflow_east and overflow_west:
-        new_x0 = bx0
-        new_x1 = bx1
+    requested_width = x1 - x0
+    requested_height = y1 - y0
+    if requested_width / requested_height < canvas_aspect:
+        requested_width = requested_height * canvas_aspect
     else:
-        new_x0 = x_focus - new_width * focus_x
-        new_x1 = new_x0 + new_width
-        if new_x0 < bx0:
-            new_x0 = bx0
-            new_x1 = new_x0 + new_width
-        if new_x1 > bx1:
-            new_x1 = bx1
-            new_x0 = new_x1 - new_width
+        requested_height = requested_width / canvas_aspect
 
-    if overflow_top and not overflow_bottom:
-        new_y1 = by1
-        new_y0 = new_y1 - new_height
-    elif overflow_bottom and not overflow_top:
+    x_focus = x0 + (x1 - x0) * focus_x
+    y_focus = y0 + (y1 - y0) * focus_y
+    x_focus = min(max(x_focus, bx0), bx1)
+    y_focus = min(max(y_focus, by0), by1)
+
+    max_width_by_left = (x_focus - bx0) / focus_x if focus_x > 0 else float("inf")
+    max_width_by_right = (bx1 - x_focus) / (1.0 - focus_x) if focus_x < 1 else float("inf")
+    max_width_by_x = max(0.0, min(max_width_by_left, max_width_by_right, bx1 - bx0))
+
+    max_height_by_bottom = (y_focus - by0) / focus_y if focus_y > 0 else float("inf")
+    max_height_by_top = (by1 - y_focus) / (1.0 - focus_y) if focus_y < 1 else float("inf")
+    max_height_by_y = max(0.0, min(max_height_by_bottom, max_height_by_top, by1 - by0))
+
+    final_width = min(requested_width, max_width_by_x, max_height_by_y * canvas_aspect)
+    if final_width <= 0:
+        final_width = min(bx1 - bx0, (by1 - by0) * canvas_aspect)
+    final_height = final_width / canvas_aspect
+    if final_height > by1 - by0:
+        final_height = by1 - by0
+        final_width = final_height * canvas_aspect
+    if final_width > bx1 - bx0:
+        final_width = bx1 - bx0
+        final_height = final_width / canvas_aspect
+
+    new_x0 = x_focus - final_width * focus_x
+    new_x1 = new_x0 + final_width
+    if new_x0 < bx0:
+        new_x0 = bx0
+        new_x1 = new_x0 + final_width
+    if new_x1 > bx1:
+        new_x1 = bx1
+        new_x0 = new_x1 - final_width
+
+    new_y0 = y_focus - final_height * focus_y
+    new_y1 = new_y0 + final_height
+    if new_y0 < by0:
         new_y0 = by0
-        new_y1 = new_y0 + new_height
-    elif overflow_top and overflow_bottom:
-        new_y0 = by0
+        new_y1 = new_y0 + final_height
+    if new_y1 > by1:
         new_y1 = by1
-    else:
-        new_y0 = y_focus - new_height * focus_y
-        new_y1 = new_y0 + new_height
-        if new_y0 < by0:
-            new_y0 = by0
-            new_y1 = new_y0 + new_height
-        if new_y1 > by1:
-            new_y1 = by1
-            new_y0 = new_y1 - new_height
+        new_y0 = new_y1 - final_height
 
     new_center_x = (new_x0 + new_x1) / 2.0
     new_center_y = (new_y0 + new_y1) / 2.0
-
     new_lon_min, _ = data_crs.transform_point(new_x0, new_center_y, projection)
     new_lon_max, _ = data_crs.transform_point(new_x1, new_center_y, projection)
     _, new_lat_min = data_crs.transform_point(new_center_x, new_y0, projection)
     _, new_lat_max = data_crs.transform_point(new_center_x, new_y1, projection)
 
-    fitted = [
-        float(new_lon_min),
-        float(new_lon_max),
-        float(new_lat_min),
-        float(new_lat_max),
+    epsilon = 1e-7
+    return [
+        float(min(max(new_lon_min, min_lon - epsilon), max_lon + epsilon)),
+        float(min(max(new_lon_max, min_lon - epsilon), max_lon + epsilon)),
+        float(min(max(new_lat_min, min_lat - epsilon), max_lat + epsilon)),
+        float(min(max(new_lat_max, min_lat - epsilon), max_lat + epsilon)),
     ]
-    return shift_extent_to_bounds(
-        fitted,
-        min_lon=min_lon,
-        max_lon=max_lon,
-        min_lat=min_lat,
-        max_lat=max_lat,
-    )
-
 
 def legend_row_count_for(df: pd.DataFrame, settings: Settings) -> int:
     excluded = excluded_models_for(df)
