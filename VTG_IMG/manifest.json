@@ -1,130 +1,78 @@
 {
   "version": 2,
-  "updated_at_utc": "202308241100",
+  "updated_at_utc": "202308241700",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202308240600",
-      "cycle_time_utc": "202308240600",
-      "start_utc": "202308241100",
-      "end_utc": "202308241700"
+      "data_time": "202308241200",
+      "cycle_time_utc": "202308241200",
+      "start_utc": "202308241700",
+      "end_utc": "202308242300"
     }
   ],
   "runs": [
     {
       "job": {
-        "storm_key": "td_2023_17_typ_10",
-        "stage": "TD_PRE_TYP",
+        "storm_key": "typ_2023_09",
+        "stage": "TYP_LINKED",
         "year": 2023,
-        "data_time": "202308240600",
-        "td_number": 17,
-        "linked_td_number": null,
-        "typ_number": 17,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp082023",
+        "data_time": "202308241200",
+        "td_number": null,
+        "linked_td_number": 18,
+        "typ_number": 9,
+        "typ_name_ko": "사올라",
+        "typ_name": "SAOLA",
+        "typ_en": "SAOLA",
+        "atcf_id": "wp092023",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308240600",
-        "cycle_time_utc": "202308240600",
-        "start_utc": "202308241100",
-        "end_utc": "202308241700"
+        "data_time": "202308241200",
+        "cycle_time_utc": "202308241200",
+        "start_utc": "202308241700",
+        "end_utc": "202308242300"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615151609",
-          "image_path": "VTG_IMG/2023/TD_2317_NONAME/TD_2317_NONAME_202308240600_120h.png",
-          "storm_stage": "TD",
+          "generated_at_utc": "20260615151909",
+          "image_path": "VTG_IMG/2023/TYP_2309_SAOLA/TYP_2309_SAOLA_202308241200_120h.png",
+          "storm_stage": "TYP",
           "storm_year": "2023",
-          "typ_number": 17,
-          "data_typ_number": 17,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": 10,
-          "atcf_id": "wp082023",
+          "typ_number": 9,
+          "data_typ_number": 9,
+          "typ_name": "SAOLA",
+          "typ_name_ko": "사올라",
+          "linked_td_number": 18,
+          "linked_typ_number": null,
+          "atcf_id": "wp092023",
           "extra_atcf_ids": [],
-          "data_time": "202308240600",
+          "data_time": "202308241200",
           "fcst_hours": 120,
-          "intensity": "TD",
-          "model_count": 10,
+          "intensity": "TYP",
+          "model_count": 17,
           "target_model_count": 19,
           "model_labels": [
+            "CMC",
+            "CMC EPS",
             "COAMPS-TC EPS",
             "COAMPS-TC",
             "ECMWF",
             "ECMWF EPS",
+            "NAVGEM EPS",
             "GFS",
             "GFS EPS",
             "HAFS",
             "JGSM",
+            "KIM",
+            "KIM EPS",
             "NAVGEM",
-            "JGSM EPS"
-          ],
-          "skip_atcf": false
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "td_2023_17_typ_10",
-        "stage": "TD_PRE_TYP",
-        "year": 2023,
-        "data_time": "202308240600",
-        "td_number": 17,
-        "linked_td_number": null,
-        "typ_number": 17,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp082023",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202308240600",
-        "cycle_time_utc": "202308240600",
-        "start_utc": "202308241100",
-        "end_utc": "202308241700"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20260615151611",
-          "image_path": "VTG_IMG/2023/TD_2317_NONAME/TD_2317_NONAME_202308240600_240h.png",
-          "storm_stage": "TD",
-          "storm_year": "2023",
-          "typ_number": 17,
-          "data_typ_number": 17,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": 10,
-          "atcf_id": "wp082023",
-          "extra_atcf_ids": [],
-          "data_time": "202308240600",
-          "fcst_hours": 240,
-          "intensity": "TD",
-          "model_count": 10,
-          "target_model_count": 19,
-          "model_labels": [
-            "COAMPS-TC EPS",
-            "COAMPS-TC",
-            "ECMWF",
-            "ECMWF EPS",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "JGSM",
-            "NAVGEM",
-            "JGSM EPS"
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
           ],
           "skip_atcf": false
         }
@@ -137,7 +85,7 @@
         "storm_key": "typ_2023_09",
         "stage": "TYP_LINKED",
         "year": 2023,
-        "data_time": "202308240600",
+        "data_time": "202308241200",
         "td_number": null,
         "linked_td_number": 18,
         "typ_number": 9,
@@ -148,16 +96,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308240600",
-        "cycle_time_utc": "202308240600",
-        "start_utc": "202308241100",
-        "end_utc": "202308241700"
+        "data_time": "202308241200",
+        "cycle_time_utc": "202308241200",
+        "start_utc": "202308241700",
+        "end_utc": "202308242300"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615151609",
-          "image_path": "VTG_IMG/2023/TYP_2309_SAOLA/TYP_2309_SAOLA_202308240600_120h.png",
+          "generated_at_utc": "20260615151911",
+          "image_path": "VTG_IMG/2023/TYP_2309_SAOLA/TYP_2309_SAOLA_202308241200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
           "typ_number": 9,
@@ -168,24 +116,29 @@
           "linked_typ_number": null,
           "atcf_id": "wp092023",
           "extra_atcf_ids": [],
-          "data_time": "202308240600",
-          "fcst_hours": 120,
+          "data_time": "202308241200",
+          "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 12,
+          "model_count": 17,
           "target_model_count": 19,
           "model_labels": [
+            "CMC",
+            "CMC EPS",
             "COAMPS-TC EPS",
             "COAMPS-TC",
             "ECMWF",
             "ECMWF EPS",
+            "NAVGEM EPS",
             "GFS",
             "GFS EPS",
             "HAFS",
             "JGSM",
             "KIM",
+            "KIM EPS",
             "NAVGEM",
             "JGSM EPS",
-            "UM"
+            "UM",
+            "UM EPS"
           ],
           "skip_atcf": false
         }
@@ -195,58 +148,127 @@
     },
     {
       "job": {
-        "storm_key": "typ_2023_09",
-        "stage": "TYP_LINKED",
+        "storm_key": "td_2023_17_typ_10",
+        "stage": "TD_PRE_TYP",
         "year": 2023,
-        "data_time": "202308240600",
-        "td_number": null,
-        "linked_td_number": 18,
-        "typ_number": 9,
-        "typ_name_ko": "사올라",
-        "typ_name": "SAOLA",
-        "typ_en": "SAOLA",
-        "atcf_id": "wp092023",
+        "data_time": "202308241200",
+        "td_number": 17,
+        "linked_td_number": null,
+        "typ_number": 17,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp082023",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308240600",
-        "cycle_time_utc": "202308240600",
-        "start_utc": "202308241100",
-        "end_utc": "202308241700"
+        "data_time": "202308241200",
+        "cycle_time_utc": "202308241200",
+        "start_utc": "202308241700",
+        "end_utc": "202308242300"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615151611",
-          "image_path": "VTG_IMG/2023/TYP_2309_SAOLA/TYP_2309_SAOLA_202308240600_240h.png",
-          "storm_stage": "TYP",
+          "generated_at_utc": "20260615151910",
+          "image_path": "VTG_IMG/2023/TD_2317_NONAME/TD_2317_NONAME_202308241200_120h.png",
+          "storm_stage": "TD",
           "storm_year": "2023",
-          "typ_number": 9,
-          "data_typ_number": 9,
-          "typ_name": "SAOLA",
-          "typ_name_ko": "사올라",
-          "linked_td_number": 18,
-          "linked_typ_number": null,
-          "atcf_id": "wp092023",
+          "typ_number": 17,
+          "data_typ_number": 17,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 10,
+          "atcf_id": "wp082023",
           "extra_atcf_ids": [],
-          "data_time": "202308240600",
-          "fcst_hours": 240,
-          "intensity": "TYP",
-          "model_count": 12,
+          "data_time": "202308241200",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 16,
           "target_model_count": 19,
           "model_labels": [
-            "COAMPS-TC EPS",
+            "CMC",
+            "CMC EPS",
             "COAMPS-TC",
             "ECMWF",
             "ECMWF EPS",
+            "NAVGEM EPS",
             "GFS",
             "GFS EPS",
             "HAFS",
             "JGSM",
             "KIM",
+            "KIM EPS",
             "NAVGEM",
             "JGSM EPS",
-            "UM"
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2023_17_typ_10",
+        "stage": "TD_PRE_TYP",
+        "year": 2023,
+        "data_time": "202308241200",
+        "td_number": 17,
+        "linked_td_number": null,
+        "typ_number": 17,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp082023",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202308241200",
+        "cycle_time_utc": "202308241200",
+        "start_utc": "202308241700",
+        "end_utc": "202308242300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260615151912",
+          "image_path": "VTG_IMG/2023/TD_2317_NONAME/TD_2317_NONAME_202308241200_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2023",
+          "typ_number": 17,
+          "data_typ_number": 17,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 10,
+          "atcf_id": "wp082023",
+          "extra_atcf_ids": [],
+          "data_time": "202308241200",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 16,
+          "target_model_count": 19,
+          "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "ECMWF",
+            "ECMWF EPS",
+            "NAVGEM EPS",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "JGSM",
+            "KIM",
+            "KIM EPS",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
           ],
           "skip_atcf": false
         }
@@ -104265,28 +104287,28 @@
     {
       "job": {
         "storm_key": "typ_2023_09",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308241200",
         "td_number": null,
         "linked_td_number": 18,
-        "linked_typ_number": null,
         "typ_number": 9,
-        "data_typ_number": 9,
         "typ_name_ko": "사올라",
         "typ_name": "SAOLA",
         "typ_en": "SAOLA",
         "atcf_id": "wp092023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308241200"
+        "data_time": "202308241200",
+        "cycle_time_utc": "202308241200",
+        "start_utc": "202308241700",
+        "end_utc": "202308242300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615062527",
+          "generated_at_utc": "20260615151909",
           "image_path": "VTG_IMG/2023/TYP_2309_SAOLA/TYP_2309_SAOLA_202308241200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -104322,37 +104344,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308241200_typ_2023_09_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_09",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308241200",
         "td_number": null,
         "linked_td_number": 18,
-        "linked_typ_number": null,
         "typ_number": 9,
-        "data_typ_number": 9,
         "typ_name_ko": "사올라",
         "typ_name": "SAOLA",
         "typ_en": "SAOLA",
         "atcf_id": "wp092023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308241200"
+        "data_time": "202308241200",
+        "cycle_time_utc": "202308241200",
+        "start_utc": "202308241700",
+        "end_utc": "202308242300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615062529",
+          "generated_at_utc": "20260615151911",
           "image_path": "VTG_IMG/2023/TYP_2309_SAOLA/TYP_2309_SAOLA_202308241200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -104388,11 +104410,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308241200_typ_2023_09_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
@@ -133664,29 +133686,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2023_17",
-        "stage": "TD",
+        "storm_key": "td_2023_17_typ_10",
+        "stage": "TD_PRE_TYP",
         "year": 2023,
         "data_time": "202308241200",
         "td_number": 17,
         "linked_td_number": null,
-        "linked_typ_number": 10,
         "typ_number": 17,
-        "data_typ_number": 17,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp082023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308241200"
+        "data_time": "202308241200",
+        "cycle_time_utc": "202308241200",
+        "start_utc": "202308241700",
+        "end_utc": "202308242300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615062527",
+          "generated_at_utc": "20260615151910",
           "image_path": "VTG_IMG/2023/TD_2317_NONAME/TD_2317_NONAME_202308241200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2023",
@@ -133721,37 +133743,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308241200_td_2023_17_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2023_17",
-        "stage": "TD",
+        "storm_key": "td_2023_17_typ_10",
+        "stage": "TD_PRE_TYP",
         "year": 2023,
         "data_time": "202308241200",
         "td_number": 17,
         "linked_td_number": null,
-        "linked_typ_number": 10,
         "typ_number": 17,
-        "data_typ_number": 17,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp082023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308241200"
+        "data_time": "202308241200",
+        "cycle_time_utc": "202308241200",
+        "start_utc": "202308241700",
+        "end_utc": "202308242300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615062529",
+          "generated_at_utc": "20260615151912",
           "image_path": "VTG_IMG/2023/TD_2317_NONAME/TD_2317_NONAME_202308241200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2023",
@@ -133786,11 +133808,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308241200_td_2023_17_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
