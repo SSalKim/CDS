@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202304222300",
+  "updated_at_utc": "202606151244",
   "storm_key": "td_2023_03",
-  "stage": "TD_LINKED_TYP",
+  "stage": "TD",
   "year": 2023,
   "typ_number": 3,
   "linked_td_number": null,
@@ -14,27 +14,27 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2023_03_typ_01",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2023_03",
+        "stage": "TD",
         "year": 2023,
         "data_time": "202304221800",
         "td_number": 3,
         "linked_td_number": null,
+        "linked_typ_number": 1,
         "typ_number": 3,
+        "data_typ_number": 3,
         "typ_name_ko": "상우",
         "typ_name": "SANVU",
         "typ_en": "SANVU",
         "atcf_id": "wp012023",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202304221800",
-        "cycle_time_utc": "202304221800",
-        "start_utc": "202304222300",
-        "end_utc": "202304230500"
+        "data_time": "202304221800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260615035950",
           "image_path": "VTG_IMG/2023/TD_2303_SANVU/TD_2303_SANVU_202304221800_120h.png",
@@ -56,35 +56,35 @@
           "model_labels": [
             "ECMWF EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202304221800_td_2023_03_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2023_03_typ_01",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2023_03",
+        "stage": "TD",
         "year": 2023,
         "data_time": "202304221800",
         "td_number": 3,
         "linked_td_number": null,
+        "linked_typ_number": 1,
         "typ_number": 3,
+        "data_typ_number": 3,
         "typ_name_ko": "상우",
         "typ_name": "SANVU",
         "typ_en": "SANVU",
         "atcf_id": "wp012023",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202304221800",
-        "cycle_time_utc": "202304221800",
-        "start_utc": "202304222300",
-        "end_utc": "202304230500"
+        "data_time": "202304221800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260615040000",
           "image_path": "VTG_IMG/2023/TD_2303_SANVU/TD_2303_SANVU_202304221800_240h.png",
@@ -106,11 +106,11 @@
           "model_labels": [
             "ECMWF EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202304221800_td_2023_03_240h.json"
     }
   ]
 }

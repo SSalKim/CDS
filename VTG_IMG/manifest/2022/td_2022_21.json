@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202208260500",
+  "updated_at_utc": "202606151244",
   "storm_key": "td_2022_21",
-  "stage": "TD_LINKED_TYP",
+  "stage": "TD",
   "year": 2022,
   "typ_number": 21,
   "linked_td_number": null,
@@ -14,27 +14,27 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2022_21_typ_09",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2022_21",
+        "stage": "TD",
         "year": 2022,
         "data_time": "202208251800",
         "td_number": 21,
         "linked_td_number": null,
+        "linked_typ_number": 9,
         "typ_number": 21,
+        "data_typ_number": 21,
         "typ_name_ko": "망온",
         "typ_name": "MA-ON",
         "typ_en": "MA-ON",
         "atcf_id": "wp102022",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202208251800",
-        "cycle_time_utc": "202208251800",
-        "start_utc": "202208252300",
-        "end_utc": "202208260500"
+        "data_time": "202208251800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260615100555",
           "image_path": "VTG_IMG/2022/TD_2221_MA-ON/TD_2221_MA-ON_202208251800_120h.png",
@@ -59,35 +59,35 @@
             "JGSM",
             "JGSM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202208251800_td_2022_21_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2022_21_typ_09",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2022_21",
+        "stage": "TD",
         "year": 2022,
         "data_time": "202208251800",
         "td_number": 21,
         "linked_td_number": null,
+        "linked_typ_number": 9,
         "typ_number": 21,
+        "data_typ_number": 21,
         "typ_name_ko": "망온",
         "typ_name": "MA-ON",
         "typ_en": "MA-ON",
         "atcf_id": "wp102022",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202208251800",
-        "cycle_time_utc": "202208251800",
-        "start_utc": "202208252300",
-        "end_utc": "202208260500"
+        "data_time": "202208251800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260615100558",
           "image_path": "VTG_IMG/2022/TD_2221_MA-ON/TD_2221_MA-ON_202208251800_240h.png",
@@ -112,11 +112,11 @@
             "JGSM",
             "JGSM EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202208251800_td_2022_21_240h.json"
     }
   ]
 }

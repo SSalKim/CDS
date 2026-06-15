@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202308170500",
+  "updated_at_utc": "202606151244",
   "storm_key": "td_2023_15",
-  "stage": "TD_LINKED_TYP",
+  "stage": "TD",
   "year": 2023,
   "typ_number": 15,
   "linked_td_number": null,
@@ -14,27 +14,27 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2023_15_typ_08",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2023_15",
+        "stage": "TD",
         "year": 2023,
         "data_time": "202308150600",
         "td_number": 15,
         "linked_td_number": null,
+        "linked_typ_number": 8,
         "typ_number": 15,
+        "data_typ_number": 15,
         "typ_name_ko": "도라",
         "typ_name": "DORA",
         "typ_en": "DORA",
-        "atcf_id": null,
+        "atcf_id": "",
+        "fcst_hours": 120,
         "skip_atcf": true
       },
       "window": {
-        "data_time": "202308150600",
-        "cycle_time_utc": "202308150600",
-        "start_utc": "202308151100",
-        "end_utc": "202308151700"
+        "data_time": "202308150600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260615060727",
           "image_path": "VTG_IMG/2023/TD_2315_DORA/TD_2315_DORA_202308150600_120h.png",
@@ -57,35 +57,35 @@
             "ECMWF",
             "ECMWF EPS"
           ],
-          "skip_atcf": true
+          "skip_atcf": true,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202308150600_td_2023_15_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2023_15_typ_08",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2023_15",
+        "stage": "TD",
         "year": 2023,
         "data_time": "202308150600",
         "td_number": 15,
         "linked_td_number": null,
+        "linked_typ_number": 8,
         "typ_number": 15,
+        "data_typ_number": 15,
         "typ_name_ko": "도라",
         "typ_name": "DORA",
         "typ_en": "DORA",
-        "atcf_id": null,
+        "atcf_id": "",
+        "fcst_hours": 240,
         "skip_atcf": true
       },
       "window": {
-        "data_time": "202308150600",
-        "cycle_time_utc": "202308150600",
-        "start_utc": "202308151100",
-        "end_utc": "202308151700"
+        "data_time": "202308150600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260615060742",
           "image_path": "VTG_IMG/2023/TD_2315_DORA/TD_2315_DORA_202308150600_240h.png",
@@ -108,11 +108,11 @@
             "ECMWF",
             "ECMWF EPS"
           ],
-          "skip_atcf": true
+          "skip_atcf": true,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202308150600_td_2023_15_240h.json"
     }
   ]
 }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202210150500",
+  "updated_at_utc": "202606151244",
   "storm_key": "td_2022_37",
-  "stage": "TD_LINKED_TYP",
+  "stage": "TD",
   "year": 2022,
   "typ_number": 37,
   "linked_td_number": null,
@@ -14,27 +14,27 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2022_37_typ_19",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2022_37",
+        "stage": "TD",
         "year": 2022,
         "data_time": "202210150000",
         "td_number": 37,
         "linked_td_number": null,
+        "linked_typ_number": 19,
         "typ_number": 37,
+        "data_typ_number": 37,
         "typ_name_ko": "선까",
         "typ_name": "SONCA",
         "typ_en": "SONCA",
         "atcf_id": "wp222022",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202210150000",
-        "cycle_time_utc": "202210150000",
-        "start_utc": "202210150500",
-        "end_utc": "202210151100"
+        "data_time": "202210150000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260615115102",
           "image_path": "VTG_IMG/2022/TD_2237_SONCA/TD_2237_SONCA_202210150000_120h.png",
@@ -61,35 +61,35 @@
             "GFS",
             "GFS EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202210150000_td_2022_37_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2022_37_typ_19",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2022_37",
+        "stage": "TD",
         "year": 2022,
         "data_time": "202210150000",
         "td_number": 37,
         "linked_td_number": null,
+        "linked_typ_number": 19,
         "typ_number": 37,
+        "data_typ_number": 37,
         "typ_name_ko": "선까",
         "typ_name": "SONCA",
         "typ_en": "SONCA",
         "atcf_id": "wp222022",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202210150000",
-        "cycle_time_utc": "202210150000",
-        "start_utc": "202210150500",
-        "end_utc": "202210151100"
+        "data_time": "202210150000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260615115104",
           "image_path": "VTG_IMG/2022/TD_2237_SONCA/TD_2237_SONCA_202210150000_240h.png",
@@ -116,11 +116,11 @@
             "GFS",
             "GFS EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202210150000_td_2022_37_240h.json"
     }
   ]
 }
