@@ -1,76 +1,176 @@
 {
   "version": 2,
-  "updated_at_utc": "202308261700",
+  "updated_at_utc": "202209061700",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202308261200",
-      "cycle_time_utc": "202308261200",
-      "start_utc": "202308261700",
-      "end_utc": "202308262300"
+      "data_time": "202209061200",
+      "cycle_time_utc": "202209061200",
+      "start_utc": "202209061700",
+      "end_utc": "202209062300"
     }
   ],
   "runs": [
     {
       "job": {
-        "storm_key": "typ_2023_09",
-        "stage": "TYP_LINKED",
-        "year": 2023,
-        "data_time": "202308261200",
-        "td_number": null,
-        "linked_td_number": 18,
-        "typ_number": 9,
-        "typ_name_ko": "사올라",
-        "typ_name": "SAOLA",
-        "typ_en": "SAOLA",
-        "atcf_id": "wp092023",
+        "storm_key": "td_2022_24_typ_12",
+        "stage": "TD_PRE_TYP",
+        "year": 2022,
+        "data_time": "202209061200",
+        "td_number": 24,
+        "linked_td_number": null,
+        "typ_number": 24,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp142022",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308261200",
-        "cycle_time_utc": "202308261200",
-        "start_utc": "202308261700",
-        "end_utc": "202308262300"
+        "data_time": "202209061200",
+        "cycle_time_utc": "202209061200",
+        "start_utc": "202209061700",
+        "end_utc": "202209062300"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615152611",
-          "image_path": "VTG_IMG/2023/TYP_2309_SAOLA/TYP_2309_SAOLA_202308261200_120h.png",
-          "storm_stage": "TYP",
-          "storm_year": "2023",
-          "typ_number": 9,
-          "data_typ_number": 9,
-          "typ_name": "SAOLA",
-          "typ_name_ko": "사올라",
-          "linked_td_number": 18,
-          "linked_typ_number": null,
-          "atcf_id": "wp092023",
+          "generated_at_utc": "20260615153638",
+          "image_path": "VTG_IMG/2022/TD_2224_NONAME/TD_2224_NONAME_202209061200_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2022",
+          "typ_number": 24,
+          "data_typ_number": 24,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 12,
+          "atcf_id": "wp142022",
           "extra_atcf_ids": [],
-          "data_time": "202308261200",
+          "data_time": "202209061200",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 6,
+          "target_model_count": 19,
+          "model_labels": [
+            "COAMPS-TC",
+            "ECMWF",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "NAVGEM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2022_24_typ_12",
+        "stage": "TD_PRE_TYP",
+        "year": 2022,
+        "data_time": "202209061200",
+        "td_number": 24,
+        "linked_td_number": null,
+        "typ_number": 24,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp142022",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202209061200",
+        "cycle_time_utc": "202209061200",
+        "start_utc": "202209061700",
+        "end_utc": "202209062300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260615153640",
+          "image_path": "VTG_IMG/2022/TD_2224_NONAME/TD_2224_NONAME_202209061200_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2022",
+          "typ_number": 24,
+          "data_typ_number": 24,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 12,
+          "atcf_id": "wp142022",
+          "extra_atcf_ids": [],
+          "data_time": "202209061200",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 6,
+          "target_model_count": 19,
+          "model_labels": [
+            "COAMPS-TC",
+            "ECMWF",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "NAVGEM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2022_11",
+        "stage": "TYP_LINKED",
+        "year": 2022,
+        "data_time": "202209061200",
+        "td_number": null,
+        "linked_td_number": 22,
+        "typ_number": 11,
+        "typ_name_ko": "힌남노",
+        "typ_name": "HINNAMNOR",
+        "typ_en": "HINNAMNOR",
+        "atcf_id": "wp122022",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202209061200",
+        "cycle_time_utc": "202209061200",
+        "start_utc": "202209061700",
+        "end_utc": "202209062300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260615153638",
+          "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209061200_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2022",
+          "typ_number": 11,
+          "data_typ_number": 11,
+          "typ_name": "HINNAMNOR",
+          "typ_name_ko": "힌남노",
+          "linked_td_number": 22,
+          "linked_typ_number": null,
+          "atcf_id": "wp122022",
+          "extra_atcf_ids": [],
+          "data_time": "202209061200",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 15,
+          "model_count": 5,
           "target_model_count": 19,
           "model_labels": [
             "CMC",
             "CMC EPS",
-            "COAMPS-TC EPS",
-            "COAMPS-TC",
-            "ECMWF",
-            "ECMWF EPS",
             "NAVGEM EPS",
             "GFS",
-            "GFS EPS",
-            "HAFS",
-            "JGSM",
-            "KIM",
-            "NAVGEM",
-            "JGSM EPS",
-            "UM"
+            "GFS EPS"
           ],
           "skip_atcf": false
         }
@@ -80,193 +180,51 @@
     },
     {
       "job": {
-        "storm_key": "typ_2023_09",
+        "storm_key": "typ_2022_11",
         "stage": "TYP_LINKED",
-        "year": 2023,
-        "data_time": "202308261200",
+        "year": 2022,
+        "data_time": "202209061200",
         "td_number": null,
-        "linked_td_number": 18,
-        "typ_number": 9,
-        "typ_name_ko": "사올라",
-        "typ_name": "SAOLA",
-        "typ_en": "SAOLA",
-        "atcf_id": "wp092023",
+        "linked_td_number": 22,
+        "typ_number": 11,
+        "typ_name_ko": "힌남노",
+        "typ_name": "HINNAMNOR",
+        "typ_en": "HINNAMNOR",
+        "atcf_id": "wp122022",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308261200",
-        "cycle_time_utc": "202308261200",
-        "start_utc": "202308261700",
-        "end_utc": "202308262300"
+        "data_time": "202209061200",
+        "cycle_time_utc": "202209061200",
+        "start_utc": "202209061700",
+        "end_utc": "202209062300"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615152614",
-          "image_path": "VTG_IMG/2023/TYP_2309_SAOLA/TYP_2309_SAOLA_202308261200_240h.png",
+          "generated_at_utc": "20260615153640",
+          "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209061200_240h.png",
           "storm_stage": "TYP",
-          "storm_year": "2023",
-          "typ_number": 9,
-          "data_typ_number": 9,
-          "typ_name": "SAOLA",
-          "typ_name_ko": "사올라",
-          "linked_td_number": 18,
+          "storm_year": "2022",
+          "typ_number": 11,
+          "data_typ_number": 11,
+          "typ_name": "HINNAMNOR",
+          "typ_name_ko": "힌남노",
+          "linked_td_number": 22,
           "linked_typ_number": null,
-          "atcf_id": "wp092023",
+          "atcf_id": "wp122022",
           "extra_atcf_ids": [],
-          "data_time": "202308261200",
+          "data_time": "202209061200",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 15,
+          "model_count": 5,
           "target_model_count": 19,
           "model_labels": [
             "CMC",
             "CMC EPS",
-            "COAMPS-TC EPS",
-            "COAMPS-TC",
-            "ECMWF",
-            "ECMWF EPS",
             "NAVGEM EPS",
             "GFS",
-            "GFS EPS",
-            "HAFS",
-            "JGSM",
-            "KIM",
-            "NAVGEM",
-            "JGSM EPS",
-            "UM"
-          ],
-          "skip_atcf": false
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "typ_2023_10",
-        "stage": "TYP_LINKED",
-        "year": 2023,
-        "data_time": "202308261200",
-        "td_number": null,
-        "linked_td_number": 17,
-        "typ_number": 10,
-        "typ_name_ko": "담레이",
-        "typ_name": "DAMREY",
-        "typ_en": "DAMREY",
-        "atcf_id": "wp082023",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202308261200",
-        "cycle_time_utc": "202308261200",
-        "start_utc": "202308261700",
-        "end_utc": "202308262300"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20260615152611",
-          "image_path": "VTG_IMG/2023/TYP_2310_DAMREY/TYP_2310_DAMREY_202308261200_120h.png",
-          "storm_stage": "TYP",
-          "storm_year": "2023",
-          "typ_number": 10,
-          "data_typ_number": 10,
-          "typ_name": "DAMREY",
-          "typ_name_ko": "담레이",
-          "linked_td_number": 17,
-          "linked_typ_number": null,
-          "atcf_id": "wp082023",
-          "extra_atcf_ids": [],
-          "data_time": "202308261200",
-          "fcst_hours": 120,
-          "intensity": "TYP",
-          "model_count": 17,
-          "target_model_count": 19,
-          "model_labels": [
-            "CMC",
-            "CMC EPS",
-            "COAMPS-TC EPS",
-            "COAMPS-TC",
-            "ECMWF",
-            "ECMWF EPS",
-            "NAVGEM EPS",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "JGSM",
-            "KIM",
-            "KIM EPS",
-            "NAVGEM",
-            "JGSM EPS",
-            "UM",
-            "UM EPS"
-          ],
-          "skip_atcf": false
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "typ_2023_10",
-        "stage": "TYP_LINKED",
-        "year": 2023,
-        "data_time": "202308261200",
-        "td_number": null,
-        "linked_td_number": 17,
-        "typ_number": 10,
-        "typ_name_ko": "담레이",
-        "typ_name": "DAMREY",
-        "typ_en": "DAMREY",
-        "atcf_id": "wp082023",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202308261200",
-        "cycle_time_utc": "202308261200",
-        "start_utc": "202308261700",
-        "end_utc": "202308262300"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20260615152614",
-          "image_path": "VTG_IMG/2023/TYP_2310_DAMREY/TYP_2310_DAMREY_202308261200_240h.png",
-          "storm_stage": "TYP",
-          "storm_year": "2023",
-          "typ_number": 10,
-          "data_typ_number": 10,
-          "typ_name": "DAMREY",
-          "typ_name_ko": "담레이",
-          "linked_td_number": 17,
-          "linked_typ_number": null,
-          "atcf_id": "wp082023",
-          "extra_atcf_ids": [],
-          "data_time": "202308261200",
-          "fcst_hours": 240,
-          "intensity": "TYP",
-          "model_count": 17,
-          "target_model_count": 19,
-          "model_labels": [
-            "CMC",
-            "CMC EPS",
-            "COAMPS-TC EPS",
-            "COAMPS-TC",
-            "ECMWF",
-            "ECMWF EPS",
-            "NAVGEM EPS",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "JGSM",
-            "KIM",
-            "KIM EPS",
-            "NAVGEM",
-            "JGSM EPS",
-            "UM",
-            "UM EPS"
+            "GFS EPS"
           ],
           "skip_atcf": false
         }
@@ -22295,28 +22253,28 @@
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209020600",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209020600"
+        "data_time": "202209020600",
+        "cycle_time_utc": "202209020600",
+        "start_utc": "202209021100",
+        "end_utc": "202209021700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615101940",
+          "generated_at_utc": "20260615152649",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209020600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -22346,37 +22304,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209020600_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209020600",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209020600"
+        "data_time": "202209020600",
+        "cycle_time_utc": "202209020600",
+        "start_utc": "202209021100",
+        "end_utc": "202209021700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615101941",
+          "generated_at_utc": "20260615152651",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209020600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -22406,37 +22364,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209020600_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209021200",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209021200"
+        "data_time": "202209021200",
+        "cycle_time_utc": "202209021200",
+        "start_utc": "202209021700",
+        "end_utc": "202209022300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102013",
+          "generated_at_utc": "20260615152722",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209021200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -22472,37 +22430,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209021200_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209021200",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209021200"
+        "data_time": "202209021200",
+        "cycle_time_utc": "202209021200",
+        "start_utc": "202209021700",
+        "end_utc": "202209022300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102015",
+          "generated_at_utc": "20260615152724",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209021200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -22538,37 +22496,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209021200_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209021800",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209021800"
+        "data_time": "202209021800",
+        "cycle_time_utc": "202209021800",
+        "start_utc": "202209022300",
+        "end_utc": "202209030500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102046",
+          "generated_at_utc": "20260615152756",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209021800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -22598,37 +22556,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209021800_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209021800",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209021800"
+        "data_time": "202209021800",
+        "cycle_time_utc": "202209021800",
+        "start_utc": "202209022300",
+        "end_utc": "202209030500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102047",
+          "generated_at_utc": "20260615152757",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209021800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -22658,37 +22616,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209021800_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209030000",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209030000"
+        "data_time": "202209030000",
+        "cycle_time_utc": "202209030000",
+        "start_utc": "202209030500",
+        "end_utc": "202209031100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102119",
+          "generated_at_utc": "20260615152829",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209030000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -22724,37 +22682,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209030000_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209030000",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209030000"
+        "data_time": "202209030000",
+        "cycle_time_utc": "202209030000",
+        "start_utc": "202209030500",
+        "end_utc": "202209031100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102121",
+          "generated_at_utc": "20260615152831",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209030000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -22790,37 +22748,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209030000_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209030600",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209030600"
+        "data_time": "202209030600",
+        "cycle_time_utc": "202209030600",
+        "start_utc": "202209031100",
+        "end_utc": "202209031700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102153",
+          "generated_at_utc": "20260615152902",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209030600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -22850,37 +22808,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209030600_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209030600",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209030600"
+        "data_time": "202209030600",
+        "cycle_time_utc": "202209030600",
+        "start_utc": "202209031100",
+        "end_utc": "202209031700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102154",
+          "generated_at_utc": "20260615152903",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209030600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -22910,37 +22868,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209030600_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209031200",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209031200"
+        "data_time": "202209031200",
+        "cycle_time_utc": "202209031200",
+        "start_utc": "202209031700",
+        "end_utc": "202209032300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102226",
+          "generated_at_utc": "20260615152936",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209031200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -22977,37 +22935,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209031200_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209031200",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209031200"
+        "data_time": "202209031200",
+        "cycle_time_utc": "202209031200",
+        "start_utc": "202209031700",
+        "end_utc": "202209032300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102228",
+          "generated_at_utc": "20260615152937",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209031200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23044,37 +23002,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209031200_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209031800",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209031800"
+        "data_time": "202209031800",
+        "cycle_time_utc": "202209031800",
+        "start_utc": "202209032300",
+        "end_utc": "202209040500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102300",
+          "generated_at_utc": "20260615153008",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209031800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23104,37 +23062,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209031800_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209031800",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209031800"
+        "data_time": "202209031800",
+        "cycle_time_utc": "202209031800",
+        "start_utc": "202209032300",
+        "end_utc": "202209040500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102301",
+          "generated_at_utc": "20260615153010",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209031800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23164,37 +23122,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209031800_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209040000",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209040000"
+        "data_time": "202209040000",
+        "cycle_time_utc": "202209040000",
+        "start_utc": "202209040500",
+        "end_utc": "202209041100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102333",
+          "generated_at_utc": "20260615153041",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209040000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23231,37 +23189,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209040000_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209040000",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209040000"
+        "data_time": "202209040000",
+        "cycle_time_utc": "202209040000",
+        "start_utc": "202209040500",
+        "end_utc": "202209041100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102335",
+          "generated_at_utc": "20260615153043",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209040000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23298,37 +23256,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209040000_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209040600",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209040600"
+        "data_time": "202209040600",
+        "cycle_time_utc": "202209040600",
+        "start_utc": "202209041100",
+        "end_utc": "202209041700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102406",
+          "generated_at_utc": "20260615153114",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209040600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23359,37 +23317,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209040600_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209040600",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209040600"
+        "data_time": "202209040600",
+        "cycle_time_utc": "202209040600",
+        "start_utc": "202209041100",
+        "end_utc": "202209041700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102408",
+          "generated_at_utc": "20260615153116",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209040600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23420,37 +23378,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209040600_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209041200",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209041200"
+        "data_time": "202209041200",
+        "cycle_time_utc": "202209041200",
+        "start_utc": "202209041700",
+        "end_utc": "202209042300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102439",
+          "generated_at_utc": "20260615153148",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209041200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23487,37 +23445,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209041200_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209041200",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209041200"
+        "data_time": "202209041200",
+        "cycle_time_utc": "202209041200",
+        "start_utc": "202209041700",
+        "end_utc": "202209042300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102441",
+          "generated_at_utc": "20260615153150",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209041200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23554,37 +23512,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209041200_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209041800",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209041800"
+        "data_time": "202209041800",
+        "cycle_time_utc": "202209041800",
+        "start_utc": "202209042300",
+        "end_utc": "202209050500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102512",
+          "generated_at_utc": "20260615153220",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209041800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23615,37 +23573,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209041800_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209041800",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209041800"
+        "data_time": "202209041800",
+        "cycle_time_utc": "202209041800",
+        "start_utc": "202209042300",
+        "end_utc": "202209050500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102514",
+          "generated_at_utc": "20260615153222",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209041800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23676,37 +23634,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209041800_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209050000",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209050000"
+        "data_time": "202209050000",
+        "cycle_time_utc": "202209050000",
+        "start_utc": "202209050500",
+        "end_utc": "202209051100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102545",
+          "generated_at_utc": "20260615153253",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209050000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23743,37 +23701,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209050000_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209050000",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209050000"
+        "data_time": "202209050000",
+        "cycle_time_utc": "202209050000",
+        "start_utc": "202209050500",
+        "end_utc": "202209051100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102547",
+          "generated_at_utc": "20260615153255",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209050000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23810,37 +23768,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209050000_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209050600",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209050600"
+        "data_time": "202209050600",
+        "cycle_time_utc": "202209050600",
+        "start_utc": "202209051100",
+        "end_utc": "202209051700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102619",
+          "generated_at_utc": "20260615153327",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209050600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23871,37 +23829,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209050600_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209050600",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209050600"
+        "data_time": "202209050600",
+        "cycle_time_utc": "202209050600",
+        "start_utc": "202209051100",
+        "end_utc": "202209051700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102621",
+          "generated_at_utc": "20260615153329",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209050600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23932,37 +23890,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209050600_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209051200",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209051200"
+        "data_time": "202209051200",
+        "cycle_time_utc": "202209051200",
+        "start_utc": "202209051700",
+        "end_utc": "202209052300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102653",
+          "generated_at_utc": "20260615153405",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209051200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -23999,37 +23957,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209051200_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209051200",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209051200"
+        "data_time": "202209051200",
+        "cycle_time_utc": "202209051200",
+        "start_utc": "202209051700",
+        "end_utc": "202209052300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102655",
+          "generated_at_utc": "20260615153407",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209051200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -24066,37 +24024,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209051200_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209051800",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209051800"
+        "data_time": "202209051800",
+        "cycle_time_utc": "202209051800",
+        "start_utc": "202209052300",
+        "end_utc": "202209060500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102805",
+          "generated_at_utc": "20260615153443",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209051800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -24126,37 +24084,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209051800_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209051800",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209051800"
+        "data_time": "202209051800",
+        "cycle_time_utc": "202209051800",
+        "start_utc": "202209052300",
+        "end_utc": "202209060500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102807",
+          "generated_at_utc": "20260615153445",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209051800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -24186,37 +24144,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209051800_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209060000",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209060000"
+        "data_time": "202209060000",
+        "cycle_time_utc": "202209060000",
+        "start_utc": "202209060500",
+        "end_utc": "202209061100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102843",
+          "generated_at_utc": "20260615153521",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209060000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -24252,37 +24210,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209060000_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209060000",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209060000"
+        "data_time": "202209060000",
+        "cycle_time_utc": "202209060000",
+        "start_utc": "202209060500",
+        "end_utc": "202209061100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102845",
+          "generated_at_utc": "20260615153523",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209060000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -24318,37 +24276,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209060000_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209060600",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209060600"
+        "data_time": "202209060600",
+        "cycle_time_utc": "202209060600",
+        "start_utc": "202209061100",
+        "end_utc": "202209061700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102924",
+          "generated_at_utc": "20260615153559",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209060600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -24377,37 +24335,37 @@
             "KIM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209060600_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209060600",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209060600"
+        "data_time": "202209060600",
+        "cycle_time_utc": "202209060600",
+        "start_utc": "202209061100",
+        "end_utc": "202209061700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102926",
+          "generated_at_utc": "20260615153602",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209060600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -24436,37 +24394,37 @@
             "KIM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209060600_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209061200",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209061200"
+        "data_time": "202209061200",
+        "cycle_time_utc": "202209061200",
+        "start_utc": "202209061700",
+        "end_utc": "202209062300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615103000",
+          "generated_at_utc": "20260615153638",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209061200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -24490,37 +24448,37 @@
             "GFS",
             "GFS EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209061200_typ_2022_11_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_11",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209061200",
         "td_number": null,
         "linked_td_number": 22,
-        "linked_typ_number": null,
         "typ_number": 11,
-        "data_typ_number": 11,
         "typ_name_ko": "힌남노",
         "typ_name": "HINNAMNOR",
         "typ_en": "HINNAMNOR",
         "atcf_id": "wp122022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209061200"
+        "data_time": "202209061200",
+        "cycle_time_utc": "202209061200",
+        "start_utc": "202209061700",
+        "end_utc": "202209062300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615103003",
+          "generated_at_utc": "20260615153640",
           "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209061200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -24544,11 +24502,11 @@
             "GFS",
             "GFS EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209061200_typ_2022_11_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
@@ -52730,29 +52688,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2022_24",
-        "stage": "TD",
+        "storm_key": "td_2022_24_typ_12",
+        "stage": "TD_PRE_TYP",
         "year": 2022,
         "data_time": "202209051200",
         "td_number": 24,
         "linked_td_number": null,
-        "linked_typ_number": 12,
         "typ_number": 24,
-        "data_typ_number": 24,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp142022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209051200"
+        "data_time": "202209051200",
+        "cycle_time_utc": "202209051200",
+        "start_utc": "202209051700",
+        "end_utc": "202209052300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102727",
+          "generated_at_utc": "20260615153404",
           "image_path": "VTG_IMG/2022/TD_2224_NONAME/TD_2224_NONAME_202209051200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -52779,37 +52737,37 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209051200_td_2022_24_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_24",
-        "stage": "TD",
+        "storm_key": "td_2022_24_typ_12",
+        "stage": "TD_PRE_TYP",
         "year": 2022,
         "data_time": "202209051200",
         "td_number": 24,
         "linked_td_number": null,
-        "linked_typ_number": 12,
         "typ_number": 24,
-        "data_typ_number": 24,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp142022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209051200"
+        "data_time": "202209051200",
+        "cycle_time_utc": "202209051200",
+        "start_utc": "202209051700",
+        "end_utc": "202209052300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102730",
+          "generated_at_utc": "20260615153406",
           "image_path": "VTG_IMG/2022/TD_2224_NONAME/TD_2224_NONAME_202209051200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -52836,37 +52794,37 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209051200_td_2022_24_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_24",
-        "stage": "TD",
+        "storm_key": "td_2022_24_typ_12",
+        "stage": "TD_PRE_TYP",
         "year": 2022,
         "data_time": "202209051800",
         "td_number": 24,
         "linked_td_number": null,
-        "linked_typ_number": 12,
         "typ_number": 24,
-        "data_typ_number": 24,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp142022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209051800"
+        "data_time": "202209051800",
+        "cycle_time_utc": "202209051800",
+        "start_utc": "202209052300",
+        "end_utc": "202209060500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102803",
+          "generated_at_utc": "20260615153442",
           "image_path": "VTG_IMG/2022/TD_2224_NONAME/TD_2224_NONAME_202209051800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -52891,37 +52849,37 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209051800_td_2022_24_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_24",
-        "stage": "TD",
+        "storm_key": "td_2022_24_typ_12",
+        "stage": "TD_PRE_TYP",
         "year": 2022,
         "data_time": "202209051800",
         "td_number": 24,
         "linked_td_number": null,
-        "linked_typ_number": 12,
         "typ_number": 24,
-        "data_typ_number": 24,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp142022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209051800"
+        "data_time": "202209051800",
+        "cycle_time_utc": "202209051800",
+        "start_utc": "202209052300",
+        "end_utc": "202209060500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102806",
+          "generated_at_utc": "20260615153445",
           "image_path": "VTG_IMG/2022/TD_2224_NONAME/TD_2224_NONAME_202209051800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -52946,37 +52904,37 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209051800_td_2022_24_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_24",
-        "stage": "TD",
+        "storm_key": "td_2022_24_typ_12",
+        "stage": "TD_PRE_TYP",
         "year": 2022,
         "data_time": "202209060000",
         "td_number": 24,
         "linked_td_number": null,
-        "linked_typ_number": 12,
         "typ_number": 24,
-        "data_typ_number": 24,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp142022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209060000"
+        "data_time": "202209060000",
+        "cycle_time_utc": "202209060000",
+        "start_utc": "202209060500",
+        "end_utc": "202209061100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102842",
+          "generated_at_utc": "20260615153521",
           "image_path": "VTG_IMG/2022/TD_2224_NONAME/TD_2224_NONAME_202209060000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -53004,37 +52962,37 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209060000_td_2022_24_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_24",
-        "stage": "TD",
+        "storm_key": "td_2022_24_typ_12",
+        "stage": "TD_PRE_TYP",
         "year": 2022,
         "data_time": "202209060000",
         "td_number": 24,
         "linked_td_number": null,
-        "linked_typ_number": 12,
         "typ_number": 24,
-        "data_typ_number": 24,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp142022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209060000"
+        "data_time": "202209060000",
+        "cycle_time_utc": "202209060000",
+        "start_utc": "202209060500",
+        "end_utc": "202209061100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102843",
+          "generated_at_utc": "20260615153522",
           "image_path": "VTG_IMG/2022/TD_2224_NONAME/TD_2224_NONAME_202209060000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -53062,37 +53020,37 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209060000_td_2022_24_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_24",
-        "stage": "TD",
+        "storm_key": "td_2022_24_typ_12",
+        "stage": "TD_PRE_TYP",
         "year": 2022,
         "data_time": "202209060600",
         "td_number": 24,
         "linked_td_number": null,
-        "linked_typ_number": 12,
         "typ_number": 24,
-        "data_typ_number": 24,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp142022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209060600"
+        "data_time": "202209060600",
+        "cycle_time_utc": "202209060600",
+        "start_utc": "202209061100",
+        "end_utc": "202209061700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102923",
+          "generated_at_utc": "20260615153559",
           "image_path": "VTG_IMG/2022/TD_2224_NONAME/TD_2224_NONAME_202209060600_120h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -53119,37 +53077,37 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209060600_td_2022_24_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_24",
-        "stage": "TD",
+        "storm_key": "td_2022_24_typ_12",
+        "stage": "TD_PRE_TYP",
         "year": 2022,
         "data_time": "202209060600",
         "td_number": 24,
         "linked_td_number": null,
-        "linked_typ_number": 12,
         "typ_number": 24,
-        "data_typ_number": 24,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp142022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209060600"
+        "data_time": "202209060600",
+        "cycle_time_utc": "202209060600",
+        "start_utc": "202209061100",
+        "end_utc": "202209061700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615102925",
+          "generated_at_utc": "20260615153601",
           "image_path": "VTG_IMG/2022/TD_2224_NONAME/TD_2224_NONAME_202209060600_240h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -53176,37 +53134,37 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209060600_td_2022_24_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_24",
-        "stage": "TD",
+        "storm_key": "td_2022_24_typ_12",
+        "stage": "TD_PRE_TYP",
         "year": 2022,
         "data_time": "202209061200",
         "td_number": 24,
         "linked_td_number": null,
-        "linked_typ_number": 12,
         "typ_number": 24,
-        "data_typ_number": 24,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp142022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209061200"
+        "data_time": "202209061200",
+        "cycle_time_utc": "202209061200",
+        "start_utc": "202209061700",
+        "end_utc": "202209062300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615103000",
+          "generated_at_utc": "20260615153638",
           "image_path": "VTG_IMG/2022/TD_2224_NONAME/TD_2224_NONAME_202209061200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -53231,37 +53189,37 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209061200_td_2022_24_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_24",
-        "stage": "TD",
+        "storm_key": "td_2022_24_typ_12",
+        "stage": "TD_PRE_TYP",
         "year": 2022,
         "data_time": "202209061200",
         "td_number": 24,
         "linked_td_number": null,
-        "linked_typ_number": 12,
         "typ_number": 24,
-        "data_typ_number": 24,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp142022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209061200"
+        "data_time": "202209061200",
+        "cycle_time_utc": "202209061200",
+        "start_utc": "202209061700",
+        "end_utc": "202209062300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615103003",
+          "generated_at_utc": "20260615153640",
           "image_path": "VTG_IMG/2022/TD_2224_NONAME/TD_2224_NONAME_202209061200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -53286,11 +53244,11 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209061200_td_2022_24_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
