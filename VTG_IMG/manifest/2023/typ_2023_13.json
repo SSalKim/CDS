@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202606151554",
+  "updated_at_utc": "202309060500",
   "storm_key": "typ_2023_13",
   "stage": "TYP",
   "year": 2023,
@@ -267,28 +267,28 @@
     {
       "job": {
         "storm_key": "typ_2023_13",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202309060000",
         "td_number": null,
         "linked_td_number": 24,
-        "linked_typ_number": null,
         "typ_number": 13,
-        "data_typ_number": 13,
         "typ_name_ko": "윈욍",
         "typ_name": "YUN-YEUNG",
         "typ_en": "YUN-YEUNG",
         "atcf_id": "wp122023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202309060000"
+        "data_time": "202309060000",
+        "cycle_time_utc": "202309060000",
+        "start_utc": "202309060500",
+        "end_utc": "202309061100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615071933",
+          "generated_at_utc": "20260615160020",
           "image_path": "VTG_IMG/2023/TYP_2313_YUN-YEUNG/TYP_2313_YUN-YEUNG_202309060000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -325,37 +325,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202309060000_typ_2023_13_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_13",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202309060000",
         "td_number": null,
         "linked_td_number": 24,
-        "linked_typ_number": null,
         "typ_number": 13,
-        "data_typ_number": 13,
         "typ_name_ko": "윈욍",
         "typ_name": "YUN-YEUNG",
         "typ_en": "YUN-YEUNG",
         "atcf_id": "wp122023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202309060000"
+        "data_time": "202309060000",
+        "cycle_time_utc": "202309060000",
+        "start_utc": "202309060500",
+        "end_utc": "202309061100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615071936",
+          "generated_at_utc": "20260615160023",
           "image_path": "VTG_IMG/2023/TYP_2313_YUN-YEUNG/TYP_2313_YUN-YEUNG_202309060000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -392,11 +392,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202309060000_typ_2023_13_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
