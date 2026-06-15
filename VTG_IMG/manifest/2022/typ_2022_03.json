@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202206300500",
+  "updated_at_utc": "202207010500",
   "storm_key": "typ_2022_03",
   "stage": "TYP",
   "year": 2022,
@@ -525,28 +525,28 @@
     {
       "job": {
         "storm_key": "typ_2022_03",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202207010000",
         "td_number": null,
         "linked_td_number": 5,
-        "linked_typ_number": null,
         "typ_number": 3,
-        "data_typ_number": 3,
         "typ_name_ko": "차바",
         "typ_name": "CHABA",
         "typ_en": "CHABA",
         "atcf_id": "wp042022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202207010000"
+        "data_time": "202207010000",
+        "cycle_time_utc": "202207010000",
+        "start_utc": "202207010500",
+        "end_utc": "202207011100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615091355",
+          "generated_at_utc": "20260615143258",
           "image_path": "VTG_IMG/2022/TYP_2203_CHABA/TYP_2203_CHABA_202207010000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -583,37 +583,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202207010000_typ_2022_03_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_03",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202207010000",
         "td_number": null,
         "linked_td_number": 5,
-        "linked_typ_number": null,
         "typ_number": 3,
-        "data_typ_number": 3,
         "typ_name_ko": "차바",
         "typ_name": "CHABA",
         "typ_en": "CHABA",
         "atcf_id": "wp042022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202207010000"
+        "data_time": "202207010000",
+        "cycle_time_utc": "202207010000",
+        "start_utc": "202207010500",
+        "end_utc": "202207011100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615091357",
+          "generated_at_utc": "20260615143300",
           "image_path": "VTG_IMG/2022/TYP_2203_CHABA/TYP_2203_CHABA_202207010000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -650,11 +650,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202207010000_typ_2022_03_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
