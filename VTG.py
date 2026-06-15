@@ -177,7 +177,7 @@ MODEL_CATEGORIES = {
 }
 
 MODEL_ACTIVE_WINDOWS = {
-    "HAFS": ("202301010000", None),                 # HAFS 예측자료 신규 추가(2023.1.1.~)
+    "HAFS": ("202307191200", None),                 # HAFS 예측자료 신규 추가(2023.7.19.~)
 
     "ECMWF_AIFS": ("202408010000", None),           # ECMWF AIFS 예측자료 신규 추가(2024.8.19.~)
 
