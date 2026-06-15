@@ -295,17 +295,32 @@ MODEL_SOURCE_ALIASES = {
     for column in SOURCE_IDENTIFIER_COLUMNS.values()
     if row.get(column)
 }
+MODEL_ALIAS_PRIORITIES: dict[str, int] = {}
 for row in MODEL_SOURCES:
     for source, column in SOURCE_IDENTIFIER_COLUMNS.items():
         model_id = row.get(column)
         if not model_id:
             continue
 
+        MODEL_ALIAS_PRIORITIES.setdefault(model_id, 0)
+
         alias_ids = []
+        if source == "APIHUB" and model_id == "ECMWF":
+            alias_ids.extend(["ECMWF_TIGGE", "ECMWF_SPR_D"])
+        if source == "NOAA" and model_id == "ECMWF":
+            alias_ids.extend(["ECMO", "EMX"])
+        if source == "APIHUB" and model_id == "ECMWF_EPS":
+            alias_ids.extend(["ECMWF_SPR_E"])
         if source == "APIHUB" and model_id == "UM_KEPS":
-            alias_ids.append("KEPS")
+            alias_ids.extend(["KEPS"])
+        if source == "APIHUB" and model_id == "GFS":
+            alias_ids.extend(["GFS_TIGGE", "NCEP_TIGGE"])
+        if source == "APIHUB" and model_id == "CMC":
+            alias_ids.extend(["CMSC"])
+        if source == "APIHUB" and model_id == "CMC_EPS":
+            alias_ids.extend(["CMSC_EPS"])
         if source == "APIHUB" and model_id == "NAVGEM":
-            alias_ids.append("NOGAPS")
+            alias_ids.extend(["NOGAPS"])
 
         if model_id.endswith("_AI"):
             alias_ids.append(model_id[:-3])
@@ -317,15 +332,16 @@ for row in MODEL_SOURCES:
             alias_ids.extend(["GPUM"])
 
         if source == "APIHUB" and model_id == "ECMWF_AIFS":
-            alias_ids.extend(["ECMWF_AIFS", "ECMF_AIFS"])
-        if source == "NOAA" and model_id == "ECMWF":
-            alias_ids.extend(["ECMF", "ECMO"])
+            alias_ids.extend(["ECMF_AIFS"])
 
-        for alias_id in alias_ids:
+
+        for alias_priority, alias_id in enumerate(alias_ids, start=1):
             MODEL_SOURCE_ALIASES.setdefault(alias_id, row["name"])
             SOURCE_MODEL_IDS[source].add(alias_id)
+            MODEL_ALIAS_PRIORITIES.setdefault(alias_id, alias_priority)
 
 DATA_SOURCE_COLUMN = "_DATA_SOURCE"
+MODEL_ALIAS_PRIORITY_COLUMN = "_MODEL_ALIAS_PRIORITY"
 MS_PER_KT = 0.514444
 KMA_BASE_URL = "https://apihub-pub.kma.go.kr/api/typ01/url/typ_gts_now.php"
 DEFAULT_AUTH_KEY = ""
@@ -792,7 +808,13 @@ def read_kma_csv(text: str | None, settings: Settings, *, forecast_only: bool) -
     df = df.loc[mask].copy()
     if forecast_only:
         df = df[df["SRC"].isin(SOURCE_MODEL_IDS["APIHUB"]) | df["SRC"].eq("KMA")].copy()
+        df[MODEL_ALIAS_PRIORITY_COLUMN] = (
+            df["SRC"].map(MODEL_ALIAS_PRIORITIES).fillna(0).astype(int)
+        )
         df["SRC"] = df["SRC"].replace(MODEL_SOURCE_ALIASES)
+    else:
+        df[MODEL_ALIAS_PRIORITY_COLUMN] = 0
+
     df[DATA_SOURCE_COLUMN] = "APIHUB"
     return df
 
@@ -832,25 +854,29 @@ def raw_github_url(settings: Settings, model: str) -> str:
 
 def ral_ucar_url(atcf_id: str) -> str:
     atcf_id = str(atcf_id or "").strip().lower()
-    year = atcf_id[-4:] if len(atcf_id) >= 4 else ""
+    year = atcf_id[-4:]
     return (
         "https://hurricanes.ral.ucar.edu/realtime/plots/"
         f"northwestpacific/{year}/{atcf_id}/a{atcf_id}.dat"
     )
 
 
+def bdeck_url(atcf_id: str) -> str:
+    atcf_id = str(atcf_id or "").strip().lower()
+    return f"https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/b{atcf_id}.dat"
+
+
 def atcf_urls(settings: Settings) -> list[tuple[str, str, int]]:
     urls = []
-    atcf_ids = list(dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)))
-    for atcf_id in atcf_ids:
+    for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
         urls.append(("NOAA", f"https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/a{atcf_id}.dat", 0))
-    for atcf_id in atcf_ids:
+    for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
         urls.append(("RAL.UCAR", ral_ucar_url(atcf_id), 0))
     urls.extend([
         ("RAW.GITHUB", raw_github_url(settings, "GENC"), 6),
         ("RAW.GITHUB", raw_github_url(settings, "FNV3"), 6),
     ])
-    for atcf_id in atcf_ids:
+    for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
         urls.append(("KNACKWX", knackwx_url(settings, atcf_id), 0))
     return urls
 
@@ -962,6 +988,96 @@ def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFra
         & raw["ATCF_NUMBER"].isin(target_storm_nums)
     )
     return raw.loc[mask].copy()
+
+
+def kma_has_current_track_point(kma_df: pd.DataFrame) -> bool:
+    if kma_df.empty:
+        return False
+    if "SRC" not in kma_df or "TMD" not in kma_df:
+        return False
+    start = kma_df[(kma_df["SRC"].eq("KMA")) & (pd.to_numeric(kma_df["TMD"], errors="coerce").eq(0))]
+    return not start.dropna(subset=["LAT", "LON"]).empty
+
+
+def fetch_bdeck_analysis_point(session: requests.Session, settings: Settings, *, max_offset_hours: int = 12) -> AnalysisPoint | None:
+    if settings.skip_atcf or not settings.atcf_id:
+        return None
+    text = fetch_text(
+        session,
+        bdeck_url(settings.atcf_id),
+        retries=2,
+        timeout=12,
+        retry_delay=2,
+        cache_dir=settings.http_cache_dir,
+        cache_ttl_seconds=settings.http_cache_ttl_seconds,
+    )
+    raw = read_atcf_csv(text, source="BDECK")
+    if raw.empty:
+        return None
+
+    for col in ["ATCF_NUMBER", "TM10", "FTM", "LATI", "LONG"]:
+        raw[col] = pd.to_numeric(raw[col], errors="coerce")
+    target_numbers = storm_numbers(settings)
+    target_dt = datetime.strptime(settings.data_time[:10], "%Y%m%d%H").replace(tzinfo=timezone.utc)
+    raw = raw[
+        raw["ATCF_NUMBER"].isin(target_numbers)
+        & raw["FTM"].eq(0)
+        & raw["LATI"].notna()
+        & raw["LONG"].notna()
+    ].copy()
+    if raw.empty:
+        return None
+
+    raw["_time"] = pd.to_datetime(raw["TM10"].astype("Int64").astype(str), format="%Y%m%d%H", errors="coerce", utc=True)
+    raw = raw.dropna(subset=["_time"])
+    if raw.empty:
+        return None
+    raw["_offset_hours"] = (raw["_time"] - target_dt).abs().dt.total_seconds() / 3600.0
+    raw = raw[raw["_offset_hours"].le(max_offset_hours)].sort_values("_offset_hours")
+    if raw.empty:
+        return None
+
+    row = raw.iloc[0]
+    time_utc = row["_time"].strftime("%Y%m%d%H%M")
+    if row["_offset_hours"] > 0:
+        print(
+            "KMA current track is missing; using nearest BDECK/bwp analysis point "
+            f"{time_utc} for {settings.atcf_id} at {settings.data_time}."
+        )
+    else:
+        print(
+            "KMA current track is missing; using BDECK/bwp analysis point "
+            f"for {settings.atcf_id} at {settings.data_time}."
+        )
+    return AnalysisPoint(
+        time_utc=time_utc,
+        lat=float(row["LATI"]),
+        lon=float(row["LONG"]),
+        source="BDECK",
+        atcf_id=settings.atcf_id,
+        match_method="bdeck_fallback",
+        distance_km=None,
+    )
+
+
+def settings_with_bdeck_analysis_if_needed(session: requests.Session, settings: Settings, kma_df: pd.DataFrame) -> Settings:
+    if cli_analysis_point(settings) is not None:
+        return settings
+    if kma_has_current_track_point(kma_df):
+        return settings
+    analysis = fetch_bdeck_analysis_point(session, settings)
+    if analysis is None:
+        return settings
+    return replace(
+        settings,
+        analysis_lat=analysis.lat,
+        analysis_lon=analysis.lon,
+        analysis_time=analysis.time_utc,
+        analysis_source=analysis.source,
+        analysis_atcf_id=analysis.atcf_id,
+        analysis_match_method=analysis.match_method,
+        analysis_distance_km=analysis.distance_km,
+    )
 
 
 def atcf_to_kma_schema(raw: pd.DataFrame, settings: Settings) -> pd.DataFrame:
@@ -1362,6 +1478,19 @@ def normalize_track_data(kma_df: pd.DataFrame, atcf_df: pd.DataFrame, settings: 
         return df
 
     df = select_model_sources_by_priority(df, settings)
+
+    if MODEL_ALIAS_PRIORITY_COLUMN not in df.columns:
+        df[MODEL_ALIAS_PRIORITY_COLUMN] = 0
+    df[MODEL_ALIAS_PRIORITY_COLUMN] = (
+        pd.to_numeric(df[MODEL_ALIAS_PRIORITY_COLUMN], errors="coerce")
+        .fillna(0)
+        .astype(int)
+    )
+
+    df = df.sort_values(
+        ["TYP", "SRC", "FT_TM(UTC)", MODEL_ALIAS_PRIORITY_COLUMN],
+        kind="stable",
+    )
     df = df.drop_duplicates(subset=["TYP", "SRC", "FT_TM(UTC)"], keep="first")
     df = df[df["SRC"].isin(MODEL_NAMES)].copy()
     for col in ["LAT", "LON", "WS", "TMD", "SEQ"]:
@@ -2960,6 +3089,12 @@ def main() -> None:
                 cache_ttl_seconds=fetch_settings.http_cache_ttl_seconds,
             )
         kma_df = read_kma_csv(kma_forecast_text, fetch_settings, forecast_only=True)
+        fetch_settings = settings_with_bdeck_analysis_if_needed(session, fetch_settings, kma_df)
+        if kma_df.empty and not fetch_settings.skip_atcf:
+            print(
+                "KMA APIHUB has no forecast model rows for this storm/time; "
+                "trying ATCF-only guidance sources."
+            )
         atcf_df = empty_atcf_frame() if fetch_settings.skip_atcf else fetch_atcf_data(session, fetch_settings)
         df = normalize_track_data(kma_df, atcf_df, fetch_settings)
 
