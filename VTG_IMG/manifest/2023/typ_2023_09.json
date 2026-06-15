@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202308251100",
+  "updated_at_utc": "202308251700",
   "storm_key": "typ_2023_09",
   "stage": "TYP",
   "year": 2023,
@@ -645,28 +645,28 @@
     {
       "job": {
         "storm_key": "typ_2023_09",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308251200",
         "td_number": null,
         "linked_td_number": 18,
-        "linked_typ_number": null,
         "typ_number": 9,
-        "data_typ_number": 9,
         "typ_name_ko": "사올라",
         "typ_name": "SAOLA",
         "typ_en": "SAOLA",
         "atcf_id": "wp092023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308251200"
+        "data_time": "202308251200",
+        "cycle_time_utc": "202308251200",
+        "start_utc": "202308251700",
+        "end_utc": "202308252300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615062758",
+          "generated_at_utc": "20260615152411",
           "image_path": "VTG_IMG/2023/TYP_2309_SAOLA/TYP_2309_SAOLA_202308251200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -702,37 +702,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308251200_typ_2023_09_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_09",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308251200",
         "td_number": null,
         "linked_td_number": 18,
-        "linked_typ_number": null,
         "typ_number": 9,
-        "data_typ_number": 9,
         "typ_name_ko": "사올라",
         "typ_name": "SAOLA",
         "typ_en": "SAOLA",
         "atcf_id": "wp092023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308251200"
+        "data_time": "202308251200",
+        "cycle_time_utc": "202308251200",
+        "start_utc": "202308251700",
+        "end_utc": "202308252300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615062800",
+          "generated_at_utc": "20260615152413",
           "image_path": "VTG_IMG/2023/TYP_2309_SAOLA/TYP_2309_SAOLA_202308251200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -768,11 +768,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308251200_typ_2023_09_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
