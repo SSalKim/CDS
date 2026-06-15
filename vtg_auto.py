@@ -12,7 +12,6 @@ import subprocess
 import sys
 import tempfile
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -62,19 +61,6 @@ MANIFEST_METADATA_KEYS = (
     "no_output_reason",
 )
 STATUS_METADATA_KEYS = MANIFEST_METADATA_KEYS + ("render_signature",)
-HTTP_FETCH_CACHE_DIR: Path | None = None
-HTTP_FETCH_CACHE_TTL_SECONDS = 6 * 3600
-BDECK_TEXT_CACHE: dict[str, str | None] = {}
-BDECK_FETCH_STATS = {
-    "cache_hits": 0,
-    "fetches": 0,
-    "successes": 0,
-    "missing": 0,
-    "errors": 0,
-}
-DEFAULT_ATCF_POSITION_PARALLEL_WORKERS = max(1, int(os.getenv("ATCF_POSITION_PARALLEL_WORKERS", "6")))
-DEFAULT_ATCF_POSITION_BDECK_TIMEOUT = float(os.getenv("ATCF_POSITION_BDECK_TIMEOUT", "10"))
-
 REQUEST_HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -156,11 +142,6 @@ def normalize_kma_list_stamp_year(value: str, year: int) -> str:
     stamp_year = int(text[:4])
     if stamp_year in (2100, 9999):
         return text
-    # KMA list rows are keyed by season year (YY), but storms can cross
-    # calendar years. Preserve adjacent-year timestamps such as YY=2025
-    # with TM_ED=202601010000 instead of forcing them back to 2025.
-    if abs(stamp_year - year) <= 1:
-        return text
     if stamp_year != year:
         return f"{year:04d}{text[4:]}"
     return text
@@ -220,43 +201,7 @@ def active_typ_at(now: datetime, row: dict) -> bool:
     return active_at(now, row.get("TM_ST", ""), row.get("TM_ED", ""))
 
 
-
-def fetch_text_cache_path(url: str) -> Path | None:
-    if HTTP_FETCH_CACHE_DIR is None:
-        return None
-    digest = hashlib.sha256(url.encode("utf-8")).hexdigest()
-    return HTTP_FETCH_CACHE_DIR / "http" / f"{digest}.txt"
-
-
-def read_fetch_text_cache(path: Path | None) -> str | None:
-    if path is None or not path.exists():
-        return None
-    try:
-        if HTTP_FETCH_CACHE_TTL_SECONDS > 0 and time.time() - path.stat().st_mtime > HTTP_FETCH_CACHE_TTL_SECONDS:
-            return None
-        return path.read_text(encoding="utf-8")
-    except OSError:
-        return None
-
-
-def write_fetch_text_cache(path: Path | None, text: str) -> None:
-    if path is None:
-        return
-    try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        tmp_path = path.with_name(f".{path.name}.{os.getpid()}.tmp")
-        tmp_path.write_text(text, encoding="utf-8")
-        tmp_path.replace(path)
-    except OSError as exc:
-        print(f"Warning: failed to write HTTP text cache {path}: {exc}")
-
-
 def fetch_text(url: str, *, timeout: float = 12, retries: int = 2, retry_delay: float = 3.0) -> str:
-    cache_path = fetch_text_cache_path(url)
-    cached = read_fetch_text_cache(cache_path)
-    if cached is not None:
-        return cached
-
     last_error: Exception | None = None
     for attempt in range(retries + 1):
         request = Request(url, headers=REQUEST_HEADERS)
@@ -268,7 +213,7 @@ def fetch_text(url: str, *, timeout: float = 12, retries: int = 2, retry_delay: 
             last_error = exc
             if exc.code < 500 or attempt >= retries:
                 raise
-        except (URLError, TimeoutError, OSError) as exc:
+        except (URLError, TimeoutError) as exc:
             last_error = exc
             if attempt >= retries:
                 raise
@@ -278,14 +223,10 @@ def fetch_text(url: str, *, timeout: float = 12, retries: int = 2, retry_delay: 
 
     for encoding in ("utf-8", "cp949", "euc-kr"):
         try:
-            text = data.decode(encoding)
-            write_fetch_text_cache(cache_path, text)
-            return text
+            return data.decode(encoding)
         except UnicodeDecodeError:
             continue
-    text = data.decode("utf-8", errors="replace")
-    write_fetch_text_cache(cache_path, text)
-    return text
+    return data.decode("utf-8", errors="replace")
 
 
 def kma_list_url(endpoint: str, year: int, auth_key: str) -> str:
@@ -370,7 +311,7 @@ def fetch_kma_list_text(endpoint: str, year: int, auth_key: str, *, cache_dir: P
             raise
         print(f"KMA APIHUB {Path(endpoint).stem} {year} failed with HTTP {exc.code}; trying cached rows.")
         return None
-    except (URLError, TimeoutError, OSError) as exc:
+    except (URLError, TimeoutError) as exc:
         print(f"KMA APIHUB {Path(endpoint).stem} {year} request failed ({exc}); trying cached rows.")
         return None
 
@@ -434,20 +375,11 @@ def safe_float(value) -> float | None:
         return None
 
 
-def fetch_kma_reference_point(
-    *,
-    typ_number: int,
-    data_time: str,
-    auth_key: str,
-    gts_text: str | None = None,
-) -> TrackPoint | None:
-    if gts_text is None:
-        try:
-            text = fetch_text(kma_gts_now_url(data_time, auth_key), timeout=15, retries=1, retry_delay=3.0)
-        except (HTTPError, URLError, TimeoutError, OSError):
-            return None
-    else:
-        text = gts_text
+def fetch_kma_reference_point(*, typ_number: int, data_time: str, auth_key: str) -> TrackPoint | None:
+    try:
+        text = fetch_text(kma_gts_now_url(data_time, auth_key), timeout=15, retries=1, retry_delay=3.0)
+    except (HTTPError, URLError, TimeoutError):
+        return None
 
     candidates: list[TrackPoint] = []
     for row in parse_kma_csv_lines(text, fixed_columns=18):
@@ -474,106 +406,6 @@ def fetch_kma_reference_point(
     return TrackPoint(time_utc=f"{data_time[:10]}00", lat=lat, lon=lon)
 
 
-
-def kma_typ_number_has_rows(*, typ_number: int, data_time: str, gts_text: str | None) -> bool:
-    if not gts_text:
-        return False
-    for row in parse_kma_csv_lines(gts_text, fixed_columns=18):
-        if safe_int(row[2]) != typ_number:
-            continue
-        ft_time = row[6].strip() if len(row) > 6 else ""
-        if ft_time[:10] == data_time[:10]:
-            return True
-    return False
-
-
-def select_kma_data_typ_number(
-    *,
-    candidates: list[int],
-    data_time: str,
-    gts_text: str | None,
-    fallback: int,
-) -> int:
-    seen: set[int] = set()
-    for candidate in candidates:
-        if not candidate or candidate in seen:
-            continue
-        seen.add(candidate)
-        if kma_typ_number_has_rows(typ_number=candidate, data_time=data_time, gts_text=gts_text):
-            return candidate
-    return fallback
-
-
-def fetch_kma_reference_point_any(
-    *,
-    typ_numbers: list[int],
-    data_time: str,
-    auth_key: str,
-    gts_text: str | None = None,
-) -> tuple[TrackPoint | None, int | None]:
-    seen: set[int] = set()
-    for typ_number in typ_numbers:
-        if not typ_number or typ_number in seen:
-            continue
-        seen.add(typ_number)
-        point = fetch_kma_reference_point(
-            typ_number=typ_number,
-            data_time=data_time,
-            auth_key=auth_key,
-            gts_text=gts_text,
-        )
-        if point is not None:
-            return point, typ_number
-    return None, None
-
-
-def previous_atcf_match_from_status(
-    status: dict | None,
-    *,
-    storm_key: str = "",
-    storm_keys: list[str] | None = None,
-    data_time: str,
-) -> AtcfMatch | None:
-    if not isinstance(status, dict):
-        return None
-    cycles = status.get("cycles")
-    if not isinstance(cycles, dict):
-        return None
-
-    keys: list[str] = []
-    for key in (storm_keys or []):
-        key = str(key or "").strip()
-        if key and key not in keys:
-            keys.append(key)
-    storm_key = str(storm_key or "").strip()
-    if storm_key and storm_key not in keys:
-        keys.append(storm_key)
-    if not keys:
-        return None
-
-    prefixes = tuple(f"{key}_" for key in keys)
-    for cycle_time in sorted((str(key) for key in cycles.keys() if str(key) < data_time), reverse=True):
-        records = cycles.get(cycle_time)
-        if not isinstance(records, dict):
-            continue
-        for record_key, record in records.items():
-            if not str(record_key).startswith(prefixes) or not isinstance(record, dict):
-                continue
-            metadata = record.get("metadata") if isinstance(record.get("metadata"), dict) else {}
-            atcf_id = str(record.get("atcf_id") or metadata.get("atcf_id") or "").strip().lower()
-            if not atcf_id:
-                continue
-            method = str(
-                record.get("atcf_match_method")
-                or metadata.get("analysis_match_method")
-                or "previous_status"
-            ).strip()
-            if method and not method.startswith("previous_"):
-                method = f"previous_{method}"
-            return AtcfMatch(atcf_id=atcf_id, method=method or "previous_status")
-    return None
-
-
 def normalize_name(value: str) -> str:
     return re.sub(r"[^A-Z0-9]", "", str(value or "").upper())
 
@@ -588,86 +420,49 @@ def candidate_offsets(positive_radius: int, negative_radius: int) -> list[int]:
     return offsets
 
 
-def ordered_regular_atcf_offsets() -> tuple[list[int], list[int]]:
-    # Fast path requested for KMA/JTWC number drift:
-    # exact -> +1..+5 -> -1..-3, then wider +6..+10 -> -4..-5.
-    return [0, 1, 2, 3, 4, 5, -1, -2, -3], [6, 7, 8, 9, 10, -4, -5]
-
-
-def make_atcf_ids_from_offsets(*, base_number: int, year: int, offsets: list[int], regular_only: bool = True) -> list[str]:
+def candidate_atcf_ids(*, typ_number: int, year: int, positive_radius: int, negative_radius: int) -> list[str]:
     ids: list[str] = []
     seen: set[str] = set()
 
     def add(candidate_number: int) -> None:
-        if regular_only and not (1 <= candidate_number <= 89):
-            return
-        if not regular_only and not (1 <= candidate_number <= 99):
+        if candidate_number < 1 or candidate_number > 99:
             return
         atcf_id = f"wp{candidate_number:02d}{year}"
         if atcf_id not in seen:
             seen.add(atcf_id)
             ids.append(atcf_id)
 
-    for offset in offsets:
-        add(base_number + offset)
+    for offset in candidate_offsets(positive_radius, negative_radius):
+        add(typ_number + offset)
+    for candidate_number in range(90, 100):
+        add(candidate_number)
     return ids
 
 
-def candidate_atcf_ids(*, typ_number: int, year: int, positive_radius: int, negative_radius: int) -> list[str]:
-    # For named typhoons, search regular ATCF IDs only. Do not scan wp90..wp99
-    # because active TYP systems should already have regular JTWC numbers.
-    first_offsets, second_offsets = ordered_regular_atcf_offsets()
-    return make_atcf_ids_from_offsets(
-        base_number=typ_number,
-        year=year,
-        offsets=first_offsets + second_offsets,
-        regular_only=True,
-    )
-
-
-def candidate_td_atcf_ids(*, td_number: int, year: int, linked_typ_number: int | None = None) -> list[str]:
-    # For KMA TD systems, prefer the linked future/active TYP number when it is
-    # already known. Otherwise, the best regular-ID first guess is TD/2 rounded
-    # up. TD can still be an invest in JTWC, so scan wp90..wp99 before looking
-    # at lower regular numbers.
-    base_number = linked_typ_number if linked_typ_number else math.ceil(td_number / 2)
-    base_number = max(1, min(89, int(base_number)))
-
-    groups = (
-        make_atcf_ids_from_offsets(
-            base_number=base_number,
-            year=year,
-            offsets=[0, 1, 2, 3, 4, 5],
-            regular_only=True,
-        ),
-        [f"wp{candidate_number:02d}{year}" for candidate_number in range(90, 100)],
-        make_atcf_ids_from_offsets(
-            base_number=base_number,
-            year=year,
-            offsets=[-1, -2, -3],
-            regular_only=True,
-        ),
-        make_atcf_ids_from_offsets(
-            base_number=base_number,
-            year=year,
-            offsets=[6, 7, 8, 9, 10],
-            regular_only=True,
-        ),
-        make_atcf_ids_from_offsets(
-            base_number=base_number,
-            year=year,
-            offsets=[-4, -5],
-            regular_only=True,
-        ),
-    )
-
+def candidate_td_atcf_ids(*, td_number: int, year: int) -> list[str]:
     ids: list[str] = []
     seen: set[str] = set()
-    for group in groups:
-        for atcf_id in group:
-            if atcf_id not in seen:
-                seen.add(atcf_id)
-                ids.append(atcf_id)
+    start_number = max(1, min(50, math.ceil(td_number / 2)))
+
+    def add(candidate_number: int) -> None:
+        if candidate_number < 1 or candidate_number > 99:
+            return
+        atcf_id = f"wp{candidate_number:02d}{year}"
+        if atcf_id not in seen:
+            seen.add(atcf_id)
+            ids.append(atcf_id)
+
+    add(start_number)
+    for offset in range(1, 50):
+        for candidate_number in (start_number + offset, start_number - offset):
+            if 1 <= candidate_number <= 50:
+                add(candidate_number)
+        if len(ids) >= 50:
+            break
+    for candidate_number in range(90, 100):
+        add(candidate_number)
+    for candidate_number in range(51, 90):
+        add(candidate_number)
     return ids
 
 
@@ -728,120 +523,10 @@ def bdeck_track_points(text: str, *, reference_time: str) -> list[TrackPoint]:
     return points
 
 
-def bdeck_missing_cache_path(atcf_id: str) -> Path | None:
-    if HTTP_FETCH_CACHE_DIR is None:
-        return None
-    return HTTP_FETCH_CACHE_DIR / "bdeck_missing" / f"{atcf_id.lower()}.missing"
-
-
-def read_bdeck_missing_cache(path: Path | None) -> bool:
-    if path is None or not path.exists():
-        return False
-    try:
-        if HTTP_FETCH_CACHE_TTL_SECONDS > 0 and time.time() - path.stat().st_mtime > HTTP_FETCH_CACHE_TTL_SECONDS:
-            return False
-        return True
-    except OSError:
-        return False
-
-
-def write_bdeck_missing_cache(path: Path | None, reason: str) -> None:
-    if path is None:
-        return
-    try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(reason + "\n", encoding="utf-8")
-    except OSError:
-        pass
-
-
-def fetch_bdeck_text(atcf_id: str, *, timeout: float = 15) -> str | None:
-    normalized = str(atcf_id or "").strip().lower()
-    if not normalized:
-        return None
-    if normalized in BDECK_TEXT_CACHE:
-        BDECK_FETCH_STATS["cache_hits"] += 1
-        return BDECK_TEXT_CACHE[normalized]
-
-    missing_path = bdeck_missing_cache_path(normalized)
-    if read_bdeck_missing_cache(missing_path):
-        BDECK_FETCH_STATS["cache_hits"] += 1
-        BDECK_FETCH_STATS["missing"] += 1
-        BDECK_TEXT_CACHE[normalized] = None
-        return None
-
-    try:
-        BDECK_FETCH_STATS["fetches"] += 1
-        text = fetch_text(NOAA_BDECK_URL.format(atcf_id=normalized), timeout=timeout)
-    except HTTPError as exc:
-        if 400 <= exc.code < 500:
-            BDECK_FETCH_STATS["missing"] += 1
-            write_bdeck_missing_cache(missing_path, f"HTTP {exc.code}")
-        else:
-            BDECK_FETCH_STATS["errors"] += 1
-        BDECK_TEXT_CACHE[normalized] = None
-        return None
-    except (URLError, TimeoutError):
-        BDECK_FETCH_STATS["errors"] += 1
-        BDECK_TEXT_CACHE[normalized] = None
-        return None
-
-    BDECK_FETCH_STATS["successes"] += 1
-    BDECK_TEXT_CACHE[normalized] = text
-    return text
-
-
-def bdeck_stats_snapshot() -> dict[str, int]:
-    return dict(BDECK_FETCH_STATS)
-
-
-def bdeck_stats_delta(before: dict[str, int]) -> dict[str, int]:
-    return {key: BDECK_FETCH_STATS.get(key, 0) - before.get(key, 0) for key in BDECK_FETCH_STATS}
-
-
-
-def bdeck_nearest_track_point(
-    text: str,
-    *,
-    reference_time: str,
-    max_offset_hours: float = 12.0,
-) -> tuple[TrackPoint, float] | None:
-    target = parse_utc_stamp(f"{reference_time[:10]}00")
-    if target is None:
-        return None
-
-    best: tuple[TrackPoint, float] | None = None
-    for raw_line in text.splitlines():
-        line = raw_line.strip()
-        if not line:
-            continue
-        try:
-            row = [item.strip() for item in next(csv.reader([line]))]
-        except csv.Error:
-            continue
-        if len(row) < 8:
-            continue
-        if safe_int(row[5]) != 0:
-            continue
-        valid_time = parse_utc_stamp(f"{row[2]}00")
-        if valid_time is None:
-            continue
-        offset_hours = abs((valid_time - target).total_seconds()) / 3600.0
-        if offset_hours > max_offset_hours:
-            continue
-        lat = parse_atcf_coord(row[6])
-        lon = parse_atcf_coord(row[7])
-        if lat is None or lon is None:
-            continue
-        point = TrackPoint(time_utc=f"{reference_time[:10]}00", lat=lat, lon=lon)
-        if best is None or offset_hours < best[1]:
-            best = (point, offset_hours)
-    return best
-
-
 def fetch_bdeck_analysis_point(atcf_id: str, *, data_time: str) -> TrackPoint | None:
-    text = fetch_bdeck_text(atcf_id, timeout=15)
-    if not text:
+    try:
+        text = fetch_text(NOAA_BDECK_URL.format(atcf_id=atcf_id), timeout=15)
+    except (HTTPError, URLError, TimeoutError):
         return None
     points = bdeck_track_points(text, reference_time=f"{data_time[:10]}00")
     return points[0] if points else None
@@ -864,65 +549,24 @@ def find_atcf_match(
     year: int,
     positive_radius: int,
     negative_radius: int,
-    atcf_ids: list[str] | None = None,
 ) -> AtcfMatch | None:
     target_name = normalize_name(typ_en)
     if not target_name:
         return None
 
-    if atcf_ids is None:
-        atcf_ids = candidate_atcf_ids(
-            typ_number=typ_number,
-            year=year,
-            positive_radius=positive_radius,
-            negative_radius=negative_radius,
-        )
-
-    for atcf_id in atcf_ids:
-        text = fetch_bdeck_text(atcf_id, timeout=15)
-        if not text:
+    for atcf_id in candidate_atcf_ids(
+        typ_number=typ_number,
+        year=year,
+        positive_radius=positive_radius,
+        negative_radius=negative_radius,
+    ):
+        try:
+            text = fetch_text(NOAA_BDECK_URL.format(atcf_id=atcf_id), timeout=15)
+        except (HTTPError, URLError, TimeoutError):
             continue
         if target_name in normalize_name(text):
             return AtcfMatch(atcf_id=atcf_id, method="name")
     return None
-
-
-def fetch_bdeck_texts_parallel(
-    atcf_ids: list[str],
-    *,
-    timeout: float = DEFAULT_ATCF_POSITION_BDECK_TIMEOUT,
-    max_workers: int = DEFAULT_ATCF_POSITION_PARALLEL_WORKERS,
-) -> dict[str, str | None]:
-    unique_ids: list[str] = []
-    seen: set[str] = set()
-    for atcf_id in atcf_ids:
-        normalized = str(atcf_id or "").strip().lower()
-        if not normalized or normalized in seen:
-            continue
-        seen.add(normalized)
-        unique_ids.append(normalized)
-
-    if not unique_ids:
-        return {}
-    if max_workers <= 1 or len(unique_ids) == 1:
-        return {atcf_id: fetch_bdeck_text(atcf_id, timeout=timeout) for atcf_id in unique_ids}
-
-    results: dict[str, str | None] = {}
-    worker_count = min(max_workers, len(unique_ids))
-    with ThreadPoolExecutor(max_workers=worker_count) as executor:
-        futures = {
-            executor.submit(fetch_bdeck_text, atcf_id, timeout=timeout): atcf_id
-            for atcf_id in unique_ids
-        }
-        for future in as_completed(futures):
-            atcf_id = futures[future]
-            try:
-                results[atcf_id] = future.result()
-            except Exception as exc:
-                BDECK_FETCH_STATS["errors"] = BDECK_FETCH_STATS.get("errors", 0) + 1
-                print(f"Warning: parallel BDECK fetch failed for {atcf_id}: {exc}", file=sys.stderr)
-                results[atcf_id] = None
-    return results
 
 
 def find_atcf_position_match(
@@ -951,38 +595,18 @@ def find_atcf_position_match(
             negative_radius=negative_radius,
         )
 
-    ordered_ids: list[str] = []
-    seen_ids: set[str] = set()
-    for atcf_id in atcf_ids:
-        normalized = str(atcf_id or "").strip().lower()
-        if normalized and normalized not in seen_ids:
-            seen_ids.add(normalized)
-            ordered_ids.append(normalized)
-
-    # Name matching already stores successful/missing BDECKs in memory, so this
-    # parallel fetch reuses those cached results immediately and only downloads
-    # candidates that were not opened earlier in this same workflow run.
-    bdeck_texts = fetch_bdeck_texts_parallel(ordered_ids)
-
     candidates: list[AtcfMatch] = []
-    for atcf_id in ordered_ids:
-        text = bdeck_texts.get(atcf_id)
-        if not text:
+    for atcf_id in atcf_ids:
+        try:
+            text = fetch_text(NOAA_BDECK_URL.format(atcf_id=atcf_id), timeout=15)
+        except (HTTPError, URLError, TimeoutError):
             continue
-        exact_points = bdeck_track_points(text, reference_time=kma_point.time_utc)
-        candidate_points = [(point, "position", max_distance_km) for point in exact_points]
-        if not candidate_points:
-            nearest = bdeck_nearest_track_point(text, reference_time=kma_point.time_utc, max_offset_hours=12.0)
-            if nearest is not None:
-                point, offset_hours = nearest
-                relaxed_distance_km = max_distance_km + min(360.0, offset_hours * 60.0)
-                candidate_points.append((point, f"position_nearest_{offset_hours:.0f}h", relaxed_distance_km))
-        for point, method, distance_limit_km in candidate_points:
+        for point in bdeck_track_points(text, reference_time=kma_point.time_utc):
             distance = haversine_km(kma_point.lat, kma_point.lon, point.lat, point.lon)
-            if distance <= distance_limit_km:
+            if distance <= max_distance_km:
                 candidates.append(AtcfMatch(
                     atcf_id=atcf_id,
-                    method=method,
+                    method="position",
                     distance_km=distance,
                     point=point,
                     reference_point=kma_point,
@@ -1023,6 +647,7 @@ def find_atcf_position_match(
                     return preferred_candidate
             return None
     return candidates[0]
+
 
 def active_cycle_windows(now: datetime) -> list[CycleWindow]:
     windows = []
@@ -1073,55 +698,6 @@ def write_json(path: Path, payload) -> None:
             pass
 
 
-
-def log_timing(label: str, started_at: float) -> None:
-    print(f"[timing] {label}: {time.monotonic() - started_at:.1f}s")
-
-
-def add_timing_elapsed(timings: dict[str, float], key: str, started_at: float) -> None:
-    timings[key] = timings.get(key, 0.0) + (time.monotonic() - started_at)
-
-
-def kma_gts_now_cache_path(cache_dir: Path, data_time: str, mode: str) -> Path:
-    return cache_dir / "kma_gts_now" / f"{data_time}_mode{mode}.txt"
-
-
-def ensure_kma_gts_now_cache(
-    *,
-    data_time: str,
-    auth_key: str,
-    cache_dir: Path | None,
-    mode: str,
-) -> Path | None:
-    if cache_dir is None:
-        return None
-    path = kma_gts_now_cache_path(cache_dir, data_time, mode)
-    if path.exists():
-        return path
-    started_at = time.monotonic()
-    try:
-        text = fetch_text(kma_gts_now_url(data_time, auth_key, mode=mode), timeout=20, retries=1, retry_delay=3.0)
-    except (HTTPError, URLError, TimeoutError, OSError) as exc:
-        print(f"Warning: failed to prefetch KMA typ_gts_now mode={mode} {data_time}: {exc}")
-        return None
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp_path = path.with_name(f".{path.name}.{os.getpid()}.tmp")
-    tmp_path.write_text(text, encoding="utf-8")
-    tmp_path.replace(path)
-    log_timing(f"prefetch KMA typ_gts_now mode={mode} {data_time}", started_at)
-    return path
-
-
-def read_optional_text(path: Path | None) -> str | None:
-    if path is None:
-        return None
-    try:
-        return path.read_text(encoding="utf-8")
-    except OSError as exc:
-        print(f"Warning: failed to read cached text {path}: {exc}")
-        return None
-
-
 def write_github_outputs(path: Path | None, outputs: dict[str, object]) -> None:
     if path is None:
         return
@@ -1157,67 +733,14 @@ def manual_atcf_id(manual_map: dict, *, year: int, td_number: int | None, typ_nu
     return None
 
 
-def linked_td_number_for_typ(
-    td_rows: list[dict],
-    *,
-    year: int,
-    typ_number: int,
-    data_time: str = "",
-) -> int | None:
-    candidates: list[tuple[int, datetime | None, datetime | None]] = []
+def linked_td_number_for_typ(td_rows: list[dict], *, year: int, typ_number: int) -> int | None:
     for row in td_rows:
         try:
-            row_year = int(row.get("YY", 0))
-            row_typ_number = int(row.get("TYP", -1))
-            row_td_number = int(row.get("TD", 0))
+            if int(row.get("YY", 0)) == year and int(row.get("TYP", -1)) == typ_number:
+                return int(row.get("TD", 0))
         except (TypeError, ValueError):
             continue
-        if row_year != year or row_typ_number != typ_number:
-            continue
-        candidates.append((
-            row_td_number,
-            parse_utc_stamp(str(row.get("TM_ST") or "")),
-            parse_utc_stamp(str(row.get("TM_ED") or "")),
-        ))
-
-    if not candidates:
-        return None
-
-    target_time = parse_utc_stamp(data_time) if data_time else None
-    if target_time is not None:
-        active_candidates = [
-            item for item in candidates
-            if (item[1] is None or item[1] <= target_time)
-            and (item[2] is None or target_time <= item[2])
-        ]
-        if active_candidates:
-            return max(active_candidates, key=lambda item: item[1] or datetime.min.replace(tzinfo=timezone.utc))[0]
-
-        previous_candidates = [
-            item for item in candidates
-            if item[1] is not None and item[1] <= target_time
-        ]
-        if previous_candidates:
-            return max(previous_candidates, key=lambda item: item[1] or datetime.min.replace(tzinfo=timezone.utc))[0]
-
-    return min(candidates, key=lambda item: item[1] or datetime.max.replace(tzinfo=timezone.utc))[0]
-
-
-def active_linked_td_rows_by_typ(td_rows: list[dict], *, now: datetime) -> dict[tuple[int, int], list[dict]]:
-    active_rows: dict[tuple[int, int], list[dict]] = {}
-    for row in td_rows:
-        try:
-            year = int(row.get("YY", 0))
-            td_number = int(row.get("TD", 0))
-            typ_number = int(row.get("TYP", 0))
-        except (TypeError, ValueError):
-            continue
-        if typ_number <= 0:
-            continue
-        if not active_at(now, row.get("TM_ST", ""), row.get("TM_ED", "")):
-            continue
-        active_rows.setdefault((year, typ_number), []).append(row)
-    return active_rows
+    return None
 
 
 def build_storm_jobs(
@@ -1233,64 +756,27 @@ def build_storm_jobs(
     atcf_position_max_distance_km: float,
     atcf_position_min_distance_gap_km: float,
     resolve_atcf: bool = True,
-    kma_gts_now_text: str | None = None,
-    status: dict | None = None,
 ) -> list[StormJob]:
-    total_started_at = time.monotonic()
-    timing_stats: dict[str, float] = {
-        "atcf_name": 0.0,
-        "kma_reference": 0.0,
-        "atcf_position": 0.0,
-        "bdeck_analysis": 0.0,
-    }
-    bdeck_before = bdeck_stats_snapshot()
     jobs: list[StormJob] = []
     data_dt = parse_utc_stamp(data_time)
     if not data_dt:
         return jobs
 
-    # KMA can list one named typhoon period broadly in typ_lst.php while td_lst.php
-    # contains intermittent weakening/redevelopment TD episodes linked to the same
-    # TYP number. In those intervals, prefer the active TD row and suppress the
-    # broad TYP row to avoid rendering the system as TYP during a TD phase.
-    active_td_links = active_linked_td_rows_by_typ(td_rows, now=now)
-
-    active_typhoons: list[tuple[int, int]] = []
-    seen_typ_keys: set[tuple[int, int]] = set()
+    active_typhoons = []
     for row in typ_rows:
         try:
             typ_number = int(row["SEQ"])
             year = int(row["YY"])
         except (TypeError, ValueError):
             continue
-        typ_key = (year, typ_number)
-        if typ_key in seen_typ_keys:
-            continue
         is_active = active_typ_at(now, row)
         if not is_active:
             continue
         if parse_utc_stamp(row.get("TM_ST", "")) and data_dt < parse_utc_stamp(row.get("TM_ST", "")):
             continue
-        if typ_key in active_td_links:
-            td_labels = ", ".join(
-                f"TD{safe_int(item.get('TD')) or 0:02d}"
-                for item in active_td_links.get(typ_key, [])
-            )
-            print(
-                f"Suppressing broad TYP{typ_number:02d} row at {data_time}; "
-                f"active linked TD phase detected: {td_labels}."
-            )
-            continue
-        seen_typ_keys.add(typ_key)
         typ_en = row.get("TYP_EN", "").strip().upper()
         typ_name_ko = row.get("TYP_NAME", "").strip()
-        linked_td_number = linked_td_number_for_typ(td_rows, year=year, typ_number=typ_number, data_time=data_time)
-        typ_atcf_ids = candidate_atcf_ids(
-            typ_number=typ_number,
-            year=year,
-            positive_radius=atcf_search_positive_radius,
-            negative_radius=atcf_search_negative_radius,
-        )
+        linked_td_number = linked_td_number_for_typ(td_rows, year=year, typ_number=typ_number)
         manual_id = None
         atcf_match = None
         if resolve_atcf:
@@ -1301,67 +787,44 @@ def build_storm_jobs(
                 typ_number=typ_number,
                 typ_en=typ_en,
             )
-            if manual_id:
-                atcf_match = AtcfMatch(manual_id, "manual")
-            if atcf_match is None:
-                previous_keys = [f"typ_{year}_{typ_number:02d}"]
-                if linked_td_number:
-                    previous_keys.extend([
-                        f"td_{year}_{linked_td_number:02d}_typ_{typ_number:02d}",
-                        f"td_{year}_{linked_td_number:02d}",
-                    ])
-                atcf_match = previous_atcf_match_from_status(
-                    status,
-                    storm_keys=previous_keys,
-                    data_time=data_time,
-                )
-            if atcf_match is None:
-                started_at = time.monotonic()
-                atcf_match = find_atcf_match(
-                    typ_en=typ_en,
-                    typ_number=typ_number,
-                    year=year,
-                    positive_radius=atcf_search_positive_radius,
-                    negative_radius=atcf_search_negative_radius,
-                    atcf_ids=typ_atcf_ids,
-                )
-                add_timing_elapsed(timing_stats, "atcf_name", started_at)
+            atcf_match = AtcfMatch(manual_id, "manual") if manual_id else find_atcf_match(
+                typ_en=typ_en,
+                typ_number=typ_number,
+                year=year,
+                positive_radius=atcf_search_positive_radius,
+                negative_radius=atcf_search_negative_radius,
+            )
         if resolve_atcf and atcf_match is None and typ_en:
-            started_at = time.monotonic()
-            kma_point = fetch_kma_reference_point(typ_number=typ_number, data_time=data_time, auth_key=auth_key, gts_text=kma_gts_now_text)
-            add_timing_elapsed(timing_stats, "kma_reference", started_at)
-            started_at = time.monotonic()
+            kma_point = fetch_kma_reference_point(typ_number=typ_number, data_time=data_time, auth_key=auth_key)
             atcf_match = find_atcf_position_match(
                 typ_number=typ_number,
                 year=year,
                 data_time=data_time,
                 kma_point=kma_point,
-                atcf_ids=typ_atcf_ids,
+                positive_radius=atcf_search_positive_radius,
+                negative_radius=atcf_search_negative_radius,
                 preferred_atcf_id=f"wp{typ_number:02d}{year}",
                 max_distance_km=atcf_position_max_distance_km,
                 min_distance_gap_km=atcf_position_min_distance_gap_km,
             )
-            add_timing_elapsed(timing_stats, "atcf_position", started_at)
         atcf_id = atcf_match.atcf_id if atcf_match else None
         atcf_method = atcf_match.method if atcf_match else ""
-        analysis_point = atcf_match.point if atcf_match and atcf_match.method.startswith("position") else None
+        analysis_point = atcf_match.point if atcf_match and atcf_match.method == "position" else None
         if analysis_point is None and atcf_id:
-            started_at = time.monotonic()
             analysis_point = fetch_bdeck_analysis_point(atcf_id, data_time=data_time)
-            add_timing_elapsed(timing_stats, "bdeck_analysis", started_at)
         analysis_source = "BDECK" if analysis_point else ""
         analysis_match_method = atcf_match.method if analysis_point and atcf_match else ""
         analysis_distance_km = atcf_match.distance_km if analysis_point and atcf_match else None
         if not resolve_atcf:
             reason = "ATCF matching skipped for lightweight precheck."
-        elif atcf_match and atcf_match.method.startswith("position"):
+        elif atcf_match and atcf_match.method == "position":
             reason = (
                 "ATCF name match not found; using temporary position match "
                 f"{atcf_match.atcf_id} ({atcf_match.distance_km:.0f} km)."
             )
         else:
             reason = "" if atcf_id else "ATCF name match not found; generating KMA-only guidance."
-        active_typhoons.append((year, typ_number))
+        active_typhoons.append(typ_number)
         jobs.append(StormJob(
             storm_key=f"typ_{year}_{typ_number:02d}",
             stage="TYP_LINKED" if atcf_id else "TYP_LINKED_ATCF_PENDING",
@@ -1395,7 +858,7 @@ def build_storm_jobs(
             continue
         if not active_at(now, row.get("TM_ST", ""), row.get("TM_ED", "")):
             continue
-        if (year, typ_number) in active_typhoon_set:
+        if typ_number in active_typhoon_set:
             continue
 
         linked_typ_row = None
@@ -1417,21 +880,7 @@ def build_storm_jobs(
         linked_typ_has_started = bool(typ_number and linked_typ_start and data_dt >= linked_typ_start)
         display_typ_en = linked_typ_en if linked_typ_has_started else ""
         display_typ_name_ko = linked_typ_name_ko if linked_typ_has_started else ""
-        matching_typ_en = linked_typ_en if typ_number else ""
-        td_data_typ_number = select_kma_data_typ_number(
-            candidates=[td_number, typ_number],
-            data_time=data_time,
-            gts_text=kma_gts_now_text,
-            fallback=td_number,
-        )
-        td_storm_key = (
-            f"td_{year}_{td_number:02d}_typ_{typ_number:02d}"
-            if typ_number
-            else f"td_{year}_{td_number:02d}"
-        )
 
-        td_atcf_ids = candidate_td_atcf_ids(td_number=td_number, year=year, linked_typ_number=(typ_number or None))
-        td_base_atcf_number = max(1, min(89, typ_number or math.ceil(td_number / 2)))
         manual_id = None
         atcf_match = None
         if resolve_atcf:
@@ -1440,68 +889,51 @@ def build_storm_jobs(
                 year=year,
                 td_number=td_number,
                 typ_number=typ_number or td_number,
-                typ_en=matching_typ_en or display_typ_en,
+                typ_en=display_typ_en,
             )
             atcf_match = AtcfMatch(manual_id, "manual") if manual_id else None
-            if atcf_match is None:
-                previous_keys = [td_storm_key, f"td_{year}_{td_number:02d}"]
-                if typ_number:
-                    previous_keys.append(f"typ_{year}_{typ_number:02d}")
-                atcf_match = previous_atcf_match_from_status(
-                    status,
-                    storm_keys=previous_keys,
-                    data_time=data_time,
-                )
-            if atcf_match is None and matching_typ_en:
-                started_at = time.monotonic()
+            if atcf_match is None and display_typ_en:
                 atcf_match = find_atcf_match(
-                    typ_en=matching_typ_en,
-                    typ_number=td_base_atcf_number,
+                    typ_en=display_typ_en,
+                    typ_number=typ_number,
                     year=year,
                     positive_radius=atcf_search_positive_radius,
                     negative_radius=atcf_search_negative_radius,
-                    atcf_ids=td_atcf_ids,
                 )
-                add_timing_elapsed(timing_stats, "atcf_name", started_at)
         if resolve_atcf and atcf_match is None:
-            reference_typ_number = td_data_typ_number
-            started_at = time.monotonic()
-            kma_point, matched_kma_typ_number = fetch_kma_reference_point_any(
-                typ_numbers=[td_data_typ_number, td_number, typ_number],
-                data_time=data_time,
-                auth_key=auth_key,
-                gts_text=kma_gts_now_text,
-            )
-            if matched_kma_typ_number:
-                reference_typ_number = matched_kma_typ_number
-                td_data_typ_number = matched_kma_typ_number
-            add_timing_elapsed(timing_stats, "kma_reference", started_at)
-            started_at = time.monotonic()
+            reference_typ_number = td_number
+            kma_point = fetch_kma_reference_point(typ_number=reference_typ_number, data_time=data_time, auth_key=auth_key)
             atcf_match = find_atcf_position_match(
                 typ_number=reference_typ_number,
                 year=year,
                 data_time=data_time,
                 kma_point=kma_point,
-                atcf_ids=td_atcf_ids,
+                atcf_ids=(
+                    candidate_atcf_ids(
+                        typ_number=typ_number,
+                        year=year,
+                        positive_radius=atcf_search_positive_radius,
+                        negative_radius=atcf_search_negative_radius,
+                    )
+                    if typ_number
+                    else candidate_td_atcf_ids(td_number=td_number, year=year)
+                ),
                 preferred_atcf_id=(f"wp{typ_number:02d}{year}" if typ_number else None),
                 max_distance_km=atcf_position_max_distance_km,
                 min_distance_gap_km=atcf_position_min_distance_gap_km,
             )
-            add_timing_elapsed(timing_stats, "atcf_position", started_at)
         atcf_id = atcf_match.atcf_id if atcf_match else None
         atcf_method = atcf_match.method if atcf_match else ""
-        analysis_point = atcf_match.point if atcf_match and atcf_match.method.startswith("position") else None
+        analysis_point = atcf_match.point if atcf_match and atcf_match.method == "position" else None
         if analysis_point is None and atcf_id:
-            started_at = time.monotonic()
             analysis_point = fetch_bdeck_analysis_point(atcf_id, data_time=data_time)
-            add_timing_elapsed(timing_stats, "bdeck_analysis", started_at)
         analysis_source = "BDECK" if analysis_point else ""
         analysis_match_method = atcf_match.method if analysis_point and atcf_match else ""
         analysis_distance_km = atcf_match.distance_km if analysis_point and atcf_match else None
         if not resolve_atcf:
             stage = "TD_UNLINKED"
             reason = "ATCF matching skipped for lightweight precheck."
-        elif typ_number != 0 and atcf_match and atcf_match.method.startswith("position"):
+        elif typ_number != 0 and atcf_match and atcf_match.method == "position":
             if linked_typ_has_started:
                 stage = "TD_LINKED_TYP_POSITION_ATCF"
                 reason = (
@@ -1526,7 +958,7 @@ def build_storm_jobs(
                     if atcf_id
                     else f"TD is linked to future typhoon {typ_number}; name withheld until typhoon start; ATCF match not found."
                 )
-        elif atcf_match and atcf_match.method.startswith("position"):
+        elif atcf_match and atcf_match.method == "position":
             stage = "TD_POSITION_ATCF"
             reason = (
                 "TD has no linked typhoon number yet; using temporary position match "
@@ -1539,7 +971,11 @@ def build_storm_jobs(
             stage = "TD_UNLINKED"
             reason = "TD has no linked typhoon number yet."
         jobs.append(StormJob(
-            storm_key=td_storm_key,
+            storm_key=(
+                f"td_{year}_{td_number:02d}_typ_{typ_number:02d}"
+                if typ_number
+                else f"td_{year}_{td_number:02d}"
+            ),
             stage=stage,
             year=year,
             data_time=data_time,
@@ -1547,7 +983,7 @@ def build_storm_jobs(
             linked_td_number=None,
             linked_typ_number=typ_number or None,
             typ_number=td_number,
-            data_typ_number=td_data_typ_number,
+            data_typ_number=td_number,
             typ_name_ko=display_typ_name_ko if typ_number else "",
             typ_name=display_typ_en or display_typ_name_ko or "NONAME",
             typ_en=display_typ_en,
@@ -1561,23 +997,6 @@ def build_storm_jobs(
             analysis_distance_km=analysis_distance_km,
         ))
 
-    total_elapsed = time.monotonic() - total_started_at
-    measured_elapsed = sum(timing_stats.values())
-    bdeck_delta = bdeck_stats_delta(bdeck_before)
-    print(
-        "[timing] build storm jobs detail "
-        f"{data_time}: jobs={len(jobs)} "
-        f"atcf_name={timing_stats['atcf_name']:.1f}s "
-        f"kma_reference={timing_stats['kma_reference']:.1f}s "
-        f"atcf_position={timing_stats['atcf_position']:.1f}s "
-        f"bdeck_analysis={timing_stats['bdeck_analysis']:.1f}s "
-        f"other_active_linking={max(0.0, total_elapsed - measured_elapsed):.1f}s "
-        f"bdeck_fetches={bdeck_delta.get('fetches', 0)} "
-        f"bdeck_successes={bdeck_delta.get('successes', 0)} "
-        f"bdeck_missing={bdeck_delta.get('missing', 0)} "
-        f"bdeck_errors={bdeck_delta.get('errors', 0)} "
-        f"bdeck_cache_hits={bdeck_delta.get('cache_hits', 0)}"
-    )
     return jobs
 
 
@@ -1823,9 +1242,6 @@ def vtg_command(
     fcst_hours_list: list[int],
     auto_fcst_hours: bool,
     source_overrides: list[str],
-    kma_forecast_text_path: Path | None = None,
-    kma_past_text_path: Path | None = None,
-    http_cache_dir: Path | None = None,
 ) -> tuple[list[str], dict[int, Path]]:
     unique_hours = list(dict.fromkeys(fcst_hours_list))
     metadata_paths = {fcst_hours: metadata_path_for(output_root, job, fcst_hours) for fcst_hours in unique_hours}
@@ -1844,8 +1260,6 @@ def vtg_command(
         "TD" if job.stage.startswith("TD_") else "TYP",
         "--data-time",
         job.data_time,
-        "--storm-year",
-        str(job.year),
         "--fcst-hours",
         ",".join(str(fcst_hours) for fcst_hours in unique_hours),
         "--output-root",
@@ -1855,12 +1269,6 @@ def vtg_command(
         "--overwrite",
         "--no-show",
     ]
-    if kma_forecast_text_path is not None:
-        command.extend(["--kma-forecast-text-path", str(kma_forecast_text_path)])
-    if kma_past_text_path is not None:
-        command.extend(["--kma-past-text-path", str(kma_past_text_path)])
-    if http_cache_dir is not None:
-        command.extend(["--http-cache-dir", str(http_cache_dir)])
     if len(unique_hours) == 1:
         command.extend(["--metadata-path", str(metadata_paths[unique_hours[0]])])
     if job.atcf_id:
@@ -1906,9 +1314,6 @@ def run_vtg_batch(
     source_overrides: list[str],
     dry_run: bool,
     clear_existing: bool = False,
-    kma_forecast_text_path: Path | None = None,
-    kma_past_text_path: Path | None = None,
-    http_cache_dir: Path | None = None,
 ) -> dict[int, dict]:
     command, metadata_paths = vtg_command(
         job=job,
@@ -1918,9 +1323,6 @@ def run_vtg_batch(
         fcst_hours_list=fcst_hours_list,
         auto_fcst_hours=auto_fcst_hours,
         source_overrides=source_overrides,
-        kma_forecast_text_path=kma_forecast_text_path,
-        kma_past_text_path=kma_past_text_path,
-        http_cache_dir=http_cache_dir,
     )
 
     if dry_run:
@@ -1944,14 +1346,12 @@ def run_vtg_batch(
         )
 
     command_started_at = time.time()
-    timing_started_at = time.monotonic()
     completed = run_command_with_network_retry(
         command,
         cwd=PROJECT_ROOT,
         retries=1,
         retry_delay_seconds=60,
     )
-    log_timing(f"VTG.py {job.storm_key} hours={','.join(str(item) for item in metadata_paths)}", timing_started_at)
     results: dict[int, dict] = {}
     for fcst_hours, metadata_path in metadata_paths.items():
         metadata_is_current = is_current_file(metadata_path, command_started_at)
@@ -2027,53 +1427,6 @@ def run_vtg(
         source_overrides=source_overrides,
         dry_run=dry_run,
     )[fcst_hours]
-
-
-
-def record_batch_results(
-    *,
-    job: StormJob,
-    window: CycleWindow,
-    due_hours: list[int],
-    batch_results: dict[int, dict],
-    output_root: Path,
-    cycle_status: dict,
-    run_entries: list[dict],
-    complete_model_count: int,
-    final_check_window: bool,
-    now: datetime,
-) -> None:
-    for fcst_hours in due_hours:
-        status_key = status_key_for(job, fcst_hours)
-        result = batch_results.get(fcst_hours, {
-            "status": "failed",
-            "metadata_path": str(metadata_path_for(output_root, job, fcst_hours)),
-            "stderr": "VTG batch run did not return a result for this forecast hour.",
-        })
-        log_failed_vtg_result(job, fcst_hours, result)
-        metadata = result.get("metadata") or {}
-        model_count = metadata_model_count(metadata)
-        completed = model_count >= complete_model_count
-        status_record = {
-            "updated_at_utc": format_utc_stamp(now),
-            "completed": completed,
-            "metadata": metadata,
-            "last_status": result.get("status"),
-            "atcf_id": job.atcf_id,
-            "atcf_match_method": job.atcf_match_method,
-            "reason": job.reason,
-        }
-        if final_check_window:
-            status_record["final_checked_at_utc"] = format_utc_stamp(now)
-            status_record["final_check_window_end_utc"] = window.end_utc
-        cycle_status[status_key] = status_record
-        run_entries.append({
-            "job": asdict(job),
-            "window": asdict(window),
-            "result": result,
-            "completed": completed,
-            "final_check": final_check_window,
-        })
 
 
 def manifest_entry_from_metadata(path: Path, metadata: dict) -> dict:
@@ -2455,306 +1808,6 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
     )
 
 
-def sort_manifest_inventory(entries: list[dict]) -> list[dict]:
-    return sorted(
-        entries,
-        key=lambda item: (
-            item.get("job", {}).get("year") or 0,
-            item.get("job", {}).get("typ_number") or 0,
-            item.get("job", {}).get("data_time") or "",
-            item.get("result", {}).get("metadata", {}).get("fcst_hours") or 0,
-        ),
-    )
-
-
-def manifest_storm_key_from_metadata(metadata: dict) -> str:
-    data_time = str(metadata.get("data_time") or "")
-    year_text = str(metadata.get("storm_year") or data_time[:4] or "0")
-    try:
-        year = int(year_text)
-    except (TypeError, ValueError):
-        year = 0
-    try:
-        typ_number = int(metadata.get("typ_number") or 0)
-    except (TypeError, ValueError):
-        typ_number = 0
-    stage = str(metadata.get("storm_stage") or "TYP").upper()
-    prefix = "td" if stage == "TD" else "typ"
-    return f"{prefix}_{year}_{typ_number:02d}" if year and typ_number else "unknown"
-
-
-def manifest_storm_key_from_entry(entry: dict) -> str:
-    metadata = entry.get("result", {}).get("metadata") if isinstance(entry, dict) else None
-    if isinstance(metadata, dict) and metadata:
-        return manifest_storm_key_from_metadata(metadata)
-    job = entry.get("job") if isinstance(entry, dict) else None
-    if isinstance(job, dict) and job.get("storm_key"):
-        return str(job.get("storm_key"))
-    return "unknown"
-
-
-def storm_manifest_path(output_root: Path, year: int | str, storm_key: str) -> Path:
-    return output_root / "manifest" / str(year) / f"{storm_key}.json"
-
-
-def year_manifest_index_path(output_root: Path, year: int | str) -> Path:
-    return output_root / "manifest" / str(year) / "index.json"
-
-
-def entry_from_existing_manifest_item(item: dict) -> dict:
-    if not isinstance(item, dict):
-        return {}
-    # Existing items are already compact manifest entries.
-    return item
-
-
-def merge_manifest_inventory(existing_inventory: list[dict], run_entries: list[dict]) -> list[dict]:
-    entries_by_key: dict[str, dict] = {}
-    suppressed_tokens: set[str] = set()
-
-    for entry in existing_inventory or []:
-        entry = entry_from_existing_manifest_item(entry)
-        metadata = entry.get("result", {}).get("metadata") if isinstance(entry, dict) else None
-        if not isinstance(metadata, dict) or not metadata:
-            continue
-        try:
-            fcst_hours = int(metadata.get("fcst_hours") or 0)
-        except (TypeError, ValueError):
-            continue
-        if fcst_hours not in VALID_FCST_HOURS:
-            continue
-        if metadata_matches_suppression(metadata, suppressed_tokens):
-            continue
-        entries_by_key[manifest_inventory_key(metadata)] = entry
-
-    for entry in run_entries:
-        metadata = entry.get("result", {}).get("metadata") if isinstance(entry, dict) else None
-        if not isinstance(metadata, dict) or not metadata:
-            continue
-        try:
-            fcst_hours = int(metadata.get("fcst_hours") or 0)
-        except (TypeError, ValueError):
-            continue
-        if fcst_hours not in VALID_FCST_HOURS:
-            continue
-        key = manifest_inventory_key(metadata)
-        if not metadata_has_output_image(metadata):
-            tokens = manifest_suppression_tokens(metadata)
-            suppressed_tokens.update(tokens)
-            existing = entries_by_key.get(key)
-            existing_metadata = existing.get("result", {}).get("metadata", {}) if isinstance(existing, dict) else {}
-            if isinstance(existing_metadata, dict) and metadata_matches_suppression(existing_metadata, tokens):
-                entries_by_key.pop(key, None)
-            continue
-        entries_by_key[key] = compact_manifest_entry(entry)
-
-    return sort_manifest_inventory(list(entries_by_key.values()))
-
-
-def storm_summary_from_inventory(storm_key: str, inventory: list[dict]) -> dict:
-    latest_entry = None
-    for entry in inventory:
-        metadata = entry.get("result", {}).get("metadata", {}) if isinstance(entry, dict) else {}
-        if not isinstance(metadata, dict):
-            continue
-        if latest_entry is None or str(metadata.get("data_time") or "") >= str(latest_entry.get("result", {}).get("metadata", {}).get("data_time") or ""):
-            latest_entry = entry
-    metadata = latest_entry.get("result", {}).get("metadata", {}) if isinstance(latest_entry, dict) else {}
-    job = latest_entry.get("job", {}) if isinstance(latest_entry, dict) else {}
-    return {
-        "storm_key": storm_key,
-        "stage": job.get("stage") or metadata.get("storm_stage") or "",
-        "year": job.get("year") or metadata.get("storm_year") or "",
-        "typ_number": job.get("typ_number") or metadata.get("typ_number") or 0,
-        "linked_td_number": job.get("linked_td_number") or metadata.get("linked_td_number"),
-        "linked_typ_number": job.get("linked_typ_number") or metadata.get("linked_typ_number"),
-        "typ_name": job.get("typ_name") or metadata.get("typ_name") or "NONAME",
-        "typ_name_ko": job.get("typ_name_ko") or metadata.get("typ_name_ko") or "",
-        "latest_data_time": metadata.get("data_time") or "",
-        "item_count": len(inventory),
-    }
-
-
-def write_split_manifest_files(output_root: Path, run_entries: list[dict], *, updated_at_utc: str) -> list[Path]:
-    changed_paths: list[Path] = []
-    entries_by_storm: dict[tuple[str, str], list[dict]] = {}
-    for entry in run_entries:
-        metadata = entry.get("result", {}).get("metadata") if isinstance(entry, dict) else None
-        if not isinstance(metadata, dict) or not metadata:
-            continue
-        year = str(metadata.get("storm_year") or metadata.get("data_time", "")[:4] or "0")
-        storm_key = manifest_storm_key_from_entry(entry)
-        if not year or storm_key == "unknown":
-            continue
-        entries_by_storm.setdefault((year, storm_key), []).append(entry)
-
-    touched_years: set[str] = set()
-    touched_systems: dict[str, list[dict]] = {}
-    for (year, storm_key), entries in sorted(entries_by_storm.items()):
-        path = storm_manifest_path(output_root, year, storm_key)
-        previous = load_json(path, {})
-        previous_inventory = previous.get("inventory") if isinstance(previous, dict) else []
-        if not isinstance(previous_inventory, list):
-            previous_inventory = []
-        inventory = merge_manifest_inventory(previous_inventory, entries)
-        summary = storm_summary_from_inventory(storm_key, inventory)
-        payload = {
-            "version": 2,
-            "updated_at_utc": updated_at_utc,
-            **summary,
-            "inventory": inventory,
-        }
-        if previous != payload:
-            write_json(path, payload)
-            changed_paths.append(path)
-        touched_years.add(str(year))
-        summary["manifest_path"] = relative_asset_path(path)
-        touched_systems.setdefault(str(year), []).append(summary)
-
-    for year in sorted(touched_years):
-        path = year_manifest_index_path(output_root, year)
-        previous = load_json(path, {})
-        systems = previous.get("systems") if isinstance(previous, dict) else []
-        if not isinstance(systems, list):
-            systems = []
-        by_key = {
-            str(item.get("storm_key")): item
-            for item in systems
-            if isinstance(item, dict) and item.get("storm_key")
-        }
-        for item in touched_systems.get(year, []):
-            by_key[str(item["storm_key"])] = item
-        payload = {
-            "version": 2,
-            "updated_at_utc": updated_at_utc,
-            "year": int(year) if str(year).isdigit() else year,
-            "systems": sorted(by_key.values(), key=lambda item: (item.get("typ_number") or 0, item.get("storm_key") or "")),
-        }
-        if previous != payload:
-            write_json(path, payload)
-            changed_paths.append(path)
-
-    return changed_paths
-
-
-def rebuild_split_manifest_files(output_root: Path, inventory: list[dict], *, updated_at_utc: str) -> list[Path]:
-    changed_paths: list[Path] = []
-    grouped: dict[tuple[str, str], list[dict]] = {}
-    for entry in inventory:
-        metadata = entry.get("result", {}).get("metadata") if isinstance(entry, dict) else None
-        if not isinstance(metadata, dict) or not metadata:
-            continue
-        year = str(metadata.get("storm_year") or metadata.get("data_time", "")[:4] or "0")
-        storm_key = manifest_storm_key_from_metadata(metadata)
-        if not year or storm_key == "unknown":
-            continue
-        grouped.setdefault((year, storm_key), []).append(entry)
-
-    systems_by_year: dict[str, list[dict]] = {}
-    for (year, storm_key), entries in sorted(grouped.items()):
-        path = storm_manifest_path(output_root, year, storm_key)
-        storm_inventory = sort_manifest_inventory(entries)
-        summary = storm_summary_from_inventory(storm_key, storm_inventory)
-        payload = {
-            "version": 2,
-            "updated_at_utc": updated_at_utc,
-            **summary,
-            "inventory": storm_inventory,
-        }
-        previous = load_json(path, {})
-        if previous != payload:
-            write_json(path, payload)
-            changed_paths.append(path)
-        summary["manifest_path"] = relative_asset_path(path)
-        systems_by_year.setdefault(str(year), []).append(summary)
-
-    for year, systems in sorted(systems_by_year.items()):
-        path = year_manifest_index_path(output_root, year)
-        payload = {
-            "version": 2,
-            "updated_at_utc": updated_at_utc,
-            "year": int(year) if str(year).isdigit() else year,
-            "systems": sorted(systems, key=lambda item: (item.get("typ_number") or 0, item.get("storm_key") or "")),
-        }
-        previous = load_json(path, {})
-        if previous != payload:
-            write_json(path, payload)
-            changed_paths.append(path)
-    return changed_paths
-
-
-def root_manifest_indexes(output_root: Path) -> list[dict]:
-    root = output_root / "manifest"
-    indexes = []
-    if not root.exists():
-        return indexes
-    for path in sorted(root.glob("[0-9][0-9][0-9][0-9]/index.json")):
-        year = path.parent.name
-        indexes.append({"year": int(year), "path": relative_asset_path(path)})
-    return indexes
-
-
-def relative_changed_path(path: Path) -> str:
-    try:
-        return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
-    except ValueError:
-        return path.as_posix()
-
-
-def collect_changed_asset_paths(
-    *,
-    run_entries: list[dict],
-    manifest_path: Path,
-    status_path: Path,
-    split_manifest_paths: list[Path],
-    include_manifest: bool = True,
-    include_status: bool = True,
-) -> list[str]:
-    paths: set[str] = set()
-    if include_manifest:
-        paths.add(relative_changed_path(manifest_path))
-    if include_status:
-        paths.add(relative_changed_path(status_path))
-    for path in split_manifest_paths:
-        paths.add(relative_changed_path(path))
-    for entry in run_entries:
-        result = entry.get("result") if isinstance(entry, dict) else {}
-        if isinstance(result, dict):
-            metadata_path = result.get("metadata_path")
-            if metadata_path:
-                paths.add(relative_changed_path(Path(str(metadata_path))))
-            metadata = result.get("metadata")
-            if isinstance(metadata, dict):
-                image_path = str(metadata.get("image_path") or "").strip()
-                if image_path:
-                    paths.add(relative_changed_path(PROJECT_ROOT / image_path))
-    return sorted(paths)
-
-
-def write_changed_paths(path: Path | None, paths: list[str]) -> None:
-    if path is None:
-        return
-    unique_paths = sorted({str(item).strip() for item in paths if str(item).strip()})
-    path.write_text("\n".join(unique_paths) + ("\n" if unique_paths else ""), encoding="utf-8")
-
-
-def print_manifest_or_summary(manifest: dict, *, verbose: bool, changed_paths: list[str] | None = None) -> None:
-    if verbose:
-        print(json.dumps(manifest, ensure_ascii=False, indent=2))
-        return
-    summary = {
-        "updated_at_utc": manifest.get("updated_at_utc"),
-        "active_windows": manifest.get("active_windows", []),
-        "run_count": len(manifest.get("runs", []) or []),
-        "inventory_count": len(manifest.get("inventory", []) or []),
-        "manifest_indexes": manifest.get("manifest_indexes", []),
-    }
-    if changed_paths is not None:
-        summary["changed_path_count"] = len(changed_paths)
-        summary["changed_paths_preview"] = changed_paths[:30]
-    print(json.dumps(summary, ensure_ascii=False, indent=2))
-
-
 def parse_fcst_hours(value: str) -> list[int]:
     hours: list[int] = []
     for token in str(value or "").replace(",", " ").split():
@@ -2798,11 +1851,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--github-output", type=Path, default=None, help="Optional GitHub Actions output file for --check-run-needed.")
     parser.add_argument("--force", action="store_true", help="Run even if a previous metadata record met the completion target.")
     parser.add_argument("--status-retention-days", type=int, default=DEFAULT_STATUS_RETENTION_DAYS, help="Keep compact automation status for this many days; use 0 to disable pruning.")
-    parser.add_argument("--changed-paths-file", type=Path, default=None, help="Write generated/updated asset paths for git add --pathspec-from-file.")
-    parser.add_argument("--verbose-manifest", action="store_true", help="Print full manifest JSON instead of a compact summary.")
-    parser.add_argument("--full-manifest-scan", action="store_true", help="Scan all VTG_IMG assets on every run. Default uses incremental manifest updates.")
-    parser.add_argument("--http-cache-dir", type=Path, default=None, help="Shared workflow-local HTTP/KMA cache directory for VTG.py subprocesses.")
-    parser.add_argument("--parallel-jobs", type=int, default=int(os.getenv("VTG_PARALLEL_JOBS", "2")), help="Maximum active storm VTG.py subprocesses per cycle.")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 
@@ -2822,30 +1870,20 @@ def main() -> int:
     kma_cache_dir = args.kma_cache_dir or output_root / "kma_apihub_cache"
     status_path = args.status_path or output_root / "vtg_auto_status.json"
     manifest_path = args.manifest_path or output_root / "manifest.json"
-    http_cache_dir = args.http_cache_dir or Path(tempfile.gettempdir()) / "vtg_http_cache"
-    http_cache_dir.mkdir(parents=True, exist_ok=True)
-    global HTTP_FETCH_CACHE_DIR
-    HTTP_FETCH_CACHE_DIR = http_cache_dir
-    parallel_jobs = max(1, int(args.parallel_jobs or 1))
     windows = active_cycle_windows(now)
     status = load_json(status_path, {"cycles": {}})
     manual_map = load_manual_map(args.manual_map)
 
     if args.index_only:
-        updated_at_utc = format_utc_stamp(now)
-        inventory = build_manifest_inventory(output_root, [])
-        split_paths = [] if args.dry_run else rebuild_split_manifest_files(output_root, inventory, updated_at_utc=updated_at_utc)
         manifest = {
-            "version": 2,
-            "updated_at_utc": updated_at_utc,
+            "updated_at_utc": format_utc_stamp(now),
             "window_start_offset_hours": WINDOW_START_OFFSET_HOURS,
             "window_end_offset_hours": WINDOW_END_OFFSET_HOURS,
             "complete_model_count": args.complete_model_count,
             "final_check_before_window_end_minutes": args.final_check_before_window_end_minutes,
             "active_windows": [asdict(window) for window in windows],
             "runs": [],
-            "inventory": inventory,
-            "manifest_indexes": root_manifest_indexes(output_root),
+            "inventory": build_manifest_inventory(output_root, []),
         }
         status_for_write = prune_status_for_persistence(
             status,
@@ -2853,20 +1891,11 @@ def main() -> int:
             retention_days=args.status_retention_days,
             reference_time=utc_now(),
         )
-        changed_paths = collect_changed_asset_paths(
-            run_entries=[],
-            manifest_path=manifest_path,
-            status_path=status_path,
-            split_manifest_paths=split_paths,
-            include_manifest=True,
-            include_status=status_for_write != status,
-        )
         if not args.dry_run:
             write_json(manifest_path, manifest)
             if status_for_write != status:
                 write_json(status_path, status_for_write)
-        write_changed_paths(args.changed_paths_file, changed_paths)
-        print_manifest_or_summary(manifest, verbose=args.verbose_manifest, changed_paths=changed_paths)
+        print(json.dumps(manifest, ensure_ascii=False, indent=2))
         return 0
 
     if not args.auth_key:
@@ -2884,12 +1913,10 @@ def main() -> int:
         else args.atcf_search_negative_radius
     )
 
-    years: set[int] = set()
+    years = {now.year}
     for window in windows:
         year = int(window.data_time[:4])
-        years.update({year - 1, year, year + 1})
-    if not years:
-        years.add(now.year)
+        years.add(year)
 
     td_rows: list[dict] = []
     typ_rows: list[dict] = []
@@ -2901,27 +1928,12 @@ def main() -> int:
     actual_run_count = 0
     render_signature = current_render_signature()
     for window in windows:
-        window_started_at = time.monotonic()
         cycle_status = status.setdefault("cycles", {}).setdefault(window.data_time, {})
         final_check_window = is_final_check_window(
             now,
             window,
             args.final_check_before_window_end_minutes,
         )
-
-        kma_forecast_text_path = None
-        kma_past_text_path = None
-        kma_forecast_text = None
-        if not args.check_run_needed:
-            kma_forecast_text_path = ensure_kma_gts_now_cache(
-                data_time=window.data_time,
-                auth_key=args.auth_key,
-                cache_dir=http_cache_dir,
-                mode="2",
-            )
-            kma_forecast_text = read_optional_text(kma_forecast_text_path)
-
-        job_started_at = time.monotonic()
         jobs = build_storm_jobs(
             now=now,
             data_time=window.data_time,
@@ -2934,12 +1946,7 @@ def main() -> int:
             atcf_position_max_distance_km=args.atcf_position_max_distance_km,
             atcf_position_min_distance_gap_km=args.atcf_position_min_distance_gap_km,
             resolve_atcf=not args.check_run_needed,
-            kma_gts_now_text=kma_forecast_text,
-            status=status,
         )
-        log_timing(f"build storm jobs {window.data_time} jobs={len(jobs)}", job_started_at)
-
-        pending_batches: list[tuple[StormJob, list[int], bool]] = []
         for job in jobs:
             due_hours: list[int] = []
             for fcst_hours in fcst_hours_list:
@@ -3001,99 +2008,49 @@ def main() -> int:
 
             if args.check_run_needed or not due_hours:
                 continue
-            pending_batches.append((job, due_hours, final_check_window))
 
-        if pending_batches:
-            kma_past_text_path = ensure_kma_gts_now_cache(
-                data_time=window.data_time,
+            batch_results = run_vtg_batch(
+                job=job,
+                output_root=output_root,
                 auth_key=args.auth_key,
-                cache_dir=http_cache_dir,
-                mode="0",
+                python=args.python,
+                fcst_hours_list=due_hours,
+                auto_fcst_hours=args.auto_fcst_hours,
+                source_overrides=args.source_override,
+                dry_run=args.dry_run,
+                clear_existing=args.force,
             )
-
-            worker_count = min(parallel_jobs, len(pending_batches))
-            print(
-                f"Running {len(pending_batches)} active storm job(s) for {window.data_time} "
-                f"with parallel_jobs={worker_count}."
-            )
-            render_started_at = time.monotonic()
-
-            if worker_count == 1:
-                for job, due_hours, batch_final_check_window in pending_batches:
-                    batch_results = run_vtg_batch(
-                        job=job,
-                        output_root=output_root,
-                        auth_key=args.auth_key,
-                        python=args.python,
-                        fcst_hours_list=due_hours,
-                        auto_fcst_hours=args.auto_fcst_hours,
-                        source_overrides=args.source_override,
-                        dry_run=args.dry_run,
-                        clear_existing=args.force,
-                        kma_forecast_text_path=kma_forecast_text_path,
-                        kma_past_text_path=kma_past_text_path,
-                        http_cache_dir=http_cache_dir,
-                    )
-                    record_batch_results(
-                        job=job,
-                        window=window,
-                        due_hours=due_hours,
-                        batch_results=batch_results,
-                        output_root=output_root,
-                        cycle_status=cycle_status,
-                        run_entries=run_entries,
-                        complete_model_count=args.complete_model_count,
-                        final_check_window=batch_final_check_window,
-                        now=now,
-                    )
-            else:
-                with ThreadPoolExecutor(max_workers=worker_count) as executor:
-                    futures = {
-                        executor.submit(
-                            run_vtg_batch,
-                            job=job,
-                            output_root=output_root,
-                            auth_key=args.auth_key,
-                            python=args.python,
-                            fcst_hours_list=due_hours,
-                            auto_fcst_hours=args.auto_fcst_hours,
-                            source_overrides=args.source_override,
-                            dry_run=args.dry_run,
-                            clear_existing=args.force,
-                            kma_forecast_text_path=kma_forecast_text_path,
-                            kma_past_text_path=kma_past_text_path,
-                            http_cache_dir=http_cache_dir,
-                        ): (job, due_hours, batch_final_check_window)
-                        for job, due_hours, batch_final_check_window in pending_batches
-                    }
-                    for future in as_completed(futures):
-                        job, due_hours, batch_final_check_window = futures[future]
-                        try:
-                            batch_results = future.result()
-                        except Exception as exc:
-                            batch_results = {
-                                fcst_hours: {
-                                    "status": "failed",
-                                    "metadata_path": str(metadata_path_for(output_root, job, fcst_hours)),
-                                    "stderr": f"VTG batch raised an exception: {exc}",
-                                }
-                                for fcst_hours in due_hours
-                            }
-                        record_batch_results(
-                            job=job,
-                            window=window,
-                            due_hours=due_hours,
-                            batch_results=batch_results,
-                            output_root=output_root,
-                            cycle_status=cycle_status,
-                            run_entries=run_entries,
-                            complete_model_count=args.complete_model_count,
-                            final_check_window=batch_final_check_window,
-                            now=now,
-                        )
-
-            log_timing(f"render active storm batches {window.data_time}", render_started_at)
-        log_timing(f"cycle total before manifest {window.data_time}", window_started_at)
+            for fcst_hours in due_hours:
+                status_key = status_key_for(job, fcst_hours)
+                result = batch_results.get(fcst_hours, {
+                    "status": "failed",
+                    "metadata_path": str(metadata_path_for(output_root, job, fcst_hours)),
+                    "stderr": "VTG batch run did not return a result for this forecast hour.",
+                })
+                log_failed_vtg_result(job, fcst_hours, result)
+                metadata = result.get("metadata") or {}
+                model_count = metadata_model_count(metadata)
+                completed = model_count >= args.complete_model_count
+                status_record = {
+                    "updated_at_utc": format_utc_stamp(now),
+                    "completed": completed,
+                    "metadata": metadata,
+                    "last_status": result.get("status"),
+                    "atcf_id": job.atcf_id,
+                    "atcf_match_method": job.atcf_match_method,
+                    "reason": job.reason,
+                }
+                if final_check_window:
+                    status_record["final_checked_at_utc"] = format_utc_stamp(now)
+                    status_record["final_check_window_end_utc"] = window.end_utc
+                cycle_status[status_key] = status_record
+                run_entries.append({
+                    "job": asdict(job),
+                    "window": asdict(window),
+                    "result": result,
+                    "completed": completed,
+                    "final_check": final_check_window,
+                })
 
     if args.check_run_needed:
         run_needed = actual_run_count > 0
@@ -3117,18 +2074,9 @@ def main() -> int:
 
     previous_manifest = load_json(manifest_path, {})
     compact_runs = compact_manifest_runs(run_entries)
-    updated_at_utc = format_utc_stamp(now)
-    if args.full_manifest_scan:
-        inventory = build_manifest_inventory(output_root, run_entries)
-    else:
-        previous_inventory = previous_manifest.get("inventory") if isinstance(previous_manifest, dict) else []
-        if not isinstance(previous_inventory, list):
-            previous_inventory = []
-        inventory = merge_manifest_inventory(previous_inventory, run_entries)
-    split_paths = [] if args.dry_run else write_split_manifest_files(output_root, run_entries, updated_at_utc=updated_at_utc)
+    inventory = build_manifest_inventory(output_root, run_entries)
     manifest = {
-        "version": 2,
-        "updated_at_utc": updated_at_utc,
+        "updated_at_utc": format_utc_stamp(now),
         "window_start_offset_hours": WINDOW_START_OFFSET_HOURS,
         "window_end_offset_hours": WINDOW_END_OFFSET_HOURS,
         "complete_model_count": args.complete_model_count,
@@ -3136,7 +2084,6 @@ def main() -> int:
         "active_windows": [asdict(window) for window in windows],
         "runs": compact_runs,
         "inventory": inventory,
-        "manifest_indexes": root_manifest_indexes(output_root),
     }
     status_for_write = prune_status_for_persistence(
         status,
@@ -3146,25 +2093,14 @@ def main() -> int:
     )
     should_clear_previous_manifest = not run_entries and bool(previous_manifest.get("runs"))
     inventory_changed = previous_manifest.get("inventory") != manifest.get("inventory")
-    index_changed = previous_manifest.get("manifest_indexes") != manifest.get("manifest_indexes")
     status_changed = status_for_write != status
     should_write_outputs = not args.dry_run and (
-        actual_run_count > 0 or should_clear_previous_manifest or inventory_changed or index_changed or status_changed or bool(split_paths)
-    )
-    changed_paths = collect_changed_asset_paths(
-        run_entries=run_entries,
-        manifest_path=manifest_path,
-        status_path=status_path,
-        split_manifest_paths=split_paths,
-        include_manifest=should_write_outputs,
-        include_status=status_changed,
+        actual_run_count > 0 or should_clear_previous_manifest or inventory_changed or status_changed
     )
     if should_write_outputs:
         write_json(manifest_path, manifest)
-        if status_changed or actual_run_count > 0:
-            write_json(status_path, status_for_write)
-    write_changed_paths(args.changed_paths_file, changed_paths)
-    print_manifest_or_summary(manifest, verbose=args.verbose_manifest, changed_paths=changed_paths)
+        write_json(status_path, status_for_write)
+    print(json.dumps(manifest, ensure_ascii=False, indent=2))
     return 0
 
 
