@@ -1,175 +1,66 @@
 {
   "version": 2,
-  "updated_at_utc": "202209061700",
+  "updated_at_utc": "202308110500",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202209061200",
-      "cycle_time_utc": "202209061200",
-      "start_utc": "202209061700",
-      "end_utc": "202209062300"
+      "data_time": "202308110000",
+      "cycle_time_utc": "202308110000",
+      "start_utc": "202308110500",
+      "end_utc": "202308111100"
     }
   ],
   "runs": [
     {
       "job": {
-        "storm_key": "td_2022_24_typ_12",
-        "stage": "TD_PRE_TYP",
-        "year": 2022,
-        "data_time": "202209061200",
-        "td_number": 24,
+        "storm_key": "td_2023_14_typ_06",
+        "stage": "TD_LINKED_TYP",
+        "year": 2023,
+        "data_time": "202308110000",
+        "td_number": 14,
         "linked_td_number": null,
-        "typ_number": 24,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp142022",
+        "typ_number": 14,
+        "typ_name_ko": "카눈",
+        "typ_name": "KHANUN",
+        "typ_en": "KHANUN",
+        "atcf_id": "wp062023",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209061200",
-        "cycle_time_utc": "202209061200",
-        "start_utc": "202209061700",
-        "end_utc": "202209062300"
+        "data_time": "202308110000",
+        "cycle_time_utc": "202308110000",
+        "start_utc": "202308110500",
+        "end_utc": "202308111100"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615193540",
-          "image_path": "VTG_IMG/2022/TD_2224_NONAME/TD_2224_NONAME_202209061200_120h.png",
+          "generated_at_utc": "20260615194711",
+          "image_path": "VTG_IMG/2023/TD_2314_KHANUN/TD_2314_KHANUN_202308110000_120h.png",
           "storm_stage": "TD",
-          "storm_year": "2022",
-          "typ_number": 24,
-          "data_typ_number": 24,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
+          "storm_year": "2023",
+          "typ_number": 14,
+          "data_typ_number": 14,
+          "typ_name": "KHANUN",
+          "typ_name_ko": "카눈",
           "linked_td_number": null,
-          "linked_typ_number": 12,
-          "atcf_id": "wp142022",
+          "linked_typ_number": 6,
+          "atcf_id": "wp062023",
           "extra_atcf_ids": [],
-          "data_time": "202209061200",
+          "data_time": "202308110000",
           "fcst_hours": 120,
           "intensity": "TD",
           "model_count": 6,
-          "target_model_count": 18,
-          "model_labels": [
-            "COAMPS-TC",
-            "ECMWF",
-            "GFS",
-            "GFS EPS",
-            "HWRF",
-            "NAVGEM"
-          ],
-          "skip_atcf": false
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "td_2022_24_typ_12",
-        "stage": "TD_PRE_TYP",
-        "year": 2022,
-        "data_time": "202209061200",
-        "td_number": 24,
-        "linked_td_number": null,
-        "typ_number": 24,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp142022",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202209061200",
-        "cycle_time_utc": "202209061200",
-        "start_utc": "202209061700",
-        "end_utc": "202209062300"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20260615193542",
-          "image_path": "VTG_IMG/2022/TD_2224_NONAME/TD_2224_NONAME_202209061200_240h.png",
-          "storm_stage": "TD",
-          "storm_year": "2022",
-          "typ_number": 24,
-          "data_typ_number": 24,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": 12,
-          "atcf_id": "wp142022",
-          "extra_atcf_ids": [],
-          "data_time": "202209061200",
-          "fcst_hours": 240,
-          "intensity": "TD",
-          "model_count": 6,
-          "target_model_count": 18,
-          "model_labels": [
-            "COAMPS-TC",
-            "ECMWF",
-            "GFS",
-            "GFS EPS",
-            "HWRF",
-            "NAVGEM"
-          ],
-          "skip_atcf": false
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "typ_2022_11",
-        "stage": "TYP_LINKED",
-        "year": 2022,
-        "data_time": "202209061200",
-        "td_number": null,
-        "linked_td_number": 22,
-        "typ_number": 11,
-        "typ_name_ko": "힌남노",
-        "typ_name": "HINNAMNOR",
-        "typ_en": "HINNAMNOR",
-        "atcf_id": "wp122022",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202209061200",
-        "cycle_time_utc": "202209061200",
-        "start_utc": "202209061700",
-        "end_utc": "202209062300"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20260615193541",
-          "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209061200_120h.png",
-          "storm_stage": "TYP",
-          "storm_year": "2022",
-          "typ_number": 11,
-          "data_typ_number": 11,
-          "typ_name": "HINNAMNOR",
-          "typ_name_ko": "힌남노",
-          "linked_td_number": 22,
-          "linked_typ_number": null,
-          "atcf_id": "wp122022",
-          "extra_atcf_ids": [],
-          "data_time": "202209061200",
-          "fcst_hours": 120,
-          "intensity": "TYP",
-          "model_count": 5,
-          "target_model_count": 18,
+          "target_model_count": 19,
           "model_labels": [
             "CMC",
             "CMC EPS",
+            "ECMWF",
+            "ECMWF EPS",
             "NAVGEM EPS",
-            "GFS",
             "GFS EPS"
           ],
           "skip_atcf": false
@@ -180,51 +71,186 @@
     },
     {
       "job": {
-        "storm_key": "typ_2022_11",
-        "stage": "TYP_LINKED",
-        "year": 2022,
-        "data_time": "202209061200",
-        "td_number": null,
-        "linked_td_number": 22,
-        "typ_number": 11,
-        "typ_name_ko": "힌남노",
-        "typ_name": "HINNAMNOR",
-        "typ_en": "HINNAMNOR",
-        "atcf_id": "wp122022",
+        "storm_key": "td_2023_14_typ_06",
+        "stage": "TD_LINKED_TYP",
+        "year": 2023,
+        "data_time": "202308110000",
+        "td_number": 14,
+        "linked_td_number": null,
+        "typ_number": 14,
+        "typ_name_ko": "카눈",
+        "typ_name": "KHANUN",
+        "typ_en": "KHANUN",
+        "atcf_id": "wp062023",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209061200",
-        "cycle_time_utc": "202209061200",
-        "start_utc": "202209061700",
-        "end_utc": "202209062300"
+        "data_time": "202308110000",
+        "cycle_time_utc": "202308110000",
+        "start_utc": "202308110500",
+        "end_utc": "202308111100"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615193543",
-          "image_path": "VTG_IMG/2022/TYP_2211_HINNAMNOR/TYP_2211_HINNAMNOR_202209061200_240h.png",
-          "storm_stage": "TYP",
-          "storm_year": "2022",
-          "typ_number": 11,
-          "data_typ_number": 11,
-          "typ_name": "HINNAMNOR",
-          "typ_name_ko": "힌남노",
-          "linked_td_number": 22,
-          "linked_typ_number": null,
-          "atcf_id": "wp122022",
+          "generated_at_utc": "20260615194713",
+          "image_path": "VTG_IMG/2023/TD_2314_KHANUN/TD_2314_KHANUN_202308110000_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2023",
+          "typ_number": 14,
+          "data_typ_number": 14,
+          "typ_name": "KHANUN",
+          "typ_name_ko": "카눈",
+          "linked_td_number": null,
+          "linked_typ_number": 6,
+          "atcf_id": "wp062023",
           "extra_atcf_ids": [],
-          "data_time": "202209061200",
+          "data_time": "202308110000",
           "fcst_hours": 240,
-          "intensity": "TYP",
-          "model_count": 5,
-          "target_model_count": 18,
+          "intensity": "TD",
+          "model_count": 6,
+          "target_model_count": 19,
           "model_labels": [
             "CMC",
             "CMC EPS",
+            "ECMWF",
+            "ECMWF EPS",
+            "NAVGEM EPS",
+            "GFS EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2023_07",
+        "stage": "TYP_LINKED",
+        "year": 2023,
+        "data_time": "202308110000",
+        "td_number": null,
+        "linked_td_number": 13,
+        "typ_number": 7,
+        "typ_name_ko": "란",
+        "typ_name": "LAN",
+        "typ_en": "LAN",
+        "atcf_id": "wp072023",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202308110000",
+        "cycle_time_utc": "202308110000",
+        "start_utc": "202308110500",
+        "end_utc": "202308111100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260615194712",
+          "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308110000_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2023",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "LAN",
+          "typ_name_ko": "란",
+          "linked_td_number": 13,
+          "linked_typ_number": null,
+          "atcf_id": "wp072023",
+          "extra_atcf_ids": [],
+          "data_time": "202308110000",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 18,
+          "target_model_count": 19,
+          "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC EPS",
+            "COAMPS-TC",
+            "ECMWF",
+            "ECMWF EPS",
             "NAVGEM EPS",
             "GFS",
-            "GFS EPS"
+            "GFS EPS",
+            "HAFS",
+            "HWRF",
+            "JGSM",
+            "KIM",
+            "KIM EPS",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2023_07",
+        "stage": "TYP_LINKED",
+        "year": 2023,
+        "data_time": "202308110000",
+        "td_number": null,
+        "linked_td_number": 13,
+        "typ_number": 7,
+        "typ_name_ko": "란",
+        "typ_name": "LAN",
+        "typ_en": "LAN",
+        "atcf_id": "wp072023",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202308110000",
+        "cycle_time_utc": "202308110000",
+        "start_utc": "202308110500",
+        "end_utc": "202308111100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260615194714",
+          "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308110000_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2023",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "LAN",
+          "typ_name_ko": "란",
+          "linked_td_number": 13,
+          "linked_typ_number": null,
+          "atcf_id": "wp072023",
+          "extra_atcf_ids": [],
+          "data_time": "202308110000",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 18,
+          "target_model_count": 19,
+          "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC EPS",
+            "COAMPS-TC",
+            "ECMWF",
+            "ECMWF EPS",
+            "NAVGEM EPS",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "HWRF",
+            "JGSM",
+            "KIM",
+            "KIM EPS",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
           ],
           "skip_atcf": false
         }
@@ -91743,28 +91769,28 @@
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308071200",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308071200"
+        "data_time": "202308071200",
+        "cycle_time_utc": "202308071200",
+        "start_utc": "202308071700",
+        "end_utc": "202308072300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184744",
+          "generated_at_utc": "20260615193824",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308071200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -91801,37 +91827,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308071200_typ_2023_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308071200",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308071200"
+        "data_time": "202308071200",
+        "cycle_time_utc": "202308071200",
+        "start_utc": "202308071700",
+        "end_utc": "202308072300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184746",
+          "generated_at_utc": "20260615193826",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308071200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -91868,37 +91894,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308071200_typ_2023_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308071800",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308071800"
+        "data_time": "202308071800",
+        "cycle_time_utc": "202308071800",
+        "start_utc": "202308072300",
+        "end_utc": "202308080500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184819",
+          "generated_at_utc": "20260615193900",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308071800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -91929,37 +91955,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308071800_typ_2023_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308071800",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308071800"
+        "data_time": "202308071800",
+        "cycle_time_utc": "202308071800",
+        "start_utc": "202308072300",
+        "end_utc": "202308080500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184821",
+          "generated_at_utc": "20260615193901",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308071800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -91990,37 +92016,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308071800_typ_2023_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308080000",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308080000"
+        "data_time": "202308080000",
+        "cycle_time_utc": "202308080000",
+        "start_utc": "202308080500",
+        "end_utc": "202308081100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184856",
+          "generated_at_utc": "20260615193935",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308080000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92057,37 +92083,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308080000_typ_2023_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308080000",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308080000"
+        "data_time": "202308080000",
+        "cycle_time_utc": "202308080000",
+        "start_utc": "202308080500",
+        "end_utc": "202308081100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184858",
+          "generated_at_utc": "20260615193937",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308080000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92124,37 +92150,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308080000_typ_2023_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308080600",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308080600"
+        "data_time": "202308080600",
+        "cycle_time_utc": "202308080600",
+        "start_utc": "202308081100",
+        "end_utc": "202308081700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184932",
+          "generated_at_utc": "20260615194034",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308080600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92186,37 +92212,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308080600_typ_2023_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308080600",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308080600"
+        "data_time": "202308080600",
+        "cycle_time_utc": "202308080600",
+        "start_utc": "202308081100",
+        "end_utc": "202308081700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184934",
+          "generated_at_utc": "20260615194036",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308080600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92248,37 +92274,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308080600_typ_2023_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308081200",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308081200"
+        "data_time": "202308081200",
+        "cycle_time_utc": "202308081200",
+        "start_utc": "202308081700",
+        "end_utc": "202308082300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185007",
+          "generated_at_utc": "20260615194111",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308081200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92315,37 +92341,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308081200_typ_2023_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308081200",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308081200"
+        "data_time": "202308081200",
+        "cycle_time_utc": "202308081200",
+        "start_utc": "202308081700",
+        "end_utc": "202308082300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185010",
+          "generated_at_utc": "20260615194112",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308081200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92382,37 +92408,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308081200_typ_2023_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308081800",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308081800"
+        "data_time": "202308081800",
+        "cycle_time_utc": "202308081800",
+        "start_utc": "202308082300",
+        "end_utc": "202308090500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185042",
+          "generated_at_utc": "20260615194147",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308081800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92444,37 +92470,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308081800_typ_2023_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308081800",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308081800"
+        "data_time": "202308081800",
+        "cycle_time_utc": "202308081800",
+        "start_utc": "202308082300",
+        "end_utc": "202308090500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185044",
+          "generated_at_utc": "20260615194149",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308081800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92506,37 +92532,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308081800_typ_2023_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308090000",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308090000"
+        "data_time": "202308090000",
+        "cycle_time_utc": "202308090000",
+        "start_utc": "202308090500",
+        "end_utc": "202308091100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185119",
+          "generated_at_utc": "20260615194223",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308090000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92573,37 +92599,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308090000_typ_2023_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308090000",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308090000"
+        "data_time": "202308090000",
+        "cycle_time_utc": "202308090000",
+        "start_utc": "202308090500",
+        "end_utc": "202308091100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185121",
+          "generated_at_utc": "20260615194225",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308090000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92640,37 +92666,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308090000_typ_2023_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308090600",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308090600"
+        "data_time": "202308090600",
+        "cycle_time_utc": "202308090600",
+        "start_utc": "202308091100",
+        "end_utc": "202308091700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185154",
+          "generated_at_utc": "20260615194259",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308090600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92702,37 +92728,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308090600_typ_2023_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308090600",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308090600"
+        "data_time": "202308090600",
+        "cycle_time_utc": "202308090600",
+        "start_utc": "202308091100",
+        "end_utc": "202308091700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185157",
+          "generated_at_utc": "20260615194301",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308090600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92764,37 +92790,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308090600_typ_2023_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308091200",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308091200"
+        "data_time": "202308091200",
+        "cycle_time_utc": "202308091200",
+        "start_utc": "202308091700",
+        "end_utc": "202308092300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185231",
+          "generated_at_utc": "20260615194336",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308091200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92831,37 +92857,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308091200_typ_2023_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308091200",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308091200"
+        "data_time": "202308091200",
+        "cycle_time_utc": "202308091200",
+        "start_utc": "202308091700",
+        "end_utc": "202308092300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185233",
+          "generated_at_utc": "20260615194338",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308091200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92898,37 +92924,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308091200_typ_2023_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308091800",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308091800"
+        "data_time": "202308091800",
+        "cycle_time_utc": "202308091800",
+        "start_utc": "202308092300",
+        "end_utc": "202308100500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185307",
+          "generated_at_utc": "20260615194412",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308091800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -92960,37 +92986,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308091800_typ_2023_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308091800",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308091800"
+        "data_time": "202308091800",
+        "cycle_time_utc": "202308091800",
+        "start_utc": "202308092300",
+        "end_utc": "202308100500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185309",
+          "generated_at_utc": "20260615194413",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308091800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -93022,37 +93048,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308091800_typ_2023_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308100000",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308100000"
+        "data_time": "202308100000",
+        "cycle_time_utc": "202308100000",
+        "start_utc": "202308100500",
+        "end_utc": "202308101100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185343",
+          "generated_at_utc": "20260615194448",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308100000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -93089,37 +93115,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308100000_typ_2023_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308100000",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308100000"
+        "data_time": "202308100000",
+        "cycle_time_utc": "202308100000",
+        "start_utc": "202308100500",
+        "end_utc": "202308101100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185346",
+          "generated_at_utc": "20260615194450",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308100000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -93156,37 +93182,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308100000_typ_2023_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308100600",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308100600"
+        "data_time": "202308100600",
+        "cycle_time_utc": "202308100600",
+        "start_utc": "202308101100",
+        "end_utc": "202308101700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185420",
+          "generated_at_utc": "20260615194524",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308100600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -93218,37 +93244,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308100600_typ_2023_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308100600",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308100600"
+        "data_time": "202308100600",
+        "cycle_time_utc": "202308100600",
+        "start_utc": "202308101100",
+        "end_utc": "202308101700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185422",
+          "generated_at_utc": "20260615194526",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308100600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -93280,37 +93306,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308100600_typ_2023_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308101200",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308101200"
+        "data_time": "202308101200",
+        "cycle_time_utc": "202308101200",
+        "start_utc": "202308101700",
+        "end_utc": "202308102300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185457",
+          "generated_at_utc": "20260615194600",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308101200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -93346,37 +93372,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308101200_typ_2023_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308101200",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308101200"
+        "data_time": "202308101200",
+        "cycle_time_utc": "202308101200",
+        "start_utc": "202308101700",
+        "end_utc": "202308102300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185459",
+          "generated_at_utc": "20260615194602",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308101200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -93412,37 +93438,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308101200_typ_2023_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308101800",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308101800"
+        "data_time": "202308101800",
+        "cycle_time_utc": "202308101800",
+        "start_utc": "202308102300",
+        "end_utc": "202308110500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185532",
+          "generated_at_utc": "20260615194636",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308101800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -93467,37 +93493,37 @@
             "KIM",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308101800_typ_2023_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_06",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308101800",
         "td_number": null,
         "linked_td_number": 10,
-        "linked_typ_number": null,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308101800"
+        "data_time": "202308101800",
+        "cycle_time_utc": "202308101800",
+        "start_utc": "202308102300",
+        "end_utc": "202308110500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185534",
+          "generated_at_utc": "20260615194638",
           "image_path": "VTG_IMG/2023/TYP_2306_KHANUN/TYP_2306_KHANUN_202308101800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -93522,11 +93548,11 @@
             "KIM",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308101800_typ_2023_06_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
@@ -94145,28 +94171,28 @@
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308080000",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308080000"
+        "data_time": "202308080000",
+        "cycle_time_utc": "202308080000",
+        "start_utc": "202308080500",
+        "end_utc": "202308081100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184854",
+          "generated_at_utc": "20260615193934",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308080000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -94203,37 +94229,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308080000_typ_2023_07_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308080000",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308080000"
+        "data_time": "202308080000",
+        "cycle_time_utc": "202308080000",
+        "start_utc": "202308080500",
+        "end_utc": "202308081100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184857",
+          "generated_at_utc": "20260615193937",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308080000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -94270,37 +94296,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308080000_typ_2023_07_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308080600",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308080600"
+        "data_time": "202308080600",
+        "cycle_time_utc": "202308080600",
+        "start_utc": "202308081100",
+        "end_utc": "202308081700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184931",
+          "generated_at_utc": "20260615194032",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308080600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -94332,37 +94358,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308080600_typ_2023_07_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308080600",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308080600"
+        "data_time": "202308080600",
+        "cycle_time_utc": "202308080600",
+        "start_utc": "202308081100",
+        "end_utc": "202308081700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184934",
+          "generated_at_utc": "20260615194036",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308080600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -94394,37 +94420,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308080600_typ_2023_07_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308081200",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308081200"
+        "data_time": "202308081200",
+        "cycle_time_utc": "202308081200",
+        "start_utc": "202308081700",
+        "end_utc": "202308082300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185006",
+          "generated_at_utc": "20260615194109",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308081200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -94461,37 +94487,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308081200_typ_2023_07_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308081200",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308081200"
+        "data_time": "202308081200",
+        "cycle_time_utc": "202308081200",
+        "start_utc": "202308081700",
+        "end_utc": "202308082300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185009",
+          "generated_at_utc": "20260615194112",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308081200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -94528,37 +94554,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308081200_typ_2023_07_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308081800",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308081800"
+        "data_time": "202308081800",
+        "cycle_time_utc": "202308081800",
+        "start_utc": "202308082300",
+        "end_utc": "202308090500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185042",
+          "generated_at_utc": "20260615194145",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308081800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -94590,37 +94616,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308081800_typ_2023_07_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308081800",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308081800"
+        "data_time": "202308081800",
+        "cycle_time_utc": "202308081800",
+        "start_utc": "202308082300",
+        "end_utc": "202308090500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185045",
+          "generated_at_utc": "20260615194148",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308081800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -94652,37 +94678,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308081800_typ_2023_07_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308090000",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308090000"
+        "data_time": "202308090000",
+        "cycle_time_utc": "202308090000",
+        "start_utc": "202308090500",
+        "end_utc": "202308091100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185118",
+          "generated_at_utc": "20260615194223",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308090000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -94719,37 +94745,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308090000_typ_2023_07_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308090000",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308090000"
+        "data_time": "202308090000",
+        "cycle_time_utc": "202308090000",
+        "start_utc": "202308090500",
+        "end_utc": "202308091100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185121",
+          "generated_at_utc": "20260615194225",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308090000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -94786,37 +94812,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308090000_typ_2023_07_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308090600",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308090600"
+        "data_time": "202308090600",
+        "cycle_time_utc": "202308090600",
+        "start_utc": "202308091100",
+        "end_utc": "202308091700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185155",
+          "generated_at_utc": "20260615194259",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308090600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -94848,37 +94874,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308090600_typ_2023_07_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308090600",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308090600"
+        "data_time": "202308090600",
+        "cycle_time_utc": "202308090600",
+        "start_utc": "202308091100",
+        "end_utc": "202308091700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185157",
+          "generated_at_utc": "20260615194302",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308090600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -94910,37 +94936,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308090600_typ_2023_07_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308091200",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308091200"
+        "data_time": "202308091200",
+        "cycle_time_utc": "202308091200",
+        "start_utc": "202308091700",
+        "end_utc": "202308092300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185231",
+          "generated_at_utc": "20260615194334",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308091200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -94977,37 +95003,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308091200_typ_2023_07_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308091200",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308091200"
+        "data_time": "202308091200",
+        "cycle_time_utc": "202308091200",
+        "start_utc": "202308091700",
+        "end_utc": "202308092300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185233",
+          "generated_at_utc": "20260615194336",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308091200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -95044,37 +95070,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308091200_typ_2023_07_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308091800",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308091800"
+        "data_time": "202308091800",
+        "cycle_time_utc": "202308091800",
+        "start_utc": "202308092300",
+        "end_utc": "202308100500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185306",
+          "generated_at_utc": "20260615194411",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308091800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -95106,37 +95132,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308091800_typ_2023_07_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308091800",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308091800"
+        "data_time": "202308091800",
+        "cycle_time_utc": "202308091800",
+        "start_utc": "202308092300",
+        "end_utc": "202308100500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185308",
+          "generated_at_utc": "20260615194413",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308091800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -95168,37 +95194,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308091800_typ_2023_07_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308100000",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308100000"
+        "data_time": "202308100000",
+        "cycle_time_utc": "202308100000",
+        "start_utc": "202308100500",
+        "end_utc": "202308101100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185344",
+          "generated_at_utc": "20260615194447",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308100000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -95235,37 +95261,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308100000_typ_2023_07_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308100000",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308100000"
+        "data_time": "202308100000",
+        "cycle_time_utc": "202308100000",
+        "start_utc": "202308100500",
+        "end_utc": "202308101100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185346",
+          "generated_at_utc": "20260615194450",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308100000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -95302,37 +95328,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308100000_typ_2023_07_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308100600",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308100600"
+        "data_time": "202308100600",
+        "cycle_time_utc": "202308100600",
+        "start_utc": "202308101100",
+        "end_utc": "202308101700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185419",
+          "generated_at_utc": "20260615194525",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308100600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -95364,37 +95390,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308100600_typ_2023_07_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308100600",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308100600"
+        "data_time": "202308100600",
+        "cycle_time_utc": "202308100600",
+        "start_utc": "202308101100",
+        "end_utc": "202308101700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185422",
+          "generated_at_utc": "20260615194527",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308100600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -95426,37 +95452,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308100600_typ_2023_07_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308101200",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308101200"
+        "data_time": "202308101200",
+        "cycle_time_utc": "202308101200",
+        "start_utc": "202308101700",
+        "end_utc": "202308102300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185455",
+          "generated_at_utc": "20260615194600",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308101200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -95493,37 +95519,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308101200_typ_2023_07_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308101200",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308101200"
+        "data_time": "202308101200",
+        "cycle_time_utc": "202308101200",
+        "start_utc": "202308101700",
+        "end_utc": "202308102300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185458",
+          "generated_at_utc": "20260615194602",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308101200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -95560,37 +95586,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308101200_typ_2023_07_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308101800",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308101800"
+        "data_time": "202308101800",
+        "cycle_time_utc": "202308101800",
+        "start_utc": "202308102300",
+        "end_utc": "202308110500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185533",
+          "generated_at_utc": "20260615194636",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308101800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -95622,37 +95648,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308101800_typ_2023_07_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308101800",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308101800"
+        "data_time": "202308101800",
+        "cycle_time_utc": "202308101800",
+        "start_utc": "202308102300",
+        "end_utc": "202308110500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185535",
+          "generated_at_utc": "20260615194638",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308101800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -95684,37 +95710,37 @@
             "JGSM EPS",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308101800_typ_2023_07_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308110000",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308110000"
+        "data_time": "202308110000",
+        "cycle_time_utc": "202308110000",
+        "start_utc": "202308110500",
+        "end_utc": "202308111100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185608",
+          "generated_at_utc": "20260615194712",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308110000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -95751,37 +95777,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308110000_typ_2023_07_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2023_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2023,
         "data_time": "202308110000",
         "td_number": null,
         "linked_td_number": 13,
-        "linked_typ_number": null,
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "란",
         "typ_name": "LAN",
         "typ_en": "LAN",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308110000"
+        "data_time": "202308110000",
+        "cycle_time_utc": "202308110000",
+        "start_utc": "202308110500",
+        "end_utc": "202308111100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185611",
+          "generated_at_utc": "20260615194714",
           "image_path": "VTG_IMG/2023/TYP_2307_LAN/TYP_2307_LAN_202308110000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2023",
@@ -95818,11 +95844,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308110000_typ_2023_07_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
@@ -116116,29 +116142,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2023_13",
-        "stage": "TD",
+        "storm_key": "td_2023_13_typ_07",
+        "stage": "TD_PRE_TYP",
         "year": 2023,
         "data_time": "202308071200",
         "td_number": 13,
         "linked_td_number": null,
-        "linked_typ_number": 7,
         "typ_number": 13,
-        "data_typ_number": 13,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308071200"
+        "data_time": "202308071200",
+        "cycle_time_utc": "202308071200",
+        "start_utc": "202308071700",
+        "end_utc": "202308072300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184704",
+          "generated_at_utc": "20260615193732",
           "image_path": "VTG_IMG/2023/TD_2313_NONAME/TD_2313_NONAME_202308071200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2023",
@@ -116172,37 +116198,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308071200_td_2023_13_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2023_13",
-        "stage": "TD",
+        "storm_key": "td_2023_13_typ_07",
+        "stage": "TD_PRE_TYP",
         "year": 2023,
         "data_time": "202308071200",
         "td_number": 13,
         "linked_td_number": null,
-        "linked_typ_number": 7,
         "typ_number": 13,
-        "data_typ_number": 13,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308071200"
+        "data_time": "202308071200",
+        "cycle_time_utc": "202308071200",
+        "start_utc": "202308071700",
+        "end_utc": "202308072300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184707",
+          "generated_at_utc": "20260615193735",
           "image_path": "VTG_IMG/2023/TD_2313_NONAME/TD_2313_NONAME_202308071200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2023",
@@ -116236,37 +116262,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308071200_td_2023_13_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2023_13",
-        "stage": "TD",
+        "storm_key": "td_2023_13_typ_07",
+        "stage": "TD_PRE_TYP",
         "year": 2023,
         "data_time": "202308071800",
         "td_number": 13,
         "linked_td_number": null,
-        "linked_typ_number": 7,
         "typ_number": 13,
-        "data_typ_number": 13,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp072023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308071800"
+        "data_time": "202308071800",
+        "cycle_time_utc": "202308071800",
+        "start_utc": "202308072300",
+        "end_utc": "202308080500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184817",
+          "generated_at_utc": "20260615193858",
           "image_path": "VTG_IMG/2023/TD_2313_NONAME/TD_2313_NONAME_202308071800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2023",
@@ -116295,37 +116321,37 @@
             "JGSM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308071800_td_2023_13_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2023_13",
-        "stage": "TD",
+        "storm_key": "td_2023_13_typ_07",
+        "stage": "TD_PRE_TYP",
         "year": 2023,
         "data_time": "202308071800",
         "td_number": 13,
         "linked_td_number": null,
-        "linked_typ_number": 7,
         "typ_number": 13,
-        "data_typ_number": 13,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp072023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308071800"
+        "data_time": "202308071800",
+        "cycle_time_utc": "202308071800",
+        "start_utc": "202308072300",
+        "end_utc": "202308080500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615184820",
+          "generated_at_utc": "20260615193901",
           "image_path": "VTG_IMG/2023/TD_2313_NONAME/TD_2313_NONAME_202308071800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2023",
@@ -116354,11 +116380,11 @@
             "JGSM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308071800_td_2023_13_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
@@ -117888,29 +117914,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2023_14",
-        "stage": "TD",
+        "storm_key": "td_2023_14_typ_06",
+        "stage": "TD_LINKED_TYP",
         "year": 2023,
         "data_time": "202308110000",
         "td_number": 14,
         "linked_td_number": null,
-        "linked_typ_number": 6,
         "typ_number": 14,
-        "data_typ_number": 14,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308110000"
+        "data_time": "202308110000",
+        "cycle_time_utc": "202308110000",
+        "start_utc": "202308110500",
+        "end_utc": "202308111100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185608",
+          "generated_at_utc": "20260615194711",
           "image_path": "VTG_IMG/2023/TD_2314_KHANUN/TD_2314_KHANUN_202308110000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2023",
@@ -117935,37 +117961,37 @@
             "NAVGEM EPS",
             "GFS EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308110000_td_2023_14_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2023_14",
-        "stage": "TD",
+        "storm_key": "td_2023_14_typ_06",
+        "stage": "TD_LINKED_TYP",
         "year": 2023,
         "data_time": "202308110000",
         "td_number": 14,
         "linked_td_number": null,
-        "linked_typ_number": 6,
         "typ_number": 14,
-        "data_typ_number": 14,
         "typ_name_ko": "카눈",
         "typ_name": "KHANUN",
         "typ_en": "KHANUN",
         "atcf_id": "wp062023",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202308110000"
+        "data_time": "202308110000",
+        "cycle_time_utc": "202308110000",
+        "start_utc": "202308110500",
+        "end_utc": "202308111100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615185610",
+          "generated_at_utc": "20260615194713",
           "image_path": "VTG_IMG/2023/TD_2314_KHANUN/TD_2314_KHANUN_202308110000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2023",
@@ -117990,11 +118016,11 @@
             "NAVGEM EPS",
             "GFS EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202308110000_td_2023_14_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
