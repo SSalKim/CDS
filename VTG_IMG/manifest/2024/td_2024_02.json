@@ -1,16 +1,16 @@
 {
   "version": 2,
-  "updated_at_utc": "202606142108",
+  "updated_at_utc": "202405310500",
   "storm_key": "td_2024_02",
-  "stage": "TD",
+  "stage": "TD_PRE_TYP_POSITION_ATCF",
   "year": 2024,
   "typ_number": 2,
   "linked_td_number": null,
   "linked_typ_number": 2,
   "typ_name": "NONAME",
   "typ_name_ko": "",
-  "latest_data_time": "202405301800",
-  "item_count": 6,
+  "latest_data_time": "202405310000",
+  "item_count": 8,
   "inventory": [
     {
       "job": {
@@ -389,6 +389,138 @@
         }
       },
       "metadata_path": "VTG_IMG/metadata/202405301800_td_2024_02_240h.json"
+    },
+    {
+      "job": {
+        "storm_key": "td_2024_02_typ_02",
+        "stage": "TD_PRE_TYP_POSITION_ATCF",
+        "year": 2024,
+        "data_time": "202405310000",
+        "td_number": 2,
+        "linked_td_number": null,
+        "typ_number": 2,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp022024",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202405310000",
+        "cycle_time_utc": "202405310000",
+        "start_utc": "202405310500",
+        "end_utc": "202405311100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260615023152",
+          "image_path": "VTG_IMG/2024/TD_2402_NONAME/TD_2402_NONAME_202405310000_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2024",
+          "typ_number": 2,
+          "data_typ_number": 2,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 2,
+          "atcf_id": "wp022024",
+          "extra_atcf_ids": [],
+          "data_time": "202405310000",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 17,
+          "target_model_count": 28,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "ECMWF",
+            "ECMWF EPS",
+            "NAVGEM EPS",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "HWRF",
+            "JGSM",
+            "KIM",
+            "KIM EPS",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2024_02_typ_02",
+        "stage": "TD_PRE_TYP_POSITION_ATCF",
+        "year": 2024,
+        "data_time": "202405310000",
+        "td_number": 2,
+        "linked_td_number": null,
+        "typ_number": 2,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp022024",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202405310000",
+        "cycle_time_utc": "202405310000",
+        "start_utc": "202405310500",
+        "end_utc": "202405311100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260615023153",
+          "image_path": "VTG_IMG/2024/TD_2402_NONAME/TD_2402_NONAME_202405310000_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2024",
+          "typ_number": 2,
+          "data_typ_number": 2,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 2,
+          "atcf_id": "wp022024",
+          "extra_atcf_ids": [],
+          "data_time": "202405310000",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 17,
+          "target_model_count": 28,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "ECMWF",
+            "ECMWF EPS",
+            "NAVGEM EPS",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "HWRF",
+            "JGSM",
+            "KIM",
+            "KIM EPS",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
     }
   ]
 }
