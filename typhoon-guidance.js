@@ -2,6 +2,7 @@ const TYPHOON_MANIFEST_PATH='VTG_IMG/manifest.json';
 const TYPHOON_STATUS_PATH='VTG_IMG/vtg_auto_status.json';
 const TYPHOON_REFRESH_MS=10*60*1000;
 const TYPHOON_SLOT_HOURS=6;
+const TYPHOON_ACTIVE_STORM_RECENCY_HOURS=30;
 const TYPHOON_PAGE_CACHE_TOKEN=new URLSearchParams(window.location.search).get('fresh') || String(Date.now());
 const TYPHOON_IMAGE_PRELOAD_RADIUS=4;
 const TYPHOON_IMAGE_CACHE_LIMIT=80;
@@ -345,7 +346,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "가변형 둥지격차 (4-36km)",
     "연직층수": "40층",
     "기반": "역학코어",
-    "참고사항": "COAMPS-TC 실험버전(CTCX), GFS 초기장 활용"
+    "참고사항": ""
   },
   {
     "표출명칭": "COAMPS-TC EPS",
@@ -791,7 +792,7 @@ let detailButton=document.createElement('button');
 detailButton.type='button';
 detailButton.className='typhoon-model-detail-button';
 detailButton.title='모델 상세 설명 열기';
-detailButton.innerHTML='<span class="typhoon-model-detail-button-icon">▦</span><span>상세보기</span>';
+detailButton.innerHTML='<span class="typhoon-model-detail-button-icon">▦</span><span>모델 상세 설명</span>';
 detailButton.onclick=()=>openTyphoonModelDetailModal(detailButton);
 
 actions.appendChild(detailButton);
@@ -807,6 +808,11 @@ return;
 let style=document.createElement('style');
 style.id='typhoonModelDetailStyles';
 style.textContent=`
+.typhoon-storm-select option.typhoon-active-storm-option{
+background:#dff5ff;
+color:#0f3d64;
+font-weight:800;
+}
 .typhoon-model-info-panel{
 position:relative;
 display:flex;
@@ -1087,7 +1093,7 @@ title.textContent='모델 상세 설명';
 
 let subtitle=document.createElement('p');
 subtitle.className='typhoon-model-detail-subtitle';
-subtitle.textContent='표출 가능 모델 정보(2026.6. 기준)';
+subtitle.textContent='표출 모델의 운영기관, 모델명, 도메인, 해상도, 연직층수와 기반 정보를 정리한 표입니다.';
 
 titleWrap.appendChild(title);
 titleWrap.appendChild(subtitle);
@@ -1479,32 +1485,69 @@ selectLatestSlotForStorm();
 
 function buildTyphoonStormsForYear(year){
 let byKey=new Map();
+let activeWindowTimes=typhoonActiveWindowDataTimes();
 typhoonState.entries
 .filter(entry=>entry.year===year)
 .forEach(entry=>{
+let isNamedTypEntry=entry.stage!=='TD' && entry.originalStage!=='TD';
 if(!byKey.has(entry.stormKey)){
 byKey.set(entry.stormKey,{
 key:entry.stormKey,
 typNumber:entry.typNumber,
+stage:entry.stage,
 label:stormDropdownLabel(entry),
 first:entry.dataTime,
-latest:entry.dataTime
+latest:entry.dataTime,
+typFirst:isNamedTypEntry ? entry.dataTime : '',
+active:isActiveTyphoonStormEntry(entry,activeWindowTimes)
 });
 }
 let storm=byKey.get(entry.stormKey);
+if(entry.stage!=='TD'){
+storm.stage=entry.stage;
+}
+if(isNamedTypEntry && (!storm.typFirst || entry.dataTime<storm.typFirst)){
+storm.typFirst=entry.dataTime;
+}
 if(entry.dataTime<storm.first){
 storm.first=entry.dataTime;
 }
 if(entry.dataTime>storm.latest){
 storm.latest=entry.dataTime;
 }
+if(isActiveTyphoonStormEntry(entry,activeWindowTimes)){
+storm.active=true;
+}
 });
-return [...byKey.values()].sort((a,b)=>
-String(b.first || '').localeCompare(String(a.first || '')) ||
+return [...byKey.values()]
+.map(storm=>({
+...storm,
+sortTime:(storm.stage==='TD' ? storm.first : (storm.typFirst || storm.first)) || storm.first
+}))
+.sort((a,b)=>
+String(b.sortTime || '').localeCompare(String(a.sortTime || '')) ||
 String(b.latest || '').localeCompare(String(a.latest || '')) ||
 Number(b.typNumber || 0)-Number(a.typNumber || 0) ||
 a.label.localeCompare(b.label)
 );
+}
+
+function typhoonActiveWindowDataTimes(){
+let windows=Array.isArray(typhoonState.manifest?.active_windows) ? typhoonState.manifest.active_windows : [];
+return new Set(windows.map(window=>String(window?.data_time || '')).filter(Boolean));
+}
+
+function isActiveTyphoonStormEntry(entry,activeWindowTimes=typhoonActiveWindowDataTimes()){
+let dataTime=String(entry?.dataTime || '');
+if(activeWindowTimes.has(dataTime)){
+return true;
+}
+let date=parseTyphoonUtcDate(dataTime);
+if(!date){
+return false;
+}
+let diffHours=(Date.now()-date.getTime())/(60*60*1000);
+return diffHours>=-6 && diffHours<=TYPHOON_ACTIVE_STORM_RECENCY_HOURS;
 }
 
 function selectDefaultStormForYear(){
@@ -1612,6 +1655,12 @@ typhoonState.storms.forEach(storm=>{
 let option=document.createElement('option');
 option.value=storm.key;
 option.textContent=storm.label;
+if(storm.active){
+option.className='typhoon-active-storm-option';
+option.style.backgroundColor='#dff5ff';
+option.style.color='#0f3d64';
+option.style.fontWeight='800';
+}
 stormSelect.appendChild(option);
 });
 stormSelect.value=typhoonState.selectedStormKey;
