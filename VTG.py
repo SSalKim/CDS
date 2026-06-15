@@ -94,7 +94,7 @@ MODEL_SOURCES = [
     {"name": "UM_GFDL_6h", "apihub": "UM_GFDL_6h", "noaa": None, "knackwx": None},
     {"name": "UM_KEPS", "apihub": "UM_KEPS", "noaa": None, "knackwx": None},
     {"name": "UKM", "apihub": "UKX", "noaa": "UKM", "ral_ucar": "UKM", "knackwx": "UKM"},
-    {"name": "UKMO_EPS", "apihub": None, "noaa": "UEMN", "knackwx": "UEMN"},
+    {"name": "UKMO_EPS", "apihub": "EGRR_EPS", "noaa": "UEMN", "knackwx": "UEMN"},
     {"name": "GFS", "apihub": "GFS", "noaa": "AVNO", "knackwx": "AVNO"},
     {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "ral_ucar": "AEMN", "knackwx": "AEMN"},
     {"name": "CMC", "apihub": "CMC", "noaa": "CMC", "ral_ucar": "CMC", "knackwx": "CMC"},
@@ -177,6 +177,8 @@ MODEL_CATEGORIES = {
 }
 
 MODEL_ACTIVE_WINDOWS = {
+    "HAFS": ("202301010000", None),                 # HAFS 예측자료 신규 추가(2023.1.1.~)
+
     "ECMWF_AIFS": ("202408010000", None),           # ECMWF AIFS 예측자료 신규 추가(2024.8.19.~)
 
     "FNEC_AI": ("202405150000", None),              # 기상청(KMA) AI 예측자료 신규 추가(2025.3.17.~)
@@ -229,21 +231,16 @@ MAX_STABLE_240_LAT_SPAN = 64.0
 MAX_DISPLAY_240_LON_SPAN = 112.0
 MAX_DISPLAY_240_LAT_SPAN = 70.0
 MIN_DISPLAY_240_WEST_LON = 80.0
-MAX_DISPLAY_240_EAST_LON = 179.8
+MAX_DISPLAY_240_EAST_LON = 179.9
 MIN_DISPLAY_240_SOUTH_LAT = -22.0
 MAX_DISPLAY_240_NORTH_LAT = 74.0
 MAX_CAMERA_240_LON_DISTANCE = 92.0
 MAX_CAMERA_240_LAT_DISTANCE = 62.0
 
-# 240h output now uses a stable fixed West-Pacific view. Keep the east
-# boundary below 180E because the current PlateCarree/Mercator path wraps
-# values above 180E into a near-global extent.
 FIXED_240_MAP_EXTENT = [100.0, 179.9, 0.0, 51.45]
-# For 120h products, keep the operational view inside the western North Pacific
-# interest domain. Points outside this box are clipped after the first boundary
-# crossing per model track so the final line segment remains visually connected.
+
 DISPLAY_120_LON_MIN = 0.0
-DISPLAY_120_LON_MAX = 180.0
+DISPLAY_120_LON_MAX = 179.9
 DISPLAY_120_LAT_MIN = 0.0
 DISPLAY_120_LAT_MAX = 50.0
 APIHUB_MODEL_START_MAX_DISTANCE_KM = float(os.getenv("VTG_APIHUB_START_MAX_DISTANCE_KM", "850"))
@@ -2585,6 +2582,62 @@ def clamp_west_pacific_extent(
     return [float(lon_min), float(lon_max), float(lat_min), float(lat_max)]
 
 
+
+
+def shift_extent_to_bounds(
+    extent: list[float],
+    *,
+    min_lon: float,
+    max_lon: float,
+    min_lat: float,
+    max_lat: float,
+) -> list[float]:
+    """Move an extent inside hard display bounds while preserving its span.
+
+    This is intentionally different from simple min/max clipping. Clipping after
+    aspect matching changes the final map aspect and makes Cartopy letterbox the
+    GeoAxes as a thin horizontal/vertical strip. When the matched extent crosses
+    a display bound, shift the whole window back inside the domain first; only
+    fall back to full-domain clipping if the requested span is larger than the
+    domain itself.
+    """
+    lon_min, lon_max, lat_min, lat_max = [float(value) for value in extent]
+    if not all(math.isfinite(value) for value in (lon_min, lon_max, lat_min, lat_max)):
+        return extent
+    if lon_max <= lon_min or lat_max <= lat_min:
+        return extent
+
+    lon_span = lon_max - lon_min
+    max_lon_span = max_lon - min_lon
+    if lon_span >= max_lon_span:
+        lon_min, lon_max = min_lon, max_lon
+    else:
+        if lon_min < min_lon:
+            shift = min_lon - lon_min
+            lon_min += shift
+            lon_max += shift
+        if lon_max > max_lon:
+            shift = lon_max - max_lon
+            lon_min -= shift
+            lon_max -= shift
+
+    lat_span = lat_max - lat_min
+    max_lat_span = max_lat - min_lat
+    if lat_span >= max_lat_span:
+        lat_min, lat_max = min_lat, max_lat
+    else:
+        if lat_min < min_lat:
+            shift = min_lat - lat_min
+            lat_min += shift
+            lat_max += shift
+        if lat_max > max_lat:
+            shift = lat_max - max_lat
+            lat_min -= shift
+            lat_max -= shift
+
+    return [float(lon_min), float(lon_max), float(lat_min), float(lat_max)]
+
+
 def legend_row_count_for(df: pd.DataFrame, settings: Settings) -> int:
     excluded = excluded_models_for(df)
     active = active_model_names(settings)
@@ -2713,26 +2766,40 @@ def finalize_map_extent(
 ) -> list[float]:
     """Finalize map extent.
 
-    240h intentionally uses a fixed West-Pacific view. 120h uses only the
-    track-driven camera and canvas aspect matching because the legend now lives
-    outside the map panel.
+    240h intentionally uses a fixed West-Pacific view. For 120h, keep the
+    final viewport inside the display domain without clipping away the aspect
+    matched latitude/longitude span. Plain min/max clipping after aspect
+    matching breaks the GeoAxes aspect and creates large blank top/bottom
+    margins.
     """
     if settings.fcst_hours == 240:
         return fixed_240_map_extent(settings)
 
-    extent = aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
     if settings.fcst_hours == 120:
-        lon_min, lon_max, lat_min, lat_max = extent
-        lon_min = max(DISPLAY_120_LON_MIN, lon_min)
-        lon_max = min(DISPLAY_120_LON_MAX, lon_max)
-        lat_min = max(DISPLAY_120_LAT_MIN, lat_min)
-        lat_max = min(DISPLAY_120_LAT_MAX, lat_max)
-        if lon_max <= lon_min:
-            lon_min, lon_max = DISPLAY_120_LON_MIN, DISPLAY_120_LON_MAX
-        if lat_max <= lat_min:
-            lat_min, lat_max = DISPLAY_120_LAT_MIN, DISPLAY_120_LAT_MAX
-        extent = [lon_min, lon_max, lat_min, lat_max]
-    return extent
+        extent = clamp_west_pacific_extent(extent)
+        extent = shift_extent_to_bounds(
+            extent,
+            min_lon=DISPLAY_120_LON_MIN,
+            max_lon=DISPLAY_120_LON_MAX,
+            min_lat=DISPLAY_120_LAT_MIN,
+            max_lat=DISPLAY_120_LAT_MAX,
+        )
+        extent = match_extent_to_canvas_aspect(
+            extent,
+            fig_width=fig_width,
+            fig_height=fig_height,
+            east_expand_ratio=canvas_east_expand_ratio(settings),
+        )
+        extent = shift_extent_to_bounds(
+            extent,
+            min_lon=DISPLAY_120_LON_MIN,
+            max_lon=DISPLAY_120_LON_MAX,
+            min_lat=DISPLAY_120_LAT_MIN,
+            max_lat=DISPLAY_120_LAT_MAX,
+        )
+        return extent
+
+    return aspect_match_and_clamp_extent(extent, settings, fig_width=fig_width, fig_height=fig_height)
 
 
 def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, intensity: str) -> Path:

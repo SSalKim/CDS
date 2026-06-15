@@ -1,5 +1,11 @@
 const TYPHOON_MANIFEST_PATH='VTG_IMG/manifest.json';
 const TYPHOON_STATUS_PATH='VTG_IMG/vtg_auto_status.json';
+const TYPHOON_TYP_LIST_CACHE_PREFIX='VTG_IMG/kma_apihub_cache/typ_lst_';
+const TYPHOON_TYP_LIST_CACHE_SUFFIX='.json';
+const TYPHOON_IMPACT_EFF_VALUES=new Set(['1','2','3']);
+const TYPHOON_IMPACT_OPTION_BG='#F9E5FF';
+const TYPHOON_IMPACT_OPTION_COLOR='#5d2b66';
+const TYPHOON_IMPACT_OPTION_WEIGHT='700';
 const TYPHOON_REFRESH_MS=10*60*1000;
 const TYPHOON_SLOT_HOURS=6;
 const TYPHOON_ACTIVE_STORM_RECENCY_HOURS=30;
@@ -596,7 +602,8 @@ timer:null,
 keyboardBound:false,
 imageCache:new Map(),
 imageRequestSeq:0,
-modelDetailLastFocus:null
+modelDetailLastFocus:null,
+typImpactByYear:new Map()
 };
 
 function openTyphoonGuidancePage(){
@@ -808,6 +815,11 @@ return;
 let style=document.createElement('style');
 style.id='typhoonModelDetailStyles';
 style.textContent=`
+.typhoon-storm-select option.typhoon-impact-storm-option{
+background:#F9E5FF;
+color:#5d2b66;
+font-weight:700;
+}
 .typhoon-storm-select option.typhoon-active-storm-option{
 background:#dff5ff;
 color:#0f3d64;
@@ -825,7 +837,7 @@ min-height:0;
 .typhoon-model-info-actions{
 display:flex;
 align-items:center;
-justify-content:flex-start;
+justify-content:space-between;
 gap:12px;
 padding:10px 10px 12px;
 margin-top:auto;
@@ -836,7 +848,6 @@ bottom:0;
 z-index:2;
 }
 .typhoon-model-info-actions .typhoon-updated-time{
-flex:1 1 auto;
 min-width:0;
 margin-right:auto;
 text-align:left;
@@ -1311,6 +1322,7 @@ throw manifestError || new Error('HTTP 404');
 
 typhoonState.manifest=manifest;
 typhoonState.entries=normalizeTyphoonEntries(manifest || {},status);
+await loadTyphoonImpactMapsForYears([...new Set(typhoonState.entries.map(entry=>entry.year).filter(Boolean))]);
 pruneTyphoonImageCache();
 syncTyphoonSelection();
 renderTyphoonManifest();
@@ -1318,6 +1330,7 @@ renderTyphoonManifest();
 catch(error){
 typhoonState.manifest=null;
 typhoonState.entries=[];
+typhoonState.typImpactByYear=new Map();
 syncTyphoonSelection();
 renderTyphoonEmpty(`자료 없음 (${error.message})`);
 }
@@ -1518,6 +1531,80 @@ selectLatestSlotForStorm();
 }
 }
 
+
+async function loadTyphoonImpactMapsForYears(years){
+let uniqueYears=[...new Set((years || []).map(year=>String(year || '').trim()).filter(Boolean))];
+let nextMap=new Map();
+await Promise.all(uniqueYears.map(async year=>{
+nextMap.set(year,await fetchTyphoonImpactMapForYear(year));
+}));
+typhoonState.typImpactByYear=nextMap;
+}
+
+async function fetchTyphoonImpactMapForYear(year){
+let path=`${TYPHOON_TYP_LIST_CACHE_PREFIX}${year}${TYPHOON_TYP_LIST_CACHE_SUFFIX}`;
+try{
+let payload=await fetchTyphoonJson(path);
+let rows=Array.isArray(payload?.rows) ? payload.rows : [];
+let result=new Map();
+rows.forEach(row=>{
+let seq=Number(row?.SEQ);
+let eff=normalizeTyphoonImpactEff(row?.EFF);
+if(Number.isFinite(seq) && seq>0 && eff){
+result.set(String(seq),eff);
+}
+});
+return result;
+}
+catch(error){
+return new Map();
+}
+}
+
+function normalizeTyphoonImpactEff(value){
+let text=String(value ?? '').trim();
+return ['1','2','3','4'].includes(text) ? text : '';
+}
+
+function typhoonImpactEffLabel(eff){
+if(eff==='1') return '상륙';
+if(eff==='2') return '직접영향';
+if(eff==='3') return '간접영향';
+if(eff==='4') return '영향 없음';
+return '';
+}
+
+function preferredTyphoonImpactEff(current,next){
+let currentEff=normalizeTyphoonImpactEff(current);
+let nextEff=normalizeTyphoonImpactEff(next);
+if(!currentEff) return nextEff;
+if(!nextEff) return currentEff;
+return Number(nextEff)<Number(currentEff) ? nextEff : currentEff;
+}
+
+function typhoonImpactEffectForEntry(entry){
+let metadata=entry?.metadata || {};
+let job=entry?.job || {};
+let explicit=normalizeTyphoonImpactEff(
+metadata.typ_eff ?? metadata.kma_eff ?? metadata.impact_eff ??
+job.typ_eff ?? job.kma_eff ?? job.impact_eff ?? ''
+);
+if(explicit){
+return explicit;
+}
+let year=String(entry?.year || metadata.storm_year || job.year || '').trim();
+let typNumber=Number(entry?.typNumber || metadata.linked_typ_number || metadata.typ_number || job.linked_typ_number || job.typ_number || 0);
+if(!year || !Number.isFinite(typNumber) || typNumber<=0){
+return '';
+}
+let yearMap=typhoonState.typImpactByYear instanceof Map ? typhoonState.typImpactByYear.get(year) : null;
+return yearMap instanceof Map ? (yearMap.get(String(typNumber)) || '') : '';
+}
+
+function isKoreaImpactTyphoonEntry(entry){
+return TYPHOON_IMPACT_EFF_VALUES.has(typhoonImpactEffectForEntry(entry));
+}
+
 function buildTyphoonStormsForYear(year){
 let byKey=new Map();
 let activeWindowTimes=typhoonActiveWindowDataTimes();
@@ -1525,6 +1612,7 @@ typhoonState.entries
 .filter(entry=>entry.year===year)
 .forEach(entry=>{
 let isNamedTypEntry=entry.stage!=='TD' && entry.originalStage!=='TD';
+let impactEff=typhoonImpactEffectForEntry(entry);
 if(!byKey.has(entry.stormKey)){
 byKey.set(entry.stormKey,{
 key:entry.stormKey,
@@ -1534,7 +1622,9 @@ label:stormDropdownLabel(entry),
 first:entry.dataTime,
 latest:entry.dataTime,
 typFirst:isNamedTypEntry ? entry.dataTime : '',
-active:isActiveTyphoonStormEntry(entry,activeWindowTimes)
+active:isActiveTyphoonStormEntry(entry,activeWindowTimes),
+impactEff,
+impact:TYPHOON_IMPACT_EFF_VALUES.has(impactEff)
 });
 }
 let storm=byKey.get(entry.stormKey);
@@ -1553,30 +1643,22 @@ storm.latest=entry.dataTime;
 if(isActiveTyphoonStormEntry(entry,activeWindowTimes)){
 storm.active=true;
 }
+storm.impactEff=preferredTyphoonImpactEff(storm.impactEff,impactEff);
+if(TYPHOON_IMPACT_EFF_VALUES.has(storm.impactEff)){
+storm.impact=true;
+}
 });
 return [...byKey.values()]
 .map(storm=>({
 ...storm,
-sortTime:(storm.stage==='TD' ? storm.first : (storm.typFirst || storm.first)) || storm.first,
-sortTypNumber:Number(storm.typNumber || 0)
+sortTime:(storm.stage==='TD' ? storm.first : (storm.typFirst || storm.first)) || storm.first
 }))
-.sort((a,b)=>{
-let timeCompare=String(b.sortTime || '').localeCompare(String(a.sortTime || ''));
-if(timeCompare!==0){
-return timeCompare;
-}
-// If two named typhoons share the same effective start cycle, put the later
-// named/larger typhoon number first. This fixes cases like 2022 TYP10/TYP09.
-if(a.stage!=='TD' && b.stage!=='TD'){
-let numberCompare=Number(b.sortTypNumber || 0)-Number(a.sortTypNumber || 0);
-if(numberCompare!==0){
-return numberCompare;
-}
-}
-return String(b.latest || '').localeCompare(String(a.latest || '')) ||
+.sort((a,b)=>
+String(b.sortTime || '').localeCompare(String(a.sortTime || '')) ||
+String(b.latest || '').localeCompare(String(a.latest || '')) ||
 Number(b.typNumber || 0)-Number(a.typNumber || 0) ||
-a.label.localeCompare(b.label);
-});
+a.label.localeCompare(b.label)
+);
 }
 
 function typhoonActiveWindowDataTimes(){
@@ -1702,12 +1784,22 @@ typhoonState.storms.forEach(storm=>{
 let option=document.createElement('option');
 option.value=storm.key;
 option.textContent=storm.label;
+let optionClasses=[];
+if(storm.impact){
+optionClasses.push('typhoon-impact-storm-option');
+option.style.backgroundColor=TYPHOON_IMPACT_OPTION_BG;
+option.style.color=TYPHOON_IMPACT_OPTION_COLOR;
+option.style.fontWeight=TYPHOON_IMPACT_OPTION_WEIGHT;
+option.title=`한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}`;
+}
 if(storm.active){
-option.className='typhoon-active-storm-option';
+optionClasses.push('typhoon-active-storm-option');
 option.style.backgroundColor='#dff5ff';
 option.style.color='#0f3d64';
 option.style.fontWeight='800';
+option.title=storm.impact ? `현재 활동중 · 한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}` : '현재 활동중';
 }
+option.className=optionClasses.join(' ');
 stormSelect.appendChild(option);
 });
 stormSelect.value=typhoonState.selectedStormKey;
