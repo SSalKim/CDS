@@ -2634,6 +2634,8 @@ def match_extent_to_canvas_aspect(
     x1, _ = projection.transform_point(lon_max, center_lat, data_crs)
     _, y0 = projection.transform_point(center_lon, lat_min, data_crs)
     _, y1 = projection.transform_point(center_lon, lat_max, data_crs)
+    
+    x_center = (x0 + x1) / 2
 
     map_width = abs(x1 - x0)
     map_height = abs(y1 - y0)
@@ -2665,8 +2667,8 @@ def match_extent_to_canvas_aspect(
         y_center = (y0 + y1) / 2
         y_half = map_height / 2 * scale
 
-        _, new_lat_min = data_crs.transform_point(center_lon, y_center - y_half, projection)
-        _, new_lat_max = data_crs.transform_point(center_lon, y_center + y_half, projection)
+        _, new_lat_min = data_crs.transform_point(x_center, y_center - y_half, projection)
+        _, new_lat_max = data_crs.transform_point(x_center, y_center + y_half, projection)
 
         return [
             lon_min,
