@@ -75,6 +75,7 @@ jobs:
 
           selected = None
           selected_has_cds_label = False
+          selected_busy = False
           for runner in payload.get("runners", []):
               labels = {str(label.get("name", "")).lower() for label in runner.get("labels", [])}
               name = str(runner.get("name", "")).lower()
@@ -88,18 +89,25 @@ jobs:
                   "labels=",
                   ",".join(sorted(labels)),
               )
+              # Choose an ONLINE cds-vtg self-hosted runner even when it is busy.
+              # GitHub Actions will queue this job on the self-hosted label until
+              # that runner becomes idle. Only fall back to GitHub-hosted when no
+              # matching self-hosted runner is online at all.
               if (
                   runner.get("status") == "online"
-                  and not runner.get("busy")
                   and ("cds-vtg" in labels or name == "cds-vtg-laptop")
               ):
                   selected = runner
                   selected_has_cds_label = "cds-vtg" in labels
+                  selected_busy = bool(runner.get("busy"))
                   break
 
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
               if selected:
-                  print(f"Using self-hosted runner: {selected.get('name')}")
+                  if selected_busy:
+                      print(f"Using self-hosted runner queue: {selected.get('name')} is online but busy; job will wait for it to become idle.")
+                  else:
+                      print(f"Using idle self-hosted runner: {selected.get('name')}")
                   output.write("runner_kind=self-hosted\n")
                   if selected_has_cds_label:
                       output.write('runner_labels=["self-hosted","cds-vtg"]\n')
@@ -107,7 +115,7 @@ jobs:
                       print("Warning: selected runner is missing the cds-vtg label; using generic self-hosted routing.")
                       output.write('runner_labels=["self-hosted"]\n')
               else:
-                  print("No idle cds-vtg self-hosted runner found; using GitHub-hosted.")
+                  print("No online cds-vtg self-hosted runner found; using GitHub-hosted.")
                   output.write("runner_kind=github-hosted\n")
                   output.write('runner_labels="ubuntu-latest"\n')
           PY
