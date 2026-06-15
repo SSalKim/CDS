@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202209080500",
+  "updated_at_utc": "202209120500",
   "storm_key": "typ_2022_12",
   "stage": "TYP",
   "year": 2022,
@@ -2041,28 +2041,28 @@
     {
       "job": {
         "storm_key": "typ_2022_12",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209120000",
         "td_number": null,
         "linked_td_number": 24,
-        "linked_typ_number": null,
         "typ_number": 12,
-        "data_typ_number": 12,
         "typ_name_ko": "무이파",
         "typ_name": "MUIFA",
         "typ_en": "MUIFA",
         "atcf_id": "wp142022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209120000"
+        "data_time": "202209120000",
+        "cycle_time_utc": "202209120000",
+        "start_utc": "202209120500",
+        "end_utc": "202209121100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615104534",
+          "generated_at_utc": "20260615143826",
           "image_path": "VTG_IMG/2022/TYP_2212_MUIFA/TYP_2212_MUIFA_202209120000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -2098,37 +2098,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209120000_typ_2022_12_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_12",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209120000",
         "td_number": null,
         "linked_td_number": 24,
-        "linked_typ_number": null,
         "typ_number": 12,
-        "data_typ_number": 12,
         "typ_name_ko": "무이파",
         "typ_name": "MUIFA",
         "typ_en": "MUIFA",
         "atcf_id": "wp142022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209120000"
+        "data_time": "202209120000",
+        "cycle_time_utc": "202209120000",
+        "start_utc": "202209120500",
+        "end_utc": "202209121100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615104536",
+          "generated_at_utc": "20260615143828",
           "image_path": "VTG_IMG/2022/TYP_2212_MUIFA/TYP_2212_MUIFA_202209120000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -2164,11 +2164,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209120000_typ_2022_12_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
