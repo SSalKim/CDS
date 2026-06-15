@@ -346,7 +346,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "가변형 둥지격차 (4-36km)",
     "연직층수": "40층",
     "기반": "역학코어",
-    "참고사항": ""
+    "참고사항": "COAMPS-TC 실험모델(CTCX), GFS 초기장 활용"
   },
   {
     "표출명칭": "COAMPS-TC EPS",
@@ -696,18 +696,12 @@ selectLatestSlotForStorm();
 renderTyphoonManifest();
 };
 
-let updatedAt=document.createElement('div');
-updatedAt.className='typhoon-updated-time';
-updatedAt.dataset.role='subtitle';
-updatedAt.textContent='';
-
 controls.appendChild(yearSelect);
 controls.appendChild(stormSelect);
 controls.appendChild(createTyphoonFcstSelector());
 
 header.appendChild(titleWrap);
 header.appendChild(controls);
-header.appendChild(updatedAt);
 
 let timeBar=document.createElement('div');
 timeBar.className='forecast-bar typhoon-time-bar';
@@ -788,13 +782,19 @@ list.appendChild(row);
 let actions=document.createElement('div');
 actions.className='typhoon-model-info-actions';
 
+let updatedAt=document.createElement('div');
+updatedAt.className='typhoon-updated-time';
+updatedAt.dataset.role='subtitle';
+updatedAt.textContent='';
+
 let detailButton=document.createElement('button');
 detailButton.type='button';
 detailButton.className='typhoon-model-detail-button';
 detailButton.title='모델 상세 설명 열기';
-detailButton.innerHTML='<span class="typhoon-model-detail-button-icon">▦</span><span>모델 상세 설명</span>';
+detailButton.innerHTML='<span class="typhoon-model-detail-button-icon">▦</span><span>상세보기</span>';
 detailButton.onclick=()=>openTyphoonModelDetailModal(detailButton);
 
+actions.appendChild(updatedAt);
 actions.appendChild(detailButton);
 panel.appendChild(list);
 panel.appendChild(actions);
@@ -824,7 +824,9 @@ min-height:0;
 }
 .typhoon-model-info-actions{
 display:flex;
-justify-content:flex-end;
+align-items:center;
+justify-content:space-between;
+gap:12px;
 padding:10px 10px 12px;
 margin-top:auto;
 border-top:1px solid rgba(15,23,42,.08);
@@ -832,6 +834,37 @@ background:linear-gradient(180deg,rgba(255,255,255,.72),rgba(248,250,252,.96));
 position:sticky;
 bottom:0;
 z-index:2;
+}
+.typhoon-model-info-actions .typhoon-updated-time{
+min-width:0;
+margin-right:auto;
+text-align:left;
+font-size:12px;
+font-weight:750;
+letter-spacing:-.02em;
+line-height:1.25;
+color:#64748b;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+.typhoon-fcst-option{
+transition:background .15s ease,border-color .15s ease,box-shadow .15s ease,filter .15s ease,color .15s ease;
+}
+.typhoon-fcst-option:has(input:checked),
+.typhoon-fcst-option.is-active{
+background:linear-gradient(135deg,rgba(37,99,235,.95),rgba(14,165,233,.88)) !important;
+border-color:rgba(37,99,235,.32) !important;
+color:#fff !important;
+box-shadow:0 8px 18px rgba(37,99,235,.20), inset 0 1px 0 rgba(255,255,255,.22) !important;
+}
+.typhoon-fcst-option:has(input:checked) span,
+.typhoon-fcst-option.is-active span{
+color:#fff !important;
+}
+.typhoon-fcst-option:has(input:checked):hover,
+.typhoon-fcst-option.is-active:hover{
+filter:saturate(1.06) brightness(1.03);
 }
 .typhoon-model-detail-button{
 appearance:none;
@@ -850,6 +883,7 @@ align-items:center;
 gap:6px;
 box-shadow:0 8px 18px rgba(37,99,235,.22), inset 0 1px 0 rgba(255,255,255,.22);
 cursor:pointer;
+flex:0 0 auto;
 transition:box-shadow .15s ease,filter .15s ease,background .15s ease;
 }
 .typhoon-model-detail-button:hover{
@@ -936,12 +970,11 @@ display:flex;
 align-items:center;
 justify-content:center;
 cursor:pointer;
-transition:background .15s ease,transform .15s ease;
+transition:background .15s ease;
 flex:0 0 auto;
 }
 .typhoon-model-detail-close:hover{
 background:rgba(255,255,255,.22);
-transform:translateY(-1px);
 }
 .typhoon-model-detail-body{
 padding:16px 18px 18px;
@@ -1093,7 +1126,7 @@ title.textContent='모델 상세 설명';
 
 let subtitle=document.createElement('p');
 subtitle.className='typhoon-model-detail-subtitle';
-subtitle.textContent='표출 모델의 운영기관, 모델명, 도메인, 해상도, 연직층수와 기반 정보를 정리한 표입니다.';
+subtitle.textContent='2026년 6월 기준 표출 모델 상세정보';
 
 titleWrap.appendChild(title);
 titleWrap.appendChild(subtitle);
@@ -1217,14 +1250,15 @@ group.setAttribute('aria-label','예측기간');
 
 TYPHOON_FCST_OPTIONS.forEach(option=>{
 let label=document.createElement('label');
-label.className='typhoon-fcst-option';
+let isActiveOption=typhoonState.selectedFcstHours===option.hours;
+label.className='typhoon-fcst-option'+(isActiveOption?' is-active':'');
 
 let input=document.createElement('input');
 input.type='radio';
 input.name='typhoonFcstHours';
 input.value=String(option.hours);
 input.dataset.role='fcstOption';
-input.checked=typhoonState.selectedFcstHours===option.hours;
+input.checked=isActiveOption;
 input.onchange=()=>{
 let currentDataTime=getSelectedTyphoonDataTime();
 typhoonState.selectedFcstHours=option.hours;
@@ -1669,7 +1703,12 @@ yearSelect.disabled=!typhoonState.years.length;
 stormSelect.disabled=!typhoonState.storms.length;
 
 typhoonState.root?.querySelectorAll('[data-role="fcstOption"]').forEach(input=>{
-input.checked=Number(input.value)===typhoonState.selectedFcstHours;
+let checked=Number(input.value)===typhoonState.selectedFcstHours;
+input.checked=checked;
+let label=input.closest('.typhoon-fcst-option');
+if(label){
+label.classList.toggle('is-active',checked);
+}
 });
 }
 
@@ -1679,7 +1718,7 @@ if(!subtitle){
 return;
 }
 let updated=formatTyphoonKst(run?.generatedAt || run?.metadata?.generated_at_utc || '');
-subtitle.textContent=updated && updated!=='-' ? `최근 업데이트 ${updated}` : '';
+subtitle.textContent=updated && updated!=='-' ? `최근 업데이트 : ${updated}` : '';
 }
 
 function renderTyphoonTimeline(){
