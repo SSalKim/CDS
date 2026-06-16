@@ -1,65 +1,72 @@
 {
   "version": 2,
-  "updated_at_utc": "202007300500",
+  "updated_at_utc": "202008050500",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202007300000",
-      "cycle_time_utc": "202007300000",
-      "start_utc": "202007300500",
-      "end_utc": "202007301100"
+      "data_time": "202008050000",
+      "cycle_time_utc": "202008050000",
+      "start_utc": "202008050500",
+      "end_utc": "202008051100"
     }
   ],
   "runs": [
     {
       "job": {
-        "storm_key": "td_2020_06",
-        "stage": "TD_UNLINKED",
+        "storm_key": "td_2020_10_typ_04",
+        "stage": "TD_LINKED_TYP",
         "year": 2020,
-        "data_time": "202007300000",
-        "td_number": 6,
+        "data_time": "202008050000",
+        "td_number": 10,
         "linked_td_number": null,
-        "typ_number": 6,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true
+        "typ_number": 10,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
       },
       "window": {
-        "data_time": "202007300000",
-        "cycle_time_utc": "202007300000",
-        "start_utc": "202007300500",
-        "end_utc": "202007301100"
+        "data_time": "202008050000",
+        "cycle_time_utc": "202008050000",
+        "start_utc": "202008050500",
+        "end_utc": "202008051100"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616091618",
-          "image_path": "VTG_IMG/2020/TD_2006_NONAME/TD_2006_NONAME_202007300000_120h.png",
+          "generated_at_utc": "20260616093408",
+          "image_path": "VTG_IMG/2020/TD_2010_HAGUPIT/TD_2010_HAGUPIT_202008050000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
-          "typ_number": 6,
-          "data_typ_number": 6,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
+          "typ_number": 10,
+          "data_typ_number": 10,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
           "linked_td_number": null,
-          "linked_typ_number": null,
-          "atcf_id": "",
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
           "extra_atcf_ids": [],
-          "data_time": "202007300000",
+          "data_time": "202008050000",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 9,
           "target_model_count": 18,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": true,
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -67,50 +74,57 @@
     },
     {
       "job": {
-        "storm_key": "td_2020_06",
-        "stage": "TD_UNLINKED",
+        "storm_key": "td_2020_10_typ_04",
+        "stage": "TD_LINKED_TYP",
         "year": 2020,
-        "data_time": "202007300000",
-        "td_number": 6,
+        "data_time": "202008050000",
+        "td_number": 10,
         "linked_td_number": null,
-        "typ_number": 6,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true
+        "typ_number": 10,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
       },
       "window": {
-        "data_time": "202007300000",
-        "cycle_time_utc": "202007300000",
-        "start_utc": "202007300500",
-        "end_utc": "202007301100"
+        "data_time": "202008050000",
+        "cycle_time_utc": "202008050000",
+        "start_utc": "202008050500",
+        "end_utc": "202008051100"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616091618",
-          "image_path": "VTG_IMG/2020/TD_2006_NONAME/TD_2006_NONAME_202007300000_240h.png",
+          "generated_at_utc": "20260616093410",
+          "image_path": "VTG_IMG/2020/TD_2010_HAGUPIT/TD_2010_HAGUPIT_202008050000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
-          "typ_number": 6,
-          "data_typ_number": 6,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
+          "typ_number": 10,
+          "data_typ_number": 10,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
           "linked_td_number": null,
-          "linked_typ_number": null,
-          "atcf_id": "",
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
           "extra_atcf_ids": [],
-          "data_time": "202007300000",
+          "data_time": "202008050000",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 9,
           "target_model_count": 18,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": true,
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -4828,7 +4842,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075825",
+          "generated_at_utc": "20260616092207",
           "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008010600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -4886,7 +4900,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075830",
+          "generated_at_utc": "20260616092212",
           "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008010600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -4944,7 +4958,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075916",
+          "generated_at_utc": "20260616092303",
           "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008011200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5007,7 +5021,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075921",
+          "generated_at_utc": "20260616092308",
           "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008011200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5070,7 +5084,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080010",
+          "generated_at_utc": "20260616092357",
           "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008011800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5128,7 +5142,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080019",
+          "generated_at_utc": "20260616092403",
           "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008011800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5186,7 +5200,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080106",
+          "generated_at_utc": "20260616092453",
           "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008020000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5249,7 +5263,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080111",
+          "generated_at_utc": "20260616092458",
           "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008020000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5312,7 +5326,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080159",
+          "generated_at_utc": "20260616092544",
           "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008020600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5369,7 +5383,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080209",
+          "generated_at_utc": "20260616092554",
           "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008020600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5426,7 +5440,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080258",
+          "generated_at_utc": "20260616092643",
           "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008021200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5484,7 +5498,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080304",
+          "generated_at_utc": "20260616092648",
           "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008021200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5650,7 +5664,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075918",
+          "generated_at_utc": "20260616092307",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008011200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5711,7 +5725,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075921",
+          "generated_at_utc": "20260616092309",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008011200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5772,7 +5786,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080016",
+          "generated_at_utc": "20260616092401",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008011800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5829,7 +5843,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080019",
+          "generated_at_utc": "20260616092404",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008011800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5886,7 +5900,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080107",
+          "generated_at_utc": "20260616092456",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008020000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -5949,7 +5963,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080110",
+          "generated_at_utc": "20260616092459",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008020000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6012,7 +6026,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080205",
+          "generated_at_utc": "20260616092551",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008020600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6070,7 +6084,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080208",
+          "generated_at_utc": "20260616092554",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008020600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6128,7 +6142,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080302",
+          "generated_at_utc": "20260616092646",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008021200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6191,7 +6205,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080304",
+          "generated_at_utc": "20260616092649",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008021200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6254,7 +6268,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080346",
+          "generated_at_utc": "20260616092731",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008021800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6311,7 +6325,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080348",
+          "generated_at_utc": "20260616092733",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008021800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6368,7 +6382,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080429",
+          "generated_at_utc": "20260616092814",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008030000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6430,7 +6444,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080431",
+          "generated_at_utc": "20260616092816",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008030000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6492,7 +6506,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080512",
+          "generated_at_utc": "20260616092858",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008030600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6549,7 +6563,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080514",
+          "generated_at_utc": "20260616092901",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008030600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6606,7 +6620,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080556",
+          "generated_at_utc": "20260616092943",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008031200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6668,7 +6682,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080558",
+          "generated_at_utc": "20260616092945",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008031200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6730,7 +6744,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080639",
+          "generated_at_utc": "20260616093028",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008031800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6788,7 +6802,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080642",
+          "generated_at_utc": "20260616093030",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008031800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6846,7 +6860,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080723",
+          "generated_at_utc": "20260616093119",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008040000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6909,7 +6923,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080726",
+          "generated_at_utc": "20260616093121",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008040000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -6972,7 +6986,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080807",
+          "generated_at_utc": "20260616093202",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008040600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -7029,7 +7043,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080809",
+          "generated_at_utc": "20260616093204",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008040600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -7086,7 +7100,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080851",
+          "generated_at_utc": "20260616093236",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008041200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -7149,7 +7163,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080853",
+          "generated_at_utc": "20260616093238",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008041200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -7212,7 +7226,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080934",
+          "generated_at_utc": "20260616093334",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008041800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -7270,7 +7284,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616080937",
+          "generated_at_utc": "20260616093335",
           "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008041800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -8734,7 +8748,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075339",
+          "generated_at_utc": "20260616091708",
           "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007310000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -8792,7 +8806,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075343",
+          "generated_at_utc": "20260616091711",
           "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007310000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -8850,7 +8864,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075500",
+          "generated_at_utc": "20260616091819",
           "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007310600_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -8907,7 +8921,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075505",
+          "generated_at_utc": "20260616091823",
           "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007310600_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -8964,7 +8978,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075554",
+          "generated_at_utc": "20260616091920",
           "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007311200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -9022,7 +9036,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075557",
+          "generated_at_utc": "20260616091924",
           "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007311200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -9080,7 +9094,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075639",
+          "generated_at_utc": "20260616092016",
           "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007311800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -9137,7 +9151,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075643",
+          "generated_at_utc": "20260616092020",
           "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007311800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -9194,7 +9208,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075734",
+          "generated_at_utc": "20260616092112",
           "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202008010000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -9252,7 +9266,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075738",
+          "generated_at_utc": "20260616092116",
           "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202008010000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -10232,7 +10246,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075509",
+          "generated_at_utc": "20260616091828",
           "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202007310600_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -10287,7 +10301,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075511",
+          "generated_at_utc": "20260616091830",
           "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202007310600_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -10342,7 +10356,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075555",
+          "generated_at_utc": "20260616091923",
           "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202007311200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -10398,7 +10412,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075557",
+          "generated_at_utc": "20260616091925",
           "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202007311200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -10454,7 +10468,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075640",
+          "generated_at_utc": "20260616092019",
           "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202007311800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -10508,7 +10522,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075642",
+          "generated_at_utc": "20260616092021",
           "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202007311800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -10562,7 +10576,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075737",
+          "generated_at_utc": "20260616092114",
           "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202008010000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -10615,7 +10629,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075739",
+          "generated_at_utc": "20260616092117",
           "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202008010000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -10668,7 +10682,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075826",
+          "generated_at_utc": "20260616092209",
           "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202008010600_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -10725,7 +10739,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616075829",
+          "generated_at_utc": "20260616092212",
           "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202008010600_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -16292,7 +16306,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616084138",
+          "generated_at_utc": "20260616093408",
           "image_path": "VTG_IMG/2020/TD_2010_HAGUPIT/TD_2010_HAGUPIT_202008050000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -16350,7 +16364,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616084140",
+          "generated_at_utc": "20260616093410",
           "image_path": "VTG_IMG/2020/TD_2010_HAGUPIT/TD_2010_HAGUPIT_202008050000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
