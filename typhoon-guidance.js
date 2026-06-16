@@ -91,16 +91,16 @@ const TYPHOON_MODEL_INFO=[
 {name:'HWRF',description:'미해양대기청(NOAA EMC) 태풍모델(HWRF)'},
 {name:'ECMWF AIFS',description:'[AI] 유럽중기예보센터(ECMWF) AI 전구모델(AIFS-Single)'},
 {name:'ECMWF AIFS EPS',description:'[AI] 유럽중기예보센터(ECMWF) AI 앙상블모델(AIFS-ENS)'},
-{name:'KMA AIFS-ECMWF',description:'[AI] 기상청 수치예보센터 수행 AIFS (ECMWF 초기장)'},
-{name:'KMA AIFS-KIM',description:'[AI] 기상청 수치예보센터 수행 AIFS (KIM 초기장)'},
+{name:'KMA AIFS-ECMWF',description:'[AI] 기상청 국립기상과학원 수행 AIFS (ECMWF 초기장)'},
+{name:'KMA AIFS-KIM',description:'[AI] 기상청 국립기상과학원 수행 AIFS (KIM 초기장)'},
 {name:'AIGFS',description:'[AI] 미해양대기청(NOAA NCEP) AI 전구모델(AIGFS)'},
 {name:'AIGFS EPS',description:'[AI] 미해양대기청(NOAA NCEP) AI 앙상블모델(AIGEFS) 평균'},
-{name:'FourCastNet-ECMWF',description:'[AI] 기상청 수치예보센터 수행 FourCastNet (ECMWF 초기장)'},
-{name:'FourCastNet-KIM',description:'[AI] 기상청 수치예보센터 수행 FourCastNet (KIM 초기장)'},
-{name:'Pangu-Weather-ECMWF',description:'[AI] 기상청 수치예보센터 수행 Pangu-Weather (ECMWF 초기장)'},
-{name:'Pangu-Weather-KIM',description:'[AI] 기상청 수치예보센터 수행 Pangu-Weather (KIM 초기장)'},
-{name:'GraphCast-ECMWF',description:'[AI] 기상청 수치예보센터 수행 GraphCast (ECMWF 초기장)'},
-{name:'GraphCast-KIM',description:'[AI] 기상청 수치예보센터 수행 GraphCast (KIM 초기장)'},
+{name:'FourCastNet-ECMWF',description:'[AI] 기상청 국립기상과학원 수행 FourCastNet (ECMWF 초기장)'},
+{name:'FourCastNet-KIM',description:'[AI] 기상청 국립기상과학원 수행 FourCastNet (KIM 초기장)'},
+{name:'Pangu-Weather-ECMWF',description:'[AI] 기상청 국립기상과학원 수행 Pangu-Weather (ECMWF 초기장)'},
+{name:'Pangu-Weather-KIM',description:'[AI] 기상청 국립기상과학원 수행 Pangu-Weather (KIM 초기장)'},
+{name:'GraphCast-ECMWF',description:'[AI] 기상청 국립기상과학원 수행 GraphCast (ECMWF 초기장)'},
+{name:'GraphCast-KIM',description:'[AI] 기상청 국립기상과학원 수행 GraphCast (KIM 초기장)'},
 {name:'GenCast',description:'[AI] 구글 딥마인드(GDM) 앙상블모델(GenCast) 평균'},
 {name:'FNV3',description:'[AI] 구글 딥마인드(GDM) 앙상블 실험모델(FNV3) 평균'},
 {name:'Aurora-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 Aurora (ECMWF 초기장)'},
@@ -429,7 +429,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "14층",
     "기반": "AI",
-    "참고사항": "ECMWF AIFS 기상청 자체 수행, ECMWF 초기장 활용"
+    "참고사항": "ECMWF AIFS 기상청 국립기상과학원 자체 수행, ECMWF 초기장 활용"
   },
   {
     "표출명칭": "KMA AIFS-KIM",
@@ -440,7 +440,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "14층",
     "기반": "AI",
-    "참고사항": "ECMWF AIFS 기상청 자체 수행, KIM 초기장 활용"
+    "참고사항": "ECMWF AIFS 기상청 국립기상과학원 자체 수행, KIM 초기장 활용"
   },
   {
     "표출명칭": "AIGFS",
