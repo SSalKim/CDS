@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202606161145",
+  "updated_at_utc": "202008100500",
   "storm_key": "td_2020_12",
-  "stage": "TD",
+  "stage": "TD_PRE_TYP",
   "year": 2020,
   "typ_number": 12,
   "linked_td_number": null,
@@ -344,29 +344,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2020_12",
-        "stage": "TD",
+        "storm_key": "td_2020_12_typ_06",
+        "stage": "TD_PRE_TYP",
         "year": 2020,
         "data_time": "202008100000",
         "td_number": 12,
         "linked_td_number": null,
-        "linked_typ_number": 6,
         "typ_number": 12,
-        "data_typ_number": 12,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp072020",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202008100000"
+        "data_time": "202008100000",
+        "cycle_time_utc": "202008100000",
+        "start_utc": "202008100500",
+        "end_utc": "202008101100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616094058",
+          "generated_at_utc": "20260616114907",
           "image_path": "VTG_IMG/2020/TD_2012_NONAME/TD_2012_NONAME_202008100000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -394,37 +394,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202008100000_td_2020_12_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2020_12",
-        "stage": "TD",
+        "storm_key": "td_2020_12_typ_06",
+        "stage": "TD_PRE_TYP",
         "year": 2020,
         "data_time": "202008100000",
         "td_number": 12,
         "linked_td_number": null,
-        "linked_typ_number": 6,
         "typ_number": 12,
-        "data_typ_number": 12,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp072020",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202008100000"
+        "data_time": "202008100000",
+        "cycle_time_utc": "202008100000",
+        "start_utc": "202008100500",
+        "end_utc": "202008101100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616094100",
+          "generated_at_utc": "20260616114909",
           "image_path": "VTG_IMG/2020/TD_2012_NONAME/TD_2012_NONAME_202008100000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -452,11 +452,11 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202008100000_td_2020_12_240h.json"
+      "completed": false,
+      "final_check": false
     }
   ]
 }
