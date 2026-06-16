@@ -163,6 +163,22 @@ return enforceModelAllowedForCurrentSelection({notify});
 }
 
 
+function shouldSuppressAnalysisObservationNotice(){
+if(typeof currentMainMenu==='undefined' || currentMainMenu!=='analysis'){
+return false;
+}
+
+if(
+typeof suppressAnalysisObservationUnsupportedStyling==='function' &&
+suppressAnalysisObservationUnsupportedStyling(getBaseVisibleCategory(),currentModel)
+){
+return true;
+}
+
+return false;
+}
+
+
 function getFirstAllowedVisibleModelIdForCurrentSelection(){
 
 for(let group of getVisibleModelGroups()){
@@ -198,7 +214,11 @@ return false;
 
 currentModel=fallback;
 
-if(notify && typeof showSelectionToast==='function'){
+if(
+notify &&
+typeof showSelectionToast==='function' &&
+!shouldSuppressAnalysisObservationNotice()
+){
 showSelectionToast('해당 모델에서는 지원하지 않는 자료입니다.');
 }
 

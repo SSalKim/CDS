@@ -1,5 +1,24 @@
 /* Product category/product option helpers and rendering. Depends on app.js globals at call time. */
 
+const ANALYSIS_OBSERVATION_MODEL_IDS=new Set(['obs_upper','usst','sat_gk2a']);
+const ANALYSIS_ALWAYS_ACTIVE_CATEGORY_IDS=new Set(['skewob','skewds','ssta']);
+
+function isAnalysisCatalogActive(){
+return typeof currentMainMenu!=='undefined' && currentMainMenu==='analysis';
+}
+
+function isAnalysisObservationModel(modelId=currentModel){
+return isAnalysisCatalogActive() && ANALYSIS_OBSERVATION_MODEL_IDS.has(modelId);
+}
+
+function isAnalysisAlwaysActiveCategory(categoryId){
+return isAnalysisCatalogActive() && ANALYSIS_ALWAYS_ACTIVE_CATEGORY_IDS.has(categoryId);
+}
+
+function suppressAnalysisObservationUnsupportedStyling(categoryId=getCurrentCategory(),modelId=currentModel){
+return isAnalysisAlwaysActiveCategory(categoryId) || isAnalysisObservationModel(modelId);
+}
+
 function getProductsInCategory(categoryId){
 
 return getActiveProducts().filter(
@@ -156,47 +175,23 @@ return enforceModelAllowedForCurrentSelection();
 }
 
 
+function markOptionSupported(option){
+option.classList.add('supported-option');
+option.dataset.supported='true';
+option.style.color='#0f172a';
+option.style.backgroundColor='#dbeafe';
+option.style.fontWeight='600';
+option.title='현재 모델에서 바로 표출 가능한 산출물입니다.';
+}
+
+
 function markOptionUnsupported(option,message){
 option.classList.add('unsupported-option');
 option.dataset.unsupported='true';
-option.style.color='#a8b0bd';
-option.style.backgroundColor='#f8fafc';
+option.style.color='#111827';
+option.style.backgroundColor='';
+option.style.fontWeight='400';
 option.title=message;
-}
-
-
-const ANALYSIS_OBSERVATION_RELAXED_CATEGORIES=new Set([
-'skewob',
-'skewds',
-'ssta'
-]);
-
-const ANALYSIS_OBSERVATION_RELAXED_MODELS=new Set([
-'obs_upper',
-'usst',
-'sat_gk2a'
-]);
-
-function isAnalysisObservationRelaxedCategory(categoryId){
-return currentMainMenu==='analysis' && ANALYSIS_OBSERVATION_RELAXED_CATEGORIES.has(categoryId);
-}
-
-function isAnalysisObservationRelaxedCurrentModel(modelId=currentModel){
-return currentMainMenu==='analysis' && ANALYSIS_OBSERVATION_RELAXED_MODELS.has(modelId);
-}
-
-function shouldSuppressUnsupportedProductStyling(productOrCategory,modelId=currentModel){
-let categoryId=typeof productOrCategory==='string'
-?productOrCategory
-:productOrCategory?.category;
-
-return !!(
-currentMainMenu==='analysis' &&
-(
-isAnalysisObservationRelaxedCategory(categoryId) ||
-isAnalysisObservationRelaxedCurrentModel(modelId)
-)
-);
 }
 
 
@@ -233,14 +228,16 @@ return;
 o.value=c.id;
 o.textContent=c.name;
 
-if(
-isProductCategoryUnsupportedForModel(c.id,currentModel) &&
-!shouldSuppressUnsupportedProductStyling(c.id,currentModel)
-){
+let categoryUnsupported=isProductCategoryUnsupportedForModel(c.id,currentModel);
+
+if(categoryUnsupported && !suppressAnalysisObservationUnsupportedStyling(c.id,currentModel)){
 markOptionUnsupported(
 o,
 '현재 모델에서 이 분류의 산출물을 지원하지 않습니다. 선택하면 지원 모델로 자동 전환됩니다.'
 );
+}
+else{
+markOptionSupported(o);
 }
 
 productCategory.appendChild(o);
@@ -279,14 +276,16 @@ return;
 o.value=p.id;
 o.textContent=p.label;
 
-if(
-!productSupportsModel(p,currentModel) &&
-!shouldSuppressUnsupportedProductStyling(p,currentModel)
-){
+let productUnsupported=!productSupportsModel(p,currentModel);
+
+if(productUnsupported && !suppressAnalysisObservationUnsupportedStyling(p.category,currentModel)){
 markOptionUnsupported(
 o,
 '현재 모델에서는 지원하지 않는 산출물입니다. 선택하면 지원 모델로 자동 전환됩니다.'
 );
+}
+else{
+markOptionSupported(o);
 }
 
 productSelect.appendChild(o);
