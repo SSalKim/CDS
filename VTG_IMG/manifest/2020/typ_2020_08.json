@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202008240500",
+  "updated_at_utc": "202008230500",
   "storm_key": "typ_2020_08",
   "stage": "TYP",
   "year": 2020,
@@ -489,28 +489,28 @@
     {
       "job": {
         "storm_key": "typ_2020_08",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2020,
         "data_time": "202008230000",
         "td_number": null,
         "linked_td_number": 17,
-        "linked_typ_number": null,
         "typ_number": 8,
-        "data_typ_number": 8,
         "typ_name_ko": "바비",
         "typ_name": "BAVI",
         "typ_en": "BAVI",
         "atcf_id": "wp092020",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202008230000"
+        "data_time": "202008230000",
+        "cycle_time_utc": "202008230000",
+        "start_utc": "202008230500",
+        "end_utc": "202008231100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616055515",
+          "generated_at_utc": "20260616142630",
           "image_path": "VTG_IMG/2020/TYP_2008_BAVI/TYP_2008_BAVI_202008230000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -542,37 +542,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202008230000_typ_2020_08_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2020_08",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2020,
         "data_time": "202008230000",
         "td_number": null,
         "linked_td_number": 17,
-        "linked_typ_number": null,
         "typ_number": 8,
-        "data_typ_number": 8,
         "typ_name_ko": "바비",
         "typ_name": "BAVI",
         "typ_en": "BAVI",
         "atcf_id": "wp092020",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202008230000"
+        "data_time": "202008230000",
+        "cycle_time_utc": "202008230000",
+        "start_utc": "202008230500",
+        "end_utc": "202008231100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616055517",
+          "generated_at_utc": "20260616142631",
           "image_path": "VTG_IMG/2020/TYP_2008_BAVI/TYP_2008_BAVI_202008230000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -604,11 +604,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202008230000_typ_2020_08_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
