@@ -165,6 +165,41 @@ option.title=message;
 }
 
 
+const ANALYSIS_OBSERVATION_RELAXED_CATEGORIES=new Set([
+'skewob',
+'skewds',
+'ssta'
+]);
+
+const ANALYSIS_OBSERVATION_RELAXED_MODELS=new Set([
+'obs_upper',
+'usst',
+'sat_gk2a'
+]);
+
+function isAnalysisObservationRelaxedCategory(categoryId){
+return currentMainMenu==='analysis' && ANALYSIS_OBSERVATION_RELAXED_CATEGORIES.has(categoryId);
+}
+
+function isAnalysisObservationRelaxedCurrentModel(modelId=currentModel){
+return currentMainMenu==='analysis' && ANALYSIS_OBSERVATION_RELAXED_MODELS.has(modelId);
+}
+
+function shouldSuppressUnsupportedProductStyling(productOrCategory,modelId=currentModel){
+let categoryId=typeof productOrCategory==='string'
+?productOrCategory
+:productOrCategory?.category;
+
+return !!(
+currentMainMenu==='analysis' &&
+(
+isAnalysisObservationRelaxedCategory(categoryId) ||
+isAnalysisObservationRelaxedCurrentModel(modelId)
+)
+);
+}
+
+
 function populateProductCategories(){
 
 let categories=getActiveCategories();
@@ -198,7 +233,10 @@ return;
 o.value=c.id;
 o.textContent=c.name;
 
-if(isProductCategoryUnsupportedForModel(c.id,currentModel)){
+if(
+isProductCategoryUnsupportedForModel(c.id,currentModel) &&
+!shouldSuppressUnsupportedProductStyling(c.id,currentModel)
+){
 markOptionUnsupported(
 o,
 '현재 모델에서 이 분류의 산출물을 지원하지 않습니다. 선택하면 지원 모델로 자동 전환됩니다.'
@@ -241,7 +279,10 @@ return;
 o.value=p.id;
 o.textContent=p.label;
 
-if(!productSupportsModel(p,currentModel)){
+if(
+!productSupportsModel(p,currentModel) &&
+!shouldSuppressUnsupportedProductStyling(p,currentModel)
+){
 markOptionUnsupported(
 o,
 '현재 모델에서는 지원하지 않는 산출물입니다. 선택하면 지원 모델로 자동 전환됩니다.'

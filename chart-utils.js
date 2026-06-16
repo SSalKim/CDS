@@ -1,8 +1,8 @@
 (function(global){
 
-const DEFAULT_CHART_BASE_URL='https://dmdw.kma.go.kr/map/data/CHT';
+const DEFAULT_CHART_BASE_URL='https://data.kma.go.kr/CHT';
 const DEFAULT_CHART_BACKUP_BASE_URLS=[
-'https://data.kma.go.kr/CHT',
+'https://dmdw.kma.go.kr/map/data/CHT',
 'https://afso.kma.go.kr/data/CHT'
 ];
 const DEFAULT_CHART_BASE_URLS=[

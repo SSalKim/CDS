@@ -1674,12 +1674,42 @@ return true;
 
 }
 
+
+function getForecastPreloadOrder(count){
+let safeCount=Math.max(0,Number(count) || 0);
+let defaultOrder=Array.from({length:safeCount},(_,index)=>index);
+
+if(currentMainMenu!=='analysis' || !isRunTimeSliderMode()){
+return defaultOrder;
+}
+
+let zeroIndex=currentForecastList.findIndex(value=>Number(value)===0);
+
+if(zeroIndex<0){
+zeroIndex=Number(slider.value || 0);
+}
+
+zeroIndex=Math.max(0,Math.min(safeCount-1,zeroIndex));
+
+let order=[];
+for(let i=zeroIndex;i>=0;i--){
+order.push(i);
+}
+for(let i=zeroIndex+1;i<safeCount;i++){
+order.push(i);
+}
+
+return order;
+}
+
+
 async function preloadAllForecastImages({
 imageRefreshToken=''
 }={}){
 
 let seq=++imagePreloadSeq;
 let count=currentForecastList.length || 1;
+let preloadOrder=getForecastPreloadOrder(count);
 let availableCount=0;
 resetForecastImageCache();
 setAllForecastLoadStates(count,'loading');
@@ -1687,10 +1717,11 @@ renderForecastTimeline();
 setViewerLoading(true,'이미지 로딩 중');
 
 await CDSImagePipeline.runConcurrentRange({
-count,
+count:preloadOrder.length,
 concurrency:IMAGE_PRELOAD_CONCURRENCY,
 isCancelled:()=>seq!==imagePreloadSeq,
-task:async i=>{
+task:async orderIndex=>{
+let i=preloadOrder[orderIndex];
 let result=await preloadForecastIndex(i,seq,{imageRefreshToken});
 
 if(seq!==imagePreloadSeq || result.cancelled){

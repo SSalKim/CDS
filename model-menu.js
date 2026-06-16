@@ -239,6 +239,116 @@ currentModel=fallback;
 
 }
 
+
+function getRestrictionForCandidateSelection(categoryId,productId){
+let selectionRestrictions=typeof getActiveSelectionModelRestrictions==='function'
+?getActiveSelectionModelRestrictions()
+:{};
+let categoryRestrictions=typeof getActiveCategoryModelRestrictions==='function'
+?getActiveCategoryModelRestrictions()
+:{};
+
+return (
+selectionRestrictions[`${categoryId}:${productId}`] ||
+selectionRestrictions[`${categoryId}:*`] ||
+categoryRestrictions[categoryId] ||
+null
+);
+}
+
+function candidateSelectionSupportsModel(categoryId,product,modelId){
+if(!product || product.type==='header'){
+return false;
+}
+
+let restriction=getRestrictionForCandidateSelection(categoryId,product.id);
+
+if(restriction && !restriction.allowedModels.includes(modelId)){
+return false;
+}
+
+return productSupportsModel(product,modelId);
+}
+
+function findFallbackSelectionForModel(modelId){
+let selectableCategories=typeof getSelectableCategories==='function'
+?getSelectableCategories().filter(category=>category && !category.type)
+:[];
+let activeProducts=typeof getActiveProducts==='function'
+?getActiveProducts()
+:[];
+let currentCategoryId=typeof getCurrentCategory==='function'
+?getCurrentCategory()
+:productCategory?.value;
+
+let orderedCategories=[
+...selectableCategories.filter(category=>category.id===currentCategoryId),
+...selectableCategories.filter(category=>category.id!==currentCategoryId)
+];
+
+for(let category of orderedCategories){
+let product=activeProducts.find(item=>
+item.category===category.id &&
+item.type!=='header' &&
+candidateSelectionSupportsModel(category.id,item,modelId)
+);
+
+if(product){
+return {categoryId:category.id,productId:product.id};
+}
+}
+
+return null;
+}
+
+function applyUnsupportedModelSwitch(modelId,label){
+let fallback=findFallbackSelectionForModel(modelId);
+
+if(!fallback){
+if(typeof showSelectionToast==='function'){
+showSelectionToast(`${label}에서 지원하는 산출물을 찾지 못했습니다.`);
+}
+return false;
+}
+
+let previousForecastHour=typeof getSelectedForecastHour==='function'
+?getSelectedForecastHour()
+:null;
+
+invalidateSelectionAsyncWork?.();
+currentModel=modelId;
+productCategory.value=fallback.categoryId;
+currentProduct=fallback.productId;
+currentAuxValue=null;
+
+if(typeof showSelectionToast==='function'){
+showSelectionToast('현재 산출물은 이 모델을 지원하지 않습니다. 지원하는 산출물로 자동 전환합니다.');
+}
+
+refreshViewAfterSelectionChange({
+updateCategories:true,
+updateProducts:true,
+updateHours:true,
+resetSlider:true,
+preserveForecastHour:previousForecastHour,
+updateChartAfter:true
+});
+
+return true;
+}
+
+function decorateUnsupportedModelButton(button){
+button.classList.add('unsupported-model');
+button.setAttribute('aria-disabled','true');
+button.title='현재 산출물을 지원하지 않습니다. 클릭하면 이 모델에서 지원하는 산출물로 자동 전환됩니다.';
+button.style.opacity='0.62';
+button.style.borderColor='rgba(148,163,184,0.72)';
+button.style.color='#64748b';
+button.style.background='rgba(248,250,252,0.75)';
+button.style.cursor='pointer';
+}
+
+
 function renderModels(){
 
 modelGrid.innerHTML='';
@@ -307,19 +417,30 @@ btn.className=
 'model-cell'+
 (!modelCompareMode && modelId===currentModel ? ' active' : '')+
 (compareSelected ? ' compare-selected' : '')+
-(!modelAllowed ? ' disabled' : '');
+(!modelAllowed ? ' unsupported-model' : '');
 
-btn.disabled=!modelAllowed;
+btn.disabled=false;
 btn.textContent=label;
+
+if(!modelAllowed){
+decorateUnsupportedModelButton(btn);
+}
 
 btn.onclick=()=>{
 
+if(modelCompareMode){
 if(!modelAllowed){
+if(typeof showSelectionToast==='function'){
+showSelectionToast('현재 산출물은 이 모델을 비교 지원하지 않습니다.');
+}
+return;
+}
+toggleCompareModel(modelId);
 return;
 }
 
-if(modelCompareMode){
-toggleCompareModel(modelId);
+if(!modelAllowed){
+applyUnsupportedModelSwitch(modelId,label);
 return;
 }
 
