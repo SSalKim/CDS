@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202606160257",
+  "updated_at_utc": "202209301700",
   "storm_key": "typ_2022_18",
   "stage": "TYP",
   "year": 2022,
@@ -1041,28 +1041,28 @@
     {
       "job": {
         "storm_key": "typ_2022_18",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209301200",
         "td_number": null,
         "linked_td_number": 31,
-        "linked_typ_number": null,
         "typ_number": 18,
-        "data_typ_number": 18,
         "typ_name_ko": "로키",
         "typ_name": "ROKE",
         "typ_en": "ROKE",
         "atcf_id": "wp202022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209301200"
+        "data_time": "202209301200",
+        "cycle_time_utc": "202209301200",
+        "start_utc": "202209301700",
+        "end_utc": "202209302300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615113948",
+          "generated_at_utc": "20260616071552",
           "image_path": "VTG_IMG/2022/TYP_2218_ROKE/TYP_2218_ROKE_202209301200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -1078,7 +1078,7 @@
           "fcst_hours": 120,
           "intensity": "TYP",
           "model_count": 18,
-          "target_model_count": 19,
+          "target_model_count": 18,
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -1099,37 +1099,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209301200_typ_2022_18_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2022_18",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2022,
         "data_time": "202209301200",
         "td_number": null,
         "linked_td_number": 31,
-        "linked_typ_number": null,
         "typ_number": 18,
-        "data_typ_number": 18,
         "typ_name_ko": "로키",
         "typ_name": "ROKE",
         "typ_en": "ROKE",
         "atcf_id": "wp202022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202209301200"
+        "data_time": "202209301200",
+        "cycle_time_utc": "202209301200",
+        "start_utc": "202209301700",
+        "end_utc": "202209302300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615113950",
+          "generated_at_utc": "20260616071554",
           "image_path": "VTG_IMG/2022/TYP_2218_ROKE/TYP_2218_ROKE_202209301200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2022",
@@ -1145,7 +1145,7 @@
           "fcst_hours": 240,
           "intensity": "TYP",
           "model_count": 18,
-          "target_model_count": 19,
+          "target_model_count": 18,
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -1166,11 +1166,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202209301200_typ_2022_18_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
