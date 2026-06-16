@@ -175,13 +175,24 @@ return enforceModelAllowedForCurrentSelection();
 }
 
 
-function markOptionSupported(option){
+function markOptionSupported(option,message='현재 모델에서 바로 표출 가능한 산출물입니다.'){
 option.classList.add('supported-option');
 option.dataset.supported='true';
 option.style.color='#0f172a';
 option.style.backgroundColor='#dbeafe';
 option.style.fontWeight='400';
-option.title='현재 모델에서 바로 표출 가능한 산출물입니다.';
+option.title=message;
+}
+
+
+function markOptionNeutral(option,message=''){
+option.classList.remove('supported-option','unsupported-option');
+delete option.dataset.supported;
+delete option.dataset.unsupported;
+option.style.color='#111827';
+option.style.backgroundColor='';
+option.style.fontWeight='400';
+option.title=message;
 }
 
 
@@ -192,6 +203,34 @@ option.style.color='#111827';
 option.style.backgroundColor='';
 option.style.fontWeight='400';
 option.title=message;
+}
+
+
+function isCategoryVisuallySupportedForDropdown(categoryId,modelId=currentModel){
+let categoryUnsupported=isProductCategoryUnsupportedForModel(categoryId,modelId);
+return !categoryUnsupported || suppressAnalysisObservationUnsupportedStyling(categoryId,modelId);
+}
+
+
+function isProductVisuallySupportedForDropdown(product,modelId=currentModel){
+if(!product || product.type==='header'){
+return false;
+}
+return productSupportsModel(product,modelId) || suppressAnalysisObservationUnsupportedStyling(product.category,modelId);
+}
+
+
+function headerHasSupportedItems(items,headerIndex,isHeaderFn,isSupportedFn){
+for(let i=headerIndex+1;i<items.length;i++){
+let item=items[i];
+if(isHeaderFn(item)){
+break;
+}
+if(isSupportedFn(item)){
+return true;
+}
+}
+return false;
 }
 
 
@@ -211,7 +250,7 @@ prevCategory=selectableCategories[0]?.id || 'empty';
 
 productCategory.innerHTML='';
 
-categories.forEach(c=>{
+categories.forEach((c,index)=>{
 
 let o=document.createElement('option');
 
@@ -220,6 +259,19 @@ if(isCategoryHeader(c)){
 o.textContent=c.name || c.label || '────────';
 o.disabled=true;
 o.className='group-header';
+
+if(headerHasSupportedItems(
+categories,
+index,
+isCategoryHeader,
+item=>isCategoryVisuallySupportedForDropdown(item.id,currentModel)
+)){
+markOptionSupported(o,'이 구역에 현재 선택 조건에서 표출 가능한 산출물이 있습니다.');
+}
+else{
+markOptionNeutral(o);
+}
+
 productCategory.appendChild(o);
 return;
 
@@ -258,10 +310,9 @@ productSelect.innerHTML='';
 
 let cat=getCurrentCategory();
 let products=getActiveProducts();
+let categoryProducts=products.filter(p=>p.category===cat);
 
-products.forEach(p=>{
-
-if(p.category!==cat) return;
+categoryProducts.forEach((p,index)=>{
 
 let o=document.createElement('option');
 
@@ -269,6 +320,19 @@ if(p.type==='header'){
 o.textContent=p.label;
 o.disabled=true;
 o.className='group-header';
+
+if(headerHasSupportedItems(
+categoryProducts,
+index,
+item=>item.type==='header',
+item=>isProductVisuallySupportedForDropdown(item,currentModel)
+)){
+markOptionSupported(o,'이 구역에 현재 선택 조건에서 표출 가능한 산출물이 있습니다.');
+}
+else{
+markOptionNeutral(o);
+}
+
 productSelect.appendChild(o);
 return;
 }
