@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202606161145",
+  "updated_at_utc": "202005181700",
   "storm_key": "td_2020_02",
-  "stage": "TD",
+  "stage": "TD_LINKED_TYP",
   "year": 2020,
   "typ_number": 2,
   "linked_td_number": null,
@@ -14,29 +14,29 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2020_02",
-        "stage": "TD",
+        "storm_key": "td_2020_02_typ_01",
+        "stage": "TD_LINKED_TYP",
         "year": 2020,
         "data_time": "202005170000",
         "td_number": 2,
         "linked_td_number": null,
-        "linked_typ_number": 1,
         "typ_number": 2,
-        "data_typ_number": 2,
         "typ_name_ko": "봉퐁",
         "typ_name": "VONGFONG",
         "typ_en": "VONGFONG",
         "atcf_id": "wp012020",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202005170000"
+        "data_time": "202005170000",
+        "cycle_time_utc": "202005170000",
+        "start_utc": "202005170500",
+        "end_utc": "202005171100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616090107",
+          "generated_at_utc": "20260616123649",
           "image_path": "VTG_IMG/2020/TD_2002_VONGFONG/TD_2002_VONGFONG_202005170000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -56,37 +56,37 @@
           "model_labels": [
             "GFS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202005170000_td_2020_02_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2020_02",
-        "stage": "TD",
+        "storm_key": "td_2020_02_typ_01",
+        "stage": "TD_LINKED_TYP",
         "year": 2020,
         "data_time": "202005170000",
         "td_number": 2,
         "linked_td_number": null,
-        "linked_typ_number": 1,
         "typ_number": 2,
-        "data_typ_number": 2,
         "typ_name_ko": "봉퐁",
         "typ_name": "VONGFONG",
         "typ_en": "VONGFONG",
         "atcf_id": "wp012020",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202005170000"
+        "data_time": "202005170000",
+        "cycle_time_utc": "202005170000",
+        "start_utc": "202005170500",
+        "end_utc": "202005171100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616090110",
+          "generated_at_utc": "20260616123651",
           "image_path": "VTG_IMG/2020/TD_2002_VONGFONG/TD_2002_VONGFONG_202005170000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
@@ -106,11 +106,11 @@
           "model_labels": [
             "GFS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202005170000_td_2020_02_240h.json"
+      "completed": false,
+      "final_check": false
     }
   ]
 }
