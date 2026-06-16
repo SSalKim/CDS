@@ -2797,74 +2797,133 @@ def zoom_cropped_extent_to_canvas_aspect(
     fig_height: float,
     focus_x: float = 0.56,
     focus_y: float = 0.44,
+    start_point: tuple[float, float] | None = None,
+    start_margin_ratio: float = 0.04,
 ) -> list[float]:
-    """Match canvas aspect by shrinking the unconstrained dimension.
+    """Match canvas aspect by selecting a zoomed sub-window in Mercator space.
 
-    This is for 120h overflow cases only. After cropping the overflowing extent to
-    the hard display bounds, do not fill the missing span by shifting the window
-    in the opposite direction. Instead, zoom in by trimming the other dimension.
+    This is for 120h overflow cases only. The important detail is that the
+    final window is selected directly in the map projection coordinate space.
+    That keeps the final projected width/height exactly aligned with the map
+    panel, so Cartopy does not shrink the GeoAxes and create top/bottom blank
+    bands. If a 0h start point is supplied, shift the sub-window inside the
+    cropped bounds so the start point remains visible without changing the
+    aspect ratio.
     """
     projection = ccrs.Mercator()
     data_crs = ccrs.PlateCarree()
 
-    lon_min, lon_max, lat_min, lat_max = extent
-    center_lon = (lon_min + lon_max) / 2
-    center_lat = (lat_min + lat_max) / 2
-
-    x0, _ = projection.transform_point(lon_min, center_lat, data_crs)
-    x1, _ = projection.transform_point(lon_max, center_lat, data_crs)
-    _, y0 = projection.transform_point(center_lon, lat_min, data_crs)
-    _, y1 = projection.transform_point(center_lon, lat_max, data_crs)
-
-    map_width = abs(x1 - x0)
-    map_height = abs(y1 - y0)
-    if map_width <= 0 or map_height <= 0:
+    lon_min, lon_max, lat_min, lat_max = [float(value) for value in extent]
+    if lon_max <= lon_min or lat_max <= lat_min:
         return extent
 
-    map_aspect = map_width / map_height
-    canvas_aspect = fig_width / fig_height if fig_height else map_aspect
+    center_lon = (lon_min + lon_max) / 2.0
+    center_lat = (lat_min + lat_max) / 2.0
+
+    x_left, _ = projection.transform_point(lon_min, center_lat, data_crs)
+    x_right, _ = projection.transform_point(lon_max, center_lat, data_crs)
+    _, y_bottom = projection.transform_point(center_lon, lat_min, data_crs)
+    _, y_top = projection.transform_point(center_lon, lat_max, data_crs)
+
+    x0, x1 = sorted([float(x_left), float(x_right)])
+    y0, y1 = sorted([float(y_bottom), float(y_top)])
+    crop_width = x1 - x0
+    crop_height = y1 - y0
+    if crop_width <= 0 or crop_height <= 0:
+        return extent
+
+    canvas_aspect = fig_width / fig_height if fig_height else crop_width / crop_height
     if canvas_aspect <= 0:
         return extent
 
     focus_x = min(0.9, max(0.1, float(focus_x)))
     focus_y = min(0.9, max(0.1, float(focus_y)))
 
-    if map_aspect > canvas_aspect:
-        # Too wide after crop -> trim longitude span (left/right crop) and zoom in.
-        new_width = map_height * canvas_aspect
-        x_focus = x0 + map_width * focus_x
-        new_x0 = x_focus - new_width * focus_x
-        new_x1 = new_x0 + new_width
-        if new_x0 < min(x0, x1):
-            new_x0 = min(x0, x1)
-            new_x1 = new_x0 + new_width
-        if new_x1 > max(x0, x1):
-            new_x1 = max(x0, x1)
-            new_x0 = new_x1 - new_width
-        new_center_x = (new_x0 + new_x1) / 2
-        new_lon_min, _ = data_crs.transform_point(new_x0, y0 + map_height / 2, projection)
-        new_lon_max, _ = data_crs.transform_point(new_x1, y0 + map_height / 2, projection)
-        return [float(new_lon_min), float(new_lon_max), lat_min, lat_max]
+    crop_aspect = crop_width / crop_height
+    if crop_aspect > canvas_aspect:
+        # Cropped box is too wide: keep full height and trim left/right.
+        window_height = crop_height
+        window_width = window_height * canvas_aspect
+    else:
+        # Cropped box is too tall: keep full width and trim top/bottom.
+        window_width = crop_width
+        window_height = window_width / canvas_aspect
 
-    if map_aspect < canvas_aspect:
-        # Too tall after crop -> trim latitude span (top/bottom crop) and zoom in.
-        new_height = map_width / canvas_aspect
-        y_focus = y0 + map_height * focus_y
-        new_y0 = y_focus - new_height * focus_y
-        new_y1 = new_y0 + new_height
-        if new_y0 < min(y0, y1):
-            new_y0 = min(y0, y1)
-            new_y1 = new_y0 + new_height
-        if new_y1 > max(y0, y1):
-            new_y1 = max(y0, y1)
-            new_y0 = new_y1 - new_height
-        new_center_y = (new_y0 + new_y1) / 2
-        _, new_lat_min = data_crs.transform_point(x0 + map_width / 2, new_y0, projection)
-        _, new_lat_max = data_crs.transform_point(x0 + map_width / 2, new_y1, projection)
-        return [lon_min, lon_max, float(new_lat_min), float(new_lat_max)]
+    window_width = min(window_width, crop_width)
+    window_height = min(window_height, crop_height)
 
-    return extent
+    focus_x_proj = x0 + crop_width * focus_x
+    focus_y_proj = y0 + crop_height * focus_y
+    win_x0 = focus_x_proj - window_width * focus_x
+    win_x1 = win_x0 + window_width
+    win_y0 = focus_y_proj - window_height * focus_y
+    win_y1 = win_y0 + window_height
 
+    def clamp_window(win_min: float, win_max: float, bound_min: float, bound_max: float) -> tuple[float, float]:
+        span = win_max - win_min
+        if span >= bound_max - bound_min:
+            return bound_min, bound_max
+        if win_min < bound_min:
+            win_min = bound_min
+            win_max = win_min + span
+        if win_max > bound_max:
+            win_max = bound_max
+            win_min = win_max - span
+        return win_min, win_max
+
+    win_x0, win_x1 = clamp_window(win_x0, win_x1, x0, x1)
+    win_y0, win_y1 = clamp_window(win_y0, win_y1, y0, y1)
+
+    if start_point is not None:
+        start_lon, start_lat = [float(value) for value in start_point]
+        start_x, start_y = projection.transform_point(start_lon, start_lat, data_crs)
+        if math.isfinite(start_x) and math.isfinite(start_y):
+            x_margin = max(0.0, min(window_width * start_margin_ratio, window_width * 0.2))
+            y_margin = max(0.0, min(window_height * start_margin_ratio, window_height * 0.2))
+
+            def include_required(
+                win_min: float,
+                win_max: float,
+                bound_min: float,
+                bound_max: float,
+                req_min: float,
+                req_max: float,
+            ) -> tuple[float, float]:
+                span = win_max - win_min
+                if span >= bound_max - bound_min:
+                    return bound_min, bound_max
+                if req_min < win_min:
+                    shift = req_min - win_min
+                    win_min += shift
+                    win_max += shift
+                if req_max > win_max:
+                    shift = req_max - win_max
+                    win_min += shift
+                    win_max += shift
+                return clamp_window(win_min, win_max, bound_min, bound_max)
+
+            win_x0, win_x1 = include_required(
+                win_x0, win_x1, x0, x1, start_x - x_margin, start_x + x_margin
+            )
+            win_y0, win_y1 = include_required(
+                win_y0, win_y1, y0, y1, start_y - y_margin, start_y + y_margin
+            )
+
+    # Convert the exact projected box back to lon/lat extent. Use the projected
+    # box center for inverse transforms to keep the conversion stable.
+    center_x = (win_x0 + win_x1) / 2.0
+    center_y = (win_y0 + win_y1) / 2.0
+    new_lon_min, _ = data_crs.transform_point(win_x0, center_y, projection)
+    new_lon_max, _ = data_crs.transform_point(win_x1, center_y, projection)
+    _, new_lat_min = data_crs.transform_point(center_x, win_y0, projection)
+    _, new_lat_max = data_crs.transform_point(center_x, win_y1, projection)
+
+    return [
+        float(new_lon_min),
+        float(new_lon_max),
+        float(new_lat_min),
+        float(new_lat_max),
+    ]
 
 
 def required_start_point_for_120_extent(df: pd.DataFrame) -> tuple[float, float] | None:
@@ -3011,14 +3070,7 @@ def finalize_map_extent(
             extent,
             fig_width=fig_width,
             fig_height=fig_height,
-        )
-        extent = ensure_start_point_visible(
-            extent,
-            start_point,
-            min_lon=DISPLAY_120_LON_MIN,
-            max_lon=DISPLAY_120_LON_MAX,
-            min_lat=DISPLAY_120_LAT_MIN,
-            max_lat=DISPLAY_120_LAT_MAX,
+            start_point=start_point,
         )
         return extent
 
