@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202006150500",
+  "updated_at_utc": "202606161145",
   "storm_key": "td_2020_04",
-  "stage": "TD_LINKED_TYP",
+  "stage": "TD",
   "year": 2020,
   "typ_number": 4,
   "linked_td_number": null,
@@ -14,27 +14,27 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2020_04_typ_02",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2020_04",
+        "stage": "TD",
         "year": 2020,
         "data_time": "202006140600",
         "td_number": 4,
         "linked_td_number": null,
+        "linked_typ_number": 2,
         "typ_number": 4,
+        "data_typ_number": 4,
         "typ_name_ko": "누리",
         "typ_name": "NURI",
         "typ_en": "NURI",
         "atcf_id": "wp022020",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202006140600",
-        "cycle_time_utc": "202006140600",
-        "start_utc": "202006141100",
-        "end_utc": "202006141700"
+        "data_time": "202006140600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260616091448",
           "image_path": "VTG_IMG/2020/TD_2004_NURI/TD_2004_NURI_202006140600_120h.png",
@@ -60,35 +60,35 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202006140600_td_2020_04_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2020_04_typ_02",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2020_04",
+        "stage": "TD",
         "year": 2020,
         "data_time": "202006140600",
         "td_number": 4,
         "linked_td_number": null,
+        "linked_typ_number": 2,
         "typ_number": 4,
+        "data_typ_number": 4,
         "typ_name_ko": "누리",
         "typ_name": "NURI",
         "typ_en": "NURI",
         "atcf_id": "wp022020",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202006140600",
-        "cycle_time_utc": "202006140600",
-        "start_utc": "202006141100",
-        "end_utc": "202006141700"
+        "data_time": "202006140600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260616091452",
           "image_path": "VTG_IMG/2020/TD_2004_NURI/TD_2004_NURI_202006140600_240h.png",
@@ -114,11 +114,11 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202006140600_td_2020_04_240h.json"
     }
   ]
 }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202005181700",
+  "updated_at_utc": "202606161145",
   "storm_key": "td_2020_02",
-  "stage": "TD_LINKED_TYP",
+  "stage": "TD",
   "year": 2020,
   "typ_number": 2,
   "linked_td_number": null,
@@ -14,27 +14,27 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2020_02_typ_01",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2020_02",
+        "stage": "TD",
         "year": 2020,
         "data_time": "202005170000",
         "td_number": 2,
         "linked_td_number": null,
+        "linked_typ_number": 1,
         "typ_number": 2,
+        "data_typ_number": 2,
         "typ_name_ko": "봉퐁",
         "typ_name": "VONGFONG",
         "typ_en": "VONGFONG",
         "atcf_id": "wp012020",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202005170000",
-        "cycle_time_utc": "202005170000",
-        "start_utc": "202005170500",
-        "end_utc": "202005171100"
+        "data_time": "202005170000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260616090107",
           "image_path": "VTG_IMG/2020/TD_2002_VONGFONG/TD_2002_VONGFONG_202005170000_120h.png",
@@ -56,35 +56,35 @@
           "model_labels": [
             "GFS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202005170000_td_2020_02_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2020_02_typ_01",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2020_02",
+        "stage": "TD",
         "year": 2020,
         "data_time": "202005170000",
         "td_number": 2,
         "linked_td_number": null,
+        "linked_typ_number": 1,
         "typ_number": 2,
+        "data_typ_number": 2,
         "typ_name_ko": "봉퐁",
         "typ_name": "VONGFONG",
         "typ_en": "VONGFONG",
         "atcf_id": "wp012020",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202005170000",
-        "cycle_time_utc": "202005170000",
-        "start_utc": "202005170500",
-        "end_utc": "202005171100"
+        "data_time": "202005170000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260616090110",
           "image_path": "VTG_IMG/2020/TD_2002_VONGFONG/TD_2002_VONGFONG_202005170000_240h.png",
@@ -106,11 +106,11 @@
           "model_labels": [
             "GFS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202005170000_td_2020_02_240h.json"
     }
   ]
 }
