@@ -243,6 +243,9 @@ DISPLAY_120_LON_MIN = 100.0
 DISPLAY_120_LON_MAX = 179.9
 DISPLAY_120_LAT_MIN = 0.0
 DISPLAY_120_LAT_MAX = 50.0
+CAMERA_120_TERMINAL_TRIM_FRACTION = 0.10
+CAMERA_120_TERMINAL_ROBUST_Z_LIMIT = 3.5
+CAMERA_120_TERMINAL_MIN_KEEP_RATIO = 0.70
 APIHUB_MODEL_START_MAX_DISTANCE_KM = float(os.getenv("VTG_APIHUB_START_MAX_DISTANCE_KM", "850"))
 
 
@@ -2118,7 +2121,12 @@ def storm_number_label(settings: Settings) -> str:
     if settings.skip_atcf or len(atcf_id) < 8 or not atcf_id[2:4].isdigit():
         return ""
     basin = atcf_id[:2].upper()
-    basin_label = "W" if basin == "WP" else basin
+    basin_label = {
+        "WP": "W",
+        "EP": "E",
+        "CP": "C",
+        "AL": "L",
+    }.get(basin, basin)
     return f"({atcf_id[2:4]}{basin_label})"
 
 
@@ -2817,6 +2825,103 @@ def point_inside_120_display_bounds(lon: float, lat: float) -> bool:
 
 
 
+def filter_120_terminal_anchor_outliers(
+    anchors: list[tuple[str, float, float]],
+    *,
+    minimum_models: int = 5,
+    robust_z_limit: float = CAMERA_120_TERMINAL_ROBUST_Z_LIMIT,
+    trim_fraction: float = CAMERA_120_TERMINAL_TRIM_FRACTION,
+    minimum_keep_ratio: float = CAMERA_120_TERMINAL_MIN_KEEP_RATIO,
+) -> list[tuple[str, float, float]]:
+    """Remove only clearly isolated terminal camera anchors.
+
+    The 0h point is not passed here and therefore remains mandatory.  Terminal
+    anchors are filtered in Mercator coordinates using a median/MAD robust
+    distance.  A point is removed only when it is both statistically distant
+    and located beyond the central percentile envelope, so a legitimate broad
+    or bifurcated forecast spread is preserved while a single remote model does
+    not drag the whole camera away from the main plume.
+    """
+    if len(anchors) < minimum_models:
+        return anchors
+
+    projection = ccrs.Mercator()
+    data_crs = ccrs.PlateCarree()
+    projected: list[tuple[str, float, float, float, float]] = []
+    for model_name, lon, lat in anchors:
+        x, y = projection.transform_point(float(lon), float(lat), data_crs)
+        if math.isfinite(x) and math.isfinite(y):
+            projected.append((model_name, float(lon), float(lat), float(x), float(y)))
+
+    if len(projected) < minimum_models:
+        return anchors
+
+    frame = pd.DataFrame(projected, columns=['model', 'lon', 'lat', 'x', 'y'])
+    median_x = float(frame['x'].median())
+    median_y = float(frame['y'].median())
+
+    abs_dx = (frame['x'] - median_x).abs()
+    abs_dy = (frame['y'] - median_y).abs()
+    mad_x = float(abs_dx.median())
+    mad_y = float(abs_dy.median())
+    iqr_x = float(frame['x'].quantile(0.75) - frame['x'].quantile(0.25))
+    iqr_y = float(frame['y'].quantile(0.75) - frame['y'].quantile(0.25))
+
+    # Roughly one degree in projected distance is the minimum scale.  This
+    # prevents almost-identical boundary points from creating infinite z-scores.
+    one_degree_x = abs(
+        projection.transform_point(1.0, 0.0, data_crs)[0]
+        - projection.transform_point(0.0, 0.0, data_crs)[0]
+    )
+    one_degree_y = abs(
+        projection.transform_point(0.0, 1.0, data_crs)[1]
+        - projection.transform_point(0.0, 0.0, data_crs)[1]
+    )
+    scale_x = max(1.4826 * mad_x, iqr_x / 1.349 if iqr_x > 0 else 0.0, one_degree_x)
+    scale_y = max(1.4826 * mad_y, iqr_y / 1.349 if iqr_y > 0 else 0.0, one_degree_y)
+
+    frame['robust_distance'] = (
+        ((frame['x'] - median_x) / scale_x) ** 2
+        + ((frame['y'] - median_y) / scale_y) ** 2
+    ) ** 0.5
+
+    trim_fraction = min(0.20, max(0.0, float(trim_fraction)))
+    q_low = trim_fraction
+    q_high = 1.0 - trim_fraction
+    x_low = float(frame['x'].quantile(q_low))
+    x_high = float(frame['x'].quantile(q_high))
+    y_low = float(frame['y'].quantile(q_low))
+    y_high = float(frame['y'].quantile(q_high))
+
+    beyond_percentile_envelope = (
+        frame['x'].lt(x_low)
+        | frame['x'].gt(x_high)
+        | frame['y'].lt(y_low)
+        | frame['y'].gt(y_high)
+    )
+    clear_outlier = frame['robust_distance'].gt(float(robust_z_limit)) & beyond_percentile_envelope
+    kept = frame.loc[~clear_outlier].copy()
+
+    minimum_keep = max(3, math.ceil(len(frame) * float(minimum_keep_ratio)))
+    if len(kept) < minimum_keep:
+        kept = frame.nsmallest(minimum_keep, 'robust_distance').copy()
+
+    removed = frame.loc[~frame.index.isin(kept.index)].copy()
+    if not removed.empty:
+        details = ', '.join(
+            f"{row.model} ({row.lon:.1f}E, {row.lat:.1f}N)"
+            for row in removed.itertuples(index=False)
+        )
+        print(
+            '120h camera ignored isolated terminal anchor(s): '
+            + details
+        )
+
+    keep_models = set(kept['model'])
+    return [item for item in anchors if item[0] in keep_models]
+
+
+
 def required_anchor_points_for_120_extent(df: pd.DataFrame) -> list[tuple[float, float]]:
     if df.empty:
         return []
@@ -2831,12 +2936,14 @@ def required_anchor_points_for_120_extent(df: pd.DataFrame) -> list[tuple[float,
         return []
 
     anchors: list[tuple[float, float]] = []
+    terminal_anchors: list[tuple[str, float, float]] = []
 
+    # The current position is always mandatory and is never outlier-filtered.
     kma_zero = work[work['SRC'].eq('KMA') & work['TMD'].eq(0)].head(1)
     if not kma_zero.empty:
         anchors.append((float(kma_zero.iloc[0]['LON']), float(kma_zero.iloc[0]['LAT'])))
 
-    for _, track in work.groupby('SRC', dropna=False):
+    for model_name, track in work.groupby('SRC', dropna=False):
         track = track.sort_values('TMD')
         rows = list(track[['LON', 'LAT']].itertuples(index=False, name=None))
         if not rows:
@@ -2863,17 +2970,18 @@ def required_anchor_points_for_120_extent(df: pd.DataFrame) -> list[tuple[float,
             )
             if clipped is None:
                 continue
-            (cx0, cy0), (cx1, cy1) = clipped
+            _, (cx1, cy1) = clipped
             next_inside = point_inside_120_display_bounds(next_lon, next_lat)
             if inside and not next_inside:
                 last_visible = (float(cx1), float(cy1))
-            elif (not inside) and next_inside:
-                # Entry point can matter when the start lies outside the hard domain.
-                if last_visible is None:
-                    last_visible = (float(cx1), float(cy1))
+            elif (not inside) and next_inside and last_visible is None:
+                last_visible = (float(cx1), float(cy1))
 
-        if last_visible is not None:
-            anchors.append(last_visible)
+        if last_visible is not None and str(model_name) != 'KMA':
+            terminal_anchors.append((str(model_name), last_visible[0], last_visible[1]))
+
+    for _, lon, lat in filter_120_terminal_anchor_outliers(terminal_anchors):
+        anchors.append((lon, lat))
 
     # Deduplicate while preserving order.
     deduped: list[tuple[float, float]] = []
