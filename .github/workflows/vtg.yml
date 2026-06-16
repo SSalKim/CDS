@@ -75,10 +75,13 @@ jobs:
 
           selected = None
           selected_has_cds_label = False
-          selected_busy = False
+          busy_matches = []
           for runner in payload.get("runners", []):
               labels = {str(label.get("name", "")).lower() for label in runner.get("labels", [])}
               name = str(runner.get("name", "")).lower()
+              is_match = "cds-vtg" in labels or name == "cds-vtg-laptop"
+              is_online = runner.get("status") == "online"
+              is_busy = bool(runner.get("busy"))
               print(
                   "runner:",
                   runner.get("name"),
@@ -89,25 +92,21 @@ jobs:
                   "labels=",
                   ",".join(sorted(labels)),
               )
-              # Choose an ONLINE cds-vtg self-hosted runner even when it is busy.
-              # GitHub Actions will queue this job on the self-hosted label until
-              # that runner becomes idle. Only fall back to GitHub-hosted when no
-              # matching self-hosted runner is online at all.
-              if (
-                  runner.get("status") == "online"
-                  and ("cds-vtg" in labels or name == "cds-vtg-laptop")
-              ):
+
+              # Generate VTG images should use the laptop only when it is both
+              # online and idle. If the matching laptop is busy, run immediately
+              # on GitHub-hosted instead of waiting in the self-hosted queue.
+              if is_match and is_online and is_busy:
+                  busy_matches.append(str(runner.get("name", "self-hosted runner")))
+                  continue
+              if is_match and is_online and not is_busy:
                   selected = runner
                   selected_has_cds_label = "cds-vtg" in labels
-                  selected_busy = bool(runner.get("busy"))
                   break
 
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
               if selected:
-                  if selected_busy:
-                      print(f"Using self-hosted runner queue: {selected.get('name')} is online but busy; job will wait for it to become idle.")
-                  else:
-                      print(f"Using idle self-hosted runner: {selected.get('name')}")
+                  print(f"Using idle self-hosted runner: {selected.get('name')}")
                   output.write("runner_kind=self-hosted\n")
                   if selected_has_cds_label:
                       output.write('runner_labels=["self-hosted","cds-vtg"]\n')
@@ -115,7 +114,14 @@ jobs:
                       print("Warning: selected runner is missing the cds-vtg label; using generic self-hosted routing.")
                       output.write('runner_labels=["self-hosted"]\n')
               else:
-                  print("No online cds-vtg self-hosted runner found; using GitHub-hosted.")
+                  if busy_matches:
+                      print(
+                          "Matching self-hosted runner is busy ("
+                          + ", ".join(busy_matches)
+                          + "); using GitHub-hosted instead."
+                      )
+                  else:
+                      print("No online idle cds-vtg self-hosted runner found; using GitHub-hosted.")
                   output.write("runner_kind=github-hosted\n")
                   output.write('runner_labels="ubuntu-latest"\n')
           PY
