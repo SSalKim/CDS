@@ -1,70 +1,432 @@
 {
   "version": 2,
-  "updated_at_utc": "202009070500",
+  "updated_at_utc": "202508050500",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202009070000",
-      "cycle_time_utc": "202009070000",
-      "start_utc": "202009070500",
-      "end_utc": "202009071100"
+      "data_time": "202508050000",
+      "cycle_time_utc": "202508050000",
+      "start_utc": "202508050500",
+      "end_utc": "202508051100"
     }
   ],
   "runs": [
     {
       "job": {
-        "storm_key": "typ_2020_10",
-        "stage": "TYP_LINKED",
-        "year": 2020,
-        "data_time": "202009070000",
-        "td_number": null,
-        "linked_td_number": 19,
-        "typ_number": 10,
-        "typ_name_ko": "하이선",
-        "typ_name": "HAISHEN",
-        "typ_en": "HAISHEN",
-        "atcf_id": "wp112020",
-        "skip_atcf": false
+        "storm_key": "td_2025_23",
+        "stage": "TD_UNLINKED",
+        "year": 2025,
+        "data_time": "202508050000",
+        "td_number": 23,
+        "linked_td_number": null,
+        "typ_number": 23,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": null,
+        "skip_atcf": true
       },
       "window": {
-        "data_time": "202009070000",
-        "cycle_time_utc": "202009070000",
-        "start_utc": "202009070500",
-        "end_utc": "202009071100"
+        "data_time": "202508050000",
+        "cycle_time_utc": "202508050000",
+        "start_utc": "202508050500",
+        "end_utc": "202508051100"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616115443",
-          "image_path": "VTG_IMG/2020/TYP_2010_HAISHEN/TYP_2010_HAISHEN_202009070000_120h.png",
-          "storm_stage": "TYP",
-          "storm_year": "2020",
-          "typ_number": 10,
-          "data_typ_number": 10,
-          "typ_name": "HAISHEN",
-          "typ_name_ko": "하이선",
-          "linked_td_number": 19,
+          "generated_at_utc": "20260616115542",
+          "image_path": "VTG_IMG/2025/TD_2523_NONAME/TD_2523_NONAME_202508050000_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2025",
+          "typ_number": 23,
+          "data_typ_number": 23,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
           "linked_typ_number": null,
-          "atcf_id": "wp112020",
+          "atcf_id": "",
           "extra_atcf_ids": [],
-          "data_time": "202009070000",
+          "data_time": "202508050000",
           "fcst_hours": 120,
-          "intensity": "TYP",
-          "model_count": 12,
-          "target_model_count": 18,
+          "intensity": "TD",
+          "model_count": 20,
+          "target_model_count": 34,
           "model_labels": [
-            "GALWEM",
             "CMC",
             "CMC EPS",
-            "COAMPS-TC",
+            "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "FourCastNet-UM",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "GraphCast-UM",
             "GFS",
             "GFS EPS",
+            "HAFS",
             "HWRF",
+            "KIM",
+            "KIM EPS",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "Pangu-Weather-UM",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": true
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2025_23",
+        "stage": "TD_UNLINKED",
+        "year": 2025,
+        "data_time": "202508050000",
+        "td_number": 23,
+        "linked_td_number": null,
+        "typ_number": 23,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": null,
+        "skip_atcf": true
+      },
+      "window": {
+        "data_time": "202508050000",
+        "cycle_time_utc": "202508050000",
+        "start_utc": "202508050500",
+        "end_utc": "202508051100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616115550",
+          "image_path": "VTG_IMG/2025/TD_2523_NONAME/TD_2523_NONAME_202508050000_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2025",
+          "typ_number": 23,
+          "data_typ_number": 23,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": null,
+          "atcf_id": "",
+          "extra_atcf_ids": [],
+          "data_time": "202508050000",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 20,
+          "target_model_count": 34,
+          "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "FourCastNet-UM",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "GraphCast-UM",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "HWRF",
+            "KIM",
+            "KIM EPS",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "Pangu-Weather-UM",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": true
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_03_typ_02",
+        "stage": "TD_PRE_TYP",
+        "year": 2026,
+        "data_time": "202508050000",
+        "td_number": 3,
+        "linked_td_number": null,
+        "typ_number": 3,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp022026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202508050000",
+        "cycle_time_utc": "202508050000",
+        "start_utc": "202508050500",
+        "end_utc": "202508051100"
+      },
+      "result": {
+        "status": "no_output",
+        "metadata": {
+          "generated_at_utc": "20260616115557",
+          "image_path": "VTG_IMG/2026/TD_2603_NONAME/TD_2603_NONAME_202508050000_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 3,
+          "data_typ_number": 3,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 2,
+          "atcf_id": "wp022026",
+          "extra_atcf_ids": [],
+          "data_time": "202508050000",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 0,
+          "target_model_count": 34,
+          "models": [],
+          "model_labels": [],
+          "skip_atcf": false,
+          "no_output": true,
+          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_03_typ_02",
+        "stage": "TD_PRE_TYP",
+        "year": 2026,
+        "data_time": "202508050000",
+        "td_number": 3,
+        "linked_td_number": null,
+        "typ_number": 3,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp022026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202508050000",
+        "cycle_time_utc": "202508050000",
+        "start_utc": "202508050500",
+        "end_utc": "202508051100"
+      },
+      "result": {
+        "status": "no_output",
+        "metadata": {
+          "generated_at_utc": "20260616115557",
+          "image_path": "VTG_IMG/2026/TD_2603_NONAME/TD_2603_NONAME_202508050000_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 3,
+          "data_typ_number": 3,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 2,
+          "atcf_id": "wp022026",
+          "extra_atcf_ids": [],
+          "data_time": "202508050000",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 0,
+          "target_model_count": 34,
+          "models": [],
+          "model_labels": [],
+          "skip_atcf": false,
+          "no_output": true,
+          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_04_typ_02",
+        "stage": "TD_PRE_TYP",
+        "year": 2026,
+        "data_time": "202508050000",
+        "td_number": 4,
+        "linked_td_number": null,
+        "typ_number": 4,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp022026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202508050000",
+        "cycle_time_utc": "202508050000",
+        "start_utc": "202508050500",
+        "end_utc": "202508051100"
+      },
+      "result": {
+        "status": "no_output",
+        "metadata": {
+          "generated_at_utc": "20260616115604",
+          "image_path": "VTG_IMG/2026/TD_2604_NONAME/TD_2604_NONAME_202508050000_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 2,
+          "atcf_id": "wp022026",
+          "extra_atcf_ids": [],
+          "data_time": "202508050000",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 0,
+          "target_model_count": 34,
+          "models": [],
+          "model_labels": [],
+          "skip_atcf": false,
+          "no_output": true,
+          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_04_typ_02",
+        "stage": "TD_PRE_TYP",
+        "year": 2026,
+        "data_time": "202508050000",
+        "td_number": 4,
+        "linked_td_number": null,
+        "typ_number": 4,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp022026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202508050000",
+        "cycle_time_utc": "202508050000",
+        "start_utc": "202508050500",
+        "end_utc": "202508051100"
+      },
+      "result": {
+        "status": "no_output",
+        "metadata": {
+          "generated_at_utc": "20260616115604",
+          "image_path": "VTG_IMG/2026/TD_2604_NONAME/TD_2604_NONAME_202508050000_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 2,
+          "atcf_id": "wp022026",
+          "extra_atcf_ids": [],
+          "data_time": "202508050000",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 0,
+          "target_model_count": 34,
+          "models": [],
+          "model_labels": [],
+          "skip_atcf": false,
+          "no_output": true,
+          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2025_10",
+        "stage": "TYP_LINKED",
+        "year": 2025,
+        "data_time": "202508050000",
+        "td_number": null,
+        "linked_td_number": 20,
+        "typ_number": 10,
+        "typ_name_ko": "바이루",
+        "typ_name": "BAILU",
+        "typ_en": "BAILU",
+        "atcf_id": "wp132025",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202508050000",
+        "cycle_time_utc": "202508050000",
+        "start_utc": "202508050500",
+        "end_utc": "202508051100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616115601",
+          "image_path": "VTG_IMG/2025/TYP_2510_BAILU/TYP_2510_BAILU_202508050000_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2025",
+          "typ_number": 10,
+          "data_typ_number": 10,
+          "typ_name": "BAILU",
+          "typ_name_ko": "바이루",
+          "linked_td_number": 20,
+          "linked_typ_number": null,
+          "atcf_id": "wp132025",
+          "extra_atcf_ids": [],
+          "data_time": "202508050000",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 32,
+          "target_model_count": 34,
+          "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC EPS",
+            "COAMPS-TC",
+            "ECMWF",
+            "ECMWF AIFS",
+            "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "NAVGEM EPS",
+            "FourCastNet-UM",
+            "FNV3",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "GraphCast-UM",
+            "GenCast",
+            "GFS",
+            "GFS EPS",
+            "HAFS",
+            "Aurora-ECMWF",
+            "FengWu-ECMWF",
+            "FuXi-ECMWF",
             "JGSM",
+            "KIM",
+            "KIM EPS",
             "NAVGEM",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "Pangu-Weather-UM",
             "JGSM EPS",
             "UM",
             "UM EPS"
@@ -77,55 +439,75 @@
     },
     {
       "job": {
-        "storm_key": "typ_2020_10",
+        "storm_key": "typ_2025_10",
         "stage": "TYP_LINKED",
-        "year": 2020,
-        "data_time": "202009070000",
+        "year": 2025,
+        "data_time": "202508050000",
         "td_number": null,
-        "linked_td_number": 19,
+        "linked_td_number": 20,
         "typ_number": 10,
-        "typ_name_ko": "하이선",
-        "typ_name": "HAISHEN",
-        "typ_en": "HAISHEN",
-        "atcf_id": "wp112020",
+        "typ_name_ko": "바이루",
+        "typ_name": "BAILU",
+        "typ_en": "BAILU",
+        "atcf_id": "wp132025",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202009070000",
-        "cycle_time_utc": "202009070000",
-        "start_utc": "202009070500",
-        "end_utc": "202009071100"
+        "data_time": "202508050000",
+        "cycle_time_utc": "202508050000",
+        "start_utc": "202508050500",
+        "end_utc": "202508051100"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616115445",
-          "image_path": "VTG_IMG/2020/TYP_2010_HAISHEN/TYP_2010_HAISHEN_202009070000_240h.png",
+          "generated_at_utc": "20260616115615",
+          "image_path": "VTG_IMG/2025/TYP_2510_BAILU/TYP_2510_BAILU_202508050000_240h.png",
           "storm_stage": "TYP",
-          "storm_year": "2020",
+          "storm_year": "2025",
           "typ_number": 10,
           "data_typ_number": 10,
-          "typ_name": "HAISHEN",
-          "typ_name_ko": "하이선",
-          "linked_td_number": 19,
+          "typ_name": "BAILU",
+          "typ_name_ko": "바이루",
+          "linked_td_number": 20,
           "linked_typ_number": null,
-          "atcf_id": "wp112020",
+          "atcf_id": "wp132025",
           "extra_atcf_ids": [],
-          "data_time": "202009070000",
+          "data_time": "202508050000",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 12,
-          "target_model_count": 18,
+          "model_count": 32,
+          "target_model_count": 34,
           "model_labels": [
-            "GALWEM",
             "CMC",
             "CMC EPS",
+            "COAMPS-TC EPS",
             "COAMPS-TC",
+            "ECMWF",
+            "ECMWF AIFS",
+            "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "NAVGEM EPS",
+            "FourCastNet-UM",
+            "FNV3",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "GraphCast-UM",
+            "GenCast",
             "GFS",
             "GFS EPS",
-            "HWRF",
+            "HAFS",
+            "Aurora-ECMWF",
+            "FengWu-ECMWF",
+            "FuXi-ECMWF",
             "JGSM",
+            "KIM",
+            "KIM EPS",
             "NAVGEM",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "Pangu-Weather-UM",
             "JGSM EPS",
             "UM",
             "UM EPS"
@@ -309389,28 +309771,28 @@
     {
       "job": {
         "storm_key": "typ_2025_10",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2025,
         "data_time": "202508050000",
         "td_number": null,
         "linked_td_number": 20,
-        "linked_typ_number": null,
         "typ_number": 10,
-        "data_typ_number": 10,
         "typ_name_ko": "바이루",
         "typ_name": "BAILU",
         "typ_en": "BAILU",
         "atcf_id": "wp132025",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202508050000"
+        "data_time": "202508050000",
+        "cycle_time_utc": "202508050000",
+        "start_utc": "202508050500",
+        "end_utc": "202508051100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614110021",
+          "generated_at_utc": "20260616115601",
           "image_path": "VTG_IMG/2025/TYP_2510_BAILU/TYP_2510_BAILU_202508050000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2025",
@@ -309461,37 +309843,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202508050000_typ_2025_10_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2025_10",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2025,
         "data_time": "202508050000",
         "td_number": null,
         "linked_td_number": 20,
-        "linked_typ_number": null,
         "typ_number": 10,
-        "data_typ_number": 10,
         "typ_name_ko": "바이루",
         "typ_name": "BAILU",
         "typ_en": "BAILU",
         "atcf_id": "wp132025",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202508050000"
+        "data_time": "202508050000",
+        "cycle_time_utc": "202508050000",
+        "start_utc": "202508050500",
+        "end_utc": "202508051100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614110037",
+          "generated_at_utc": "20260616115615",
           "image_path": "VTG_IMG/2025/TYP_2510_BAILU/TYP_2510_BAILU_202508050000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2025",
@@ -309542,11 +309924,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202508050000_typ_2025_10_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
@@ -349179,28 +349561,28 @@
     {
       "job": {
         "storm_key": "td_2025_23",
-        "stage": "TD",
+        "stage": "TD_UNLINKED",
         "year": 2025,
         "data_time": "202508050000",
         "td_number": 23,
         "linked_td_number": null,
-        "linked_typ_number": null,
         "typ_number": 23,
-        "data_typ_number": 23,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
-        "atcf_id": "",
-        "fcst_hours": 120,
+        "typ_en": "",
+        "atcf_id": null,
         "skip_atcf": true
       },
       "window": {
-        "data_time": "202508050000"
+        "data_time": "202508050000",
+        "cycle_time_utc": "202508050000",
+        "start_utc": "202508050500",
+        "end_utc": "202508051100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614110022",
+          "generated_at_utc": "20260616115542",
           "image_path": "VTG_IMG/2025/TD_2523_NONAME/TD_2523_NONAME_202508050000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -349239,37 +349621,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": true,
-          "models": []
+          "skip_atcf": true
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202508050000_td_2025_23_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2025_23",
-        "stage": "TD",
+        "stage": "TD_UNLINKED",
         "year": 2025,
         "data_time": "202508050000",
         "td_number": 23,
         "linked_td_number": null,
-        "linked_typ_number": null,
         "typ_number": 23,
-        "data_typ_number": 23,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
-        "atcf_id": "",
-        "fcst_hours": 240,
+        "typ_en": "",
+        "atcf_id": null,
         "skip_atcf": true
       },
       "window": {
-        "data_time": "202508050000"
+        "data_time": "202508050000",
+        "cycle_time_utc": "202508050000",
+        "start_utc": "202508050500",
+        "end_utc": "202508051100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614110034",
+          "generated_at_utc": "20260616115550",
           "image_path": "VTG_IMG/2025/TD_2523_NONAME/TD_2523_NONAME_202508050000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -349308,11 +349690,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": true,
-          "models": []
+          "skip_atcf": true
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202508050000_td_2025_23_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
