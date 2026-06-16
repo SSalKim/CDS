@@ -314,11 +314,11 @@ for row in MODEL_SOURCES:
 
         alias_ids = []
         if source == "APIHUB" and model_id == "ECMWF":
-            alias_ids.extend(["ECMWF_TIGGE", "ECMWF_SPR_D"])
+            alias_ids.extend(["ECMWF_TIGGE", "ECM_SPR_D"])
         if source == "NOAA" and model_id == "ECMWF":
             alias_ids.extend(["ECMO", "EMX"])
         if source == "APIHUB" and model_id == "ECMWF_EPS":
-            alias_ids.extend(["ECMWF_SPR_E"])
+            alias_ids.extend(["ECM_SPR_E"])
         if source == "APIHUB" and model_id == "UM_KEPS":
             alias_ids.extend(["KEPS"])
         if source == "APIHUB" and model_id == "GFS":
