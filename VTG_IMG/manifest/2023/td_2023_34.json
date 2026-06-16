@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202310202300",
+  "updated_at_utc": "202606160244",
   "storm_key": "td_2023_34",
-  "stage": "TD_LINKED_TYP",
+  "stage": "TD",
   "year": 2023,
   "typ_number": 34,
   "linked_td_number": null,
@@ -138,27 +138,27 @@
     },
     {
       "job": {
-        "storm_key": "td_2023_34_typ_16",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2023_34",
+        "stage": "TD",
         "year": 2023,
         "data_time": "202310201800",
         "td_number": 34,
         "linked_td_number": null,
+        "linked_typ_number": 16,
         "typ_number": 34,
+        "data_typ_number": 34,
         "typ_name_ko": "산바",
         "typ_name": "SANBA",
         "typ_en": "SANBA",
         "atcf_id": "wp162023",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202310201800",
-        "cycle_time_utc": "202310201800",
-        "start_utc": "202310202300",
-        "end_utc": "202310210500"
+        "data_time": "202310201800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260616014819",
           "image_path": "VTG_IMG/2023/TD_2334_SANBA/TD_2334_SANBA_202310201800_120h.png",
@@ -188,35 +188,35 @@
             "NAVGEM",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202310201800_td_2023_34_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2023_34_typ_16",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2023_34",
+        "stage": "TD",
         "year": 2023,
         "data_time": "202310201800",
         "td_number": 34,
         "linked_td_number": null,
+        "linked_typ_number": 16,
         "typ_number": 34,
+        "data_typ_number": 34,
         "typ_name_ko": "산바",
         "typ_name": "SANBA",
         "typ_en": "SANBA",
         "atcf_id": "wp162023",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202310201800",
-        "cycle_time_utc": "202310201800",
-        "start_utc": "202310202300",
-        "end_utc": "202310210500"
+        "data_time": "202310201800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260616014821",
           "image_path": "VTG_IMG/2023/TD_2334_SANBA/TD_2334_SANBA_202310201800_240h.png",
@@ -246,11 +246,11 @@
             "NAVGEM",
             "UM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202310201800_td_2023_34_240h.json"
     }
   ]
 }
