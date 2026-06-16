@@ -180,7 +180,7 @@ option.classList.add('supported-option');
 option.dataset.supported='true';
 option.style.color='#0f172a';
 option.style.backgroundColor='#dbeafe';
-option.style.fontWeight='600';
+option.style.fontWeight='400';
 option.title='현재 모델에서 바로 표출 가능한 산출물입니다.';
 }
 

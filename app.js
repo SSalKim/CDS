@@ -278,11 +278,13 @@ return forecastTimelineState.getImageCacheEntry(index);
 function setForecastAvailabilityResult(index,{
 ok,
 urls=[],
-baseUrls=[]
+baseUrls=[],
+quiet=false,
+future=false
 }={}){
 
 setForecastLoadState(index,ok ? 'available' : 'missing');
-setForecastImageCacheEntry(index,{urls,baseUrls,ok});
+setForecastImageCacheEntry(index,{urls,baseUrls,ok,quiet,future});
 updateForecastSegmentState(index);
 
 }
@@ -1466,6 +1468,18 @@ if(!selectionIsDisplayable()){
 return;
 }
 
+if(isRunTimeFrameFuture(index)){
+setForecastAvailabilityResult(index,{
+ok:false,
+urls:[],
+baseUrls:[],
+quiet:true,
+future:true
+});
+showViewerMessage(makeFutureRunTimeFrameMessage(index));
+return;
+}
+
 /*
 성공 캐시만 신뢰한다.
 실패 캐시는 네트워크 지연/timeout일 수 있으므로 현재 선택 이미지는 다시 직접 시도한다.
@@ -1557,36 +1571,12 @@ return false;
 
 async function quietImageExists(url,timeoutMs=PRELOAD_IMAGE_TIMEOUT_MS){
 
-if(typeof fetch!=='function' || typeof AbortController==='undefined'){
+// Do not use fetch(HEAD) for KMA CHT images.
+// data.kma.go.kr and afso.kma.go.kr frequently reject HEAD with 405 and/or
+// CORS errors even when normal <img> loading works.  Those rejected probes are
+// harmless functionally, but they flood DevTools with red errors.
+// Returning null lets the regular image loader try the candidate URL directly.
 return null;
-}
-
-let controller=new AbortController();
-let timer=setTimeout(()=>controller.abort(),timeoutMs);
-
-try{
-let response=await fetch(url,{
-method:'HEAD',
-cache:'no-store',
-signal:controller.signal
-});
-
-// Some KMA CHT endpoints, especially SVG analysis products, do not allow
-// HEAD even when the file is available through normal image GET.  Treat 405
-// as inconclusive so the <img> loader below can try the same URL instead of
-// incorrectly skipping the primary mirror.
-if(response.status===405){
-return null;
-}
-
-return response.ok;
-}
-catch(e){
-return null;
-}
-finally{
-clearTimeout(timer);
-}
 
 }
 
@@ -1620,6 +1610,10 @@ return false;
 async function preloadForecastIndex(index,seq,{
 imageRefreshToken=''
 }={}){
+
+if(isRunTimeFrameFuture(index)){
+return {index,ok:false,urls:[],baseUrls:[],quiet:true,future:true};
+}
 
 let baseUrls=buildImageUrlsForForecastIndex(index);
 
@@ -1712,6 +1706,49 @@ return order;
 }
 
 
+function isRunTimeFrameFuture(index,nowUTC=new Date()){
+
+if(!isRunTimeSliderMode()){
+return false;
+}
+
+if(!['analysis','edit'].includes(currentMainMenu)){
+return false;
+}
+
+let runUTC=getRunUTCForForecastIndex(index);
+
+if(!(runUTC instanceof Date) || Number.isNaN(runUTC.getTime())){
+return false;
+}
+
+// Treat frames later than the current real UTC minute as not-yet-available.
+// This prevents expected future analysis/edit frames from creating avoidable
+// browser 404/CORS noise when the user searches near real time or presses Now.
+let safeNow=new Date(nowUTC.getTime()+60*1000);
+return runUTC.getTime()>safeNow.getTime();
+
+}
+
+
+function makeFutureRunTimeFrameMessage(index=Number(slider.value || 0)){
+
+let runUTC=getRunUTCForForecastIndex(index);
+let display=timeMode==='KST'
+?new Date(runUTC.getTime()+9*60*60*1000)
+:new Date(runUTC.getTime());
+let displayDate=formatDateInputFromUTCParts(display);
+let displayHour=pad2(display.getUTCHours());
+
+return (
+`${getCurrentMainMenuLabel()} / ${displayDate} ${displayHour}:00 ${timeMode}
+`+
+`현재 시각 이후 자료시각입니다. 아직 생산되지 않은 자료라 이미지 요청을 건너뜁니다.`
+);
+
+}
+
+
 async function preloadAllForecastImages({
 imageRefreshToken=''
 }={}){
@@ -1745,7 +1782,9 @@ setForecastLoadState(i,result.ok ? 'available' : 'missing');
 setForecastImageCacheEntry(i,{
 urls:result.urls,
 baseUrls:result.baseUrls,
-ok:result.ok
+ok:result.ok,
+quiet:!!result.quiet,
+future:!!result.future
 });
 updateForecastSegmentState(i);
 
