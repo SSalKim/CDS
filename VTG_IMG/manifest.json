@@ -1,280 +1,61 @@
 {
   "version": 2,
-  "updated_at_utc": "202008100500",
+  "updated_at_utc": "202008260500",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202008100000",
-      "cycle_time_utc": "202008100000",
-      "start_utc": "202008100500",
-      "end_utc": "202008101100"
+      "data_time": "202008260000",
+      "cycle_time_utc": "202008260000",
+      "start_utc": "202008260500",
+      "end_utc": "202008261100"
     }
   ],
   "runs": [
     {
       "job": {
-        "storm_key": "td_2020_12_typ_06",
-        "stage": "TD_PRE_TYP",
-        "year": 2020,
-        "data_time": "202008100000",
-        "td_number": 12,
-        "linked_td_number": null,
-        "typ_number": 12,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp072020",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202008100000",
-        "cycle_time_utc": "202008100000",
-        "start_utc": "202008100500",
-        "end_utc": "202008101100"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20260616114907",
-          "image_path": "VTG_IMG/2020/TD_2012_NONAME/TD_2012_NONAME_202008100000_120h.png",
-          "storm_stage": "TD",
-          "storm_year": "2020",
-          "typ_number": 12,
-          "data_typ_number": 12,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": 6,
-          "atcf_id": "wp072020",
-          "extra_atcf_ids": [],
-          "data_time": "202008100000",
-          "fcst_hours": 120,
-          "intensity": "TD",
-          "model_count": 9,
-          "target_model_count": 18,
-          "model_labels": [
-            "GALWEM",
-            "CMC EPS",
-            "COAMPS-TC",
-            "GFS",
-            "GFS EPS",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "JGSM EPS"
-          ],
-          "skip_atcf": false
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "td_2020_12_typ_06",
-        "stage": "TD_PRE_TYP",
-        "year": 2020,
-        "data_time": "202008100000",
-        "td_number": 12,
-        "linked_td_number": null,
-        "typ_number": 12,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp072020",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202008100000",
-        "cycle_time_utc": "202008100000",
-        "start_utc": "202008100500",
-        "end_utc": "202008101100"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20260616114909",
-          "image_path": "VTG_IMG/2020/TD_2012_NONAME/TD_2012_NONAME_202008100000_240h.png",
-          "storm_stage": "TD",
-          "storm_year": "2020",
-          "typ_number": 12,
-          "data_typ_number": 12,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": 6,
-          "atcf_id": "wp072020",
-          "extra_atcf_ids": [],
-          "data_time": "202008100000",
-          "fcst_hours": 240,
-          "intensity": "TD",
-          "model_count": 9,
-          "target_model_count": 18,
-          "model_labels": [
-            "GALWEM",
-            "CMC EPS",
-            "COAMPS-TC",
-            "GFS",
-            "GFS EPS",
-            "HWRF",
-            "JGSM",
-            "NAVGEM",
-            "JGSM EPS"
-          ],
-          "skip_atcf": false
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "td_2020_13",
-        "stage": "TD_UNLINKED",
-        "year": 2020,
-        "data_time": "202008100000",
-        "td_number": 13,
-        "linked_td_number": null,
-        "typ_number": 13,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true
-      },
-      "window": {
-        "data_time": "202008100000",
-        "cycle_time_utc": "202008100000",
-        "start_utc": "202008100500",
-        "end_utc": "202008101100"
-      },
-      "result": {
-        "status": "no_output",
-        "metadata": {
-          "generated_at_utc": "20260616114910",
-          "image_path": "VTG_IMG/2020/TD_2013_NONAME/TD_2013_NONAME_202008100000_120h.png",
-          "storm_stage": "TD",
-          "storm_year": "2020",
-          "typ_number": 13,
-          "data_typ_number": 13,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": null,
-          "atcf_id": "",
-          "extra_atcf_ids": [],
-          "data_time": "202008100000",
-          "fcst_hours": 120,
-          "intensity": "TD",
-          "model_count": 0,
-          "target_model_count": 18,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": true,
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "td_2020_13",
-        "stage": "TD_UNLINKED",
-        "year": 2020,
-        "data_time": "202008100000",
-        "td_number": 13,
-        "linked_td_number": null,
-        "typ_number": 13,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true
-      },
-      "window": {
-        "data_time": "202008100000",
-        "cycle_time_utc": "202008100000",
-        "start_utc": "202008100500",
-        "end_utc": "202008101100"
-      },
-      "result": {
-        "status": "no_output",
-        "metadata": {
-          "generated_at_utc": "20260616114910",
-          "image_path": "VTG_IMG/2020/TD_2013_NONAME/TD_2013_NONAME_202008100000_240h.png",
-          "storm_stage": "TD",
-          "storm_year": "2020",
-          "typ_number": 13,
-          "data_typ_number": 13,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": null,
-          "atcf_id": "",
-          "extra_atcf_ids": [],
-          "data_time": "202008100000",
-          "fcst_hours": 240,
-          "intensity": "TD",
-          "model_count": 0,
-          "target_model_count": 18,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": true,
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "typ_2020_05",
+        "storm_key": "typ_2020_08",
         "stage": "TYP_LINKED",
         "year": 2020,
-        "data_time": "202008100000",
+        "data_time": "202008260000",
         "td_number": null,
-        "linked_td_number": 11,
-        "typ_number": 5,
-        "typ_name_ko": "장미",
-        "typ_name": "JANGMI",
-        "typ_en": "JANGMI",
-        "atcf_id": "wp052020",
+        "linked_td_number": 17,
+        "typ_number": 8,
+        "typ_name_ko": "바비",
+        "typ_name": "BAVI",
+        "typ_en": "BAVI",
+        "atcf_id": "wp092020",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202008100000",
-        "cycle_time_utc": "202008100000",
-        "start_utc": "202008100500",
-        "end_utc": "202008101100"
+        "data_time": "202008260000",
+        "cycle_time_utc": "202008260000",
+        "start_utc": "202008260500",
+        "end_utc": "202008261100"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616114917",
-          "image_path": "VTG_IMG/2020/TYP_2005_JANGMI/TYP_2005_JANGMI_202008100000_120h.png",
+          "generated_at_utc": "20260616115109",
+          "image_path": "VTG_IMG/2020/TYP_2008_BAVI/TYP_2008_BAVI_202008260000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
-          "typ_number": 5,
-          "data_typ_number": 5,
-          "typ_name": "JANGMI",
-          "typ_name_ko": "장미",
-          "linked_td_number": 11,
+          "typ_number": 8,
+          "data_typ_number": 8,
+          "typ_name": "BAVI",
+          "typ_name_ko": "바비",
+          "linked_td_number": 17,
           "linked_typ_number": null,
-          "atcf_id": "wp052020",
+          "atcf_id": "wp092020",
           "extra_atcf_ids": [],
-          "data_time": "202008100000",
+          "data_time": "202008260000",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 12,
+          "model_count": 11,
           "target_model_count": 18,
           "model_labels": [
-            "GALWEM",
             "CMC",
             "CMC EPS",
             "COAMPS-TC",
@@ -295,47 +76,46 @@
     },
     {
       "job": {
-        "storm_key": "typ_2020_05",
+        "storm_key": "typ_2020_08",
         "stage": "TYP_LINKED",
         "year": 2020,
-        "data_time": "202008100000",
+        "data_time": "202008260000",
         "td_number": null,
-        "linked_td_number": 11,
-        "typ_number": 5,
-        "typ_name_ko": "장미",
-        "typ_name": "JANGMI",
-        "typ_en": "JANGMI",
-        "atcf_id": "wp052020",
+        "linked_td_number": 17,
+        "typ_number": 8,
+        "typ_name_ko": "바비",
+        "typ_name": "BAVI",
+        "typ_en": "BAVI",
+        "atcf_id": "wp092020",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202008100000",
-        "cycle_time_utc": "202008100000",
-        "start_utc": "202008100500",
-        "end_utc": "202008101100"
+        "data_time": "202008260000",
+        "cycle_time_utc": "202008260000",
+        "start_utc": "202008260500",
+        "end_utc": "202008261100"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616114919",
-          "image_path": "VTG_IMG/2020/TYP_2005_JANGMI/TYP_2005_JANGMI_202008100000_240h.png",
+          "generated_at_utc": "20260616115111",
+          "image_path": "VTG_IMG/2020/TYP_2008_BAVI/TYP_2008_BAVI_202008260000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
-          "typ_number": 5,
-          "data_typ_number": 5,
-          "typ_name": "JANGMI",
-          "typ_name_ko": "장미",
-          "linked_td_number": 11,
+          "typ_number": 8,
+          "data_typ_number": 8,
+          "typ_name": "BAVI",
+          "typ_name_ko": "바비",
+          "linked_td_number": 17,
           "linked_typ_number": null,
-          "atcf_id": "wp052020",
+          "atcf_id": "wp092020",
           "extra_atcf_ids": [],
-          "data_time": "202008100000",
+          "data_time": "202008260000",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 12,
+          "model_count": 11,
           "target_model_count": 18,
           "model_labels": [
-            "GALWEM",
             "CMC",
             "CMC EPS",
             "COAMPS-TC",
@@ -12897,28 +12677,28 @@
     {
       "job": {
         "storm_key": "typ_2020_08",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2020,
         "data_time": "202008260000",
         "td_number": null,
         "linked_td_number": 17,
-        "linked_typ_number": null,
         "typ_number": 8,
-        "data_typ_number": 8,
         "typ_name_ko": "바비",
         "typ_name": "BAVI",
         "typ_en": "BAVI",
         "atcf_id": "wp092020",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202008260000"
+        "data_time": "202008260000",
+        "cycle_time_utc": "202008260000",
+        "start_utc": "202008260500",
+        "end_utc": "202008261100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616060226",
+          "generated_at_utc": "20260616115109",
           "image_path": "VTG_IMG/2020/TYP_2008_BAVI/TYP_2008_BAVI_202008260000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -12933,14 +12713,12 @@
           "data_time": "202008260000",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 13,
+          "model_count": 11,
           "target_model_count": 18,
           "model_labels": [
             "CMC",
             "CMC EPS",
             "COAMPS-TC",
-            "ECMWF",
-            "ECMWF EPS",
             "GFS",
             "GFS EPS",
             "HWRF",
@@ -12950,37 +12728,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202008260000_typ_2020_08_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2020_08",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2020,
         "data_time": "202008260000",
         "td_number": null,
         "linked_td_number": 17,
-        "linked_typ_number": null,
         "typ_number": 8,
-        "data_typ_number": 8,
         "typ_name_ko": "바비",
         "typ_name": "BAVI",
         "typ_en": "BAVI",
         "atcf_id": "wp092020",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202008260000"
+        "data_time": "202008260000",
+        "cycle_time_utc": "202008260000",
+        "start_utc": "202008260500",
+        "end_utc": "202008261100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616060228",
+          "generated_at_utc": "20260616115111",
           "image_path": "VTG_IMG/2020/TYP_2008_BAVI/TYP_2008_BAVI_202008260000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -12995,14 +12773,12 @@
           "data_time": "202008260000",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 13,
+          "model_count": 11,
           "target_model_count": 18,
           "model_labels": [
             "CMC",
             "CMC EPS",
             "COAMPS-TC",
-            "ECMWF",
-            "ECMWF EPS",
             "GFS",
             "GFS EPS",
             "HWRF",
@@ -13012,11 +12788,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202008260000_typ_2020_08_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
