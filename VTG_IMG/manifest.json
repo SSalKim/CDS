@@ -1,65 +1,76 @@
 {
   "version": 2,
-  "updated_at_utc": "202008201700",
+  "updated_at_utc": "202008240500",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202008201200",
-      "cycle_time_utc": "202008201200",
-      "start_utc": "202008201700",
-      "end_utc": "202008202300"
+      "data_time": "202008240000",
+      "cycle_time_utc": "202008240000",
+      "start_utc": "202008240500",
+      "end_utc": "202008241100"
     }
   ],
   "runs": [
     {
       "job": {
-        "storm_key": "td_2020_16_typ_07",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "typ_2020_08",
+        "stage": "TYP_LINKED",
         "year": 2020,
-        "data_time": "202008201200",
-        "td_number": 16,
-        "linked_td_number": null,
-        "typ_number": 16,
-        "typ_name_ko": "히고스",
-        "typ_name": "HIGOS",
-        "typ_en": "HIGOS",
-        "atcf_id": "wp082020",
+        "data_time": "202008240000",
+        "td_number": null,
+        "linked_td_number": 17,
+        "typ_number": 8,
+        "typ_name_ko": "바비",
+        "typ_name": "BAVI",
+        "typ_en": "BAVI",
+        "atcf_id": "wp092020",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202008201200",
-        "cycle_time_utc": "202008201200",
-        "start_utc": "202008201700",
-        "end_utc": "202008202300"
+        "data_time": "202008240000",
+        "cycle_time_utc": "202008240000",
+        "start_utc": "202008240500",
+        "end_utc": "202008241100"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616132336",
-          "image_path": "VTG_IMG/2020/TD_2016_HIGOS/TD_2016_HIGOS_202008201200_120h.png",
-          "storm_stage": "TD",
+          "generated_at_utc": "20260616140355",
+          "image_path": "VTG_IMG/2020/TYP_2008_BAVI/TYP_2008_BAVI_202008240000_120h.png",
+          "storm_stage": "TYP",
           "storm_year": "2020",
-          "typ_number": 16,
-          "data_typ_number": 16,
-          "typ_name": "HIGOS",
-          "typ_name_ko": "히고스",
-          "linked_td_number": null,
-          "linked_typ_number": 7,
-          "atcf_id": "wp082020",
+          "typ_number": 8,
+          "data_typ_number": 8,
+          "typ_name": "BAVI",
+          "typ_name_ko": "바비",
+          "linked_td_number": 17,
+          "linked_typ_number": null,
+          "atcf_id": "wp092020",
           "extra_atcf_ids": [],
-          "data_time": "202008201200",
+          "data_time": "202008240000",
           "fcst_hours": 120,
-          "intensity": "TD",
-          "model_count": 0,
+          "intensity": "TYP",
+          "model_count": 13,
           "target_model_count": 18,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": false,
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+          "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "ECMWF",
+            "ECMWF EPS",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -67,50 +78,61 @@
     },
     {
       "job": {
-        "storm_key": "td_2020_16_typ_07",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "typ_2020_08",
+        "stage": "TYP_LINKED",
         "year": 2020,
-        "data_time": "202008201200",
-        "td_number": 16,
-        "linked_td_number": null,
-        "typ_number": 16,
-        "typ_name_ko": "히고스",
-        "typ_name": "HIGOS",
-        "typ_en": "HIGOS",
-        "atcf_id": "wp082020",
+        "data_time": "202008240000",
+        "td_number": null,
+        "linked_td_number": 17,
+        "typ_number": 8,
+        "typ_name_ko": "바비",
+        "typ_name": "BAVI",
+        "typ_en": "BAVI",
+        "atcf_id": "wp092020",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202008201200",
-        "cycle_time_utc": "202008201200",
-        "start_utc": "202008201700",
-        "end_utc": "202008202300"
+        "data_time": "202008240000",
+        "cycle_time_utc": "202008240000",
+        "start_utc": "202008240500",
+        "end_utc": "202008241100"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616132336",
-          "image_path": "VTG_IMG/2020/TD_2016_HIGOS/TD_2016_HIGOS_202008201200_240h.png",
-          "storm_stage": "TD",
+          "generated_at_utc": "20260616140357",
+          "image_path": "VTG_IMG/2020/TYP_2008_BAVI/TYP_2008_BAVI_202008240000_240h.png",
+          "storm_stage": "TYP",
           "storm_year": "2020",
-          "typ_number": 16,
-          "data_typ_number": 16,
-          "typ_name": "HIGOS",
-          "typ_name_ko": "히고스",
-          "linked_td_number": null,
-          "linked_typ_number": 7,
-          "atcf_id": "wp082020",
+          "typ_number": 8,
+          "data_typ_number": 8,
+          "typ_name": "BAVI",
+          "typ_name_ko": "바비",
+          "linked_td_number": 17,
+          "linked_typ_number": null,
+          "atcf_id": "wp092020",
           "extra_atcf_ids": [],
-          "data_time": "202008201200",
+          "data_time": "202008240000",
           "fcst_hours": 240,
-          "intensity": "TD",
-          "model_count": 0,
+          "intensity": "TYP",
+          "model_count": 13,
           "target_model_count": 18,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": false,
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+          "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "ECMWF",
+            "ECMWF EPS",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -11711,28 +11733,28 @@
     {
       "job": {
         "storm_key": "typ_2020_08",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2020,
         "data_time": "202008240000",
         "td_number": null,
         "linked_td_number": 17,
-        "linked_typ_number": null,
         "typ_number": 8,
-        "data_typ_number": 8,
         "typ_name_ko": "바비",
         "typ_name": "BAVI",
         "typ_en": "BAVI",
         "atcf_id": "wp092020",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202008240000"
+        "data_time": "202008240000",
+        "cycle_time_utc": "202008240000",
+        "start_utc": "202008240500",
+        "end_utc": "202008241100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616055730",
+          "generated_at_utc": "20260616140355",
           "image_path": "VTG_IMG/2020/TYP_2008_BAVI/TYP_2008_BAVI_202008240000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -11764,37 +11786,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202008240000_typ_2020_08_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2020_08",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2020,
         "data_time": "202008240000",
         "td_number": null,
         "linked_td_number": 17,
-        "linked_typ_number": null,
         "typ_number": 8,
-        "data_typ_number": 8,
         "typ_name_ko": "바비",
         "typ_name": "BAVI",
         "typ_en": "BAVI",
         "atcf_id": "wp092020",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202008240000"
+        "data_time": "202008240000",
+        "cycle_time_utc": "202008240000",
+        "start_utc": "202008240500",
+        "end_utc": "202008241100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616055732",
+          "generated_at_utc": "20260616140357",
           "image_path": "VTG_IMG/2020/TYP_2008_BAVI/TYP_2008_BAVI_202008240000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2020",
@@ -11826,11 +11848,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202008240000_typ_2020_08_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
