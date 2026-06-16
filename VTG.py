@@ -837,8 +837,28 @@ def storm_numbers(settings: Settings) -> set[int]:
     return {int(atcf_id[2:4]) for atcf_id in ids}
 
 
+def atcf_basin_suffix(atcf_id: str) -> str:
+    basin = str(atcf_id or "")[:2].upper()
+    return {
+        "WP": "W",
+        "EP": "E",
+        "CP": "C",
+        "AL": "L",
+        "SL": "S",
+        "SH": "S",
+        "IO": "I",
+    }.get(basin, basin[-1:] if basin else "")
+
+
+def atcf_storm_number_label(atcf_id: str) -> str:
+    text = str(atcf_id or "").strip().lower()
+    if len(text) < 4 or not text[2:4].isdigit():
+        return ""
+    return f"{text[2:4]}{atcf_basin_suffix(text)}"
+
+
 def storm_id_from_atcf_id(atcf_id: str) -> str:
-    return f"{atcf_id[2:4].upper()}W"
+    return atcf_storm_number_label(atcf_id)
 
 
 def knackwx_url(settings: Settings, atcf_id: str) -> str:
@@ -2115,11 +2135,10 @@ def storm_year(settings: Settings) -> str:
 
 def storm_number_label(settings: Settings) -> str:
     atcf_id = settings.atcf_id.lower()
-    if settings.skip_atcf or len(atcf_id) < 8 or not atcf_id[2:4].isdigit():
+    if settings.skip_atcf or len(atcf_id) < 8:
         return ""
-    basin = atcf_id[:2].upper()
-    basin_label = "W" if basin == "WP" else basin
-    return f"({atcf_id[2:4]}{basin_label})"
+    label = atcf_storm_number_label(atcf_id)
+    return f"({label})" if label else ""
 
 
 def display_typ_name(settings: Settings) -> str:
