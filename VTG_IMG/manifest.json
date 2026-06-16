@@ -1,65 +1,72 @@
 {
   "version": 2,
-  "updated_at_utc": "202007300500",
+  "updated_at_utc": "202008050500",
   "window_start_offset_hours": 5,
   "window_end_offset_hours": 11,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202007300000",
-      "cycle_time_utc": "202007300000",
-      "start_utc": "202007300500",
-      "end_utc": "202007301100"
+      "data_time": "202008050000",
+      "cycle_time_utc": "202008050000",
+      "start_utc": "202008050500",
+      "end_utc": "202008051100"
     }
   ],
   "runs": [
     {
       "job": {
-        "storm_key": "td_2020_06",
-        "stage": "TD_UNLINKED",
+        "storm_key": "td_2020_10_typ_04",
+        "stage": "TD_LINKED_TYP",
         "year": 2020,
-        "data_time": "202007300000",
-        "td_number": 6,
+        "data_time": "202008050000",
+        "td_number": 10,
         "linked_td_number": null,
-        "typ_number": 6,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true
+        "typ_number": 10,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
       },
       "window": {
-        "data_time": "202007300000",
-        "cycle_time_utc": "202007300000",
-        "start_utc": "202007300500",
-        "end_utc": "202007301100"
+        "data_time": "202008050000",
+        "cycle_time_utc": "202008050000",
+        "start_utc": "202008050500",
+        "end_utc": "202008051100"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616033927",
-          "image_path": "VTG_IMG/2020/TD_2006_NONAME/TD_2006_NONAME_202007300000_120h.png",
+          "generated_at_utc": "20260616035248",
+          "image_path": "VTG_IMG/2020/TD_2010_HAGUPIT/TD_2010_HAGUPIT_202008050000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
-          "typ_number": 6,
-          "data_typ_number": 6,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
+          "typ_number": 10,
+          "data_typ_number": 10,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
           "linked_td_number": null,
-          "linked_typ_number": null,
-          "atcf_id": "",
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
           "extra_atcf_ids": [],
-          "data_time": "202007300000",
+          "data_time": "202008050000",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 9,
           "target_model_count": 18,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": true,
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -67,50 +74,57 @@
     },
     {
       "job": {
-        "storm_key": "td_2020_06",
-        "stage": "TD_UNLINKED",
+        "storm_key": "td_2020_10_typ_04",
+        "stage": "TD_LINKED_TYP",
         "year": 2020,
-        "data_time": "202007300000",
-        "td_number": 6,
+        "data_time": "202008050000",
+        "td_number": 10,
         "linked_td_number": null,
-        "typ_number": 6,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true
+        "typ_number": 10,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
       },
       "window": {
-        "data_time": "202007300000",
-        "cycle_time_utc": "202007300000",
-        "start_utc": "202007300500",
-        "end_utc": "202007301100"
+        "data_time": "202008050000",
+        "cycle_time_utc": "202008050000",
+        "start_utc": "202008050500",
+        "end_utc": "202008051100"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260616033927",
-          "image_path": "VTG_IMG/2020/TD_2006_NONAME/TD_2006_NONAME_202007300000_240h.png",
+          "generated_at_utc": "20260616035250",
+          "image_path": "VTG_IMG/2020/TD_2010_HAGUPIT/TD_2010_HAGUPIT_202008050000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2020",
-          "typ_number": 6,
-          "data_typ_number": 6,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
+          "typ_number": 10,
+          "data_typ_number": 10,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
           "linked_td_number": null,
-          "linked_typ_number": null,
-          "atcf_id": "",
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
           "extra_atcf_ids": [],
-          "data_time": "202007300000",
+          "data_time": "202008050000",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 9,
           "target_model_count": 18,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": true,
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
         }
       },
       "completed": false,
@@ -4780,6 +4794,712 @@
     },
     {
       "job": {
+        "storm_key": "typ_2020_03",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008010600",
+        "td_number": null,
+        "linked_td_number": 7,
+        "typ_number": 3,
+        "typ_name_ko": "실라코",
+        "typ_name": "SINLAKU",
+        "typ_en": "SINLAKU",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008010600",
+        "cycle_time_utc": "202008010600",
+        "start_utc": "202008011100",
+        "end_utc": "202008011700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034342",
+          "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008010600_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 3,
+          "data_typ_number": 3,
+          "typ_name": "SINLAKU",
+          "typ_name_ko": "실라코",
+          "linked_td_number": 7,
+          "linked_typ_number": null,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202008010600",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_03",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008010600",
+        "td_number": null,
+        "linked_td_number": 7,
+        "typ_number": 3,
+        "typ_name_ko": "실라코",
+        "typ_name": "SINLAKU",
+        "typ_en": "SINLAKU",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008010600",
+        "cycle_time_utc": "202008010600",
+        "start_utc": "202008011100",
+        "end_utc": "202008011700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034345",
+          "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008010600_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 3,
+          "data_typ_number": 3,
+          "typ_name": "SINLAKU",
+          "typ_name_ko": "실라코",
+          "linked_td_number": 7,
+          "linked_typ_number": null,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202008010600",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_03",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008011200",
+        "td_number": null,
+        "linked_td_number": 7,
+        "typ_number": 3,
+        "typ_name_ko": "실라코",
+        "typ_name": "SINLAKU",
+        "typ_en": "SINLAKU",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008011200",
+        "cycle_time_utc": "202008011200",
+        "start_utc": "202008011700",
+        "end_utc": "202008012300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034420",
+          "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008011200_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 3,
+          "data_typ_number": 3,
+          "typ_name": "SINLAKU",
+          "typ_name_ko": "실라코",
+          "linked_td_number": 7,
+          "linked_typ_number": null,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202008011200",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 12,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_03",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008011200",
+        "td_number": null,
+        "linked_td_number": 7,
+        "typ_number": 3,
+        "typ_name_ko": "실라코",
+        "typ_name": "SINLAKU",
+        "typ_en": "SINLAKU",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008011200",
+        "cycle_time_utc": "202008011200",
+        "start_utc": "202008011700",
+        "end_utc": "202008012300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034422",
+          "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008011200_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 3,
+          "data_typ_number": 3,
+          "typ_name": "SINLAKU",
+          "typ_name_ko": "실라코",
+          "linked_td_number": 7,
+          "linked_typ_number": null,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202008011200",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 12,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_03",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008011800",
+        "td_number": null,
+        "linked_td_number": 7,
+        "typ_number": 3,
+        "typ_name_ko": "실라코",
+        "typ_name": "SINLAKU",
+        "typ_en": "SINLAKU",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008011800",
+        "cycle_time_utc": "202008011800",
+        "start_utc": "202008012300",
+        "end_utc": "202008020500"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034459",
+          "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008011800_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 3,
+          "data_typ_number": 3,
+          "typ_name": "SINLAKU",
+          "typ_name_ko": "실라코",
+          "linked_td_number": 7,
+          "linked_typ_number": null,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202008011800",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_03",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008011800",
+        "td_number": null,
+        "linked_td_number": 7,
+        "typ_number": 3,
+        "typ_name_ko": "실라코",
+        "typ_name": "SINLAKU",
+        "typ_en": "SINLAKU",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008011800",
+        "cycle_time_utc": "202008011800",
+        "start_utc": "202008012300",
+        "end_utc": "202008020500"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034500",
+          "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008011800_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 3,
+          "data_typ_number": 3,
+          "typ_name": "SINLAKU",
+          "typ_name_ko": "실라코",
+          "linked_td_number": 7,
+          "linked_typ_number": null,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202008011800",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_03",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008020000",
+        "td_number": null,
+        "linked_td_number": 7,
+        "typ_number": 3,
+        "typ_name_ko": "실라코",
+        "typ_name": "SINLAKU",
+        "typ_en": "SINLAKU",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008020000",
+        "cycle_time_utc": "202008020000",
+        "start_utc": "202008020500",
+        "end_utc": "202008021100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034537",
+          "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008020000_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 3,
+          "data_typ_number": 3,
+          "typ_name": "SINLAKU",
+          "typ_name_ko": "실라코",
+          "linked_td_number": 7,
+          "linked_typ_number": null,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202008020000",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 12,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_03",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008020000",
+        "td_number": null,
+        "linked_td_number": 7,
+        "typ_number": 3,
+        "typ_name_ko": "실라코",
+        "typ_name": "SINLAKU",
+        "typ_en": "SINLAKU",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008020000",
+        "cycle_time_utc": "202008020000",
+        "start_utc": "202008020500",
+        "end_utc": "202008021100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034538",
+          "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008020000_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 3,
+          "data_typ_number": 3,
+          "typ_name": "SINLAKU",
+          "typ_name_ko": "실라코",
+          "linked_td_number": 7,
+          "linked_typ_number": null,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202008020000",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 12,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_03",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008020600",
+        "td_number": null,
+        "linked_td_number": 7,
+        "typ_number": 3,
+        "typ_name_ko": "실라코",
+        "typ_name": "SINLAKU",
+        "typ_en": "SINLAKU",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008020600",
+        "cycle_time_utc": "202008020600",
+        "start_utc": "202008021100",
+        "end_utc": "202008021700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034615",
+          "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008020600_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 3,
+          "data_typ_number": 3,
+          "typ_name": "SINLAKU",
+          "typ_name_ko": "실라코",
+          "linked_td_number": 7,
+          "linked_typ_number": null,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202008020600",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_03",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008020600",
+        "td_number": null,
+        "linked_td_number": 7,
+        "typ_number": 3,
+        "typ_name_ko": "실라코",
+        "typ_name": "SINLAKU",
+        "typ_en": "SINLAKU",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008020600",
+        "cycle_time_utc": "202008020600",
+        "start_utc": "202008021100",
+        "end_utc": "202008021700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034617",
+          "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008020600_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 3,
+          "data_typ_number": 3,
+          "typ_name": "SINLAKU",
+          "typ_name_ko": "실라코",
+          "linked_td_number": 7,
+          "linked_typ_number": null,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202008020600",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_03",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008021200",
+        "td_number": null,
+        "linked_td_number": 9,
+        "typ_number": 3,
+        "typ_name_ko": "실라코",
+        "typ_name": "SINLAKU",
+        "typ_en": "SINLAKU",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008021200",
+        "cycle_time_utc": "202008021200",
+        "start_utc": "202008021700",
+        "end_utc": "202008022300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034653",
+          "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008021200_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 3,
+          "data_typ_number": 3,
+          "typ_name": "SINLAKU",
+          "typ_name_ko": "실라코",
+          "linked_td_number": 9,
+          "linked_typ_number": null,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202008021200",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "NAVGEM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_03",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008021200",
+        "td_number": null,
+        "linked_td_number": 9,
+        "typ_number": 3,
+        "typ_name_ko": "실라코",
+        "typ_name": "SINLAKU",
+        "typ_en": "SINLAKU",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008021200",
+        "cycle_time_utc": "202008021200",
+        "start_utc": "202008021700",
+        "end_utc": "202008022300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034655",
+          "image_path": "VTG_IMG/2020/TYP_2003_SINLAKU/TYP_2003_SINLAKU_202008021200_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 3,
+          "data_typ_number": 3,
+          "typ_name": "SINLAKU",
+          "typ_name_ko": "실라코",
+          "linked_td_number": 9,
+          "linked_typ_number": null,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202008021200",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "NAVGEM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
         "storm_key": "td_2020_04_typ_02",
         "stage": "TD_LINKED_TYP",
         "year": 2020,
@@ -4879,6 +5599,2900 @@
             "GFS EPS",
             "HWRF",
             "NAVGEM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008011200",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008011200",
+        "cycle_time_utc": "202008011200",
+        "start_utc": "202008011700",
+        "end_utc": "202008012300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034421",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008011200_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008011200",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 11,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008011200",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008011200",
+        "cycle_time_utc": "202008011200",
+        "start_utc": "202008011700",
+        "end_utc": "202008012300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034423",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008011200_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008011200",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 11,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008011800",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008011800",
+        "cycle_time_utc": "202008011800",
+        "start_utc": "202008012300",
+        "end_utc": "202008020500"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034458",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008011800_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008011800",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008011800",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008011800",
+        "cycle_time_utc": "202008011800",
+        "start_utc": "202008012300",
+        "end_utc": "202008020500"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034500",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008011800_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008011800",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008020000",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008020000",
+        "cycle_time_utc": "202008020000",
+        "start_utc": "202008020500",
+        "end_utc": "202008021100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034536",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008020000_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008020000",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 12,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008020000",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008020000",
+        "cycle_time_utc": "202008020000",
+        "start_utc": "202008020500",
+        "end_utc": "202008021100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034538",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008020000_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008020000",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 12,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008020600",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008020600",
+        "cycle_time_utc": "202008020600",
+        "start_utc": "202008021100",
+        "end_utc": "202008021700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034615",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008020600_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008020600",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008020600",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008020600",
+        "cycle_time_utc": "202008020600",
+        "start_utc": "202008021100",
+        "end_utc": "202008021700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034617",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008020600_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008020600",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008021200",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008021200",
+        "cycle_time_utc": "202008021200",
+        "start_utc": "202008021700",
+        "end_utc": "202008022300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034653",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008021200_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008021200",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 12,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008021200",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008021200",
+        "cycle_time_utc": "202008021200",
+        "start_utc": "202008021700",
+        "end_utc": "202008022300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034655",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008021200_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008021200",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 12,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008021800",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008021800",
+        "cycle_time_utc": "202008021800",
+        "start_utc": "202008022300",
+        "end_utc": "202008030500"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034728",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008021800_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008021800",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008021800",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008021800",
+        "cycle_time_utc": "202008021800",
+        "start_utc": "202008022300",
+        "end_utc": "202008030500"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034729",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008021800_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008021800",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008030000",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008030000",
+        "cycle_time_utc": "202008030000",
+        "start_utc": "202008030500",
+        "end_utc": "202008031100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034802",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008030000_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008030000",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 11,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008030000",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008030000",
+        "cycle_time_utc": "202008030000",
+        "start_utc": "202008030500",
+        "end_utc": "202008031100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034804",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008030000_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008030000",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 11,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008030600",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008030600",
+        "cycle_time_utc": "202008030600",
+        "start_utc": "202008031100",
+        "end_utc": "202008031700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034835",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008030600_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008030600",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008030600",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008030600",
+        "cycle_time_utc": "202008030600",
+        "start_utc": "202008031100",
+        "end_utc": "202008031700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034837",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008030600_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008030600",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008031200",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008031200",
+        "cycle_time_utc": "202008031200",
+        "start_utc": "202008031700",
+        "end_utc": "202008032300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034908",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008031200_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008031200",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 11,
+          "target_model_count": 18,
+          "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008031200",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008031200",
+        "cycle_time_utc": "202008031200",
+        "start_utc": "202008031700",
+        "end_utc": "202008032300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034911",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008031200_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008031200",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 11,
+          "target_model_count": 18,
+          "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008031800",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008031800",
+        "cycle_time_utc": "202008031800",
+        "start_utc": "202008032300",
+        "end_utc": "202008040500"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034943",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008031800_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008031800",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008031800",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008031800",
+        "cycle_time_utc": "202008031800",
+        "start_utc": "202008032300",
+        "end_utc": "202008040500"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034945",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008031800_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008031800",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008040000",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008040000",
+        "cycle_time_utc": "202008040000",
+        "start_utc": "202008040500",
+        "end_utc": "202008041100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616035017",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008040000_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008040000",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 12,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008040000",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008040000",
+        "cycle_time_utc": "202008040000",
+        "start_utc": "202008040500",
+        "end_utc": "202008041100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616035019",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008040000_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008040000",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 12,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008040600",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008040600",
+        "cycle_time_utc": "202008040600",
+        "start_utc": "202008041100",
+        "end_utc": "202008041700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616035051",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008040600_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008040600",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008040600",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008040600",
+        "cycle_time_utc": "202008040600",
+        "start_utc": "202008041100",
+        "end_utc": "202008041700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616035053",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008040600_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008040600",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008041200",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008041200",
+        "cycle_time_utc": "202008041200",
+        "start_utc": "202008041700",
+        "end_utc": "202008042300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616035126",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008041200_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008041200",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 12,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008041200",
+        "td_number": null,
+        "linked_td_number": 8,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008041200",
+        "cycle_time_utc": "202008041200",
+        "start_utc": "202008041700",
+        "end_utc": "202008042300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616035128",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008041200_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 8,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008041200",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 12,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM",
+            "UM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008041800",
+        "td_number": null,
+        "linked_td_number": 10,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008041800",
+        "cycle_time_utc": "202008041800",
+        "start_utc": "202008042300",
+        "end_utc": "202008050500"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616035200",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008041800_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 10,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008041800",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2020_04",
+        "stage": "TYP_LINKED",
+        "year": 2020,
+        "data_time": "202008041800",
+        "td_number": null,
+        "linked_td_number": 10,
+        "typ_number": 4,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008041800",
+        "cycle_time_utc": "202008041800",
+        "start_utc": "202008042300",
+        "end_utc": "202008050500"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616035202",
+          "image_path": "VTG_IMG/2020/TYP_2004_HAGUPIT/TYP_2004_HAGUPIT_202008041800_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2020",
+          "typ_number": 4,
+          "data_typ_number": 4,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": 10,
+          "linked_typ_number": null,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008041800",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_07_typ_03",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202007310000",
+        "td_number": 7,
+        "linked_td_number": null,
+        "typ_number": 7,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202007310000",
+        "cycle_time_utc": "202007310000",
+        "start_utc": "202007310500",
+        "end_utc": "202007311100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034007",
+          "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007310000_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 3,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202007310000",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_07_typ_03",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202007310000",
+        "td_number": 7,
+        "linked_td_number": null,
+        "typ_number": 7,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202007310000",
+        "cycle_time_utc": "202007310000",
+        "start_utc": "202007310500",
+        "end_utc": "202007311100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034009",
+          "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007310000_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 3,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202007310000",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_07_typ_03",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202007310600",
+        "td_number": 7,
+        "linked_td_number": null,
+        "typ_number": 7,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202007310600",
+        "cycle_time_utc": "202007310600",
+        "start_utc": "202007311100",
+        "end_utc": "202007311700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034056",
+          "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007310600_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 3,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202007310600",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_07_typ_03",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202007310600",
+        "td_number": 7,
+        "linked_td_number": null,
+        "typ_number": 7,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202007310600",
+        "cycle_time_utc": "202007310600",
+        "start_utc": "202007311100",
+        "end_utc": "202007311700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034059",
+          "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007310600_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 3,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202007310600",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_07_typ_03",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202007311200",
+        "td_number": 7,
+        "linked_td_number": null,
+        "typ_number": 7,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202007311200",
+        "cycle_time_utc": "202007311200",
+        "start_utc": "202007311700",
+        "end_utc": "202007312300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034145",
+          "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007311200_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 3,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202007311200",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_07_typ_03",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202007311200",
+        "td_number": 7,
+        "linked_td_number": null,
+        "typ_number": 7,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202007311200",
+        "cycle_time_utc": "202007311200",
+        "start_utc": "202007311700",
+        "end_utc": "202007312300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034147",
+          "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007311200_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 3,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202007311200",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_07_typ_03",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202007311800",
+        "td_number": 7,
+        "linked_td_number": null,
+        "typ_number": 7,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202007311800",
+        "cycle_time_utc": "202007311800",
+        "start_utc": "202007312300",
+        "end_utc": "202008010500"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034225",
+          "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007311800_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 3,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202007311800",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_07_typ_03",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202007311800",
+        "td_number": 7,
+        "linked_td_number": null,
+        "typ_number": 7,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202007311800",
+        "cycle_time_utc": "202007311800",
+        "start_utc": "202007312300",
+        "end_utc": "202008010500"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034227",
+          "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202007311800_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 3,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202007311800",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_07_typ_03",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202008010000",
+        "td_number": 7,
+        "linked_td_number": null,
+        "typ_number": 7,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008010000",
+        "cycle_time_utc": "202008010000",
+        "start_utc": "202008010500",
+        "end_utc": "202008011100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034303",
+          "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202008010000_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 3,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202008010000",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_07_typ_03",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202008010000",
+        "td_number": 7,
+        "linked_td_number": null,
+        "typ_number": 7,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp042020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008010000",
+        "cycle_time_utc": "202008010000",
+        "start_utc": "202008010500",
+        "end_utc": "202008011100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034305",
+          "image_path": "VTG_IMG/2020/TD_2007_NONAME/TD_2007_NONAME_202008010000_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 3,
+          "atcf_id": "wp042020",
+          "extra_atcf_ids": [],
+          "data_time": "202008010000",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_08_typ_04",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202007310600",
+        "td_number": 8,
+        "linked_td_number": null,
+        "typ_number": 8,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202007310600",
+        "cycle_time_utc": "202007310600",
+        "start_utc": "202007311100",
+        "end_utc": "202007311700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034106",
+          "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202007310600_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 8,
+          "data_typ_number": 8,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202007310600",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 6,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "NAVGEM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_08_typ_04",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202007310600",
+        "td_number": 8,
+        "linked_td_number": null,
+        "typ_number": 8,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202007310600",
+        "cycle_time_utc": "202007310600",
+        "start_utc": "202007311100",
+        "end_utc": "202007311700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034108",
+          "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202007310600_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 8,
+          "data_typ_number": 8,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202007310600",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 6,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "NAVGEM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_08_typ_04",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202007311200",
+        "td_number": 8,
+        "linked_td_number": null,
+        "typ_number": 8,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202007311200",
+        "cycle_time_utc": "202007311200",
+        "start_utc": "202007311700",
+        "end_utc": "202007312300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034144",
+          "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202007311200_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 8,
+          "data_typ_number": 8,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202007311200",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 7,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "NAVGEM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_08_typ_04",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202007311200",
+        "td_number": 8,
+        "linked_td_number": null,
+        "typ_number": 8,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202007311200",
+        "cycle_time_utc": "202007311200",
+        "start_utc": "202007311700",
+        "end_utc": "202007312300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034146",
+          "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202007311200_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 8,
+          "data_typ_number": 8,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202007311200",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 7,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "NAVGEM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_08_typ_04",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202007311800",
+        "td_number": 8,
+        "linked_td_number": null,
+        "typ_number": 8,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202007311800",
+        "cycle_time_utc": "202007311800",
+        "start_utc": "202007312300",
+        "end_utc": "202008010500"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034226",
+          "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202007311800_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 8,
+          "data_typ_number": 8,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202007311800",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 5,
+          "target_model_count": 18,
+          "model_labels": [
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "NAVGEM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_08_typ_04",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202007311800",
+        "td_number": 8,
+        "linked_td_number": null,
+        "typ_number": 8,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202007311800",
+        "cycle_time_utc": "202007311800",
+        "start_utc": "202007312300",
+        "end_utc": "202008010500"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034227",
+          "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202007311800_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 8,
+          "data_typ_number": 8,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202007311800",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 5,
+          "target_model_count": 18,
+          "model_labels": [
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "NAVGEM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_08_typ_04",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202008010000",
+        "td_number": 8,
+        "linked_td_number": null,
+        "typ_number": 8,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008010000",
+        "cycle_time_utc": "202008010000",
+        "start_utc": "202008010500",
+        "end_utc": "202008011100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034304",
+          "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202008010000_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 8,
+          "data_typ_number": 8,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008010000",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 4,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_08_typ_04",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202008010000",
+        "td_number": 8,
+        "linked_td_number": null,
+        "typ_number": 8,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008010000",
+        "cycle_time_utc": "202008010000",
+        "start_utc": "202008010500",
+        "end_utc": "202008011100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034306",
+          "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202008010000_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 8,
+          "data_typ_number": 8,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008010000",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 4,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_08_typ_04",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202008010600",
+        "td_number": 8,
+        "linked_td_number": null,
+        "typ_number": 8,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008010600",
+        "cycle_time_utc": "202008010600",
+        "start_utc": "202008011100",
+        "end_utc": "202008011700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034343",
+          "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202008010600_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 8,
+          "data_typ_number": 8,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008010600",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_08_typ_04",
+        "stage": "TD_PRE_TYP",
+        "year": 2020,
+        "data_time": "202008010600",
+        "td_number": 8,
+        "linked_td_number": null,
+        "typ_number": 8,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008010600",
+        "cycle_time_utc": "202008010600",
+        "start_utc": "202008011100",
+        "end_utc": "202008011700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616034345",
+          "image_path": "VTG_IMG/2020/TD_2008_NONAME/TD_2008_NONAME_202008010600_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 8,
+          "data_typ_number": 8,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008010600",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 8,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_10_typ_04",
+        "stage": "TD_LINKED_TYP",
+        "year": 2020,
+        "data_time": "202008050000",
+        "td_number": 10,
+        "linked_td_number": null,
+        "typ_number": 10,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008050000",
+        "cycle_time_utc": "202008050000",
+        "start_utc": "202008050500",
+        "end_utc": "202008051100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616035248",
+          "image_path": "VTG_IMG/2020/TD_2010_HAGUPIT/TD_2010_HAGUPIT_202008050000_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 10,
+          "data_typ_number": 10,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": null,
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008050000",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2020_10_typ_04",
+        "stage": "TD_LINKED_TYP",
+        "year": 2020,
+        "data_time": "202008050000",
+        "td_number": 10,
+        "linked_td_number": null,
+        "typ_number": 10,
+        "typ_name_ko": "하구핏",
+        "typ_name": "HAGUPIT",
+        "typ_en": "HAGUPIT",
+        "atcf_id": "wp032020",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202008050000",
+        "cycle_time_utc": "202008050000",
+        "start_utc": "202008050500",
+        "end_utc": "202008051100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260616035250",
+          "image_path": "VTG_IMG/2020/TD_2010_HAGUPIT/TD_2010_HAGUPIT_202008050000_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2020",
+          "typ_number": 10,
+          "data_typ_number": 10,
+          "typ_name": "HAGUPIT",
+          "typ_name_ko": "하구핏",
+          "linked_td_number": null,
+          "linked_typ_number": 4,
+          "atcf_id": "wp032020",
+          "extra_atcf_ids": [],
+          "data_time": "202008050000",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 9,
+          "target_model_count": 18,
+          "model_labels": [
+            "GALWEM",
+            "CMC EPS",
+            "COAMPS-TC",
+            "GFS",
+            "GFS EPS",
+            "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS"
           ],
           "skip_atcf": false
         }
