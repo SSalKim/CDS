@@ -1570,6 +1570,15 @@ method:'HEAD',
 cache:'no-store',
 signal:controller.signal
 });
+
+// Some KMA CHT endpoints, especially SVG analysis products, do not allow
+// HEAD even when the file is available through normal image GET.  Treat 405
+// as inconclusive so the <img> loader below can try the same URL instead of
+// incorrectly skipping the primary mirror.
+if(response.status===405){
+return null;
+}
+
 return response.ok;
 }
 catch(e){
