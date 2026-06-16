@@ -3,8 +3,8 @@ const TYPHOON_STATUS_PATH='VTG_IMG/vtg_auto_status.json';
 const TYPHOON_TYP_LIST_CACHE_PREFIX='VTG_IMG/kma_apihub_cache/typ_lst_';
 const TYPHOON_TYP_LIST_CACHE_SUFFIX='.json';
 const TYPHOON_IMPACT_EFF_VALUES=new Set(['1','2','3']);
-const TYPHOON_IMPACT_OPTION_BG='#F9E5FF';
-const TYPHOON_IMPACT_OPTION_COLOR='#5d2b66';
+const TYPHOON_IMPACT_OPTION_BG='#dff5ff';
+const TYPHOON_IMPACT_OPTION_COLOR='#0f3d64';
 const TYPHOON_IMPACT_OPTION_WEIGHT='700';
 const TYPHOON_REFRESH_MS=10*60*1000;
 const TYPHOON_SLOT_HOURS=6;
@@ -429,7 +429,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "14층",
     "기반": "AI",
-    "참고사항": "ECMWF AIFS 기상청 국립기상과학원 자체 수행, ECMWF 초기장 활용"
+    "참고사항": "ECMWF AIFS 기상청 자체 수행, ECMWF 초기장 활용"
   },
   {
     "표출명칭": "KMA AIFS-KIM",
@@ -440,7 +440,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "14층",
     "기반": "AI",
-    "참고사항": "ECMWF AIFS 기상청 국립기상과학원 자체 수행, KIM 초기장 활용"
+    "참고사항": "ECMWF AIFS 기상청 자체 수행, KIM 초기장 활용"
   },
   {
     "표출명칭": "AIGFS",
@@ -816,13 +816,13 @@ let style=document.createElement('style');
 style.id='typhoonModelDetailStyles';
 style.textContent=`
 .typhoon-storm-select option.typhoon-impact-storm-option{
-background:#F9E5FF;
-color:#5d2b66;
+background:#dff5ff;
+color:#0f3d64;
 font-weight:700;
 }
 .typhoon-storm-select option.typhoon-active-storm-option{
-background:#dff5ff;
-color:#0f3d64;
+background:#F9E5FF;
+color:#5d2b66;
 font-weight:800;
 }
 .typhoon-model-info-panel{
@@ -848,28 +848,17 @@ bottom:0;
 z-index:2;
 }
 .typhoon-model-info-actions .typhoon-updated-time{
-flex:1 1 auto;
 min-width:0;
 margin-right:auto;
-display:flex;
-flex-direction:column;
-align-items:flex-start;
-justify-content:center;
 text-align:left;
 font-size:12px;
 font-weight:750;
 letter-spacing:-.02em;
-line-height:1.28;
+line-height:1.25;
 color:#64748b;
-white-space:normal;
-overflow:visible;
-text-overflow:clip;
-}
-.typhoon-model-info-actions .typhoon-updated-schedule{
-font-size:11px;
-font-weight:700;
-color:#94a3b8;
-margin-top:2px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
 }
 .typhoon-fcst-option{
 transition:background .15s ease,border-color .15s ease,box-shadow .15s ease,filter .15s ease,color .15s ease;
@@ -1796,9 +1785,7 @@ let option=document.createElement('option');
 option.value=storm.key;
 option.textContent=storm.label;
 let optionClasses=[];
-let isNamedTyphoon=String(storm.stage || '').toUpperCase()!=='TD';
-let shouldStyleImpact=storm.impact && isNamedTyphoon;
-if(shouldStyleImpact){
+if(storm.impact){
 optionClasses.push('typhoon-impact-storm-option');
 option.style.backgroundColor=TYPHOON_IMPACT_OPTION_BG;
 option.style.color=TYPHOON_IMPACT_OPTION_COLOR;
@@ -1807,10 +1794,10 @@ option.title=`한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}`;
 }
 if(storm.active){
 optionClasses.push('typhoon-active-storm-option');
-option.style.backgroundColor='#dff5ff';
-option.style.color='#0f3d64';
+option.style.backgroundColor='#F9E5FF';
+option.style.color='#5d2b66';
 option.style.fontWeight='800';
-option.title=shouldStyleImpact ? `현재 활동중 · 한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}` : '현재 활동중';
+option.title=storm.impact ? `현재 활동중 · 한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}` : '현재 활동중';
 }
 option.className=optionClasses.join(' ');
 stormSelect.appendChild(option);
@@ -1836,16 +1823,7 @@ if(!subtitle){
 return;
 }
 let updated=formatTyphoonKst(run?.generatedAt || run?.metadata?.generated_at_utc || '');
-subtitle.replaceChildren();
-if(updated && updated!=='-'){
-let updatedLine=document.createElement('div');
-updatedLine.textContent=`최근 업데이트 : ${updated}`;
-subtitle.appendChild(updatedLine);
-}
-let scheduleLine=document.createElement('div');
-scheduleLine.className='typhoon-updated-schedule';
-scheduleLine.textContent='00UTC 기준 14KST 시작 / 20KST 종료';
-subtitle.appendChild(scheduleLine);
+subtitle.textContent=updated && updated!=='-' ? `최근 업데이트 : ${updated}` : '';
 }
 
 function renderTyphoonTimeline(){
