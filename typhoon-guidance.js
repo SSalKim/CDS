@@ -820,11 +820,6 @@ background:#F9E5FF;
 color:#5d2b66;
 font-weight:700;
 }
-.typhoon-storm-select option.typhoon-impact-linked-td-option{
-background:#F5ECFF;
-color:#7a5a8f;
-font-weight:600;
-}
 .typhoon-storm-select option.typhoon-active-storm-option{
 background:#dff5ff;
 color:#0f3d64;
@@ -853,17 +848,28 @@ bottom:0;
 z-index:2;
 }
 .typhoon-model-info-actions .typhoon-updated-time{
+flex:1 1 auto;
 min-width:0;
 margin-right:auto;
+display:flex;
+flex-direction:column;
+align-items:flex-start;
+justify-content:center;
 text-align:left;
 font-size:12px;
 font-weight:750;
 letter-spacing:-.02em;
-line-height:1.25;
+line-height:1.28;
 color:#64748b;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
+white-space:normal;
+overflow:visible;
+text-overflow:clip;
+}
+.typhoon-model-info-actions .typhoon-updated-schedule{
+font-size:11px;
+font-weight:700;
+color:#94a3b8;
+margin-top:2px;
 }
 .typhoon-fcst-option{
 transition:background .15s ease,border-color .15s ease,box-shadow .15s ease,filter .15s ease,color .15s ease;
@@ -1610,10 +1616,6 @@ function isKoreaImpactTyphoonEntry(entry){
 return TYPHOON_IMPACT_EFF_VALUES.has(typhoonImpactEffectForEntry(entry));
 }
 
-function isNamedTyphoonStormStage(stage){
-return String(stage || '').toUpperCase()!=='TD';
-}
-
 function buildTyphoonStormsForYear(year){
 let byKey=new Map();
 let activeWindowTimes=typhoonActiveWindowDataTimes();
@@ -1794,28 +1796,21 @@ let option=document.createElement('option');
 option.value=storm.key;
 option.textContent=storm.label;
 let optionClasses=[];
-let namedImpact=storm.impact && isNamedTyphoonStormStage(storm.stage);
-let linkedTdImpact=storm.impact && !isNamedTyphoonStormStage(storm.stage);
-if(namedImpact){
+let isNamedTyphoon=String(storm.stage || '').toUpperCase()!=='TD';
+let shouldStyleImpact=storm.impact && isNamedTyphoon;
+if(shouldStyleImpact){
 optionClasses.push('typhoon-impact-storm-option');
 option.style.backgroundColor=TYPHOON_IMPACT_OPTION_BG;
 option.style.color=TYPHOON_IMPACT_OPTION_COLOR;
 option.style.fontWeight=TYPHOON_IMPACT_OPTION_WEIGHT;
 option.title=`한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}`;
 }
-else if(linkedTdImpact){
-optionClasses.push('typhoon-impact-linked-td-option');
-option.style.backgroundColor='#F5ECFF';
-option.style.color='#7a5a8f';
-option.style.fontWeight='600';
-option.title=`영향태풍과 연결된 TD · 한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}`;
-}
 if(storm.active){
 optionClasses.push('typhoon-active-storm-option');
 option.style.backgroundColor='#dff5ff';
 option.style.color='#0f3d64';
 option.style.fontWeight='800';
-option.title=storm.impact ? `현재 활동중 · 한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}` : '현재 활동중';
+option.title=shouldStyleImpact ? `현재 활동중 · 한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}` : '현재 활동중';
 }
 option.className=optionClasses.join(' ');
 stormSelect.appendChild(option);
@@ -1841,7 +1836,16 @@ if(!subtitle){
 return;
 }
 let updated=formatTyphoonKst(run?.generatedAt || run?.metadata?.generated_at_utc || '');
-subtitle.textContent=updated && updated!=='-' ? `최근 업데이트 : ${updated}` : '';
+subtitle.replaceChildren();
+if(updated && updated!=='-'){
+let updatedLine=document.createElement('div');
+updatedLine.textContent=`최근 업데이트 : ${updated}`;
+subtitle.appendChild(updatedLine);
+}
+let scheduleLine=document.createElement('div');
+scheduleLine.className='typhoon-updated-schedule';
+scheduleLine.textContent='00UTC 기준 14KST 시작 / 20KST 종료';
+subtitle.appendChild(scheduleLine);
 }
 
 function renderTyphoonTimeline(){

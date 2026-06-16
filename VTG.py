@@ -177,7 +177,7 @@ MODEL_CATEGORIES = {
 }
 
 MODEL_ACTIVE_WINDOWS = {
-    "HAFS": ("202307191200", None),                 # HAFS 예측자료 신규 추가(2023.7.19.~)
+    "HAFS": ("202301010000", None),                 # HAFS 예측자료 신규 추가(2023.1.1.~)
 
     "ECMWF_AIFS": ("202408010000", None),           # ECMWF AIFS 예측자료 신규 추가(2024.8.19.~)
 
@@ -2644,170 +2644,6 @@ def legend_row_count_for(df: pd.DataFrame, settings: Settings) -> int:
     return len([model for model in MODEL_INFO if model["name"] in active and model["name"] not in excluded])
 
 
-def required_start_points_for_120_extent(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
-    if settings.fcst_hours != 120 or df.empty:
-        return pd.DataFrame(columns=["LAT", "LON", "TMD", "SRC"])
-
-    points = numeric_track_points(df)
-    if points.empty or "TMD" not in points:
-        return pd.DataFrame(columns=["LAT", "LON", "TMD", "SRC"])
-
-    leads = pd.to_numeric(points["TMD"], errors="coerce")
-    zero_points = points[leads.eq(0)].copy()
-    if zero_points.empty:
-        return pd.DataFrame(columns=["LAT", "LON", "TMD", "SRC"])
-
-    if "SRC" in zero_points.columns:
-        kma_zero = zero_points[zero_points["SRC"].eq("KMA")].copy()
-        if not kma_zero.empty:
-            return kma_zero[[col for col in ["LAT", "LON", "TMD", "SRC"] if col in kma_zero.columns]].head(1)
-
-    return zero_points[[col for col in ["LAT", "LON", "TMD", "SRC"] if col in zero_points.columns]]
-
-
-def expand_extent_to_include_required_points(
-    extent: list[float],
-    required_points: pd.DataFrame | None,
-    *,
-    min_lon: float,
-    max_lon: float,
-    min_lat: float,
-    max_lat: float,
-    lon_margin: float = 1.1,
-    lat_margin: float = 0.9,
-) -> list[float]:
-    """Expand the raw 120h camera box only enough to keep required points visible.
-
-    This is applied before hard-bound clipping. It is meant to protect the 0h
-    start point from being dropped by robust quantiles, not to make the whole
-    past track drive the camera.
-    """
-    if required_points is None or required_points.empty:
-        return extent
-
-    points = numeric_track_points(required_points)
-    if points.empty:
-        return extent
-
-    lon_min0, lon_max0, lat_min0, lat_max0 = [float(v) for v in extent]
-    req_lon_min = max(min_lon, float(points["LON"].min()) - lon_margin)
-    req_lon_max = min(max_lon, float(points["LON"].max()) + lon_margin)
-    req_lat_min = max(min_lat, float(points["LAT"].min()) - lat_margin)
-    req_lat_max = min(max_lat, float(points["LAT"].max()) + lat_margin)
-
-    return [
-        min(lon_min0, req_lon_min),
-        max(lon_max0, req_lon_max),
-        min(lat_min0, req_lat_min),
-        max(lat_max0, req_lat_max),
-    ]
-
-
-def clip_extent_to_bounds(
-    extent: list[float],
-    *,
-    min_lon: float,
-    max_lon: float,
-    min_lat: float,
-    max_lat: float,
-) -> list[float]:
-    """Clip an extent to hard display bounds without counter-shifting.
-
-    This is the key difference from shift_extent_to_bounds(). If the requested
-    120h camera reaches 55N, the visible latitude becomes e.g. 35-50N, not
-    30-50N. The out-of-domain side is cropped instead of filling the opposite
-    side with empty space.
-    """
-    lon_min, lon_max, lat_min, lat_max = [float(value) for value in extent]
-    lon_min = max(min_lon, min(max_lon, lon_min))
-    lon_max = max(min_lon, min(max_lon, lon_max))
-    lat_min = max(min_lat, min(max_lat, lat_min))
-    lat_max = max(min_lat, min(max_lat, lat_max))
-
-    if lon_max <= lon_min:
-        lon_min, lon_max = min_lon, max_lon
-    if lat_max <= lat_min:
-        lat_min, lat_max = min_lat, max_lat
-
-    return [float(lon_min), float(lon_max), float(lat_min), float(lat_max)]
-
-
-def match_120_extent_to_canvas_by_longitude(
-    extent: list[float],
-    *,
-    fig_width: float,
-    fig_height: float,
-    min_lon: float,
-    max_lon: float,
-    min_lat: float,
-    max_lat: float,
-    east_expand_ratio: float = 0.68,
-) -> list[float]:
-    """Match the fixed canvas aspect by changing longitude span only.
-
-    For 120h hard-bound cases, latitude outside 0-50N is treated as cropped
-    content, not as a reason to shift the map down. After clipping latitude, use
-    the remaining latitude span and adjust only the left/right span to match the
-    panel aspect. This gives the "crop outside bounds, then zoom" behavior.
-    """
-    lon_min, lon_max, lat_min, lat_max = clip_extent_to_bounds(
-        extent,
-        min_lon=min_lon,
-        max_lon=max_lon,
-        min_lat=min_lat,
-        max_lat=max_lat,
-    )
-
-    projection = ccrs.Mercator()
-    data_crs = ccrs.PlateCarree()
-    canvas_aspect = fig_width / fig_height if fig_height else 1.3333333333
-
-    center_lon = (lon_min + lon_max) / 2.0
-    center_lat = (lat_min + lat_max) / 2.0
-    _, y0 = projection.transform_point(center_lon, lat_min, data_crs)
-    _, y1 = projection.transform_point(center_lon, lat_max, data_crs)
-    map_height = abs(y1 - y0)
-    if map_height == 0 or not math.isfinite(map_height):
-        return [lon_min, lon_max, lat_min, lat_max]
-
-    target_width = map_height * canvas_aspect
-    domain_x0, _ = projection.transform_point(min_lon, center_lat, data_crs)
-    domain_x1, _ = projection.transform_point(max_lon, center_lat, data_crs)
-    max_width = abs(domain_x1 - domain_x0)
-    target_width = min(target_width, max_width)
-
-    old_x0, _ = projection.transform_point(lon_min, center_lat, data_crs)
-    old_x1, _ = projection.transform_point(lon_max, center_lat, data_crs)
-    old_width = abs(old_x1 - old_x0)
-    if old_width == 0 or not math.isfinite(old_width):
-        return [lon_min, lon_max, lat_min, lat_max]
-
-    # Preserve the existing composition bias when the longitude span changes.
-    x_focus = old_x0 + old_width * (1.0 - east_expand_ratio)
-    new_x0 = x_focus - target_width * (1.0 - east_expand_ratio)
-    new_x1 = new_x0 + target_width
-
-    if new_x0 < domain_x0:
-        new_x0 = domain_x0
-        new_x1 = new_x0 + target_width
-    if new_x1 > domain_x1:
-        new_x1 = domain_x1
-        new_x0 = new_x1 - target_width
-
-    x_center = (new_x0 + new_x1) / 2.0
-    y_center = (y0 + y1) / 2.0
-    new_lon_min, _ = data_crs.transform_point(new_x0, y_center, projection)
-    new_lon_max, _ = data_crs.transform_point(new_x1, y_center, projection)
-    _, new_lat_min = data_crs.transform_point(x_center, y0, projection)
-    _, new_lat_max = data_crs.transform_point(x_center, y1, projection)
-
-    return clip_extent_to_bounds(
-        [new_lon_min, new_lon_max, new_lat_min, new_lat_max],
-        min_lon=min_lon,
-        max_lon=max_lon,
-        min_lat=min_lat,
-        max_lat=max_lat,
-    )
 
 
 def fixed_240_map_extent(settings: Settings) -> list[float]:
@@ -2921,13 +2757,193 @@ def aspect_match_and_clamp_extent(
     return clamp_west_pacific_extent(extent)
 
 
+def extent_exceeds_bounds(
+    extent: list[float],
+    *,
+    min_lon: float,
+    max_lon: float,
+    min_lat: float,
+    max_lat: float,
+) -> bool:
+    lon_min, lon_max, lat_min, lat_max = [float(v) for v in extent]
+    return (
+        lon_min < min_lon or lon_max > max_lon or lat_min < min_lat or lat_max > max_lat
+    )
+
+
+
+def crop_extent_to_bounds(
+    extent: list[float],
+    *,
+    min_lon: float,
+    max_lon: float,
+    min_lat: float,
+    max_lat: float,
+) -> list[float]:
+    lon_min, lon_max, lat_min, lat_max = [float(v) for v in extent]
+    return [
+        max(min_lon, min(max_lon, lon_min)),
+        max(min_lon, min(max_lon, lon_max)),
+        max(min_lat, min(max_lat, lat_min)),
+        max(min_lat, min(max_lat, lat_max)),
+    ]
+
+
+
+def zoom_cropped_extent_to_canvas_aspect(
+    extent: list[float],
+    *,
+    fig_width: float,
+    fig_height: float,
+    focus_x: float = 0.56,
+    focus_y: float = 0.44,
+) -> list[float]:
+    """Match canvas aspect by shrinking the unconstrained dimension.
+
+    This is for 120h overflow cases only. After cropping the overflowing extent to
+    the hard display bounds, do not fill the missing span by shifting the window
+    in the opposite direction. Instead, zoom in by trimming the other dimension.
+    """
+    projection = ccrs.Mercator()
+    data_crs = ccrs.PlateCarree()
+
+    lon_min, lon_max, lat_min, lat_max = extent
+    center_lon = (lon_min + lon_max) / 2
+    center_lat = (lat_min + lat_max) / 2
+
+    x0, _ = projection.transform_point(lon_min, center_lat, data_crs)
+    x1, _ = projection.transform_point(lon_max, center_lat, data_crs)
+    _, y0 = projection.transform_point(center_lon, lat_min, data_crs)
+    _, y1 = projection.transform_point(center_lon, lat_max, data_crs)
+
+    map_width = abs(x1 - x0)
+    map_height = abs(y1 - y0)
+    if map_width <= 0 or map_height <= 0:
+        return extent
+
+    map_aspect = map_width / map_height
+    canvas_aspect = fig_width / fig_height if fig_height else map_aspect
+    if canvas_aspect <= 0:
+        return extent
+
+    focus_x = min(0.9, max(0.1, float(focus_x)))
+    focus_y = min(0.9, max(0.1, float(focus_y)))
+
+    if map_aspect > canvas_aspect:
+        # Too wide after crop -> trim longitude span (left/right crop) and zoom in.
+        new_width = map_height * canvas_aspect
+        x_focus = x0 + map_width * focus_x
+        new_x0 = x_focus - new_width * focus_x
+        new_x1 = new_x0 + new_width
+        if new_x0 < min(x0, x1):
+            new_x0 = min(x0, x1)
+            new_x1 = new_x0 + new_width
+        if new_x1 > max(x0, x1):
+            new_x1 = max(x0, x1)
+            new_x0 = new_x1 - new_width
+        new_center_x = (new_x0 + new_x1) / 2
+        new_lon_min, _ = data_crs.transform_point(new_x0, y0 + map_height / 2, projection)
+        new_lon_max, _ = data_crs.transform_point(new_x1, y0 + map_height / 2, projection)
+        return [float(new_lon_min), float(new_lon_max), lat_min, lat_max]
+
+    if map_aspect < canvas_aspect:
+        # Too tall after crop -> trim latitude span (top/bottom crop) and zoom in.
+        new_height = map_width / canvas_aspect
+        y_focus = y0 + map_height * focus_y
+        new_y0 = y_focus - new_height * focus_y
+        new_y1 = new_y0 + new_height
+        if new_y0 < min(y0, y1):
+            new_y0 = min(y0, y1)
+            new_y1 = new_y0 + new_height
+        if new_y1 > max(y0, y1):
+            new_y1 = max(y0, y1)
+            new_y0 = new_y1 - new_height
+        new_center_y = (new_y0 + new_y1) / 2
+        _, new_lat_min = data_crs.transform_point(x0 + map_width / 2, new_y0, projection)
+        _, new_lat_max = data_crs.transform_point(x0 + map_width / 2, new_y1, projection)
+        return [lon_min, lon_max, float(new_lat_min), float(new_lat_max)]
+
+    return extent
+
+
+
+def required_start_point_for_120_extent(df: pd.DataFrame) -> tuple[float, float] | None:
+    points = numeric_track_points(df)
+    if points.empty or 'TMD' not in points.columns:
+        return None
+
+    leads = pd.to_numeric(points['TMD'], errors='coerce')
+    zero_points = points[leads.eq(0)].copy()
+    if zero_points.empty:
+        return None
+
+    if 'SRC' in zero_points.columns:
+        kma_zero = zero_points[zero_points['SRC'].eq('KMA')].copy()
+        if not kma_zero.empty:
+            return float(kma_zero.iloc[0]['LON']), float(kma_zero.iloc[0]['LAT'])
+
+    return float(zero_points['LON'].median()), float(zero_points['LAT'].median())
+
+
+
+def ensure_start_point_visible(
+    extent: list[float],
+    start_point: tuple[float, float] | None,
+    *,
+    min_lon: float,
+    max_lon: float,
+    min_lat: float,
+    max_lat: float,
+    lon_margin: float = 0.8,
+    lat_margin: float = 0.8,
+) -> list[float]:
+    if start_point is None:
+        return extent
+
+    start_lon, start_lat = [float(v) for v in start_point]
+    lon_min, lon_max, lat_min, lat_max = [float(v) for v in extent]
+    lon_span = lon_max - lon_min
+    lat_span = lat_max - lat_min
+    if lon_span <= 0 or lat_span <= 0:
+        return extent
+
+    req_lon_min = start_lon - lon_margin
+    req_lon_max = start_lon + lon_margin
+    req_lat_min = start_lat - lat_margin
+    req_lat_max = start_lat + lat_margin
+
+    if req_lon_min >= lon_min and req_lon_max <= lon_max and req_lat_min >= lat_min and req_lat_max <= lat_max:
+        return extent
+
+    if req_lon_min < lon_min:
+        lon_min = req_lon_min
+        lon_max = lon_min + lon_span
+    if req_lon_max > lon_max:
+        lon_max = req_lon_max
+        lon_min = lon_max - lon_span
+    if req_lat_min < lat_min:
+        lat_min = req_lat_min
+        lat_max = lat_min + lat_span
+    if req_lat_max > lat_max:
+        lat_max = req_lat_max
+        lat_min = lat_max - lat_span
+
+    return shift_extent_to_bounds(
+        [lon_min, lon_max, lat_min, lat_max],
+        min_lon=min_lon,
+        max_lon=max_lon,
+        min_lat=min_lat,
+        max_lat=max_lat,
+    )
+
+
 def finalize_map_extent(
     settings: Settings,
     extent: list[float],
     *,
     fig_width: float,
     fig_height: float,
-    required_points: pd.DataFrame | None = None,
+    start_point: tuple[float, float] | None = None,
 ) -> list[float]:
     """Finalize map extent.
 
@@ -2942,30 +2958,67 @@ def finalize_map_extent(
 
     if settings.fcst_hours == 120:
         extent = clamp_west_pacific_extent(extent)
-        extent = expand_extent_to_include_required_points(
-            extent,
-            required_points,
-            min_lon=DISPLAY_120_LON_MIN,
-            max_lon=DISPLAY_120_LON_MAX,
-            min_lat=DISPLAY_120_LAT_MIN,
-            max_lat=DISPLAY_120_LAT_MAX,
-        )
-        extent = clip_extent_to_bounds(
+        overflow = extent_exceeds_bounds(
             extent,
             min_lon=DISPLAY_120_LON_MIN,
             max_lon=DISPLAY_120_LON_MAX,
             min_lat=DISPLAY_120_LAT_MIN,
             max_lat=DISPLAY_120_LAT_MAX,
         )
-        extent = match_120_extent_to_canvas_by_longitude(
+        if not overflow:
+            # Keep the original stable 120h camera behavior when the raw auto
+            # extent already fits inside the hard display domain.
+            extent = shift_extent_to_bounds(
+                extent,
+                min_lon=DISPLAY_120_LON_MIN,
+                max_lon=DISPLAY_120_LON_MAX,
+                min_lat=DISPLAY_120_LAT_MIN,
+                max_lat=DISPLAY_120_LAT_MAX,
+            )
+            extent = match_extent_to_canvas_aspect(
+                extent,
+                fig_width=fig_width,
+                fig_height=fig_height,
+                east_expand_ratio=canvas_east_expand_ratio(settings),
+            )
+            extent = shift_extent_to_bounds(
+                extent,
+                min_lon=DISPLAY_120_LON_MIN,
+                max_lon=DISPLAY_120_LON_MAX,
+                min_lat=DISPLAY_120_LAT_MIN,
+                max_lat=DISPLAY_120_LAT_MAX,
+            )
+            return extent
+
+        # Overflow case only: crop to the hard domain first, then zoom by
+        # trimming the other dimension instead of filling the opposite side.
+        extent = crop_extent_to_bounds(
+            extent,
+            min_lon=DISPLAY_120_LON_MIN,
+            max_lon=DISPLAY_120_LON_MAX,
+            min_lat=DISPLAY_120_LAT_MIN,
+            max_lat=DISPLAY_120_LAT_MAX,
+        )
+        extent = ensure_start_point_visible(
+            extent,
+            start_point,
+            min_lon=DISPLAY_120_LON_MIN,
+            max_lon=DISPLAY_120_LON_MAX,
+            min_lat=DISPLAY_120_LAT_MIN,
+            max_lat=DISPLAY_120_LAT_MAX,
+        )
+        extent = zoom_cropped_extent_to_canvas_aspect(
             extent,
             fig_width=fig_width,
             fig_height=fig_height,
+        )
+        extent = ensure_start_point_visible(
+            extent,
+            start_point,
             min_lon=DISPLAY_120_LON_MIN,
             max_lon=DISPLAY_120_LON_MAX,
             min_lat=DISPLAY_120_LAT_MIN,
             max_lat=DISPLAY_120_LAT_MAX,
-            east_expand_ratio=canvas_east_expand_ratio(settings),
         )
         return extent
 
@@ -2994,14 +3047,14 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     fig_width = settings.figure_width
     fig_height = settings.figure_height
 
-    required_points = required_start_points_for_120_extent(df, settings)
+    start_point = required_start_point_for_120_extent(df) if settings.fcst_hours == 120 else None
 
     extent = finalize_map_extent(
         settings,
         extent,
         fig_width=fig_width,
         fig_height=fig_height,
-        required_points=required_points,
+        start_point=start_point,
     )
 
     data_crs = ccrs.PlateCarree()
