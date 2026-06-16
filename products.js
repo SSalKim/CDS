@@ -11,7 +11,7 @@ const PRODUCT_CATEGORIES=[
 {id:"isen", name:"등온위면분석"},
 {id:"wtem1", name:"상세-바람기온"},
 {id:"wtem2", name:"상세바람-기온(확장영역)"},
-{type:"header", name:"─────────────"},
+{type:"header", name:"───────────"},
 {id:"skew", name:"예상단열선도"},
 {id:"city", name:"연직시계열"}
 ];
