@@ -126,21 +126,21 @@ sstRegion:{
 },
 
 analysisAsiaOverlay:{
-  title:'표출 구성',
+  title:'중첩분석',
   widthClass:'wide',
   optionSet:'analysisAsiaOverlays',
   defaultValue:'base'
 },
 
 analysisKoreaOverlay:{
-  title:'표출 구성',
+  title:'중첩분석',
   widthClass:'wide',
   optionSet:'analysisKoreaOverlays',
   defaultValue:'base'
 },
 
 analysisTyphoonOverlay:{
-  title:'표출 구성',
+  title:'중첩분석',
   widthClass:'wide',
   optionSet:'analysisTyphoonOverlays',
   defaultValue:'base'
