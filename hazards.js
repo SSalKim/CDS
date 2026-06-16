@@ -474,6 +474,45 @@ const HAZARD_PRODUCT_CATEGORY_UI_CONFIG={
 typhoon:{hideProductSelect:true}
 };
 */
+/* CDS 3.4.2: 초단기 안정도 산출물을 위험기상-한반도 항목에 통합 */
+(function mergeNowcastStabilityProducts(){
+
+let globalScope=typeof window!=='undefined'?window:globalThis;
+let sources=globalScope.CDS_NOWCAST_HAZARD_PRODUCTS || {};
+let mapFields=[
+'patternByModel',
+'folderByModel',
+'archiveStartByModel',
+'archiveEndByModel',
+'forecastStepByModel',
+'cyclesByModel',
+'existenceModeByModel'
+];
+
+['kindex','sindex','lindex'].forEach(productId=>{
+let source=sources[productId];
+let target=HAZARD_PRODUCTS.find(product=>
+product.category==='stbk' && product.id===productId
+);
+
+if(!source || !target){
+return;
+}
+
+mapFields.forEach(field=>{
+if(!source[field]){
+return;
+}
+
+target[field]={
+...(target[field] || {}),
+...source[field]
+};
+});
+});
+
+})();
+
 const HAZARD_PRODUCT_CATEGORY_UI_CONFIG={
 
 };

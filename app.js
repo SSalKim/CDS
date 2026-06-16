@@ -466,7 +466,8 @@ checkAvailability=false
 let resolvedPatterns=patterns ?? CDSChartUtils.getProductPatternsForDetail(
 product,
 modelId,
-detailToken
+detailToken,
+runUTC
 );
 
 return CDSChartUtils.makeChartImageUrls({

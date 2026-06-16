@@ -11,7 +11,7 @@ const PRODUCT_CATEGORIES=[
 {id:"isen", name:"등온위면분석"},
 {id:"wtem1", name:"상세-바람기온"},
 {id:"wtem2", name:"상세바람-기온(확장영역)"},
-{type:"header", name:"─────────────────"},
+{type:"header", name:"─────────────"},
 {id:"skew", name:"예상단열선도"},
 {id:"city", name:"연직시계열"}
 ];
@@ -215,7 +215,7 @@ const PRODUCTS=[
         um_ldps:"2018-01-18"
     },
 },
-{category:"asia", type:"header", label:"────── 강수 ──────"},
+{category:"asia", type:"header", label:"───── 강수 ─────"},
 {category:"asia", id:"surfce", label:"해면기압, 누적강수량",
     patternByModel:{
         kim_gdps: "kim_gdps_erly_asia_surfce_ft06_pa4_s{fh}_{run}.png",
@@ -482,7 +482,7 @@ const PRODUCTS=[
         um_ldps:"2018-01-18"
     },
 },
-{category:"asia", type:"header", label:"────── 전선 ──────"},
+{category:"asia", type:"header", label:"───── 전선 ─────"},
 {category:"asia", id:"frg700", label:"700 전선강도,고도,기온",
     patternByModel:{
         kim_gdps: "kim_gdps_erly_asia_frg700_ft06_pa4_s{fh}_{run}.png",
@@ -623,7 +623,7 @@ const PRODUCTS=[
         um_ldps:"2018-01-18"
     },
 },
-{category:"asia", type:"header", label:"────── 기타 ──────"},
+{category:"asia", type:"header", label:"───── 기타 ─────"},
 {category:"asia", id:"tgc2d", label:"지상바람",
     patternByModel:{
         kim_gdps: "kim_gdps_erly_asia_tgc2d_ft06_pa4_s{fh}_{run}.png",
@@ -816,7 +816,7 @@ const PRODUCTS=[
         um_ldps: "ldps_lc06_wnd925_s{fh}_{run}.gif"
     }
 },
-{category:"hkor", type:"header", label:"────── 강수 ──────"},
+{category:"hkor", type:"header", label:"───── 강수 ─────"},
 {category:"hkor", id:"acrain", label:"총누적강수량",
     patternByModel:{
         kim_gdps: "kim_gdps_erly_hkor_acrain_s{fh}_{run}.png",
@@ -979,7 +979,7 @@ const PRODUCTS=[
         um_ldps: "ldps_lc06_con850_s{fh}_{run}.gif"
     }
 },
-{category:"hkor", type:"header", label:"────── 전선 ──────"},
+{category:"hkor", type:"header", label:"───── 전선 ─────"},
 {category:"hkor", id:"frg700", label:"700 전선강도,고도,기온",
     patternByModel:{
         kim_gdps: "kim_gdps_erly_hkor_frg700_s{fh}_{run}.png",
@@ -1100,7 +1100,7 @@ const PRODUCTS=[
         um_ldps: "ldps_lc06_adthck_s{fh}_{run}.gif"
     }
 },
-{category:"hkor", type:"header", label:"────── 기타 ──────"},
+{category:"hkor", type:"header", label:"───── 기타 ─────"},
 {category:"hkor", id:"wndgst", label:"강풍가이던스",
     patternByModel:{
         kim_gdps: "kim_gdps_erly_hkor_wndgst_s{fh}_{run}.png",
@@ -2642,8 +2642,8 @@ const PRODUCTS=[
 
 ];
 
-/* CDS 3.4: 초단기(KLAPS/VDAPS) 산출물을 기본예상도(한반도)에 통합 */
-(function mergeNowcastProductsIntoKoreaCategory(){
+/* CDS 3.4.2: 초단기 산출물을 일반 메뉴와 전용 구역에 분배 */
+(function mergeNowcastProductsIntoForecastCatalog(){
 
 const sourceCategory='klfs_vdps';
 const targetCategory='hkor';
@@ -2656,17 +2656,66 @@ const mapFields=[
 'cyclesByModel',
 'existenceModeByModel'
 ];
+const hazardProductIds=new Set(['kindex','sindex','lindex']);
+const targetIdBySource={
+surfce:'acptot'
+};
+
+function mergeModelMaps(target,source){
+mapFields.forEach(field=>{
+if(!source[field]){
+return;
+}
+
+target[field]={
+...(target[field] || {}),
+...source[field]
+};
+});
+}
+
+function moveProductBefore(category,id,beforeId){
+let sourceIndex=PRODUCTS.findIndex(product=>
+product.category===category && product.type!=='header' && product.id===id
+);
+let targetIndex=PRODUCTS.findIndex(product=>
+product.category===category && product.type!=='header' && product.id===beforeId
+);
+
+if(sourceIndex<0 || targetIndex<0 || sourceIndex===targetIndex){
+return;
+}
+
+let [product]=PRODUCTS.splice(sourceIndex,1);
+if(sourceIndex<targetIndex){
+targetIndex-=1;
+}
+PRODUCTS.splice(targetIndex,0,product);
+}
 
 let sourceProducts=PRODUCTS.filter(product=>
 product.category===sourceCategory && product.type!=='header'
 );
+let sourceById=new Map(sourceProducts.map(product=>[product.id,product]));
 let uniqueNowcastProducts=[];
+let hazardSources={};
 
 sourceProducts.forEach(source=>{
+if(hazardProductIds.has(source.id)){
+hazardSources[source.id]=source;
+return;
+}
+
+/* VDPS 300hPa는 통합 200/300 항목의 겨울철 대체 패턴으로 사용 */
+if(source.id==='gph300'){
+return;
+}
+
+let targetId=targetIdBySource[source.id] || source.id;
 let target=PRODUCTS.find(product=>
 product.category===targetCategory &&
 product.type!=='header' &&
-product.id===source.id
+product.id===targetId
 );
 
 if(!target){
@@ -2678,18 +2727,29 @@ nowcastOnly:true
 return;
 }
 
-mapFields.forEach(field=>{
-if(!source[field]){
-return;
-}
+mergeModelMaps(target,source);
+});
 
-target[field]={
-...(target[field] || {}),
-...source[field]
+/* 일반 200/300 항목에서 VDPS는 겨울 300hPa, 여름 200hPa를 사용 */
+let hkorUpperProduct=PRODUCTS.find(product=>
+product.category===targetCategory && product.type!=='header' && product.id==='gph200'
+);
+let vdps200=sourceById.get('gph200')?.patternByModel?.um_vdps;
+let vdps300=sourceById.get('gph300')?.patternByModel?.um_vdps;
+
+if(hkorUpperProduct && vdps200 && vdps300){
+hkorUpperProduct.patternByModel={
+...(hkorUpperProduct.patternByModel || {}),
+um_vdps:vdps200
 };
-});
-
-});
+hkorUpperProduct.seasonalPatternByModel={
+...(hkorUpperProduct.seasonalPatternByModel || {}),
+um_vdps:{
+winter:vdps300,
+summer:vdps200
+}
+};
+}
 
 for(let index=PRODUCTS.length-1;index>=0;index--){
 if(PRODUCTS[index].category===sourceCategory){
@@ -2702,10 +2762,17 @@ PRODUCTS.push(
 {
 category:targetCategory,
 type:'header',
-label:'──── 초단기(KLAPS/VDAPS) 전용 ────'
+label:'───── 초단기 ─────'
 },
 ...uniqueNowcastProducts
 );
 }
+
+/* 공통 메뉴로 승격한 초단기 전용 항목의 위치 */
+moveProductBefore(targetCategory,'gph925','anlsfc');
+moveProductBefore(targetCategory,'con925','con850');
+
+let globalScope=typeof window!=='undefined'?window:globalThis;
+globalScope.CDS_NOWCAST_HAZARD_PRODUCTS=hazardSources;
 
 })();

@@ -76,9 +76,36 @@ return Array.isArray(pattern)
 }
 
 
-function getProductPatternsForDetail(product,modelId,detailToken){
+function isWinterSeasonRunDate(runUTC){
 
-let basePattern=product?.patternByModel?.[modelId];
+if(!(runUTC instanceof Date) || Number.isNaN(runUTC.getTime())){
+return false;
+}
+
+let month=runUTC.getUTCMonth()+1;
+return month>=11 || month<=4;
+
+}
+
+function getSeasonalPatternForModel(product,modelId,runUTC){
+
+let seasonal=product?.seasonalPatternByModel?.[modelId];
+
+if(!seasonal){
+return null;
+}
+
+return isWinterSeasonRunDate(runUTC)
+?seasonal.winter || seasonal.summer || null
+:seasonal.summer || seasonal.winter || null;
+
+}
+
+function getProductPatternsForDetail(product,modelId,detailToken,runUTC=null){
+
+let basePattern=
+getSeasonalPatternForModel(product,modelId,runUTC) ||
+product?.patternByModel?.[modelId];
 
 if(!product?.detailPatternByModel){
 return basePattern;
@@ -433,6 +460,8 @@ DEFAULT_CHART_BACKUP_BASE_URLS,
 getChartBaseUrls,
 getChartUrlCandidates,
 normalizePatternList,
+isWinterSeasonRunDate,
+getSeasonalPatternForModel,
 getProductPatternsForDetail,
 getProductFolderForModel,
 getChartUrlParts,
