@@ -903,8 +903,374 @@ const ANALYSIS_PRODUCTS=[
 ];
 
 
-const ANALYSIS_DEFAULT_PRODUCT_BY_CATEGORY={
+/* CDS 3.4.1: 분석장 합성/관측 보조 패널 파일 매핑
+   - CSV의 신규 산출물만 별도 패턴으로 등록한다.
+   - 기본 항목은 기존 patternByModel을 그대로 사용한다.
+   - 파일명이 없는 조합은 우측 패널에서 비활성화된다. */
+const ANALYSIS_DETAIL_PATTERN_MAP={
+  "asia:sfc3": {
+    "kim_anal": {
+      "satir1": "kim_sfc3_anlden_satir1_pb4_{run}.gif",
+      "satir3": "kim_sfc3_anlden_satir3_pb4_{run}.gif",
+      "nocir1": "kim_sfc3_anlden_nocir1_pb4_{run}.gif",
+      "nocir3": "kim_sfc3_anlden_nocir3_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "sfc3_anlden_satir1_pb4_{run}.gif",
+      "satir3": "sfc3_anlden_satir3_pb4_{run}.gif",
+      "nocir1": "sfc3_anlden_nocir1_pb4_{run}.gif",
+      "nocir3": "sfc3_anlden_nocir3_pb4_{run}.gif"
+    }
+  },
+  "asia:sfc3_ptrend": {
+    "kim_anal": {
+      "satir1": "kim_sfc3_ptrend_satir1_pb4_{run}.gif",
+      "satir3": "kim_sfc3_ptrend_satir3_pb4_{run}.gif",
+      "nocir1": "kim_sfc3_ptrend_nocir1_pb4_{run}.gif",
+      "nocir3": "kim_sfc3_ptrend_nocir3_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "sfc3_ptrend_satir1_pb4_{run}.gif",
+      "satir3": "sfc3_ptrend_satir3_pb4_{run}.gif",
+      "nocir1": "sfc3_ptrend_nocir1_pb4_{run}.gif",
+      "nocir3": "sfc3_ptrend_nocir3_pb4_{run}.gif"
+    }
+  },
+  "asia:surf": {
+    "kim_anal": {
+      "satir1": "kim_surf_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "kim_surf_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "kim_surf_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "kim_surf_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "kim_surf_pltstn_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "surf_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "surf_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "surf_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "surf_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "surf_pltstn_pb4_{run}.gif"
+    }
+  },
+  "asia:surf2": {},
+  "asia:up92": {
+    "kim_anal": {
+      "satir1": "kim_up92_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "kim_up92_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "kim_up92_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "kim_up92_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "kim_up92_pltstn_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "up92_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "up92_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "up92_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "up92_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "up92_pltstn_pb4_{run}.gif"
+    }
+  },
+  "asia:up85": {
+    "kim_anal": {
+      "satir1": "kim_up85_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "kim_up85_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "kim_up85_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "kim_up85_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "kim_up85_pltstn_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "up85_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "up85_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "up85_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "up85_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "up85_pltstn_pb4_{run}.gif"
+    }
+  },
+  "asia:up70": {
+    "kim_anal": {
+      "satir1": "kim_up70_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "kim_up70_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "kim_up70_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "kim_up70_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "kim_up70_pltstn_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "up70_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "up70_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "up70_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "up70_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "up70_pltstn_pb4_{run}.gif"
+    }
+  },
+  "asia:up50": {
+    "kim_anal": {
+      "satir1": "kim_up50_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "kim_up50_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "kim_up50_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "kim_up50_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "kim_up50_pltstn_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "up50_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "up50_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "up50_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "up50_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "up50_pltstn_pb4_{run}.gif"
+    }
+  },
+  "asia:up30": {
+    "kim_anal": {
+      "satir1": "kim_up30_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "kim_up30_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "kim_up30_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "kim_up30_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "kim_up30_pltstn_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "up30_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "up30_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "up30_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "up30_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "up30_pltstn_pb4_{run}.gif"
+    }
+  },
+  "asia:up20": {
+    "kim_anal": {
+      "satir1": "kim_up20_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "kim_up20_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "kim_up20_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "kim_up20_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "kim_up20_pltstn_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "up20_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "up20_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "up20_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "up20_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "up20_pltstn_pb4_{run}.gif"
+    }
+  },
+  "asia:up10": {
+    "kim_anal": {
+      "satir1": "kim_up10_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "kim_up10_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "kim_up10_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "kim_up10_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "kim_up10_pltstn_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "up10_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "up10_anlmod_satir3_pb4_{run}.gif",
+      "nocir1": "up10_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "up10_anlmod_nocir3_pb4_{run}.gif",
+      "pltstn": "up10_pltstn_pb4_{run}.gif"
+    }
+  },
+  "hkor:anlmod": {
+    "kim_anal": {
+      "satir1": "kim_kor1_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "kim_kor1_anlmod_satir3_pb4_{run}.gif",
+      "oradar": "kim_kor1_anlmod_oradar_pb4_{run}.gif",
+      "nocir1": "kim_kor1_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "kim_kor1_anlmod_nocir3_pb4_{run}.gif",
+      "nradar": "kim_kor1_anlmod_nradar_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "kor1_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "kor1_anlmod_satir3_pb4_{run}.gif",
+      "oradar": "kor1_anlmod_oradar_pb4_{run}.gif",
+      "nocir1": "kor1_anlmod_nocir1_pb4_{run}.gif",
+      "nocir3": "kor1_anlmod_nocir3_pb4_{run}.gif",
+      "nradar": "kor1_anlmod_nradar_pb4_{run}.gif"
+    },
+    "kas": {
+      "satir1": "kas0_kor1_anlmod_satir1_pb4_{run}.gif",
+      "satir3": "kas0_kor1_anlmod_satir3_pb4_{run}.gif",
+      "oradar": "kas0_kor1_anlmod_oradar_pb4_{run}.gif"
+    }
+  },
+  "hkor:ptrend": {
+    "kim_anal": {
+      "satir1": "kim_kor1_ptrend_satir1_pb4_{run}.gif",
+      "satir3": "kim_kor1_ptrend_satir3_pb4_{run}.gif",
+      "oradar": "kim_kor1_ptrend_oradar_pb4_{run}.gif",
+      "nocir1": "kim_kor1_ptrend_nocir1_pb4_{run}.gif",
+      "nocir3": "kim_kor1_ptrend_nocir3_pb4_{run}.gif",
+      "nradar": "kim_kor1_ptrend_nradar_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "kor1_ptrend_satir1_pb4_{run}.gif",
+      "satir3": "kor1_ptrend_satir3_pb4_{run}.gif",
+      "oradar": "kor1_ptrend_oradar_pb4_{run}.gif",
+      "nocir1": "kor1_ptrend_nocir1_pb4_{run}.gif",
+      "nocir3": "kor1_ptrend_nocir3_pb4_{run}.gif",
+      "nradar": "kor1_ptrend_nradar_pb4_{run}.gif"
+    }
+  },
+  "hkor:slptmp": {
+    "kim_anal": {
+      "satir1": "kim_kor1_slptmp_satir1_pb4_{run}.gif",
+      "satir3": "kim_kor1_slptmp_satir3_pb4_{run}.gif",
+      "oradar": "kim_kor1_slptmp_oradar_pb4_{run}.gif",
+      "nocir1": "kim_kor1_slptmp_nocir1_pb4_{run}.gif",
+      "nocir3": "kim_kor1_slptmp_nocir3_pb4_{run}.gif",
+      "nradar": "kim_kor1_slptmp_nradar_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "kor1_slptmp_satir1_pb4_{run}.gif",
+      "satir3": "kor1_slptmp_satir3_pb4_{run}.gif",
+      "oradar": "kor1_slptmp_oradar_pb4_{run}.gif",
+      "nocir1": "kor1_slptmp_nocir1_pb4_{run}.gif",
+      "nocir3": "kor1_slptmp_nocir3_pb4_{run}.gif",
+      "nradar": "kor1_slptmp_nradar_pb4_{run}.gif"
+    }
+  },
+  "hkor:spdmod": {
+    "kim_anal": {
+      "satir1": "kim_kor1_spdmod_satir1_pb4_{run}.gif",
+      "satir3": "kim_kor1_spdmod_satir3_pb4_{run}.gif",
+      "oradar": "kim_kor1_spdmod_oradar_pb4_{run}.gif",
+      "nocir1": "kim_kor1_spdmod_nocir1_pb4_{run}.gif",
+      "nocir3": "kim_kor1_spdmod_nocir3_pb4_{run}.gif",
+      "nradar": "kim_kor1_spdmod_nradar_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "kor1_spdmod_satir1_pb4_{run}.gif",
+      "satir3": "kor1_spdmod_satir3_pb4_{run}.gif",
+      "oradar": "kor1_spdmod_oradar_pb4_{run}.gif",
+      "nocir1": "kor1_spdmod_nocir1_pb4_{run}.gif",
+      "nocir3": "kor1_spdmod_nocir3_pb4_{run}.gif",
+      "nradar": "kor1_spdmod_nradar_pb4_{run}.gif"
+    }
+  },
+  "hkor:rhumod": {},
+  "hkor:divmod": {},
+  "typh:sfc3": {
+    "kim_anal": {
+      "satir1": "kim_sfc3_anlden_satir1_typh_pb4_{run}.gif",
+      "satir3": "kim_sfc3_anlden_satir3_typh_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "sfc3_anlden_satir1_typh_pb4_{run}.gif",
+      "satir3": "sfc3_anlden_satir3_typh_pb4_{run}.gif"
+    }
+  },
+  "typh:sfc3_ptrend": {
+    "kim_anal": {
+      "satir1": "kim_sfc3_ptrend_satir1_typh_pb4_{run}.gif",
+      "satir3": "kim_sfc3_ptrend_satir3_typh_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "sfc3_ptrend_satir1_typh_pb4_{run}.gif",
+      "satir3": "sfc3_ptrend_satir3_typh_pb4_{run}.gif"
+    }
+  },
+  "typh:surf": {
+    "kim_anal": {
+      "satir1": "kim_surf_anlmod_satir1_typh_{run}.gif",
+      "satir3": "kim_surf_anlmod_satir3_typh_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "surf_anlmod_satir1_typh_{run}.gif",
+      "satir3": "surf_anlmod_satir3_typh_{run}.gif"
+    }
+  },
+  "typh:up92": {
+    "kim_anal": {
+      "satir1": "kim_up92_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "kim_up92_anlmod_satir3_typh_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "up92_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "up92_anlmod_satir3_typh_pb4_{run}.gif"
+    }
+  },
+  "typh:up85": {
+    "kim_anal": {
+      "satir1": "kim_up85_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "kim_up85_anlmod_satir3_typh_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "up85_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "up85_anlmod_satir3_typh_pb4_{run}.gif"
+    }
+  },
+  "typh:up70": {
+    "kim_anal": {
+      "satir1": "kim_up70_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "kim_up70_anlmod_satir3_typh_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "up70_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "up70_anlmod_satir3_typh_pb4_{run}.gif"
+    }
+  },
+  "typh:up50": {
+    "kim_anal": {
+      "satir1": "kim_up50_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "kim_up50_anlmod_satir3_typh_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "up50_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "up50_anlmod_satir3_typh_pb4_{run}.gif"
+    }
+  },
+  "typh:up30": {
+    "kim_anal": {
+      "satir1": "kim_up30_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "kim_up30_anlmod_satir3_typh_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "up30_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "up30_anlmod_satir3_typh_pb4_{run}.gif"
+    }
+  },
+  "typh:up20": {
+    "kim_anal": {
+      "satir1": "kim_up20_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "kim_up20_anlmod_satir3_typh_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "up20_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "up20_anlmod_satir3_typh_pb4_{run}.gif"
+    }
+  },
+  "typh:up10": {
+    "kim_anal": {
+      "satir1": "kim_up10_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "kim_up10_anlmod_satir3_typh_pb4_{run}.gif"
+    },
+    "um_anal": {
+      "satir1": "up10_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "up10_anlmod_satir3_typh_pb4_{run}.gif"
+    }
+  },
+  "asia:sfc1": {
+    "kas": {
+      "satir1": "kas0_sfc3_anlden_satir1_pb4_{run}.gif",
+      "satir3": "kas0_sfc3_anlden_satir3_pb4_{run}.gif"
+    }
+  },
+  "asia:sfc1_ptrend": {}
+};
 
+const ANALYSIS_DETAIL_SELECTOR_BY_CATEGORY={
+  "asia": "analysisAsiaOverlay",
+  "hkor": "analysisKoreaOverlay",
+  "typh": "analysisTyphoonOverlay"
+};
+
+ANALYSIS_PRODUCTS.forEach(product=>{
+  let key=`${product.category}:${product.id}`;
+  if(!Object.prototype.hasOwnProperty.call(ANALYSIS_DETAIL_PATTERN_MAP,key)){
+    return;
+  }
+  product.auxSelectorKey=ANALYSIS_DETAIL_SELECTOR_BY_CATEGORY[product.category];
+  product.detailPatternByModel=ANALYSIS_DETAIL_PATTERN_MAP[key];
+});
+
+
+const ANALYSIS_DEFAULT_PRODUCT_BY_CATEGORY={
+asia:"surf"
 };
 
 

@@ -1,14 +1,7 @@
 /* Catalog, product, and model selection helpers. Depends on app.js globals at call time. */
 
 function syncProductCategoryVisibility(){
-
-if(getActiveModelSpecificProductCategory()[currentModel]){
-productCategory.classList.add('hidden');
-}
-else{
 productCategory.classList.remove('hidden');
-}
-
 }
 
 
@@ -68,37 +61,14 @@ selectableCategories[0]?.id ||
 
 function getCategoryIdForModelFiltering(modelId){
 
-/*
-초단기처럼 모델 전용 category가 있는 경우:
-대상 모델 기준의 전용 category를 사용한다.
-예: kim_klfs / um_klfs / um_vdps → klfs_vdps
-*/
-if(
-isForecastCatalog() &&
-getActiveModelSpecificProductCategory()[modelId]
-){
-return getActiveModelSpecificProductCategory()[modelId];
-}
-
-/*
-일반 모델로 돌아가는 경우:
-현재 currentModel이 초단기더라도 getCurrentCategory()를 쓰면 klfs_vdps가 반환된다.
-따라서 숨겨져 있던 실제 1차 드롭다운 값(productCategory.value)을 기준으로 복귀해야 한다.
-*/
 let categoryId=getBaseVisibleCategory();
 
-/*
-모델별 category redirect 적용.
-예: kim_ldps에서 asia → hkor
-*/
 if(isForecastCatalog()){
-
 let redirects=getActiveCategoryRedirectByModel()[modelId];
 
 if(redirects && redirects[categoryId]){
 categoryId=redirects[categoryId];
 }
-
 }
 
 return categoryId;
@@ -121,14 +91,8 @@ p.type!=="header"
 function getCategoryRestrictionForModelFiltering(modelId){
 
 let categoryId=getCategoryIdForModelFiltering(modelId);
-
-let product=getProductByIdInCategory(
-categoryId,
-currentProduct
-);
-
+let product=getProductByIdInCategory(categoryId,currentProduct);
 let productId=product?.id || currentProduct;
-
 let exactKey=`${categoryId}:${productId}`;
 let categoryKey=`${categoryId}:*`;
 
@@ -145,20 +109,14 @@ null
 }
 
 
-function modelUsesSpecificProductCategory(modelId){
-
-return !!(
-isForecastCatalog() &&
-getActiveModelSpecificProductCategory()[modelId]
-);
-
+function modelUsesSpecificProductCategory(){
+return false;
 }
 
 
 function isModelAllowedByCurrentCategory(modelId){
 
 let categoryId=getCategoryIdForModelFiltering(modelId);
-
 let restriction=getCategoryRestrictionForModelFiltering(modelId);
 
 if(
@@ -168,63 +126,42 @@ restriction &&
 return false;
 }
 
-/*
-초단기/VDAPS처럼 모델 전용 category를 쓰는 모델은
-현재 선택된 일반 산출물 ID에 묶이면 안 된다.
-해당 전용 category 안에서 지원 산출물이 하나라도 있으면 선택 가능하게 둔다.
-*/
-if(modelUsesSpecificProductCategory(modelId)){
-return categoryHasSupportedProduct(categoryId,modelId);
-}
-
-/*
-일반 모델로 돌아가는 경우:
-현재 currentProduct가 klfs_vdps 전용 product일 수 있다.
-그 product가 일반 category에 없으면, 현재 product 기준으로 막지 말고
-해당 category에서 지원 가능한 산출물이 하나라도 있는지만 본다.
-*/
 let product=getProductByIdInCategory(
 categoryId,
 currentProduct
 );
 
 if(!product){
-return categoryHasSupportedProduct(categoryId,modelId);
-}
-
-/*
-일반 상태에서는 현재 선택 산출물을 지원하는 모델만 활성화한다.
-*/
-if(!productSupportsModel(product,modelId)){
 return false;
 }
 
-return true;
+return productSupportsModel(product,modelId);
 
 }
 
 
-function enforceModelRestrictionForCurrentCategory(){
+function getPreferredAllowedVisibleModelIdForCurrentSelection(){
 
 let restriction=getCurrentCategoryRestriction();
+let preferred=restriction?.fallbackModel;
 
 if(
-restriction &&
-!restriction.allowedModels.includes(currentModel)
+preferred &&
+isModelVisibleInCurrentMenu(preferred) &&
+isModelAllowedByCurrentCategory(preferred)
 ){
-
-let fallback=restriction.fallbackModel;
-
-if(fallback && isModelAllowedByCurrentCategory(fallback)){
-currentModel=fallback;
-return;
+return preferred;
 }
+
+return getFirstAllowedVisibleModelIdForCurrentSelection();
 
 }
 
-enforceModelAllowedForCurrentSelection();
 
+function enforceModelRestrictionForCurrentCategory({notify=false}={}){
+return enforceModelAllowedForCurrentSelection({notify});
 }
+
 
 function getFirstAllowedVisibleModelIdForCurrentSelection(){
 
@@ -247,17 +184,25 @@ return null;
 }
 
 
-function enforceModelAllowedForCurrentSelection(){
+function enforceModelAllowedForCurrentSelection({notify=false}={}){
 
 if(isModelAllowedByCurrentCategory(currentModel)){
-return;
+return false;
 }
 
-let fallback=getFirstAllowedVisibleModelIdForCurrentSelection();
+let fallback=getPreferredAllowedVisibleModelIdForCurrentSelection();
 
-if(fallback){
+if(!fallback){
+return false;
+}
+
 currentModel=fallback;
+
+if(notify && typeof showSelectionToast==='function'){
+showSelectionToast('해당 모델에서는 지원하지 않는 자료입니다.');
 }
+
+return true;
 
 }
 

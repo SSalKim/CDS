@@ -271,7 +271,7 @@ getSelectedUTCDate().getTime()+delta*60*60*1000
 
 setRunControlsToUTCAllowUnsupported(nextUTC);
 
-refreshView({
+refreshViewAfterSelectionChange({
 updateCategories:false,
 updateProducts:true,
 updateHours:false,
@@ -313,7 +313,7 @@ normalizeRunDateYearInput();
 
 invalidateSelectionAsyncWork();
 populateHours();
-refreshView({
+refreshViewAfterSelectionChange({
   updateCategories:false,
   updateProducts:true,
   updateHours:false,
@@ -326,7 +326,7 @@ refreshView({
 function handleRunHourChanged(){
 
 invalidateSelectionAsyncWork();
-refreshView({
+refreshViewAfterSelectionChange({
   updateCategories:false,
   updateProducts:true,
   updateHours:false,

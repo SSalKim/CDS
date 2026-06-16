@@ -90,6 +90,16 @@ if(item.disabled){
 return false;
 }
 
+let product=getCurrentProduct();
+let detailPatterns=product?.detailPatternByModel?.[currentModel];
+
+if(product?.detailPatternByModel){
+  if(item.value==='base'){
+    return !!product.patternByModel?.[currentModel];
+  }
+  return !!detailPatterns?.[item.value];
+}
+
 if(item.excludeModels && item.excludeModels.includes(currentModel)){
 return false;
 }

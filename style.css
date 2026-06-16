@@ -3754,3 +3754,37 @@ option.group-header{
   line-height:24px !important;
   padding:0 2px !important;
 }
+
+/* CDS 3.4: 클릭 가능한 미지원 산출물 표시 */
+select option.unsupported-option{
+  color:#a8b0bd;
+  background:#f8fafc;
+}
+
+/* CDS 3.4: 모델 자동 전환 안내 말풍선 */
+.selection-toast{
+  position:fixed;
+  z-index:10000;
+  top:58px;
+  left:50%;
+  transform:translate(-50%,-8px);
+  max-width:min(420px,calc(100vw - 32px));
+  padding:9px 14px;
+  border:1px solid #93c5fd;
+  border-radius:10px;
+  background:rgba(239,246,255,.97);
+  color:#1e3a8a;
+  font-size:12px;
+  font-weight:800;
+  line-height:1.35;
+  text-align:center;
+  box-shadow:0 8px 24px rgba(15,23,42,.16);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease,transform .18s ease;
+}
+
+.selection-toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}

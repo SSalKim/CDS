@@ -1,6 +1,67 @@
 (function(global){
 
 const DEFAULT_CHART_BASE_URL='https://dmdw.kma.go.kr/map/data/CHT';
+const DEFAULT_CHART_BACKUP_BASE_URLS=[
+'https://data.kma.go.kr/CHT',
+'https://afso.kma.go.kr/data/CHT'
+];
+const DEFAULT_CHART_BASE_URLS=[
+DEFAULT_CHART_BASE_URL,
+...DEFAULT_CHART_BACKUP_BASE_URLS
+];
+
+function getChartBaseUrls(){
+return [...DEFAULT_CHART_BASE_URLS];
+}
+
+function splitChartUrl(url){
+
+if(typeof url!=='string' || !url){
+return null;
+}
+
+try{
+let parsed=new URL(url,typeof window!=='undefined'?window.location.href:undefined);
+let roots=[
+{host:'dmdw.kma.go.kr',path:'/map/data/CHT/'},
+{host:'data.kma.go.kr',path:'/CHT/'},
+{host:'afso.kma.go.kr',path:'/data/CHT/'}
+];
+let matched=roots.find(root=>
+parsed.hostname===root.host && parsed.pathname.startsWith(root.path)
+);
+
+if(!matched){
+return null;
+}
+
+return {
+relativePath:parsed.pathname.slice(matched.path.length),
+search:parsed.search || '',
+hash:parsed.hash || ''
+};
+}
+catch(e){
+return null;
+}
+
+}
+
+function getChartUrlCandidates(url){
+
+let parts=splitChartUrl(url);
+
+if(!parts){
+return [url];
+}
+
+let candidates=DEFAULT_CHART_BASE_URLS.map(base=>
+`${base}/${parts.relativePath}${parts.search}${parts.hash}`
+);
+
+return [...new Set(candidates)];
+}
+
 
 function normalizePatternList(pattern){
 
@@ -11,6 +72,23 @@ return [];
 return Array.isArray(pattern)
 ?pattern
 :[pattern];
+
+}
+
+
+function getProductPatternsForDetail(product,modelId,detailToken){
+
+let basePattern=product?.patternByModel?.[modelId];
+
+if(!product?.detailPatternByModel){
+return basePattern;
+}
+
+if(!detailToken || detailToken==='base'){
+return basePattern;
+}
+
+return product.detailPatternByModel?.[modelId]?.[detailToken] || null;
 
 }
 
@@ -350,7 +428,12 @@ resetCacheIfLarge
 }
 
 global.CDSChartUtils={
+DEFAULT_CHART_BASE_URL,
+DEFAULT_CHART_BACKUP_BASE_URLS,
+getChartBaseUrls,
+getChartUrlCandidates,
 normalizePatternList,
+getProductPatternsForDetail,
 getProductFolderForModel,
 getChartUrlParts,
 applyChartPatternTokens,

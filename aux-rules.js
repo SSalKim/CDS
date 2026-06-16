@@ -125,6 +125,28 @@ sstRegion:{
   defaultValue:'glob'
 },
 
+analysisAsiaOverlay:{
+  title:'표출 구성',
+  widthClass:'wide',
+  optionSet:'analysisAsiaOverlays',
+  defaultValue:'base'
+},
+
+analysisKoreaOverlay:{
+  title:'표출 구성',
+  widthClass:'wide',
+  optionSet:'analysisKoreaOverlays',
+  defaultValue:'base'
+},
+
+analysisTyphoonOverlay:{
+  title:'표출 구성',
+  widthClass:'wide',
+  optionSet:'analysisTyphoonOverlays',
+  defaultValue:'base'
+},
+
+
 astdLevel:{
   title:'고도',
   widthClass:'narrow',
@@ -137,6 +159,10 @@ astdLevel:{
 const AUX_USAGE_RULES={
 
 analysis:{
+
+  analysisAsiaOverlay:{selector:'analysisAsiaOverlay'},
+  analysisKoreaOverlay:{selector:'analysisKoreaOverlay'},
+  analysisTyphoonOverlay:{selector:'analysisTyphoonOverlay'},
   skewan:{
     selector:'stationWide',
     excludeByModel:{

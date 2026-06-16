@@ -1,8 +1,4 @@
-const MODEL_SPECIFIC_PRODUCT_CATEGORY={
-kim_klfs:"klfs_vdps",
-um_klfs:"klfs_vdps",
-um_vdps:"klfs_vdps"
-};
+const MODEL_SPECIFIC_PRODUCT_CATEGORY={};
 
 const PRODUCT_CATEGORY_UI_CONFIG={
 isen:{

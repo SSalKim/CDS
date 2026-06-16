@@ -330,29 +330,7 @@ currentModel=modelId;
 
 applyCategoryRedirectForCurrentModel();
 
-let categoryId=getCurrentCategory();
-
-let currentProductObject=getProductByIdInCategory(
-categoryId,
-currentProduct
-);
-
-if(
-!currentProductObject ||
-!productSupportsModel(currentProductObject,currentModel)
-){
-
-let fallbackProduct=getProductsInCategory(categoryId).find(
-p=>productSupportsModel(p,currentModel)
-);
-
-if(fallbackProduct){
-currentProduct=fallbackProduct.id;
-}
-
-}
-
-refreshView({
+refreshViewAfterSelectionChange({
 updateCategories:true,
 updateProducts:true,
 updateHours:true,

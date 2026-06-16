@@ -215,8 +215,9 @@ function buildRunTimeSliderOffsets(){
 
 let step=getCurrentRunCycleStepHours();
 let offsets=[];
+let frameRadius=currentMainMenu==='analysis' ? 10 : 4;
 
-for(let i=-4;i<=4;i++){
+for(let i=-frameRadius;i<=frameRadius;i++){
 offsets.push(i*step);
 }
 

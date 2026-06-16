@@ -2641,3 +2641,71 @@ const PRODUCTS=[
 
 
 ];
+
+/* CDS 3.4: 초단기(KLAPS/VDAPS) 산출물을 기본예상도(한반도)에 통합 */
+(function mergeNowcastProductsIntoKoreaCategory(){
+
+const sourceCategory='klfs_vdps';
+const targetCategory='hkor';
+const mapFields=[
+'patternByModel',
+'folderByModel',
+'archiveStartByModel',
+'archiveEndByModel',
+'forecastStepByModel',
+'cyclesByModel',
+'existenceModeByModel'
+];
+
+let sourceProducts=PRODUCTS.filter(product=>
+product.category===sourceCategory && product.type!=='header'
+);
+let uniqueNowcastProducts=[];
+
+sourceProducts.forEach(source=>{
+let target=PRODUCTS.find(product=>
+product.category===targetCategory &&
+product.type!=='header' &&
+product.id===source.id
+);
+
+if(!target){
+uniqueNowcastProducts.push({
+...source,
+category:targetCategory,
+nowcastOnly:true
+});
+return;
+}
+
+mapFields.forEach(field=>{
+if(!source[field]){
+return;
+}
+
+target[field]={
+...(target[field] || {}),
+...source[field]
+};
+});
+
+});
+
+for(let index=PRODUCTS.length-1;index>=0;index--){
+if(PRODUCTS[index].category===sourceCategory){
+PRODUCTS.splice(index,1);
+}
+}
+
+if(uniqueNowcastProducts.length){
+PRODUCTS.push(
+{
+category:targetCategory,
+type:'header',
+label:'──── 초단기(KLAPS/VDAPS) 전용 ────'
+},
+...uniqueNowcastProducts
+);
+}
+
+})();

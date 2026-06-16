@@ -18,6 +18,7 @@ const forecastTimeline=document.getElementById('forecastTimeline');
 const viewerWrap=document.querySelector('.viewer-wrap');
 const timelineTopControls=document.getElementById('timelineTopControls');
 const appTitleReset=document.getElementById('appTitleReset');
+const selectionToast=document.getElementById('selectionToast');
 
 let currentModel='kim_gdps';
 let currentProduct='gph500';
@@ -59,7 +60,33 @@ decodeTimeoutMs:IMAGE_DECODE_TIMEOUT_MS,
 cacheLimit:500,
 trimTo:250
 });
-const createDecodedDisplayImage=chartImageLoader.createDecodedDisplayImage;
+const chartResolvedUrlCache=new Map();
+
+function getOrderedChartUrlCandidates(url){
+let candidates=typeof CDSChartUtils.getChartUrlCandidates==='function'
+?CDSChartUtils.getChartUrlCandidates(url)
+:[url];
+let preferred=chartResolvedUrlCache.get(url);
+
+if(preferred && candidates.includes(preferred)){
+return [preferred,...candidates.filter(candidate=>candidate!==preferred)];
+}
+
+return candidates;
+}
+
+const createDecodedDisplayImage=async url=>{
+for(let candidate of getOrderedChartUrlCandidates(url)){
+let img=await chartImageLoader.createDecodedDisplayImage(candidate);
+
+if(img){
+chartResolvedUrlCache.set(url,candidate);
+return img;
+}
+}
+
+return null;
+};
 const revealPreparedImagesFromLoader=chartImageLoader.revealPreparedImages;
 
 const CURRENT_PRODUCT_EXISTENCE_MODE="all";
@@ -74,11 +101,58 @@ const PRELOAD_IMAGE_TIMEOUT_MS=15000;
 const DISPLAY_IMAGE_RETRY_DELAY_MS=500;
 const DISPLAY_IMAGE_MAX_RETRIES=2;
 const AUTO_CHECK_DEBOUNCE_MS=250;
-const QUIET_IMAGE_PROBE_HOSTS=new Set(['dmdw.kma.go.kr']);
+const QUIET_IMAGE_PROBE_HOSTS=new Set(['dmdw.kma.go.kr','data.kma.go.kr','afso.kma.go.kr']);
 
 let latestSearchSeq=0;
 let latestSearchInProgress=false;
 let autoCheckTimer=null;
+let selectionToastTimer=null;
+
+function showSelectionToast(message){
+
+if(!selectionToast){
+return;
+}
+
+clearTimeout(selectionToastTimer);
+selectionToast.textContent=message;
+selectionToast.classList.remove('hidden');
+selectionToast.classList.remove('show');
+void selectionToast.offsetWidth;
+selectionToast.classList.add('show');
+
+selectionToastTimer=setTimeout(()=>{
+selectionToast.classList.remove('show');
+setTimeout(()=>selectionToast.classList.add('hidden'),180);
+},2200);
+
+}
+
+
+function refreshViewAfterSelectionChange(options={}){
+
+let shouldSearchAnalysis=currentMainMenu==='analysis';
+let baseDate=options.analysisBaseDate || getSelectedUTCDate();
+let preserveForecastHour=options.preserveForecastHour ?? getSelectedTimelineHourForPreserve();
+let refreshPromise=refreshView({
+...options,
+updateChartAfter:shouldSearchAnalysis ? false : options.updateChartAfter!==false
+});
+
+if(shouldSearchAnalysis){
+Promise.resolve(refreshPromise).then(()=>{
+jumpLatestAvailableForCurrentSelection({
+silent:false,
+preserveForecastHour,
+baseDate
+});
+});
+}
+
+return refreshPromise;
+
+}
+
 
 function invalidateForecastDisplay(){
 
@@ -389,11 +463,17 @@ requireDetailToken=true,
 checkAvailability=false
 }={}){
 
+let resolvedPatterns=patterns ?? CDSChartUtils.getProductPatternsForDetail(
+product,
+modelId,
+detailToken
+);
+
 return CDSChartUtils.makeChartImageUrls({
 product,
 modelId,
 runUTC,
-patterns,
+patterns:resolvedPatterns,
 forecastHour,
 detailToken,
 requireDetailToken,
@@ -1460,7 +1540,11 @@ try{
 let parsed=new URL(url,window.location.href);
 return (
 QUIET_IMAGE_PROBE_HOSTS.has(parsed.hostname) &&
-parsed.pathname.startsWith('/map/data/CHT/')
+(
+parsed.pathname.startsWith('/map/data/CHT/') ||
+parsed.pathname.startsWith('/CHT/') ||
+parsed.pathname.startsWith('/data/CHT/')
+)
 );
 }
 catch(e){
@@ -1499,16 +1583,26 @@ clearTimeout(timer);
 
 async function loadImage(url,timeoutMs=PRELOAD_IMAGE_TIMEOUT_MS){
 
-if(shouldUseQuietImageProbe(url)){
-let exists=await quietImageExists(url,timeoutMs);
+for(let candidate of getOrderedChartUrlCandidates(url)){
+
+if(shouldUseQuietImageProbe(candidate)){
+let exists=await quietImageExists(candidate,timeoutMs);
 
 if(exists===false){
-return false;
+continue;
 }
 }
 
-let result=await chartImageLoader.getDecodedImage(url,timeoutMs);
-return !!result?.ok;
+let result=await chartImageLoader.getDecodedImage(candidate,timeoutMs);
+
+if(result?.ok){
+chartResolvedUrlCache.set(url,candidate);
+return true;
+}
+
+}
+
+return false;
 
 }
 
@@ -1953,6 +2047,10 @@ function getLatestSearchLookbackHours(product=getCurrentProduct()){
 
 let baseLookback=Math.max(24,Number(NOW_LOOKBACK_HOURS) || 24);
 
+if(currentMainMenu==='analysis'){
+baseLookback=Math.max(baseLookback,72);
+}
+
 if(isSeaSurfaceTemperatureDailySelection(product)){
 return Math.max(baseLookback,SST_LOOKBACK_HOURS);
 }
@@ -2283,13 +2381,14 @@ currentProduct=firstProduct.id;
 }
 
 /*
-새 category + 새 product 기준으로 지원 가능한 모델로 이동
+새 category + 새 product 기준으로 지원 가능한 모델로 이동한다.
+산출물 선택이 우선이며, 현재 모델 미지원 시에만 안내 후 모델을 바꾼다.
 */
-enforceModelRestrictionForCurrentCategory();
+enforceModelRestrictionForCurrentCategory({notify:true});
 
 populateProductCategories();
 
-refreshView({
+refreshViewAfterSelectionChange({
 updateCategories:false,
 updateProducts:true,
 updateHours:true,
@@ -2317,11 +2416,10 @@ if(modelCompareMode){
 normalizeCompareModels();
 }
 
-applyModelSwitchForCurrentProduct();
-enforceModelAllowedForCurrentSelection();
+enforceModelAllowedForCurrentSelection({notify:true});
 
-refreshView({
-updateCategories:false,
+refreshViewAfterSelectionChange({
+updateCategories:true,
 updateProducts:true,
 updateHours:true,
 resetSlider:true,

@@ -41,38 +41,32 @@ null
 }
 
 
+function getVisibleModelsSupportingProduct(product){
+
+let supported=[];
+
+for(let group of getVisibleModelGroups()){
+for(let model of group.models){
+let modelId=model[0];
+
+if(productSupportsModel(product,modelId)){
+supported.push(modelId);
+}
+}
+}
+
+return supported;
+
+}
 
 
 function canSelectProductByModelSwitch(product){
-
-let restriction=getSelectionRestrictionForProduct(product);
-
-if(!restriction || !restriction.allowModelSwitch){
-return false;
-}
-
-let fallback=restriction.fallbackModel;
-
-if(!fallback){
-return false;
-}
-
-if(!isModelVisibleInCurrentMenu(fallback)){
-return false;
-}
-
-return productSupportsModel(product,fallback);
-
+return getVisibleModelsSupportingProduct(product).length>0;
 }
 
 
-function isProductSelectableInDropdown(product,modelId=currentModel){
-
-return (
-productSupportsModel(product,modelId) ||
-canSelectProductByModelSwitch(product)
-);
-
+function isProductSelectableInDropdown(product){
+return !!product && product.type!=="header";
 }
 
 
@@ -121,7 +115,7 @@ return false;
 
 }
 
-function isProductCategoryDisabled(categoryId){
+function isProductCategoryUnsupportedForModel(categoryId,modelId=currentModel){
 
 if(getCurrentCatalogKey()==="empty" || categoryId==="empty"){
 return false;
@@ -129,59 +123,45 @@ return false;
 
 if(
 (
-getActiveDisabledProductCategoriesByModel()[currentModel] || []
+getActiveDisabledProductCategoriesByModel()[modelId] || []
 ).includes(categoryId)
 ){
 return true;
 }
 
-/*
-1차 드롭다운은 현재 모델 기준으로 막지 않는다.
-현재 대메뉴에서 보이는 모델 중 하나라도 해당 category 산출물을 지원하면 활성화한다.
-*/
-if(!categoryHasSupportedProductForAnyVisibleModel(categoryId)){
+if(!isCategoryAllowedByModelRestriction(categoryId,modelId)){
 return true;
 }
 
-return false;
+return !categoryHasSupportedProduct(categoryId,modelId);
 
+}
+
+/*
+CDS 3.4에서는 산출물 선택을 우선한다.
+1차/2차 드롭다운은 클릭을 막지 않고, 현재 모델 미지원 항목만 회색으로 표시한다.
+*/
+function isProductCategoryDisabled(){
+return false;
 }
 
 
 function getFirstEnabledProductCategory(){
-
-return getSelectableCategories().find(
-c=>!isProductCategoryDisabled(c.id)
-);
-
+return getSelectableCategories()[0] || null;
 }
+
 
 function applyModelSwitchForCurrentProduct(){
-
-let product=getCurrentProduct();
-let restriction=getSelectionRestrictionForProduct(product);
-
-if(!product || !restriction || !restriction.allowModelSwitch){
-return false;
+return enforceModelAllowedForCurrentSelection();
 }
 
-if(productSupportsModel(product,currentModel)){
-return false;
-}
 
-let fallback=restriction.fallbackModel;
-
-if(
-fallback &&
-isModelVisibleInCurrentMenu(fallback) &&
-productSupportsModel(product,fallback)
-){
-currentModel=fallback;
-return true;
-}
-
-return false;
-
+function markOptionUnsupported(option,message){
+option.classList.add('unsupported-option');
+option.dataset.unsupported='true';
+option.style.color='#a8b0bd';
+option.style.backgroundColor='#f8fafc';
+option.title=message;
 }
 
 
@@ -218,26 +198,18 @@ return;
 o.value=c.id;
 o.textContent=c.name;
 
-if(isProductCategoryDisabled(c.id)){
-o.disabled=true;
+if(isProductCategoryUnsupportedForModel(c.id,currentModel)){
+markOptionUnsupported(
+o,
+'현재 모델에서 이 분류의 산출물을 지원하지 않습니다. 선택하면 지원 모델로 자동 전환됩니다.'
+);
 }
 
 productCategory.appendChild(o);
 
 });
 
-if(isProductCategoryDisabled(prevCategory)){
-
-let firstEnabled=getFirstEnabledProductCategory();
-
-if(firstEnabled){
-productCategory.value=firstEnabled.id;
-}
-
-}
-else{
 productCategory.value=prevCategory;
-}
 
 if(!productCategory.value && selectableCategories.length){
 productCategory.value=selectableCategories[0].id;
@@ -269,10 +241,11 @@ return;
 o.value=p.id;
 o.textContent=p.label;
 
-let supported=isProductSelectableInDropdown(p,currentModel);
-
-if(!supported){
-o.disabled=true;
+if(!productSupportsModel(p,currentModel)){
+markOptionUnsupported(
+o,
+'현재 모델에서는 지원하지 않는 산출물입니다. 선택하면 지원 모델로 자동 전환됩니다.'
+);
 }
 
 productSelect.appendChild(o);
@@ -280,38 +253,18 @@ productSelect.appendChild(o);
 });
 
 let defaultProduct=getDefaultProductForCategory(cat);
-
 let currentProductObject=products.find(
 p=>p.category===cat && p.id===currentProduct && p.type!=='header'
 );
 
-let existsInCategory=!!currentProductObject;
-
-let currentProductSupported=
-currentProductObject &&
-isProductSelectableInDropdown(currentProductObject,currentModel);
-
-let supportedDefaultProduct=
-defaultProduct &&
-isProductSelectableInDropdown(defaultProduct,currentModel)
-?defaultProduct
-:getProductsInCategory(cat).find(
-p=>isProductSelectableInDropdown(p,currentModel)
-);
-
-if(getProductCategoryUIConfig().hideProductSelect){
-
-if(supportedDefaultProduct){
-currentProduct=supportedDefaultProduct.id;
+if(getProductCategoryUIConfig().hideProductSelect || !currentProductObject){
+if(defaultProduct){
+currentProduct=defaultProduct.id;
 }
-
+else{
+let firstProduct=getProductsInCategory(cat)[0];
+currentProduct=firstProduct?.id || '';
 }
-else if(!existsInCategory || !currentProductSupported){
-
-if(supportedDefaultProduct){
-currentProduct=supportedDefaultProduct.id;
-}
-
 }
 
 productSelect.value=currentProduct;

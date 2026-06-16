@@ -1200,6 +1200,40 @@ astdLevels:{
   ]
 },
 
+analysisAsiaOverlays:{
+  type:"analysis-overlay",
+  items:[
+    {type:"item",value:"base",label:"기본"},
+    {type:"item",value:"satir1",label:"적외+기본(관측O)"},
+    {type:"item",value:"satir3",label:"수증기+기본(관측O)"},
+    {type:"item",value:"nocir1",label:"적외+기본(관측X)"},
+    {type:"item",value:"nocir3",label:"수증기+기본(관측X)"},
+    {type:"item",value:"pltstn",label:"관측값만"}
+  ]
+},
+
+analysisKoreaOverlays:{
+  type:"analysis-overlay",
+  items:[
+    {type:"item",value:"base",label:"기본"},
+    {type:"item",value:"satir1",label:"적외+기본(관측O)"},
+    {type:"item",value:"satir3",label:"수증기+기본(관측O)"},
+    {type:"item",value:"oradar",label:"레이더+기본(관측O)"},
+    {type:"item",value:"nocir1",label:"적외+기본(관측X)"},
+    {type:"item",value:"nocir3",label:"수증기+기본(관측X)"},
+    {type:"item",value:"nradar",label:"레이더+기본(관측X)"}
+  ]
+},
+
+analysisTyphoonOverlays:{
+  type:"analysis-overlay",
+  items:[
+    {type:"item",value:"base",label:"기본"},
+    {type:"item",value:"satir1",label:"적외+기본(관측O)"},
+    {type:"item",value:"satir3",label:"수증기+기본(관측O)"}
+  ]
+},
+
 };
 
 
