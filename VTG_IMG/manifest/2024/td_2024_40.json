@@ -1,16 +1,16 @@
 {
   "version": 2,
-  "updated_at_utc": "202606170340",
+  "updated_at_utc": "202410041700",
   "storm_key": "td_2024_40",
-  "stage": "TD",
+  "stage": "TD_LINKED_TYP",
   "year": 2024,
   "typ_number": 40,
   "linked_td_number": null,
   "linked_typ_number": 18,
   "typ_name": "KRATHON",
   "typ_name_ko": "끄라톤",
-  "latest_data_time": "202410040600",
-  "item_count": 4,
+  "latest_data_time": "202410041200",
+  "item_count": 6,
   "inventory": [
     {
       "job": {
@@ -122,29 +122,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2024_40",
-        "stage": "TD",
+        "storm_key": "td_2024_40_typ_18",
+        "stage": "TD_LINKED_TYP",
         "year": 2024,
         "data_time": "202410040600",
         "td_number": 40,
         "linked_td_number": null,
-        "linked_typ_number": 18,
         "typ_number": 40,
-        "data_typ_number": 40,
         "typ_name_ko": "끄라톤",
         "typ_name": "KRATHON",
         "typ_en": "KRATHON",
         "atcf_id": "wp202024",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202410040600"
+        "data_time": "202410040600",
+        "cycle_time_utc": "202410040600",
+        "start_utc": "202410041100",
+        "end_utc": "202410041700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614191437",
+          "generated_at_utc": "20260617194830",
           "image_path": "VTG_IMG/2024/TD_2440_KRATHON/TD_2440_KRATHON_202410040600_120h.png",
           "storm_stage": "TD",
           "storm_year": "2024",
@@ -166,37 +166,37 @@
             "KIM",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202410040600_td_2024_40_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2024_40",
-        "stage": "TD",
+        "storm_key": "td_2024_40_typ_18",
+        "stage": "TD_LINKED_TYP",
         "year": 2024,
         "data_time": "202410040600",
         "td_number": 40,
         "linked_td_number": null,
-        "linked_typ_number": 18,
         "typ_number": 40,
-        "data_typ_number": 40,
         "typ_name_ko": "끄라톤",
         "typ_name": "KRATHON",
         "typ_en": "KRATHON",
         "atcf_id": "wp202024",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202410040600"
+        "data_time": "202410040600",
+        "cycle_time_utc": "202410040600",
+        "start_utc": "202410041100",
+        "end_utc": "202410041700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614191439",
+          "generated_at_utc": "20260617194832",
           "image_path": "VTG_IMG/2024/TD_2440_KRATHON/TD_2440_KRATHON_202410040600_240h.png",
           "storm_stage": "TD",
           "storm_year": "2024",
@@ -218,11 +218,115 @@
             "KIM",
             "UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202410040600_td_2024_40_240h.json"
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2024_40_typ_18",
+        "stage": "TD_LINKED_TYP",
+        "year": 2024,
+        "data_time": "202410041200",
+        "td_number": 40,
+        "linked_td_number": null,
+        "typ_number": 40,
+        "typ_name_ko": "끄라톤",
+        "typ_name": "KRATHON",
+        "typ_en": "KRATHON",
+        "atcf_id": "wp202024",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202410041200",
+        "cycle_time_utc": "202410041200",
+        "start_utc": "202410041700",
+        "end_utc": "202410042300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260617194907",
+          "image_path": "VTG_IMG/2024/TD_2440_KRATHON/TD_2440_KRATHON_202410041200_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2024",
+          "typ_number": 40,
+          "data_typ_number": 40,
+          "typ_name": "KRATHON",
+          "typ_name_ko": "끄라톤",
+          "linked_td_number": null,
+          "linked_typ_number": 18,
+          "atcf_id": "wp202024",
+          "extra_atcf_ids": [],
+          "data_time": "202410041200",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 3,
+          "target_model_count": 29,
+          "model_labels": [
+            "ECMWF EPS",
+            "KIM",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2024_40_typ_18",
+        "stage": "TD_LINKED_TYP",
+        "year": 2024,
+        "data_time": "202410041200",
+        "td_number": 40,
+        "linked_td_number": null,
+        "typ_number": 40,
+        "typ_name_ko": "끄라톤",
+        "typ_name": "KRATHON",
+        "typ_en": "KRATHON",
+        "atcf_id": "wp202024",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202410041200",
+        "cycle_time_utc": "202410041200",
+        "start_utc": "202410041700",
+        "end_utc": "202410042300"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260617194909",
+          "image_path": "VTG_IMG/2024/TD_2440_KRATHON/TD_2440_KRATHON_202410041200_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2024",
+          "typ_number": 40,
+          "data_typ_number": 40,
+          "typ_name": "KRATHON",
+          "typ_name_ko": "끄라톤",
+          "linked_td_number": null,
+          "linked_typ_number": 18,
+          "atcf_id": "wp202024",
+          "extra_atcf_ids": [],
+          "data_time": "202410041200",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 3,
+          "target_model_count": 29,
+          "model_labels": [
+            "ECMWF EPS",
+            "KIM",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
     }
   ]
 }
