@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202606161145",
+  "updated_at_utc": "202207050500",
   "storm_key": "td_2022_08",
-  "stage": "TD",
+  "stage": "TD_LINKED_TYP",
   "year": 2022,
   "typ_number": 8,
   "linked_td_number": null,
@@ -130,29 +130,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2022_08",
-        "stage": "TD",
+        "storm_key": "td_2022_08_typ_04",
+        "stage": "TD_LINKED_TYP",
         "year": 2022,
         "data_time": "202207050000",
         "td_number": 8,
         "linked_td_number": null,
-        "linked_typ_number": 4,
         "typ_number": 8,
-        "data_typ_number": 8,
         "typ_name_ko": "에어리",
         "typ_name": "AERE",
         "typ_en": "AERE",
         "atcf_id": "wp052022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202207050000"
+        "data_time": "202207050000",
+        "cycle_time_utc": "202207050000",
+        "start_utc": "202207050500",
+        "end_utc": "202207051100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615092328",
+          "generated_at_utc": "20260617021759",
           "image_path": "VTG_IMG/2022/TD_2208_AERE/TD_2208_AERE_202207050000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -168,7 +168,7 @@
           "fcst_hours": 120,
           "intensity": "TD",
           "model_count": 10,
-          "target_model_count": 19,
+          "target_model_count": 18,
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -181,37 +181,37 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202207050000_td_2022_08_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_08",
-        "stage": "TD",
+        "storm_key": "td_2022_08_typ_04",
+        "stage": "TD_LINKED_TYP",
         "year": 2022,
         "data_time": "202207050000",
         "td_number": 8,
         "linked_td_number": null,
-        "linked_typ_number": 4,
         "typ_number": 8,
-        "data_typ_number": 8,
         "typ_name_ko": "에어리",
         "typ_name": "AERE",
         "typ_en": "AERE",
         "atcf_id": "wp052022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202207050000"
+        "data_time": "202207050000",
+        "cycle_time_utc": "202207050000",
+        "start_utc": "202207050500",
+        "end_utc": "202207051100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615092330",
+          "generated_at_utc": "20260617021802",
           "image_path": "VTG_IMG/2022/TD_2208_AERE/TD_2208_AERE_202207050000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -227,7 +227,7 @@
           "fcst_hours": 240,
           "intensity": "TD",
           "model_count": 10,
-          "target_model_count": 19,
+          "target_model_count": 18,
           "model_labels": [
             "GALWEM",
             "CMC",
@@ -240,11 +240,11 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202207050000_td_2022_08_240h.json"
+      "completed": false,
+      "final_check": false
     }
   ]
 }
