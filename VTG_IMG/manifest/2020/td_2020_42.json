@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202011071700",
+  "updated_at_utc": "202606170340",
   "storm_key": "td_2020_42",
-  "stage": "TD_LINKED_TYP",
+  "stage": "TD",
   "year": 2020,
   "typ_number": 42,
   "linked_td_number": null,
@@ -14,27 +14,27 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2020_42_typ_20",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2020_42",
+        "stage": "TD",
         "year": 2020,
         "data_time": "202011071200",
         "td_number": 42,
         "linked_td_number": null,
+        "linked_typ_number": 20,
         "typ_number": 42,
+        "data_typ_number": 42,
         "typ_name_ko": "앗사니",
         "typ_name": "ATSANI",
         "typ_en": "ATSANI",
         "atcf_id": "wp232020",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202011071200",
-        "cycle_time_utc": "202011071200",
-        "start_utc": "202011071700",
-        "end_utc": "202011072300"
+        "data_time": "202011071200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260616182251",
           "image_path": "VTG_IMG/2020/TD_2042_ATSANI/TD_2042_ATSANI_202011071200_120h.png",
@@ -59,35 +59,35 @@
             "GFS EPS",
             "HWRF"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202011071200_td_2020_42_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2020_42_typ_20",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2020_42",
+        "stage": "TD",
         "year": 2020,
         "data_time": "202011071200",
         "td_number": 42,
         "linked_td_number": null,
+        "linked_typ_number": 20,
         "typ_number": 42,
+        "data_typ_number": 42,
         "typ_name_ko": "앗사니",
         "typ_name": "ATSANI",
         "typ_en": "ATSANI",
         "atcf_id": "wp232020",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202011071200",
-        "cycle_time_utc": "202011071200",
-        "start_utc": "202011071700",
-        "end_utc": "202011072300"
+        "data_time": "202011071200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260616182253",
           "image_path": "VTG_IMG/2020/TD_2042_ATSANI/TD_2042_ATSANI_202011071200_240h.png",
@@ -112,11 +112,11 @@
             "GFS EPS",
             "HWRF"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202011071200_td_2020_42_240h.json"
     }
   ]
 }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202110102300",
+  "updated_at_utc": "202606170340",
   "storm_key": "td_2021_41",
-  "stage": "TD_LINKED_TYP",
+  "stage": "TD",
   "year": 2021,
   "typ_number": 41,
   "linked_td_number": null,
@@ -14,27 +14,27 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2021_41_typ_17",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2021_41",
+        "stage": "TD",
         "year": 2021,
         "data_time": "202110101800",
         "td_number": 41,
         "linked_td_number": null,
+        "linked_typ_number": 17,
         "typ_number": 41,
+        "data_typ_number": 41,
         "typ_name_ko": "라이언록",
         "typ_name": "LIONROCK",
         "typ_en": "LIONROCK",
         "atcf_id": "wp222021",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202110101800",
-        "cycle_time_utc": "202110101800",
-        "start_utc": "202110102300",
-        "end_utc": "202110110500"
+        "data_time": "202110101800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260617000255",
           "image_path": "VTG_IMG/2021/TD_2141_LIONROCK/TD_2141_LIONROCK_202110101800_120h.png",
@@ -56,35 +56,35 @@
           "model_labels": [
             "GFS EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202110101800_td_2021_41_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2021_41_typ_17",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2021_41",
+        "stage": "TD",
         "year": 2021,
         "data_time": "202110101800",
         "td_number": 41,
         "linked_td_number": null,
+        "linked_typ_number": 17,
         "typ_number": 41,
+        "data_typ_number": 41,
         "typ_name_ko": "라이언록",
         "typ_name": "LIONROCK",
         "typ_en": "LIONROCK",
         "atcf_id": "wp222021",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202110101800",
-        "cycle_time_utc": "202110101800",
-        "start_utc": "202110102300",
-        "end_utc": "202110110500"
+        "data_time": "202110101800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260617000258",
           "image_path": "VTG_IMG/2021/TD_2141_LIONROCK/TD_2141_LIONROCK_202110101800_240h.png",
@@ -106,11 +106,11 @@
           "model_labels": [
             "GFS EPS"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202110101800_td_2021_41_240h.json"
     }
   ]
 }

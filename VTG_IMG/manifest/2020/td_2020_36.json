@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202010260500",
+  "updated_at_utc": "202606170340",
   "storm_key": "td_2020_36",
-  "stage": "TD_LINKED_TYP",
+  "stage": "TD",
   "year": 2020,
   "typ_number": 36,
   "linked_td_number": null,
@@ -14,27 +14,27 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2020_36_typ_17",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2020_36",
+        "stage": "TD",
         "year": 2020,
         "data_time": "202010260000",
         "td_number": 36,
         "linked_td_number": null,
+        "linked_typ_number": 17,
         "typ_number": 36,
+        "data_typ_number": 36,
         "typ_name_ko": "사우델",
         "typ_name": "SAUDEL",
         "typ_en": "SAUDEL",
         "atcf_id": "wp192020",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202010260000",
-        "cycle_time_utc": "202010260000",
-        "start_utc": "202010260500",
-        "end_utc": "202010261100"
+        "data_time": "202010260000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260616174936",
           "image_path": "VTG_IMG/2020/TD_2036_SAUDEL/TD_2036_SAUDEL_202010260000_120h.png",
@@ -63,35 +63,35 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202010260000_td_2020_36_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2020_36_typ_17",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2020_36",
+        "stage": "TD",
         "year": 2020,
         "data_time": "202010260000",
         "td_number": 36,
         "linked_td_number": null,
+        "linked_typ_number": 17,
         "typ_number": 36,
+        "data_typ_number": 36,
         "typ_name_ko": "사우델",
         "typ_name": "SAUDEL",
         "typ_en": "SAUDEL",
         "atcf_id": "wp192020",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202010260000",
-        "cycle_time_utc": "202010260000",
-        "start_utc": "202010260500",
-        "end_utc": "202010261100"
+        "data_time": "202010260000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260616174939",
           "image_path": "VTG_IMG/2020/TD_2036_SAUDEL/TD_2036_SAUDEL_202010260000_240h.png",
@@ -120,11 +120,11 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202010260000_td_2020_36_240h.json"
     }
   ]
 }
