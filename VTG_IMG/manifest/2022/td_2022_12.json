@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202606161145",
+  "updated_at_utc": "202208011700",
   "storm_key": "td_2022_12",
-  "stage": "TD",
+  "stage": "TD_LINKED_TYP",
   "year": 2022,
   "typ_number": 12,
   "linked_td_number": null,
@@ -122,29 +122,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2022_12",
-        "stage": "TD",
+        "storm_key": "td_2022_12_typ_05",
+        "stage": "TD_LINKED_TYP",
         "year": 2022,
         "data_time": "202208010000",
         "td_number": 12,
         "linked_td_number": null,
-        "linked_typ_number": 5,
         "typ_number": 12,
-        "data_typ_number": 12,
         "typ_name_ko": "송다",
         "typ_name": "SONGDA",
         "typ_en": "SONGDA",
         "atcf_id": "wp062022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202208010000"
+        "data_time": "202208010000",
+        "cycle_time_utc": "202208010000",
+        "start_utc": "202208010500",
+        "end_utc": "202208011100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615093547",
+          "generated_at_utc": "20260617023519",
           "image_path": "VTG_IMG/2022/TD_2212_SONGDA/TD_2212_SONGDA_202208010000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -160,7 +160,7 @@
           "fcst_hours": 120,
           "intensity": "TD",
           "model_count": 9,
-          "target_model_count": 19,
+          "target_model_count": 18,
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -172,37 +172,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202208010000_td_2022_12_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_12",
-        "stage": "TD",
+        "storm_key": "td_2022_12_typ_05",
+        "stage": "TD_LINKED_TYP",
         "year": 2022,
         "data_time": "202208010000",
         "td_number": 12,
         "linked_td_number": null,
-        "linked_typ_number": 5,
         "typ_number": 12,
-        "data_typ_number": 12,
         "typ_name_ko": "송다",
         "typ_name": "SONGDA",
         "typ_en": "SONGDA",
         "atcf_id": "wp062022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202208010000"
+        "data_time": "202208010000",
+        "cycle_time_utc": "202208010000",
+        "start_utc": "202208010500",
+        "end_utc": "202208011100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615093550",
+          "generated_at_utc": "20260617023523",
           "image_path": "VTG_IMG/2022/TD_2212_SONGDA/TD_2212_SONGDA_202208010000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -218,7 +218,7 @@
           "fcst_hours": 240,
           "intensity": "TD",
           "model_count": 9,
-          "target_model_count": 19,
+          "target_model_count": 18,
           "model_labels": [
             "CMC",
             "CMC EPS",
@@ -230,37 +230,37 @@
             "NAVGEM",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202208010000_td_2022_12_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_12",
-        "stage": "TD",
+        "storm_key": "td_2022_12_typ_05",
+        "stage": "TD_LINKED_TYP",
         "year": 2022,
         "data_time": "202208010600",
         "td_number": 12,
         "linked_td_number": null,
-        "linked_typ_number": 5,
         "typ_number": 12,
-        "data_typ_number": 12,
         "typ_name_ko": "송다",
         "typ_name": "SONGDA",
         "typ_en": "SONGDA",
         "atcf_id": "wp062022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202208010600"
+        "data_time": "202208010600",
+        "cycle_time_utc": "202208010600",
+        "start_utc": "202208011100",
+        "end_utc": "202208011700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615093624",
+          "generated_at_utc": "20260617023615",
           "image_path": "VTG_IMG/2022/TD_2212_SONGDA/TD_2212_SONGDA_202208010600_120h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -276,43 +276,43 @@
           "fcst_hours": 120,
           "intensity": "TD",
           "model_count": 3,
-          "target_model_count": 19,
+          "target_model_count": 18,
           "model_labels": [
             "GFS",
             "GFS EPS",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202208010600_td_2022_12_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_12",
-        "stage": "TD",
+        "storm_key": "td_2022_12_typ_05",
+        "stage": "TD_LINKED_TYP",
         "year": 2022,
         "data_time": "202208010600",
         "td_number": 12,
         "linked_td_number": null,
-        "linked_typ_number": 5,
         "typ_number": 12,
-        "data_typ_number": 12,
         "typ_name_ko": "송다",
         "typ_name": "SONGDA",
         "typ_en": "SONGDA",
         "atcf_id": "wp062022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202208010600"
+        "data_time": "202208010600",
+        "cycle_time_utc": "202208010600",
+        "start_utc": "202208011100",
+        "end_utc": "202208011700"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615093627",
+          "generated_at_utc": "20260617023619",
           "image_path": "VTG_IMG/2022/TD_2212_SONGDA/TD_2212_SONGDA_202208010600_240h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -328,17 +328,17 @@
           "fcst_hours": 240,
           "intensity": "TD",
           "model_count": 3,
-          "target_model_count": 19,
+          "target_model_count": 18,
           "model_labels": [
             "GFS",
             "GFS EPS",
             "JGSM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202208010600_td_2022_12_240h.json"
+      "completed": false,
+      "final_check": false
     }
   ]
 }
