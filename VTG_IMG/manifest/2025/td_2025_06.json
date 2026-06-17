@@ -1,16 +1,16 @@
 {
   "version": 2,
-  "updated_at_utc": "202606170340",
+  "updated_at_utc": "202506251100",
   "storm_key": "td_2025_06",
-  "stage": "TD",
+  "stage": "TD_LINKED_TYP",
   "year": 2025,
   "typ_number": 6,
   "linked_td_number": null,
   "linked_typ_number": 2,
   "typ_name": "SEPAT",
   "typ_name_ko": "스팟",
-  "latest_data_time": "202506250000",
-  "item_count": 4,
+  "latest_data_time": "202506250600",
+  "item_count": 6,
   "inventory": [
     {
       "job": {
@@ -134,29 +134,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2025_06",
-        "stage": "TD",
+        "storm_key": "td_2025_06_typ_02",
+        "stage": "TD_LINKED_TYP",
         "year": 2025,
         "data_time": "202506250000",
         "td_number": 6,
         "linked_td_number": null,
-        "linked_typ_number": 2,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "스팟",
         "typ_name": "SEPAT",
         "typ_en": "SEPAT",
         "atcf_id": "wp022025",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202506250000"
+        "data_time": "202506250000",
+        "cycle_time_utc": "202506250000",
+        "start_utc": "202506250500",
+        "end_utc": "202506251100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614085049",
+          "generated_at_utc": "20260617223422",
           "image_path": "VTG_IMG/2025/TD_2506_SEPAT/TD_2506_SEPAT_202506250000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -202,37 +202,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202506250000_td_2025_06_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2025_06",
-        "stage": "TD",
+        "storm_key": "td_2025_06_typ_02",
+        "stage": "TD_LINKED_TYP",
         "year": 2025,
         "data_time": "202506250000",
         "td_number": 6,
         "linked_td_number": null,
-        "linked_typ_number": 2,
         "typ_number": 6,
-        "data_typ_number": 6,
         "typ_name_ko": "스팟",
         "typ_name": "SEPAT",
         "typ_en": "SEPAT",
         "atcf_id": "wp022025",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202506250000"
+        "data_time": "202506250000",
+        "cycle_time_utc": "202506250000",
+        "start_utc": "202506250500",
+        "end_utc": "202506251100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614085052",
+          "generated_at_utc": "20260617223425",
           "image_path": "VTG_IMG/2025/TD_2506_SEPAT/TD_2506_SEPAT_202506250000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -278,11 +278,129 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202506250000_td_2025_06_240h.json"
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2025_06_typ_02",
+        "stage": "TD_LINKED_TYP",
+        "year": 2025,
+        "data_time": "202506250600",
+        "td_number": 6,
+        "linked_td_number": null,
+        "typ_number": 6,
+        "typ_name_ko": "스팟",
+        "typ_name": "SEPAT",
+        "typ_en": "SEPAT",
+        "atcf_id": "wp022025",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202506250600",
+        "cycle_time_utc": "202506250600",
+        "start_utc": "202506251100",
+        "end_utc": "202506251700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260617223510",
+          "image_path": "VTG_IMG/2025/TD_2506_SEPAT/TD_2506_SEPAT_202506250600_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2025",
+          "typ_number": 6,
+          "data_typ_number": 6,
+          "typ_name": "SEPAT",
+          "typ_name_ko": "스팟",
+          "linked_td_number": null,
+          "linked_typ_number": 2,
+          "atcf_id": "wp022025",
+          "extra_atcf_ids": [],
+          "data_time": "202506250600",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 10,
+          "target_model_count": 31,
+          "model_labels": [
+            "ECMWF",
+            "ECMWF AIFS",
+            "ECMWF EPS",
+            "FNV3",
+            "GenCast",
+            "GFS",
+            "GFS EPS",
+            "KIM",
+            "NAVGEM",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2025_06_typ_02",
+        "stage": "TD_LINKED_TYP",
+        "year": 2025,
+        "data_time": "202506250600",
+        "td_number": 6,
+        "linked_td_number": null,
+        "typ_number": 6,
+        "typ_name_ko": "스팟",
+        "typ_name": "SEPAT",
+        "typ_en": "SEPAT",
+        "atcf_id": "wp022025",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202506250600",
+        "cycle_time_utc": "202506250600",
+        "start_utc": "202506251100",
+        "end_utc": "202506251700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260617223513",
+          "image_path": "VTG_IMG/2025/TD_2506_SEPAT/TD_2506_SEPAT_202506250600_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2025",
+          "typ_number": 6,
+          "data_typ_number": 6,
+          "typ_name": "SEPAT",
+          "typ_name_ko": "스팟",
+          "linked_td_number": null,
+          "linked_typ_number": 2,
+          "atcf_id": "wp022025",
+          "extra_atcf_ids": [],
+          "data_time": "202506250600",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 10,
+          "target_model_count": 31,
+          "model_labels": [
+            "ECMWF",
+            "ECMWF AIFS",
+            "ECMWF EPS",
+            "FNV3",
+            "GenCast",
+            "GFS",
+            "GFS EPS",
+            "KIM",
+            "NAVGEM",
+            "UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
     }
   ]
 }
