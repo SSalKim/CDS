@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202606170340",
+  "updated_at_utc": "202411162300",
   "storm_key": "td_2024_54",
-  "stage": "TD",
+  "stage": "TD_LINKED_TYP",
   "year": 2024,
   "typ_number": 54,
   "linked_td_number": null,
@@ -128,29 +128,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2024_54",
-        "stage": "TD",
+        "storm_key": "td_2024_54_typ_25",
+        "stage": "TD_LINKED_TYP",
         "year": 2024,
         "data_time": "202411161200",
         "td_number": 54,
         "linked_td_number": null,
-        "linked_typ_number": 25,
         "typ_number": 54,
-        "data_typ_number": 54,
         "typ_name_ko": "우사기",
         "typ_name": "USAGI",
         "typ_en": "USAGI",
         "atcf_id": "wp272024",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202411161200"
+        "data_time": "202411161200",
+        "cycle_time_utc": "202411161200",
+        "start_utc": "202411161700",
+        "end_utc": "202411162300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614205309",
+          "generated_at_utc": "20260617214857",
           "image_path": "VTG_IMG/2024/TD_2454_USAGI/TD_2454_USAGI_202411161200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2024",
@@ -178,37 +178,37 @@
             "HAFS",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202411161200_td_2024_54_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2024_54",
-        "stage": "TD",
+        "storm_key": "td_2024_54_typ_25",
+        "stage": "TD_LINKED_TYP",
         "year": 2024,
         "data_time": "202411161200",
         "td_number": 54,
         "linked_td_number": null,
-        "linked_typ_number": 25,
         "typ_number": 54,
-        "data_typ_number": 54,
         "typ_name_ko": "우사기",
         "typ_name": "USAGI",
         "typ_en": "USAGI",
         "atcf_id": "wp272024",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202411161200"
+        "data_time": "202411161200",
+        "cycle_time_utc": "202411161200",
+        "start_utc": "202411161700",
+        "end_utc": "202411162300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614205311",
+          "generated_at_utc": "20260617214900",
           "image_path": "VTG_IMG/2024/TD_2454_USAGI/TD_2454_USAGI_202411161200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2024",
@@ -236,11 +236,11 @@
             "HAFS",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202411161200_td_2024_54_240h.json"
+      "completed": false,
+      "final_check": false
     }
   ]
 }
