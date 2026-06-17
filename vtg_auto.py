@@ -162,14 +162,23 @@ def normalize_kma_list_stamp_year(value: str, year: int) -> str:
     stamp_year = int(text[:4])
     if stamp_year in (2100, 9999):
         return text
-    # KMA list rows are keyed by season year (YY), but storms can cross
-    # calendar years. Preserve adjacent-year timestamps such as YY=2025
-    # with TM_ED=202601010000 instead of forcing them back to 2025.
-    if abs(stamp_year - year) <= 1:
+    if stamp_year == year:
         return text
-    if stamp_year != year:
-        return f"{year:04d}{text[4:]}"
-    return text
+
+    month = int(text[4:6])
+    # KMA list rows are keyed by season year (YY), but a storm can genuinely
+    # cross New Year. Preserve only plausible adjacent-year boundary stamps:
+    # late-year starts from YY-1 and early-year ends in YY+1. An adjacent year
+    # in the middle of the year is treated as a source typo. This corrects the
+    # 2022 TD02 row published as 202104090000-202104100000 while still keeping
+    # legitimate Dec/Jan cross-year storms intact.
+    plausible_cross_year = (
+        (stamp_year == year - 1 and month >= 11)
+        or (stamp_year == year + 1 and month <= 2)
+    )
+    if plausible_cross_year:
+        return text
+    return f"{year:04d}{text[4:]}"
 
 
 def normalize_kma_list_row_years(row: dict) -> dict:
