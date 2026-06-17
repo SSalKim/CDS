@@ -3,8 +3,8 @@ const TYPHOON_STATUS_PATH='VTG_IMG/vtg_auto_status.json';
 const TYPHOON_TYP_LIST_CACHE_PREFIX='VTG_IMG/kma_apihub_cache/typ_lst_';
 const TYPHOON_TYP_LIST_CACHE_SUFFIX='.json';
 const TYPHOON_IMPACT_EFF_VALUES=new Set(['1','2','3']);
-const TYPHOON_IMPACT_OPTION_BG='#dff5ff';
-const TYPHOON_IMPACT_OPTION_COLOR='#0f3d64';
+const TYPHOON_IMPACT_OPTION_BG='#F9E5FF';
+const TYPHOON_IMPACT_OPTION_COLOR='#5d2b66';
 const TYPHOON_IMPACT_OPTION_WEIGHT='700';
 const TYPHOON_REFRESH_MS=10*60*1000;
 const TYPHOON_SLOT_HOURS=6;
@@ -91,16 +91,16 @@ const TYPHOON_MODEL_INFO=[
 {name:'HWRF',description:'미해양대기청(NOAA EMC) 태풍모델(HWRF)'},
 {name:'ECMWF AIFS',description:'[AI] 유럽중기예보센터(ECMWF) AI 전구모델(AIFS-Single)'},
 {name:'ECMWF AIFS EPS',description:'[AI] 유럽중기예보센터(ECMWF) AI 앙상블모델(AIFS-ENS)'},
-{name:'KMA AIFS-ECMWF',description:'[AI] 기상청 국립기상과학원 수행 AIFS (ECMWF 초기장)'},
-{name:'KMA AIFS-KIM',description:'[AI] 기상청 국립기상과학원 수행 AIFS (KIM 초기장)'},
+{name:'KMA AIFS-ECMWF',description:'[AI] 기상청 수치예보센터 수행 AIFS (ECMWF 초기장)'},
+{name:'KMA AIFS-KIM',description:'[AI] 기상청 수치예보센터 수행 AIFS (KIM 초기장)'},
 {name:'AIGFS',description:'[AI] 미해양대기청(NOAA NCEP) AI 전구모델(AIGFS)'},
 {name:'AIGFS EPS',description:'[AI] 미해양대기청(NOAA NCEP) AI 앙상블모델(AIGEFS) 평균'},
-{name:'FourCastNet-ECMWF',description:'[AI] 기상청 국립기상과학원 수행 FourCastNet (ECMWF 초기장)'},
-{name:'FourCastNet-KIM',description:'[AI] 기상청 국립기상과학원 수행 FourCastNet (KIM 초기장)'},
-{name:'Pangu-Weather-ECMWF',description:'[AI] 기상청 국립기상과학원 수행 Pangu-Weather (ECMWF 초기장)'},
-{name:'Pangu-Weather-KIM',description:'[AI] 기상청 국립기상과학원 수행 Pangu-Weather (KIM 초기장)'},
-{name:'GraphCast-ECMWF',description:'[AI] 기상청 국립기상과학원 수행 GraphCast (ECMWF 초기장)'},
-{name:'GraphCast-KIM',description:'[AI] 기상청 국립기상과학원 수행 GraphCast (KIM 초기장)'},
+{name:'FourCastNet-ECMWF',description:'[AI] 기상청 수치예보센터 수행 FourCastNet (ECMWF 초기장)'},
+{name:'FourCastNet-KIM',description:'[AI] 기상청 수치예보센터 수행 FourCastNet (KIM 초기장)'},
+{name:'Pangu-Weather-ECMWF',description:'[AI] 기상청 수치예보센터 수행 Pangu-Weather (ECMWF 초기장)'},
+{name:'Pangu-Weather-KIM',description:'[AI] 기상청 수치예보센터 수행 Pangu-Weather (KIM 초기장)'},
+{name:'GraphCast-ECMWF',description:'[AI] 기상청 수치예보센터 수행 GraphCast (ECMWF 초기장)'},
+{name:'GraphCast-KIM',description:'[AI] 기상청 수치예보센터 수행 GraphCast (KIM 초기장)'},
 {name:'GenCast',description:'[AI] 구글 딥마인드(GDM) 앙상블모델(GenCast) 평균'},
 {name:'FNV3',description:'[AI] 구글 딥마인드(GDM) 앙상블 실험모델(FNV3) 평균'},
 {name:'Aurora-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 Aurora (ECMWF 초기장)'},
@@ -427,9 +427,9 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "도메인": "전지구",
     "구분": "결정론적 모델",
     "격자체계 (분해능)": "0.25° (~28km)",
-    "연직층수": "14층",
+    "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "ECMWF AIFS 기상청 자체 수행, ECMWF 초기장 활용"
+    "참고사항": "ECMWF AIFS 기상청 국립기상과학원 자체 수행, ECMWF 초기장 활용"
   },
   {
     "표출명칭": "KMA AIFS-KIM",
@@ -438,9 +438,9 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "도메인": "전지구",
     "구분": "결정론적 모델",
     "격자체계 (분해능)": "0.25° (~28km)",
-    "연직층수": "14층",
+    "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "ECMWF AIFS 기상청 자체 수행, KIM 초기장 활용"
+    "참고사항": "ECMWF AIFS 기상청 국립기상과학원 자체 수행, KIM 초기장 활용"
   },
   {
     "표출명칭": "AIGFS",
@@ -454,7 +454,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "참고사항": ""
   },
   {
-    "표출명칭": "AIGEFS",
+    "표출명칭": "AIGFS EPS",
     "운영기관": "미해양대기청(NOAA) 국립환경예측센터(NCEP)",
     "모델명": "AIGEFS",
     "도메인": "전지구",
@@ -473,7 +473,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "NVIDIA AI모델 FourCastNet 기상청 자체 수행, ECMWF 초기장 활용"
+    "참고사항": "NVIDIA AI모델 FourCastNet 기상청 국립기상과학원 자체 수행, ECMWF 초기장 활용"
   },
   {
     "표출명칭": "FourCastNet-KIM",
@@ -484,7 +484,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "NVIDIA AI모델 FourCastNet 기상청 자체 수행, KIM 초기장 활용"
+    "참고사항": "NVIDIA AI모델 FourCastNet 기상청 국립기상과학원 자체 수행, KIM 초기장 활용"
   },
   {
     "표출명칭": "Pangu-Weather-ECMWF",
@@ -495,7 +495,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "HUAWEI AI모델 Pangu-Weather 기상청 자체 수행, ECMWF 초기장 활용"
+    "참고사항": "HUAWEI AI모델 Pangu-Weather 기상청 국립기상과학원 자체 수행, ECMWF 초기장 활용"
   },
   {
     "표출명칭": "Pangu-Weather-KIM",
@@ -506,7 +506,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "HUAWEI AI모델 Pangu-Weather 기상청 자체 수행, KIM 초기장 활용"
+    "참고사항": "HUAWEI AI모델 Pangu-Weather 기상청 국립기상과학원 자체 수행, KIM 초기장 활용"
   },
   {
     "표출명칭": "GraphCast-ECMWF",
@@ -517,7 +517,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "Google DeepMind AI모델 GraphCast 기상청 자체 수행, ECMWF 초기장 활용"
+    "참고사항": "Google DeepMind AI모델 GraphCast 기상청 국립기상과학원 자체 수행, ECMWF 초기장 활용"
   },
   {
     "표출명칭": "GraphCast-KIM",
@@ -528,7 +528,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "Google DeepMind AI모델 GraphCast 기상청 자체 수행, KIM 초기장 활용"
+    "참고사항": "Google DeepMind AI모델 GraphCast 기상청 국립기상과학원 자체 수행, KIM 초기장 활용"
   },
   {
     "표출명칭": "GenCast",
@@ -816,13 +816,13 @@ let style=document.createElement('style');
 style.id='typhoonModelDetailStyles';
 style.textContent=`
 .typhoon-storm-select option.typhoon-impact-storm-option{
-background:#dff5ff;
-color:#0f3d64;
+background:#F9E5FF;
+color:#5d2b66;
 font-weight:700;
 }
 .typhoon-storm-select option.typhoon-active-storm-option{
-background:#F9E5FF;
-color:#5d2b66;
+background:#dff5ff;
+color:#0f3d64;
 font-weight:800;
 }
 .typhoon-model-info-panel{
@@ -848,17 +848,32 @@ bottom:0;
 z-index:2;
 }
 .typhoon-model-info-actions .typhoon-updated-time{
+flex:1 1 auto;
 min-width:0;
 margin-right:auto;
+display:flex;
+flex-direction:column;
+align-items:flex-start;
+justify-content:center;
 text-align:left;
 font-size:12px;
 font-weight:750;
 letter-spacing:-.02em;
-line-height:1.25;
+line-height:1.35;
 color:#64748b;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
+white-space:normal;
+overflow:visible;
+}
+.typhoon-updated-time .typhoon-updated-time-line,
+.typhoon-updated-time .typhoon-update-schedule{
+width:100%;
+text-align:left;
+}
+.typhoon-updated-time .typhoon-update-schedule{
+margin-top:2px;
+font-size:11px;
+font-weight:500;
+color:#7c8798;
 }
 .typhoon-fcst-option{
 transition:background .15s ease,border-color .15s ease,box-shadow .15s ease,filter .15s ease,color .15s ease;
@@ -1794,8 +1809,8 @@ option.title=`한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}`;
 }
 if(storm.active){
 optionClasses.push('typhoon-active-storm-option');
-option.style.backgroundColor='#F9E5FF';
-option.style.color='#5d2b66';
+option.style.backgroundColor='#dff5ff';
+option.style.color='#0f3d64';
 option.style.fontWeight='800';
 option.title=storm.impact ? `현재 활동중 · 한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}` : '현재 활동중';
 }
@@ -1823,7 +1838,20 @@ if(!subtitle){
 return;
 }
 let updated=formatTyphoonKst(run?.generatedAt || run?.metadata?.generated_at_utc || '');
-subtitle.textContent=updated && updated!=='-' ? `최근 업데이트 : ${updated}` : '';
+subtitle.replaceChildren();
+
+let updatedLine=document.createElement('div');
+updatedLine.className='typhoon-updated-time-line';
+updatedLine.textContent=updated && updated!=='-'
+?`최근 업데이트 : ${updated}`
+:'최근 업데이트 : -';
+
+let scheduleLine=document.createElement('div');
+scheduleLine.className='typhoon-update-schedule';
+scheduleLine.textContent='00Z 기준 14KST 시작 / 20KST 완료';
+
+subtitle.appendChild(updatedLine);
+subtitle.appendChild(scheduleLine);
 }
 
 function renderTyphoonTimeline(){
