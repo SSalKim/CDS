@@ -816,14 +816,14 @@ let style=document.createElement('style');
 style.id='typhoonModelDetailStyles';
 style.textContent=`
 .typhoon-storm-select option.typhoon-impact-storm-option{
-background:#F9E5FF;
-color:#5d2b66;
+background:#dff5ff;
+color:#0f3d64;
 font-weight:700;
 }
 .typhoon-storm-select option.typhoon-active-storm-option{
-background:#dff5ff;
-color:#0f3d64;
-font-weight:800;
+background:#F9E5FF;
+color:#5d2b66;
+font-weight:700;
 }
 .typhoon-model-info-panel{
 position:relative;
