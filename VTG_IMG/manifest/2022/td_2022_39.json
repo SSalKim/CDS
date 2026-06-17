@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202606170340",
+  "updated_at_utc": "202210201700",
   "storm_key": "td_2022_39",
-  "stage": "TD",
+  "stage": "TD_LINKED_TYP",
   "year": 2022,
   "typ_number": 39,
   "linked_td_number": null,
@@ -124,29 +124,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2022_39",
-        "stage": "TD",
+        "storm_key": "td_2022_39_typ_20",
+        "stage": "TD_LINKED_TYP",
         "year": 2022,
         "data_time": "202210201200",
         "td_number": 39,
         "linked_td_number": null,
-        "linked_typ_number": 20,
         "typ_number": 39,
-        "data_typ_number": 39,
         "typ_name_ko": "네삿",
         "typ_name": "NESAT",
         "typ_en": "NESAT",
         "atcf_id": "wp232022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202210201200"
+        "data_time": "202210201200",
+        "cycle_time_utc": "202210201200",
+        "start_utc": "202210201700",
+        "end_utc": "202210202300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615120422",
+          "generated_at_utc": "20260617074911",
           "image_path": "VTG_IMG/2022/TD_2239_NESAT/TD_2239_NESAT_202210201200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -162,7 +162,7 @@
           "fcst_hours": 120,
           "intensity": "TD",
           "model_count": 6,
-          "target_model_count": 19,
+          "target_model_count": 18,
           "model_labels": [
             "CMC EPS",
             "COAMPS-TC",
@@ -171,37 +171,37 @@
             "GFS EPS",
             "HWRF"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202210201200_td_2022_39_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_39",
-        "stage": "TD",
+        "storm_key": "td_2022_39_typ_20",
+        "stage": "TD_LINKED_TYP",
         "year": 2022,
         "data_time": "202210201200",
         "td_number": 39,
         "linked_td_number": null,
-        "linked_typ_number": 20,
         "typ_number": 39,
-        "data_typ_number": 39,
         "typ_name_ko": "네삿",
         "typ_name": "NESAT",
         "typ_en": "NESAT",
         "atcf_id": "wp232022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202210201200"
+        "data_time": "202210201200",
+        "cycle_time_utc": "202210201200",
+        "start_utc": "202210201700",
+        "end_utc": "202210202300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615120425",
+          "generated_at_utc": "20260617074914",
           "image_path": "VTG_IMG/2022/TD_2239_NESAT/TD_2239_NESAT_202210201200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -217,7 +217,7 @@
           "fcst_hours": 240,
           "intensity": "TD",
           "model_count": 6,
-          "target_model_count": 19,
+          "target_model_count": 18,
           "model_labels": [
             "CMC EPS",
             "COAMPS-TC",
@@ -226,11 +226,11 @@
             "GFS EPS",
             "HWRF"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202210201200_td_2022_39_240h.json"
+      "completed": false,
+      "final_check": false
     }
   ]
 }
