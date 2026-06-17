@@ -101,8 +101,8 @@ const TYPHOON_MODEL_INFO=[
 {name:'Pangu-Weather-KIM',description:'[AI] 기상청 수행 Pangu-Weather (KIM 초기장)'},
 {name:'GraphCast-ECMWF',description:'[AI] 기상청 수행 GraphCast (ECMWF 초기장)'},
 {name:'GraphCast-KIM',description:'[AI] 기상청 수행 GraphCast (KIM 초기장)'},
-{name:'GenCast',description:'[AI] 구글 딥마인드(GDM) 앙상블모델(GenCast) 평균'},
-{name:'FNV3',description:'[AI] 구글 딥마인드(GDM) 앙상블 실험모델(FNV3) 평균'},
+{name:'GenCast',description:'[AI] 구글 딥마인드 앙상블모델(GenCast) 평균'},
+{name:'FNV3',description:'[AI] 구글 딥마인드 앙상블 실험모델(FNV3) 평균'},
 {name:'Aurora-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 Aurora (ECMWF 초기장)'},
 {name:'FuXi-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FuXi (ECMWF 초기장)'},
 {name:'FengWu-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FengWu (ECMWF 초기장)'},
@@ -213,7 +213,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
   },
   {
     "표출명칭": "KIM",
-    "운영기관": "기상청(KMA) 수치예보센터",
+    "운영기관": "기상청(KMA)",
     "모델명": "KIM (GDAPS)",
     "도메인": "전지구",
     "구분": "결정론적 모델",
@@ -224,7 +224,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
   },
   {
     "표출명칭": "KIM EPS",
-    "운영기관": "기상청(KMA) 수치예보센터",
+    "운영기관": "기상청(KMA)",
     "모델명": "KIM (GENS)",
     "도메인": "전지구",
     "구분": "앙상블 모델 평균 (M26)",
@@ -471,7 +471,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "도메인": "전지구",
     "구분": "결정론적 모델",
     "격자체계 (분해능)": "0.25° (~28km)",
-    "연직층수": "13층",
+    "연직층수": "4층",
     "기반": "AI",
     "참고사항": "NVIDIA AI모델 FourCastNet 기상청 국립기상과학원 자체 수행, ECMWF 초기장 활용"
   },
@@ -482,7 +482,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "도메인": "전지구",
     "구분": "결정론적 모델",
     "격자체계 (분해능)": "0.25° (~28km)",
-    "연직층수": "13층",
+    "연직층수": "4층",
     "기반": "AI",
     "참고사항": "NVIDIA AI모델 FourCastNet 기상청 국립기상과학원 자체 수행, KIM 초기장 활용"
   },
@@ -493,7 +493,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "도메인": "전지구",
     "구분": "결정론적 모델",
     "격자체계 (분해능)": "0.25° (~28km)",
-    "연직층수": "13층",
+    "연직층수": "14층",
     "기반": "AI",
     "참고사항": "HUAWEI AI모델 Pangu-Weather 기상청 국립기상과학원 자체 수행, ECMWF 초기장 활용"
   },
@@ -504,7 +504,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "도메인": "전지구",
     "구분": "결정론적 모델",
     "격자체계 (분해능)": "0.25° (~28km)",
-    "연직층수": "13층",
+    "연직층수": "14층",
     "기반": "AI",
     "참고사항": "HUAWEI AI모델 Pangu-Weather 기상청 국립기상과학원 자체 수행, KIM 초기장 활용"
   },
@@ -515,7 +515,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "도메인": "전지구",
     "구분": "결정론적 모델",
     "격자체계 (분해능)": "0.25° (~28km)",
-    "연직층수": "13층",
+    "연직층수": "37층",
     "기반": "AI",
     "참고사항": "Google DeepMind AI모델 GraphCast 기상청 국립기상과학원 자체 수행, ECMWF 초기장 활용"
   },
@@ -526,7 +526,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "도메인": "전지구",
     "구분": "결정론적 모델",
     "격자체계 (분해능)": "0.25° (~28km)",
-    "연직층수": "13층",
+    "연직층수": "37층",
     "기반": "AI",
     "참고사항": "Google DeepMind AI모델 GraphCast 기상청 국립기상과학원 자체 수행, KIM 초기장 활용"
   },
@@ -1149,11 +1149,11 @@ titleWrap.className='typhoon-model-detail-title-wrap';
 let title=document.createElement('h2');
 title.id='typhoonModelDetailTitle';
 title.className='typhoon-model-detail-title';
-title.textContent='모델 상세 설명';
+title.textContent='모델 상세정보';
 
 let subtitle=document.createElement('p');
 subtitle.className='typhoon-model-detail-subtitle';
-subtitle.textContent='2026년 6월 기준 표출 모델 상세정보';
+subtitle.textContent='2026년 6월 기준 표출 모델';
 
 titleWrap.appendChild(title);
 titleWrap.appendChild(subtitle);
