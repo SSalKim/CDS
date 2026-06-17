@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202606170340",
+  "updated_at_utc": "202211141700",
   "storm_key": "td_2022_45",
-  "stage": "TD",
+  "stage": "TD_LINKED_TYP",
   "year": 2022,
   "typ_number": 45,
   "linked_td_number": null,
@@ -124,29 +124,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2022_45",
-        "stage": "TD",
+        "storm_key": "td_2022_45_typ_24",
+        "stage": "TD_LINKED_TYP",
         "year": 2022,
         "data_time": "202211141200",
         "td_number": 45,
         "linked_td_number": null,
-        "linked_typ_number": 24,
         "typ_number": 45,
-        "data_typ_number": 45,
         "typ_name_ko": "야마네코",
         "typ_name": "YAMANEKO",
         "typ_en": "YAMANEKO",
         "atcf_id": "wp282022",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202211141200"
+        "data_time": "202211141200",
+        "cycle_time_utc": "202211141200",
+        "start_utc": "202211141700",
+        "end_utc": "202211142300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615123806",
+          "generated_at_utc": "20260617082926",
           "image_path": "VTG_IMG/2022/TD_2245_YAMANEKO/TD_2245_YAMANEKO_202211141200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -162,7 +162,7 @@
           "fcst_hours": 120,
           "intensity": "TD",
           "model_count": 9,
-          "target_model_count": 19,
+          "target_model_count": 18,
           "model_labels": [
             "GALWEM",
             "CMC EPS",
@@ -174,37 +174,37 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202211141200_td_2022_45_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2022_45",
-        "stage": "TD",
+        "storm_key": "td_2022_45_typ_24",
+        "stage": "TD_LINKED_TYP",
         "year": 2022,
         "data_time": "202211141200",
         "td_number": 45,
         "linked_td_number": null,
-        "linked_typ_number": 24,
         "typ_number": 45,
-        "data_typ_number": 45,
         "typ_name_ko": "야마네코",
         "typ_name": "YAMANEKO",
         "typ_en": "YAMANEKO",
         "atcf_id": "wp282022",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202211141200"
+        "data_time": "202211141200",
+        "cycle_time_utc": "202211141200",
+        "start_utc": "202211141700",
+        "end_utc": "202211142300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260615123808",
+          "generated_at_utc": "20260617082942",
           "image_path": "VTG_IMG/2022/TD_2245_YAMANEKO/TD_2245_YAMANEKO_202211141200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2022",
@@ -220,7 +220,7 @@
           "fcst_hours": 240,
           "intensity": "TD",
           "model_count": 9,
-          "target_model_count": 19,
+          "target_model_count": 18,
           "model_labels": [
             "GALWEM",
             "CMC EPS",
@@ -232,11 +232,11 @@
             "HWRF",
             "NAVGEM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202211141200_td_2022_45_240h.json"
+      "completed": false,
+      "final_check": false
     }
   ]
 }
