@@ -1,16 +1,16 @@
 {
   "version": 2,
-  "updated_at_utc": "202606170340",
+  "updated_at_utc": "202510070500",
   "storm_key": "td_2025_46",
-  "stage": "TD",
+  "stage": "TD_LINKED_TYP",
   "year": 2025,
   "typ_number": 46,
   "linked_td_number": null,
   "linked_typ_number": 21,
   "typ_name": "MATMO",
   "typ_name_ko": "마트모",
-  "latest_data_time": "202510061800",
-  "item_count": 4,
+  "latest_data_time": "202510070000",
+  "item_count": 6,
   "inventory": [
     {
       "job": {
@@ -142,29 +142,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2025_46",
-        "stage": "TD",
+        "storm_key": "td_2025_46_typ_21",
+        "stage": "TD_LINKED_TYP",
         "year": 2025,
         "data_time": "202510061800",
         "td_number": 46,
         "linked_td_number": null,
-        "linked_typ_number": 21,
         "typ_number": 46,
-        "data_typ_number": 46,
         "typ_name_ko": "마트모",
         "typ_name": "MATMO",
         "typ_en": "MATMO",
         "atcf_id": "wp272025",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202510061800"
+        "data_time": "202510061800",
+        "cycle_time_utc": "202510061800",
+        "start_utc": "202510062300",
+        "end_utc": "202510070500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614132918",
+          "generated_at_utc": "20260618032631",
           "image_path": "VTG_IMG/2025/TD_2546_MATMO/TD_2546_MATMO_202510061800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -185,37 +185,37 @@
             "ECMWF AIFS",
             "ECMWF EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202510061800_td_2025_46_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2025_46",
-        "stage": "TD",
+        "storm_key": "td_2025_46_typ_21",
+        "stage": "TD_LINKED_TYP",
         "year": 2025,
         "data_time": "202510061800",
         "td_number": 46,
         "linked_td_number": null,
-        "linked_typ_number": 21,
         "typ_number": 46,
-        "data_typ_number": 46,
         "typ_name_ko": "마트모",
         "typ_name": "MATMO",
         "typ_en": "MATMO",
         "atcf_id": "wp272025",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202510061800"
+        "data_time": "202510061800",
+        "cycle_time_utc": "202510061800",
+        "start_utc": "202510062300",
+        "end_utc": "202510070500"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614132920",
+          "generated_at_utc": "20260618032635",
           "image_path": "VTG_IMG/2025/TD_2546_MATMO/TD_2546_MATMO_202510061800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -236,11 +236,113 @@
             "ECMWF AIFS",
             "ECMWF EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202510061800_td_2025_46_240h.json"
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2025_46_typ_21",
+        "stage": "TD_LINKED_TYP",
+        "year": 2025,
+        "data_time": "202510070000",
+        "td_number": 46,
+        "linked_td_number": null,
+        "typ_number": 46,
+        "typ_name_ko": "마트모",
+        "typ_name": "MATMO",
+        "typ_en": "MATMO",
+        "atcf_id": "wp272025",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202510070000",
+        "cycle_time_utc": "202510070000",
+        "start_utc": "202510070500",
+        "end_utc": "202510071100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260618032755",
+          "image_path": "VTG_IMG/2025/TD_2546_MATMO/TD_2546_MATMO_202510070000_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2025",
+          "typ_number": 46,
+          "data_typ_number": 46,
+          "typ_name": "MATMO",
+          "typ_name_ko": "마트모",
+          "linked_td_number": null,
+          "linked_typ_number": 21,
+          "atcf_id": "wp272025",
+          "extra_atcf_ids": [],
+          "data_time": "202510070000",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 2,
+          "target_model_count": 34,
+          "model_labels": [
+            "ECMWF AIFS",
+            "ECMWF EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2025_46_typ_21",
+        "stage": "TD_LINKED_TYP",
+        "year": 2025,
+        "data_time": "202510070000",
+        "td_number": 46,
+        "linked_td_number": null,
+        "typ_number": 46,
+        "typ_name_ko": "마트모",
+        "typ_name": "MATMO",
+        "typ_en": "MATMO",
+        "atcf_id": "wp272025",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202510070000",
+        "cycle_time_utc": "202510070000",
+        "start_utc": "202510070500",
+        "end_utc": "202510071100"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260618032758",
+          "image_path": "VTG_IMG/2025/TD_2546_MATMO/TD_2546_MATMO_202510070000_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2025",
+          "typ_number": 46,
+          "data_typ_number": 46,
+          "typ_name": "MATMO",
+          "typ_name_ko": "마트모",
+          "linked_td_number": null,
+          "linked_typ_number": 21,
+          "atcf_id": "wp272025",
+          "extra_atcf_ids": [],
+          "data_time": "202510070000",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 2,
+          "target_model_count": 34,
+          "model_labels": [
+            "ECMWF AIFS",
+            "ECMWF EPS"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
     }
   ]
 }
