@@ -14,29 +14,29 @@
   "inventory": [
     {
       "job": {
-        "storm_key": "td_2025_19",
-        "stage": "TD",
+        "storm_key": "td_2025_19_typ_08",
+        "stage": "TD_LINKED_TYP",
         "year": 2025,
         "data_time": "202507310000",
         "td_number": 19,
         "linked_td_number": null,
-        "linked_typ_number": 8,
         "typ_number": 19,
-        "data_typ_number": 19,
         "typ_name_ko": "꼬마이",
         "typ_name": "CO-MAY",
         "typ_en": "CO-MAY",
         "atcf_id": "wp112025",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202507310000"
+        "data_time": "202507310000",
+        "cycle_time_utc": "202507310000",
+        "start_utc": "202507310500",
+        "end_utc": "202507311100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614103002",
+          "generated_at_utc": "20260618073637",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202507310000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -82,37 +82,37 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202507310000_td_2025_19_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2025_19",
-        "stage": "TD",
+        "storm_key": "td_2025_19_typ_08",
+        "stage": "TD_LINKED_TYP",
         "year": 2025,
         "data_time": "202507310000",
         "td_number": 19,
         "linked_td_number": null,
-        "linked_typ_number": 8,
         "typ_number": 19,
-        "data_typ_number": 19,
         "typ_name_ko": "꼬마이",
         "typ_name": "CO-MAY",
         "typ_en": "CO-MAY",
         "atcf_id": "wp112025",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202507310000"
+        "data_time": "202507310000",
+        "cycle_time_utc": "202507310000",
+        "start_utc": "202507310500",
+        "end_utc": "202507311100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614103006",
+          "generated_at_utc": "20260618073641",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202507310000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -158,11 +158,11 @@
             "UM",
             "UM EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202507310000_td_2025_19_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
@@ -188,7 +188,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618001545",
+          "generated_at_utc": "20260618073827",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202507310600_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -248,7 +248,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618001548",
+          "generated_at_utc": "20260618073831",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202507310600_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -308,7 +308,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618001709",
+          "generated_at_utc": "20260618074007",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202507311200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -384,7 +384,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618001713",
+          "generated_at_utc": "20260618074011",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202507311200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -460,7 +460,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618001835",
+          "generated_at_utc": "20260618074131",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202507311800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -520,7 +520,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618001838",
+          "generated_at_utc": "20260618074135",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202507311800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -580,7 +580,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618001958",
+          "generated_at_utc": "20260618074306",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508010000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -656,7 +656,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618002002",
+          "generated_at_utc": "20260618074309",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508010000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -732,7 +732,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618002133",
+          "generated_at_utc": "20260618074451",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508010600_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -792,7 +792,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618002136",
+          "generated_at_utc": "20260618074454",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508010600_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -852,7 +852,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618002307",
+          "generated_at_utc": "20260618074628",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508011200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -924,7 +924,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618002311",
+          "generated_at_utc": "20260618074631",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508011200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -996,7 +996,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618002441",
+          "generated_at_utc": "20260618074808",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508011800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -1052,7 +1052,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618002444",
+          "generated_at_utc": "20260618074811",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508011800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -1108,7 +1108,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618002603",
+          "generated_at_utc": "20260618074940",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508020000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -1176,7 +1176,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618002606",
+          "generated_at_utc": "20260618074943",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508020000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -1244,7 +1244,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618002725",
+          "generated_at_utc": "20260618075115",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508020600_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -1294,7 +1294,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618002729",
+          "generated_at_utc": "20260618075118",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508020600_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -1344,7 +1344,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618002848",
+          "generated_at_utc": "20260618075324",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508021200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -1406,7 +1406,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618002851",
+          "generated_at_utc": "20260618075327",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508021200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -1468,7 +1468,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618003059",
+          "generated_at_utc": "20260618075542",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508021800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -1530,7 +1530,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260618003102",
+          "generated_at_utc": "20260618075545",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508021800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -1590,7 +1590,7 @@
         "end_utc": "202508031100"
       },
       "result": {
-        "status": "ok",
+        "status": "restored_previous",
         "metadata": {
           "generated_at_utc": "20260618003357",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508030000_120h.png",
@@ -1652,7 +1652,7 @@
         "end_utc": "202508031100"
       },
       "result": {
-        "status": "ok",
+        "status": "restored_previous",
         "metadata": {
           "generated_at_utc": "20260618003400",
           "image_path": "VTG_IMG/2025/TD_2519_CO-MAY/TD_2519_CO-MAY_202508030000_240h.png",
