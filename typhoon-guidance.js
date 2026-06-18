@@ -1427,16 +1427,23 @@ return run;
 function linkTdEntriesToTyphoons(entries){
 let tdLinks=new Map();
 let typLinks=new Map();
-entries.forEach(entry=>{
-if(entry.stage==='TD' || !entry.tdNumber){
-if(entry.stage!=='TD' && entry.typNumber){
-typLinks.set(`${entry.year}|${Number(entry.typNumber)}`,entry);
+
+function keepEarliest(map,key,entry){
+let existing=map.get(key);
+if(!existing || String(entry.dataTime || '')<String(existing.dataTime || '')){
+map.set(key,entry);
 }
+}
+
+entries.forEach(entry=>{
+if(entry.stage==='TD'){
 return;
 }
-tdLinks.set(`${entry.year}|${Number(entry.tdNumber)}`,entry);
+if(entry.tdNumber){
+keepEarliest(tdLinks,`${entry.year}|${Number(entry.tdNumber)}`,entry);
+}
 if(entry.typNumber){
-typLinks.set(`${entry.year}|${Number(entry.typNumber)}`,entry);
+keepEarliest(typLinks,`${entry.year}|${Number(entry.typNumber)}`,entry);
 }
 });
 
@@ -1455,6 +1462,17 @@ linked=typLinks.get(`${entry.year}|${Number(entry.linkedTypNumber)}`);
 if(!linked){
 return entry;
 }
+
+// Only the TD phase before the first named-TYP cycle is folded into the TYP
+// dropdown. A later weakening/redevelopment TD has its own TD number and must
+// remain a separate TD entry, even when a later TYP entry points back to that
+// TD number as its redevelopment source.
+let firstNamedTyp=typLinks.get(`${entry.year}|${Number(linked.typNumber)}`) || linked;
+if(String(entry.dataTime || '')>String(firstNamedTyp.dataTime || '')){
+return entry;
+}
+linked=firstNamedTyp;
+
 return applyTyphoonSortKey({
 ...entry,
 originalStage:'TD',
@@ -1600,6 +1618,10 @@ return Number(nextEff)<Number(currentEff) ? nextEff : currentEff;
 function typhoonImpactEffectForEntry(entry){
 let metadata=entry?.metadata || {};
 let job=entry?.job || {};
+let rawStage=String(entry?.originalStage || entry?.stage || metadata.storm_stage || job.stage || '').toUpperCase();
+if(rawStage==='TD'){
+return '';
+}
 let explicit=normalizeTyphoonImpactEff(
 metadata.typ_eff ?? metadata.kma_eff ?? metadata.impact_eff ??
 job.typ_eff ?? job.kma_eff ?? job.impact_eff ?? ''
@@ -1800,14 +1822,15 @@ let option=document.createElement('option');
 option.value=storm.key;
 option.textContent=storm.label;
 let optionClasses=[];
-if(storm.impact){
+let allowStormHighlight=storm.stage!=='TD';
+if(allowStormHighlight && storm.impact){
 optionClasses.push('typhoon-impact-storm-option');
 option.style.backgroundColor=TYPHOON_IMPACT_OPTION_BG;
 option.style.color=TYPHOON_IMPACT_OPTION_COLOR;
 option.style.fontWeight=TYPHOON_IMPACT_OPTION_WEIGHT;
 option.title=`한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}`;
 }
-if(storm.active){
+if(allowStormHighlight && storm.active){
 optionClasses.push('typhoon-active-storm-option');
 option.style.backgroundColor='#F9E5FF';
 option.style.color='#5d2b66';

@@ -1197,11 +1197,32 @@ def linked_td_number_for_typ(
     return min(candidates, key=lambda item: item[1] or datetime.max.replace(tzinfo=timezone.utc))[0]
 
 
+def td_row_represents_td_phase_at_cycle(row: dict, *, data_time: str) -> bool:
+    """Return True while a linked TD episode owns the requested cycle.
+
+    td_lst TM_ED is the transition time back to TYP (or dissipation). Treat the
+    interval as half-open [TM_ST, TM_ED), so the exact redevelopment cycle is
+    rendered as TYP while earlier cycles remain TD. This also keeps short
+    episodes such as 00-03UTC active for the 00UTC cycle.
+    """
+    cycle = parse_utc_stamp(data_time)
+    if cycle is None:
+        return False
+    start = parse_utc_stamp(str(row.get("TM_ST") or ""))
+    end = parse_utc_stamp(str(row.get("TM_ED") or ""))
+    if start and cycle < start:
+        return False
+    if end and cycle >= end:
+        return False
+    return True
+
+
 def active_linked_td_rows_by_typ(
     td_rows: list[dict],
     *,
     now: datetime,
     cycle_time: datetime | None = None,
+    data_time: str = "",
 ) -> dict[tuple[int, int], list[dict]]:
     active_rows: dict[tuple[int, int], list[dict]] = {}
     for row in td_rows:
@@ -1213,10 +1234,136 @@ def active_linked_td_rows_by_typ(
             continue
         if typ_number <= 0:
             continue
-        if not row_active_for_time(row, probe_time=now, cycle_time=cycle_time):
+        if data_time:
+            if not td_row_represents_td_phase_at_cycle(row, data_time=data_time):
+                continue
+        elif not row_active_for_time(row, probe_time=now, cycle_time=cycle_time):
             continue
         active_rows.setdefault((year, typ_number), []).append(row)
     return active_rows
+
+
+def suppressed_typ_metadata_for_td_phase(
+    *,
+    td_job: StormJob,
+    fcst_hours: int,
+    existing_metadata: dict | None = None,
+) -> dict:
+    metadata = dict(existing_metadata) if isinstance(existing_metadata, dict) else {}
+    linked_typ_number = int(td_job.linked_typ_number or 0)
+    metadata.update({
+        "generated_at_utc": format_utc_stamp(utc_now()),
+        "image_path": "",
+        "storm_stage": "TYP",
+        "storm_year": str(td_job.year),
+        "typ_number": linked_typ_number,
+        "data_typ_number": linked_typ_number,
+        "data_time": td_job.data_time,
+        "fcst_hours": fcst_hours,
+        "model_count": 0,
+        "target_model_count": ACTIVE_MODEL_TARGET,
+        "models": [],
+        "model_labels": [],
+        "no_output": True,
+        "no_output_reason": (
+            f"Suppressed because linked TD{td_job.typ_number:02d} phase is active."
+        ),
+    })
+    return metadata
+
+
+def remove_obsolete_typ_artifacts_for_td_phases(
+    *,
+    output_root: Path,
+    jobs: list[StormJob],
+    fcst_hours_list: list[int],
+    cycle_status: dict,
+    window: CycleWindow,
+    dry_run: bool,
+) -> list[dict]:
+    """Remove stale TYP products left by an older TD/TYP phase decision."""
+    active_typ_keys = {
+        (job.year, job.typ_number)
+        for job in jobs
+        if not job.stage.startswith("TD_")
+    }
+    td_phase_jobs: dict[tuple[int, int], StormJob] = {}
+    for job in jobs:
+        if not job.stage.startswith("TD_") or not job.linked_typ_number:
+            continue
+        key = (job.year, int(job.linked_typ_number))
+        if key in active_typ_keys:
+            continue
+        td_phase_jobs.setdefault(key, job)
+
+    suppression_entries: list[dict] = []
+    for (year, typ_number), td_job in sorted(td_phase_jobs.items()):
+        cyclone_id = f"{year % 100:02d}{typ_number:02d}"
+        status_prefix = f"typ_{year}_{typ_number:02d}"
+        for fcst_hours in dict.fromkeys(fcst_hours_list):
+            metadata_path = output_root / "metadata" / (
+                f"{td_job.data_time}_typ_{year}_{typ_number:02d}_{fcst_hours}h.json"
+            )
+            existing_metadata = load_json(metadata_path, None)
+            image_paths = sorted(
+                (output_root / str(year)).glob(
+                    f"TYP_{cyclone_id}_*/TYP_{cyclone_id}_*_{td_job.data_time}_{fcst_hours}h.png"
+                )
+            )
+            for image_path in image_paths:
+                print(
+                    f"Removing obsolete TYP output during linked TD phase: {image_path}"
+                    if not dry_run
+                    else f"Would remove obsolete TYP output during linked TD phase: {image_path}"
+                )
+                if not dry_run:
+                    try:
+                        image_path.unlink()
+                    except FileNotFoundError:
+                        pass
+                    try:
+                        image_path.parent.rmdir()
+                    except OSError:
+                        pass
+            if metadata_path.exists():
+                print(
+                    f"Removing obsolete TYP metadata during linked TD phase: {metadata_path}"
+                    if not dry_run
+                    else f"Would remove obsolete TYP metadata during linked TD phase: {metadata_path}"
+                )
+                if not dry_run:
+                    metadata_path.unlink()
+
+            cycle_status.pop(f"{status_prefix}_{fcst_hours}h", None)
+            metadata = suppressed_typ_metadata_for_td_phase(
+                td_job=td_job,
+                fcst_hours=fcst_hours,
+                existing_metadata=existing_metadata,
+            )
+            suppression_entries.append({
+                "job": {
+                    "storm_key": status_prefix,
+                    "stage": "TYP_SUPPRESSED_BY_TD",
+                    "year": year,
+                    "data_time": td_job.data_time,
+                    "td_number": td_job.typ_number,
+                    "linked_td_number": td_job.typ_number,
+                    "linked_typ_number": None,
+                    "typ_number": typ_number,
+                    "typ_name_ko": metadata.get("typ_name_ko", td_job.typ_name_ko),
+                    "typ_name": metadata.get("typ_name", td_job.typ_name),
+                    "typ_en": metadata.get("typ_name", td_job.typ_en),
+                    "atcf_id": metadata.get("atcf_id", td_job.atcf_id or ""),
+                    "fcst_hours": fcst_hours,
+                    "skip_atcf": bool(metadata.get("skip_atcf", td_job.skip_atcf)),
+                },
+                "window": asdict(window),
+                "result": {
+                    "status": "suppressed_td_phase",
+                    "metadata": metadata,
+                },
+            })
+    return suppression_entries
 
 
 def build_storm_jobs(
@@ -1253,7 +1400,12 @@ def build_storm_jobs(
     # contains intermittent weakening/redevelopment TD episodes linked to the same
     # TYP number. In those intervals, prefer the active TD row and suppress the
     # broad TYP row to avoid rendering the system as TYP during a TD phase.
-    active_td_links = active_linked_td_rows_by_typ(td_rows, now=now, cycle_time=activity_cycle_time)
+    active_td_links = active_linked_td_rows_by_typ(
+        td_rows,
+        now=now,
+        cycle_time=activity_cycle_time,
+        data_time=data_time,
+    )
 
     active_typhoons: list[tuple[int, int]] = []
     seen_typ_keys: set[tuple[int, int]] = set()
@@ -1272,7 +1424,7 @@ def build_storm_jobs(
         typ_start_time = parse_utc_stamp(row.get("TM_ST", ""))
         if typ_start_time and data_dt < typ_start_time:
             continue
-        if typ_key in active_td_links and not (typ_start_time and data_dt >= typ_start_time):
+        if typ_key in active_td_links:
             td_labels = ", ".join(
                 f"TD{safe_int(item.get('TD')) or 0:02d}"
                 for item in active_td_links.get(typ_key, [])
@@ -2432,6 +2584,10 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
         if fcst_hours not in VALID_FCST_HOURS:
             continue
         key = manifest_inventory_key(metadata)
+        result_status = str(entry.get("result", {}).get("status") or "")
+        if result_status == "suppressed_td_phase":
+            entries_by_key.pop(key, None)
+            continue
         if not metadata_has_output_image(metadata):
             tokens = manifest_suppression_tokens(metadata)
             suppressed_tokens.update(tokens)
@@ -2942,6 +3098,15 @@ def main() -> int:
             status=status,
         )
         log_timing(f"build storm jobs {window.data_time} jobs={len(jobs)}", job_started_at)
+
+        run_entries.extend(remove_obsolete_typ_artifacts_for_td_phases(
+            output_root=output_root,
+            jobs=jobs,
+            fcst_hours_list=fcst_hours_list,
+            cycle_status=cycle_status,
+            window=window,
+            dry_run=args.dry_run or args.check_run_needed,
+        ))
 
         pending_batches: list[tuple[StormJob, list[int], bool]] = []
         for job in jobs:
