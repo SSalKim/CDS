@@ -1,16 +1,16 @@
 {
   "version": 2,
-  "updated_at_utc": "202606170340",
+  "updated_at_utc": "202507231100",
   "storm_key": "td_2025_14",
-  "stage": "TD",
+  "stage": "TD_LINKED_TYP",
   "year": 2025,
   "typ_number": 14,
   "linked_td_number": null,
   "linked_typ_number": 6,
   "typ_name": "WIPHA",
   "typ_name_ko": "위파",
-  "latest_data_time": "202507230000",
-  "item_count": 4,
+  "latest_data_time": "202507230600",
+  "item_count": 6,
   "inventory": [
     {
       "job": {
@@ -118,29 +118,29 @@
     },
     {
       "job": {
-        "storm_key": "td_2025_14",
-        "stage": "TD",
+        "storm_key": "td_2025_14_typ_06",
+        "stage": "TD_LINKED_TYP",
         "year": 2025,
         "data_time": "202507230000",
         "td_number": 14,
         "linked_td_number": null,
-        "linked_typ_number": 6,
         "typ_number": 14,
-        "data_typ_number": 14,
         "typ_name_ko": "위파",
         "typ_name": "WIPHA",
         "typ_en": "WIPHA",
         "atcf_id": "wp092025",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202507230000"
+        "data_time": "202507230000",
+        "cycle_time_utc": "202507230000",
+        "start_utc": "202507230500",
+        "end_utc": "202507231100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614095214",
+          "generated_at_utc": "20260617233624",
           "image_path": "VTG_IMG/2025/TD_2514_WIPHA/TD_2514_WIPHA_202507230000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -170,37 +170,37 @@
             "Pangu-Weather-KIM",
             "Pangu-Weather-UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202507230000_td_2025_14_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2025_14",
-        "stage": "TD",
+        "storm_key": "td_2025_14_typ_06",
+        "stage": "TD_LINKED_TYP",
         "year": 2025,
         "data_time": "202507230000",
         "td_number": 14,
         "linked_td_number": null,
-        "linked_typ_number": 6,
         "typ_number": 14,
-        "data_typ_number": 14,
         "typ_name_ko": "위파",
         "typ_name": "WIPHA",
         "typ_en": "WIPHA",
         "atcf_id": "wp092025",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202507230000"
+        "data_time": "202507230000",
+        "cycle_time_utc": "202507230000",
+        "start_utc": "202507230500",
+        "end_utc": "202507231100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260614095218",
+          "generated_at_utc": "20260617233628",
           "image_path": "VTG_IMG/2025/TD_2514_WIPHA/TD_2514_WIPHA_202507230000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2025",
@@ -230,11 +230,131 @@
             "Pangu-Weather-KIM",
             "Pangu-Weather-UM"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202507230000_td_2025_14_240h.json"
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2025_14_typ_06",
+        "stage": "TD_LINKED_TYP",
+        "year": 2025,
+        "data_time": "202507230600",
+        "td_number": 14,
+        "linked_td_number": null,
+        "typ_number": 14,
+        "typ_name_ko": "위파",
+        "typ_name": "WIPHA",
+        "typ_en": "WIPHA",
+        "atcf_id": "wp092025",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202507230600",
+        "cycle_time_utc": "202507230600",
+        "start_utc": "202507231100",
+        "end_utc": "202507231700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260617233817",
+          "image_path": "VTG_IMG/2025/TD_2514_WIPHA/TD_2514_WIPHA_202507230600_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2025",
+          "typ_number": 14,
+          "data_typ_number": 14,
+          "typ_name": "WIPHA",
+          "typ_name_ko": "위파",
+          "linked_td_number": null,
+          "linked_typ_number": 6,
+          "atcf_id": "wp092025",
+          "extra_atcf_ids": [],
+          "data_time": "202507230600",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 11,
+          "target_model_count": 34,
+          "model_labels": [
+            "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "FourCastNet-UM",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "GraphCast-UM",
+            "KIM",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "Pangu-Weather-UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2025_14_typ_06",
+        "stage": "TD_LINKED_TYP",
+        "year": 2025,
+        "data_time": "202507230600",
+        "td_number": 14,
+        "linked_td_number": null,
+        "typ_number": 14,
+        "typ_name_ko": "위파",
+        "typ_name": "WIPHA",
+        "typ_en": "WIPHA",
+        "atcf_id": "wp092025",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202507230600",
+        "cycle_time_utc": "202507230600",
+        "start_utc": "202507231100",
+        "end_utc": "202507231700"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260617233821",
+          "image_path": "VTG_IMG/2025/TD_2514_WIPHA/TD_2514_WIPHA_202507230600_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2025",
+          "typ_number": 14,
+          "data_typ_number": 14,
+          "typ_name": "WIPHA",
+          "typ_name_ko": "위파",
+          "linked_td_number": null,
+          "linked_typ_number": 6,
+          "atcf_id": "wp092025",
+          "extra_atcf_ids": [],
+          "data_time": "202507230600",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 11,
+          "target_model_count": 34,
+          "model_labels": [
+            "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "FourCastNet-UM",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "GraphCast-UM",
+            "KIM",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "Pangu-Weather-UM"
+          ],
+          "skip_atcf": false
+        }
+      },
+      "completed": false,
+      "final_check": false
     }
   ]
 }
