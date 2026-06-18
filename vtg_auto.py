@@ -488,6 +488,34 @@ def safe_float(value) -> float | None:
         return None
 
 
+def kma_gts_row_source(row: list[str]) -> str:
+    # typ_gts_now columns follow KMA_COLUMNS:
+    # ... 15D(index 16), 15R(index 17), SRC(index 18), trailing blank(index 19).
+    # Older cached/debug rows may omit the final blank column, but SRC should
+    # still be index 18. Only fall back to index 17 when the source column is
+    # genuinely absent.
+    if len(row) > 18:
+        return str(row[18] or "").strip().upper()
+    if len(row) > 17:
+        return str(row[17] or "").strip().upper()
+    return ""
+
+
+def is_apihub_model_zero_source(source: str) -> bool:
+    source = str(source or "").strip().upper()
+    if not source or source == "KMA":
+        return False
+    return True
+
+
+def mean_track_point(points: list[TrackPoint], *, time_utc: str) -> TrackPoint | None:
+    if not points:
+        return None
+    lat = sum(point.lat for point in points) / len(points)
+    lon = sum(point.lon for point in points) / len(points)
+    return TrackPoint(time_utc=time_utc, lat=lat, lon=lon)
+
+
 def fetch_kma_reference_point(
     *,
     typ_number: int,
@@ -503,29 +531,47 @@ def fetch_kma_reference_point(
     else:
         text = gts_text
 
-    candidates: list[TrackPoint] = []
-    for row in parse_kma_csv_lines(text, fixed_columns=18):
+    model_zero_points: list[TrackPoint] = []
+    unknown_zero_points: list[TrackPoint] = []
+    for row in parse_kma_csv_lines(text, fixed_columns=19):
         if safe_int(row[2]) != typ_number:
             continue
         tmd = safe_int(row[4])
+        if tmd != 0:
+            continue
         lat = safe_float(row[7])
         lon = safe_float(row[8])
         ft_time = row[6].strip() if len(row) > 6 else ""
-        source = row[17].strip().upper() if len(row) > 17 else ""
+        source = kma_gts_row_source(row)
         if lat is None or lon is None or not ft_time:
             continue
         if ft_time[:10] != data_time[:10]:
             continue
-        if tmd == 0 and (not source or source == "KMA"):
-            return TrackPoint(time_utc=ft_time, lat=lat, lon=lon)
-        if tmd == 0:
-            candidates.append(TrackPoint(time_utc=ft_time, lat=lat, lon=lon))
-    if not candidates:
-        return None
+        point = TrackPoint(time_utc=ft_time, lat=lat, lon=lon)
+        if source == "KMA":
+            return point
+        if is_apihub_model_zero_source(source):
+            model_zero_points.append(point)
+        else:
+            unknown_zero_points.append(point)
 
-    lat = sum(point.lat for point in candidates) / len(candidates)
-    lon = sum(point.lon for point in candidates) / len(candidates)
-    return TrackPoint(time_utc=f"{data_time[:10]}00", lat=lat, lon=lon)
+    mean_point = mean_track_point(model_zero_points, time_utc=f"{data_time[:10]}00")
+    if mean_point is not None:
+        print(
+            "KMA 0h reference point is missing from typ_gts_now; using the mean of "
+            f"{len(model_zero_points)} APIHUB model 0h point(s): "
+            f"{mean_point.lat:.2f}N, {mean_point.lon:.2f}E."
+        )
+        return mean_point
+
+    mean_point = mean_track_point(unknown_zero_points, time_utc=f"{data_time[:10]}00")
+    if mean_point is not None:
+        print(
+            "KMA 0h reference point is missing from typ_gts_now; using the mean of "
+            f"{len(unknown_zero_points)} unlabeled 0h point(s): "
+            f"{mean_point.lat:.2f}N, {mean_point.lon:.2f}E."
+        )
+    return mean_point
 
 
 def normalize_name(value: str) -> str:
