@@ -935,6 +935,69 @@ def fetch_bdeck_texts_parallel(
     return results
 
 
+def format_atcf_position_candidate(match: AtcfMatch) -> str:
+    distance = match.distance_km if match.distance_km is not None else float("inf")
+    point = match.point
+    if point is None:
+        return f"{match.atcf_id}:{distance:.1f}km"
+    return (
+        f"{match.atcf_id}:{distance:.1f}km "
+        f"({point.lat:.2f}N,{point.lon:.2f}E {point.time_utc[:10]})"
+    )
+
+
+def log_atcf_position_diagnostics(
+    *,
+    data_time: str,
+    kma_point: TrackPoint,
+    ordered_ids: list[str],
+    all_matches: list[AtcfMatch],
+    candidates: list[AtcfMatch],
+    max_distance_km: float,
+    min_distance_gap_km: float,
+    preferred_atcf_id: str | None,
+    reason: str,
+) -> None:
+    checked_count = len(ordered_ids)
+    bdeck_point_count = len(all_matches)
+    print(
+        "ATCF position diagnostics: "
+        f"data_time={data_time} "
+        f"reference={kma_point.lat:.2f}N,{kma_point.lon:.2f}E "
+        f"time={kma_point.time_utc[:10]} "
+        f"checked_ids={checked_count} "
+        f"bdeck_0h_points={bdeck_point_count} "
+        f"within_{max_distance_km:.0f}km={len(candidates)} "
+        f"preferred={str(preferred_atcf_id or '').strip().lower() or '-'} "
+        f"result={reason}."
+    )
+    if not all_matches:
+        print(
+            "ATCF position diagnostics: no exact-time BDECK 0h points were found "
+            "for the checked IDs: " + ", ".join(ordered_ids)
+        )
+        return
+
+    top_matches = sorted(all_matches, key=atcf_match_distance)[:8]
+    print(
+        "ATCF position nearest candidates: "
+        + ", ".join(format_atcf_position_candidate(item) for item in top_matches)
+    )
+
+    if candidates:
+        top_within = sorted(candidates, key=atcf_match_distance)[:8]
+        print(
+            "ATCF position candidates within threshold: "
+            + ", ".join(format_atcf_position_candidate(item) for item in top_within)
+        )
+        if len(top_within) >= 2:
+            gap = atcf_match_distance(top_within[1]) - atcf_match_distance(top_within[0])
+            print(
+                "ATCF position best-vs-second gap: "
+                f"{gap:.1f} km; required >= {min_distance_gap_km:.1f} km."
+            )
+
+
 def find_atcf_position_match(
     *,
     typ_number: int,
@@ -949,6 +1012,7 @@ def find_atcf_position_match(
     min_distance_gap_km: float,
 ) -> AtcfMatch | None:
     if kma_point is None:
+        print(f"ATCF position diagnostics: skipped for {data_time}; no KMA/APIHUB reference point.")
         return None
 
     if atcf_ids is None:
@@ -974,6 +1038,7 @@ def find_atcf_position_match(
     # candidates that were not opened earlier in this same workflow run.
     bdeck_texts = fetch_bdeck_texts_parallel(ordered_ids)
 
+    all_matches: list[AtcfMatch] = []
     candidates: list[AtcfMatch] = []
     for atcf_id in ordered_ids:
         text = bdeck_texts.get(atcf_id)
@@ -981,18 +1046,34 @@ def find_atcf_position_match(
             continue
         for point in bdeck_track_points(text, reference_time=kma_point.time_utc):
             distance = haversine_km(kma_point.lat, kma_point.lon, point.lat, point.lon)
+            match = AtcfMatch(
+                atcf_id=atcf_id,
+                method="position",
+                distance_km=distance,
+                point=point,
+                reference_point=kma_point,
+            )
+            all_matches.append(match)
             if distance <= max_distance_km:
-                candidates.append(AtcfMatch(
-                    atcf_id=atcf_id,
-                    method="position",
-                    distance_km=distance,
-                    point=point,
-                    reference_point=kma_point,
-                ))
+                candidates.append(match)
+
+    all_matches.sort(key=atcf_match_distance)
+    candidates.sort(key=atcf_match_distance)
 
     if not candidates:
+        log_atcf_position_diagnostics(
+            data_time=data_time,
+            kma_point=kma_point,
+            ordered_ids=ordered_ids,
+            all_matches=all_matches,
+            candidates=candidates,
+            max_distance_km=max_distance_km,
+            min_distance_gap_km=min_distance_gap_km,
+            preferred_atcf_id=preferred_atcf_id,
+            reason="no_candidate_within_threshold",
+        )
         return None
-    candidates.sort(key=atcf_match_distance)
+
     if len(candidates) >= 2:
         best_distance = atcf_match_distance(candidates[0])
         next_distance = atcf_match_distance(candidates[1])
@@ -1022,9 +1103,44 @@ def find_atcf_position_match(
                         f"{preferred_candidate.atcf_id} ({preferred_candidate.distance_km:.1f} km)"
                         + (f" over {competitors}." if competitors else ".")
                     )
+                    log_atcf_position_diagnostics(
+                        data_time=data_time,
+                        kma_point=kma_point,
+                        ordered_ids=ordered_ids,
+                        all_matches=all_matches,
+                        candidates=candidates,
+                        max_distance_km=max_distance_km,
+                        min_distance_gap_km=min_distance_gap_km,
+                        preferred_atcf_id=preferred_atcf_id,
+                        reason=f"selected_preferred_{preferred_candidate.atcf_id}",
+                    )
                     return preferred_candidate
+            log_atcf_position_diagnostics(
+                data_time=data_time,
+                kma_point=kma_point,
+                ordered_ids=ordered_ids,
+                all_matches=all_matches,
+                candidates=candidates,
+                max_distance_km=max_distance_km,
+                min_distance_gap_km=min_distance_gap_km,
+                preferred_atcf_id=preferred_atcf_id,
+                reason="ambiguous_best_candidates",
+            )
             return None
-    return candidates[0]
+
+    selected = candidates[0]
+    log_atcf_position_diagnostics(
+        data_time=data_time,
+        kma_point=kma_point,
+        ordered_ids=ordered_ids,
+        all_matches=all_matches,
+        candidates=candidates,
+        max_distance_km=max_distance_km,
+        min_distance_gap_km=min_distance_gap_km,
+        preferred_atcf_id=preferred_atcf_id,
+        reason=f"selected_{selected.atcf_id}",
+    )
+    return selected
 
 def active_cycle_windows(now: datetime) -> list[CycleWindow]:
     windows = []
