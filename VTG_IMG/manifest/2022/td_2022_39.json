@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202210201700",
+  "updated_at_utc": "202606190358",
   "storm_key": "td_2022_39",
-  "stage": "TD_LINKED_TYP",
+  "stage": "TD",
   "year": 2022,
   "typ_number": 39,
   "linked_td_number": null,
@@ -124,27 +124,27 @@
     },
     {
       "job": {
-        "storm_key": "td_2022_39_typ_20",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2022_39",
+        "stage": "TD",
         "year": 2022,
         "data_time": "202210201200",
         "td_number": 39,
         "linked_td_number": null,
+        "linked_typ_number": 20,
         "typ_number": 39,
+        "data_typ_number": 39,
         "typ_name_ko": "네삿",
         "typ_name": "NESAT",
         "typ_en": "NESAT",
         "atcf_id": "wp232022",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202210201200",
-        "cycle_time_utc": "202210201200",
-        "start_utc": "202210201700",
-        "end_utc": "202210202300"
+        "data_time": "202210201200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260617074911",
           "image_path": "VTG_IMG/2022/TD_2239_NESAT/TD_2239_NESAT_202210201200_120h.png",
@@ -171,35 +171,35 @@
             "GFS EPS",
             "HWRF"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202210201200_td_2022_39_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2022_39_typ_20",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2022_39",
+        "stage": "TD",
         "year": 2022,
         "data_time": "202210201200",
         "td_number": 39,
         "linked_td_number": null,
+        "linked_typ_number": 20,
         "typ_number": 39,
+        "data_typ_number": 39,
         "typ_name_ko": "네삿",
         "typ_name": "NESAT",
         "typ_en": "NESAT",
         "atcf_id": "wp232022",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202210201200",
-        "cycle_time_utc": "202210201200",
-        "start_utc": "202210201700",
-        "end_utc": "202210202300"
+        "data_time": "202210201200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260617074914",
           "image_path": "VTG_IMG/2022/TD_2239_NESAT/TD_2239_NESAT_202210201200_240h.png",
@@ -226,11 +226,11 @@
             "GFS EPS",
             "HWRF"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202210201200_td_2022_39_240h.json"
     }
   ]
 }

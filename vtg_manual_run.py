@@ -9,7 +9,14 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from vtg_auto import build_manifest_inventory, load_json, write_json
+from vtg_auto import (
+    CycleWindow,
+    load_json,
+    root_manifest_payload,
+    split_manifest_inventory_count,
+    write_json,
+    write_split_manifest_files,
+)
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -74,32 +81,46 @@ def main() -> int:
         return completed.returncode
 
     metadata = load_json(metadata_path, {})
-    manifest = {
-        "updated_at_utc": datetime.now(timezone.utc).strftime("%Y%m%d%H%M"),
-        "manual": True,
-        "manual_args": args.vtg_args,
-        "runs": [
-            {
-                "job": {
-                    "stage": metadata.get("storm_stage", storm_stage),
-                    "year": int(metadata.get("storm_year") or year),
-                    "data_time": metadata.get("data_time", data_time),
-                    "td_number": metadata.get("typ_number") if metadata.get("storm_stage") == "TD" else None,
-                    "linked_td_number": metadata.get("linked_td_number"),
-                    "typ_number": metadata.get("typ_number", typ_number),
-                    "typ_name_ko": metadata.get("typ_name_ko", ""),
-                    "typ_name": metadata.get("typ_name", ""),
-                    "typ_en": metadata.get("typ_name", ""),
-                    "atcf_id": metadata.get("atcf_id"),
-                    "fcst_hours": metadata.get("fcst_hours", fcst_hours),
-                    "skip_atcf": bool(metadata.get("skip_atcf")),
-                },
-                "window": {"data_time": metadata.get("data_time", data_time)},
-                "result": {"status": "manual", "metadata": metadata},
-            }
-        ],
-    }
-    manifest["inventory"] = build_manifest_inventory(args.output_root, manifest["runs"])
+    updated_at_utc = datetime.now(timezone.utc).strftime("%Y%m%d%H%M")
+    run_entries = [
+        {
+            "job": {
+                "stage": metadata.get("storm_stage", storm_stage),
+                "year": int(metadata.get("storm_year") or year),
+                "data_time": metadata.get("data_time", data_time),
+                "td_number": metadata.get("typ_number") if metadata.get("storm_stage") == "TD" else None,
+                "linked_td_number": metadata.get("linked_td_number"),
+                "typ_number": metadata.get("typ_number", typ_number),
+                "typ_name_ko": metadata.get("typ_name_ko", ""),
+                "typ_name": metadata.get("typ_name", ""),
+                "typ_en": metadata.get("typ_name", ""),
+                "atcf_id": metadata.get("atcf_id"),
+                "fcst_hours": metadata.get("fcst_hours", fcst_hours),
+                "skip_atcf": bool(metadata.get("skip_atcf")),
+            },
+            "window": {"data_time": metadata.get("data_time", data_time)},
+            "result": {"status": "manual", "metadata": metadata},
+        }
+    ]
+    write_split_manifest_files(args.output_root, run_entries, updated_at_utc=updated_at_utc)
+    data_time_text = str(metadata.get("data_time") or data_time)
+    window = CycleWindow(
+        data_time=data_time_text,
+        cycle_time_utc=data_time_text,
+        start_utc=data_time_text,
+        end_utc=data_time_text,
+    )
+    manifest = root_manifest_payload(
+        updated_at_utc=updated_at_utc,
+        windows=[window],
+        complete_model_count=0,
+        final_check_before_window_end_minutes=0,
+        runs=run_entries,
+        output_root=args.output_root,
+        inventory_count=split_manifest_inventory_count(args.output_root),
+    )
+    manifest["manual"] = True
+    manifest["manual_args"] = args.vtg_args
     write_json(args.output_root / "manifest.json", manifest)
     print(json.dumps(manifest, ensure_ascii=False, indent=2))
     return 0

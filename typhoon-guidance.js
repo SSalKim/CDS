@@ -1336,7 +1336,8 @@ throw manifestError || new Error('HTTP 404');
 }
 
 typhoonState.manifest=manifest;
-typhoonState.entries=normalizeTyphoonEntries(manifest || {},status);
+let inventory=await loadTyphoonSplitInventory(manifest || {});
+typhoonState.entries=normalizeTyphoonEntries({...manifest,inventory},status);
 await loadTyphoonImpactMapsForYears([...new Set(typhoonState.entries.map(entry=>entry.year).filter(Boolean))]);
 pruneTyphoonImageCache();
 syncTyphoonSelection();
@@ -1352,6 +1353,57 @@ renderTyphoonEmpty(`자료 없음 (${error.message})`);
 finally{
 root.classList.remove('typhoon-loading-state');
 }
+}
+
+async function loadTyphoonSplitInventory(manifest){
+if(Array.isArray(manifest?.inventory) && manifest.inventory.length){
+return manifest.inventory;
+}
+
+let indexes=Array.isArray(manifest?.manifest_indexes) ? manifest.manifest_indexes : [];
+if(!indexes.length){
+return [];
+}
+
+let yearIndexes=await fetchTyphoonJsonBatch(
+indexes
+.map(item=>String(item?.path || '').trim())
+.filter(Boolean),
+8
+);
+
+let stormPaths=[];
+yearIndexes.forEach(indexPayload=>{
+let systems=Array.isArray(indexPayload?.systems) ? indexPayload.systems : [];
+systems.forEach(system=>{
+let path=String(system?.manifest_path || '').trim();
+if(path){
+stormPaths.push(path);
+}
+});
+});
+
+let stormManifests=await fetchTyphoonJsonBatch([...new Set(stormPaths)],12);
+return stormManifests.flatMap(payload=>Array.isArray(payload?.inventory) ? payload.inventory : []);
+}
+
+async function fetchTyphoonJsonBatch(paths,concurrency=8){
+let results=[];
+let index=0;
+let workers=Array.from({length:Math.max(1,Math.min(concurrency,paths.length || 1))},async ()=>{
+while(index<paths.length){
+let current=index++;
+try{
+results[current]=await fetchTyphoonJson(paths[current]);
+}
+catch(error){
+console.warn(`태풍 manifest 로드 실패: ${paths[current]}`,error);
+results[current]=null;
+}
+}
+});
+await Promise.all(workers);
+return results.filter(Boolean);
 }
 
 async function fetchTyphoonJson(path){

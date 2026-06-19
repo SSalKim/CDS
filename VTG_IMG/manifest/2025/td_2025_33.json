@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "updated_at_utc": "202508310500",
+  "updated_at_utc": "202606190358",
   "storm_key": "td_2025_33",
-  "stage": "TD_LINKED_TYP",
+  "stage": "TD",
   "year": 2025,
   "typ_number": 33,
   "linked_td_number": null,
@@ -120,27 +120,27 @@
     },
     {
       "job": {
-        "storm_key": "td_2025_33_typ_14",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2025_33",
+        "stage": "TD",
         "year": 2025,
         "data_time": "202508310000",
         "td_number": 33,
         "linked_td_number": null,
+        "linked_typ_number": 14,
         "typ_number": 33,
+        "data_typ_number": 33,
         "typ_name_ko": "농파",
         "typ_name": "NONGFA",
         "typ_en": "NONGFA",
         "atcf_id": "wp202025",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202508310000",
-        "cycle_time_utc": "202508310000",
-        "start_utc": "202508310500",
-        "end_utc": "202508311100"
+        "data_time": "202508310000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260618014905",
           "image_path": "VTG_IMG/2025/TD_2533_NONGFA/TD_2533_NONGFA_202508310000_120h.png",
@@ -162,35 +162,35 @@
           "model_labels": [
             "KIM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202508310000_td_2025_33_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2025_33_typ_14",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "td_2025_33",
+        "stage": "TD",
         "year": 2025,
         "data_time": "202508310000",
         "td_number": 33,
         "linked_td_number": null,
+        "linked_typ_number": 14,
         "typ_number": 33,
+        "data_typ_number": 33,
         "typ_name_ko": "농파",
         "typ_name": "NONGFA",
         "typ_en": "NONGFA",
         "atcf_id": "wp202025",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202508310000",
-        "cycle_time_utc": "202508310000",
-        "start_utc": "202508310500",
-        "end_utc": "202508311100"
+        "data_time": "202508310000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260618014909",
           "image_path": "VTG_IMG/2025/TD_2533_NONGFA/TD_2533_NONGFA_202508310000_240h.png",
@@ -212,11 +212,11 @@
           "model_labels": [
             "KIM"
           ],
-          "skip_atcf": false
+          "skip_atcf": false,
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "VTG_IMG/metadata/202508310000_td_2025_33_240h.json"
     }
   ]
 }

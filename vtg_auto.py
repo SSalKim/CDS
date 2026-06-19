@@ -244,15 +244,6 @@ def active_at(now: datetime, start_text: str, end_text: str) -> bool:
     return True
 
 
-def active_typ_at(now: datetime, row: dict) -> bool:
-    now_flag = str(row.get("NOW", "")).strip()
-    if now_flag == "1":
-        return True
-    if now_flag == "2":
-        return active_at(now, row.get("TM_ST", ""), row.get("TM_ED", ""))
-    return active_at(now, row.get("TM_ST", ""), row.get("TM_ED", ""))
-
-
 def active_at_regular_cycle(cycle_time: datetime, start_text: str, end_text: str) -> bool:
     start = parse_utc_stamp(start_text)
     end = parse_utc_stamp(end_text)
@@ -576,16 +567,6 @@ def fetch_kma_reference_point(
 
 def normalize_name(value: str) -> str:
     return re.sub(r"[^A-Z0-9]", "", str(value or "").upper())
-
-
-def candidate_offsets(positive_radius: int, negative_radius: int) -> list[int]:
-    offsets = [0]
-    for value in range(1, max(positive_radius, negative_radius) + 1):
-        if value <= positive_radius:
-            offsets.append(value)
-        if value <= negative_radius:
-            offsets.append(-value)
-    return offsets
 
 
 def ordered_regular_atcf_offsets() -> tuple[list[int], list[int]]:
@@ -2353,30 +2334,6 @@ def run_vtg_batch(
     return results
 
 
-def run_vtg(
-    *,
-    job: StormJob,
-    output_root: Path,
-    auth_key: str,
-    python: str,
-    fcst_hours: int,
-    auto_fcst_hours: bool,
-    source_overrides: list[str],
-    dry_run: bool,
-) -> dict:
-    return run_vtg_batch(
-        job=job,
-        output_root=output_root,
-        auth_key=auth_key,
-        python=python,
-        fcst_hours_list=[fcst_hours],
-        auto_fcst_hours=auto_fcst_hours,
-        source_overrides=source_overrides,
-        dry_run=dry_run,
-    )[fcst_hours]
-
-
-
 def record_batch_results(
     *,
     job: StormJob,
@@ -2926,6 +2883,17 @@ def storm_summary_from_inventory(storm_key: str, inventory: list[dict]) -> dict:
     }
 
 
+def manifest_payload_changed(previous: dict, payload: dict) -> bool:
+    if previous == payload:
+        return False
+    if isinstance(previous, dict) and previous.get("updated_at_utc"):
+        comparable = dict(payload)
+        comparable["updated_at_utc"] = previous.get("updated_at_utc")
+        if previous == comparable:
+            return False
+    return True
+
+
 def write_split_manifest_files(output_root: Path, run_entries: list[dict], *, updated_at_utc: str) -> list[Path]:
     changed_paths: list[Path] = []
     entries_by_storm: dict[tuple[str, str], list[dict]] = {}
@@ -2955,7 +2923,7 @@ def write_split_manifest_files(output_root: Path, run_entries: list[dict], *, up
             **summary,
             "inventory": inventory,
         }
-        if previous != payload:
+        if manifest_payload_changed(previous, payload):
             write_json(path, payload)
             changed_paths.append(path)
         touched_years.add(str(year))
@@ -2981,7 +2949,7 @@ def write_split_manifest_files(output_root: Path, run_entries: list[dict], *, up
             "year": int(year) if str(year).isdigit() else year,
             "systems": sorted(by_key.values(), key=lambda item: (item.get("typ_number") or 0, item.get("storm_key") or "")),
         }
-        if previous != payload:
+        if manifest_payload_changed(previous, payload):
             write_json(path, payload)
             changed_paths.append(path)
 
@@ -3013,7 +2981,7 @@ def rebuild_split_manifest_files(output_root: Path, inventory: list[dict], *, up
             "inventory": storm_inventory,
         }
         previous = load_json(path, {})
-        if previous != payload:
+        if manifest_payload_changed(previous, payload):
             write_json(path, payload)
             changed_paths.append(path)
         summary["manifest_path"] = relative_asset_path(path)
@@ -3028,7 +2996,7 @@ def rebuild_split_manifest_files(output_root: Path, inventory: list[dict], *, up
             "systems": sorted(systems, key=lambda item: (item.get("typ_number") or 0, item.get("storm_key") or "")),
         }
         previous = load_json(path, {})
-        if previous != payload:
+        if manifest_payload_changed(previous, payload):
             write_json(path, payload)
             changed_paths.append(path)
     return changed_paths
@@ -3043,6 +3011,47 @@ def root_manifest_indexes(output_root: Path) -> list[dict]:
         year = path.parent.name
         indexes.append({"year": int(year), "path": relative_asset_path(path)})
     return indexes
+
+
+def split_manifest_inventory_count(output_root: Path) -> int:
+    total = 0
+    for item in root_manifest_indexes(output_root):
+        path = PROJECT_ROOT / str(item.get("path") or "")
+        payload = load_json(path, {})
+        systems = payload.get("systems") if isinstance(payload, dict) else []
+        if not isinstance(systems, list):
+            continue
+        for system in systems:
+            if isinstance(system, dict):
+                try:
+                    total += int(system.get("item_count") or 0)
+                except (TypeError, ValueError):
+                    continue
+    return total
+
+
+def root_manifest_payload(
+    *,
+    updated_at_utc: str,
+    windows: list[CycleWindow],
+    complete_model_count: int,
+    final_check_before_window_end_minutes: int,
+    runs: list[dict],
+    output_root: Path,
+    inventory_count: int = 0,
+) -> dict:
+    return {
+        "version": 3,
+        "updated_at_utc": updated_at_utc,
+        "window_start_offset_hours": WINDOW_START_OFFSET_HOURS,
+        "window_end_offset_hours": WINDOW_END_OFFSET_HOURS,
+        "complete_model_count": complete_model_count,
+        "final_check_before_window_end_minutes": final_check_before_window_end_minutes,
+        "active_windows": [asdict(window) for window in windows],
+        "runs": runs,
+        "inventory_count": inventory_count,
+        "manifest_indexes": root_manifest_indexes(output_root),
+    }
 
 
 def relative_changed_path(path: Path) -> str:
@@ -3097,7 +3106,7 @@ def print_manifest_or_summary(manifest: dict, *, verbose: bool, changed_paths: l
         "updated_at_utc": manifest.get("updated_at_utc"),
         "active_windows": manifest.get("active_windows", []),
         "run_count": len(manifest.get("runs", []) or []),
-        "inventory_count": len(manifest.get("inventory", []) or []),
+        "inventory_count": manifest.get("inventory_count", len(manifest.get("inventory", []) or [])),
         "manifest_indexes": manifest.get("manifest_indexes", []),
     }
     if changed_paths is not None:
@@ -3191,18 +3200,15 @@ def main() -> int:
         updated_at_utc = format_utc_stamp(now)
         inventory = build_manifest_inventory(output_root, [])
         split_paths = [] if args.dry_run else rebuild_split_manifest_files(output_root, inventory, updated_at_utc=updated_at_utc)
-        manifest = {
-            "version": 2,
-            "updated_at_utc": updated_at_utc,
-            "window_start_offset_hours": WINDOW_START_OFFSET_HOURS,
-            "window_end_offset_hours": WINDOW_END_OFFSET_HOURS,
-            "complete_model_count": args.complete_model_count,
-            "final_check_before_window_end_minutes": args.final_check_before_window_end_minutes,
-            "active_windows": [asdict(window) for window in windows],
-            "runs": [],
-            "inventory": inventory,
-            "manifest_indexes": root_manifest_indexes(output_root),
-        }
+        manifest = root_manifest_payload(
+            updated_at_utc=updated_at_utc,
+            windows=windows,
+            complete_model_count=args.complete_model_count,
+            final_check_before_window_end_minutes=args.final_check_before_window_end_minutes,
+            runs=[],
+            output_root=output_root,
+            inventory_count=len(inventory),
+        )
         status_for_write = prune_status_for_persistence(
             status,
             active_data_times={window.data_time for window in windows},
@@ -3492,18 +3498,19 @@ def main() -> int:
             previous_inventory = []
         inventory = merge_manifest_inventory(previous_inventory, run_entries)
     split_paths = [] if args.dry_run else write_split_manifest_files(output_root, run_entries, updated_at_utc=updated_at_utc)
-    manifest = {
-        "version": 2,
-        "updated_at_utc": updated_at_utc,
-        "window_start_offset_hours": WINDOW_START_OFFSET_HOURS,
-        "window_end_offset_hours": WINDOW_END_OFFSET_HOURS,
-        "complete_model_count": args.complete_model_count,
-        "final_check_before_window_end_minutes": args.final_check_before_window_end_minutes,
-        "active_windows": [asdict(window) for window in windows],
-        "runs": compact_runs,
-        "inventory": inventory,
-        "manifest_indexes": root_manifest_indexes(output_root),
-    }
+    if args.full_manifest_scan or previous_inventory:
+        inventory_count = len(inventory)
+    else:
+        inventory_count = split_manifest_inventory_count(output_root)
+    manifest = root_manifest_payload(
+        updated_at_utc=updated_at_utc,
+        windows=windows,
+        complete_model_count=args.complete_model_count,
+        final_check_before_window_end_minutes=args.final_check_before_window_end_minutes,
+        runs=compact_runs,
+        output_root=output_root,
+        inventory_count=inventory_count,
+    )
     status_for_write = prune_status_for_persistence(
         status,
         active_data_times={window.data_time for window in windows},
@@ -3511,7 +3518,7 @@ def main() -> int:
         reference_time=utc_now(),
     )
     should_clear_previous_manifest = not run_entries and bool(previous_manifest.get("runs"))
-    inventory_changed = previous_manifest.get("inventory") != manifest.get("inventory")
+    inventory_changed = previous_manifest.get("inventory_count") != manifest.get("inventory_count")
     index_changed = previous_manifest.get("manifest_indexes") != manifest.get("manifest_indexes")
     status_changed = status_for_write != status
     should_write_outputs = not args.dry_run and (

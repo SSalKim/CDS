@@ -828,10 +828,6 @@ def kma_data_typ_number(settings: Settings) -> int:
     return settings.data_typ_number or settings.typ_number
 
 
-def canonical_model_name(model_name: str) -> str:
-    return MODEL_SOURCE_ALIASES.get(model_name, model_name)
-
-
 def storm_numbers(settings: Settings) -> set[int]:
     ids = (settings.atcf_id, *settings.extra_atcf_ids)
     return {int(atcf_id[2:4]) for atcf_id in ids}
@@ -2230,71 +2226,6 @@ def relative_image_path(target: Path) -> str:
     return image_path.as_posix()
 
 
-def load_previous_metadata(path: Path) -> dict:
-    if not path.exists():
-        return {}
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    return payload if isinstance(payload, dict) else {}
-
-
-def write_preserved_output_metadata(
-    path: Path,
-    *,
-    settings: Settings,
-    intensity: str,
-    reason: str,
-    target: Path,
-) -> None:
-    previous = load_previous_metadata(path)
-    previous_model_count = 0
-    try:
-        previous_model_count = int(previous.get("model_count") or 0)
-    except (TypeError, ValueError):
-        previous_model_count = 0
-    previous_image_path = str(previous.get("image_path") or "")
-    previous_render_signature = str(previous.get("render_signature") or "")
-    target_image_path = relative_image_path(target)
-    preserved_render_signature = (
-        previous_render_signature
-        if previous_image_path == target_image_path and not previous.get("no_output")
-        else ""
-    )
-
-    payload = {
-        "generated_at_utc": datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"),
-        "render_signature": preserved_render_signature,
-        "image_path": target_image_path,
-        "storm_stage": settings.storm_stage,
-        "storm_year": storm_year(settings),
-        "typ_number": settings.typ_number,
-        "data_typ_number": kma_data_typ_number(settings),
-        "typ_name": settings.typ_name,
-        "typ_name_ko": settings.typ_name_ko,
-        "linked_td_number": settings.linked_td_number,
-        "linked_typ_number": settings.linked_typ_number,
-        "atcf_id": "" if settings.skip_atcf else settings.atcf_id,
-        "extra_atcf_ids": [] if settings.skip_atcf else list(settings.extra_atcf_ids),
-        "data_time": settings.data_time,
-        "fcst_hours": settings.fcst_hours,
-        "intensity": intensity,
-        "model_count": max(previous_model_count, 1),
-        "target_model_count": active_model_target_count(settings),
-        "models": previous.get("models") if isinstance(previous.get("models"), list) else [],
-        "model_labels": previous.get("model_labels") if isinstance(previous.get("model_labels"), list) else [],
-        "skip_atcf": settings.skip_atcf,
-        "preserved_existing_image": True,
-        "preserve_reason": reason,
-    }
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
-
-
 def write_no_output_metadata(
     path: Path,
     *,
@@ -2589,60 +2520,6 @@ def clamp_west_pacific_extent(
 
 
 
-def shift_extent_to_bounds(
-    extent: list[float],
-    *,
-    min_lon: float,
-    max_lon: float,
-    min_lat: float,
-    max_lat: float,
-) -> list[float]:
-    """Move an extent inside hard display bounds while preserving its span.
-
-    This is intentionally different from simple min/max clipping. Clipping after
-    aspect matching changes the final map aspect and makes Cartopy letterbox the
-    GeoAxes as a thin horizontal/vertical strip. When the matched extent crosses
-    a display bound, shift the whole window back inside the domain first; only
-    fall back to full-domain clipping if the requested span is larger than the
-    domain itself.
-    """
-    lon_min, lon_max, lat_min, lat_max = [float(value) for value in extent]
-    if not all(math.isfinite(value) for value in (lon_min, lon_max, lat_min, lat_max)):
-        return extent
-    if lon_max <= lon_min or lat_max <= lat_min:
-        return extent
-
-    lon_span = lon_max - lon_min
-    max_lon_span = max_lon - min_lon
-    if lon_span >= max_lon_span:
-        lon_min, lon_max = min_lon, max_lon
-    else:
-        if lon_min < min_lon:
-            shift = min_lon - lon_min
-            lon_min += shift
-            lon_max += shift
-        if lon_max > max_lon:
-            shift = lon_max - max_lon
-            lon_min -= shift
-            lon_max -= shift
-
-    lat_span = lat_max - lat_min
-    max_lat_span = max_lat - min_lat
-    if lat_span >= max_lat_span:
-        lat_min, lat_max = min_lat, max_lat
-    else:
-        if lat_min < min_lat:
-            shift = min_lat - lat_min
-            lat_min += shift
-            lat_max += shift
-        if lat_max > max_lat:
-            shift = lat_max - max_lat
-            lat_min -= shift
-            lat_max -= shift
-
-    return [float(lon_min), float(lon_max), float(lat_min), float(lat_max)]
-
-
 def legend_row_count_for(df: pd.DataFrame, settings: Settings) -> int:
     excluded = excluded_models_for(df)
     active = active_model_names(settings)
@@ -2654,19 +2531,6 @@ def legend_row_count_for(df: pd.DataFrame, settings: Settings) -> int:
 def fixed_240_map_extent(settings: Settings) -> list[float]:
     """Stable 240h West-Pacific view used instead of dynamic 240h camera fitting."""
     return list(FIXED_240_MAP_EXTENT)
-
-
-def mercator_figure_size(extent: list[float], *, width: float = 11.2) -> tuple[float, float]:
-    projection = ccrs.Mercator()
-    lon_min, lon_max, lat_min, lat_max = extent
-    center_lon = (lon_min + lon_max) / 2
-    center_lat = (lat_min + lat_max) / 2
-    x0, _ = projection.transform_point(lon_min, center_lat, ccrs.PlateCarree())
-    x1, _ = projection.transform_point(lon_max, center_lat, ccrs.PlateCarree())
-    _, y0 = projection.transform_point(center_lon, lat_min, ccrs.PlateCarree())
-    _, y1 = projection.transform_point(center_lon, lat_max, ccrs.PlateCarree())
-    aspect = abs((y1 - y0) / (x1 - x0)) if x1 != x0 else 0.8
-    return width, max(7.2, min(10.8, width * aspect))
 
 
 def match_extent_to_canvas_aspect(
