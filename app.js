@@ -419,6 +419,66 @@ return revealPreparedImagesFromLoader(root);
 
 }
 
+function getAnalyticsUrlSource(urls){
+let list=Array.isArray(urls) ? urls : [urls];
+let first=list.find(Boolean) || '';
+return window.CDSAnalytics?.sourceFromUrl
+?window.CDSAnalytics.sourceFromUrl(first)
+:'unknown';
+}
+
+function getCurrentForecastAnalyticsParams({urls=[],loadedImages=[],viewContext='single'}={}){
+let product=typeof getCurrentProduct==='function' ? getCurrentProduct() : null;
+let category=typeof getCurrentCategory==='function' ? getCurrentCategory() : product?.category || '';
+let modelId=currentModel || '';
+let productId=product?.id || currentProduct || '';
+let sliderIndex=Number(slider?.value || 0);
+let forecastHour=currentForecastList?.[sliderIndex] ?? '';
+let detailToken='';
+
+try{
+detailToken=typeof getCurrentAuxToken==='function' ? (getCurrentAuxToken() || '') : '';
+}
+catch(error){
+detailToken='';
+}
+
+let productKey=[
+currentMainMenu || '',
+category || '',
+productId || '',
+modelId || '',
+detailToken || ''
+].filter(Boolean).join('|');
+
+return {
+analytics_key:[productKey,forecastHour,viewContext].filter(value=>value!=='' && value!==undefined).join('|'),
+product_key:productKey,
+menu:currentMainMenu || '',
+category,
+product_id:productId,
+product_name:product?.label || productId,
+model_id:modelId,
+model_name:typeof getCurrentModelName==='function' ? getCurrentModelName(modelId) : modelId,
+forecast_hour:Number(forecastHour),
+detail_token:detailToken,
+view_context:viewContext,
+image_source:getAnalyticsUrlSource(urls),
+url_count:Array.isArray(urls) ? urls.length : 0,
+loaded_count:Array.isArray(loadedImages) ? loadedImages.length : 0
+};
+}
+
+function trackCurrentForecastViewAnalytics(options){
+if(!window.CDSAnalytics?.trackProductView){
+return;
+}
+
+window.CDSAnalytics.trackProductView(
+getCurrentForecastAnalyticsParams(options)
+);
+}
+
 
 function getSelectedForecastHour(){
 
@@ -1101,6 +1161,12 @@ warn.textContent='일부 이미지 로드 실패';
 stack.appendChild(warn);
 }
 
+trackCurrentForecastViewAnalytics({
+urls,
+loadedImages,
+viewContext:'nmsc_progressive'
+});
+
 return;
 }
 
@@ -1179,6 +1245,11 @@ stack.appendChild(warn);
 
 modelStatus.textContent='';
 modelStatus.classList.add('hidden');
+trackCurrentForecastViewAnalytics({
+urls,
+loadedImages,
+viewContext:'nmsc_stack'
+});
 return;
 }
 
@@ -1198,6 +1269,11 @@ revealPreparedImages(chartImages);
 
 modelStatus.textContent='';
 modelStatus.classList.add('hidden');
+trackCurrentForecastViewAnalytics({
+urls,
+loadedImages,
+viewContext:'single'
+});
 return;
 
 }

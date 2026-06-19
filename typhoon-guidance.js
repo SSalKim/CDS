@@ -2555,6 +2555,66 @@ function shouldUseRawTyphoonImage(run){
 return Boolean(TYPHOON_ACTIVE_IMAGE_BASE_URL && isActiveTyphoonStormEntry(run));
 }
 
+function getTyphoonAnalyticsSource(url){
+return window.CDSAnalytics?.sourceFromUrl
+?window.CDSAnalytics.sourceFromUrl(url || '')
+:'unknown';
+}
+
+function getTyphoonAnalyticsParams(run,{url='',urls=[]}={}){
+let stormStatus=shouldUseRawTyphoonImage(run) ? 'active' : 'ended';
+let archiveUrl=run?.imagePath ? typhoonState.driveArchiveImages.get(run.imagePath) : '';
+let archiveSource=stormStatus==='active'
+?'github_raw'
+:(archiveUrl ? getTyphoonAnalyticsSource(archiveUrl) : 'github_pages_archive');
+let stormKey=run?.stormKey || [
+run?.year || '',
+run?.stage || '',
+run?.typNumber || '',
+run?.typName || ''
+].join('|');
+
+return {
+analytics_key:['vtg',stormKey,run?.dataTime || '',run?.fcstHours || ''].filter(Boolean).join('|'),
+storm_key:stormKey,
+storm_year:String(run?.year || ''),
+storm_stage:run?.stage || '',
+storm_origin_stage:run?.originalStage || run?.stage || '',
+storm_number:Number(run?.typNumber || 0),
+storm_name:run?.typName || '',
+storm_status:stormStatus,
+fcst_hours:Number(run?.fcstHours || 0),
+data_time:run?.dataTime || '',
+image_source:getTyphoonAnalyticsSource(url || urls?.[0] || ''),
+archive_source:archiveSource,
+view_context:'vtg'
+};
+}
+
+function trackTyphoonImageView(run,result){
+if(!window.CDSAnalytics?.trackTyphoonView){
+return;
+}
+
+window.CDSAnalytics.trackTyphoonView(
+getTyphoonAnalyticsParams(run,{url:result?.url || ''})
+);
+}
+
+function trackTyphoonImageFailure(run,result,urls){
+if(!window.CDSAnalytics?.trackTyphoonImageFailure){
+return;
+}
+
+let attemptedSources=[...new Set((urls || []).map(getTyphoonAnalyticsSource).filter(Boolean))];
+window.CDSAnalytics.trackTyphoonImageFailure({
+...getTyphoonAnalyticsParams(run,{url:result?.url || '',urls}),
+attempt_count:Array.isArray(urls) ? urls.length : 0,
+attempted_sources:attemptedSources,
+last_source:getTyphoonAnalyticsSource(result?.url || urls?.[urls.length-1] || '')
+});
+}
+
 function configureTyphoonImageElement(image,url){
 
 image.className='typhoon-guidance-image';
@@ -2724,6 +2784,7 @@ let currentImage=viewer.querySelector('.typhoon-guidance-image');
 preloadNearbyTyphoonImages(typhoonState.selectedSlotIndex);
 
 if(currentImage?.dataset.cacheUrl && urls.includes(currentImage.dataset.cacheUrl) && currentImage.complete){
+trackTyphoonImageView(run,{url:currentImage.dataset.cacheUrl});
 return;
 }
 
@@ -2737,9 +2798,14 @@ if(requestId!==typhoonState.imageRequestSeq){
 return;
 }
 
+if(!(result.ok && result.image)){
+trackTyphoonImageFailure(run,result,urls);
+}
+
 if(result.ok && result.image){
 let error=createTyphoonStatusPanel('이미지 로드 실패',{hidden:true});
 viewer.replaceChildren(result.image,error);
+trackTyphoonImageView(run,result);
 return;
 }
 

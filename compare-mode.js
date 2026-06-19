@@ -1639,6 +1639,51 @@ syncCompareImageItemHeights();
 
 }
 
+function trackCompareProductViewAnalytics(payload){
+if(!payload || !window.CDSAnalytics?.trackProductView){
+return;
+}
+
+let modelId=payload.modelId || '';
+let product=payload.product || null;
+let forecastHour=payload.forecastHour ?? '';
+let detailToken='';
+
+try{
+detailToken=typeof getCurrentAuxToken==='function' ? (getCurrentAuxToken() || '') : '';
+}
+catch(error){
+detailToken='';
+}
+
+let category=product?.category || '';
+let productId=product?.id || currentProduct || '';
+let productKey=[
+currentMainMenu || '',
+category,
+productId,
+modelId,
+detailToken
+].filter(Boolean).join('|');
+
+window.CDSAnalytics.trackProductView({
+analytics_key:[productKey,forecastHour,'compare'].filter(value=>value!=='' && value!==undefined).join('|'),
+product_key:productKey,
+menu:currentMainMenu || '',
+category,
+product_id:productId,
+product_name:product?.label || productId,
+model_id:modelId,
+model_name:typeof getModelDisplayLabel==='function' ? getModelDisplayLabel(modelId) : modelId,
+forecast_hour:Number(forecastHour),
+detail_token:detailToken,
+view_context:'compare',
+image_source:window.CDSAnalytics.sourceFromUrl(payload.urls?.[0] || ''),
+url_count:Array.isArray(payload.urls) ? payload.urls.length : 0,
+loaded_count:Number(payload.loadedCount || 0)
+});
+}
+
 async function renderCompareImages(){
 
 let requestId=++forecastDisplayRequest;
@@ -1712,6 +1757,13 @@ stack.appendChild(warn);
 }
 
 item.appendChild(stack);
+item._cdsAnalyticsPayload={
+modelId,
+product,
+forecastHour:fh,
+urls,
+loadedCount:loadedImages.length
+};
 return item;
 
 });
@@ -1726,6 +1778,7 @@ clearCompareImageItemHeights();
 chartImages.replaceChildren(...items);
 revealPreparedImages(chartImages);
 scheduleCompareImageItemHeightSync();
+items.forEach(item=>trackCompareProductViewAnalytics(item._cdsAnalyticsPayload));
 
 }
 

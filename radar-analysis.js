@@ -1495,7 +1495,43 @@ function getRadarImageDisplaySource(url,entry){
 return entry?.image?.currentSrc || entry?.image?.src || url;
 }
 
-function applyRadarImageEntry(paneElement,img,url,entry){
+function trackRadarImageView(paneIndex,url){
+if(!window.CDSAnalytics?.trackRadarView){
+return;
+}
+
+let pane=radarState.panes[paneIndex] || radarState.panes[0] || {};
+let {level1,level2,level3}=normalizeRadarPaneSelection({...pane});
+let frame=radarState.frames[radarState.activeIndex] || null;
+let radarKey=[
+level1?.id || '',
+level2?.id || '',
+level3?.id || ''
+].filter(Boolean).join('|');
+let radarLabel=[
+level1?.label || '',
+level2?.label || '',
+level3?.label || ''
+].filter(Boolean).join(' / ');
+
+window.CDSAnalytics.trackRadarView({
+analytics_key:['radar',radarKey,paneIndex+1].join('|'),
+radar_key:radarKey,
+radar_source:level1?.id || '',
+radar_provider:level2?.id || '',
+radar_product:level3?.id || level2?.id || '',
+radar_label:radarLabel,
+pane_index:paneIndex+1,
+pane_count:radarState.paneCount,
+frame_time:frame ? formatRadarTimestamp(frame) : '',
+image_source:window.CDSAnalytics.sourceFromUrl(url),
+overlay_wind:radarState.wind.enabled ? 'on' : 'off',
+overlay_station:radarState.station.enabled ? 'on' : 'off',
+overlay_lightning:radarState.lightning.enabled ? 'on' : 'off'
+});
+}
+
+function applyRadarImageEntry(paneElement,img,url,entry,paneIndex=0){
 if(!img || !entry || entry.status!=='loaded'){
 return false;
 }
@@ -1511,6 +1547,7 @@ paneElement.dataset.renderedUrl=url;
 paneElement.dataset.renderedFrameIndex=paneElement.dataset.currentFrameIndex || '';
 paneElement.classList.add('has-current-image');
 setRadarPaneError(paneElement,'');
+trackRadarImageView(paneIndex,url);
 return true;
 }
 
@@ -1767,7 +1804,7 @@ setRadarPaneError(paneElement,'');
 paneElement.classList.toggle('has-current-image',hasCurrent);
 
 if(cached?.status==='loaded'){
-applyRadarImageEntry(paneElement,img,url,cached);
+applyRadarImageEntry(paneElement,img,url,cached,paneIndex);
 setRadarPageLoading(paneElement,false);
 refreshRadarFrameLoadState(frameIndex);
 return;
@@ -1787,7 +1824,7 @@ return;
 }
 
 if(entry.status==='loaded' && img){
-applyRadarImageEntry(paneElement,img,url,entry);
+applyRadarImageEntry(paneElement,img,url,entry,paneIndex);
 }
 else{
 setRadarPaneError(paneElement,'레이더 이미지를 불러오지 못했습니다.');
