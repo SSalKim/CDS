@@ -866,6 +866,11 @@ def bdeck_url(atcf_id: str) -> str:
     return f"https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/b{atcf_id}.dat"
 
 
+def ftp_nhc_bdeck_url(atcf_id: str) -> str:
+    atcf_id = str(atcf_id or "").strip().lower()
+    return f"https://ftp.nhc.noaa.gov/atcf/jtwc/b{atcf_id}.dat"
+
+
 def atcf_urls(settings: Settings) -> list[tuple[str, str, int]]:
     urls = []
     for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
@@ -976,21 +981,10 @@ def kma_has_current_track_point(kma_df: pd.DataFrame) -> bool:
     return not start.dropna(subset=["LAT", "LON"]).empty
 
 
-def fetch_bdeck_analysis_point(session: requests.Session, settings: Settings, *, max_offset_hours: int = 12) -> AnalysisPoint | None:
-    if settings.skip_atcf or not settings.atcf_id:
-        return None
-    text = fetch_text(
-        session,
-        bdeck_url(settings.atcf_id),
-        retries=2,
-        timeout=12,
-        retry_delay=2,
-        cache_dir=settings.http_cache_dir,
-        cache_ttl_seconds=settings.http_cache_ttl_seconds,
-    )
+def bdeck_analysis_candidates(text: str | None, settings: Settings, *, max_offset_hours: int = 12) -> pd.DataFrame:
     raw = read_atcf_csv(text, source="BDECK")
     if raw.empty:
-        return None
+        return raw
 
     for col in ["ATCF_NUMBER", "TM10", "FTM", "LATI", "LONG"]:
         raw[col] = pd.to_numeric(raw[col], errors="coerce")
@@ -1003,27 +997,99 @@ def fetch_bdeck_analysis_point(session: requests.Session, settings: Settings, *,
         & raw["LONG"].notna()
     ].copy()
     if raw.empty:
-        return None
+        return raw
 
     raw["_time"] = pd.to_datetime(raw["TM10"].astype("Int64").astype(str), format="%Y%m%d%H", errors="coerce", utc=True)
     raw = raw.dropna(subset=["_time"])
     if raw.empty:
-        return None
+        return raw
     raw["_offset_hours"] = (raw["_time"] - target_dt).abs().dt.total_seconds() / 3600.0
     raw = raw[raw["_offset_hours"].le(max_offset_hours)].sort_values("_offset_hours")
-    if raw.empty:
+    return raw
+
+
+def fetch_bdeck_analysis_candidates(
+    session: requests.Session,
+    settings: Settings,
+    *,
+    url: str,
+    max_offset_hours: int,
+) -> pd.DataFrame:
+    text = fetch_text(
+        session,
+        url,
+        retries=2,
+        timeout=12,
+        retry_delay=2,
+        cache_dir=settings.http_cache_dir,
+        cache_ttl_seconds=settings.http_cache_ttl_seconds,
+    )
+    return bdeck_analysis_candidates(text, settings, max_offset_hours=max_offset_hours)
+
+
+def exact_bdeck_rows(frame: pd.DataFrame) -> pd.DataFrame:
+    if frame.empty or "_offset_hours" not in frame:
+        return frame.iloc[0:0].copy()
+    return frame[frame["_offset_hours"].le(0)].copy()
+
+
+def select_bdeck_analysis_row(
+    session: requests.Session,
+    settings: Settings,
+    *,
+    max_offset_hours: int,
+) -> tuple[pd.Series, str] | None:
+    noaa_frame = fetch_bdeck_analysis_candidates(
+        session,
+        settings,
+        url=bdeck_url(settings.atcf_id),
+        max_offset_hours=max_offset_hours,
+    )
+    noaa_exact = exact_bdeck_rows(noaa_frame)
+    if not noaa_exact.empty:
+        return noaa_exact.iloc[0], "NOAA"
+
+    ftp_frame = fetch_bdeck_analysis_candidates(
+        session,
+        settings,
+        url=ftp_nhc_bdeck_url(settings.atcf_id),
+        max_offset_hours=max_offset_hours,
+    )
+    ftp_exact = exact_bdeck_rows(ftp_frame)
+    if not ftp_exact.empty:
+        print(
+            "BDECK exact analysis point missing from NOAA source; "
+            f"using FTP.NHC for {settings.atcf_id} at {settings.data_time}."
+        )
+        return ftp_exact.iloc[0], "FTP.NHC"
+    if not ftp_frame.empty:
+        print(
+            "BDECK exact analysis point missing from NOAA source; "
+            f"using nearest FTP.NHC point for {settings.atcf_id} at {settings.data_time}."
+        )
+        return ftp_frame.iloc[0], "FTP.NHC"
+    if not noaa_frame.empty:
+        return noaa_frame.iloc[0], "NOAA"
+    return None
+
+
+def fetch_bdeck_analysis_point(session: requests.Session, settings: Settings, *, max_offset_hours: int = 12) -> AnalysisPoint | None:
+    if settings.skip_atcf or not settings.atcf_id:
         return None
 
-    row = raw.iloc[0]
+    selected = select_bdeck_analysis_row(session, settings, max_offset_hours=max_offset_hours)
+    if selected is None:
+        return None
+    row, source_name = selected
     time_utc = row["_time"].strftime("%Y%m%d%H%M")
     if row["_offset_hours"] > 0:
         print(
-            "KMA current track is missing; using nearest BDECK/bwp analysis point "
+            f"KMA current track is missing; using nearest {source_name} BDECK/bwp analysis point "
             f"{time_utc} for {settings.atcf_id} at {settings.data_time}."
         )
     else:
         print(
-            "KMA current track is missing; using BDECK/bwp analysis point "
+            f"KMA current track is missing; using {source_name} BDECK/bwp analysis point "
             f"for {settings.atcf_id} at {settings.data_time}."
         )
     return AnalysisPoint(
@@ -1032,7 +1098,7 @@ def fetch_bdeck_analysis_point(session: requests.Session, settings: Settings, *,
         lon=float(row["LONG"]),
         source="BDECK",
         atcf_id=settings.atcf_id,
-        match_method="bdeck_fallback",
+        match_method=f"{source_name.lower().replace('.', '_')}_bdeck_fallback",
         distance_km=None,
     )
 

@@ -26,6 +26,11 @@ KMA_LIST_BASE_URL = "https://apihub-pub.kma.go.kr/api/typ01/url"
 TD_LIST_ENDPOINT = "td_lst.php"
 TYP_LIST_ENDPOINT = "typ_lst.php"
 NOAA_BDECK_URL = "https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/b{atcf_id}.dat"
+FTP_NHC_BDECK_URL = "https://ftp.nhc.noaa.gov/atcf/jtwc/b{atcf_id}.dat"
+BDECK_SOURCE_URLS = (
+    ("NOAA", NOAA_BDECK_URL),
+    ("FTP.NHC", FTP_NHC_BDECK_URL),
+)
 KMA_GTS_NOW_URL = f"{KMA_LIST_BASE_URL}/typ_gts_now.php"
 ACTIVE_MODEL_TARGET = 36
 DEFAULT_ATCF_SEARCH_POSITIVE_RADIUS = 10
@@ -71,12 +76,14 @@ STATUS_METADATA_KEYS = MANIFEST_METADATA_KEYS + ("render_signature",)
 HTTP_FETCH_CACHE_DIR: Path | None = None
 HTTP_FETCH_CACHE_TTL_SECONDS = 6 * 3600
 BDECK_TEXT_CACHE: dict[str, str | None] = {}
+BDECK_SOURCE_TEXT_CACHE: dict[tuple[str, str], str | None] = {}
 BDECK_FETCH_STATS = {
     "cache_hits": 0,
     "fetches": 0,
     "successes": 0,
     "missing": 0,
     "errors": 0,
+    "fallbacks": 0,
 }
 DEFAULT_ATCF_POSITION_PARALLEL_WORKERS = max(1, int(os.getenv("ATCF_POSITION_PARALLEL_WORKERS", "6")))
 DEFAULT_ATCF_POSITION_BDECK_TIMEOUT = float(os.getenv("ATCF_POSITION_BDECK_TIMEOUT", "10"))
@@ -709,10 +716,14 @@ def bdeck_track_points(text: str, *, reference_time: str) -> list[TrackPoint]:
     return points
 
 
-def bdeck_missing_cache_path(atcf_id: str) -> Path | None:
+def bdeck_source_slug(source: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", str(source or "").lower()).strip("_") or "source"
+
+
+def bdeck_missing_cache_path(atcf_id: str, *, source: str = "NOAA") -> Path | None:
     if HTTP_FETCH_CACHE_DIR is None:
         return None
-    return HTTP_FETCH_CACHE_DIR / "bdeck_missing" / f"{atcf_id.lower()}.missing"
+    return HTTP_FETCH_CACHE_DIR / "bdeck_missing" / bdeck_source_slug(source) / f"{atcf_id.lower()}.missing"
 
 
 def read_bdeck_missing_cache(path: Path | None) -> bool:
@@ -736,6 +747,49 @@ def write_bdeck_missing_cache(path: Path | None, reason: str) -> None:
         pass
 
 
+def fetch_bdeck_text_from_source(
+    atcf_id: str,
+    *,
+    source: str,
+    url_template: str,
+    timeout: float = 15,
+) -> str | None:
+    normalized = str(atcf_id or "").strip().lower()
+    if not normalized:
+        return None
+    cache_key = (source, normalized)
+    if cache_key in BDECK_SOURCE_TEXT_CACHE:
+        BDECK_FETCH_STATS["cache_hits"] += 1
+        return BDECK_SOURCE_TEXT_CACHE[cache_key]
+
+    missing_path = bdeck_missing_cache_path(normalized, source=source)
+    if read_bdeck_missing_cache(missing_path):
+        BDECK_FETCH_STATS["cache_hits"] += 1
+        BDECK_FETCH_STATS["missing"] += 1
+        BDECK_SOURCE_TEXT_CACHE[cache_key] = None
+        return None
+
+    try:
+        BDECK_FETCH_STATS["fetches"] += 1
+        text = fetch_text(url_template.format(atcf_id=normalized), timeout=timeout)
+    except HTTPError as exc:
+        if 400 <= exc.code < 500:
+            BDECK_FETCH_STATS["missing"] += 1
+            write_bdeck_missing_cache(missing_path, f"HTTP {exc.code}")
+        else:
+            BDECK_FETCH_STATS["errors"] += 1
+        BDECK_SOURCE_TEXT_CACHE[cache_key] = None
+        return None
+    except (URLError, TimeoutError):
+        BDECK_FETCH_STATS["errors"] += 1
+        BDECK_SOURCE_TEXT_CACHE[cache_key] = None
+        return None
+
+    BDECK_FETCH_STATS["successes"] += 1
+    BDECK_SOURCE_TEXT_CACHE[cache_key] = text
+    return text
+
+
 def fetch_bdeck_text(atcf_id: str, *, timeout: float = 15) -> str | None:
     normalized = str(atcf_id or "").strip().lower()
     if not normalized:
@@ -744,32 +798,71 @@ def fetch_bdeck_text(atcf_id: str, *, timeout: float = 15) -> str | None:
         BDECK_FETCH_STATS["cache_hits"] += 1
         return BDECK_TEXT_CACHE[normalized]
 
-    missing_path = bdeck_missing_cache_path(normalized)
-    if read_bdeck_missing_cache(missing_path):
-        BDECK_FETCH_STATS["cache_hits"] += 1
-        BDECK_FETCH_STATS["missing"] += 1
-        BDECK_TEXT_CACHE[normalized] = None
+    for index, (source, url_template) in enumerate(BDECK_SOURCE_URLS):
+        text = fetch_bdeck_text_from_source(
+            normalized,
+            source=source,
+            url_template=url_template,
+            timeout=timeout,
+        )
+        if text:
+            if index > 0:
+                BDECK_FETCH_STATS["fallbacks"] += 1
+                print(f"BDECK NOAA source unavailable; using {source} for {normalized}.")
+            BDECK_TEXT_CACHE[normalized] = text
+            return text
+
+    BDECK_TEXT_CACHE[normalized] = None
+    return None
+
+
+def fetch_bdeck_text_for_reference_time(
+    atcf_id: str,
+    *,
+    reference_time: str,
+    timeout: float = 15,
+) -> str | None:
+    normalized = str(atcf_id or "").strip().lower()
+    if not normalized:
         return None
 
-    try:
-        BDECK_FETCH_STATS["fetches"] += 1
-        text = fetch_text(NOAA_BDECK_URL.format(atcf_id=normalized), timeout=timeout)
-    except HTTPError as exc:
-        if 400 <= exc.code < 500:
-            BDECK_FETCH_STATS["missing"] += 1
-            write_bdeck_missing_cache(missing_path, f"HTTP {exc.code}")
-        else:
-            BDECK_FETCH_STATS["errors"] += 1
-        BDECK_TEXT_CACHE[normalized] = None
-        return None
-    except (URLError, TimeoutError):
-        BDECK_FETCH_STATS["errors"] += 1
-        BDECK_TEXT_CACHE[normalized] = None
-        return None
+    text = fetch_bdeck_text(normalized, timeout=timeout)
+    if text and bdeck_track_points(text, reference_time=reference_time):
+        return text
 
-    BDECK_FETCH_STATS["successes"] += 1
-    BDECK_TEXT_CACHE[normalized] = text
-    return text
+    ftp_text = fetch_bdeck_text_from_source(
+        normalized,
+        source="FTP.NHC",
+        url_template=FTP_NHC_BDECK_URL,
+        timeout=timeout,
+    )
+    if ftp_text and bdeck_track_points(ftp_text, reference_time=reference_time):
+        BDECK_FETCH_STATS["fallbacks"] += 1
+        print(
+            "BDECK exact-time point missing from NOAA source; "
+            f"using FTP.NHC for {normalized} at {reference_time[:10]}."
+        )
+        BDECK_TEXT_CACHE[normalized] = ftp_text
+        return ftp_text
+
+    if text:
+        return text
+
+    if ftp_text:
+        BDECK_FETCH_STATS["fallbacks"] += 1
+        BDECK_TEXT_CACHE[normalized] = ftp_text
+        return ftp_text
+
+    BDECK_TEXT_CACHE[normalized] = None
+    return None
+
+
+def fetch_bdeck_text_for_data_time(atcf_id: str, *, data_time: str, timeout: float = 15) -> str | None:
+    return fetch_bdeck_text_for_reference_time(
+        atcf_id,
+        reference_time=f"{data_time[:10]}00",
+        timeout=timeout,
+    )
 
 
 def bdeck_stats_snapshot() -> dict[str, int]:
@@ -823,7 +916,7 @@ def bdeck_nearest_track_point(text: str, *, data_time: str, max_offset_hours: in
 
 
 def fetch_bdeck_analysis_point(atcf_id: str, *, data_time: str) -> TrackPoint | None:
-    text = fetch_bdeck_text(atcf_id, timeout=15)
+    text = fetch_bdeck_text_for_data_time(atcf_id, data_time=data_time, timeout=15)
     if not text:
         return None
     points = bdeck_track_points(text, reference_time=f"{data_time[:10]}00")
@@ -881,6 +974,7 @@ def find_atcf_match(
 def fetch_bdeck_texts_parallel(
     atcf_ids: list[str],
     *,
+    reference_time: str | None = None,
     timeout: float = DEFAULT_ATCF_POSITION_BDECK_TIMEOUT,
     max_workers: int = DEFAULT_ATCF_POSITION_PARALLEL_WORKERS,
 ) -> dict[str, str | None]:
@@ -895,14 +989,27 @@ def fetch_bdeck_texts_parallel(
 
     if not unique_ids:
         return {}
+    fetcher = fetch_bdeck_text_for_reference_time if reference_time else fetch_bdeck_text
     if max_workers <= 1 or len(unique_ids) == 1:
-        return {atcf_id: fetch_bdeck_text(atcf_id, timeout=timeout) for atcf_id in unique_ids}
+        return {
+            atcf_id: (
+                fetcher(atcf_id, reference_time=reference_time, timeout=timeout)
+                if reference_time
+                else fetcher(atcf_id, timeout=timeout)
+            )
+            for atcf_id in unique_ids
+        }
 
     results: dict[str, str | None] = {}
     worker_count = min(max_workers, len(unique_ids))
     with ThreadPoolExecutor(max_workers=worker_count) as executor:
         futures = {
-            executor.submit(fetch_bdeck_text, atcf_id, timeout=timeout): atcf_id
+            executor.submit(
+                fetcher,
+                atcf_id,
+                **({"reference_time": reference_time} if reference_time else {}),
+                timeout=timeout,
+            ): atcf_id
             for atcf_id in unique_ids
         }
         for future in as_completed(futures):
@@ -1017,7 +1124,7 @@ def find_atcf_position_match(
     # Name matching already stores successful/missing BDECKs in memory, so this
     # parallel fetch reuses those cached results immediately and only downloads
     # candidates that were not opened earlier in this same workflow run.
-    bdeck_texts = fetch_bdeck_texts_parallel(ordered_ids)
+    bdeck_texts = fetch_bdeck_texts_parallel(ordered_ids, reference_time=kma_point.time_utc)
 
     all_matches: list[AtcfMatch] = []
     candidates: list[AtcfMatch] = []
@@ -1904,6 +2011,7 @@ def build_storm_jobs(
         f"bdeck_successes={bdeck_delta.get('successes', 0)} "
         f"bdeck_missing={bdeck_delta.get('missing', 0)} "
         f"bdeck_errors={bdeck_delta.get('errors', 0)} "
+        f"bdeck_fallbacks={bdeck_delta.get('fallbacks', 0)} "
         f"bdeck_cache_hits={bdeck_delta.get('cache_hits', 0)}"
     )
     return jobs
