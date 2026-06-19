@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202606190418",
+  "updated_at_utc": "202606181700",
   "storm_key": "td_2026_12",
   "stage": "TD",
   "year": 2026,
@@ -15,28 +15,28 @@
     {
       "job": {
         "storm_key": "td_2026_12",
-        "stage": "TD",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606181200",
         "td_number": 12,
         "linked_td_number": null,
-        "linked_typ_number": null,
         "typ_number": 12,
-        "data_typ_number": 12,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp072026",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202606181200"
+        "data_time": "202606181200",
+        "cycle_time_utc": "202606181200",
+        "start_utc": "202606181700",
+        "end_utc": "202606182300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260619021808",
+          "generated_at_utc": "20260619042213",
           "image_path": "VTG_IMG/2026/TD_2612_NONAME/TD_2612_NONAME_202606181200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -81,37 +81,37 @@
             "UKMO",
             "UKMO EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202606181200_td_2026_12_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2026_12",
-        "stage": "TD",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202606181200",
         "td_number": 12,
         "linked_td_number": null,
-        "linked_typ_number": null,
         "typ_number": 12,
-        "data_typ_number": 12,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "NONAME",
+        "typ_en": "",
         "atcf_id": "wp072026",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202606181200"
+        "data_time": "202606181200",
+        "cycle_time_utc": "202606181200",
+        "start_utc": "202606181700",
+        "end_utc": "202606182300"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260619021810",
+          "generated_at_utc": "20260619042215",
           "image_path": "VTG_IMG/2026/TD_2612_NONAME/TD_2612_NONAME_202606181200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -156,11 +156,11 @@
             "UKMO",
             "UKMO EPS"
           ],
-          "skip_atcf": false,
-          "models": []
+          "skip_atcf": false
         }
       },
-      "metadata_path": "VTG_IMG/metadata/202606181200_td_2026_12_240h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
