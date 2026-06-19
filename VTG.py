@@ -85,49 +85,49 @@ MODEL_INFO = [
 ]
 
 MODEL_SOURCES = [
-    {"name": "ECMWF", "apihub": "ECMWF", "noaa": "ECMF", "knackwx": "ECMF"},
-    {"name": "ECMWF_EPS", "apihub": "ECMWF_EPS", "noaa": "EEMN", "knackwx": "EEMN"},
-    {"name": "KIM_3h", "apihub": "KIM_3h", "noaa": None, "knackwx": None},
-    {"name": "KIM_6h", "apihub": "KIM_6h", "noaa": None, "knackwx": None},
-    {"name": "KIM_EPS", "apihub": "KIM_EPS", "noaa": None, "knackwx": None},
-    {"name": "UM", "apihub": "UM", "noaa": None, "knackwx": None},
-    {"name": "UM_GFDL_6h", "apihub": "UM_GFDL_6h", "noaa": None, "knackwx": None},
-    {"name": "UM_KEPS", "apihub": "UM_KEPS", "noaa": None, "knackwx": None},
-    {"name": "UKM", "apihub": "UKX", "noaa": "UKM", "ral_ucar": "UKM", "knackwx": "UKM"},
-    {"name": "UKMO_EPS", "apihub": "EGRR_EPS", "noaa": "UEMN", "knackwx": "UEMN"},
-    {"name": "GFS", "apihub": "GFS", "noaa": "AVNO", "knackwx": "AVNO"},
-    {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "ral_ucar": "AEMN", "knackwx": "AEMN"},
-    {"name": "CMC", "apihub": "CMC", "noaa": "CMC", "ral_ucar": "CMC", "knackwx": "CMC"},
-    {"name": "CMC_EPS", "apihub": "CMC_EPS", "noaa": "CEMN", "ral_ucar": "CEMN", "knackwx": "CEMN"},
-    {"name": "JGSM", "apihub": "JGSM", "noaa": "JGSM", "knackwx": "JGSM"},
-    {"name": "TEPS", "apihub": "TEPS", "noaa": "JENS", "knackwx": "JENS"},
-    {"name": "NAVGEM", "apihub": "NAVGEM", "noaa": "NVGM", "ral_ucar": "NVGM", "knackwx": "NVGM"},
-    {"name": "FNMOC_EPS", "apihub": "FNMOC_EPS", "noaa": "NEMN", "ral_ucar": "NEMN", "knackwx": "NMEN"},
-    {"name": "CTCX", "apihub": None, "noaa": "CTCX", "knackwx": "CTCX"},
-    {"name": "COAMPS_EPS", "apihub": None, "noaa": "CTMN", "knackwx": "CTMN"},
-    {"name": "AFUM", "apihub": None, "noaa": "AFUM", "knackwx": None},
-    {"name": "HWRF", "apihub": "HWRF", "noaa": "HWRF", "knackwx": "HWRF"},
-    {"name": "HAFS", "apihub": "HAFS", "noaa": "HFSA", "knackwx": "HFSA"},
-    {"name": "ECMWF_AIFS", "apihub": "ECMWF_AIFS", "noaa": "AIFS", "knackwx": "AIFS"},
-    {"name": "ECMWF_AIFS_EPS", "apihub": None, "noaa": "EAIM", "knackwx": "EAMN"},
-    {"name": "AGFS", "apihub": None, "noaa": "AGFS", "knackwx": "AGFS"},
-    {"name": "AIGEFS", "apihub": None, "noaa": "AIMN", "knackwx": "AIMN"},
-    {"name": "IFEC_AI", "apihub": "IFEC_AI", "noaa": None, "knackwx": None},
-    {"name": "IFKM_AI", "apihub": "IFKM_AI", "noaa": None, "knackwx": None},
-    {"name": "FNEC_AI", "apihub": "FNEC_AI", "noaa": None, "knackwx": None},
-    {"name": "FNKM_AI", "apihub": "FNKM_AI", "noaa": None, "knackwx": None},
-    {"name": "FNUM_AI", "apihub": "FNUM_AI", "noaa": None, "knackwx": None},
-    {"name": "PGEC_AI", "apihub": "PGEC_AI", "noaa": None, "knackwx": None},
-    {"name": "PGKM_AI", "apihub": "PGKM_AI", "noaa": None, "knackwx": None},
-    {"name": "PGUM_AI", "apihub": "PGUM_AI", "noaa": None, "knackwx": None},
-    {"name": "GCEC_AI", "apihub": "GCEC_AI", "noaa": None, "knackwx": None},
-    {"name": "GCKM_AI", "apihub": "GCKM_AI", "noaa": None, "knackwx": None},
-    {"name": "GCUM_AI", "apihub": "GCUM_AI", "noaa": None, "knackwx": None},
-    {"name": "GENC", "apihub": None, "noaa": None, "knackwx": "GENC", "raw_github": "GENC"},
-    {"name": "FNV3", "apihub": None, "noaa": "FGNE", "knackwx": "FNV3", "raw_github": "FNV3"},
-    {"name": "HKO_AREC", "apihub": "HKO_AREC", "noaa": None, "knackwx": None},
-    {"name": "HKO_FXEC", "apihub": "HKO_FXEC", "noaa": None, "knackwx": None},
-    {"name": "HKO_FWEC", "apihub": "HKO_FWEC", "noaa": None, "knackwx": None},
+    {"name": "ECMWF", "apihub": "ECMWF", "noaa": "ECMF"},
+    {"name": "ECMWF_EPS", "apihub": "ECMWF_EPS", "noaa": "EEMN"},
+    {"name": "KIM_3h", "apihub": "KIM_3h", "noaa": None},
+    {"name": "KIM_6h", "apihub": "KIM_6h", "noaa": None},
+    {"name": "KIM_EPS", "apihub": "KIM_EPS", "noaa": None},
+    {"name": "UM", "apihub": "UM", "noaa": None},
+    {"name": "UM_GFDL_6h", "apihub": "UM_GFDL_6h", "noaa": None},
+    {"name": "UM_KEPS", "apihub": "UM_KEPS", "noaa": None},
+    {"name": "UKM", "apihub": "UKX", "noaa": "UKM", "ftp_nhc": "EGRR", "ral_ucar": "UKM"},
+    {"name": "UKMO_EPS", "apihub": "EGRR_EPS", "noaa": "UEMN", "ftp_nhc": "UEMN"},
+    {"name": "GFS", "apihub": "GFS", "noaa": "AVNO", "ftp_nhc": "AVNO"},
+    {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "ftp_nhc": "AEMN", "ral_ucar": "AEMN"},
+    {"name": "CMC", "apihub": "CMC", "noaa": "CMC", "ral_ucar": "CMC"},
+    {"name": "CMC_EPS", "apihub": "CMC_EPS", "noaa": "CEMN", "ftp_nhc": "CEMN", "ral_ucar": "CEMN"},
+    {"name": "JGSM", "apihub": "JGSM", "noaa": "JGSM", "ftp_nhc": "JGSM"},
+    {"name": "TEPS", "apihub": "TEPS", "noaa": "JENS", "ftp_nhc": "JENS"},
+    {"name": "NAVGEM", "apihub": "NAVGEM", "noaa": "NVGM", "ftp_nhc": "NVGM", "ral_ucar": "NVGM"},
+    {"name": "FNMOC_EPS", "apihub": "FNMOC_EPS", "noaa": "NEMN", "ral_ucar": "NEMN"},
+    {"name": "CTCX", "apihub": None, "noaa": "CTCX", "ftp_nhc": "CTCX"},
+    {"name": "COAMPS_EPS", "apihub": None, "noaa": "CTMN", "ftp_nhc": "CTMN"},
+    {"name": "AFUM", "apihub": None, "noaa": "AFUM", "ftp_nhc": "AFUM"},
+    {"name": "HWRF", "apihub": "HWRF", "noaa": "HWRF", "ftp_nhc": "HWRF"},
+    {"name": "HAFS", "apihub": "HAFS", "noaa": "HFSA", "ftp_nhc": "HFSA"},
+    {"name": "ECMWF_AIFS", "apihub": "ECMWF_AIFS", "noaa": "AIFS", "ftp_nhc": "AIFS"},
+    {"name": "ECMWF_AIFS_EPS", "apihub": None, "noaa": "EAIM", "ftp_nhc": "EAIM"},
+    {"name": "AGFS", "apihub": None, "noaa": "AGFS", "ftp_nhc": "AGFS"},
+    {"name": "AIGEFS", "apihub": None, "noaa": "AIMN", "ftp_nhc": "AIMN"},
+    {"name": "IFEC_AI", "apihub": "IFEC_AI", "noaa": None},
+    {"name": "IFKM_AI", "apihub": "IFKM_AI", "noaa": None},
+    {"name": "FNEC_AI", "apihub": "FNEC_AI", "noaa": None},
+    {"name": "FNKM_AI", "apihub": "FNKM_AI", "noaa": None},
+    {"name": "FNUM_AI", "apihub": "FNUM_AI", "noaa": None},
+    {"name": "PGEC_AI", "apihub": "PGEC_AI", "noaa": None},
+    {"name": "PGKM_AI", "apihub": "PGKM_AI", "noaa": None},
+    {"name": "PGUM_AI", "apihub": "PGUM_AI", "noaa": None},
+    {"name": "GCEC_AI", "apihub": "GCEC_AI", "noaa": None},
+    {"name": "GCKM_AI", "apihub": "GCKM_AI", "noaa": None},
+    {"name": "GCUM_AI", "apihub": "GCUM_AI", "noaa": None},
+    {"name": "GENC", "apihub": None, "noaa": None, "raw_github": "GENC"},
+    {"name": "FNV3", "apihub": None, "noaa": "FGNE", "ftp_nhc": "FGNE", "raw_github": "FNV3"},
+    {"name": "HKO_AREC", "apihub": "HKO_AREC", "noaa": None},
+    {"name": "HKO_FXEC", "apihub": "HKO_FXEC", "noaa": None},
+    {"name": "HKO_FWEC", "apihub": "HKO_FWEC", "noaa": None},
 ]
 
 MODEL_CATEGORIES = {
@@ -248,17 +248,17 @@ APIHUB_MODEL_START_MAX_DISTANCE_KM = float(os.getenv("VTG_APIHUB_START_MAX_DISTA
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
-SOURCE_ORDER = ("APIHUB", "NOAA", "RAL.UCAR", "RAW.GITHUB", "KNACKWX")
+SOURCE_ORDER = ("APIHUB", "NOAA", "FTP.NHC", "RAL.UCAR", "RAW.GITHUB")
 MODEL_SOURCE_PRIORITY_OVERRIDES = {
-    "GENC": ("RAW.GITHUB", "APIHUB", "NOAA", "KNACKWX"),
-    "FNV3": ("RAW.GITHUB", "APIHUB", "NOAA", "KNACKWX"),
+    "GENC": ("RAW.GITHUB", "APIHUB", "NOAA", "FTP.NHC", "RAL.UCAR"),
+    "FNV3": ("RAW.GITHUB", "APIHUB", "NOAA", "FTP.NHC", "RAL.UCAR"),
 }
 SOURCE_DISPLAY_NAMES = {
     "APIHUB": "KMA APIHUB",
     "NOAA": "NOAA ATCF",
+    "FTP.NHC": "FTP.NHC ATCF",
     "RAL.UCAR": "RAL UCAR ATCF",
     "RAW.GITHUB": "GITHUB",
-    "KNACKWX": "KNACKWX ATCF",
 }
 SOURCE_ALIASES = {
     "APIHUB": "APIHUB",
@@ -267,6 +267,10 @@ SOURCE_ALIASES = {
     "ATCF": "NOAA",
     "NCEP": "NOAA",
     "NOAAATCF": "NOAA",
+    "FTPNHC": "FTP.NHC",
+    "NHCFTP": "FTP.NHC",
+    "NHC": "FTP.NHC",
+    "NHCATCF": "FTP.NHC",
     "RALUCAR": "RAL.UCAR",
     "UCAR": "RAL.UCAR",
     "RAL": "RAL.UCAR",
@@ -276,15 +280,13 @@ SOURCE_ALIASES = {
     "RAWGITHUB": "RAW.GITHUB",
     "GITHUB": "RAW.GITHUB",
     "GDM": "RAW.GITHUB",
-    "KNACKWX": "KNACKWX",
-    "KNACKWXATCF": "KNACKWX",
 }
 SOURCE_IDENTIFIER_COLUMNS = {
     "APIHUB": "apihub",
     "NOAA": "noaa",
+    "FTP.NHC": "ftp_nhc",
     "RAL.UCAR": "ral_ucar",
     "RAW.GITHUB": "raw_github",
-    "KNACKWX": "knackwx",
 }
 SOURCE_MODEL_IDS = {
     source: {
@@ -835,16 +837,6 @@ def storm_numbers(settings: Settings) -> set[int]:
     return {int(atcf_id[2:4]) for atcf_id in ids}
 
 
-def storm_id_from_atcf_id(atcf_id: str) -> str:
-    return f"{atcf_id[2:4].upper()}W"
-
-
-def knackwx_url(settings: Settings, atcf_id: str) -> str:
-    init_time = f"{settings.data_time[8:10]}z"
-    params = urlencode({"stormID": storm_id_from_atcf_id(atcf_id), "cycle": "late", "initTime": init_time})
-    return f"https://api.knackwx.com/atcf/v1/aid/archive?{params}"
-
-
 def raw_github_url(settings: Settings, model: str) -> str:
     data_dt = datetime.strptime(settings.data_time, "%Y%m%d%H%M")
     date_path = data_dt.strftime("%Y_%m_%d")
@@ -864,6 +856,11 @@ def ral_ucar_url(atcf_id: str) -> str:
     )
 
 
+def ftp_nhc_atcf_url(atcf_id: str) -> str:
+    atcf_id = str(atcf_id or "").strip().lower()
+    return f"https://ftp.nhc.noaa.gov/atcf/jtwc/a{atcf_id}.dat"
+
+
 def bdeck_url(atcf_id: str) -> str:
     atcf_id = str(atcf_id or "").strip().lower()
     return f"https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/b{atcf_id}.dat"
@@ -874,13 +871,13 @@ def atcf_urls(settings: Settings) -> list[tuple[str, str, int]]:
     for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
         urls.append(("NOAA", f"https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/a{atcf_id}.dat", 0))
     for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
+        urls.append(("FTP.NHC", ftp_nhc_atcf_url(atcf_id), 0))
+    for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
         urls.append(("RAL.UCAR", ral_ucar_url(atcf_id), 0))
     urls.extend([
         ("RAW.GITHUB", raw_github_url(settings, "GENC"), 6),
         ("RAW.GITHUB", raw_github_url(settings, "FNV3"), 6),
     ])
-    for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
-        urls.append(("KNACKWX", knackwx_url(settings, atcf_id), 0))
     return urls
 
 
@@ -895,33 +892,10 @@ def empty_atcf_frame() -> pd.DataFrame:
     return pd.DataFrame(columns=[*ATCF_COLUMNS, DATA_SOURCE_COLUMN])
 
 
-def trim_atcf_line_after_field_space(line: str) -> str:
-    fields = line.split(",")
-    cleaned = []
-    for field in fields:
-        stripped = field.strip()
-        if " " in stripped:
-            stripped = stripped.split()[0]
-        cleaned.append(stripped)
-    return ",".join(cleaned)
-
-
-def sanitize_atcf_text(text: str, *, source: str) -> str:
-    if source != "KNACKWX":
-        return text
-    lines = []
-    for line in text.splitlines():
-        if not line.strip():
-            continue
-        lines.append(trim_atcf_line_after_field_space(line))
-    return "\n".join(lines)
-
-
 def read_atcf_csv(text: str | None, *, source: str, skiprows: int = 0) -> pd.DataFrame:
     empty = empty_atcf_frame()
     if not text or not text.strip():
         return empty
-    text = sanitize_atcf_text(text, source=source)
 
     try:
         df = pd.read_csv(
@@ -2989,7 +2963,7 @@ def draw_header(
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
     credit_x = 0.995 if legend_side == "left" else 0.005
     credit_ha = "right" if legend_side == "left" else "left"
-    ax.text(credit_x, 0.006, "Plotted by WooJin Kim\nData sourced from KMA APIHUB & NRL ATCF", transform=ax.transAxes,
+    ax.text(credit_x, 0.006, "Plotted by WooJin Kim\nData sourced from KMA APIHUB & ATCF", transform=ax.transAxes,
             fontsize=12, color="aliceblue", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="bottom", horizontalalignment=credit_ha, zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
