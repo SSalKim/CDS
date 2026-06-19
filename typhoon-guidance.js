@@ -2475,7 +2475,8 @@ return '';
 let version=run.generatedAt || run.metadata?.generated_at_utc || typhoonState.manifest?.updated_at_utc || '';
 let archiveUrl=shouldUseRawTyphoonImage(run) ? '' : typhoonState.driveArchiveImages.get(run.imagePath);
 if(archiveUrl){
-return archiveUrl;
+let fileId=typhoonDriveFileIdFromUrl(archiveUrl);
+return getTyphoonDriveImageUrls(fileId,archiveUrl)[0] || archiveUrl;
 }
 let imagePath=shouldUseRawTyphoonImage(run)
 ?typhoonBuildUrl(run.imagePath,TYPHOON_ACTIVE_IMAGE_BASE_URL)
@@ -2493,8 +2494,20 @@ return urls;
 let archiveUrl=typhoonState.driveArchiveImages.get(run.imagePath);
 let fileId=typhoonDriveFileIdFromUrl(archiveUrl);
 if(fileId){
-urls.push(typhoonDriveGoogleusercontentUrl(fileId));
-urls.push(typhoonDriveThumbnailUrl(fileId));
+urls=getTyphoonDriveImageUrls(fileId,archiveUrl);
+}
+return [...new Set(urls.filter(Boolean))];
+}
+
+function getTyphoonDriveImageUrls(fileId,archiveUrl=''){
+let id=String(fileId || '').trim();
+let urls=[];
+if(id){
+urls.push(typhoonDriveGoogleusercontentUrl(id));
+urls.push(typhoonDriveThumbnailUrl(id));
+}
+if(archiveUrl){
+urls.push(archiveUrl);
 }
 return [...new Set(urls.filter(Boolean))];
 }
