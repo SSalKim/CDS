@@ -396,11 +396,9 @@ jobs:
             local changed_file="$2"
             local filtered_file="$RUNNER_TEMP/vtg_changed_paths_filtered.txt"
 
-            if [ ! -s "$changed_file" ]; then
-              echo "Changed-path list is empty; falling back to a VTG_IMG status scan."
-              git diff --name-only -- VTG_IMG >> "$changed_file" || true
-              git ls-files --others --exclude-standard -- VTG_IMG >> "$changed_file" || true
-            fi
+            echo "Supplementing generated changed-path list with current VTG_IMG git status."
+            git diff --name-only -- VTG_IMG >> "$changed_file" || true
+            git ls-files --others --exclude-standard -- VTG_IMG >> "$changed_file" || true
             filter_changed_paths "$changed_file" "$filtered_file"
 
             if [ -s "$filtered_file" ]; then

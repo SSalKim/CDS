@@ -344,11 +344,9 @@ jobs:
           CHANGED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths.txt"
           FILTERED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths_existing.txt"
           touch "$CHANGED_PATHS_FILE"
-          if [ ! -s "$CHANGED_PATHS_FILE" ]; then
-            echo "Changed-path list is empty; falling back to a VTG_IMG status scan."
-            git diff --name-only -- VTG_IMG >> "$CHANGED_PATHS_FILE" || true
-            git ls-files --others --exclude-standard -- VTG_IMG >> "$CHANGED_PATHS_FILE" || true
-          fi
+          echo "Supplementing generated changed-path list with current VTG_IMG git status."
+          git diff --name-only -- VTG_IMG >> "$CHANGED_PATHS_FILE" || true
+          git ls-files --others --exclude-standard -- VTG_IMG >> "$CHANGED_PATHS_FILE" || true
           sort -u "$CHANGED_PATHS_FILE" -o "$CHANGED_PATHS_FILE"
 
           : > "$FILTERED_PATHS_FILE"
