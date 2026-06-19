@@ -2963,7 +2963,7 @@ def draw_header(
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
     credit_x = 0.995 if legend_side == "left" else 0.005
     credit_ha = "right" if legend_side == "left" else "left"
-    ax.text(credit_x, 0.006, "Plotted by WooJin Kim\nData sourced from KMA APIHUB & ATCF", transform=ax.transAxes,
+    ax.text(credit_x, 0.006, "Plotted by WooJin Kim\nData sourced from KMA APIHUB & NRL ATCF", transform=ax.transAxes,
             fontsize=12, color="aliceblue", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="bottom", horizontalalignment=credit_ha, zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
