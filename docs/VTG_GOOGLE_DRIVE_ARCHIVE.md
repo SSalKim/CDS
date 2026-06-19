@@ -73,3 +73,43 @@ publishing those older image files from the deploy artifact, and update
 Google Drive is best treated as an archive store, not a high-performance CDN.
 For old storms this is usually acceptable because they are viewed less often
 than active storms.
+
+## Automation
+
+The archive sync script is:
+
+```text
+vtg_drive_archive.py
+```
+
+The manual GitHub Actions workflow is:
+
+```text
+.github/workflows/vtg_archive.yml
+```
+
+Run `Archive VTG images to Google Drive` from the Actions tab. Suggested first
+run:
+
+```text
+max_files: 100
+delete_local_after_upload: true
+dry_run: true
+```
+
+If the dry run candidate list looks right, run again with:
+
+```text
+max_files: 500
+delete_local_after_upload: true
+dry_run: false
+```
+
+`max_files` limits only new Drive uploads. Files already present in
+`drive_archive_manifest.json` can still be removed from the repository when
+`delete_local_after_upload` is true. Use `max_files: 0` only when a one-shot
+large migration is acceptable.
+
+The script follows the same live-image rule as `typhoon-guidance.js`: active
+window images and images from roughly the last 30 hours stay in the repository
+for raw GitHub delivery. Older PNGs are eligible for Drive archive.
