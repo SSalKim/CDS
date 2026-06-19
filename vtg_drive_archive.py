@@ -215,7 +215,7 @@ def collect_archive_candidates(
 
 
 def drive_url(file_id: str) -> str:
-    return f"https://drive.google.com/uc?export=view&id={file_id}"
+    return f"https://drive.usercontent.google.com/download?id={file_id}&export=view&authuser=0"
 
 
 def quote_drive_query(value: str) -> str:

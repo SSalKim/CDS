@@ -1468,7 +1468,10 @@ let archiveMap=new Map();
 if(Array.isArray(images)){
 images.forEach(item=>{
 let path=normalizeTyphoonAssetPath(item?.image_path || item?.imagePath || item?.path || '');
-let url=String(item?.url || item?.drive_url || item?.driveUrl || item?.thumbnail_url || '').trim();
+let url=normalizeTyphoonDriveArchiveUrl(
+item?.url || item?.drive_url || item?.driveUrl || item?.thumbnail_url || '',
+item?.file_id || item?.fileId || ''
+);
 if(path && url){
 archiveMap.set(path,url);
 }
@@ -1479,9 +1482,10 @@ return archiveMap;
 if(images && typeof images==='object'){
 Object.entries(images).forEach(([path,value])=>{
 let normalizedPath=normalizeTyphoonAssetPath(path);
+let fileId=typeof value==='string' ? '' : String(value?.file_id || value?.fileId || '').trim();
 let url=typeof value==='string'
-?value.trim()
-:String(value?.url || value?.drive_url || value?.driveUrl || value?.thumbnail_url || '').trim();
+?normalizeTyphoonDriveArchiveUrl(value)
+:normalizeTyphoonDriveArchiveUrl(value?.url || value?.drive_url || value?.driveUrl || value?.thumbnail_url || '',fileId);
 if(normalizedPath && url){
 archiveMap.set(normalizedPath,url);
 }
@@ -1489,6 +1493,35 @@ archiveMap.set(normalizedPath,url);
 }
 
 return archiveMap;
+}
+
+function normalizeTyphoonDriveArchiveUrl(value,fileId=''){
+let url=String(value || '').trim();
+let id=String(fileId || '').trim();
+if(!id && url){
+try{
+let parsed=new URL(url,window.location.href);
+let host=parsed.hostname.toLowerCase();
+if(host==='drive.google.com' || host==='drive.usercontent.google.com'){
+id=parsed.searchParams.get('id') || '';
+}
+}
+catch(error){
+id='';
+}
+}
+if(id && /^https:\/\/drive\.google\.com\/uc\?/i.test(url)){
+return typhoonDriveUserContentUrl(id);
+}
+if(!url && id){
+return typhoonDriveUserContentUrl(id);
+}
+return url;
+}
+
+function typhoonDriveUserContentUrl(fileId){
+let id=String(fileId || '').trim();
+return id ? `https://drive.usercontent.google.com/download?id=${encodeURIComponent(id)}&export=view&authuser=0` : '';
 }
 
 function normalizeTyphoonEntries(manifest,status){
