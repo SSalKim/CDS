@@ -47,21 +47,37 @@ Supported list form:
 
 ## GitHub Actions connection
 
+For a normal personal `My Drive` archive folder, use OAuth refresh-token auth.
+Service accounts do not have personal Drive storage quota, so they can upload
+only when the target is a Google Workspace shared drive or when domain-wide
+delegation is configured.
+
 1. Create a Google Cloud project.
 2. Enable the Google Drive API.
-3. Create a service account and JSON key.
-4. Create a Google Drive folder for the VTG archive.
-5. Share that folder with the service account email as Editor.
-6. Make the archive folder or uploaded files readable by anyone with the link.
-7. Add these GitHub repository secrets:
+3. Configure the OAuth consent screen.
+4. Create an OAuth Client ID for a desktop app.
+5. Use Google OAuth Playground with your OAuth Client ID and secret.
+6. Authorize this scope:
 
 ```text
-GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON
+https://www.googleapis.com/auth/drive
+```
+
+7. Exchange the authorization code for tokens and copy the refresh token.
+8. Create a Google Drive folder for the VTG archive.
+9. Make the archive folder or uploaded files readable by anyone with the link.
+10. Add these GitHub repository secrets:
+
+```text
+GOOGLE_DRIVE_CLIENT_ID
+GOOGLE_DRIVE_CLIENT_SECRET
+GOOGLE_DRIVE_REFRESH_TOKEN
 VTG_ARCHIVE_DRIVE_FOLDER_ID
 ```
 
-`GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON` should contain the full service account
-JSON. `VTG_ARCHIVE_DRIVE_FOLDER_ID` is the folder ID from the Drive URL.
+`VTG_ARCHIVE_DRIVE_FOLDER_ID` is the folder ID from the Drive URL. The workflow
+still accepts `GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON`, but that path is intended for
+shared drives rather than a personal My Drive folder.
 
 ## Recommended flow
 

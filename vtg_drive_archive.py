@@ -17,6 +17,7 @@ DEFAULT_ARCHIVE_MANIFEST = DEFAULT_OUTPUT_ROOT / "drive_archive_manifest.json"
 DRIVE_SCOPE = "https://www.googleapis.com/auth/drive"
 DRIVE_API = "https://www.googleapis.com/drive/v3"
 DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3"
+GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 DEFAULT_ACTIVE_RECENCY_HOURS = 30.0
 
 
@@ -222,32 +223,82 @@ def quote_drive_query(value: str) -> str:
 
 
 class DriveClient:
-    def __init__(self, service_account_info: dict):
-        from google.auth.transport.requests import Request as GoogleAuthRequest
-        from google.oauth2 import service_account
+    def __init__(self, auth_config: dict):
         import requests
 
-        self._request_class = GoogleAuthRequest
         self._requests = requests
-        self.credentials = service_account.Credentials.from_service_account_info(
-            service_account_info,
-            scopes=[DRIVE_SCOPE],
-        )
         self.session = requests.Session()
         self.folder_cache: dict[tuple[str, str], str] = {}
+        self.auth_mode = str(auth_config.get("mode") or "")
+        self.credentials = None
+        self._request_class = None
+        self.oauth_client_id = ""
+        self.oauth_client_secret = ""
+        self.oauth_refresh_token = ""
+        self.access_token_expires_at = 0.0
+
+        if self.auth_mode == "service_account":
+            from google.auth.transport.requests import Request as GoogleAuthRequest
+            from google.oauth2 import service_account
+
+            self._request_class = GoogleAuthRequest
+            self.credentials = service_account.Credentials.from_service_account_info(
+                auth_config["service_account_info"],
+                scopes=[DRIVE_SCOPE],
+            )
+        elif self.auth_mode == "oauth_refresh_token":
+            self.oauth_client_id = str(auth_config.get("client_id") or "").strip()
+            self.oauth_client_secret = str(auth_config.get("client_secret") or "").strip()
+            self.oauth_refresh_token = str(auth_config.get("refresh_token") or "").strip()
+            if not self.oauth_client_id or not self.oauth_client_secret or not self.oauth_refresh_token:
+                raise SystemExit("GOOGLE_DRIVE_CLIENT_ID, GOOGLE_DRIVE_CLIENT_SECRET, and GOOGLE_DRIVE_REFRESH_TOKEN are required for OAuth uploads.")
+        else:
+            raise SystemExit("Unknown Google Drive auth mode.")
+
         self.refresh()
 
     def refresh(self) -> None:
-        if not self.credentials.valid:
-            self.credentials.refresh(self._request_class())
-        self.session.headers.update({"Authorization": f"Bearer {self.credentials.token}"})
+        if self.auth_mode == "service_account":
+            if self.credentials is None or self._request_class is None:
+                raise RuntimeError("Service account credentials are not initialized.")
+            if not self.credentials.valid:
+                self.credentials.refresh(self._request_class())
+            self.session.headers.update({"Authorization": f"Bearer {self.credentials.token}"})
+            return
+
+        response = self._requests.post(
+            GOOGLE_TOKEN_URL,
+            data={
+                "client_id": self.oauth_client_id,
+                "client_secret": self.oauth_client_secret,
+                "refresh_token": self.oauth_refresh_token,
+                "grant_type": "refresh_token",
+            },
+            timeout=60,
+        )
+        if response.status_code >= 400:
+            raise RuntimeError(f"Google OAuth token refresh failed: HTTP {response.status_code} {response.text[:500]}")
+        payload = response.json()
+        access_token = str(payload.get("access_token") or "").strip()
+        if not access_token:
+            raise RuntimeError("Google OAuth token refresh did not return an access token.")
+        self.access_token_expires_at = time.time() + float(payload.get("expires_in") or 3600)
+        self.session.headers.update({"Authorization": f"Bearer {access_token}"})
+
+    def token_is_stale(self) -> bool:
+        if self.auth_mode == "service_account":
+            return bool(self.credentials and self.credentials.expired)
+        return time.time() >= self.access_token_expires_at - 60.0
 
     def request(self, method: str, url: str, **kwargs):
-        if self.credentials.expired:
+        if self.token_is_stale():
             self.refresh()
         response = self.session.request(method, url, timeout=120, **kwargs)
         if response.status_code >= 400:
-            raise RuntimeError(f"Drive API {method} {url} failed: HTTP {response.status_code} {response.text[:500]}")
+            details = response.text[:500]
+            if response.status_code == 403 and "Service Accounts do not have storage quota" in response.text:
+                details += " Use OAuth refresh-token auth for My Drive uploads, or upload to a Google Workspace shared drive."
+            raise RuntimeError(f"Drive API {method} {url} failed: HTTP {response.status_code} {details}")
         return response
 
     def list_files(self, query: str, *, fields: str) -> list[dict]:
@@ -367,8 +418,23 @@ def service_account_info_from_args(args: argparse.Namespace) -> dict:
         return json.loads(Path(args.service_account_json_file).read_text(encoding="utf-8"))
     raw = str(args.service_account_json or "").strip()
     if not raw:
-        raise SystemExit("GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON is required for uploads.")
+        raise SystemExit("Google Drive auth is required for uploads. Prefer OAuth secrets for My Drive, or provide GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON for shared drives.")
     return json.loads(raw)
+
+
+def drive_auth_config_from_args(args: argparse.Namespace) -> dict:
+    refresh_token = str(args.oauth_refresh_token or "").strip()
+    if refresh_token:
+        return {
+            "mode": "oauth_refresh_token",
+            "client_id": args.oauth_client_id,
+            "client_secret": args.oauth_client_secret,
+            "refresh_token": refresh_token,
+        }
+    return {
+        "mode": "service_account",
+        "service_account_info": service_account_info_from_args(args),
+    }
 
 
 def load_archive_manifest(path: Path) -> tuple[dict, dict[str, dict]]:
@@ -460,6 +526,7 @@ def run(args: argparse.Namespace) -> int:
         "already_archived_count": len(already_archived),
         "upload_candidate_count": len(upload_candidates),
         "upload_candidate_bytes": total_upload_bytes,
+        "auth_mode": "oauth_refresh_token" if str(args.oauth_refresh_token or "").strip() else "service_account",
         "delete_local_after_upload": bool(args.delete_local_after_upload),
         "dry_run": bool(args.dry_run),
     }, ensure_ascii=False, indent=2))
@@ -472,7 +539,7 @@ def run(args: argparse.Namespace) -> int:
     folder_id = str(args.drive_folder_id or "").strip()
     if not folder_id:
         raise SystemExit("VTG_ARCHIVE_DRIVE_FOLDER_ID is required for uploads.")
-    drive = DriveClient(service_account_info_from_args(args)) if upload_candidates else None
+    drive = DriveClient(drive_auth_config_from_args(args)) if upload_candidates else None
 
     for index, candidate in enumerate(upload_candidates, start=1):
         relative_parts = Path(candidate.image_path).parent.parts
@@ -529,6 +596,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--archive-manifest-path", type=Path, default=DEFAULT_ARCHIVE_MANIFEST)
     parser.add_argument("--service-account-json", default=os.getenv("GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON", ""))
     parser.add_argument("--service-account-json-file", type=Path, default=None)
+    parser.add_argument("--oauth-client-id", default=os.getenv("GOOGLE_DRIVE_CLIENT_ID", ""))
+    parser.add_argument("--oauth-client-secret", default=os.getenv("GOOGLE_DRIVE_CLIENT_SECRET", ""))
+    parser.add_argument("--oauth-refresh-token", default=os.getenv("GOOGLE_DRIVE_REFRESH_TOKEN", ""))
     parser.add_argument("--drive-folder-id", default=os.getenv("VTG_ARCHIVE_DRIVE_FOLDER_ID", ""))
     parser.add_argument("--changed-paths-file", type=Path, default=None)
     parser.add_argument("--max-files", type=int, default=0, help="Maximum new files to upload; 0 means no limit.")
