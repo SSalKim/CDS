@@ -1830,14 +1830,7 @@ if(!linked){
 return entry;
 }
 
-// Only the TD phase before the first named-TYP cycle is folded into the TYP
-// dropdown. A later weakening/redevelopment TD has its own TD number and must
-// remain a separate TD entry, even when a later TYP entry points back to that
-// TD number as its redevelopment source.
 let firstNamedTyp=typLinks.get(`${entry.year}|${Number(linked.typNumber)}`) || linked;
-if(String(entry.dataTime || '')>String(firstNamedTyp.dataTime || '')){
-return entry;
-}
 linked=firstNamedTyp;
 
 return applyTyphoonSortKey({
