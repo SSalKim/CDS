@@ -19,6 +19,16 @@ on:
         required: false
         default: false
         type: boolean
+      repair_permissions:
+        description: "Ensure archived Drive files are publicly readable by link"
+        required: false
+        default: false
+        type: boolean
+      repair_only:
+        description: "Repair permissions for existing archive files without uploading new images"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -40,6 +50,8 @@ jobs:
       MAX_FILES_INPUT: ${{ inputs.max_files }}
       DELETE_LOCAL_INPUT: ${{ inputs.delete_local_after_upload }}
       DRY_RUN_INPUT: ${{ inputs.dry_run }}
+      REPAIR_PERMISSIONS_INPUT: ${{ inputs.repair_permissions }}
+      REPAIR_ONLY_INPUT: ${{ inputs.repair_only }}
 
     steps:
       - name: Check out repository
@@ -97,6 +109,12 @@ jobs:
           fi
           if [ "$DRY_RUN_INPUT" = "true" ]; then
             args+=(--dry-run)
+          fi
+          if [ "$REPAIR_PERMISSIONS_INPUT" = "true" ]; then
+            args+=(--repair-permissions)
+          fi
+          if [ "$REPAIR_ONLY_INPUT" = "true" ]; then
+            args+=(--repair-only)
           fi
 
           python vtg_drive_archive.py "${args[@]}"

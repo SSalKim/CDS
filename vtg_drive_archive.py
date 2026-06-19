@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -412,6 +413,38 @@ class DriveClient:
             )
         return response.json()
 
+    def ensure_public_reader(self, file_id: str) -> bool:
+        clean_id = str(file_id or "").strip()
+        if not clean_id:
+            return False
+        encoded_id = quote(clean_id, safe="")
+        permissions = self.request(
+            "GET",
+            f"{DRIVE_API}/files/{encoded_id}/permissions",
+            params={
+                "fields": "permissions(id,type,role,deleted)",
+                "supportsAllDrives": "true",
+            },
+        ).json().get("permissions", [])
+        for permission in permissions:
+            if permission.get("type") != "anyone" or permission.get("deleted"):
+                continue
+            if permission.get("role") in {"reader", "commenter", "writer", "owner"}:
+                return False
+        self.request(
+            "POST",
+            f"{DRIVE_API}/files/{encoded_id}/permissions",
+            params={
+                "fields": "id",
+                "supportsAllDrives": "true",
+            },
+            json={
+                "type": "anyone",
+                "role": "reader",
+            },
+        )
+        return True
+
 
 def service_account_info_from_args(args: argparse.Namespace) -> dict:
     if args.service_account_json_file:
@@ -497,6 +530,8 @@ def build_archive_manifest(base_payload: dict, images: dict[str, dict], *, folde
 
 
 def run(args: argparse.Namespace) -> int:
+    if args.repair_only:
+        args.repair_permissions = True
     output_root = args.output_root
     manifest_path = args.manifest_path or output_root / "manifest.json"
     archive_manifest_path = args.archive_manifest_path
@@ -512,6 +547,8 @@ def run(args: argparse.Namespace) -> int:
     )
     already_archived = [item for item in candidates if archived_images.get(item.image_path, {}).get("file_id")]
     upload_candidates = [item for item in candidates if item not in already_archived]
+    if args.repair_only:
+        upload_candidates = []
     if args.max_files and args.max_files > 0:
         upload_candidates = upload_candidates[:args.max_files]
 
@@ -519,6 +556,7 @@ def run(args: argparse.Namespace) -> int:
     deleted_count = 0
     uploaded_count = 0
     reused_count = 0
+    public_permission_count = 0
     total_upload_bytes = sum(item.size for item in upload_candidates)
 
     print(json.dumps({
@@ -528,6 +566,8 @@ def run(args: argparse.Namespace) -> int:
         "upload_candidate_bytes": total_upload_bytes,
         "auth_mode": "oauth_refresh_token" if str(args.oauth_refresh_token or "").strip() else "service_account",
         "delete_local_after_upload": bool(args.delete_local_after_upload),
+        "repair_permissions": bool(args.repair_permissions),
+        "repair_only": bool(args.repair_only),
         "dry_run": bool(args.dry_run),
     }, ensure_ascii=False, indent=2))
 
@@ -539,7 +579,7 @@ def run(args: argparse.Namespace) -> int:
     folder_id = str(args.drive_folder_id or "").strip()
     if not folder_id:
         raise SystemExit("VTG_ARCHIVE_DRIVE_FOLDER_ID is required for uploads.")
-    drive = DriveClient(drive_auth_config_from_args(args)) if upload_candidates else None
+    drive = DriveClient(drive_auth_config_from_args(args)) if upload_candidates or args.repair_permissions else None
 
     for index, candidate in enumerate(upload_candidates, start=1):
         relative_parts = Path(candidate.image_path).parent.parts
@@ -555,12 +595,26 @@ def run(args: argparse.Namespace) -> int:
             file_payload = drive.upload_file(candidate, parent_id) if drive else {}
             uploaded_count += 1
             print(f"[{index}/{len(upload_candidates)}] Uploaded {candidate.image_path}")
+        if drive and file_payload.get("id"):
+            if drive.ensure_public_reader(str(file_payload["id"])):
+                public_permission_count += 1
         archived_images[candidate.image_path] = archive_entry(
             file_payload,
             candidate,
             archived_images.get(candidate.image_path),
         )
         time.sleep(max(0.0, args.upload_delay_seconds))
+
+    if args.repair_permissions and drive:
+        repaired_ids: set[str] = set()
+        for path, entry in sorted(archived_images.items()):
+            file_id = str(entry.get("file_id") or "").strip()
+            if not file_id or file_id in repaired_ids:
+                continue
+            repaired_ids.add(file_id)
+            if drive.ensure_public_reader(file_id):
+                public_permission_count += 1
+                print(f"Published Drive file for {path}")
 
     safe_to_delete = [
         item for item in candidates
@@ -582,6 +636,7 @@ def run(args: argparse.Namespace) -> int:
     print(json.dumps({
         "uploaded_count": uploaded_count,
         "reused_count": reused_count,
+        "public_permission_count": public_permission_count,
         "deleted_local_count": deleted_count,
         "archive_manifest": relative_asset_path(archive_manifest_path),
         "changed_path_count": len(changed_paths),
@@ -605,6 +660,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--active-recency-hours", type=float, default=DEFAULT_ACTIVE_RECENCY_HOURS)
     parser.add_argument("--upload-delay-seconds", type=float, default=0.0)
     parser.add_argument("--delete-local-after-upload", action="store_true")
+    parser.add_argument("--repair-permissions", action="store_true", help="Ensure existing Drive archive files are readable by anyone with the link.")
+    parser.add_argument("--repair-only", action="store_true", help="Skip new uploads and only repair permissions for files already listed in the archive manifest.")
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
 

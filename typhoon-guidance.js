@@ -596,6 +596,11 @@ root:null,
 manifest:null,
 manifestBaseUrl:'',
 driveArchiveImages:new Map(),
+driveArchiveLoaded:false,
+driveArchiveLoadPromise:null,
+status:null,
+yearIndexes:new Map(),
+stormManifestCache:new Map(),
 entries:[],
 years:[],
 storms:[],
@@ -609,7 +614,8 @@ keyboardBound:false,
 imageCache:new Map(),
 imageRequestSeq:0,
 modelDetailLastFocus:null,
-typImpactByYear:new Map()
+typImpactByYear:new Map(),
+selectionLoadSeq:0
 };
 
 function openTyphoonGuidancePage(){
@@ -694,20 +700,12 @@ controls.className='typhoon-select-controls';
 let yearSelect=document.createElement('select');
 yearSelect.className='typhoon-year-select';
 yearSelect.dataset.role='yearSelect';
-yearSelect.onchange=event=>{
-typhoonState.selectedYear=event.target.value;
-selectDefaultStormForYear();
-renderTyphoonManifest();
-};
+yearSelect.onchange=event=>handleTyphoonYearChange(event.target.value);
 
 let stormSelect=document.createElement('select');
 stormSelect.className='typhoon-storm-select';
 stormSelect.dataset.role='stormSelect';
-stormSelect.onchange=event=>{
-typhoonState.selectedStormKey=event.target.value;
-selectLatestSlotForStorm();
-renderTyphoonManifest();
-};
+stormSelect.onchange=event=>handleTyphoonStormChange(event.target.value);
 
 controls.appendChild(yearSelect);
 controls.appendChild(stormSelect);
@@ -1349,20 +1347,34 @@ throw manifestError || new Error('HTTP 404');
 
 typhoonState.manifest=manifest;
 typhoonState.manifestBaseUrl=manifestResult?.baseUrl || '';
-let inventory=await loadTyphoonSplitInventory(manifest || {});
-typhoonState.entries=normalizeTyphoonEntries({...manifest,inventory},status);
-typhoonState.driveArchiveImages=await loadTyphoonDriveArchiveImages(typhoonState.manifestBaseUrl);
-await loadTyphoonImpactMapsForYears([...new Set(typhoonState.entries.map(entry=>entry.year).filter(Boolean))]);
-pruneTyphoonImageCache();
+typhoonState.status=status;
+typhoonState.yearIndexes=new Map();
+typhoonState.stormManifestCache=new Map();
+typhoonState.driveArchiveImages=new Map();
+typhoonState.driveArchiveLoaded=false;
+typhoonState.driveArchiveLoadPromise=null;
+rebuildTyphoonEntries();
 syncTyphoonSelection();
+await ensureTyphoonYearIndex(typhoonState.selectedYear);
+await loadTyphoonImpactMapsForYears([typhoonState.selectedYear]);
+syncTyphoonSelection();
+await ensureSelectedTyphoonStormManifest();
+rebuildTyphoonEntries();
+syncTyphoonSelection();
+pruneTyphoonImageCache();
 renderTyphoonManifest();
 }
 catch(error){
 typhoonState.manifest=null;
 typhoonState.manifestBaseUrl='';
+typhoonState.status=null;
 typhoonState.entries=[];
+typhoonState.yearIndexes=new Map();
+typhoonState.stormManifestCache=new Map();
 typhoonState.typImpactByYear=new Map();
 typhoonState.driveArchiveImages=new Map();
+typhoonState.driveArchiveLoaded=false;
+typhoonState.driveArchiveLoadPromise=null;
 syncTyphoonSelection();
 renderTyphoonEmpty(`자료 없음 (${error.message})`);
 }
@@ -1371,37 +1383,188 @@ root.classList.remove('typhoon-loading-state');
 }
 }
 
-async function loadTyphoonSplitInventory(manifest){
-if(Array.isArray(manifest?.inventory) && manifest.inventory.length){
-return manifest.inventory;
+async function handleTyphoonYearChange(year){
+let root=typhoonState.root;
+let requestId=++typhoonState.selectionLoadSeq;
+typhoonState.selectedYear=String(year || '');
+typhoonState.selectedStormKey='';
+typhoonState.selectedSlotIndex=0;
+root?.classList.add('typhoon-loading-state');
+try{
+await ensureTyphoonYearIndex(typhoonState.selectedYear);
+await loadTyphoonImpactMapsForYears([typhoonState.selectedYear]);
+syncTyphoonSelection();
+await ensureSelectedTyphoonStormManifest();
+if(requestId!==typhoonState.selectionLoadSeq){
+return;
+}
+rebuildTyphoonEntries();
+syncTyphoonSelection();
+pruneTyphoonImageCache();
+renderTyphoonManifest();
+}
+finally{
+root?.classList.remove('typhoon-loading-state');
+}
 }
 
-let indexes=Array.isArray(manifest?.manifest_indexes) ? manifest.manifest_indexes : [];
-if(!indexes.length){
+async function handleTyphoonStormChange(stormKey){
+let root=typhoonState.root;
+let requestId=++typhoonState.selectionLoadSeq;
+typhoonState.selectedStormKey=String(stormKey || '');
+typhoonState.selectedSlotIndex=0;
+root?.classList.add('typhoon-loading-state');
+try{
+await ensureSelectedTyphoonStormManifest();
+if(requestId!==typhoonState.selectionLoadSeq){
+return;
+}
+rebuildTyphoonEntries();
+selectLatestSlotForStorm();
+pruneTyphoonImageCache();
+renderTyphoonManifest();
+}
+finally{
+root?.classList.remove('typhoon-loading-state');
+}
+}
+
+function rebuildTyphoonEntries(){
+let loadedInventory=[];
+typhoonState.stormManifestCache.forEach(payload=>{
+if(Array.isArray(payload?.inventory)){
+loadedInventory.push(...payload.inventory);
+}
+});
+let rootRuns=Array.isArray(typhoonState.manifest?.runs) ? typhoonState.manifest.runs : [];
+let rootInventory=Array.isArray(typhoonState.manifest?.inventory) ? typhoonState.manifest.inventory : [];
+typhoonState.entries=normalizeTyphoonEntries({
+...typhoonState.manifest,
+inventory:[],
+runs:[...rootInventory,...rootRuns,...loadedInventory]
+},typhoonState.status);
+}
+
+function typhoonManifestYears(){
+let years=new Set();
+let indexes=Array.isArray(typhoonState.manifest?.manifest_indexes) ? typhoonState.manifest.manifest_indexes : [];
+indexes.forEach(item=>{
+let year=String(item?.year || '').trim();
+if(year){
+years.add(year);
+}
+});
+typhoonState.entries.forEach(entry=>{
+if(entry.year){
+years.add(entry.year);
+}
+});
+return [...years].sort((a,b)=>b.localeCompare(a));
+}
+
+async function ensureTyphoonYearIndex(year){
+let key=String(year || '').trim();
+if(!key || typhoonState.yearIndexes.has(key)){
+return typhoonState.yearIndexes.get(key) || null;
+}
+let indexes=Array.isArray(typhoonState.manifest?.manifest_indexes) ? typhoonState.manifest.manifest_indexes : [];
+let item=indexes.find(index=>String(index?.year || '').trim()===key);
+let path=String(item?.path || '').trim();
+if(!path){
+typhoonState.yearIndexes.set(key,null);
+return null;
+}
+try{
+let payload=await fetchTyphoonJson(path,typhoonState.manifestBaseUrl);
+typhoonState.yearIndexes.set(key,payload);
+return payload;
+}
+catch(error){
+console.warn(`?쒗뭾 year index 濡쒕뱶 ?ㅽ뙣: ${path}`,error);
+typhoonState.yearIndexes.set(key,null);
+return null;
+}
+}
+
+function typhoonYearSummaryEntries(year){
+let key=String(year || '').trim();
+let indexPayload=typhoonState.yearIndexes.get(key);
+let systems=Array.isArray(indexPayload?.systems) ? indexPayload.systems : [];
+if(!systems.length){
 return [];
 }
+let entries=systems
+.map((system,index)=>summaryEntryFromYearSystem(system,index))
+.filter(Boolean);
+return dedupeLinkedTyphoonEntries(linkTdEntriesToTyphoons(entries))
+.sort((a,b)=>a.sortKey.localeCompare(b.sortKey));
+}
 
-let yearIndexes=await fetchTyphoonJsonBatch(
-indexes
-.map(item=>String(item?.path || '').trim())
-.filter(Boolean),
-8,
-typhoonState.manifestBaseUrl
-);
+function summaryEntryFromYearSystem(system,index=0){
+let year=String(system?.year || '').trim();
+let stage=String(system?.stage || 'TYP').toUpperCase();
+let typNumber=Number(system?.typ_number || 0);
+let typName=normalizeTyphoonName(system?.typ_name || 'NONAME');
+let typNameKo=system?.typ_name_ko || koreanTyphoonName(typName);
+let dataTime=String(system?.latest_data_time || '').trim();
+if(!year || !typNumber || !dataTime){
+return null;
+}
+return applyTyphoonSortKey({
+index,
+entry:system,
+metadata:{},
+job:system,
+windowInfo:{},
+imagePath:'',
+dataTime,
+generatedAt:'',
+fcstHours:typhoonState.selectedFcstHours || 120,
+year,
+stage,
+typNumber,
+tdNumber:system?.linked_td_number || null,
+linkedTypNumber:system?.linked_typ_number || null,
+typNameKo,
+typName,
+stormKey:[year,stage,typNumber,typName].join('|'),
+manifestPath:String(system?.manifest_path || '').trim(),
+summaryOnly:true
+});
+}
 
-let stormPaths=[];
-yearIndexes.forEach(indexPayload=>{
-let systems=Array.isArray(indexPayload?.systems) ? indexPayload.systems : [];
-systems.forEach(system=>{
-let path=String(system?.manifest_path || '').trim();
-if(path){
-stormPaths.push(path);
+async function ensureSelectedTyphoonStormManifest(){
+let paths=manifestPathsForStormKey(typhoonState.selectedYear,typhoonState.selectedStormKey);
+let missing=paths.filter(path=>path && !typhoonState.stormManifestCache.has(path));
+if(!missing.length){
+return;
+}
+await Promise.all(missing.map(async path=>{
+try{
+let payload=await fetchTyphoonJson(path,typhoonState.manifestBaseUrl);
+typhoonState.stormManifestCache.set(path,payload);
+}
+catch(error){
+console.warn(`?쒗뭾 storm manifest 濡쒕뱶 ?ㅽ뙣: ${path}`,error);
+}
+}));
+}
+
+function manifestPathsForStormKey(year,stormKey){
+let paths=new Set();
+typhoonYearSummaryEntries(year).forEach(entry=>{
+if(entry.stormKey===stormKey && entry.manifestPath){
+paths.add(entry.manifestPath);
 }
 });
+if(!paths.size){
+typhoonState.entries.forEach(entry=>{
+if(entry.year===String(year || '') && entry.stormKey===stormKey && entry.manifestPath){
+paths.add(entry.manifestPath);
+}
 });
-
-let stormManifests=await fetchTyphoonJsonBatch([...new Set(stormPaths)],12,typhoonState.manifestBaseUrl);
-return stormManifests.flatMap(payload=>Array.isArray(payload?.inventory) ? payload.inventory : []);
+}
+return [...paths];
 }
 
 async function fetchTyphoonJsonBatch(paths,concurrency=8,baseUrl=''){
@@ -1459,6 +1622,37 @@ return normalizeTyphoonDriveArchiveImages(result.payload);
 catch(error){
 return new Map();
 }
+}
+
+async function ensureTyphoonDriveArchiveImages(){
+if(typhoonState.driveArchiveLoaded){
+return typhoonState.driveArchiveImages;
+}
+if(!typhoonState.driveArchiveLoadPromise){
+typhoonState.driveArchiveLoadPromise=loadTyphoonDriveArchiveImages(typhoonState.manifestBaseUrl)
+.then(images=>{
+typhoonState.driveArchiveImages=images;
+typhoonState.driveArchiveLoaded=true;
+return images;
+})
+.catch(error=>{
+console.warn('?쒗뭾 Drive archive manifest 濡쒕뱶 ?ㅽ뙣',error);
+typhoonState.driveArchiveImages=new Map();
+typhoonState.driveArchiveLoaded=true;
+return typhoonState.driveArchiveImages;
+})
+.finally(()=>{
+typhoonState.driveArchiveLoadPromise=null;
+});
+}
+return typhoonState.driveArchiveLoadPromise;
+}
+
+async function ensureTyphoonDriveArchiveImagesForRun(run){
+if(!run?.imagePath || shouldUseRawTyphoonImage(run) || typhoonState.driveArchiveImages.has(run.imagePath)){
+return;
+}
+await ensureTyphoonDriveArchiveImages();
 }
 
 function normalizeTyphoonDriveArchiveImages(payload){
@@ -1707,7 +1901,7 @@ return entries;
 }
 
 function syncTyphoonSelection(){
-typhoonState.years=[...new Set(typhoonState.entries.map(entry=>entry.year))].sort((a,b)=>b.localeCompare(a));
+typhoonState.years=typhoonManifestYears();
 
 if(!typhoonState.years.includes(typhoonState.selectedYear)){
 typhoonState.selectedYear=typhoonState.years[0] || '';
@@ -1807,7 +2001,9 @@ return TYPHOON_IMPACT_EFF_VALUES.has(typhoonImpactEffectForEntry(entry));
 function buildTyphoonStormsForYear(year){
 let byKey=new Map();
 let activeWindowTimes=typhoonActiveWindowDataTimes();
-typhoonState.entries
+let summaryEntries=typhoonYearSummaryEntries(year);
+let sourceEntries=summaryEntries.length ? summaryEntries : typhoonState.entries.filter(entry=>entry.year===year);
+sourceEntries
 .filter(entry=>entry.year===year)
 .forEach(entry=>{
 let isNamedTypEntry=entry.stage!=='TD' && entry.originalStage!=='TD';
@@ -1823,10 +2019,14 @@ latest:entry.dataTime,
 typFirst:isNamedTypEntry ? entry.dataTime : '',
 active:isActiveTyphoonStormEntry(entry,activeWindowTimes),
 impactEff,
-impact:TYPHOON_IMPACT_EFF_VALUES.has(impactEff)
+impact:TYPHOON_IMPACT_EFF_VALUES.has(impactEff),
+manifestPaths:new Set()
 });
 }
 let storm=byKey.get(entry.stormKey);
+if(entry.manifestPath){
+storm.manifestPaths.add(entry.manifestPath);
+}
 if(entry.stage!=='TD'){
 storm.stage=entry.stage;
 }
@@ -1850,6 +2050,7 @@ storm.impact=true;
 return [...byKey.values()]
 .map(storm=>({
 ...storm,
+manifestPaths:[...storm.manifestPaths],
 sortTime:(storm.stage==='TD' ? storm.first : (storm.typFirst || storm.first)) || storm.first
 }))
 .sort((a,b)=>
@@ -2418,6 +2619,12 @@ let requestId=++typhoonState.imageRequestSeq;
 
 if(!run.imagePath){
 renderTyphoonMissingSlot(run.dataTime);
+return;
+}
+
+await ensureTyphoonDriveArchiveImagesForRun(run);
+
+if(requestId!==typhoonState.imageRequestSeq){
 return;
 }
 
