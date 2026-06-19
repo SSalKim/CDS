@@ -318,6 +318,8 @@ for row in MODEL_SOURCES:
             alias_ids.extend(["ECM_SPR_E"])
         if source == "APIHUB" and model_id == "UM_KEPS":
             alias_ids.extend(["KEPS"])
+        if source == "NOAA" and model_id == "UKM":
+            alias_ids.extend(["EGRR"])
         if source == "APIHUB" and model_id == "GFS":
             alias_ids.extend(["GFS_TIGGE", "NCEP_TIGGE"])
         if source == "APIHUB" and model_id == "CMC":
@@ -337,7 +339,7 @@ for row in MODEL_SOURCES:
             alias_ids.extend(["GPUM"])
 
         if source == "APIHUB" and model_id == "ECMWF_AIFS":
-            alias_ids.extend(["ECMF_AIFS", "AIFS_ECM"])
+            alias_ids.extend(["ECMF_AIFS"])
 
 
         for alias_priority, alias_id in enumerate(alias_ids, start=1):
