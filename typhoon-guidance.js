@@ -1,7 +1,11 @@
 const TYPHOON_MANIFEST_PATH='VTG_IMG/manifest.json';
 const TYPHOON_STATUS_PATH='VTG_IMG/vtg_auto_status.json';
+const TYPHOON_DRIVE_ARCHIVE_MANIFEST_PATH='VTG_IMG/drive_archive_manifest.json';
 const TYPHOON_TYP_LIST_CACHE_PREFIX='VTG_IMG/kma_apihub_cache/typ_lst_';
 const TYPHOON_TYP_LIST_CACHE_SUFFIX='.json';
+const TYPHOON_RAW_REPOSITORY_BASE_URL=normalizeTyphoonBaseUrl(globalThis.CDS_TYPOON_RAW_REPOSITORY_BASE_URL || 'https://raw.githubusercontent.com/SSalKim/CDS/main/');
+const TYPHOON_LIVE_DATA_BASE_URL=normalizeTyphoonBaseUrl(globalThis.CDS_TYPOON_LIVE_DATA_BASE_URL || TYPHOON_RAW_REPOSITORY_BASE_URL);
+const TYPHOON_ACTIVE_IMAGE_BASE_URL=normalizeTyphoonBaseUrl(globalThis.CDS_TYPOON_ACTIVE_IMAGE_BASE_URL || TYPHOON_RAW_REPOSITORY_BASE_URL);
 const TYPHOON_IMPACT_EFF_VALUES=new Set(['1','2','3']);
 const TYPHOON_IMPACT_OPTION_BG='#dff5ff';
 const TYPHOON_IMPACT_OPTION_COLOR='#0f3d64';
@@ -590,6 +594,8 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
 const typhoonState={
 root:null,
 manifest:null,
+manifestBaseUrl:'',
+driveArchiveImages:new Map(),
 entries:[],
 years:[],
 storms:[],
@@ -1316,16 +1322,22 @@ try{
 let manifest=null;
 let status=null;
 let manifestError=null;
+let manifestResult=null;
 
 try{
-manifest=await fetchTyphoonJson(TYPHOON_MANIFEST_PATH);
+manifestResult=await fetchTyphoonJsonWithFallback(TYPHOON_MANIFEST_PATH);
+manifest=manifestResult.payload;
 }
 catch(error){
 manifestError=error;
 }
 
 try{
-status=await fetchTyphoonJson(TYPHOON_STATUS_PATH);
+let statusResult=await fetchTyphoonJsonWithFallback(
+TYPHOON_STATUS_PATH,
+typhoonDataBaseUrls(manifestResult?.baseUrl)
+);
+status=statusResult.payload;
 }
 catch(error){
 status=null;
@@ -1336,8 +1348,10 @@ throw manifestError || new Error('HTTP 404');
 }
 
 typhoonState.manifest=manifest;
+typhoonState.manifestBaseUrl=manifestResult?.baseUrl || '';
 let inventory=await loadTyphoonSplitInventory(manifest || {});
 typhoonState.entries=normalizeTyphoonEntries({...manifest,inventory},status);
+typhoonState.driveArchiveImages=await loadTyphoonDriveArchiveImages(typhoonState.manifestBaseUrl);
 await loadTyphoonImpactMapsForYears([...new Set(typhoonState.entries.map(entry=>entry.year).filter(Boolean))]);
 pruneTyphoonImageCache();
 syncTyphoonSelection();
@@ -1345,8 +1359,10 @@ renderTyphoonManifest();
 }
 catch(error){
 typhoonState.manifest=null;
+typhoonState.manifestBaseUrl='';
 typhoonState.entries=[];
 typhoonState.typImpactByYear=new Map();
+typhoonState.driveArchiveImages=new Map();
 syncTyphoonSelection();
 renderTyphoonEmpty(`자료 없음 (${error.message})`);
 }
@@ -1369,7 +1385,8 @@ let yearIndexes=await fetchTyphoonJsonBatch(
 indexes
 .map(item=>String(item?.path || '').trim())
 .filter(Boolean),
-8
+8,
+typhoonState.manifestBaseUrl
 );
 
 let stormPaths=[];
@@ -1383,18 +1400,18 @@ stormPaths.push(path);
 });
 });
 
-let stormManifests=await fetchTyphoonJsonBatch([...new Set(stormPaths)],12);
+let stormManifests=await fetchTyphoonJsonBatch([...new Set(stormPaths)],12,typhoonState.manifestBaseUrl);
 return stormManifests.flatMap(payload=>Array.isArray(payload?.inventory) ? payload.inventory : []);
 }
 
-async function fetchTyphoonJsonBatch(paths,concurrency=8){
+async function fetchTyphoonJsonBatch(paths,concurrency=8,baseUrl=''){
 let results=[];
 let index=0;
 let workers=Array.from({length:Math.max(1,Math.min(concurrency,paths.length || 1))},async ()=>{
 while(index<paths.length){
 let current=index++;
 try{
-results[current]=await fetchTyphoonJson(paths[current]);
+results[current]=await fetchTyphoonJson(paths[current],baseUrl);
 }
 catch(error){
 console.warn(`태풍 manifest 로드 실패: ${paths[current]}`,error);
@@ -1406,12 +1423,72 @@ await Promise.all(workers);
 return results.filter(Boolean);
 }
 
-async function fetchTyphoonJson(path){
-let response=await fetch(`${path}?fresh=${Date.now()}`,{cache:'no-store'});
+async function fetchTyphoonJson(path,baseUrl=''){
+let url=typhoonBuildUrl(path,baseUrl);
+let response=await fetch(`${url}${url.includes('?') ? '&' : '?'}fresh=${Date.now()}`,{cache:'no-store'});
 if(!response.ok){
 throw new Error(`HTTP ${response.status}`);
 }
 return response.json();
+}
+
+async function fetchTyphoonJsonWithFallback(path,baseUrls=typhoonDataBaseUrls()){
+let lastError=null;
+for(let baseUrl of baseUrls){
+try{
+return {
+payload:await fetchTyphoonJson(path,baseUrl),
+baseUrl
+};
+}
+catch(error){
+lastError=error;
+}
+}
+throw lastError || new Error('HTTP 404');
+}
+
+async function loadTyphoonDriveArchiveImages(baseUrl=''){
+try{
+let result=await fetchTyphoonJsonWithFallback(
+TYPHOON_DRIVE_ARCHIVE_MANIFEST_PATH,
+typhoonDataBaseUrls(baseUrl)
+);
+return normalizeTyphoonDriveArchiveImages(result.payload);
+}
+catch(error){
+return new Map();
+}
+}
+
+function normalizeTyphoonDriveArchiveImages(payload){
+let images=payload?.images || payload?.entries || {};
+let archiveMap=new Map();
+
+if(Array.isArray(images)){
+images.forEach(item=>{
+let path=normalizeTyphoonAssetPath(item?.image_path || item?.imagePath || item?.path || '');
+let url=String(item?.url || item?.drive_url || item?.driveUrl || item?.thumbnail_url || '').trim();
+if(path && url){
+archiveMap.set(path,url);
+}
+});
+return archiveMap;
+}
+
+if(images && typeof images==='object'){
+Object.entries(images).forEach(([path,value])=>{
+let normalizedPath=normalizeTyphoonAssetPath(path);
+let url=typeof value==='string'
+?value.trim()
+:String(value?.url || value?.drive_url || value?.driveUrl || value?.thumbnail_url || '').trim();
+if(normalizedPath && url){
+archiveMap.set(normalizedPath,url);
+}
+});
+}
+
+return archiveMap;
 }
 
 function normalizeTyphoonEntries(manifest,status){
@@ -1629,7 +1706,7 @@ typhoonState.typImpactByYear=nextMap;
 async function fetchTyphoonImpactMapForYear(year){
 let path=`${TYPHOON_TYP_LIST_CACHE_PREFIX}${year}${TYPHOON_TYP_LIST_CACHE_SUFFIX}`;
 try{
-let payload=await fetchTyphoonJson(path);
+let payload=await fetchTyphoonJson(path,typhoonState.manifestBaseUrl);
 let rows=Array.isArray(payload?.rows) ? payload.rows : [];
 let result=new Map();
 rows.forEach(row=>{
@@ -2154,8 +2231,19 @@ return '';
 }
 
 let version=run.generatedAt || run.metadata?.generated_at_utc || typhoonState.manifest?.updated_at_utc || '';
-return cacheBustedTyphoonPath(run.imagePath,version);
+let archiveUrl=shouldUseRawTyphoonImage(run) ? '' : typhoonState.driveArchiveImages.get(run.imagePath);
+if(archiveUrl){
+return archiveUrl;
+}
+let imagePath=shouldUseRawTyphoonImage(run)
+?typhoonBuildUrl(run.imagePath,TYPHOON_ACTIVE_IMAGE_BASE_URL)
+:run.imagePath;
+return cacheBustedTyphoonPath(imagePath,version);
 
+}
+
+function shouldUseRawTyphoonImage(run){
+return Boolean(TYPHOON_ACTIVE_IMAGE_BASE_URL && isActiveTyphoonStormEntry(run));
 }
 
 function configureTyphoonImageElement(image,url){
@@ -2426,12 +2514,42 @@ return `0/${target}`;
 return `${count}/${target}`;
 }
 
+function normalizeTyphoonBaseUrl(value){
+let text=String(value || '').trim();
+return text ? text.replace(/\/+$/,'/') : '';
+}
+
+function isAbsoluteTyphoonUrl(value){
+return /^https?:\/\//i.test(String(value || ''));
+}
+
+function typhoonBuildUrl(path,baseUrl=''){
+let text=String(path || '').trim();
+if(!text || isAbsoluteTyphoonUrl(text)){
+return text;
+}
+let normalizedPath=text.replace(/\\/g,'/').replace(/^\/+/,'');
+let normalizedBase=normalizeTyphoonBaseUrl(baseUrl);
+return normalizedBase ? `${normalizedBase}${normalizedPath}` : normalizedPath;
+}
+
+function typhoonDataBaseUrls(preferredBaseUrl=''){
+let urls=[];
+[preferredBaseUrl,TYPHOON_LIVE_DATA_BASE_URL,''].forEach(baseUrl=>{
+let normalizedBase=normalizeTyphoonBaseUrl(baseUrl);
+if(!urls.includes(normalizedBase)){
+urls.push(normalizedBase);
+}
+});
+return urls;
+}
+
 function normalizeTyphoonAssetPath(value){
 let path=String(value || '').replace(/\\/g,'/');
 if(!path){
 return '';
 }
-if(/^https?:\/\//i.test(path)){
+if(isAbsoluteTyphoonUrl(path)){
 return path;
 }
 let marker='VTG_IMG/';
