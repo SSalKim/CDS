@@ -31,7 +31,7 @@ ACTIVE_MODEL_TARGET = 36
 DEFAULT_ATCF_SEARCH_POSITIVE_RADIUS = 10
 DEFAULT_ATCF_SEARCH_NEGATIVE_RADIUS = 5
 DEFAULT_ATCF_POSITION_MAX_DISTANCE_KM = 600.0
-DEFAULT_ATCF_POSITION_MIN_DISTANCE_GAP_KM = 250.0
+DEFAULT_ATCF_POSITION_MIN_DISTANCE_GAP_KM = 100.0
 # Rare cross-basin systems or known KMA/JTWC mapping exceptions.
 # User manual map values still override these defaults.
 BUILTIN_MANUAL_ATCF_MAP = {
@@ -1083,11 +1083,11 @@ def find_atcf_position_match(
                 (item for item in candidates if item.atcf_id.lower() == preferred_id),
                 None,
             )
+            ambiguous_candidates = [
+                item for item in candidates
+                if atcf_match_distance(item) - best_distance < min_distance_gap_km
+            ]
             if preferred_candidate is not None:
-                ambiguous_candidates = [
-                    item for item in candidates
-                    if atcf_match_distance(item) - best_distance < min_distance_gap_km
-                ]
                 nonpreferred_regular_candidates = [
                     item for item in ambiguous_candidates
                     if item.atcf_id.lower() != preferred_id and not is_invest_atcf_id(item.atcf_id)
@@ -1115,6 +1115,41 @@ def find_atcf_position_match(
                         reason=f"selected_preferred_{preferred_candidate.atcf_id}",
                     )
                     return preferred_candidate
+
+            regular_candidates = [
+                item for item in ambiguous_candidates
+                if not is_invest_atcf_id(item.atcf_id)
+            ]
+            invest_candidates = [
+                item for item in ambiguous_candidates
+                if is_invest_atcf_id(item.atcf_id)
+            ]
+            if len(regular_candidates) == 1 and invest_candidates:
+                selected_regular = regular_candidates[0]
+                competitors = ", ".join(
+                    f"{item.atcf_id}:{item.distance_km:.1f}km"
+                    for item in ambiguous_candidates
+                    if item.atcf_id.lower() != selected_regular.atcf_id.lower()
+                    and item.distance_km is not None
+                )
+                print(
+                    "ATCF position ambiguity resolved by sole regular ID: "
+                    f"{selected_regular.atcf_id} ({selected_regular.distance_km:.1f} km)"
+                    + (f" over {competitors}." if competitors else ".")
+                )
+                log_atcf_position_diagnostics(
+                    data_time=data_time,
+                    kma_point=kma_point,
+                    ordered_ids=ordered_ids,
+                    all_matches=all_matches,
+                    candidates=candidates,
+                    max_distance_km=max_distance_km,
+                    min_distance_gap_km=min_distance_gap_km,
+                    preferred_atcf_id=preferred_atcf_id,
+                    reason=f"selected_regular_{selected_regular.atcf_id}",
+                )
+                return selected_regular
+
             log_atcf_position_diagnostics(
                 data_time=data_time,
                 kma_point=kma_point,
