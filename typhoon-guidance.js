@@ -1317,6 +1317,9 @@ return;
 root.classList.add('typhoon-loading-state');
 
 try{
+let previousYear=typhoonState.selectedYear;
+let previousStormKey=typhoonState.selectedStormKey;
+let previousDataTime=getSelectedTyphoonDataTime();
 let manifest=null;
 let status=null;
 let manifestError=null;
@@ -1354,13 +1357,13 @@ typhoonState.driveArchiveImages=new Map();
 typhoonState.driveArchiveLoaded=false;
 typhoonState.driveArchiveLoadPromise=null;
 rebuildTyphoonEntries();
-syncTyphoonSelection();
+syncTyphoonSelection({preferredYear:previousYear,preferredStormKey:previousStormKey,preferredDataTime:previousDataTime});
 await ensureTyphoonYearIndex(typhoonState.selectedYear);
 await loadTyphoonImpactMapsForYears([typhoonState.selectedYear]);
-syncTyphoonSelection();
+syncTyphoonSelection({preferredYear:previousYear,preferredStormKey:previousStormKey,preferredDataTime:previousDataTime});
 await ensureSelectedTyphoonStormManifest();
 rebuildTyphoonEntries();
-syncTyphoonSelection();
+syncTyphoonSelection({preferredYear:previousYear,preferredStormKey:previousStormKey,preferredDataTime:previousDataTime});
 pruneTyphoonImageCache();
 renderTyphoonManifest();
 }
@@ -1908,22 +1911,36 @@ result:{status:record.last_status || 'status',metadata}
 return entries;
 }
 
-function syncTyphoonSelection(){
+function syncTyphoonSelection({preferredYear='',preferredStormKey='',preferredDataTime=''}={}){
 typhoonState.years=typhoonManifestYears();
 
-if(!typhoonState.years.includes(typhoonState.selectedYear)){
+let preferredYearText=String(preferredYear || '');
+if(preferredYearText && typhoonState.years.includes(preferredYearText)){
+typhoonState.selectedYear=preferredYearText;
+}
+else if(!typhoonState.years.includes(typhoonState.selectedYear)){
 typhoonState.selectedYear=typhoonState.years[0] || '';
 }
 
 typhoonState.storms=buildTyphoonStormsForYear(typhoonState.selectedYear);
 
-if(!typhoonState.storms.some(storm=>storm.key===typhoonState.selectedStormKey)){
+let preferredStormText=String(preferredStormKey || '');
+if(preferredStormText && typhoonState.storms.some(storm=>storm.key===preferredStormText)){
+typhoonState.selectedStormKey=preferredStormText;
+}
+else if(!typhoonState.storms.some(storm=>storm.key===typhoonState.selectedStormKey)){
 selectDefaultStormForYear();
 }
 
 typhoonState.slots=buildTyphoonSlotsForStorm(typhoonState.selectedStormKey);
 
-if(typhoonState.selectedSlotIndex<0 || typhoonState.selectedSlotIndex>=typhoonState.slots.length){
+let preferredSlotIndex=preferredDataTime
+?typhoonState.slots.findIndex(slot=>slot.dataTime===preferredDataTime && slot.entry)
+:-1;
+if(preferredSlotIndex>=0){
+typhoonState.selectedSlotIndex=preferredSlotIndex;
+}
+else if(typhoonState.selectedSlotIndex<0 || typhoonState.selectedSlotIndex>=typhoonState.slots.length){
 selectLatestSlotForStorm();
 }
 }
