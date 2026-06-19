@@ -2503,8 +2503,8 @@ function getTyphoonDriveImageUrls(fileId,archiveUrl=''){
 let id=String(fileId || '').trim();
 let urls=[];
 if(id){
-urls.push(typhoonDriveGoogleusercontentUrl(id));
 urls.push(typhoonDriveThumbnailUrl(id));
+urls.push(typhoonDriveGoogleusercontentUrl(id));
 }
 if(archiveUrl){
 urls.push(archiveUrl);
