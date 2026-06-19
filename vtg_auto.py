@@ -2050,6 +2050,44 @@ def metadata_output_image_exists(output_root: Path, metadata: dict) -> bool:
     return fallback.exists()
 
 
+def metadata_int(value) -> int | None:
+    try:
+        number = int(value)
+    except (TypeError, ValueError):
+        return None
+    return number if number > 0 else None
+
+
+def track_history_paths_from_metadata(output_root: Path, metadata: dict) -> list[Path]:
+    data_time = str(metadata.get("data_time") or "")
+    year = str(metadata.get("storm_year") or data_time[:4] or "").strip()
+    typ_number = metadata_int(metadata.get("typ_number"))
+    linked_td_number = metadata_int(metadata.get("linked_td_number"))
+    linked_typ_number = metadata_int(metadata.get("linked_typ_number"))
+    stage = str(metadata.get("storm_stage") or "TYP").upper()
+    keys: list[str] = []
+
+    def add(key: str) -> None:
+        if key and key not in keys:
+            keys.append(key)
+
+    if not year:
+        return []
+    if stage == "TD":
+        if typ_number:
+            add(f"td_{year}_{typ_number:02d}")
+        if linked_typ_number:
+            add(f"typ_{year}_{linked_typ_number:02d}")
+    else:
+        if linked_td_number:
+            add(f"td_{year}_{linked_td_number:02d}")
+        if typ_number:
+            add(f"typ_{year}_{typ_number:02d}")
+
+    base = output_root / "metadata" / "track_history" / year
+    return [base / f"{key}.json" for key in keys]
+
+
 def status_key_for(job: StormJob, fcst_hours: int) -> str:
     return f"{job.storm_key}_{fcst_hours}h"
 
@@ -3071,6 +3109,7 @@ def collect_changed_asset_paths(
     include_status: bool = True,
 ) -> list[str]:
     paths: set[str] = set()
+    output_root = manifest_path.parent
     if include_manifest:
         paths.add(relative_changed_path(manifest_path))
     if include_status:
@@ -3088,6 +3127,8 @@ def collect_changed_asset_paths(
                 image_path = str(metadata.get("image_path") or "").strip()
                 if image_path:
                     paths.add(relative_changed_path(PROJECT_ROOT / image_path))
+                for history_path in track_history_paths_from_metadata(output_root, metadata):
+                    paths.add(relative_changed_path(history_path))
     return sorted(paths)
 
 
