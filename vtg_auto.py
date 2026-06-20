@@ -69,6 +69,9 @@ MANIFEST_METADATA_KEYS = (
     "models",
     "model_labels",
     "skip_atcf",
+    "source_availability_path",
+    "source_availability_summary_path",
+    "source_availability_snapshot_path",
     "no_output",
     "no_output_reason",
 )
@@ -3235,6 +3238,14 @@ def collect_changed_asset_paths(
                 image_path = str(metadata.get("image_path") or "").strip()
                 if image_path:
                     paths.add(relative_changed_path(PROJECT_ROOT / image_path))
+                for availability_key in (
+                    "source_availability_path",
+                    "source_availability_summary_path",
+                    "source_availability_snapshot_path",
+                ):
+                    availability_path = str(metadata.get(availability_key) or "").strip()
+                    if availability_path:
+                        paths.add(relative_changed_path(PROJECT_ROOT / availability_path))
                 for history_path in track_history_paths_from_metadata(output_root, metadata):
                     paths.add(relative_changed_path(history_path))
     return sorted(paths)
