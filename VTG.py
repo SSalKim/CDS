@@ -407,7 +407,7 @@ class Settings:
 
     extra_west_lon: float = 3.0
     extra_east_lon: float = 8.0
-    output_root: Path = PROJECT_ROOT / "VTG_IMG"
+    output_root: Path = PROJECT_ROOT / "data"
     metadata_path: Path | None = None
     auth_key: str = os.getenv("KMA_APIHUB_AUTH_KEY", DEFAULT_AUTH_KEY)
     base_url: str = KMA_BASE_URL
@@ -1198,8 +1198,10 @@ def storm_history_keys(settings: Settings) -> list[str]:
 
 
 def track_history_paths(settings: Settings) -> list[Path]:
-    base = settings.output_root / "metadata" / "track_history" / storm_year(settings)
-    return [base / f"{key}.json" for key in storm_history_keys(settings)]
+    return [
+        system_metadata_dir_for_key(settings, key) / "track_history.json"
+        for key in storm_history_keys(settings)
+    ]
 
 
 def history_aliases(settings: Settings) -> list[str]:
@@ -1263,9 +1265,9 @@ def load_track_history(settings: Settings) -> dict:
     # Backward compatibility: older runs wrote linked TYP history only to the
     # linked TD file, or vice versa. Scan sibling history files by alias so a
     # TYP -> TD or TD -> TYP phase transition keeps the old past track.
-    base = settings.output_root / "metadata" / "track_history" / storm_year(settings)
+    base = settings.output_root / storm_year(settings)
     if base.exists():
-        for path in sorted(base.glob("*.json")):
+        for path in sorted(base.glob("*/metadata/track_history.json")):
             merge_payload(path, require_alias_match=True)
 
     return history
@@ -1935,30 +1937,15 @@ def source_availability_storm_key(settings: Settings) -> str:
 
 
 def source_availability_base_dir(settings: Settings) -> Path:
-    return (
-        settings.output_root
-        / "metadata"
-        / "source_availability"
-        / storm_year(settings)
-        / source_availability_storm_key(settings)
-    )
+    return system_output_dir(settings) / "metadata" / "source_availability"
 
 
 def source_availability_latest_path(settings: Settings) -> Path:
-    return source_availability_base_dir(settings) / settings.data_time / "latest.json"
+    return source_availability_base_dir(settings) / f"{settings.data_time}.json"
 
 
 def source_availability_summary_path(settings: Settings) -> Path:
     return source_availability_base_dir(settings) / "summary.json"
-
-
-def source_availability_snapshot_path(settings: Settings, observed_at_utc: str) -> Path:
-    return (
-        source_availability_base_dir(settings)
-        / settings.data_time
-        / "snapshots"
-        / f"{observed_at_utc}.json"
-    )
 
 
 def relative_project_path(path: Path) -> str:
@@ -1971,21 +1958,10 @@ def relative_project_path(path: Path) -> str:
 def source_availability_metadata_paths(settings: Settings, observed_at_utc: str | None = None) -> dict[str, str]:
     latest_path = source_availability_latest_path(settings)
     summary_path = source_availability_summary_path(settings)
-    paths = {
+    return {
         "source_availability_path": relative_project_path(latest_path),
         "source_availability_summary_path": relative_project_path(summary_path),
     }
-    if observed_at_utc:
-        paths["source_availability_snapshot_path"] = relative_project_path(
-            source_availability_snapshot_path(settings, observed_at_utc)
-        )
-    else:
-        latest_payload = availability_load_json(latest_path, {})
-        if isinstance(latest_payload, dict):
-            snapshot_path = str(latest_payload.get("source_availability_snapshot_path") or "").strip()
-            if snapshot_path:
-                paths["source_availability_snapshot_path"] = snapshot_path
-    return paths
 
 
 def availability_load_json(path: Path, fallback):
@@ -2195,7 +2171,6 @@ def update_source_availability_summary(
     *,
     summary_path: Path,
     latest_path: Path,
-    snapshot_path: Path,
     snapshot: dict,
 ) -> None:
     summary = availability_load_json(summary_path, None)
@@ -2222,7 +2197,6 @@ def update_source_availability_summary(
         "typ_name_ko": snapshot.get("typ_name_ko"),
         "source_availability_path": relative_project_path(latest_path),
         "source_availability_summary_path": relative_project_path(summary_path),
-        "source_availability_snapshot_path": relative_project_path(snapshot_path),
     })
 
     observations = summary.setdefault("observations", {})
@@ -2234,7 +2208,6 @@ def update_source_availability_summary(
     })
     observation.setdefault("first_seen_utc", snapshot.get("generated_at_utc"))
     observation["last_seen_utc"] = snapshot.get("generated_at_utc")
-    observation["latest_snapshot_path"] = relative_project_path(snapshot_path)
     observation["latest_path"] = relative_project_path(latest_path)
     observation["fetch_hours"] = snapshot.get("fetch_hours")
     observation["requested_hours"] = snapshot.get("requested_hours")
@@ -2286,7 +2259,6 @@ def write_source_availability_outputs(
 ) -> dict[str, str]:
     observed_at_utc = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
     latest_path = source_availability_latest_path(settings)
-    snapshot_path = source_availability_snapshot_path(settings, observed_at_utc)
     summary_path = source_availability_summary_path(settings)
 
     snapshot = source_availability_snapshot(
@@ -2299,14 +2271,11 @@ def write_source_availability_outputs(
     )
     snapshot["source_availability_path"] = relative_project_path(latest_path)
     snapshot["source_availability_summary_path"] = relative_project_path(summary_path)
-    snapshot["source_availability_snapshot_path"] = relative_project_path(snapshot_path)
 
     availability_write_json(latest_path, snapshot)
-    availability_write_json(snapshot_path, snapshot)
     update_source_availability_summary(
         summary_path=summary_path,
         latest_path=latest_path,
-        snapshot_path=snapshot_path,
         snapshot=snapshot,
     )
     print(
@@ -2558,8 +2527,45 @@ def display_typ_name(settings: Settings) -> str:
     return "" if name.upper() == "NONAME" else name
 
 
+def system_dir_name_for_parts(year: str | int, stage: str, number: int, name: str = "NONAME") -> str:
+    year_text = str(year or "").strip()
+    try:
+        year_suffix = int(year_text) % 100
+    except (TypeError, ValueError):
+        year_suffix = 0
+    try:
+        storm_number = int(number)
+    except (TypeError, ValueError):
+        storm_number = 0
+    stage_label = "TD" if str(stage or "").upper().startswith("TD") else "TYP"
+    storm_name = str(name or "NONAME").strip() or "NONAME"
+    return f"{stage_label}_{year_suffix:02d}{storm_number:02d}_{storm_name}"
+
+
+def system_dir_name(settings: Settings) -> str:
+    stage_label = "TD" if settings.storm_stage.upper() == "TD" else "TYP"
+    return system_dir_name_for_parts(storm_year(settings), stage_label, settings.typ_number, settings.typ_name)
+
+
+def system_output_dir(settings: Settings) -> Path:
+    return settings.output_root / storm_year(settings) / system_dir_name(settings)
+
+
+def system_metadata_dir(settings: Settings) -> Path:
+    return system_output_dir(settings) / "metadata"
+
+
+def system_metadata_dir_for_key(settings: Settings, key: str) -> Path:
+    parts = str(key or "").split("_")
+    if len(parts) >= 3 and parts[1].isdigit() and parts[2].isdigit():
+        stage = "TD" if parts[0].lower() == "td" else "TYP"
+        number = int(parts[2])
+        name = settings.typ_name if stage == "TYP" else "NONAME"
+        return settings.output_root / parts[1] / system_dir_name_for_parts(parts[1], stage, number, name) / "metadata"
+    return system_metadata_dir(settings)
+
+
 def output_path(settings: Settings) -> Path:
-    year_str = storm_year(settings)
     cyclone_id = tc_id(settings)
     stage = settings.storm_stage.upper()
     storm_name = settings.typ_name or "NONAME"
@@ -2569,7 +2575,7 @@ def output_path(settings: Settings) -> Path:
     else:
         dir_name = f"TYP_{cyclone_id}_{storm_name}"
         file_name = f"TYP_{cyclone_id}_{storm_name}_{settings.data_time}_{settings.fcst_hours}h.png"
-    return settings.output_root / year_str / dir_name / file_name
+    return system_output_dir(settings) / "images" / file_name
 
 
 def metadata_path_for_settings(settings: Settings) -> Path | None:
@@ -2577,11 +2583,7 @@ def metadata_path_for_settings(settings: Settings) -> Path | None:
     if settings.metadata_path and len(hours) == 1:
         return settings.metadata_path
 
-    year_str = storm_year(settings)
-    stage = settings.storm_stage.upper()
-    storm_prefix = "td" if stage == "TD" else "typ"
-    storm_key = f"{storm_prefix}_{year_str}_{settings.typ_number:02d}"
-    return settings.output_root / "metadata" / f"{settings.data_time}_{storm_key}_{settings.fcst_hours}h.json"
+    return system_metadata_dir(settings) / "runs" / f"{settings.data_time}_{settings.fcst_hours}h.json"
 
 
 def render_signature() -> str:

@@ -99,8 +99,7 @@ jobs:
           rm -f "$changed_file"
 
           args=(
-            --output-root VTG_IMG
-            --archive-manifest-path VTG_IMG/drive_archive_manifest.json
+            --output-root data
             --changed-paths-file "$changed_file"
             --max-files "${MAX_FILES_INPUT:-500}"
           )

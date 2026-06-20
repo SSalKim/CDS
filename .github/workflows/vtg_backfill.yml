@@ -396,9 +396,9 @@ jobs:
             local changed_file="$2"
             local filtered_file="$RUNNER_TEMP/vtg_changed_paths_filtered.txt"
 
-            echo "Supplementing generated changed-path list with current VTG_IMG git status."
-            git diff --name-only -- VTG_IMG >> "$changed_file" || true
-            git ls-files --others --exclude-standard -- VTG_IMG >> "$changed_file" || true
+            echo "Supplementing generated changed-path list with current VTG data git status."
+            git diff --name-only -- data >> "$changed_file" || true
+            git ls-files --others --exclude-standard -- data >> "$changed_file" || true
             filter_changed_paths "$changed_file" "$filtered_file"
 
             if [ -s "$filtered_file" ]; then
@@ -457,7 +457,7 @@ jobs:
               exit "$status"
             fi
             PARTIAL_COMMIT_ATTEMPTED=1
-            echo "Backfill interrupted or failed with exit code $status; attempting to preserve current VTG_IMG changes."
+            echo "Backfill interrupted or failed with exit code $status; attempting to preserve current VTG data changes."
 
             local partial_changed_file
             if [ -n "${RANGE_CHANGED_PATHS_FILE:-}" ] && [ -f "$RANGE_CHANGED_PATHS_FILE" ]; then
@@ -469,8 +469,8 @@ jobs:
             fi
 
             if [ ! -s "$partial_changed_file" ]; then
-              git diff --name-only -- VTG_IMG >> "$partial_changed_file" || true
-              git ls-files --others --exclude-standard -- VTG_IMG >> "$partial_changed_file" || true
+              git diff --name-only -- data >> "$partial_changed_file" || true
+              git ls-files --others --exclude-standard -- data >> "$partial_changed_file" || true
             fi
             sort -u "$partial_changed_file" -o "$partial_changed_file"
 
@@ -480,7 +480,7 @@ jobs:
                 echo "Partial commit/push failed during exit cleanup."
               fi
             else
-              echo "No VTG_IMG changes to preserve during exit cleanup."
+              echo "No VTG data changes to preserve during exit cleanup."
             fi
             exit "$status"
           }
@@ -506,7 +506,7 @@ jobs:
             run_with_retry python vtg_auto.py \
               --now "$CYCLE" \
               --force \
-              --output-root VTG_IMG \
+              --output-root data \
               --fcst-hours "120,240" \
               --no-auto-fcst-hours \
               --min-run-interval-minutes 0 \
@@ -535,13 +535,13 @@ jobs:
           rm -f "$FINAL_CHANGED_PATHS_FILE"
           python vtg_auto.py \
             --index-only \
-            --output-root VTG_IMG \
+            --output-root data \
             --changed-paths-file "$FINAL_CHANGED_PATHS_FILE"
 
           if [ -f "$FINAL_CHANGED_PATHS_FILE" ] && [ -s "$FINAL_CHANGED_PATHS_FILE" ]; then
             commit_and_push "Rebuild VTG manifest index" "$FINAL_CHANGED_PATHS_FILE"
           else
-            git add VTG_IMG/manifest.json VTG_IMG/manifest || true
+            git add data/manifest.json data || true
             if git diff --cached --quiet; then
               echo "No manifest index changes after backfill."
             else

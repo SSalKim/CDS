@@ -1,20 +1,41 @@
 # VTG Google Drive archive
 
-This project keeps live VTG images fast by loading active storm images from
-`raw.githubusercontent.com`. Ended storms can remain in `VTG_IMG`, or can be
-moved to Google Drive and exposed through a small archive manifest.
+VTG keeps active storm images in the repository so the page can load them
+quickly through raw GitHub URLs. Older ended-storm images can be moved to
+Google Drive while the site keeps a small per-system archive map.
+
+## Data layout
+
+VTG data is grouped by year and system:
+
+```text
+data/
+  2026/
+    TYP_2607_MEKKHALA/
+      images/
+      metadata/
+        runs/
+        source_availability/
+        track_history.json
+      manifest.json
+      drive_archive.json
+    index.json
+  manifest.json
+  status.json
+```
+
+`data/manifest.json` should stay small. It points to yearly indexes, each yearly
+index points to system manifests, and the page loads a system manifest only when
+that system is selected.
 
 ## Frontend contract
 
-`typhoon-guidance.js` optionally loads:
+For archived images, `typhoon-guidance.js` loads the selected system's
+`drive_archive.json` only when needed:
 
 ```text
-VTG_IMG/drive_archive_manifest.json
+data/2026/TYP_2607_MEKKHALA/drive_archive.json
 ```
-
-If the file is missing, the page falls back to the existing `VTG_IMG` image
-paths. If the file exists, ended storm image paths listed in the manifest are
-loaded from the provided Drive URLs.
 
 Supported object form:
 
@@ -22,9 +43,9 @@ Supported object form:
 {
   "updated_at_utc": "202606190415",
   "images": {
-    "VTG_IMG/2025/TYP_2501_SAMPLE/2025010100_120h.png": {
+    "data/2026/TYP_2607_MEKKHALA/images/2026061900_120h.png": {
       "file_id": "google-drive-file-id",
-      "url": "https://drive.google.com/uc?export=view&id=google-drive-file-id"
+      "url": "https://drive.google.com/thumbnail?id=google-drive-file-id&sz=w2400"
     }
   }
 }
@@ -37,9 +58,9 @@ Supported list form:
   "updated_at_utc": "202606190415",
   "images": [
     {
-      "image_path": "VTG_IMG/2025/TYP_2501_SAMPLE/2025010100_120h.png",
+      "image_path": "data/2026/TYP_2607_MEKKHALA/images/2026061900_120h.png",
       "file_id": "google-drive-file-id",
-      "url": "https://drive.google.com/uc?export=view&id=google-drive-file-id"
+      "url": "https://drive.google.com/thumbnail?id=google-drive-file-id&sz=w2400"
     }
   ]
 }
@@ -79,17 +100,6 @@ VTG_ARCHIVE_DRIVE_FOLDER_ID
 still accepts `GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON`, but that path is intended for
 shared drives rather than a personal My Drive folder.
 
-## Recommended flow
-
-Keep the latest active storm images in the repository for raw GitHub delivery.
-When a storm ends, upload that storm folder to Google Drive, remove or stop
-publishing those older image files from the deploy artifact, and update
-`VTG_IMG/drive_archive_manifest.json` with the Drive URLs.
-
-Google Drive is best treated as an archive store, not a high-performance CDN.
-For old storms this is usually acceptable because they are viewed less often
-than active storms.
-
 ## Automation
 
 The archive sync script is:
@@ -121,8 +131,8 @@ delete_local_after_upload: true
 dry_run: false
 ```
 
-`max_files` limits only new Drive uploads. Files already present in
-`drive_archive_manifest.json` can still be removed from the repository when
+`max_files` limits only new Drive uploads. Files already present in a system
+`drive_archive.json` can still be removed from the repository when
 `delete_local_after_upload` is true. Use `max_files: 0` only when a one-shot
 large migration is acceptable.
 

@@ -71,7 +71,6 @@ MANIFEST_METADATA_KEYS = (
     "skip_atcf",
     "source_availability_path",
     "source_availability_summary_path",
-    "source_availability_snapshot_path",
     "no_output",
     "no_output_reason",
 )
@@ -1589,13 +1588,15 @@ def remove_obsolete_typ_artifacts_for_td_phases(
         cyclone_id = f"{year % 100:02d}{typ_number:02d}"
         status_prefix = f"typ_{year}_{typ_number:02d}"
         for fcst_hours in dict.fromkeys(fcst_hours_list):
-            metadata_path = output_root / "metadata" / (
-                f"{td_job.data_time}_typ_{year}_{typ_number:02d}_{fcst_hours}h.json"
+            metadata_paths = sorted(
+                (output_root / str(year)).glob(
+                    f"TYP_{cyclone_id}_*/metadata/runs/{td_job.data_time}_{fcst_hours}h.json"
+                )
             )
-            existing_metadata = load_json(metadata_path, None)
+            existing_metadata = load_json(metadata_paths[0], None) if metadata_paths else None
             image_paths = sorted(
                 (output_root / str(year)).glob(
-                    f"TYP_{cyclone_id}_*/TYP_{cyclone_id}_*_{td_job.data_time}_{fcst_hours}h.png"
+                    f"TYP_{cyclone_id}_*/images/TYP_{cyclone_id}_*_{td_job.data_time}_{fcst_hours}h.png"
                 )
             )
             for image_path in image_paths:
@@ -1613,7 +1614,7 @@ def remove_obsolete_typ_artifacts_for_td_phases(
                         image_path.parent.rmdir()
                     except OSError:
                         pass
-            if metadata_path.exists():
+            for metadata_path in metadata_paths:
                 print(
                     f"Removing obsolete TYP metadata during linked TD phase: {metadata_path}"
                     if not dry_run
@@ -2025,9 +2026,41 @@ def metadata_storm_key_for(job: StormJob) -> str:
     return f"{prefix}_{job.year}_{job.typ_number:02d}"
 
 
+def system_dir_name_for_parts(year: int | str, stage: str, typ_number: int | str, typ_name: str = "NONAME") -> str:
+    year_value = safe_int(year)
+    year_suffix = year_value % 100 if year_value is not None else 0
+    typ_number_value = safe_int(typ_number) or 0
+    stage_label = "TD" if str(stage or "").upper().startswith("TD") else "TYP"
+    name = str(typ_name or "NONAME").strip() or "NONAME"
+    return f"{stage_label}_{year_suffix:02d}{typ_number_value:02d}_{name}"
+
+
+def system_dir_name_for_job(job: StormJob) -> str:
+    stage = "TD" if job.stage.startswith("TD_") else "TYP"
+    return system_dir_name_for_parts(job.year, stage, job.typ_number, job.typ_name or "NONAME")
+
+
+def system_dir_name_from_metadata(metadata: dict) -> str:
+    data_time = str(metadata.get("data_time") or "")
+    year = str(metadata.get("storm_year") or data_time[:4] or "0")
+    stage = "TD" if str(metadata.get("storm_stage") or "TYP").upper() == "TD" else "TYP"
+    typ_number = safe_int(metadata.get("typ_number")) or 0
+    typ_name = str(metadata.get("typ_name") or "NONAME")
+    return system_dir_name_for_parts(year, stage, typ_number, typ_name)
+
+
+def system_dir_from_metadata(output_root: Path, metadata: dict) -> Path:
+    data_time = str(metadata.get("data_time") or "")
+    year = str(metadata.get("storm_year") or data_time[:4] or "0")
+    return output_root / year / system_dir_name_from_metadata(metadata)
+
+
+def system_dir_from_job(output_root: Path, job: StormJob) -> Path:
+    return output_root / str(job.year) / system_dir_name_for_job(job)
+
+
 def metadata_path_for(output_root: Path, job: StormJob, fcst_hours: int) -> Path:
-    storm_key = metadata_storm_key_for(job)
-    return output_root / "metadata" / f"{job.data_time}_{storm_key}_{fcst_hours}h.json"
+    return system_dir_from_job(output_root, job) / "metadata" / "runs" / f"{job.data_time}_{fcst_hours}h.json"
 
 
 def deterministic_output_path_for(output_root: Path, job: StormJob, fcst_hours: int) -> Path:
@@ -2035,9 +2068,8 @@ def deterministic_output_path_for(output_root: Path, job: StormJob, fcst_hours: 
     cyclone_id = f"{job.year % 100:02d}{job.typ_number:02d}"
     stage = "TD" if job.stage.startswith("TD_") else "TYP"
     storm_name = job.typ_name or "NONAME"
-    dir_name = f"{stage}_{cyclone_id}_{storm_name}"
     file_name = f"{stage}_{cyclone_id}_{storm_name}_{job.data_time}_{fcst_hours}h.png"
-    return output_root / year_str / dir_name / file_name
+    return system_dir_from_job(output_root, job) / "images" / file_name
 
 
 def stage_existing_outputs_for_forced_rerun(
@@ -2195,8 +2227,16 @@ def track_history_paths_from_metadata(output_root: Path, metadata: dict) -> list
         if typ_number:
             add(f"typ_{year}_{typ_number:02d}")
 
-    base = output_root / "metadata" / "track_history" / year
-    return [base / f"{key}.json" for key in keys]
+    paths: list[Path] = []
+    for key in keys:
+        parts = key.split("_")
+        if len(parts) < 3 or not parts[1].isdigit() or not parts[2].isdigit():
+            continue
+        stage_for_key = "TD" if parts[0].lower() == "td" else "TYP"
+        name = str(metadata.get("typ_name") or "NONAME") if stage_for_key == "TYP" else "NONAME"
+        system_dir = output_root / parts[1] / system_dir_name_for_parts(parts[1], stage_for_key, int(parts[2]), name)
+        paths.append(system_dir / "metadata" / "track_history.json")
+    return paths
 
 
 def status_key_for(job: StormJob, fcst_hours: int) -> str:
@@ -2584,7 +2624,10 @@ def metadata_from_image_path(path: Path, output_root: Path) -> dict | None:
     if fcst_hours not in VALID_FCST_HOURS:
         return None
 
-    parent_year = path.parent.parent.name if path.parent and path.parent.parent else ""
+    try:
+        parent_year = path.parents[2].name
+    except IndexError:
+        parent_year = ""
     storm_year = parent_year if re.fullmatch(r"\d{4}", parent_year) else f"20{match.group('cyclone_id')[:2]}"
     try:
         generated_at = datetime.fromtimestamp(path.stat().st_mtime, tz=timezone.utc).strftime("%Y%m%d%H%M%S")
@@ -2831,9 +2874,8 @@ def previous_final_check_done(previous: dict, window: CycleWindow) -> bool:
 def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list[dict]:
     entries_by_key: dict[str, dict] = {}
     suppressed_tokens: set[str] = set()
-    metadata_dir = output_root / "metadata"
-    if metadata_dir.exists():
-        for path in sorted(metadata_dir.glob("*.json")):
+    if output_root.exists():
+        for path in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/*/metadata/runs/*.json")):
             metadata = load_json(path, None)
             if not isinstance(metadata, dict):
                 continue
@@ -2856,7 +2898,7 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
             entries_by_key[key] = entry
 
     if output_root.exists():
-        for path in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/*/*.png")):
+        for path in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/*/images/*.png")):
             metadata = metadata_from_image_path(path, output_root)
             if not metadata:
                 continue
@@ -2951,11 +2993,30 @@ def manifest_storm_key_from_entry(entry: dict) -> str:
 
 
 def storm_manifest_path(output_root: Path, year: int | str, storm_key: str) -> Path:
-    return output_root / "manifest" / str(year) / f"{storm_key}.json"
+    parts = str(storm_key or "").split("_")
+    if len(parts) >= 3 and parts[1].isdigit() and parts[2].isdigit():
+        stage = "TD" if parts[0].lower() == "td" else "TYP"
+        return output_root / str(year) / system_dir_name_for_parts(year, stage, int(parts[2]), "NONAME") / "manifest.json"
+    return output_root / str(year) / str(storm_key or "unknown") / "manifest.json"
+
+
+def storm_manifest_path_from_summary(output_root: Path, summary: dict) -> Path:
+    year = summary.get("year") or ""
+    stage = summary.get("stage") or "TYP"
+    typ_number = safe_int(summary.get("typ_number")) or 0
+    typ_name = summary.get("typ_name") or "NONAME"
+    return output_root / str(year) / system_dir_name_for_parts(year, stage, typ_number, typ_name) / "manifest.json"
+
+
+def valid_storm_summary(summary: dict) -> bool:
+    year = safe_int(summary.get("year"))
+    typ_number = safe_int(summary.get("typ_number"))
+    stage = str(summary.get("stage") or "").upper()
+    return year is not None and year >= 1900 and typ_number is not None and typ_number > 0 and stage in {"TD", "TYP"}
 
 
 def year_manifest_index_path(output_root: Path, year: int | str) -> Path:
-    return output_root / "manifest" / str(year) / "index.json"
+    return output_root / str(year) / "index.json"
 
 
 def entry_from_existing_manifest_item(item: dict) -> dict:
@@ -3059,13 +3120,15 @@ def write_split_manifest_files(output_root: Path, run_entries: list[dict], *, up
     touched_years: set[str] = set()
     touched_systems: dict[str, list[dict]] = {}
     for (year, storm_key), entries in sorted(entries_by_storm.items()):
-        path = storm_manifest_path(output_root, year, storm_key)
+        path = storm_manifest_path_from_summary(output_root, storm_summary_from_inventory(storm_key, entries))
         previous = load_json(path, {})
         previous_inventory = previous.get("inventory") if isinstance(previous, dict) else []
         if not isinstance(previous_inventory, list):
             previous_inventory = []
         inventory = merge_manifest_inventory(previous_inventory, entries)
         summary = storm_summary_from_inventory(storm_key, inventory)
+        if not valid_storm_summary(summary):
+            continue
         payload = {
             "version": 2,
             "updated_at_utc": updated_at_utc,
@@ -3120,9 +3183,11 @@ def rebuild_split_manifest_files(output_root: Path, inventory: list[dict], *, up
 
     systems_by_year: dict[str, list[dict]] = {}
     for (year, storm_key), entries in sorted(grouped.items()):
-        path = storm_manifest_path(output_root, year, storm_key)
         storm_inventory = sort_manifest_inventory(entries)
         summary = storm_summary_from_inventory(storm_key, storm_inventory)
+        if not valid_storm_summary(summary):
+            continue
+        path = storm_manifest_path_from_summary(output_root, summary)
         payload = {
             "version": 2,
             "updated_at_utc": updated_at_utc,
@@ -3152,11 +3217,10 @@ def rebuild_split_manifest_files(output_root: Path, inventory: list[dict], *, up
 
 
 def root_manifest_indexes(output_root: Path) -> list[dict]:
-    root = output_root / "manifest"
     indexes = []
-    if not root.exists():
+    if not output_root.exists():
         return indexes
-    for path in sorted(root.glob("[0-9][0-9][0-9][0-9]/index.json")):
+    for path in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/index.json")):
         year = path.parent.name
         indexes.append({"year": int(year), "path": relative_asset_path(path)})
     return indexes
@@ -3241,7 +3305,6 @@ def collect_changed_asset_paths(
                 for availability_key in (
                     "source_availability_path",
                     "source_availability_summary_path",
-                    "source_availability_snapshot_path",
                 ):
                     availability_path = str(metadata.get(availability_key) or "").strip()
                     if availability_path:
@@ -3295,7 +3358,7 @@ def parse_fcst_hours(value: str) -> list[int]:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run scheduled VTG image generation.")
     parser.add_argument("--now", help="Override target cycle UTC, YYYYmmddHH. HH must be one of 00, 06, 12, 18.")
-    parser.add_argument("--output-root", type=Path, default=PROJECT_ROOT / "VTG_IMG")
+    parser.add_argument("--output-root", type=Path, default=PROJECT_ROOT / "data")
     parser.add_argument("--kma-cache-dir", type=Path, default=None)
     parser.add_argument("--auth-key", default=os.getenv("KMA_APIHUB_AUTH_KEY", ""))
     parser.add_argument("--manual-map", type=Path, default=PROJECT_ROOT / "vtg_manual_atcf_map.json")
@@ -3320,7 +3383,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--status-retention-days", type=int, default=DEFAULT_STATUS_RETENTION_DAYS, help="Keep compact automation status for this many days; use 0 to disable pruning.")
     parser.add_argument("--changed-paths-file", type=Path, default=None, help="Write generated/updated asset paths for git add --pathspec-from-file.")
     parser.add_argument("--verbose-manifest", action="store_true", help="Print full manifest JSON instead of a compact summary.")
-    parser.add_argument("--full-manifest-scan", action="store_true", help="Scan all VTG_IMG assets on every run. Default uses incremental manifest updates.")
+    parser.add_argument("--full-manifest-scan", action="store_true", help="Scan all VTG data assets on every run. Default uses incremental manifest updates.")
     parser.add_argument("--http-cache-dir", type=Path, default=None, help="Shared workflow-local HTTP/KMA cache directory for VTG.py subprocesses.")
     parser.add_argument("--parallel-jobs", type=int, default=int(os.getenv("VTG_PARALLEL_JOBS", "2")), help="Maximum active storm VTG.py subprocesses per cycle.")
     parser.add_argument("--dry-run", action="store_true")
@@ -3344,8 +3407,8 @@ def main() -> int:
         now = utc_now()
 
     output_root = args.output_root
-    kma_cache_dir = args.kma_cache_dir or output_root / "kma_apihub_cache"
-    status_path = args.status_path or output_root / "vtg_auto_status.json"
+    kma_cache_dir = args.kma_cache_dir or output_root / "cache" / "kma_apihub"
+    status_path = args.status_path or output_root / "status.json"
     manifest_path = args.manifest_path or output_root / "manifest.json"
     http_cache_dir = args.http_cache_dir or Path(tempfile.gettempdir()) / "vtg_http_cache"
     http_cache_dir.mkdir(parents=True, exist_ok=True)

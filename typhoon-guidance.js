@@ -1,7 +1,6 @@
-const TYPHOON_MANIFEST_PATH='VTG_IMG/manifest.json';
-const TYPHOON_STATUS_PATH='VTG_IMG/vtg_auto_status.json';
-const TYPHOON_DRIVE_ARCHIVE_MANIFEST_PATH='VTG_IMG/drive_archive_manifest.json';
-const TYPHOON_TYP_LIST_CACHE_PREFIX='VTG_IMG/kma_apihub_cache/typ_lst_';
+const TYPHOON_MANIFEST_PATH='data/manifest.json';
+const TYPHOON_STATUS_PATH='data/status.json';
+const TYPHOON_TYP_LIST_CACHE_PREFIX='data/cache/kma_apihub/typ_lst_';
 const TYPHOON_TYP_LIST_CACHE_SUFFIX='.json';
 const TYPHOON_RAW_REPOSITORY_BASE_URL=normalizeTyphoonBaseUrl(globalThis.CDS_TYPOON_RAW_REPOSITORY_BASE_URL || 'https://raw.githubusercontent.com/SSalKim/CDS/main/');
 const TYPHOON_LIVE_DATA_BASE_URL=normalizeTyphoonBaseUrl(globalThis.CDS_TYPOON_LIVE_DATA_BASE_URL || TYPHOON_RAW_REPOSITORY_BASE_URL);
@@ -596,8 +595,8 @@ root:null,
 manifest:null,
 manifestBaseUrl:'',
 driveArchiveImages:new Map(),
-driveArchiveLoaded:false,
-driveArchiveLoadPromise:null,
+driveArchivePathsLoaded:new Set(),
+driveArchiveLoadPromises:new Map(),
 status:null,
 yearIndexes:new Map(),
 stormManifestCache:new Map(),
@@ -1354,8 +1353,8 @@ typhoonState.status=status;
 typhoonState.yearIndexes=new Map();
 typhoonState.stormManifestCache=new Map();
 typhoonState.driveArchiveImages=new Map();
-typhoonState.driveArchiveLoaded=false;
-typhoonState.driveArchiveLoadPromise=null;
+typhoonState.driveArchivePathsLoaded=new Set();
+typhoonState.driveArchiveLoadPromises=new Map();
 rebuildTyphoonEntries();
 syncTyphoonSelection({preferredYear:previousYear,preferredStormKey:previousStormKey,preferredDataTime:previousDataTime});
 await ensureTyphoonYearIndex(typhoonState.selectedYear);
@@ -1376,8 +1375,8 @@ typhoonState.yearIndexes=new Map();
 typhoonState.stormManifestCache=new Map();
 typhoonState.typImpactByYear=new Map();
 typhoonState.driveArchiveImages=new Map();
-typhoonState.driveArchiveLoaded=false;
-typhoonState.driveArchiveLoadPromise=null;
+typhoonState.driveArchivePathsLoaded=new Set();
+typhoonState.driveArchiveLoadPromises=new Map();
 syncTyphoonSelection();
 renderTyphoonEmpty(`자료 없음 (${error.message})`);
 }
@@ -1650,10 +1649,31 @@ lastError=error;
 throw lastError || new Error('HTTP 404');
 }
 
-async function loadTyphoonDriveArchiveImages(baseUrl=''){
+function typhoonSystemRootFromAssetPath(value){
+let path=normalizeTyphoonAssetPath(value);
+let parts=path.split('/').filter(Boolean);
+if(parts.length>=3 && parts[0]==='data' && /^\d{4}$/.test(parts[1])){
+return parts.slice(0,3).join('/');
+}
+return '';
+}
+
+function typhoonDriveArchivePathForRun(run){
+let explicit=String(run?.metadata?.drive_archive_path || run?.driveArchivePath || '').trim();
+if(explicit){
+return normalizeTyphoonAssetPath(explicit);
+}
+let systemRoot=typhoonSystemRootFromAssetPath(run?.imagePath || run?.metadata?.image_path || '');
+return systemRoot ? `${systemRoot}/drive_archive.json` : '';
+}
+
+async function loadTyphoonDriveArchiveImages(path,baseUrl=''){
+if(!path){
+return new Map();
+}
 try{
 let result=await fetchTyphoonJsonWithFallback(
-TYPHOON_DRIVE_ARCHIVE_MANIFEST_PATH,
+path,
 typhoonDataBaseUrls(baseUrl)
 );
 return normalizeTyphoonDriveArchiveImages(result.payload);
@@ -1663,35 +1683,38 @@ return new Map();
 }
 }
 
-async function ensureTyphoonDriveArchiveImages(){
-if(typhoonState.driveArchiveLoaded){
+async function ensureTyphoonDriveArchiveImagesForPath(path){
+let archivePath=normalizeTyphoonAssetPath(path);
+if(!archivePath || typhoonState.driveArchivePathsLoaded.has(archivePath)){
 return typhoonState.driveArchiveImages;
 }
-if(!typhoonState.driveArchiveLoadPromise){
-typhoonState.driveArchiveLoadPromise=loadTyphoonDriveArchiveImages(typhoonState.manifestBaseUrl)
+if(!typhoonState.driveArchiveLoadPromises.has(archivePath)){
+let promise=loadTyphoonDriveArchiveImages(archivePath,typhoonState.manifestBaseUrl)
 .then(images=>{
-typhoonState.driveArchiveImages=images;
-typhoonState.driveArchiveLoaded=true;
-return images;
+images.forEach((url,imagePath)=>{
+typhoonState.driveArchiveImages.set(imagePath,url);
+});
+typhoonState.driveArchivePathsLoaded.add(archivePath);
+return typhoonState.driveArchiveImages;
 })
 .catch(error=>{
 console.warn('?쒗뭾 Drive archive manifest 濡쒕뱶 ?ㅽ뙣',error);
-typhoonState.driveArchiveImages=new Map();
-typhoonState.driveArchiveLoaded=true;
+typhoonState.driveArchivePathsLoaded.add(archivePath);
 return typhoonState.driveArchiveImages;
 })
 .finally(()=>{
-typhoonState.driveArchiveLoadPromise=null;
+typhoonState.driveArchiveLoadPromises.delete(archivePath);
 });
+typhoonState.driveArchiveLoadPromises.set(archivePath,promise);
 }
-return typhoonState.driveArchiveLoadPromise;
+return typhoonState.driveArchiveLoadPromises.get(archivePath);
 }
 
 async function ensureTyphoonDriveArchiveImagesForRun(run){
 if(!run?.imagePath || typhoonState.driveArchiveImages.has(run.imagePath)){
 return;
 }
-await ensureTyphoonDriveArchiveImages();
+await ensureTyphoonDriveArchiveImagesForPath(typhoonDriveArchivePathForRun(run));
 }
 
 function normalizeTyphoonDriveArchiveImages(payload){
@@ -3004,10 +3027,11 @@ return '';
 if(isAbsoluteTyphoonUrl(path)){
 return path;
 }
-let marker='VTG_IMG/';
+for(let marker of ['data/','VTG_IMG/']){
 let markerIndex=path.indexOf(marker);
 if(markerIndex>=0){
 return path.slice(markerIndex);
+}
 }
 return path.replace(/^\/+/,'');
 }

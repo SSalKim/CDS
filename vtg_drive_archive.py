@@ -13,8 +13,7 @@ from urllib.parse import quote
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
-DEFAULT_OUTPUT_ROOT = PROJECT_ROOT / "VTG_IMG"
-DEFAULT_ARCHIVE_MANIFEST = DEFAULT_OUTPUT_ROOT / "drive_archive_manifest.json"
+DEFAULT_OUTPUT_ROOT = PROJECT_ROOT / "data"
 DRIVE_SCOPE = "https://www.googleapis.com/auth/drive"
 DRIVE_API = "https://www.googleapis.com/drive/v3"
 DRIVE_UPLOAD_API = "https://www.googleapis.com/upload/drive/v3"
@@ -124,18 +123,29 @@ def normalize_asset_path(value: Any) -> str:
     path = str(value or "").replace("\\", "/").strip()
     if not path:
         return ""
-    marker = "VTG_IMG/"
-    marker_index = path.find(marker)
-    if marker_index >= 0:
-        return path[marker_index:]
+    for marker in ("data/", "VTG_IMG/"):
+        marker_index = path.find(marker)
+        if marker_index >= 0:
+            return path[marker_index:]
     return path.lstrip("/")
 
 
 def local_path_for_asset(path: str, output_root: Path) -> Path:
     normalized = normalize_asset_path(path)
-    if normalized.startswith("VTG_IMG/"):
+    if normalized.startswith(("data/", "VTG_IMG/")):
         return PROJECT_ROOT / normalized
     return output_root / normalized
+
+
+def archive_manifest_path_for_asset(output_root: Path, image_path: str) -> Path:
+    local_path = local_path_for_asset(image_path, output_root)
+    try:
+        relative_parts = local_path.resolve().relative_to(output_root.resolve()).parts
+    except ValueError:
+        relative_parts = local_path.parts
+    if len(relative_parts) >= 2 and str(relative_parts[0]).isdigit():
+        return output_root / relative_parts[0] / relative_parts[1] / "drive_archive.json"
+    return output_root / "drive_archive.json"
 
 
 def active_window_data_times(manifest: dict) -> set[str]:
@@ -171,12 +181,11 @@ def collect_archive_candidates(
     archived_images: dict[str, dict],
     active_recency_hours: float,
 ) -> list[ArchiveCandidate]:
-    metadata_root = output_root / "metadata"
     active_data_times = active_window_data_times(manifest)
     now = utc_now()
     candidates: dict[str, ArchiveCandidate] = {}
 
-    for metadata_path in sorted(metadata_root.glob("*.json")):
+    for metadata_path in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/*/metadata/runs/*.json")):
         metadata = load_json(metadata_path, None)
         if not isinstance(metadata, dict):
             continue
@@ -529,16 +538,28 @@ def build_archive_manifest(base_payload: dict, images: dict[str, dict], *, folde
     }
 
 
+def load_archive_manifests(output_root: Path, explicit_path: Path | None) -> tuple[dict[Path, dict], dict[str, dict]]:
+    paths = [explicit_path] if explicit_path else sorted(output_root.glob("[0-9][0-9][0-9][0-9]/*/drive_archive.json"))
+    payloads: dict[Path, dict] = {}
+    merged_images: dict[str, dict] = {}
+    for path in paths:
+        if path is None:
+            continue
+        payload, images = load_archive_manifest(path)
+        payloads[path] = payload
+        merged_images.update(images)
+    return payloads, merged_images
+
+
 def run(args: argparse.Namespace) -> int:
     if args.repair_only:
         args.repair_permissions = True
     output_root = args.output_root
     manifest_path = args.manifest_path or output_root / "manifest.json"
-    archive_manifest_path = args.archive_manifest_path
     manifest = load_json(manifest_path, {})
     if not isinstance(manifest, dict):
         manifest = {}
-    archive_payload, archived_images = load_archive_manifest(archive_manifest_path)
+    archive_payloads, archived_images = load_archive_manifests(output_root, args.archive_manifest_path)
     candidates = collect_archive_candidates(
         output_root=output_root,
         manifest=manifest,
@@ -553,6 +574,7 @@ def run(args: argparse.Namespace) -> int:
         upload_candidates = upload_candidates[:args.max_files]
 
     changed_paths: set[str] = set()
+    touched_archive_paths: set[Path] = set()
     deleted_count = 0
     uploaded_count = 0
     reused_count = 0
@@ -603,6 +625,7 @@ def run(args: argparse.Namespace) -> int:
             candidate,
             archived_images.get(candidate.image_path),
         )
+        touched_archive_paths.add(archive_manifest_path_for_asset(output_root, candidate.image_path))
         time.sleep(max(0.0, args.upload_delay_seconds))
 
     if args.repair_permissions and drive:
@@ -627,10 +650,23 @@ def run(args: argparse.Namespace) -> int:
             deleted_count += 1
             remove_empty_parents(candidate.local_path.parent, output_root)
 
-    archive_manifest = build_archive_manifest(archive_payload, archived_images, folder_id=folder_id)
-    if archive_manifest != archive_payload:
-        write_json(archive_manifest_path, archive_manifest)
-        changed_paths.add(relative_asset_path(archive_manifest_path))
+    if args.archive_manifest_path:
+        touched_archive_paths.add(args.archive_manifest_path)
+    elif upload_candidates or args.repair_permissions:
+        for image_path in archived_images:
+            touched_archive_paths.add(archive_manifest_path_for_asset(output_root, image_path))
+
+    for archive_manifest_path in sorted(touched_archive_paths):
+        images_for_manifest = {
+            image_path: entry
+            for image_path, entry in archived_images.items()
+            if archive_manifest_path_for_asset(output_root, image_path) == archive_manifest_path
+        }
+        archive_payload = archive_payloads.get(archive_manifest_path, {})
+        archive_manifest = build_archive_manifest(archive_payload, images_for_manifest, folder_id=folder_id)
+        if archive_manifest != archive_payload:
+            write_json(archive_manifest_path, archive_manifest)
+            changed_paths.add(relative_asset_path(archive_manifest_path))
 
     append_changed_paths(args.changed_paths_file, changed_paths)
     print(json.dumps({
@@ -638,7 +674,7 @@ def run(args: argparse.Namespace) -> int:
         "reused_count": reused_count,
         "public_permission_count": public_permission_count,
         "deleted_local_count": deleted_count,
-        "archive_manifest": relative_asset_path(archive_manifest_path),
+        "archive_manifest_count": len(touched_archive_paths),
         "changed_path_count": len(changed_paths),
     }, ensure_ascii=False, indent=2))
     return 0
@@ -648,7 +684,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Upload ended VTG images to Google Drive and build archive manifest.")
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     parser.add_argument("--manifest-path", type=Path, default=None)
-    parser.add_argument("--archive-manifest-path", type=Path, default=DEFAULT_ARCHIVE_MANIFEST)
+    parser.add_argument("--archive-manifest-path", type=Path, default=None, help="Legacy single archive manifest path. Default writes per-system drive_archive.json files.")
     parser.add_argument("--service-account-json", default=os.getenv("GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON", ""))
     parser.add_argument("--service-account-json-file", type=Path, default=None)
     parser.add_argument("--oauth-client-id", default=os.getenv("GOOGLE_DRIVE_CLIENT_ID", ""))

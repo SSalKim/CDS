@@ -41,7 +41,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--vtg-args", required=True, help="Arguments to pass to VTG.py, e.g. --typ-number 6 --typ-name JANGMI.")
     parser.add_argument("--auth-key", default=os.getenv("KMA_APIHUB_AUTH_KEY", ""))
     parser.add_argument("--python", default=sys.executable)
-    parser.add_argument("--output-root", type=Path, default=PROJECT_ROOT / "VTG_IMG")
+    parser.add_argument("--output-root", type=Path, default=PROJECT_ROOT / "data")
     return parser.parse_args()
 
 
@@ -57,10 +57,12 @@ def main() -> int:
 
     typ_number = int(option_value(tokens, ("--typ-number",), "0") or 0)
     storm_stage = (option_value(tokens, ("--storm-stage",), "TYP") or "TYP").upper()
+    typ_name = option_value(tokens, ("--typ-name",), "NONAME") or "NONAME"
     fcst_hours = int(option_value(tokens, ("--fcst-hours",), "120") or 120)
     year = data_time[:4]
-    metadata_name = f"{data_time}_{storm_stage.lower()}_{year}_{typ_number:02d}_{fcst_hours}h.json"
-    metadata_path = args.output_root / "metadata" / metadata_name
+    stage_label = "TD" if storm_stage.startswith("TD") else "TYP"
+    system_dir = f"{stage_label}_{int(year) % 100:02d}{typ_number:02d}_{typ_name}"
+    metadata_path = args.output_root / year / system_dir / "metadata" / "runs" / f"{data_time}_{fcst_hours}h.json"
 
     command = [args.python, str(PROJECT_ROOT / "VTG.py"), *tokens]
     if not has_option(tokens, ("--output-root",)):
