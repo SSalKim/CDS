@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260620144106",
-  "generated_at_kst": "2026-06-20 23:41 KST",
+  "generated_at_utc": "20260620145128",
+  "generated_at_kst": "2026-06-20 23:51 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_07",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 45,
+  "model_source_count": 47,
   "selected_model_count": 21,
   "active_target_model_count": 36,
   "model_sources": [
@@ -158,7 +158,7 @@
       ],
       "source": "FTP.NHC",
       "source_label": "FTP.NHC ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 60,
       "max_lead_hour": 126,
       "has_pressure": true,
@@ -166,6 +166,23 @@
       "is_official": false,
       "first_seen_utc": "20260620134330",
       "first_seen_kst": "2026-06-20 22:43 KST"
+    },
+    {
+      "model_id": "COAMPS_EPS",
+      "model_label": "COAMPS-TC EPS",
+      "raw_model_ids": [
+        "CTMN"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": true,
+      "point_count": 60,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260620145128",
+      "first_seen_kst": "2026-06-20 23:51 KST"
     },
     {
       "model_id": "ECMWF",
@@ -268,6 +285,23 @@
       "is_official": false,
       "first_seen_utc": "20260620133303",
       "first_seen_kst": "2026-06-20 22:33 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EEMN"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": false,
+      "point_count": 46,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260620145128",
+      "first_seen_kst": "2026-06-20 23:51 KST"
     },
     {
       "model_id": "FNV3",
