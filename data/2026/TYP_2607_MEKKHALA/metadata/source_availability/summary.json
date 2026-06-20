@@ -4589,7 +4589,7 @@
           "source": "APIHUB",
           "source_label": "KMA APIHUB",
           "first_seen_utc": "20260620110304",
-          "last_seen_utc": "20260620110304",
+          "last_seen_utc": "20260620111306",
           "latest_max_lead_hour": 132,
           "latest_point_count": 23,
           "latest_selected": true,
@@ -4603,16 +4603,30 @@
           "source": "APIHUB",
           "source_label": "KMA APIHUB",
           "first_seen_utc": "20260620110304",
-          "last_seen_utc": "20260620110304",
+          "last_seen_utc": "20260620111306",
           "latest_max_lead_hour": 132,
           "latest_point_count": 23,
           "latest_selected": true,
           "first_0h_seen_utc": "20260620110304",
           "first_72h_seen_utc": "20260620110304",
           "first_120h_seen_utc": "20260620110304"
+        },
+        "GFS|APIHUB": {
+          "model_id": "GFS",
+          "model_label": "GFS",
+          "source": "APIHUB",
+          "source_label": "KMA APIHUB",
+          "first_seen_utc": "20260620111306",
+          "last_seen_utc": "20260620111306",
+          "latest_max_lead_hour": 186,
+          "latest_point_count": 32,
+          "latest_selected": true,
+          "first_0h_seen_utc": "20260620111306",
+          "first_72h_seen_utc": "20260620111306",
+          "first_120h_seen_utc": "20260620111306"
         }
       },
-      "last_seen_utc": "20260620110304",
+      "last_seen_utc": "20260620111306",
       "latest_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606200600.json",
       "fetch_hours": 240,
       "requested_hours": [
@@ -4620,6 +4634,50 @@
         240
       ],
       "selected_models": {
+        "GFS": {
+          "selected_source": "APIHUB",
+          "selected_source_label": "KMA APIHUB",
+          "max_lead_hour": 186,
+          "lead_hours": [
+            0,
+            6,
+            12,
+            18,
+            24,
+            30,
+            36,
+            42,
+            48,
+            54,
+            60,
+            66,
+            72,
+            78,
+            84,
+            90,
+            96,
+            102,
+            108,
+            114,
+            120,
+            126,
+            132,
+            138,
+            144,
+            150,
+            156,
+            162,
+            168,
+            174,
+            180,
+            186
+          ],
+          "point_count": 32,
+          "has_0h": true,
+          "has_72h": true,
+          "has_120h": true,
+          "has_240h": false
+        },
         "JGSM": {
           "selected_source": "APIHUB",
           "selected_source_label": "KMA APIHUB",
@@ -4706,28 +4764,28 @@
       },
       "summary": {
         "source_count": 1,
-        "model_source_count": 2,
-        "selected_model_count": 2,
+        "model_source_count": 3,
+        "selected_model_count": 3,
         "active_target_model_count": 36,
         "complete_model_count_by_lead": {
-          "120": 2,
+          "120": 3,
           "240": 0
         },
         "by_source": {
           "APIHUB": {
             "source_label": "KMA APIHUB",
-            "model_count": 2,
-            "selected_model_count": 2,
-            "max_lead_hour": 132
+            "model_count": 3,
+            "selected_model_count": 3,
+            "max_lead_hour": 186
           }
         },
         "model_count_by_source": {
-          "APIHUB": 2
+          "APIHUB": 3
         }
       }
     }
   },
-  "updated_at_utc": "20260620110304",
+  "updated_at_utc": "20260620111306",
   "source_availability_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606200600.json",
   "source_availability_summary_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/summary.json"
 }
