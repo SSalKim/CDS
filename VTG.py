@@ -1481,6 +1481,28 @@ def source_display_name(source: str) -> str:
     return SOURCE_DISPLAY_NAMES.get(source, source)
 
 
+def expected_raw_model_id(model_name: str, source_name: str) -> str:
+    source_column = SOURCE_IDENTIFIER_COLUMNS.get(source_name)
+    if not source_column:
+        return ""
+    for row in MODEL_SOURCES:
+        if row.get("name") == model_name:
+            return str(row.get(source_column) or "").strip()
+    return ""
+
+
+def normalized_raw_model_ids(model_name: str, source_name: str, observed_ids: Iterable[str]) -> list[str]:
+    cleaned = sorted({
+        str(value).strip()
+        for value in observed_ids
+        if str(value or "").strip()
+    })
+    expected = expected_raw_model_id(model_name, source_name)
+    if expected and (not cleaned or cleaned == [model_name]):
+        return [expected]
+    return cleaned
+
+
 def source_priority_for_model(model_name: str, settings: Settings) -> tuple[str, ...]:
     priority = list(MODEL_SOURCE_PRIORITY_OVERRIDES.get(model_name, SOURCE_ORDER))
     overrides = dict(settings.source_overrides)
@@ -2118,11 +2140,12 @@ def source_availability_entries(
             continue
         ws_values = pd.to_numeric(group.get("WS", pd.Series(dtype=float)), errors="coerce")
         ps_values = pd.to_numeric(group.get("PS", pd.Series(dtype=float)), errors="coerce")
-        raw_model_ids = sorted({
+        observed_raw_model_ids = sorted({
             str(value).strip()
             for value in group.get(RAW_MODEL_COLUMN, pd.Series(dtype=str)).dropna()
             if str(value).strip()
         })
+        raw_model_ids = normalized_raw_model_ids(model_name, source_name, observed_raw_model_ids)
         entry = {
             "model_id": model_name,
             "model_label": model_display_label(model_name),
@@ -2193,8 +2216,6 @@ def annotate_source_first_seen(entries: list[dict], latest_path: Path, observed_
         updated = dict(entry)
         updated["first_seen_utc"] = first_seen
         updated["first_seen_kst"] = availability_kst_label(first_seen)
-        updated["last_seen_utc"] = observed_at_utc
-        updated["last_seen_kst"] = availability_kst_label(observed_at_utc)
         annotated.append(updated)
     return sorted(
         annotated,
