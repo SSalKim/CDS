@@ -386,6 +386,10 @@ class Settings:
     typ_name_ko: str = ""
     linked_td_number: int | None = None
     linked_typ_number: int | None = None
+    canonical_storm_stage: str = ""
+    canonical_typ_number: int | None = None
+    canonical_typ_name: str = ""
+    canonical_typ_name_ko: str = ""
     storm_stage: str = "TYP"
     atcf_id: str = "wp062026"
     extra_atcf_ids: tuple[str, ...] = ()
@@ -529,6 +533,10 @@ def parse_args() -> Settings:
     parser.add_argument("--typ-name-ko", default=Settings.typ_name_ko)
     parser.add_argument("--linked-td-number", type=int, default=Settings.linked_td_number)
     parser.add_argument("--linked-typ-number", type=int, default=Settings.linked_typ_number)
+    parser.add_argument("--canonical-storm-stage", choices=("", "TYP", "TD"), default=Settings.canonical_storm_stage)
+    parser.add_argument("--canonical-typ-number", type=int, default=Settings.canonical_typ_number)
+    parser.add_argument("--canonical-typ-name", default=Settings.canonical_typ_name)
+    parser.add_argument("--canonical-typ-name-ko", default=Settings.canonical_typ_name_ko)
     parser.add_argument("--storm-stage", choices=("TYP", "TD"), default=Settings.storm_stage)
     parser.add_argument("--atcf-id", default=Settings.atcf_id)
     parser.add_argument(
@@ -617,6 +625,10 @@ def parse_args() -> Settings:
         typ_name_ko=args.typ_name_ko.strip(),
         linked_td_number=args.linked_td_number,
         linked_typ_number=args.linked_typ_number,
+        canonical_storm_stage=args.canonical_storm_stage.strip(),
+        canonical_typ_number=args.canonical_typ_number,
+        canonical_typ_name=args.canonical_typ_name.strip(),
+        canonical_typ_name_ko=args.canonical_typ_name_ko.strip(),
         storm_stage=args.storm_stage,
         atcf_id=args.atcf_id.lower(),
         extra_atcf_ids=tuple(
@@ -1185,6 +1197,7 @@ def storm_history_keys(settings: Settings) -> list[str]:
         if key and key not in keys:
             keys.append(key)
 
+    add(canonical_storm_key(settings))
     stage = settings.storm_stage.upper()
     if stage == "TD":
         add(f"td_{year}_{settings.typ_number:02d}")
@@ -1198,10 +1211,7 @@ def storm_history_keys(settings: Settings) -> list[str]:
 
 
 def track_history_paths(settings: Settings) -> list[Path]:
-    return [
-        system_metadata_dir_for_key(settings, key) / "track_history.json"
-        for key in storm_history_keys(settings)
-    ]
+    return [system_metadata_dir(settings) / "track_history.json"]
 
 
 def history_aliases(settings: Settings) -> list[str]:
@@ -1218,7 +1228,7 @@ def empty_track_history(settings: Settings) -> dict:
     return {
         "version": 1,
         "year": storm_year(settings),
-        "primary_key": keys[0] if keys else "",
+        "primary_key": canonical_storm_key(settings),
         "aliases": history_aliases(settings),
         "points": [],
     }
@@ -1930,10 +1940,53 @@ def model_lead_support(df: pd.DataFrame, settings: Settings) -> dict[int, int]:
     return support
 
 
+def canonical_storm_stage(settings: Settings) -> str:
+    explicit = str(settings.canonical_storm_stage or "").strip().upper()
+    if explicit in {"TD", "TYP"}:
+        return explicit
+    if settings.storm_stage.upper() == "TD" and settings.linked_typ_number and settings.canonical_typ_number:
+        return "TYP"
+    return "TD" if settings.storm_stage.upper() == "TD" else "TYP"
+
+
+def canonical_typ_number(settings: Settings) -> int:
+    if settings.canonical_typ_number:
+        return int(settings.canonical_typ_number)
+    if canonical_storm_stage(settings) == "TYP" and settings.storm_stage.upper() == "TD" and settings.linked_typ_number:
+        return int(settings.linked_typ_number)
+    return int(settings.typ_number)
+
+
+def canonical_typ_name(settings: Settings) -> str:
+    name = str(settings.canonical_typ_name or "").strip()
+    if name:
+        return name
+    if canonical_storm_stage(settings) == "TYP":
+        return str(settings.typ_name or "NONAME").strip() or "NONAME"
+    return str(settings.typ_name or "NONAME").strip() or "NONAME"
+
+
+def canonical_typ_name_ko(settings: Settings) -> str:
+    return str(settings.canonical_typ_name_ko or settings.typ_name_ko or "").strip()
+
+
+def canonical_storm_key(settings: Settings) -> str:
+    prefix = "td" if canonical_storm_stage(settings) == "TD" else "typ"
+    return f"{prefix}_{storm_year(settings)}_{canonical_typ_number(settings):02d}"
+
+
+def canonical_metadata_fields(settings: Settings) -> dict:
+    return {
+        "canonical_storm_key": canonical_storm_key(settings),
+        "canonical_storm_stage": canonical_storm_stage(settings),
+        "canonical_typ_number": canonical_typ_number(settings),
+        "canonical_typ_name": canonical_typ_name(settings),
+        "canonical_typ_name_ko": canonical_typ_name_ko(settings),
+    }
+
 
 def source_availability_storm_key(settings: Settings) -> str:
-    prefix = "td" if settings.storm_stage.upper() == "TD" else "typ"
-    return f"{prefix}_{storm_year(settings)}_{settings.typ_number:02d}"
+    return canonical_storm_key(settings)
 
 
 def source_availability_base_dir(settings: Settings) -> Path:
@@ -2136,6 +2189,7 @@ def source_availability_snapshot(
         "data_typ_number": kma_data_typ_number(settings),
         "typ_name": settings.typ_name,
         "typ_name_ko": settings.typ_name_ko,
+        **canonical_metadata_fields(settings),
         "linked_td_number": settings.linked_td_number,
         "linked_typ_number": settings.linked_typ_number,
         "atcf_id": "" if settings.skip_atcf else settings.atcf_id,
@@ -2543,8 +2597,12 @@ def system_dir_name_for_parts(year: str | int, stage: str, number: int, name: st
 
 
 def system_dir_name(settings: Settings) -> str:
-    stage_label = "TD" if settings.storm_stage.upper() == "TD" else "TYP"
-    return system_dir_name_for_parts(storm_year(settings), stage_label, settings.typ_number, settings.typ_name)
+    return system_dir_name_for_parts(
+        storm_year(settings),
+        canonical_storm_stage(settings),
+        canonical_typ_number(settings),
+        canonical_typ_name(settings),
+    )
 
 
 def system_output_dir(settings: Settings) -> Path:
@@ -2629,6 +2687,7 @@ def write_run_metadata(
         "data_typ_number": kma_data_typ_number(settings),
         "typ_name": settings.typ_name,
         "typ_name_ko": settings.typ_name_ko,
+        **canonical_metadata_fields(settings),
         "linked_td_number": settings.linked_td_number,
         "linked_typ_number": settings.linked_typ_number,
         "atcf_id": "" if settings.skip_atcf else settings.atcf_id,
@@ -2677,6 +2736,7 @@ def write_no_output_metadata(
         "data_typ_number": kma_data_typ_number(settings),
         "typ_name": settings.typ_name,
         "typ_name_ko": settings.typ_name_ko,
+        **canonical_metadata_fields(settings),
         "linked_td_number": settings.linked_td_number,
         "linked_typ_number": settings.linked_typ_number,
         "atcf_id": "" if settings.skip_atcf else settings.atcf_id,

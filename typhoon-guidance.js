@@ -1796,12 +1796,34 @@ let dataTime=metadata.data_time || job.data_time || windowInfo.data_time || '';
 let generatedAt=metadata.generated_at_utc || manifest.updated_at_utc || '';
 let fcstHours=Number(metadata.fcst_hours || job.fcst_hours || parseTyphoonFcstHoursFromPath(imagePath) || 120);
 let year=String(metadata.storm_year || job.year || dataTime.slice(0,4) || '');
-let stage=normalizeTyphoonStage(metadata.storm_stage || job.stage || 'TYP');
-let typNumber=Number(metadata.typ_number || job.typ_number || 0);
-let tdNumber=metadata.linked_td_number || job.linked_td_number || job.td_number || null;
+let rawStage=normalizeTyphoonStage(metadata.storm_stage || job.stage || 'TYP');
+let rawTypNumber=Number(metadata.typ_number || job.typ_number || 0);
 let linkedTypNumber=metadata.linked_typ_number || job.linked_typ_number || null;
-let typName=normalizeTyphoonName(metadata.typ_name || job.typ_name || 'NONAME');
-let typNameKo=metadata.typ_name_ko || job.typ_name_ko || koreanTyphoonName(typName);
+let rawTypName=normalizeTyphoonName(metadata.typ_name || job.typ_name || 'NONAME');
+let rawTypNameKo=metadata.typ_name_ko || job.typ_name_ko || koreanTyphoonName(rawTypName);
+let hasCanonicalIdentity=Boolean(
+metadata.canonical_storm_stage || metadata.canonical_typ_number || metadata.canonical_typ_name ||
+job.canonical_storm_stage || job.canonical_typ_number || job.canonical_typ_name
+);
+let stage=hasCanonicalIdentity
+?normalizeTyphoonStage(metadata.canonical_storm_stage || job.canonical_storm_stage || rawStage)
+:rawStage;
+let typNumber=Number(
+hasCanonicalIdentity
+?(metadata.canonical_typ_number || job.canonical_typ_number || rawTypNumber)
+:rawTypNumber
+);
+let typName=normalizeTyphoonName(
+hasCanonicalIdentity
+?(metadata.canonical_typ_name || job.canonical_typ_name || rawTypName || 'NONAME')
+:(rawTypName || 'NONAME')
+);
+let typNameKo=hasCanonicalIdentity
+?(metadata.canonical_typ_name_ko || job.canonical_typ_name_ko || rawTypNameKo || koreanTyphoonName(typName))
+:(rawTypNameKo || koreanTyphoonName(typName));
+let tdNumber=rawStage==='TD'
+?rawTypNumber
+:(metadata.linked_td_number || job.linked_td_number || job.td_number || null);
 let stormKey=[year,stage,typNumber,typName].join('|');
 return applyTyphoonSortKey({
 index,
@@ -1815,6 +1837,7 @@ generatedAt,
 fcstHours,
 year,
 stage,
+originalStage:rawStage!==stage ? rawStage : undefined,
 typNumber,
 tdNumber,
 linkedTypNumber,
@@ -1953,6 +1976,10 @@ linked_typ_number:metadata.linked_typ_number || null,
 typ_number:metadata.typ_number || 0,
 typ_name:typName,
 typ_name_ko:metadata.typ_name_ko || koreanTyphoonName(typName),
+canonical_storm_stage:metadata.canonical_storm_stage || '',
+canonical_typ_number:metadata.canonical_typ_number || null,
+canonical_typ_name:metadata.canonical_typ_name || '',
+canonical_typ_name_ko:metadata.canonical_typ_name_ko || '',
 typ_en:typName,
 atcf_id:metadata.atcf_id || '',
 fcst_hours:metadata.fcst_hours || parseTyphoonFcstHoursFromPath(metadata.image_path || '') || 120,

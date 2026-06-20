@@ -59,6 +59,11 @@ MANIFEST_METADATA_KEYS = (
     "typ_name_ko",
     "linked_td_number",
     "linked_typ_number",
+    "canonical_storm_key",
+    "canonical_storm_stage",
+    "canonical_typ_number",
+    "canonical_typ_name",
+    "canonical_typ_name_ko",
     "atcf_id",
     "extra_atcf_ids",
     "data_time",
@@ -119,6 +124,10 @@ class StormJob:
     td_number: int | None
     linked_td_number: int | None
     linked_typ_number: int | None
+    canonical_storm_stage: str
+    canonical_typ_number: int | None
+    canonical_typ_name: str
+    canonical_typ_name_ko: str
     typ_number: int
     data_typ_number: int
     typ_name_ko: str
@@ -1806,6 +1815,10 @@ def build_storm_jobs(
             td_number=None,
             linked_td_number=linked_td_number,
             linked_typ_number=None,
+            canonical_storm_stage="TYP",
+            canonical_typ_number=typ_number,
+            canonical_typ_name=typ_en or typ_name_ko or "NONAME",
+            canonical_typ_name_ko=typ_name_ko,
             typ_number=typ_number,
             data_typ_number=typ_number,
             typ_name_ko=typ_name_ko,
@@ -1977,6 +1990,14 @@ def build_storm_jobs(
         else:
             stage = "TD_UNLINKED"
             reason = "TD has no linked typhoon number yet."
+        canonical_td_stage = "TYP" if typ_number else "TD"
+        canonical_td_number = typ_number if typ_number else td_number
+        canonical_td_name = (
+            linked_typ_en
+            or linked_typ_name_ko
+            or (display_typ_en if linked_typ_has_started else "")
+            or "NONAME"
+        )
         jobs.append(StormJob(
             storm_key=td_storm_key,
             stage=stage,
@@ -1985,6 +2006,10 @@ def build_storm_jobs(
             td_number=td_number,
             linked_td_number=None,
             linked_typ_number=typ_number or None,
+            canonical_storm_stage=canonical_td_stage,
+            canonical_typ_number=canonical_td_number,
+            canonical_typ_name=canonical_td_name if canonical_td_stage == "TYP" else "NONAME",
+            canonical_typ_name_ko=linked_typ_name_ko if canonical_td_stage == "TYP" else "",
             typ_number=td_number,
             data_typ_number=td_number,
             typ_name_ko=display_typ_name_ko if typ_number else "",
@@ -2021,9 +2046,39 @@ def build_storm_jobs(
     return jobs
 
 
+def canonical_stage_for_job(job: StormJob) -> str:
+    stage = str(job.canonical_storm_stage or "").strip().upper()
+    if stage in {"TD", "TYP"}:
+        return stage
+    if job.stage.startswith("TD_") and job.linked_typ_number and job.canonical_typ_number:
+        return "TYP"
+    return "TD" if job.stage.startswith("TD_") else "TYP"
+
+
+def canonical_typ_number_for_job(job: StormJob) -> int:
+    if job.canonical_typ_number:
+        return int(job.canonical_typ_number)
+    if canonical_stage_for_job(job) == "TYP" and job.stage.startswith("TD_") and job.linked_typ_number:
+        return int(job.linked_typ_number)
+    return int(job.typ_number)
+
+
+def canonical_typ_name_for_job(job: StormJob) -> str:
+    name = str(job.canonical_typ_name or "").strip()
+    if name:
+        return name
+    if canonical_stage_for_job(job) == "TYP":
+        return str(job.typ_en or job.typ_name or "NONAME").strip() or "NONAME"
+    return "NONAME" if job.stage.startswith("TD_") else (str(job.typ_name or "NONAME").strip() or "NONAME")
+
+
+def canonical_typ_name_ko_for_job(job: StormJob) -> str:
+    return str(job.canonical_typ_name_ko or job.typ_name_ko or "").strip()
+
+
 def metadata_storm_key_for(job: StormJob) -> str:
-    prefix = "td" if job.stage.startswith("TD_") else "typ"
-    return f"{prefix}_{job.year}_{job.typ_number:02d}"
+    prefix = "td" if canonical_stage_for_job(job) == "TD" else "typ"
+    return f"{prefix}_{job.year}_{canonical_typ_number_for_job(job):02d}"
 
 
 def system_dir_name_for_parts(year: int | str, stage: str, typ_number: int | str, typ_name: str = "NONAME") -> str:
@@ -2036,8 +2091,12 @@ def system_dir_name_for_parts(year: int | str, stage: str, typ_number: int | str
 
 
 def system_dir_name_for_job(job: StormJob) -> str:
-    stage = "TD" if job.stage.startswith("TD_") else "TYP"
-    return system_dir_name_for_parts(job.year, stage, job.typ_number, job.typ_name or "NONAME")
+    return system_dir_name_for_parts(
+        job.year,
+        canonical_stage_for_job(job),
+        canonical_typ_number_for_job(job),
+        canonical_typ_name_for_job(job),
+    )
 
 
 def system_dir_name_from_metadata(metadata: dict) -> str:
@@ -2201,42 +2260,409 @@ def metadata_int(value) -> int | None:
     return number if number > 0 else None
 
 
+def normalized_metadata_stage(metadata: dict) -> str:
+    stage = str(metadata.get("storm_stage") or "TYP").strip().upper()
+    return "TD" if stage == "TD" else "TYP"
+
+
+def canonical_stage_from_metadata(metadata: dict) -> str:
+    explicit = str(metadata.get("canonical_storm_stage") or "").strip().upper()
+    if explicit in {"TD", "TYP"}:
+        return explicit
+    if normalized_metadata_stage(metadata) == "TD" and metadata_int(metadata.get("linked_typ_number")):
+        return "TYP"
+    return normalized_metadata_stage(metadata)
+
+
+def canonical_typ_number_from_metadata(metadata: dict) -> int | None:
+    explicit = metadata_int(metadata.get("canonical_typ_number"))
+    if explicit:
+        return explicit
+    if canonical_stage_from_metadata(metadata) == "TYP" and normalized_metadata_stage(metadata) == "TD":
+        linked_typ_number = metadata_int(metadata.get("linked_typ_number"))
+        if linked_typ_number:
+            return linked_typ_number
+    return metadata_int(metadata.get("typ_number"))
+
+
+def canonical_typ_name_from_metadata(metadata: dict) -> str:
+    name = str(metadata.get("canonical_typ_name") or "").strip()
+    if name:
+        return name
+    if canonical_stage_from_metadata(metadata) == "TYP" and normalized_metadata_stage(metadata) == "TD":
+        linked_name = str(metadata.get("linked_typ_name") or "").strip()
+        if linked_name:
+            return linked_name
+    return str(metadata.get("typ_name") or "NONAME").strip() or "NONAME"
+
+
+def canonical_typ_name_ko_from_metadata(metadata: dict) -> str:
+    return str(metadata.get("canonical_typ_name_ko") or metadata.get("typ_name_ko") or "").strip()
+
+
+def canonical_storm_key_from_metadata(metadata: dict) -> str:
+    data_time = str(metadata.get("data_time") or "")
+    year_text = str(metadata.get("storm_year") or data_time[:4] or "0")
+    try:
+        year = int(year_text)
+    except (TypeError, ValueError):
+        year = 0
+    typ_number = canonical_typ_number_from_metadata(metadata)
+    if not year or not typ_number:
+        return "unknown"
+    prefix = "td" if canonical_stage_from_metadata(metadata) == "TD" else "typ"
+    return f"{prefix}_{year}_{typ_number:02d}"
+
+
+def canonical_metadata_fields(metadata: dict) -> dict:
+    storm_key = canonical_storm_key_from_metadata(metadata)
+    stage = canonical_stage_from_metadata(metadata)
+    typ_number = canonical_typ_number_from_metadata(metadata)
+    return {
+        "canonical_storm_key": storm_key,
+        "canonical_storm_stage": stage,
+        "canonical_typ_number": typ_number,
+        "canonical_typ_name": canonical_typ_name_from_metadata(metadata),
+        "canonical_typ_name_ko": canonical_typ_name_ko_from_metadata(metadata),
+    }
+
+
 def track_history_paths_from_metadata(output_root: Path, metadata: dict) -> list[Path]:
     data_time = str(metadata.get("data_time") or "")
     year = str(metadata.get("storm_year") or data_time[:4] or "").strip()
-    typ_number = metadata_int(metadata.get("typ_number"))
-    linked_td_number = metadata_int(metadata.get("linked_td_number"))
-    linked_typ_number = metadata_int(metadata.get("linked_typ_number"))
-    stage = str(metadata.get("storm_stage") or "TYP").upper()
-    keys: list[str] = []
-
-    def add(key: str) -> None:
-        if key and key not in keys:
-            keys.append(key)
-
-    if not year:
+    typ_number = canonical_typ_number_from_metadata(metadata)
+    stage = canonical_stage_from_metadata(metadata)
+    typ_name = canonical_typ_name_from_metadata(metadata)
+    if not year or not typ_number:
         return []
-    if stage == "TD":
-        if typ_number:
-            add(f"td_{year}_{typ_number:02d}")
-        if linked_typ_number:
-            add(f"typ_{year}_{linked_typ_number:02d}")
-    else:
-        if linked_td_number:
-            add(f"td_{year}_{linked_td_number:02d}")
-        if typ_number:
-            add(f"typ_{year}_{typ_number:02d}")
+    system_dir = output_root / year / system_dir_name_for_parts(year, stage, typ_number, typ_name)
+    return [system_dir / "metadata" / "track_history.json"]
 
-    paths: list[Path] = []
-    for key in keys:
-        parts = key.split("_")
-        if len(parts) < 3 or not parts[1].isdigit() or not parts[2].isdigit():
+
+def existing_typ_name_lookup(output_root: Path) -> dict[tuple[str, int], tuple[str, str]]:
+    lookup: dict[tuple[str, int], tuple[str, str]] = {}
+
+    def remember(year: str, typ_number: int | None, typ_name: str, typ_name_ko: str = "") -> None:
+        if not year or not typ_number:
+            return
+        name = str(typ_name or "").strip()
+        if not name or name.upper() == "NONAME":
+            return
+        key = (str(year), int(typ_number))
+        current = lookup.get(key)
+        if current and current[0].upper() != "NONAME":
+            return
+        lookup[key] = (name, str(typ_name_ko or "").strip())
+
+    for path in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/index.json")):
+        payload = load_json(path, {})
+        systems = payload.get("systems") if isinstance(payload, dict) else []
+        if not isinstance(systems, list):
             continue
-        stage_for_key = "TD" if parts[0].lower() == "td" else "TYP"
-        name = str(metadata.get("typ_name") or "NONAME") if stage_for_key == "TYP" else "NONAME"
-        system_dir = output_root / parts[1] / system_dir_name_for_parts(parts[1], stage_for_key, int(parts[2]), name)
-        paths.append(system_dir / "metadata" / "track_history.json")
-    return paths
+        for system in systems:
+            if not isinstance(system, dict):
+                continue
+            stage = str(system.get("stage") or "").upper()
+            if not stage.startswith("TYP"):
+                continue
+            remember(
+                str(system.get("year") or path.parent.name),
+                metadata_int(system.get("typ_number")),
+                str(system.get("typ_name") or ""),
+                str(system.get("typ_name_ko") or ""),
+            )
+
+    for path in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/TYP_*/manifest.json")):
+        payload = load_json(path, {})
+        if isinstance(payload, dict):
+            remember(
+                str(payload.get("year") or path.parents[1].name),
+                metadata_int(payload.get("typ_number")),
+                str(payload.get("typ_name") or ""),
+                str(payload.get("typ_name_ko") or ""),
+            )
+        match = re.match(r"^TYP_(\d{2})(\d{2})_(.+)$", path.parent.name)
+        if match:
+            remember(path.parents[1].name, int(match.group(2)), match.group(3), "")
+    return lookup
+
+
+def canonical_target_for_linked_td_metadata(
+    output_root: Path,
+    metadata: dict,
+    typ_names: dict[tuple[str, int], tuple[str, str]],
+    *,
+    fallback_linked_typ_number: int | None = None,
+) -> tuple[Path, dict] | None:
+    if normalized_metadata_stage(metadata) != "TD":
+        return None
+    linked_typ_number = metadata_int(metadata.get("linked_typ_number")) or fallback_linked_typ_number
+    if not linked_typ_number:
+        return None
+    data_time = str(metadata.get("data_time") or "")
+    year = str(metadata.get("storm_year") or data_time[:4] or "").strip()
+    if not year:
+        return None
+    canonical_name = str(metadata.get("canonical_typ_name") or "").strip()
+    canonical_name_ko = str(metadata.get("canonical_typ_name_ko") or "").strip()
+    if not canonical_name or canonical_name.upper() == "NONAME":
+        canonical_name, canonical_name_ko = typ_names.get((year, linked_typ_number), ("", ""))
+    if not canonical_name or canonical_name.upper() == "NONAME":
+        return None
+    target_dir = output_root / year / system_dir_name_for_parts(year, "TYP", linked_typ_number, canonical_name)
+    fields = {
+        "canonical_storm_key": f"typ_{year}_{linked_typ_number:02d}",
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": linked_typ_number,
+        "canonical_typ_name": canonical_name,
+        "canonical_typ_name_ko": canonical_name_ko,
+        "linked_typ_number": linked_typ_number,
+    }
+    return target_dir, fields
+
+
+def rewrite_metadata_for_canonical_target(metadata: dict, target_dir: Path, canonical_fields: dict) -> dict:
+    updated = {**metadata, **canonical_fields}
+    image_path = normalized_image_path(updated.get("image_path"))
+    if image_path:
+        updated["image_path"] = relative_asset_path(target_dir / "images" / Path(image_path).name)
+    data_time = str(updated.get("data_time") or "").strip()
+    if data_time:
+        updated["source_availability_path"] = relative_asset_path(
+            target_dir / "metadata" / "source_availability" / f"{data_time}.json"
+        )
+        updated["source_availability_summary_path"] = relative_asset_path(
+            target_dir / "metadata" / "source_availability" / "summary.json"
+        )
+    return updated
+
+
+def move_or_replace_file(source: Path, target: Path, changed_paths: set[Path], *, dry_run: bool) -> None:
+    changed_paths.add(source)
+    changed_paths.add(target)
+    if dry_run or source == target or not source.exists():
+        return
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists():
+        target.unlink()
+    shutil.move(str(source), str(target))
+
+
+def merge_track_history_payloads(target: dict, source: dict, *, canonical_key: str, aliases: list[str]) -> dict:
+    priority = {
+        "MODEL_0H_MEAN": 1,
+        "BDECK": 2,
+        "JTWC_BDECK": 2,
+        "KMA_OFFICIAL": 3,
+        "KMA": 3,
+    }
+    merged = dict(target) if isinstance(target, dict) else {}
+    merged["version"] = max(int(merged.get("version") or 1), int(source.get("version") or 1) if isinstance(source, dict) else 1)
+    if canonical_key:
+        merged["primary_key"] = canonical_key
+    alias_set = {str(item or "").strip() for item in merged.get("aliases", []) if str(item or "").strip()}
+    if isinstance(source, dict):
+        alias_set.update(str(item or "").strip() for item in source.get("aliases", []) if str(item or "").strip())
+    alias_set.update(str(item or "").strip() for item in aliases if str(item or "").strip())
+    if canonical_key:
+        alias_set.add(canonical_key)
+    merged["aliases"] = sorted(alias_set)
+
+    by_time: dict[str, dict] = {}
+    for payload in [source if isinstance(source, dict) else {}, target if isinstance(target, dict) else {}]:
+        for point in payload.get("points", []) if isinstance(payload.get("points"), list) else []:
+            if not isinstance(point, dict):
+                continue
+            time_key = str(point.get("time_utc") or "").strip()
+            if not time_key:
+                continue
+            existing = by_time.get(time_key)
+            source_priority = priority.get(str(point.get("source") or "").upper(), 0)
+            existing_priority = priority.get(str(existing.get("source") or "").upper(), 0) if existing else -1
+            if existing is None or source_priority >= existing_priority:
+                by_time[time_key] = point
+    merged["points"] = [by_time[key] for key in sorted(by_time)]
+    merged["updated_at_utc"] = format_utc_stamp(utc_now())
+    return merged
+
+
+def merge_source_availability_summary(target: dict, source: dict, canonical_fields: dict, target_dir: Path) -> dict:
+    merged = dict(target) if isinstance(target, dict) else {}
+    if not merged:
+        merged = dict(source) if isinstance(source, dict) else {}
+    observations = {}
+    for payload in (target, source):
+        if isinstance(payload, dict) and isinstance(payload.get("observations"), dict):
+            observations.update(payload["observations"])
+    merged.update({
+        "version": max(int(merged.get("version") or 1), int(source.get("version") or 1) if isinstance(source, dict) else 1),
+        "storm_key": canonical_fields["canonical_storm_key"],
+        "storm_stage": "TYP",
+        "typ_number": canonical_fields["canonical_typ_number"],
+        "typ_name": canonical_fields["canonical_typ_name"],
+        "typ_name_ko": canonical_fields.get("canonical_typ_name_ko") or "",
+        "observations": observations,
+        "updated_at_utc": format_utc_stamp(utc_now()),
+        "source_availability_summary_path": relative_asset_path(target_dir / "metadata" / "source_availability" / "summary.json"),
+    })
+    return merged
+
+
+def merge_drive_archive_payload(target: dict, source: dict, source_dir: Path, target_dir: Path, canonical_key: str) -> dict:
+    merged = dict(target) if isinstance(target, dict) else {}
+    if not merged:
+        merged = {k: v for k, v in source.items() if k != "images"} if isinstance(source, dict) else {}
+    images = dict(merged.get("images") or {}) if isinstance(merged.get("images"), dict) else {}
+    source_images = source.get("images") if isinstance(source, dict) else {}
+    if isinstance(source_images, dict):
+        for image_path, record in source_images.items():
+            image_name = Path(normalized_image_path(image_path)).name
+            new_path = relative_asset_path(target_dir / "images" / image_name)
+            new_record = dict(record) if isinstance(record, dict) else {}
+            new_record["image_path"] = new_path
+            new_record["storm_key"] = canonical_key
+            images[new_path] = new_record
+    merged["version"] = max(int(merged.get("version") or 1), int(source.get("version") or 1) if isinstance(source, dict) else 1)
+    merged["updated_at_utc"] = format_utc_stamp(utc_now())
+    merged["images"] = dict(sorted(images.items()))
+    return merged
+
+
+def canonicalize_linked_td_outputs(output_root: Path, *, dry_run: bool = False) -> list[Path]:
+    if not output_root.exists():
+        return []
+    typ_names = existing_typ_name_lookup(output_root)
+    changed_paths: set[Path] = set()
+    for td_dir in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/TD_*")):
+        if not td_dir.is_dir():
+            continue
+        run_paths = sorted((td_dir / "metadata" / "runs").glob("*.json"))
+        if not run_paths:
+            continue
+        folder_manifest = load_json(td_dir / "manifest.json", {})
+        fallback_linked_typ_number = metadata_int(folder_manifest.get("linked_typ_number")) if isinstance(folder_manifest, dict) else None
+        target_dirs: set[Path] = set()
+        migrated_any = False
+        skipped_any = False
+        for run_path in run_paths:
+            metadata = load_json(run_path, None)
+            if not isinstance(metadata, dict):
+                skipped_any = True
+                continue
+            target = canonical_target_for_linked_td_metadata(
+                output_root,
+                metadata,
+                typ_names,
+                fallback_linked_typ_number=fallback_linked_typ_number,
+            )
+            if target is None:
+                skipped_any = True
+                continue
+            target_dir, canonical_fields = target
+            target_dirs.add(target_dir)
+            updated_metadata = rewrite_metadata_for_canonical_target(metadata, target_dir, canonical_fields)
+
+            image_path = normalized_image_path(metadata.get("image_path"))
+            if image_path:
+                source_image = PROJECT_ROOT / image_path
+                target_image = target_dir / "images" / source_image.name
+                move_or_replace_file(source_image, target_image, changed_paths, dry_run=dry_run)
+
+            target_run_path = target_dir / "metadata" / "runs" / run_path.name
+            changed_paths.add(run_path)
+            changed_paths.add(target_run_path)
+            if not dry_run:
+                write_json(target_run_path, updated_metadata)
+                try:
+                    run_path.unlink()
+                except FileNotFoundError:
+                    pass
+            migrated_any = True
+
+        if not migrated_any:
+            continue
+
+        for target_dir in sorted(target_dirs):
+            source_availability_dir = td_dir / "metadata" / "source_availability"
+            target_availability_dir = target_dir / "metadata" / "source_availability"
+            for source_path in sorted(source_availability_dir.glob("*.json")) if source_availability_dir.exists() else []:
+                if source_path.name == "summary.json":
+                    continue
+                payload = load_json(source_path, None)
+                if isinstance(payload, dict):
+                    target = canonical_target_for_linked_td_metadata(
+                        output_root,
+                        payload,
+                        typ_names,
+                        fallback_linked_typ_number=fallback_linked_typ_number,
+                    )
+                    if target is not None:
+                        _, canonical_fields = target
+                        payload = rewrite_metadata_for_canonical_target(payload, target_dir, canonical_fields)
+                        target_path = target_availability_dir / source_path.name
+                        changed_paths.add(source_path)
+                        changed_paths.add(target_path)
+                        if not dry_run:
+                            write_json(target_path, payload)
+                            source_path.unlink(missing_ok=True)
+
+            source_summary_path = source_availability_dir / "summary.json"
+            if source_summary_path.exists():
+                target_summary_path = target_availability_dir / "summary.json"
+                source_summary = load_json(source_summary_path, {})
+                target_summary = load_json(target_summary_path, {})
+                first_metadata = load_json(next(iter(sorted((target_dir / "metadata" / "runs").glob("*.json"))), Path()), {})
+                canonical_fields = canonical_metadata_fields(first_metadata) if isinstance(first_metadata, dict) else {
+                    "canonical_storm_key": "",
+                    "canonical_typ_number": 0,
+                    "canonical_typ_name": "NONAME",
+                    "canonical_typ_name_ko": "",
+                }
+                merged_summary = merge_source_availability_summary(target_summary, source_summary, canonical_fields, target_dir)
+                changed_paths.add(source_summary_path)
+                changed_paths.add(target_summary_path)
+                if not dry_run:
+                    write_json(target_summary_path, merged_summary)
+                    source_summary_path.unlink(missing_ok=True)
+
+            source_history_path = td_dir / "metadata" / "track_history.json"
+            if source_history_path.exists():
+                target_history_path = target_dir / "metadata" / "track_history.json"
+                source_history = load_json(source_history_path, {})
+                target_history = load_json(target_history_path, {})
+                target_manifest = load_json(target_dir / "manifest.json", {})
+                canonical_key = str(target_manifest.get("storm_key") or "")
+                if not canonical_key:
+                    match = re.match(r"^TYP_(\d{2})(\d{2})_", target_dir.name)
+                    canonical_key = f"typ_{target_dir.parent.name}_{int(match.group(2)):02d}" if match else ""
+                aliases = [canonical_key, f"td_{td_dir.parent.name}_{td_dir.name[5:7]}"]
+                merged_history = merge_track_history_payloads(target_history, source_history, canonical_key=canonical_key, aliases=aliases)
+                changed_paths.add(source_history_path)
+                changed_paths.add(target_history_path)
+                if not dry_run:
+                    write_json(target_history_path, merged_history)
+                    source_history_path.unlink(missing_ok=True)
+
+            source_drive_path = td_dir / "drive_archive.json"
+            if source_drive_path.exists():
+                target_drive_path = target_dir / "drive_archive.json"
+                source_drive = load_json(source_drive_path, {})
+                target_drive = load_json(target_drive_path, {})
+                target_manifest = load_json(target_dir / "manifest.json", {})
+                canonical_key = str(target_manifest.get("storm_key") or "")
+                merged_drive = merge_drive_archive_payload(target_drive, source_drive, td_dir, target_dir, canonical_key)
+                changed_paths.add(source_drive_path)
+                changed_paths.add(target_drive_path)
+                if not dry_run:
+                    write_json(target_drive_path, merged_drive)
+                    source_drive_path.unlink(missing_ok=True)
+
+        changed_paths.add(td_dir / "manifest.json")
+        if not dry_run and not skipped_any:
+            shutil.rmtree(td_dir, ignore_errors=True)
+        elif dry_run:
+            print(f"Would canonicalize linked TD folder: {td_dir}")
+    return sorted(changed_paths)
 
 
 def status_key_for(job: StormJob, fcst_hours: int) -> str:
@@ -2403,6 +2829,17 @@ def vtg_command(
         command.extend(["--linked-td-number", str(job.linked_td_number)])
     if job.linked_typ_number is not None:
         command.extend(["--linked-typ-number", str(job.linked_typ_number)])
+    command.extend([
+        "--canonical-storm-stage",
+        canonical_stage_for_job(job),
+        "--canonical-typ-number",
+        str(canonical_typ_number_for_job(job)),
+        "--canonical-typ-name",
+        canonical_typ_name_for_job(job),
+    ])
+    canonical_name_ko = canonical_typ_name_ko_for_job(job)
+    if canonical_name_ko:
+        command.extend(["--canonical-typ-name-ko", canonical_name_ko])
     if job.skip_atcf:
         command.append("--skip-atcf")
     if auto_fcst_hours:
@@ -2574,8 +3011,9 @@ def manifest_entry_from_metadata(path: Path, metadata: dict) -> dict:
     year = int(str(metadata.get("storm_year") or data_time[:4] or "0") or 0)
     typ_number = int(metadata.get("typ_number") or 0)
     stage = str(metadata.get("storm_stage") or "TYP")
-    storm_key_prefix = "td" if stage.upper() == "TD" else "typ"
-    storm_key = f"{storm_key_prefix}_{year}_{typ_number:02d}" if year and typ_number else path.stem
+    canonical_fields = canonical_metadata_fields(metadata)
+    storm_key = canonical_fields.get("canonical_storm_key") or path.stem
+    enriched_metadata = {**metadata, **canonical_fields}
     return {
         "job": {
             "storm_key": storm_key,
@@ -2585,6 +3023,10 @@ def manifest_entry_from_metadata(path: Path, metadata: dict) -> dict:
             "td_number": metadata.get("typ_number") if stage.upper() == "TD" else None,
             "linked_td_number": metadata.get("linked_td_number"),
             "linked_typ_number": metadata.get("linked_typ_number"),
+            "canonical_storm_stage": canonical_fields.get("canonical_storm_stage"),
+            "canonical_typ_number": canonical_fields.get("canonical_typ_number"),
+            "canonical_typ_name": canonical_fields.get("canonical_typ_name"),
+            "canonical_typ_name_ko": canonical_fields.get("canonical_typ_name_ko"),
             "typ_number": typ_number,
             "data_typ_number": metadata.get("data_typ_number") or typ_number,
             "typ_name_ko": metadata.get("typ_name_ko") or "",
@@ -2595,7 +3037,7 @@ def manifest_entry_from_metadata(path: Path, metadata: dict) -> dict:
             "skip_atcf": bool(metadata.get("skip_atcf")),
         },
         "window": {"data_time": data_time},
-        "result": {"status": "inventory", "metadata": compact_metadata(metadata)},
+        "result": {"status": "inventory", "metadata": compact_metadata(enriched_metadata)},
         "metadata_path": relative_asset_path(path),
     }
 
@@ -2947,7 +3389,7 @@ def build_manifest_inventory(output_root: Path, run_entries: list[dict]) -> list
         entries_by_key.values(),
         key=lambda item: (
             item.get("job", {}).get("year") or 0,
-            item.get("job", {}).get("typ_number") or 0,
+            canonical_typ_number_from_metadata(item.get("result", {}).get("metadata", {}) or {}) or item.get("job", {}).get("typ_number") or 0,
             item.get("job", {}).get("data_time") or "",
             item.get("result", {}).get("metadata", {}).get("fcst_hours") or 0,
         ),
@@ -2959,7 +3401,7 @@ def sort_manifest_inventory(entries: list[dict]) -> list[dict]:
         entries,
         key=lambda item: (
             item.get("job", {}).get("year") or 0,
-            item.get("job", {}).get("typ_number") or 0,
+            canonical_typ_number_from_metadata(item.get("result", {}).get("metadata", {}) or {}) or item.get("job", {}).get("typ_number") or 0,
             item.get("job", {}).get("data_time") or "",
             item.get("result", {}).get("metadata", {}).get("fcst_hours") or 0,
         ),
@@ -2967,19 +3409,7 @@ def sort_manifest_inventory(entries: list[dict]) -> list[dict]:
 
 
 def manifest_storm_key_from_metadata(metadata: dict) -> str:
-    data_time = str(metadata.get("data_time") or "")
-    year_text = str(metadata.get("storm_year") or data_time[:4] or "0")
-    try:
-        year = int(year_text)
-    except (TypeError, ValueError):
-        year = 0
-    try:
-        typ_number = int(metadata.get("typ_number") or 0)
-    except (TypeError, ValueError):
-        typ_number = 0
-    stage = str(metadata.get("storm_stage") or "TYP").upper()
-    prefix = "td" if stage == "TD" else "typ"
-    return f"{prefix}_{year}_{typ_number:02d}" if year and typ_number else "unknown"
+    return canonical_storm_key_from_metadata(metadata)
 
 
 def manifest_storm_key_from_entry(entry: dict) -> str:
@@ -3079,15 +3509,23 @@ def storm_summary_from_inventory(storm_key: str, inventory: list[dict]) -> dict:
             latest_entry = entry
     metadata = latest_entry.get("result", {}).get("metadata", {}) if isinstance(latest_entry, dict) else {}
     job = latest_entry.get("job", {}) if isinstance(latest_entry, dict) else {}
+    canonical_stage = canonical_stage_from_metadata(metadata) if isinstance(metadata, dict) else ""
+    canonical_typ_number = canonical_typ_number_from_metadata(metadata) if isinstance(metadata, dict) else None
+    canonical_typ_name = canonical_typ_name_from_metadata(metadata) if isinstance(metadata, dict) else "NONAME"
+    canonical_typ_name_ko = canonical_typ_name_ko_from_metadata(metadata) if isinstance(metadata, dict) else ""
+    actual_stage = normalized_metadata_stage(metadata) if isinstance(metadata, dict) else ""
+    linked_td_number = job.get("linked_td_number") or metadata.get("linked_td_number")
+    if canonical_stage == "TYP" and actual_stage == "TD":
+        linked_td_number = linked_td_number or metadata_int(metadata.get("typ_number"))
     return {
         "storm_key": storm_key,
-        "stage": job.get("stage") or metadata.get("storm_stage") or "",
+        "stage": canonical_stage or job.get("stage") or metadata.get("storm_stage") or "",
         "year": job.get("year") or metadata.get("storm_year") or "",
-        "typ_number": job.get("typ_number") or metadata.get("typ_number") or 0,
-        "linked_td_number": job.get("linked_td_number") or metadata.get("linked_td_number"),
-        "linked_typ_number": job.get("linked_typ_number") or metadata.get("linked_typ_number"),
-        "typ_name": job.get("typ_name") or metadata.get("typ_name") or "NONAME",
-        "typ_name_ko": job.get("typ_name_ko") or metadata.get("typ_name_ko") or "",
+        "typ_number": canonical_typ_number or job.get("typ_number") or metadata.get("typ_number") or 0,
+        "linked_td_number": linked_td_number,
+        "linked_typ_number": None if canonical_stage == "TYP" else (job.get("linked_typ_number") or metadata.get("linked_typ_number")),
+        "typ_name": canonical_typ_name or job.get("typ_name") or metadata.get("typ_name") or "NONAME",
+        "typ_name_ko": canonical_typ_name_ko or job.get("typ_name_ko") or metadata.get("typ_name_ko") or "",
         "latest_data_time": metadata.get("data_time") or "",
         "item_count": len(inventory),
     }
@@ -3421,6 +3859,7 @@ def main() -> int:
 
     if args.index_only:
         updated_at_utc = format_utc_stamp(now)
+        canonicalized_paths = canonicalize_linked_td_outputs(output_root, dry_run=args.dry_run)
         inventory = build_manifest_inventory(output_root, [])
         split_paths = [] if args.dry_run else rebuild_split_manifest_files(output_root, inventory, updated_at_utc=updated_at_utc)
         manifest = root_manifest_payload(
@@ -3446,6 +3885,8 @@ def main() -> int:
             include_manifest=True,
             include_status=status_for_write != status,
         )
+        changed_paths.extend(relative_changed_path(path) for path in canonicalized_paths)
+        changed_paths = sorted(set(changed_paths))
         if not args.dry_run:
             write_json(manifest_path, manifest)
             if status_for_write != status:
@@ -3710,18 +4151,24 @@ def main() -> int:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
         return 0
 
+    canonicalized_paths = canonicalize_linked_td_outputs(output_root, dry_run=args.dry_run)
     previous_manifest = load_json(manifest_path, {})
     compact_runs = compact_manifest_runs(run_entries)
     updated_at_utc = format_utc_stamp(now)
-    if args.full_manifest_scan:
+    if args.full_manifest_scan or canonicalized_paths:
         inventory = build_manifest_inventory(output_root, run_entries)
     else:
         previous_inventory = previous_manifest.get("inventory") if isinstance(previous_manifest, dict) else []
         if not isinstance(previous_inventory, list):
             previous_inventory = []
         inventory = merge_manifest_inventory(previous_inventory, run_entries)
-    split_paths = [] if args.dry_run else write_split_manifest_files(output_root, run_entries, updated_at_utc=updated_at_utc)
-    if args.full_manifest_scan or previous_inventory:
+    if args.dry_run:
+        split_paths = []
+    elif args.full_manifest_scan or canonicalized_paths:
+        split_paths = rebuild_split_manifest_files(output_root, inventory, updated_at_utc=updated_at_utc)
+    else:
+        split_paths = write_split_manifest_files(output_root, run_entries, updated_at_utc=updated_at_utc)
+    if args.full_manifest_scan or canonicalized_paths or previous_inventory:
         inventory_count = len(inventory)
     else:
         inventory_count = split_manifest_inventory_count(output_root)
@@ -3745,7 +4192,7 @@ def main() -> int:
     index_changed = previous_manifest.get("manifest_indexes") != manifest.get("manifest_indexes")
     status_changed = status_for_write != status
     should_write_outputs = not args.dry_run and (
-        actual_run_count > 0 or should_clear_previous_manifest or inventory_changed or index_changed or status_changed or bool(split_paths)
+        actual_run_count > 0 or should_clear_previous_manifest or inventory_changed or index_changed or status_changed or bool(split_paths) or bool(canonicalized_paths)
     )
     changed_paths = collect_changed_asset_paths(
         run_entries=run_entries,
@@ -3755,6 +4202,8 @@ def main() -> int:
         include_manifest=should_write_outputs,
         include_status=status_changed,
     )
+    changed_paths.extend(relative_changed_path(path) for path in canonicalized_paths)
+    changed_paths = sorted(set(changed_paths))
     if should_write_outputs:
         write_json(manifest_path, manifest)
         if status_changed or actual_run_count > 0:
