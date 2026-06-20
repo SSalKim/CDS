@@ -1824,6 +1824,9 @@ let text=String(stage || 'TYP').trim().toUpperCase();
 if(text.startsWith('TD')){
 return 'TD';
 }
+if(text.startsWith('TYP')){
+return 'TYP';
+}
 return text || 'TYP';
 }
 
