@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202606200832",
+  "updated_at_utc": "202606200842",
   "storm_key": "typ_2026_07",
   "stage": "TYP",
   "year": 2026,
@@ -1013,32 +1013,28 @@
     {
       "job": {
         "storm_key": "typ_2026_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2026,
         "data_time": "202606200000",
         "td_number": null,
         "linked_td_number": 12,
-        "linked_typ_number": null,
-        "canonical_storm_stage": "TYP",
-        "canonical_typ_number": 7,
-        "canonical_typ_name": "MEKKHALA",
-        "canonical_typ_name_ko": "메칼라",
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "메칼라",
         "typ_name": "MEKKHALA",
         "typ_en": "MEKKHALA",
         "atcf_id": "wp072026",
-        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202606200000"
+        "data_time": "202606200000",
+        "cycle_time_utc": "202606200000",
+        "start_utc": "202606200500",
+        "end_utc": "202606201100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260620082333",
+          "generated_at_utc": "20260620084337",
           "image_path": "data/2026/TYP_2607_MEKKHALA/images/TYP_2607_MEKKHALA_202606200000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1058,7 +1054,7 @@
           "data_time": "202606200000",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 32,
+          "model_count": 35,
           "target_model_count": 36,
           "model_labels": [
             "GALWEM",
@@ -1081,6 +1077,9 @@
             "GFS",
             "GFS EPS",
             "HAFS",
+            "Aurora-ECMWF",
+            "FengWu-ECMWF",
+            "FuXi-ECMWF",
             "HWRF",
             "KMA AIFS-ECMWF",
             "KMA AIFS-KIM",
@@ -1096,41 +1095,37 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606200000.json",
-          "source_availability_summary_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/summary.json",
-          "models": []
+          "source_availability_summary_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/summary.json"
         }
       },
-      "metadata_path": "data/2026/TYP_2607_MEKKHALA/metadata/runs/202606200000_120h.json"
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2026_07",
-        "stage": "TYP",
+        "stage": "TYP_LINKED",
         "year": 2026,
         "data_time": "202606200000",
         "td_number": null,
         "linked_td_number": 12,
-        "linked_typ_number": null,
-        "canonical_storm_stage": "TYP",
-        "canonical_typ_number": 7,
-        "canonical_typ_name": "MEKKHALA",
-        "canonical_typ_name_ko": "메칼라",
         "typ_number": 7,
-        "data_typ_number": 7,
         "typ_name_ko": "메칼라",
         "typ_name": "MEKKHALA",
         "typ_en": "MEKKHALA",
         "atcf_id": "wp072026",
-        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202606200000"
+        "data_time": "202606200000",
+        "cycle_time_utc": "202606200000",
+        "start_utc": "202606200500",
+        "end_utc": "202606201100"
       },
       "result": {
-        "status": "inventory",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260620082335",
+          "generated_at_utc": "20260620084339",
           "image_path": "data/2026/TYP_2607_MEKKHALA/images/TYP_2607_MEKKHALA_202606200000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1150,7 +1145,7 @@
           "data_time": "202606200000",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 32,
+          "model_count": 35,
           "target_model_count": 36,
           "model_labels": [
             "GALWEM",
@@ -1173,6 +1168,9 @@
             "GFS",
             "GFS EPS",
             "HAFS",
+            "Aurora-ECMWF",
+            "FengWu-ECMWF",
+            "FuXi-ECMWF",
             "HWRF",
             "KMA AIFS-ECMWF",
             "KMA AIFS-KIM",
@@ -1188,11 +1186,11 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606200000.json",
-          "source_availability_summary_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/summary.json",
-          "models": []
+          "source_availability_summary_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/summary.json"
         }
       },
-      "metadata_path": "data/2026/TYP_2607_MEKKHALA/metadata/runs/202606200000_240h.json"
+      "completed": false,
+      "final_check": false
     }
   ]
 }
