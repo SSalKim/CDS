@@ -75,7 +75,6 @@ MANIFEST_METADATA_KEYS = (
     "model_labels",
     "skip_atcf",
     "source_availability_path",
-    "source_availability_summary_path",
     "no_output",
     "no_output_reason",
 )
@@ -2429,15 +2428,11 @@ def rewrite_metadata_for_canonical_target(metadata: dict, target_dir: Path, cano
     data_time = str(updated.get("data_time") or "").strip()
     if data_time:
         target_latest = target_dir / "metadata" / "source_availability" / f"{data_time}.json"
-        target_summary = target_dir / "metadata" / "source_availability" / "summary.json"
         if metadata_referenced_path_exists(metadata, "source_availability_path") or target_latest.exists():
             updated["source_availability_path"] = relative_asset_path(target_latest)
         else:
             updated.pop("source_availability_path", None)
-        if metadata_referenced_path_exists(metadata, "source_availability_summary_path") or target_summary.exists():
-            updated["source_availability_summary_path"] = relative_asset_path(target_summary)
-        else:
-            updated.pop("source_availability_summary_path", None)
+        updated.pop("source_availability_summary_path", None)
     else:
         updated.pop("source_availability_path", None)
         updated.pop("source_availability_summary_path", None)
@@ -2490,28 +2485,6 @@ def merge_track_history_payloads(target: dict, source: dict, *, canonical_key: s
                 by_time[time_key] = point
     merged["points"] = [by_time[key] for key in sorted(by_time)]
     merged["updated_at_utc"] = format_utc_stamp(utc_now())
-    return merged
-
-
-def merge_source_availability_summary(target: dict, source: dict, canonical_fields: dict, target_dir: Path) -> dict:
-    merged = dict(target) if isinstance(target, dict) else {}
-    if not merged:
-        merged = dict(source) if isinstance(source, dict) else {}
-    observations = {}
-    for payload in (target, source):
-        if isinstance(payload, dict) and isinstance(payload.get("observations"), dict):
-            observations.update(payload["observations"])
-    merged.update({
-        "version": max(int(merged.get("version") or 1), int(source.get("version") or 1) if isinstance(source, dict) else 1),
-        "storm_key": canonical_fields["canonical_storm_key"],
-        "storm_stage": "TYP",
-        "typ_number": canonical_fields["canonical_typ_number"],
-        "typ_name": canonical_fields["canonical_typ_name"],
-        "typ_name_ko": canonical_fields.get("canonical_typ_name_ko") or "",
-        "observations": observations,
-        "updated_at_utc": format_utc_stamp(utc_now()),
-        "source_availability_summary_path": relative_asset_path(target_dir / "metadata" / "source_availability" / "summary.json"),
-    })
     return merged
 
 
@@ -2616,21 +2589,11 @@ def canonicalize_linked_td_outputs(output_root: Path, *, dry_run: bool = False) 
             source_summary_path = source_availability_dir / "summary.json"
             if source_summary_path.exists():
                 target_summary_path = target_availability_dir / "summary.json"
-                source_summary = load_json(source_summary_path, {})
-                target_summary = load_json(target_summary_path, {})
-                first_metadata = load_json(next(iter(sorted((target_dir / "metadata" / "runs").glob("*.json"))), Path()), {})
-                canonical_fields = canonical_metadata_fields(first_metadata) if isinstance(first_metadata, dict) else {
-                    "canonical_storm_key": "",
-                    "canonical_typ_number": 0,
-                    "canonical_typ_name": "NONAME",
-                    "canonical_typ_name_ko": "",
-                }
-                merged_summary = merge_source_availability_summary(target_summary, source_summary, canonical_fields, target_dir)
                 changed_paths.add(source_summary_path)
                 changed_paths.add(target_summary_path)
                 if not dry_run:
-                    write_json(target_summary_path, merged_summary)
                     source_summary_path.unlink(missing_ok=True)
+                    target_summary_path.unlink(missing_ok=True)
 
             source_history_path = td_dir / "metadata" / "track_history.json"
             if source_history_path.exists():
@@ -3248,7 +3211,7 @@ def compact_metadata(metadata: dict | None, allowed_keys: tuple[str, ...] = MANI
             continue
         if key not in metadata:
             continue
-        if key in {"source_availability_path", "source_availability_summary_path"}:
+        if key == "source_availability_path":
             if not metadata_referenced_path_exists(metadata, key):
                 continue
         compact[key] = metadata[key]
@@ -3831,10 +3794,7 @@ def collect_changed_asset_paths(
                 image_path = str(metadata.get("image_path") or "").strip()
                 if image_path:
                     paths.add(relative_changed_path(PROJECT_ROOT / image_path))
-                for availability_key in (
-                    "source_availability_path",
-                    "source_availability_summary_path",
-                ):
+                for availability_key in ("source_availability_path",):
                     availability_path = str(metadata.get(availability_key) or "").strip()
                     if availability_path and (PROJECT_ROOT / availability_path).exists():
                         paths.add(relative_changed_path(PROJECT_ROOT / availability_path))

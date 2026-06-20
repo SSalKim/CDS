@@ -350,6 +350,7 @@ for row in MODEL_SOURCES:
             MODEL_ALIAS_PRIORITIES.setdefault(alias_id, alias_priority)
 
 DATA_SOURCE_COLUMN = "_DATA_SOURCE"
+RAW_MODEL_COLUMN = "_RAW_MODEL"
 MODEL_ALIAS_PRIORITY_COLUMN = "_MODEL_ALIAS_PRIORITY"
 MS_PER_KT = 0.514444
 KMA_BASE_URL = "https://apihub-pub.kma.go.kr/api/typ01/url/typ_gts_now.php"
@@ -1165,6 +1166,7 @@ def atcf_to_kma_schema(raw: pd.DataFrame, settings: Settings) -> pd.DataFrame:
         "15D": "",
         "15R": "",
         "SRC": raw["MODEL"].replace(MODEL_SOURCE_ALIASES),
+        RAW_MODEL_COLUMN: raw["MODEL"].astype(str),
         DATA_SOURCE_COLUMN: raw[DATA_SOURCE_COLUMN],
         "": "",
     })
@@ -2015,12 +2017,9 @@ def source_availability_metadata_paths(
     existing_only: bool = True,
 ) -> dict[str, str]:
     latest_path = source_availability_latest_path(settings)
-    summary_path = source_availability_summary_path(settings)
     paths: dict[str, str] = {}
     if not existing_only or latest_path.exists():
         paths["source_availability_path"] = relative_project_path(latest_path)
-    if not existing_only or summary_path.exists():
-        paths["source_availability_summary_path"] = relative_project_path(summary_path)
     return paths
 
 
@@ -2064,6 +2063,13 @@ def source_availability_frame(kma_df: pd.DataFrame, atcf_df: pd.DataFrame, setti
         raw[DATA_SOURCE_COLUMN] = ""
     if "SRC" not in raw or "TMD" not in raw:
         return pd.DataFrame(columns=[*KMA_COLUMNS, DATA_SOURCE_COLUMN])
+    if RAW_MODEL_COLUMN not in raw:
+        raw[RAW_MODEL_COLUMN] = raw["SRC"].astype(str)
+    else:
+        raw[RAW_MODEL_COLUMN] = raw[RAW_MODEL_COLUMN].where(
+            raw[RAW_MODEL_COLUMN].notna() & raw[RAW_MODEL_COLUMN].astype(str).str.strip().ne(""),
+            raw["SRC"],
+        ).astype(str)
     raw["SRC"] = raw["SRC"].replace(MODEL_SOURCE_ALIASES)
     raw["TMD"] = pd.to_numeric(raw["TMD"], errors="coerce")
     for column in ("LAT", "LON", "WS", "PS"):
@@ -2072,16 +2078,6 @@ def source_availability_frame(kma_df: pd.DataFrame, atcf_df: pd.DataFrame, setti
     raw = raw[raw["SRC"].isin(MODEL_NAMES)].copy()
     raw = raw.dropna(subset=["TMD"])
     return raw
-
-
-def lead_hour_flags(lead_hours: list[int]) -> dict[str, bool]:
-    lead_set = set(lead_hours)
-    return {
-        "has_0h": 0 in lead_set,
-        "has_72h": any(hour >= 72 for hour in lead_set),
-        "has_120h": any(hour >= 120 for hour in lead_set),
-        "has_240h": any(hour >= 240 for hour in lead_set),
-    }
 
 
 def source_availability_entries(
@@ -2108,9 +2104,7 @@ def source_availability_entries(
                 "selected_source": source_name,
                 "selected_source_label": source_display_name(source_name),
                 "max_lead_hour": max(leads) if leads else None,
-                "lead_hours": leads,
                 "point_count": int(len(group)),
-                **lead_hour_flags(leads),
             }
 
     entries: list[dict] = []
@@ -2124,26 +2118,94 @@ def source_availability_entries(
             continue
         ws_values = pd.to_numeric(group.get("WS", pd.Series(dtype=float)), errors="coerce")
         ps_values = pd.to_numeric(group.get("PS", pd.Series(dtype=float)), errors="coerce")
+        raw_model_ids = sorted({
+            str(value).strip()
+            for value in group.get(RAW_MODEL_COLUMN, pd.Series(dtype=str)).dropna()
+            if str(value).strip()
+        })
         entry = {
             "model_id": model_name,
             "model_label": model_display_label(model_name),
+            "raw_model_ids": raw_model_ids,
             "source": source_name,
             "source_label": source_display_name(source_name),
             "selected": (model_name, source_name) in selected_pairs,
             "point_count": int(len(group)),
-            "lead_hours": leads,
-            "min_lead_hour": min(leads),
             "max_lead_hour": max(leads),
             "has_pressure": bool(ps_values.gt(0).any()) if not ps_values.empty else False,
             "has_wind": bool(ws_values.gt(0).any()) if not ws_values.empty else False,
             "is_official": model_name == "KMA",
-            **lead_hour_flags(leads),
         }
         entries.append(entry)
 
-    entries.sort(key=lambda item: (item["source"], item["model_id"]))
+    entries.sort(key=lambda item: (item["model_label"], item["model_id"], item["source"]))
     selected_models = dict(sorted(selected_models.items(), key=lambda item: item[0]))
     return entries, selected_models
+
+
+def availability_parse_utc_stamp(value: str) -> datetime | None:
+    text = str(value or "").strip()
+    for size, fmt in ((14, "%Y%m%d%H%M%S"), (12, "%Y%m%d%H%M"), (10, "%Y%m%d%H")):
+        candidate = text[:size]
+        if len(candidate) == size and candidate.isdigit():
+            try:
+                return datetime.strptime(candidate, fmt).replace(tzinfo=timezone.utc)
+            except ValueError:
+                return None
+    return None
+
+
+def availability_kst_label(value: str) -> str:
+    parsed = availability_parse_utc_stamp(value)
+    if parsed is None:
+        return ""
+    return (parsed + timedelta(hours=9)).strftime("%Y-%m-%d %H:%M KST")
+
+
+def availability_cycle_label(value: str) -> str:
+    parsed = availability_parse_utc_stamp(value)
+    if parsed is None:
+        return str(value or "")
+    return parsed.strftime("%Y-%m-%d %HUTC")
+
+
+def previous_availability_source_records(path: Path) -> dict[str, dict]:
+    payload = availability_load_json(path, {})
+    if not isinstance(payload, dict):
+        return {}
+    records: dict[str, dict] = {}
+    for entry in payload.get("model_sources", []):
+        if not isinstance(entry, dict):
+            continue
+        key = source_model_key(entry)
+        if key != "|":
+            records[key] = entry
+    return records
+
+
+def annotate_source_first_seen(entries: list[dict], latest_path: Path, observed_at_utc: str) -> list[dict]:
+    previous_records = previous_availability_source_records(latest_path)
+    annotated: list[dict] = []
+    for entry in entries:
+        key = source_model_key(entry)
+        previous = previous_records.get(key, {})
+        first_seen = str(previous.get("first_seen_utc") or observed_at_utc)
+        updated = dict(entry)
+        updated["first_seen_utc"] = first_seen
+        updated["first_seen_kst"] = availability_kst_label(first_seen)
+        updated["last_seen_utc"] = observed_at_utc
+        updated["last_seen_kst"] = availability_kst_label(observed_at_utc)
+        annotated.append(updated)
+    return sorted(
+        annotated,
+        key=lambda item: (
+            str(item.get("model_label") or ""),
+            str(item.get("model_id") or ""),
+            str(item.get("first_seen_utc") or ""),
+            0 if item.get("selected") else 1,
+            str(item.get("source") or ""),
+        ),
+    )
 
 
 def source_availability_snapshot(
@@ -2156,39 +2218,14 @@ def source_availability_snapshot(
     observed_at_utc: str,
 ) -> dict:
     entries, selected_models = source_availability_entries(raw_df, selected_df, settings)
-    active_models = sorted(active_model_names(settings))
-    by_source: dict[str, dict] = {}
-    complete_counts = {str(hour): 0 for hour in VALID_FCST_HOURS}
-    model_count_by_source: dict[str, int] = {}
-
-    for entry in entries:
-        source = entry["source"]
-        source_summary = by_source.setdefault(source, {
-            "source_label": entry["source_label"],
-            "model_count": 0,
-            "selected_model_count": 0,
-            "max_lead_hour": None,
-        })
-        source_summary["model_count"] += 1
-        if entry.get("selected"):
-            source_summary["selected_model_count"] += 1
-        max_lead = entry.get("max_lead_hour")
-        if max_lead is not None:
-            current = source_summary.get("max_lead_hour")
-            source_summary["max_lead_hour"] = max(max_lead, current if current is not None else max_lead)
-        model_count_by_source[source] = model_count_by_source.get(source, 0) + 1
-
-    for model_name, selected in selected_models.items():
-        if model_name not in active_models:
-            continue
-        max_lead = selected.get("max_lead_hour")
-        for hour in VALID_FCST_HOURS:
-            if max_lead is not None and max_lead >= hour:
-                complete_counts[str(hour)] += 1
+    entries = annotate_source_first_seen(entries, source_availability_latest_path(settings), observed_at_utc)
+    selected_model_count = len([name for name in selected_models if name != "KMA"])
 
     return {
-        "version": 1,
+        "version": 2,
+        "schema": "cycle_model_source_first_seen",
         "generated_at_utc": observed_at_utc,
+        "generated_at_kst": availability_kst_label(observed_at_utc),
         "storm_year": storm_year(settings),
         "storm_key": source_availability_storm_key(settings),
         "storm_stage": settings.storm_stage,
@@ -2202,113 +2239,20 @@ def source_availability_snapshot(
         "atcf_id": "" if settings.skip_atcf else settings.atcf_id,
         "extra_atcf_ids": [] if settings.skip_atcf else list(settings.extra_atcf_ids),
         "data_time": settings.data_time,
+        "cycle_time_utc": settings.data_time,
+        "cycle_label_utc": availability_cycle_label(settings.data_time),
         "fetch_hours": int(fetch_hours),
         "requested_hours": list(requested_hours),
-        "source_priority": {
-            model_name: list(source_priority_for_model(model_name, settings))
-            for model_name in sorted({entry["model_id"] for entry in entries})
-            if model_name != "KMA"
-        },
+        "model_source_count": len(entries),
+        "selected_model_count": selected_model_count,
+        "active_target_model_count": active_model_target_count(settings),
         "model_sources": entries,
-        "selected_models": selected_models,
-        "summary": {
-            "source_count": len(by_source),
-            "model_source_count": len(entries),
-            "selected_model_count": len([name for name in selected_models if name != "KMA"]),
-            "active_target_model_count": active_model_target_count(settings),
-            "complete_model_count_by_lead": complete_counts,
-            "by_source": dict(sorted(by_source.items())),
-            "model_count_by_source": dict(sorted(model_count_by_source.items())),
-        },
         **source_availability_metadata_paths(settings, observed_at_utc, existing_only=False),
     }
 
 
 def source_model_key(entry: dict) -> str:
     return f"{entry.get('model_id', '')}|{entry.get('source', '')}"
-
-
-def update_source_availability_summary(
-    *,
-    summary_path: Path,
-    latest_path: Path,
-    snapshot: dict,
-) -> None:
-    summary = availability_load_json(summary_path, None)
-    if not isinstance(summary, dict):
-        summary = {
-            "version": 1,
-            "storm_year": snapshot.get("storm_year"),
-            "storm_key": snapshot.get("storm_key"),
-            "storm_stage": snapshot.get("storm_stage"),
-            "typ_number": snapshot.get("typ_number"),
-            "typ_name": snapshot.get("typ_name"),
-            "typ_name_ko": snapshot.get("typ_name_ko"),
-            "observations": {},
-        }
-
-    summary.update({
-        "version": 1,
-        "updated_at_utc": snapshot.get("generated_at_utc"),
-        "storm_year": snapshot.get("storm_year"),
-        "storm_key": snapshot.get("storm_key"),
-        "storm_stage": snapshot.get("storm_stage"),
-        "typ_number": snapshot.get("typ_number"),
-        "typ_name": snapshot.get("typ_name"),
-        "typ_name_ko": snapshot.get("typ_name_ko"),
-        "source_availability_path": relative_project_path(latest_path),
-        "source_availability_summary_path": relative_project_path(summary_path),
-    })
-
-    observations = summary.setdefault("observations", {})
-    data_time = str(snapshot.get("data_time") or "")
-    observation = observations.setdefault(data_time, {
-        "data_time": data_time,
-        "first_seen_utc": snapshot.get("generated_at_utc"),
-        "model_sources": {},
-    })
-    observation.setdefault("first_seen_utc", snapshot.get("generated_at_utc"))
-    observation["last_seen_utc"] = snapshot.get("generated_at_utc")
-    observation["latest_path"] = relative_project_path(latest_path)
-    observation["fetch_hours"] = snapshot.get("fetch_hours")
-    observation["requested_hours"] = snapshot.get("requested_hours")
-    observation["selected_models"] = snapshot.get("selected_models", {})
-    observation["summary"] = snapshot.get("summary", {})
-
-    model_sources = observation.setdefault("model_sources", {})
-    for entry in snapshot.get("model_sources", []):
-        if not isinstance(entry, dict):
-            continue
-        key = source_model_key(entry)
-        if key == "|":
-            continue
-        record = model_sources.setdefault(key, {
-            "model_id": entry.get("model_id"),
-            "model_label": entry.get("model_label"),
-            "source": entry.get("source"),
-            "source_label": entry.get("source_label"),
-            "first_seen_utc": snapshot.get("generated_at_utc"),
-        })
-        record.setdefault("first_seen_utc", snapshot.get("generated_at_utc"))
-        record["last_seen_utc"] = snapshot.get("generated_at_utc")
-        record["latest_max_lead_hour"] = entry.get("max_lead_hour")
-        record["latest_point_count"] = entry.get("point_count")
-        record["latest_selected"] = bool(entry.get("selected"))
-        # Keep full lead-hour arrays in per-cycle snapshots only; summaries store
-        # first-seen/completion markers to keep per-system files bounded.
-        for hour in (0, 72, 120, 240):
-            flag_name = f"has_{hour}h" if hour else "has_0h"
-            first_key = f"first_{hour}h_seen_utc" if hour else "first_0h_seen_utc"
-            if entry.get(flag_name) and not record.get(first_key):
-                record[first_key] = snapshot.get("generated_at_utc")
-
-    # Keep the per-system summary bounded by system/data_time instead of a single
-    # global file. Within one system, sort observations for deterministic diffs.
-    summary["observations"] = {
-        key: observations[key]
-        for key in sorted(observations)
-    }
-    availability_write_json(summary_path, summary)
 
 
 def write_source_availability_outputs(
@@ -2332,14 +2276,12 @@ def write_source_availability_outputs(
         observed_at_utc=observed_at_utc,
     )
     snapshot["source_availability_path"] = relative_project_path(latest_path)
-    snapshot["source_availability_summary_path"] = relative_project_path(summary_path)
 
     availability_write_json(latest_path, snapshot)
-    update_source_availability_summary(
-        summary_path=summary_path,
-        latest_path=latest_path,
-        snapshot=snapshot,
-    )
+    try:
+        summary_path.unlink()
+    except FileNotFoundError:
+        pass
     print(
         "Wrote source availability metadata: "
         f"{relative_project_path(latest_path)} "
