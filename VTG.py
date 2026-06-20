@@ -2008,13 +2008,20 @@ def relative_project_path(path: Path) -> str:
         return path.as_posix()
 
 
-def source_availability_metadata_paths(settings: Settings, observed_at_utc: str | None = None) -> dict[str, str]:
+def source_availability_metadata_paths(
+    settings: Settings,
+    observed_at_utc: str | None = None,
+    *,
+    existing_only: bool = True,
+) -> dict[str, str]:
     latest_path = source_availability_latest_path(settings)
     summary_path = source_availability_summary_path(settings)
-    return {
-        "source_availability_path": relative_project_path(latest_path),
-        "source_availability_summary_path": relative_project_path(summary_path),
-    }
+    paths: dict[str, str] = {}
+    if not existing_only or latest_path.exists():
+        paths["source_availability_path"] = relative_project_path(latest_path)
+    if not existing_only or summary_path.exists():
+        paths["source_availability_summary_path"] = relative_project_path(summary_path)
+    return paths
 
 
 def availability_load_json(path: Path, fallback):
@@ -2213,7 +2220,7 @@ def source_availability_snapshot(
             "by_source": dict(sorted(by_source.items())),
             "model_count_by_source": dict(sorted(model_count_by_source.items())),
         },
-        **source_availability_metadata_paths(settings, observed_at_utc),
+        **source_availability_metadata_paths(settings, observed_at_utc, existing_only=False),
     }
 
 
@@ -2287,7 +2294,8 @@ def update_source_availability_summary(
         record["latest_max_lead_hour"] = entry.get("max_lead_hour")
         record["latest_point_count"] = entry.get("point_count")
         record["latest_selected"] = bool(entry.get("selected"))
-        record["latest_lead_hours"] = entry.get("lead_hours", [])
+        # Keep full lead-hour arrays in per-cycle snapshots only; summaries store
+        # first-seen/completion markers to keep per-system files bounded.
         for hour in (0, 72, 120, 240):
             flag_name = f"has_{hour}h" if hour else "has_0h"
             first_key = f"first_{hour}h_seen_utc" if hour else "first_0h_seen_utc"

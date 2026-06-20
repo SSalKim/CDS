@@ -345,7 +345,7 @@ jobs:
           FILTERED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths_existing.txt"
           touch "$CHANGED_PATHS_FILE"
           echo "Supplementing generated changed-path list with current VTG data git status."
-          git diff --name-only -- data >> "$CHANGED_PATHS_FILE" || true
+          git diff --name-only -- data VTG_IMG >> "$CHANGED_PATHS_FILE" || true
           git ls-files --others --exclude-standard -- data >> "$CHANGED_PATHS_FILE" || true
           sort -u "$CHANGED_PATHS_FILE" -o "$CHANGED_PATHS_FILE"
 

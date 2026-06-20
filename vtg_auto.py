@@ -2428,12 +2428,19 @@ def rewrite_metadata_for_canonical_target(metadata: dict, target_dir: Path, cano
         updated["image_path"] = relative_asset_path(target_dir / "images" / Path(image_path).name)
     data_time = str(updated.get("data_time") or "").strip()
     if data_time:
-        updated["source_availability_path"] = relative_asset_path(
-            target_dir / "metadata" / "source_availability" / f"{data_time}.json"
-        )
-        updated["source_availability_summary_path"] = relative_asset_path(
-            target_dir / "metadata" / "source_availability" / "summary.json"
-        )
+        target_latest = target_dir / "metadata" / "source_availability" / f"{data_time}.json"
+        target_summary = target_dir / "metadata" / "source_availability" / "summary.json"
+        if metadata_referenced_path_exists(metadata, "source_availability_path") or target_latest.exists():
+            updated["source_availability_path"] = relative_asset_path(target_latest)
+        else:
+            updated.pop("source_availability_path", None)
+        if metadata_referenced_path_exists(metadata, "source_availability_summary_path") or target_summary.exists():
+            updated["source_availability_summary_path"] = relative_asset_path(target_summary)
+        else:
+            updated.pop("source_availability_summary_path", None)
+    else:
+        updated.pop("source_availability_path", None)
+        updated.pop("source_availability_summary_path", None)
     return updated
 
 
@@ -2663,6 +2670,64 @@ def canonicalize_linked_td_outputs(output_root: Path, *, dry_run: bool = False) 
         elif dry_run:
             print(f"Would canonicalize linked TD folder: {td_dir}")
     return sorted(changed_paths)
+
+
+def track_history_canonical_key_from_path(path: Path) -> str:
+    try:
+        system_dir = path.parents[1]
+        year = system_dir.parent.name
+    except IndexError:
+        return ""
+    match = re.match(r"^(TYP|TD)_(\d{2})(\d{2})_", system_dir.name, re.IGNORECASE)
+    if not match or not re.fullmatch(r"\d{4}", year):
+        return ""
+    prefix = "typ" if match.group(1).upper() == "TYP" else "td"
+    number = int(match.group(3))
+    return f"{prefix}_{year}_{number:02d}"
+
+
+def normalize_track_history_primary_keys(output_root: Path, *, dry_run: bool = False) -> list[Path]:
+    """Ensure canonical system folders own their track-history primary_key.
+
+    Linked TD histories are allowed as aliases, but a TYP canonical folder should
+    not keep a TD key as primary_key. This keeps later merges and index rebuilds
+    deterministic after TD -> TYP absorption.
+    """
+    changed: list[Path] = []
+    for path in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/*/metadata/track_history.json")):
+        payload = load_json(path, None)
+        if not isinstance(payload, dict):
+            continue
+        canonical_key = track_history_canonical_key_from_path(path)
+        if not canonical_key:
+            continue
+        previous_primary = str(payload.get("primary_key") or "").strip()
+        aliases = {
+            str(item or "").strip()
+            for item in payload.get("aliases", [])
+            if str(item or "").strip()
+        }
+        if previous_primary:
+            aliases.add(previous_primary)
+        aliases.add(canonical_key)
+        updated = dict(payload)
+        updated["primary_key"] = canonical_key
+        updated["aliases"] = sorted(aliases)
+        if updated == payload:
+            continue
+        changed.append(path)
+        if dry_run:
+            print(
+                f"Would normalize track history primary_key: {path} "
+                f"({previous_primary or '-'} -> {canonical_key})"
+            )
+            continue
+        write_json(path, updated)
+        print(
+            f"Normalized track history primary_key: {path} "
+            f"({previous_primary or '-'} -> {canonical_key})"
+        )
+    return changed
 
 
 def status_key_for(job: StormJob, fcst_hours: int) -> str:
@@ -3049,6 +3114,28 @@ def relative_asset_path(path: Path) -> str:
         return path.as_posix()
 
 
+def relative_existing_asset_path(path: Path) -> str:
+    return relative_asset_path(path) if path.exists() else ""
+
+
+def set_metadata_path_if_exists(metadata: dict, key: str, path: Path) -> None:
+    value = relative_existing_asset_path(path)
+    if value:
+        metadata[key] = value
+    else:
+        metadata.pop(key, None)
+
+
+def metadata_referenced_path_exists(metadata: dict, key: str) -> bool:
+    value = str(metadata.get(key) or "").strip()
+    if not value:
+        return False
+    path = Path(value)
+    if not path.is_absolute():
+        path = PROJECT_ROOT / path
+    return path.exists()
+
+
 def metadata_from_image_path(path: Path, output_root: Path) -> dict | None:
     match = re.match(
         r"^(?P<stage>TYP|TD)_(?P<cyclone_id>\d{4})_(?P<name>.+)_(?P<data_time>\d{10,12})_(?P<fcst_hours>\d{2,3})h\.png$",
@@ -3159,8 +3246,12 @@ def compact_metadata(metadata: dict | None, allowed_keys: tuple[str, ...] = MANI
     for key in allowed_keys:
         if key == "models" and has_model_labels:
             continue
-        if key in metadata:
-            compact[key] = metadata[key]
+        if key not in metadata:
+            continue
+        if key in {"source_availability_path", "source_availability_summary_path"}:
+            if not metadata_referenced_path_exists(metadata, key):
+                continue
+        compact[key] = metadata[key]
     return compact
 
 
@@ -3745,7 +3836,7 @@ def collect_changed_asset_paths(
                     "source_availability_summary_path",
                 ):
                     availability_path = str(metadata.get(availability_key) or "").strip()
-                    if availability_path:
+                    if availability_path and (PROJECT_ROOT / availability_path).exists():
                         paths.add(relative_changed_path(PROJECT_ROOT / availability_path))
                 for history_path in track_history_paths_from_metadata(output_root, metadata):
                     paths.add(relative_changed_path(history_path))
@@ -3860,6 +3951,7 @@ def main() -> int:
     if args.index_only:
         updated_at_utc = format_utc_stamp(now)
         canonicalized_paths = canonicalize_linked_td_outputs(output_root, dry_run=args.dry_run)
+        canonicalized_paths.extend(normalize_track_history_primary_keys(output_root, dry_run=args.dry_run))
         inventory = build_manifest_inventory(output_root, [])
         split_paths = [] if args.dry_run else rebuild_split_manifest_files(output_root, inventory, updated_at_utc=updated_at_utc)
         manifest = root_manifest_payload(
@@ -4152,6 +4244,7 @@ def main() -> int:
         return 0
 
     canonicalized_paths = canonicalize_linked_td_outputs(output_root, dry_run=args.dry_run)
+    canonicalized_paths.extend(normalize_track_history_primary_keys(output_root, dry_run=args.dry_run))
     previous_manifest = load_json(manifest_path, {})
     compact_runs = compact_manifest_runs(run_entries)
     updated_at_utc = format_utc_stamp(now)
