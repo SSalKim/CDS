@@ -11,7 +11,6 @@ const TYPHOON_IMPACT_OPTION_COLOR='#0f3d64';
 const TYPHOON_IMPACT_OPTION_WEIGHT='700';
 const TYPHOON_REFRESH_MS=10*60*1000;
 const TYPHOON_SLOT_HOURS=6;
-const TYPHOON_ACTIVE_STORM_RECENCY_HOURS=30;
 const TYPHOON_PAGE_CACHE_TOKEN=new URLSearchParams(window.location.search).get('fresh') || String(Date.now());
 const TYPHOON_IMAGE_PRELOAD_RADIUS=4;
 const TYPHOON_IMAGE_CACHE_LIMIT=80;
@@ -2170,20 +2169,33 @@ a.label.localeCompare(b.label)
 
 function typhoonActiveWindowDataTimes(){
 let windows=Array.isArray(typhoonState.manifest?.active_windows) ? typhoonState.manifest.active_windows : [];
-return new Set(windows.map(window=>String(window?.data_time || '')).filter(Boolean));
+let times=new Set();
+windows.forEach(window=>{
+let dataTime=String(window?.data_time || '').trim();
+if(dataTime){
+times.add(dataTime);
+times.add(dataTime.slice(0,10));
+}
+});
+return times;
 }
 
 function isActiveTyphoonStormEntry(entry,activeWindowTimes=typhoonActiveWindowDataTimes()){
 let dataTime=String(entry?.dataTime || '');
-if(activeWindowTimes.has(dataTime)){
+return Boolean(dataTime && (activeWindowTimes.has(dataTime) || activeWindowTimes.has(dataTime.slice(0,10))));
+}
+
+function isActiveTyphoonStormRun(run,activeWindowTimes=typhoonActiveWindowDataTimes()){
+let stormKey=String(run?.stormKey || '');
+if(!stormKey){
+return isActiveTyphoonStormEntry(run,activeWindowTimes);
+}
+let storms=Array.isArray(typhoonState.storms) ? typhoonState.storms : [];
+if(storms.some(storm=>storm.key===stormKey && storm.active)){
 return true;
 }
-let date=parseTyphoonUtcDate(dataTime);
-if(!date){
-return false;
-}
-let diffHours=(Date.now()-date.getTime())/(60*60*1000);
-return diffHours>=-6 && diffHours<=TYPHOON_ACTIVE_STORM_RECENCY_HOURS;
+let entries=Array.isArray(typhoonState.entries) ? typhoonState.entries : [];
+return entries.some(entry=>entry.stormKey===stormKey && isActiveTyphoonStormEntry(entry,activeWindowTimes));
 }
 
 function selectDefaultStormForYear(){
@@ -2579,7 +2591,7 @@ return getTyphoonDriveImageUrls(fileId,archiveUrl)[0] || archiveUrl;
 }
 let imagePath=shouldUseRawTyphoonImage(run)
 ?typhoonBuildUrl(run.imagePath,TYPHOON_ACTIVE_IMAGE_BASE_URL)
-:run.imagePath;
+:typhoonBuildUrl(run.imagePath,TYPHOON_LIVE_DATA_BASE_URL);
 return cacheBustedTyphoonPath(imagePath,version);
 
 }
@@ -2594,8 +2606,7 @@ return urls;
 let version=run.generatedAt || run.metadata?.generated_at_utc || typhoonState.manifest?.updated_at_utc || '';
 if(shouldUseRawTyphoonImage(run)){
 [
-typhoonBuildUrl(run.imagePath,TYPHOON_LIVE_DATA_BASE_URL),
-run.imagePath
+typhoonBuildUrl(run.imagePath,TYPHOON_LIVE_DATA_BASE_URL)
 ].forEach(path=>{
 let url=cacheBustedTyphoonPath(path,version);
 if(url){
@@ -2658,7 +2669,7 @@ return id ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=
 }
 
 function shouldUseRawTyphoonImage(run){
-return Boolean(TYPHOON_ACTIVE_IMAGE_BASE_URL && isActiveTyphoonStormEntry(run));
+return Boolean(TYPHOON_ACTIVE_IMAGE_BASE_URL && isActiveTyphoonStormRun(run));
 }
 
 function getTyphoonAnalyticsSource(url){
@@ -2672,7 +2683,7 @@ let stormStatus=shouldUseRawTyphoonImage(run) ? 'active' : 'ended';
 let archiveUrl=run?.imagePath ? typhoonState.driveArchiveImages.get(run.imagePath) : '';
 let archiveSource=stormStatus==='active'
 ?'github_raw'
-:(archiveUrl ? getTyphoonAnalyticsSource(archiveUrl) : 'github_pages_archive');
+:(archiveUrl ? getTyphoonAnalyticsSource(archiveUrl) : 'github_raw');
 let stormKey=run?.stormKey || [
 run?.year || '',
 run?.stage || '',
