@@ -1553,16 +1553,52 @@ console.warn(`?쒗뭾 storm manifest 濡쒕뱶 ?ㅽ뙣: ${path}`,error);
 }));
 }
 
+function typhoonStormKeyInfo(stormKey){
+let parts=String(stormKey || '').split('|');
+return {
+year:String(parts[0] || ''),
+stage:normalizeTyphoonStage(parts[1] || ''),
+typNumber:Number(parts[2] || 0),
+typName:parts.slice(3).join('|')
+};
+}
+
+function entryMatchesSelectedStormManifest(entry,selected,yearText,selectedKey){
+if(!entry?.manifestPath || String(entry.year || '')!==yearText){
+return false;
+}
+if(entry.stormKey===selectedKey){
+return true;
+}
+let linkedTypNumber=Number(entry.linkedTypNumber || entry.linked_typ_number || 0);
+if(selected.stage!=='TD' && entry.stage==='TD' && linkedTypNumber===selected.typNumber){
+return true;
+}
+return false;
+}
+
 function manifestPathsForStormKey(year,stormKey){
 let paths=new Set();
+let yearText=String(year || '').trim();
+let selectedKey=String(stormKey || '');
+let selected=typhoonStormKeyInfo(selectedKey);
+
 typhoonYearSummaryEntries(year).forEach(entry=>{
-if(entry.stormKey===stormKey && entry.manifestPath){
+if(entry.stormKey===selectedKey && entry.manifestPath){
+paths.add(entry.manifestPath);
+return;
+}
+if(entryMatchesSelectedStormManifest(entry,selected,yearText,selectedKey)){
 paths.add(entry.manifestPath);
 }
 });
 if(!paths.size){
 typhoonState.entries.forEach(entry=>{
-if(entry.year===String(year || '') && entry.stormKey===stormKey && entry.manifestPath){
+if(entry.year===yearText && entry.stormKey===selectedKey && entry.manifestPath){
+paths.add(entry.manifestPath);
+return;
+}
+if(entryMatchesSelectedStormManifest(entry,selected,yearText,selectedKey)){
 paths.add(entry.manifestPath);
 }
 });
@@ -1652,7 +1688,7 @@ return typhoonState.driveArchiveLoadPromise;
 }
 
 async function ensureTyphoonDriveArchiveImagesForRun(run){
-if(!run?.imagePath || shouldUseRawTyphoonImage(run) || typhoonState.driveArchiveImages.has(run.imagePath)){
+if(!run?.imagePath || typhoonState.driveArchiveImages.has(run.imagePath)){
 return;
 }
 await ensureTyphoonDriveArchiveImages();
@@ -2498,13 +2534,30 @@ return cacheBustedTyphoonPath(imagePath,version);
 function getTyphoonImageUrls(run){
 let primary=getTyphoonImageUrl(run);
 let urls=primary ? [primary] : [];
-if(!run?.imagePath || shouldUseRawTyphoonImage(run)){
+if(!run?.imagePath){
 return urls;
 }
+
+let version=run.generatedAt || run.metadata?.generated_at_utc || typhoonState.manifest?.updated_at_utc || '';
+if(shouldUseRawTyphoonImage(run)){
+[
+typhoonBuildUrl(run.imagePath,TYPHOON_LIVE_DATA_BASE_URL),
+run.imagePath
+].forEach(path=>{
+let url=cacheBustedTyphoonPath(path,version);
+if(url){
+urls.push(url);
+}
+});
+}
+
 let archiveUrl=typhoonState.driveArchiveImages.get(run.imagePath);
 let fileId=typhoonDriveFileIdFromUrl(archiveUrl);
 if(fileId){
-urls=getTyphoonDriveImageUrls(fileId,archiveUrl);
+urls.push(...getTyphoonDriveImageUrls(fileId,archiveUrl));
+}
+else if(archiveUrl){
+urls.push(archiveUrl);
 }
 return [...new Set(urls.filter(Boolean))];
 }
