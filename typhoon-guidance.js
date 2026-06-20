@@ -2353,7 +2353,7 @@ updatedLine.textContent=updated && updated!=='-'
 
 let scheduleLine=document.createElement('div');
 scheduleLine.className='typhoon-update-schedule';
-scheduleLine.textContent='00Z 기준 14KST 시작 / 20KST 완료';
+scheduleLine.textContent='00Z 기준 13KST 시작 / 19KST 완료';
 
 subtitle.appendChild(updatedLine);
 subtitle.appendChild(scheduleLine);
