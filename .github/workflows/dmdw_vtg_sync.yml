@@ -116,6 +116,24 @@ jobs:
             python -m playwright install --with-deps chromium
           fi
 
+      - name: Diagnose DMDW connectivity
+        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
+        continue-on-error: true
+        run: |
+          set +e
+          echo "Runner public IP:"
+          curl -sS --connect-timeout 10 --max-time 15 https://api.ipify.org || true
+          echo
+          echo "DMDW DNS results:"
+          getent ahosts dmdw.kma.go.kr | awk '{print $1}' | sort -u || true
+          echo "DMDW home probe:"
+          curl -sS -o /tmp/dmdw_home_probe.html \
+            --connect-timeout 20 \
+            --max-time 60 \
+            -w 'http_code=%{http_code} remote_ip=%{remote_ip} namelookup=%{time_namelookup}s connect=%{time_connect}s tls=%{time_appconnect}s starttransfer=%{time_starttransfer}s total=%{time_total}s error="%{errormsg}"\n' \
+            https://dmdw.kma.go.kr/ || true
+          wc -c /tmp/dmdw_home_probe.html || true
+
       - name: Prepare DMDW session
         if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
         run: |
@@ -123,9 +141,20 @@ jobs:
           session_dir="$RUNNER_TEMP/dmdw_session"
           mkdir -p "$session_dir"
           if [ "${{ steps.dmdw_credentials.outputs.auth_mode }}" = "login" ]; then
-            python DMDW_VTG/auto_login_refresh_cookie.py \
+            if python DMDW_VTG/auto_login_refresh_cookie.py \
               --output-dir "$session_dir" \
-              --headless
+              --headless; then
+              echo "DMDW fresh login succeeded."
+            elif [ -n "$DMDW_COOKIE" ]; then
+              echo "::warning::DMDW fresh login failed; falling back to DMDW_COOKIE secret."
+              printf '%s' "$DMDW_COOKIE" > "$session_dir/cookie.txt"
+              if [ -n "$DMDW_CSRF" ]; then
+                printf '%s' "$DMDW_CSRF" > "$session_dir/csrf.txt"
+              fi
+            else
+              echo "::error::DMDW fresh login failed and no DMDW_COOKIE fallback is configured."
+              exit 1
+            fi
           else
             printf '%s' "$DMDW_COOKIE" > "$session_dir/cookie.txt"
             if [ -n "$DMDW_CSRF" ]; then
