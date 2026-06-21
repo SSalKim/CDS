@@ -214,6 +214,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--csrf-file", type=Path, default=None)
     parser.add_argument("--home-url", default=DMDW_HOME_URL)
     parser.add_argument("--browser-channel", default=os.getenv("DMDW_BROWSER_CHANNEL", ""))
+    parser.add_argument("--browser-executable", default=os.getenv("DMDW_BROWSER_EXECUTABLE", ""))
     parser.add_argument("--headless", action=argparse.BooleanOptionalAction, default=bool(os.getenv("CI")))
     parser.add_argument("--show-cookie-preview", action="store_true")
     return parser.parse_args()
@@ -245,7 +246,9 @@ def main() -> int:
                 "--disable-blink-features=AutomationControlled",
             ],
         }
-        if args.browser_channel:
+        if args.browser_executable:
+            launch_kwargs["executable_path"] = args.browser_executable
+        elif args.browser_channel:
             launch_kwargs["channel"] = args.browser_channel
 
         browser = playwright.chromium.launch(**launch_kwargs)

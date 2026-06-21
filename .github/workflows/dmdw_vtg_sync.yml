@@ -266,7 +266,21 @@ jobs:
               echo "$req_hash" > "$hash_file"
             fi
             if [ "${{ steps.dmdw_credentials.outputs.auth_mode }}" = "login" ]; then
-              python -m playwright install chromium
+              browser_path="${DMDW_BROWSER_EXECUTABLE:-}"
+              if [ -z "$browser_path" ]; then
+                for browser_cmd in google-chrome-stable google-chrome chromium-browser chromium microsoft-edge microsoft-edge-stable; do
+                  if command -v "$browser_cmd" >/dev/null 2>&1; then
+                    browser_path="$(command -v "$browser_cmd")"
+                    break
+                  fi
+                done
+              fi
+              if [ -n "$browser_path" ] && [ -x "$browser_path" ]; then
+                echo "DMDW_BROWSER_EXECUTABLE=$browser_path" >> "$GITHUB_ENV"
+                echo "Using self-hosted system browser for DMDW login: $browser_path"
+              else
+                echo "::warning::No system Chrome/Chromium browser found on self-hosted runner; DMDW fresh login will fall back to DMDW_COOKIE if configured."
+              fi
             fi
           else
             python -m pip install --upgrade pip
@@ -301,9 +315,25 @@ jobs:
           session_dir="$RUNNER_TEMP/dmdw_session"
           mkdir -p "$session_dir"
           if [ "${{ steps.dmdw_credentials.outputs.auth_mode }}" = "login" ]; then
-            if python DMDW_VTG/auto_login_refresh_cookie.py \
-              --output-dir "$session_dir" \
-              --headless; then
+            login_status=1
+            if [ "$RUNNER_KIND" = "self-hosted" ] && [ -z "${DMDW_BROWSER_EXECUTABLE:-}" ]; then
+              echo "::warning::Skipping DMDW fresh login because no self-hosted system browser is available."
+            else
+              login_args=(
+                --output-dir "$session_dir"
+                --headless
+              )
+              if [ -n "${DMDW_BROWSER_EXECUTABLE:-}" ]; then
+                login_args+=(--browser-executable "$DMDW_BROWSER_EXECUTABLE")
+              fi
+              if python DMDW_VTG/auto_login_refresh_cookie.py "${login_args[@]}"; then
+                login_status=0
+              else
+                login_status=$?
+              fi
+            fi
+
+            if [ "$login_status" -eq 0 ]; then
               echo "DMDW fresh login succeeded."
             elif [ -n "$DMDW_COOKIE" ]; then
               echo "::warning::DMDW fresh login failed; falling back to DMDW_COOKIE secret."
