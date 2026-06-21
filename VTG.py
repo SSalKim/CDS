@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import io
 import json
@@ -353,9 +354,13 @@ DATA_SOURCE_COLUMN = "_DATA_SOURCE"
 RAW_MODEL_COLUMN = "_RAW_MODEL"
 MODEL_ALIAS_PRIORITY_COLUMN = "_MODEL_ALIAS_PRIORITY"
 MS_PER_KT = 0.514444
-KMA_BASE_URL = "https://apihub-pub.kma.go.kr/api/typ01/url/typ_gts_now.php"
+KMA_URL_BASE = "https://apihub-pub.kma.go.kr/api/typ01/url"
+KMA_BASE_URL = f"{KMA_URL_BASE}/typ_gts_now.php"
+KMA_TYP_NOW_URL = f"{KMA_URL_BASE}/typ_now.php"
+KMA_TD_NOW_URL = f"{KMA_URL_BASE}/td_now.php"
 DEFAULT_AUTH_KEY = ""
 VALID_FCST_HOURS = (120, 240)
+TRACK_HISTORY_MAX_LOOKBACK_DAYS = 45
 PROJECT_ROOT = Path(__file__).resolve().parent
 PLOT_FONT_FAMILY = "DejaVu Sans"
 PREFERRED_PLOT_FONT_FILE = PROJECT_ROOT / "fonts" / "NanumSquareB.ttf"
@@ -723,6 +728,178 @@ def kma_url(settings: Settings, mode: str) -> str:
         "authKey": settings.auth_key,
     }
     return f"{settings.base_url}?{urlencode(params)}"
+
+
+def kma_now_url(settings: Settings, endpoint_url: str, typ_number: int | None) -> str:
+    params = {
+        "src": "",
+        "typ": "" if typ_number is None else str(int(typ_number)),
+        "tm": settings.data_time,
+        "mode": "0",
+        "disp": "1",
+        "help": "0",
+        "authKey": settings.auth_key,
+    }
+    return f"{endpoint_url}?{urlencode(params)}"
+
+
+def normalize_kma_now_time(value: str) -> str:
+    text = str(value or "").strip().split(".", 1)[0]
+    if len(text) >= 12 and text[:12].isdigit():
+        return text[:12]
+    if len(text) >= 10 and text[:10].isdigit():
+        return f"{text[:10]}00"
+    return ""
+
+
+def kma_now_row_numbers(row: list[str]) -> set[int]:
+    numbers: set[int] = set()
+    for value in row[:6]:
+        text = str(value or "").strip().split(".", 1)[0]
+        if not text.isdigit():
+            continue
+        number = int(text)
+        if 1 <= number <= 99:
+            numbers.add(number)
+    return numbers
+
+
+def kma_now_row_time(row: list[str], data_time: str) -> str:
+    target = normalize_kma_now_time(data_time)
+    for value in row:
+        time_text = normalize_kma_now_time(value)
+        if time_text and time_text[:10] == target[:10]:
+            return time_text
+    return ""
+
+
+def safe_float_value(value) -> float | None:
+    try:
+        return float(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def kma_now_row_lat_lon(row: list[str]) -> tuple[float, float] | None:
+    pairs = [(7, 8), (5, 6), (4, 5), (6, 7), (8, 9)]
+    pairs.extend((index, index + 1) for index in range(max(0, len(row) - 1)))
+    seen: set[tuple[int, int]] = set()
+    for lat_index, lon_index in pairs:
+        if (lat_index, lon_index) in seen or lon_index >= len(row):
+            continue
+        seen.add((lat_index, lon_index))
+        lat = safe_float_value(row[lat_index])
+        lon = safe_float_value(row[lon_index])
+        if lat is None or lon is None:
+            continue
+        if -90.0 <= lat <= 90.0 and 0.0 <= lon <= 360.0:
+            return lat, lon
+    return None
+
+
+def kma_now_point_from_text(
+    text: str | None,
+    *,
+    settings: Settings,
+    typ_number: int | None,
+    require_number_match: bool,
+) -> AnalysisPoint | None:
+    if not text or "NODATA" in text.upper():
+        return None
+    target_number = int(typ_number) if typ_number else None
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        try:
+            row = [item.strip() for item in next(csv.reader([line]))]
+        except csv.Error:
+            continue
+        if row and row[-1] == "=":
+            row = row[:-1]
+        time_utc = kma_now_row_time(row, settings.data_time)
+        if not time_utc:
+            continue
+        if target_number is not None:
+            row_numbers = kma_now_row_numbers(row)
+            if row_numbers and target_number not in row_numbers:
+                continue
+            if require_number_match and target_number not in row_numbers:
+                continue
+        lat_lon = kma_now_row_lat_lon(row)
+        if lat_lon is None:
+            continue
+        lat, lon = lat_lon
+        return AnalysisPoint(
+            time_utc=time_utc,
+            lat=lat,
+            lon=lon,
+            source="KMA_OFFICIAL",
+            atcf_id="" if settings.skip_atcf else settings.atcf_id,
+            match_method="kma_now_fallback",
+        )
+    return None
+
+
+def kma_now_endpoint_candidates(settings: Settings) -> list[tuple[str, str, int | None, int | None]]:
+    candidates: list[tuple[str, str, int | None, int | None]] = []
+    seen: set[tuple[str, int | None, int | None]] = set()
+
+    def add(label: str, endpoint: str, query_number: int | None, filter_number: int | None = None) -> None:
+        query_value = int(query_number) if query_number else None
+        filter_value = int(filter_number) if filter_number else query_value
+        if query_value is None and filter_value is None:
+            return
+        key = (endpoint, query_value, filter_value)
+        if key not in seen:
+            seen.add(key)
+            candidates.append((label, endpoint, query_value, filter_value))
+
+    data_typ_number = kma_data_typ_number(settings)
+    stage = settings.storm_stage.upper()
+    if stage == "TD":
+        add("td_now", KMA_TD_NOW_URL, settings.typ_number)
+        if settings.linked_typ_number:
+            add("typ_now", KMA_TYP_NOW_URL, settings.linked_typ_number)
+        add("typ_now", KMA_TYP_NOW_URL, data_typ_number)
+    else:
+        add("typ_now", KMA_TYP_NOW_URL, data_typ_number)
+        if settings.linked_td_number:
+            add("td_now", KMA_TD_NOW_URL, settings.linked_td_number)
+    add("typ_now", KMA_TYP_NOW_URL, None, data_typ_number)
+    add("td_now", KMA_TD_NOW_URL, None, settings.typ_number if stage == "TD" else settings.linked_td_number)
+    return candidates
+
+
+def fetch_kma_now_analysis_point(session: requests.Session, settings: Settings) -> AnalysisPoint | None:
+    for label, endpoint, query_number, filter_number in kma_now_endpoint_candidates(settings):
+        url = kma_now_url(settings, endpoint, query_number)
+        text = fetch_text(
+            session,
+            url,
+            retries=2,
+            timeout=10,
+            retry_delay=2,
+            encoding="cp949",
+            cache_dir=settings.http_cache_dir,
+            cache_ttl_seconds=settings.http_cache_ttl_seconds,
+        )
+        point = kma_now_point_from_text(
+            text,
+            settings=settings,
+            typ_number=filter_number,
+            require_number_match=query_number is None,
+        )
+        if point is None:
+            continue
+        number_label = "all" if query_number is None else f"{query_number:02d}"
+        print(
+            "KMA 0h is missing from typ_gts_now; using "
+            f"{label} mode=0 analysis point ({number_label}) "
+            f"{point.lat:.2f}N, {point.lon:.2f}E."
+        )
+        return point
+    return None
 
 
 
@@ -1121,6 +1298,18 @@ def settings_with_bdeck_analysis_if_needed(session: requests.Session, settings: 
         return settings
     if kma_has_current_track_point(kma_df):
         return settings
+    kma_now_point = fetch_kma_now_analysis_point(session, settings)
+    if kma_now_point is not None:
+        return replace(
+            settings,
+            analysis_lat=kma_now_point.lat,
+            analysis_lon=kma_now_point.lon,
+            analysis_time=kma_now_point.time_utc,
+            analysis_source=kma_now_point.source,
+            analysis_atcf_id=kma_now_point.atcf_id,
+            analysis_match_method=kma_now_point.match_method,
+            analysis_distance_km=kma_now_point.distance_km,
+        )
     analysis = fetch_bdeck_analysis_point(session, settings)
     if analysis is None:
         return settings
@@ -1187,6 +1376,23 @@ def normalize_history_time(value: str) -> str:
     return ""
 
 
+def history_time_to_datetime(value: str) -> datetime | None:
+    text = normalize_history_time(value)
+    if not text:
+        return None
+    try:
+        return datetime.strptime(text, "%Y%m%d%H%M").replace(tzinfo=timezone.utc)
+    except ValueError:
+        return None
+
+
+def clean_history_alias(alias: str) -> str:
+    text = str(alias or "").strip().lower()
+    if not text or text == "track_history":
+        return ""
+    return text
+
+
 def analysis_source_priority(source: str) -> int:
     return ANALYSIS_SOURCE_PRIORITY.get(str(source or "").strip().upper(), 0)
 
@@ -1217,9 +1423,13 @@ def track_history_paths(settings: Settings) -> list[Path]:
 
 
 def history_aliases(settings: Settings) -> list[str]:
-    aliases = storm_history_keys(settings)
+    aliases: list[str] = []
+    for key in storm_history_keys(settings):
+        alias = clean_history_alias(key)
+        if alias and alias not in aliases:
+            aliases.append(alias)
     for atcf_id in (settings.atcf_id, *settings.extra_atcf_ids):
-        atcf_id = str(atcf_id or "").strip().lower()
+        atcf_id = clean_history_alias(atcf_id)
         if atcf_id and not settings.skip_atcf and atcf_id not in aliases:
             aliases.append(atcf_id)
     return aliases
@@ -1251,12 +1461,13 @@ def load_track_history(settings: Settings) -> dict:
         if not isinstance(payload, dict):
             return
 
-        payload_aliases = {str(path.stem).strip()}
+        payload_aliases: set[str] = set()
         primary_key = str(payload.get("primary_key") or "").strip()
+        primary_key = clean_history_alias(primary_key)
         if primary_key:
             payload_aliases.add(primary_key)
         for alias in payload.get("aliases", []):
-            alias = str(alias or "").strip()
+            alias = clean_history_alias(alias)
             if alias:
                 payload_aliases.add(alias)
 
@@ -1330,10 +1541,34 @@ def upsert_history_point(history: dict, point: dict | AnalysisPoint) -> bool:
     return True
 
 
+def filter_history_points_for_settings(settings: Settings, points: list[dict]) -> list[dict]:
+    current_dt = history_time_to_datetime(settings.data_time)
+    if current_dt is None:
+        return points
+    min_dt = current_dt - timedelta(days=TRACK_HISTORY_MAX_LOOKBACK_DAYS)
+    max_dt = current_dt + timedelta(hours=6)
+    filtered: list[dict] = []
+    for point in points:
+        point_dt = history_time_to_datetime(str(point.get("time_utc") or ""))
+        if point_dt is None:
+            continue
+        if min_dt <= point_dt <= max_dt:
+            filtered.append(point)
+    return filtered
+
+
 def save_track_history(settings: Settings, history: dict, *, original: dict) -> None:
-    history["aliases"] = sorted(set([*history.get("aliases", []), *history_aliases(settings)]))
+    aliases = {
+        alias
+        for alias in (
+            clean_history_alias(item)
+            for item in [*history.get("aliases", []), *history_aliases(settings)]
+        )
+        if alias
+    }
+    history["aliases"] = sorted(aliases)
     history["points"] = sorted(
-        history.get("points", []),
+        filter_history_points_for_settings(settings, history.get("points", [])),
         key=lambda item: normalize_history_time(str(item.get("time_utc") or "")),
     )
     if history == original:

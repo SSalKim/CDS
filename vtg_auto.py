@@ -32,6 +32,8 @@ BDECK_SOURCE_URLS = (
     ("FTP.NHC", FTP_NHC_BDECK_URL),
 )
 KMA_GTS_NOW_URL = f"{KMA_LIST_BASE_URL}/typ_gts_now.php"
+KMA_TYP_NOW_URL = f"{KMA_LIST_BASE_URL}/typ_now.php"
+KMA_TD_NOW_URL = f"{KMA_LIST_BASE_URL}/td_now.php"
 ACTIVE_MODEL_TARGET = 36
 DEFAULT_ATCF_SEARCH_POSITIVE_RADIUS = 10
 DEFAULT_ATCF_SEARCH_NEGATIVE_RADIUS = 5
@@ -372,6 +374,19 @@ def kma_gts_now_url(data_time: str, auth_key: str, *, mode: str = "2") -> str:
     return f"{KMA_GTS_NOW_URL}?{query}"
 
 
+def kma_now_url(endpoint_url: str, data_time: str, auth_key: str, *, typ_number: int | None) -> str:
+    query = urlencode({
+        "src": "",
+        "typ": "" if typ_number is None else str(int(typ_number)),
+        "tm": data_time,
+        "mode": "0",
+        "disp": "1",
+        "help": "0",
+        "authKey": auth_key,
+    })
+    return f"{endpoint_url}?{query}"
+
+
 def parse_kma_csv_lines(text: str, *, fixed_columns: int) -> list[list[str]]:
     rows: list[list[str]] = []
     for raw_line in text.splitlines():
@@ -383,6 +398,22 @@ def parse_kma_csv_lines(text: str, *, fixed_columns: int) -> list[list[str]]:
             parsed = parsed[:-1]
         if len(parsed) < fixed_columns:
             continue
+        rows.append([value.strip() for value in parsed])
+    return rows
+
+
+def parse_kma_csv_any_lines(text: str) -> list[list[str]]:
+    rows: list[list[str]] = []
+    for raw_line in str(text or "").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        try:
+            parsed = next(csv.reader([line]))
+        except csv.Error:
+            continue
+        if parsed and parsed[-1].strip() == "=":
+            parsed = parsed[:-1]
         rows.append([value.strip() for value in parsed])
     return rows
 
@@ -496,6 +527,144 @@ def safe_float(value) -> float | None:
         return None
 
 
+def normalize_kma_now_time(value: str) -> str:
+    text = str(value or "").strip().split(".", 1)[0]
+    if len(text) >= 12 and text[:12].isdigit():
+        return text[:12]
+    if len(text) >= 10 and text[:10].isdigit():
+        return f"{text[:10]}00"
+    return ""
+
+
+def kma_now_row_numbers(row: list[str]) -> set[int]:
+    numbers: set[int] = set()
+    for value in row[:6]:
+        number = safe_int(str(value or "").strip().split(".", 1)[0])
+        if number is not None and 1 <= number <= 99:
+            numbers.add(number)
+    return numbers
+
+
+def kma_now_row_time(row: list[str], data_time: str) -> str:
+    target = normalize_kma_now_time(data_time)
+    for value in row:
+        time_text = normalize_kma_now_time(value)
+        if time_text and time_text[:10] == target[:10]:
+            return time_text
+    return ""
+
+
+def kma_now_row_lat_lon(row: list[str]) -> tuple[float, float] | None:
+    pairs = [(7, 8), (5, 6), (4, 5), (6, 7), (8, 9)]
+    pairs.extend((index, index + 1) for index in range(max(0, len(row) - 1)))
+    seen: set[tuple[int, int]] = set()
+    for lat_index, lon_index in pairs:
+        if (lat_index, lon_index) in seen or lon_index >= len(row):
+            continue
+        seen.add((lat_index, lon_index))
+        lat = safe_float(row[lat_index])
+        lon = safe_float(row[lon_index])
+        if lat is None or lon is None:
+            continue
+        if -90.0 <= lat <= 90.0 and 0.0 <= lon <= 360.0:
+            return lat, lon
+    return None
+
+
+def kma_now_point_from_text(
+    text: str | None,
+    *,
+    data_time: str,
+    typ_number: int | None,
+    require_number_match: bool,
+) -> TrackPoint | None:
+    if not text or "NODATA" in text.upper():
+        return None
+    target_number = int(typ_number) if typ_number else None
+    for row in parse_kma_csv_any_lines(text):
+        time_utc = kma_now_row_time(row, data_time)
+        if not time_utc:
+            continue
+        if target_number is not None:
+            row_numbers = kma_now_row_numbers(row)
+            if row_numbers and target_number not in row_numbers:
+                continue
+            if require_number_match and target_number not in row_numbers:
+                continue
+        lat_lon = kma_now_row_lat_lon(row)
+        if lat_lon is None:
+            continue
+        lat, lon = lat_lon
+        return TrackPoint(time_utc=time_utc, lat=lat, lon=lon)
+    return None
+
+
+def kma_now_endpoint_candidates(
+    *,
+    typ_number: int,
+    stage: str | None,
+) -> list[tuple[str, str, int | None, int | None]]:
+    candidates: list[tuple[str, str, int | None, int | None]] = []
+    seen: set[tuple[str, int | None, int | None]] = set()
+
+    def add(label: str, endpoint: str, query_number: int | None, filter_number: int | None = None) -> None:
+        query_value = int(query_number) if query_number else None
+        filter_value = int(filter_number) if filter_number else query_value
+        if query_value is None and filter_value is None:
+            return
+        key = (endpoint, query_value, filter_value)
+        if key in seen:
+            return
+        seen.add(key)
+        candidates.append((label, endpoint, query_value, filter_value))
+
+    stage_text = str(stage or "").strip().upper()
+    if stage_text == "TD":
+        add("td_now", KMA_TD_NOW_URL, typ_number)
+        add("typ_now", KMA_TYP_NOW_URL, typ_number)
+    else:
+        add("typ_now", KMA_TYP_NOW_URL, typ_number)
+        add("td_now", KMA_TD_NOW_URL, typ_number)
+    add("typ_now", KMA_TYP_NOW_URL, None, typ_number)
+    add("td_now", KMA_TD_NOW_URL, None, typ_number)
+    return candidates
+
+
+def fetch_kma_now_reference_point(
+    *,
+    typ_number: int,
+    data_time: str,
+    auth_key: str,
+    stage: str | None,
+) -> TrackPoint | None:
+    for label, endpoint, query_number, filter_number in kma_now_endpoint_candidates(typ_number=typ_number, stage=stage):
+        try:
+            text = fetch_text(
+                kma_now_url(endpoint, data_time, auth_key, typ_number=query_number),
+                timeout=15,
+                retries=1,
+                retry_delay=3.0,
+            )
+        except (HTTPError, URLError, TimeoutError, OSError):
+            continue
+        point = kma_now_point_from_text(
+            text,
+            data_time=data_time,
+            typ_number=filter_number,
+            require_number_match=query_number is None,
+        )
+        if point is None:
+            continue
+        number_label = "all" if query_number is None else f"{query_number:02d}"
+        print(
+            "KMA 0h reference point is missing from typ_gts_now; using "
+            f"{label} mode=0 analysis point ({number_label}): "
+            f"{point.lat:.2f}N, {point.lon:.2f}E."
+        )
+        return point
+    return None
+
+
 def kma_gts_row_source(row: list[str]) -> str:
     # typ_gts_now columns follow KMA_COLUMNS:
     # ... 15D(index 16), 15R(index 17), SRC(index 18), trailing blank(index 19).
@@ -509,39 +678,23 @@ def kma_gts_row_source(row: list[str]) -> str:
     return ""
 
 
-def is_apihub_model_zero_source(source: str) -> bool:
-    source = str(source or "").strip().upper()
-    if not source or source == "KMA":
-        return False
-    return True
-
-
-def mean_track_point(points: list[TrackPoint], *, time_utc: str) -> TrackPoint | None:
-    if not points:
-        return None
-    lat = sum(point.lat for point in points) / len(points)
-    lon = sum(point.lon for point in points) / len(points)
-    return TrackPoint(time_utc=time_utc, lat=lat, lon=lon)
-
-
 def fetch_kma_reference_point(
     *,
     typ_number: int,
     data_time: str,
     auth_key: str,
     gts_text: str | None = None,
+    stage: str | None = None,
 ) -> TrackPoint | None:
     if gts_text is None:
         try:
             text = fetch_text(kma_gts_now_url(data_time, auth_key), timeout=15, retries=1, retry_delay=3.0)
-        except (HTTPError, URLError, TimeoutError):
-            return None
+        except (HTTPError, URLError, TimeoutError, OSError):
+            text = ""
     else:
         text = gts_text
 
-    model_zero_points: list[TrackPoint] = []
-    unknown_zero_points: list[TrackPoint] = []
-    for row in parse_kma_csv_lines(text, fixed_columns=19):
+    for row in parse_kma_csv_lines(text or "", fixed_columns=19):
         if safe_int(row[2]) != typ_number:
             continue
         tmd = safe_int(row[4])
@@ -558,28 +711,13 @@ def fetch_kma_reference_point(
         point = TrackPoint(time_utc=ft_time, lat=lat, lon=lon)
         if source == "KMA":
             return point
-        if is_apihub_model_zero_source(source):
-            model_zero_points.append(point)
-        else:
-            unknown_zero_points.append(point)
 
-    mean_point = mean_track_point(model_zero_points, time_utc=f"{data_time[:10]}00")
-    if mean_point is not None:
-        print(
-            "KMA 0h reference point is missing from typ_gts_now; using the mean of "
-            f"{len(model_zero_points)} APIHUB model 0h point(s): "
-            f"{mean_point.lat:.2f}N, {mean_point.lon:.2f}E."
-        )
-        return mean_point
-
-    mean_point = mean_track_point(unknown_zero_points, time_utc=f"{data_time[:10]}00")
-    if mean_point is not None:
-        print(
-            "KMA 0h reference point is missing from typ_gts_now; using the mean of "
-            f"{len(unknown_zero_points)} unlabeled 0h point(s): "
-            f"{mean_point.lat:.2f}N, {mean_point.lon:.2f}E."
-        )
-    return mean_point
+    return fetch_kma_now_reference_point(
+        typ_number=typ_number,
+        data_time=data_time,
+        auth_key=auth_key,
+        stage=stage,
+    )
 
 
 def normalize_name(value: str) -> str:
@@ -1766,7 +1904,13 @@ def build_storm_jobs(
                 add_timing_elapsed(timing_stats, "atcf_name", started_at)
         if resolve_atcf and atcf_match is None and typ_en:
             started_at = time.monotonic()
-            kma_point = fetch_kma_reference_point(typ_number=typ_number, data_time=data_time, auth_key=auth_key, gts_text=kma_gts_now_text)
+            kma_point = fetch_kma_reference_point(
+                typ_number=typ_number,
+                data_time=data_time,
+                auth_key=auth_key,
+                gts_text=kma_gts_now_text,
+                stage="TYP",
+            )
             add_timing_elapsed(timing_stats, "kma_reference", started_at)
             started_at = time.monotonic()
             atcf_match = find_atcf_position_match(
@@ -1913,7 +2057,13 @@ def build_storm_jobs(
         if resolve_atcf and atcf_match is None:
             reference_typ_number = td_number
             started_at = time.monotonic()
-            kma_point = fetch_kma_reference_point(typ_number=reference_typ_number, data_time=data_time, auth_key=auth_key, gts_text=kma_gts_now_text)
+            kma_point = fetch_kma_reference_point(
+                typ_number=reference_typ_number,
+                data_time=data_time,
+                auth_key=auth_key,
+                gts_text=kma_gts_now_text,
+                stage="TD",
+            )
             add_timing_elapsed(timing_stats, "kma_reference", started_at)
             started_at = time.monotonic()
             atcf_match = find_atcf_position_match(
