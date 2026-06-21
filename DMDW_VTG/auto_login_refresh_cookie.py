@@ -207,6 +207,138 @@ def looks_logged_in(page) -> bool:
     return False
 
 
+
+def save_page_debug(page, output_dir: Path, prefix: str) -> None:
+    """Save non-secret page diagnostics for headless runner troubleshooting."""
+    safe_prefix = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in prefix)
+    try:
+        screenshot_path = output_dir / f"{safe_prefix}.png"
+        page.screenshot(path=str(screenshot_path), full_page=True, timeout=5000)
+        print(f"Saved DMDW debug screenshot: {screenshot_path}")
+    except Exception as exc:
+        print(f"Could not save DMDW debug screenshot: {exc}")
+
+    try:
+        html_path = output_dir / f"{safe_prefix}.html"
+        html_path.write_text(page.content(), encoding="utf-8")
+        print(f"Saved DMDW debug HTML: {html_path}")
+    except Exception as exc:
+        print(f"Could not save DMDW debug HTML: {exc}")
+
+
+def dismiss_dmdw_overlays(page) -> None:
+    """Dismiss DMDW main-page popups that can block the login button in headless mode."""
+    selectors = [
+        "#btnModlClose1",  # 계속(PC버전유지)
+        "#btnModlClose2",
+        "#btnNoticeClose",
+        "#btnPopupClose",
+        "#btnClose",
+        "#closeBtn",
+        'a:has-text("계속(PC버전유지)")',
+        'button:has-text("계속(PC버전유지)")',
+        'a:has-text("PC버전유지")',
+        'button:has-text("PC버전유지")',
+        'button:has-text("닫기")',
+        'a:has-text("닫기")',
+        'button:has-text("확인")',
+        'a:has-text("확인")',
+        ".ui-dialog-titlebar-close",
+        ".btn_close",
+        ".btn-close",
+        ".close",
+    ]
+
+    for selector in selectors:
+        try:
+            loc = page.locator(selector).first
+            if loc.count() > 0 and loc.is_visible(timeout=300):
+                print(f"Dismissing DMDW popup/control: {selector}")
+                loc.click(timeout=1500, force=True)
+                page.wait_for_timeout(300)
+        except Exception:
+            pass
+
+    # Some DMDW popups leave a jQuery UI overlay above the login panel.
+    # Removing only overlay/dialog containers is safer than clicking arbitrary coordinates.
+    try:
+        removed = page.evaluate(
+            """
+            () => {
+              let removed = 0;
+              const remove = (el) => {
+                if (!el) return;
+                el.remove();
+                removed += 1;
+              };
+
+              document.querySelectorAll(
+                '.ui-widget-overlay, .modal-backdrop, .blockUI, .ui-front.ui-widget-overlay'
+              ).forEach(remove);
+
+              document.querySelectorAll('.ui-dialog, .ui-dialog-content, .modal, .popup, .pop_wrap, .layer_popup').forEach(el => {
+                const text = (el.innerText || el.textContent || '').trim();
+                const hasLogin = !!el.querySelector('#email, #pwd, #btnLogin, input[placeholder="ID"], input[placeholder="PASSWORD"]');
+                const looksLikeBlockingNotice =
+                  text.includes('모바일') ||
+                  text.includes('PC버전') ||
+                  text.includes('공지') ||
+                  text.includes('안내') ||
+                  text.includes('알림') ||
+                  text.includes('팝업');
+                if (!hasLogin && looksLikeBlockingNotice) {
+                  remove(el);
+                }
+              });
+
+              document.body.classList.remove('modal-open');
+              document.documentElement.style.overflow = '';
+              document.body.style.overflow = '';
+              return removed;
+            }
+            """
+        )
+        if removed:
+            print(f"Removed DMDW blocking overlay/dialog elements: {removed}")
+            page.wait_for_timeout(300)
+    except Exception as exc:
+        print(f"DMDW overlay cleanup JS failed: {exc}")
+
+
+def click_login_button(page, login_button: str, pw_selector: str) -> None:
+    """Click DMDW login robustly even when a popup overlay intercepts pointer events."""
+    dismiss_dmdw_overlays(page)
+
+    if login_button:
+        try:
+            page.click(login_button, timeout=5000)
+            return
+        except Exception as exc:
+            print(f"Normal login button click failed; retrying after popup cleanup. reason={exc}")
+
+        dismiss_dmdw_overlays(page)
+
+        try:
+            page.click(login_button, timeout=5000, force=True)
+            return
+        except Exception as exc:
+            print(f"Forced login button click failed; trying DOM click. reason={exc}")
+
+        page.evaluate(
+            """
+            (selector) => {
+              const el = document.querySelector(selector);
+              if (!el) throw new Error(`Login button not found: ${selector}`);
+              el.click();
+            }
+            """,
+            login_button,
+        )
+        return
+
+    page.press(pw_selector, "Enter")
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Refresh a DMDW login cookie for VTG source sync.")
     parser.add_argument("--output-dir", type=Path, default=BASE_DIR)
@@ -289,13 +421,18 @@ def main() -> int:
             dump_login_candidates(page)
             raise RuntimeError("Could not locate DMDW ID/PW fields.")
 
+        dismiss_dmdw_overlays(page)
         page.fill(id_selector, dmdw_id)
         page.fill(pw_selector, dmdw_pw)
+        dismiss_dmdw_overlays(page)
+
         login_button = first_visible(page, LOGIN_BUTTON_SELECTORS, timeout=1000)
-        if login_button:
-            page.click(login_button)
-        else:
-            page.press(pw_selector, "Enter")
+        print(f"DMDW login selectors: id={id_selector} pw={pw_selector} button={login_button or 'ENTER'}")
+        try:
+            click_login_button(page, login_button or "", pw_selector)
+        except Exception:
+            save_page_debug(page, output_dir, "dmdw_login_click_failed")
+            raise
 
         try:
             page.wait_for_load_state("networkidle", timeout=15000)
@@ -305,6 +442,7 @@ def main() -> int:
 
         print(f"DMDW post-login url: {page.url}")
         if not looks_logged_in(page):
+            save_page_debug(page, output_dir, "dmdw_login_not_completed")
             dump_login_candidates(page)
             raise RuntimeError("DMDW login did not appear to complete.")
 

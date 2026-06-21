@@ -180,22 +180,22 @@ jobs:
     runs-on: ${{ fromJson(needs.decide-runner.outputs.runner_labels) }}
     timeout-minutes: 20
     env:
-      RUNNER_KIND: "${{ needs.decide-runner.outputs.runner_kind }}"
-      DMDW_ID: "${{ secrets.DMDW_ID }}"
-      DMDW_PW: "${{ secrets.DMDW_PW }}"
-      DMDW_COOKIE: "${{ secrets.DMDW_COOKIE }}"
-      DMDW_CSRF: "${{ secrets.DMDW_CSRF }}"
-      DMDW_BROWSER_EXECUTABLE: "${{ vars.DMDW_BROWSER_EXECUTABLE || secrets.DMDW_BROWSER_EXECUTABLE }}"
-      DMDW_ALLOW_COOKIE_FALLBACK: "${{ vars.DMDW_ALLOW_COOKIE_FALLBACK || 'false' }}"
-      KMA_APIHUB_AUTH_KEY: "${{ secrets.KMA_APIHUB_AUTH_KEY }}"
-      CYCLE_INPUT: "${{ github.event_name == 'workflow_dispatch' && inputs.cycle || '' }}"
-      STORM_KIND_INPUT: "${{ github.event_name == 'workflow_dispatch' && inputs.storm_kind || 'typ' }}"
-      TYP_SEQ_INPUT: "${{ github.event_name == 'workflow_dispatch' && inputs.typ_seq || '' }}"
-      O_TM_SEQ_INPUT: "${{ github.event_name == 'workflow_dispatch' && inputs.o_tm_seq || '' }}"
-      START_TIME_INPUT: "${{ github.event_name == 'workflow_dispatch' && inputs.start_time || '' }}"
-      MAX_MODELS_INPUT: "${{ github.event_name == 'workflow_dispatch' && inputs.max_models || '' }}"
-      DRY_RUN_INPUT: "${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || 'false' }}"
-      PLAYWRIGHT_HOST_PLATFORM_OVERRIDE: "ubuntu24.04-x64"
+      RUNNER_KIND: ${{ needs.decide-runner.outputs.runner_kind }}
+      DMDW_ID: ${{ secrets.DMDW_ID }}
+      DMDW_PW: ${{ secrets.DMDW_PW }}
+      DMDW_COOKIE: ${{ secrets.DMDW_COOKIE }}
+      DMDW_CSRF: ${{ secrets.DMDW_CSRF }}
+      DMDW_BROWSER_EXECUTABLE: ${{ vars.DMDW_BROWSER_EXECUTABLE || secrets.DMDW_BROWSER_EXECUTABLE }}
+      DMDW_ALLOW_COOKIE_FALLBACK: ${{ vars.DMDW_ALLOW_COOKIE_FALLBACK || 'false' }}
+      KMA_APIHUB_AUTH_KEY: ${{ secrets.KMA_APIHUB_AUTH_KEY }}
+      CYCLE_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.cycle || '' }}
+      STORM_KIND_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.storm_kind || 'typ' }}
+      TYP_SEQ_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.typ_seq || '' }}
+      O_TM_SEQ_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.o_tm_seq || '' }}
+      START_TIME_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.start_time || '' }}
+      MAX_MODELS_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.max_models || '' }}
+      DRY_RUN_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+      PLAYWRIGHT_HOST_PLATFORM_OVERRIDE: ubuntu24.04-x64
       PYTHONUNBUFFERED: "1"
 
     steps:
@@ -257,13 +257,11 @@ jobs:
       - name: Install DMDW dependencies
         if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
         env:
-          AUTH_MODE: ${{ steps.dmdw_credentials.outputs.auth_mode }}
           PLAYWRIGHT_HOST_PLATFORM_OVERRIDE: ubuntu24.04-x64
         run: |
           set -euo pipefail
-
-          echo "PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=$PLAYWRIGHT_HOST_PLATFORM_OVERRIDE" >> "$GITHUB_ENV"
-          echo "Using PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=$PLAYWRIGHT_HOST_PLATFORM_OVERRIDE"
+          echo "Using PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=${PLAYWRIGHT_HOST_PLATFORM_OVERRIDE}"
+          echo "PLAYWRIGHT_HOST_PLATFORM_OVERRIDE=${PLAYWRIGHT_HOST_PLATFORM_OVERRIDE}" >> "$GITHUB_ENV"
 
           if [ "$RUNNER_KIND" = "self-hosted" ]; then
             cache_root="$HOME/.cache/cds-vtg"
@@ -278,26 +276,64 @@ jobs:
               echo "$req_hash" > "$hash_file"
             fi
 
-            if [ "$AUTH_MODE" = "login" ]; then
-              if [ -n "${DMDW_BROWSER_EXECUTABLE:-}" ] && [ -x "$DMDW_BROWSER_EXECUTABLE" ]; then
-                echo "Using configured DMDW_BROWSER_EXECUTABLE: $DMDW_BROWSER_EXECUTABLE"
+            if [ "${{ steps.dmdw_credentials.outputs.auth_mode }}" = "login" ]; then
+              browser_path="${DMDW_BROWSER_EXECUTABLE:-}"
+
+              find_system_browser() {
+                for browser_cmd in google-chrome-stable google-chrome chromium-browser chromium microsoft-edge microsoft-edge-stable; do
+                  if command -v "$browser_cmd" >/dev/null 2>&1; then
+                    command -v "$browser_cmd"
+                    return 0
+                  fi
+                done
+                for browser_file in \
+                  /usr/bin/google-chrome-stable \
+                  /usr/bin/google-chrome \
+                  /usr/bin/chromium-browser \
+                  /usr/bin/chromium \
+                  /snap/bin/chromium \
+                  /opt/google/chrome/chrome \
+                  /opt/microsoft/msedge/msedge; do
+                  if [ -x "$browser_file" ]; then
+                    printf '%s\n' "$browser_file"
+                    return 0
+                  fi
+                done
+                return 1
+              }
+
+              if [ -n "$browser_path" ] && [ ! -x "$browser_path" ]; then
+                echo "::warning::DMDW_BROWSER_EXECUTABLE is set but not executable: $browser_path"
+                browser_path=""
+                echo "DMDW_BROWSER_EXECUTABLE=" >> "$GITHUB_ENV"
+              fi
+
+              if [ -z "$browser_path" ]; then
+                browser_path="$(find_system_browser || true)"
+              fi
+
+              if [ -n "$browser_path" ]; then
+                echo "DMDW_BROWSER_EXECUTABLE=$browser_path" >> "$GITHUB_ENV"
+                echo "Using system browser for DMDW login: $browser_path"
               else
-                echo "Installing Playwright Chromium for fresh DMDW login."
+                echo "No system Chrome/Chromium found; installing Playwright-managed Chromium."
                 python -m playwright install chromium
+                echo "Using Playwright-managed Chromium for DMDW login."
               fi
 
               if command -v sudo >/dev/null 2>&1 && sudo -n true >/dev/null 2>&1; then
-                echo "Installing Playwright Chromium Linux dependencies."
-                python -m playwright install-deps chromium || true
+                echo "Installing/checking Playwright Chromium Linux dependencies."
+                python -m playwright install-deps chromium || \
+                  echo "::warning::playwright install-deps chromium failed; browser launch may still fail if host libraries are missing."
               else
                 echo "::warning::passwordless sudo is unavailable; cannot run playwright install-deps chromium."
-                echo "::warning::If browser launch fails with libnspr4/libnss3/etc., install Playwright deps on the runner host."
+                echo "::warning::If browser launch fails with libnspr4/libnss3/GTK errors, install Chromium dependencies on the runner host."
               fi
             fi
           else
             python -m pip install --upgrade pip
             python -m pip install -r requirements-dmdw.txt
-            if [ "$AUTH_MODE" = "login" ]; then
+            if [ "${{ steps.dmdw_credentials.outputs.auth_mode }}" = "login" ]; then
               python -m playwright install --with-deps chromium
             fi
           fi
