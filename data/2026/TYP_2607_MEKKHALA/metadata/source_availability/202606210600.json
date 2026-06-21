@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260621124010",
-  "generated_at_kst": "2026-06-21 21:40 KST",
+  "generated_at_utc": "20260621124959",
+  "generated_at_kst": "2026-06-21 21:49 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_07",
   "storm_stage": "TYP",
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 9,
-  "selected_model_count": 9,
+  "model_source_count": 13,
+  "selected_model_count": 11,
   "active_target_model_count": 36,
   "model_sources": [
+    {
+      "model_id": "AGFS",
+      "model_label": "AIGFS",
+      "raw_model_ids": [
+        "AGFS"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": true,
+      "point_count": 27,
+      "max_lead_hour": 156,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260621124959",
+      "first_seen_kst": "2026-06-21 21:49 KST"
+    },
     {
       "model_id": "ECMWF",
       "model_label": "ECMWF",
@@ -81,6 +98,23 @@
       "is_official": false,
       "first_seen_utc": "20260621122035",
       "first_seen_kst": "2026-06-21 21:20 KST"
+    },
+    {
+      "model_id": "AFUM",
+      "model_label": "GALWEM",
+      "raw_model_ids": [
+        "AFUM"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": true,
+      "point_count": 40,
+      "max_lead_hour": 234,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260621124959",
+      "first_seen_kst": "2026-06-21 21:49 KST"
     },
     {
       "model_id": "GFS",
@@ -168,6 +202,23 @@
       "first_seen_kst": "2026-06-21 20:47 KST"
     },
     {
+      "model_id": "JGSM",
+      "model_label": "JGSM",
+      "raw_model_ids": [
+        "JGSM"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": false,
+      "point_count": 22,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260621124959",
+      "first_seen_kst": "2026-06-21 21:49 KST"
+    },
+    {
       "model_id": "TEPS",
       "model_label": "JGSM EPS",
       "raw_model_ids": [
@@ -183,6 +234,23 @@
       "is_official": false,
       "first_seen_utc": "20260621114759",
       "first_seen_kst": "2026-06-21 20:47 KST"
+    },
+    {
+      "model_id": "TEPS",
+      "model_label": "JGSM EPS",
+      "raw_model_ids": [
+        "JENS"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": false,
+      "point_count": 23,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260621124959",
+      "first_seen_kst": "2026-06-21 21:49 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606210600.json"
