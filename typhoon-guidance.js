@@ -11,6 +11,8 @@ const TYPHOON_IMPACT_OPTION_COLOR='#0f3d64';
 const TYPHOON_IMPACT_OPTION_WEIGHT='700';
 const TYPHOON_REFRESH_MS=10*60*1000;
 const TYPHOON_SLOT_HOURS=6;
+const TYPHOON_CYCLE_WINDOW_START_OFFSET_HOURS=4;
+const TYPHOON_CYCLE_WINDOW_END_OFFSET_HOURS=10;
 const TYPHOON_PAGE_CACHE_TOKEN=new URLSearchParams(window.location.search).get('fresh') || String(Date.now());
 const TYPHOON_IMAGE_PRELOAD_RADIUS=4;
 const TYPHOON_IMAGE_CACHE_LIMIT=80;
@@ -2353,7 +2355,7 @@ updatedLine.textContent=updated && updated!=='-'
 
 let scheduleLine=document.createElement('div');
 scheduleLine.className='typhoon-update-schedule';
-scheduleLine.textContent='00Z 기준 13KST 시작 / 19KST 완료';
+scheduleLine.textContent=formatTyphoonCycleSchedule(run);
 
 subtitle.appendChild(updatedLine);
 subtitle.appendChild(scheduleLine);
@@ -3147,6 +3149,27 @@ return '-';
 }
 date.setUTCHours(date.getUTCHours()+9);
 return `${date.getUTCFullYear()}-${pad2(date.getUTCMonth()+1)}-${pad2(date.getUTCDate())} ${pad2(date.getUTCHours())}:${pad2(date.getUTCMinutes())} KST`;
+}
+
+function addTyphoonUtcHours(date,hours){
+return new Date(date.getTime()+Number(hours || 0)*60*60*1000);
+}
+
+function formatTyphoonKstWindowTime(date){
+let kst=addTyphoonUtcHours(date,9);
+return `${pad2(kst.getUTCHours())}KST`;
+}
+
+function formatTyphoonCycleSchedule(run=getSelectedTyphoonRun()){
+let dataTime=String(run?.dataTime || getSelectedTyphoonDataTime() || '').trim();
+let cycle=parseTyphoonUtcDate(dataTime);
+if(!cycle){
+return '00/06/12/18UTC cycle window';
+}
+let cycleHour=pad2(cycle.getUTCHours());
+let start=addTyphoonUtcHours(cycle,TYPHOON_CYCLE_WINDOW_START_OFFSET_HOURS);
+let end=addTyphoonUtcHours(cycle,TYPHOON_CYCLE_WINDOW_END_OFFSET_HOURS);
+return `${cycleHour}UTC 기준 ${formatTyphoonKstWindowTime(start)} 시작 / ${formatTyphoonKstWindowTime(end)} 완료`;
 }
 
 function parseTyphoonUtcDate(value){

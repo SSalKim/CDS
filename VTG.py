@@ -245,6 +245,7 @@ DISPLAY_120_LON_MAX = 179.9
 DISPLAY_120_LAT_MIN = 0.0
 DISPLAY_120_LAT_MAX = 50.0
 APIHUB_MODEL_START_MAX_DISTANCE_KM = float(os.getenv("VTG_APIHUB_START_MAX_DISTANCE_KM", "850"))
+MODEL_TRACK_MAX_SPEED_KMH = float(os.getenv("VTG_MODEL_TRACK_MAX_SPEED_KMH", "100"))
 
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
@@ -1936,6 +1937,7 @@ def normalize_track_data(kma_df: pd.DataFrame, atcf_df: pd.DataFrame, settings: 
     df = df.dropna(subset=["LAT", "LON"])
     df = apply_common_kma_start(df, settings)
     df = trim_dateline_reflected_tracks(df)
+    df = trim_excessive_motion_tracks(df)
     return clip_120_domain_tracks(df, settings)
 
 
@@ -2002,6 +2004,71 @@ def trim_dateline_reflected_tracks(df: pd.DataFrame) -> pd.DataFrame:
         frames.append(trimmed)
 
     return pd.concat(frames, ignore_index=True) if frames else df
+
+
+def excessive_motion_cutoff(track: pd.DataFrame, *, max_speed_kmh: float = MODEL_TRACK_MAX_SPEED_KMH) -> tuple[float, float] | None:
+    if track.empty or len(track) < 2 or max_speed_kmh <= 0:
+        return None
+    clean = track.dropna(subset=["LAT", "LON", "TMD"]).copy()
+    if len(clean) < 2:
+        return None
+    clean["LAT"] = pd.to_numeric(clean["LAT"], errors="coerce")
+    clean["LON"] = pd.to_numeric(clean["LON"], errors="coerce")
+    clean["TMD"] = pd.to_numeric(clean["TMD"], errors="coerce")
+    clean = (
+        clean.dropna(subset=["LAT", "LON", "TMD"])
+        .sort_values(["TMD", "FT_TM(UTC)", "SEQ"], kind="stable")
+        .drop_duplicates(subset=["TMD"], keep="first")
+        .reset_index(drop=True)
+    )
+    forecast = clean[clean["TMD"].ge(0)].reset_index(drop=True)
+    if len(forecast) < 2:
+        return None
+    previous = forecast.iloc[0]
+    for _, current in forecast.iloc[1:].iterrows():
+        hours = float(current["TMD"]) - float(previous["TMD"])
+        if hours <= 0:
+            previous = current
+            continue
+        distance = haversine_km(
+            float(previous["LAT"]),
+            float(previous["LON"]),
+            float(current["LAT"]),
+            float(current["LON"]),
+        )
+        speed = distance / hours
+        if speed >= max_speed_kmh:
+            return float(current["TMD"]), float(speed)
+        previous = current
+    return None
+
+
+def trim_excessive_motion_tracks(df: pd.DataFrame) -> pd.DataFrame:
+    if df.empty or DATA_SOURCE_COLUMN not in df.columns:
+        return df
+
+    frames: list[pd.DataFrame] = []
+    for (model_name, source_name), track in df.groupby(["SRC", DATA_SOURCE_COLUMN], dropna=False):
+        if str(model_name) == "KMA":
+            frames.append(track)
+            continue
+        cutoff = excessive_motion_cutoff(track)
+        if cutoff is None:
+            frames.append(track)
+            continue
+        cutoff_lead, speed = cutoff
+        tmd = pd.to_numeric(track["TMD"], errors="coerce")
+        trimmed = track[tmd.lt(cutoff_lead) | tmd.isna()].copy()
+        removed = len(track) - len(trimmed)
+        print(
+            f"{model_name} {source_display_name(str(source_name))}: "
+            f"trimmed {removed} point(s) from {cutoff_lead:g}h onward "
+            f"due to excessive forecast motion ({speed:.0f} km/h >= {MODEL_TRACK_MAX_SPEED_KMH:g} km/h)."
+        )
+        if not trimmed.empty:
+            frames.append(trimmed)
+
+    return pd.concat(frames, ignore_index=True) if frames else df.iloc[0:0].copy()
 
 
 def apply_common_kma_start(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
