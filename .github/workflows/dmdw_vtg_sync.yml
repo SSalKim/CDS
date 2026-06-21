@@ -89,19 +89,22 @@ jobs:
             exit 0
           fi
 
+          if [ -n "$DMDW_ID" ] && [ -n "$DMDW_PW" ]; then
+            echo "can_sync=true" >> "$GITHUB_OUTPUT"
+            echo "auth_mode=login" >> "$GITHUB_OUTPUT"
+            echo "DMDW_ID/DMDW_PW are configured; a fresh cookie will be generated."
+            exit 0
+          fi
+
           if [ -n "$DMDW_COOKIE" ]; then
             echo "can_sync=true" >> "$GITHUB_OUTPUT"
+            echo "auth_mode=cookie" >> "$GITHUB_OUTPUT"
             echo "DMDW_COOKIE is configured."
             exit 0
           fi
 
-          if [ -n "$DMDW_ID" ] && [ -n "$DMDW_PW" ]; then
-            echo "can_sync=true" >> "$GITHUB_OUTPUT"
-            echo "DMDW_ID/DMDW_PW are configured."
-            exit 0
-          fi
-
           echo "can_sync=false" >> "$GITHUB_OUTPUT"
+          echo "auth_mode=none" >> "$GITHUB_OUTPUT"
           echo "::notice::DMDW credentials are not configured. Skipping DMDW sync."
 
       - name: Install DMDW dependencies
@@ -109,7 +112,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dmdw.txt
-          if [ -z "$DMDW_COOKIE" ]; then
+          if [ "${{ steps.dmdw_credentials.outputs.auth_mode }}" = "login" ]; then
             python -m playwright install --with-deps chromium
           fi
 
@@ -119,16 +122,16 @@ jobs:
           set -euo pipefail
           session_dir="$RUNNER_TEMP/dmdw_session"
           mkdir -p "$session_dir"
-          if [ -n "$DMDW_COOKIE" ]; then
+          if [ "${{ steps.dmdw_credentials.outputs.auth_mode }}" = "login" ]; then
+            python DMDW_VTG/auto_login_refresh_cookie.py \
+              --output-dir "$session_dir" \
+              --headless
+          else
             printf '%s' "$DMDW_COOKIE" > "$session_dir/cookie.txt"
             if [ -n "$DMDW_CSRF" ]; then
               printf '%s' "$DMDW_CSRF" > "$session_dir/csrf.txt"
             fi
             echo "Using DMDW_COOKIE secret for this sync."
-          else
-            python DMDW_VTG/auto_login_refresh_cookie.py \
-              --output-dir "$session_dir" \
-              --headless
           fi
 
       - name: Sync DMDW VTG source data
