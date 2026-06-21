@@ -105,11 +105,11 @@ jobs:
           echo "::notice::DMDW credentials are not configured. Skipping DMDW sync."
 
       - name: Install DMDW dependencies
-        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' }}
+        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dmdw.txt
-          if [ "$DRY_RUN_INPUT" != "true" ] && [ -z "$DMDW_COOKIE" ]; then
+          if [ -z "$DMDW_COOKIE" ]; then
             python -m playwright install --with-deps chromium
           fi
 
