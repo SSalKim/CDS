@@ -253,7 +253,22 @@ def main() -> int:
         elif args.browser_channel:
             launch_kwargs["channel"] = args.browser_channel
 
-        browser = playwright.chromium.launch(**launch_kwargs)
+        launch_preview = {
+            "headless": launch_kwargs.get("headless"),
+            "executable_path": launch_kwargs.get("executable_path", ""),
+            "channel": launch_kwargs.get("channel", ""),
+        }
+        print(f"Launching browser for DMDW login: {launch_preview}")
+
+        try:
+            browser = playwright.chromium.launch(**launch_kwargs)
+        except Exception as exc:
+            print("DMDW browser launch failed before login page was opened.", file=sys.stderr)
+            print("On Linux/self-hosted runners this usually means Chromium shared libraries are missing.", file=sys.stderr)
+            print("Install them with: python -m playwright install-deps chromium", file=sys.stderr)
+            print(f"Original launch error: {exc}", file=sys.stderr)
+            raise
+
         context = browser.new_context(
             locale="ko-KR",
             timezone_id="Asia/Seoul",
