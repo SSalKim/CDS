@@ -244,6 +244,8 @@ def main() -> int:
             "args": [
                 "--disable-popup-blocking",
                 "--disable-blink-features=AutomationControlled",
+                "--disable-dev-shm-usage",
+                "--no-sandbox",
             ],
         }
         if args.browser_executable:

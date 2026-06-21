@@ -185,6 +185,7 @@ jobs:
       DMDW_PW: ${{ secrets.DMDW_PW }}
       DMDW_COOKIE: ${{ secrets.DMDW_COOKIE }}
       DMDW_CSRF: ${{ secrets.DMDW_CSRF }}
+      DMDW_BROWSER_EXECUTABLE: ${{ vars.DMDW_BROWSER_EXECUTABLE || secrets.DMDW_BROWSER_EXECUTABLE }}
       KMA_APIHUB_AUTH_KEY: ${{ secrets.KMA_APIHUB_AUTH_KEY }}
       CYCLE_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.cycle || '' }}
       STORM_KIND_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.storm_kind || 'typ' }}
@@ -267,13 +268,65 @@ jobs:
             fi
             if [ "${{ steps.dmdw_credentials.outputs.auth_mode }}" = "login" ]; then
               browser_path="${DMDW_BROWSER_EXECUTABLE:-}"
-              if [ -z "$browser_path" ]; then
+
+              find_browser() {
                 for browser_cmd in google-chrome-stable google-chrome chromium-browser chromium microsoft-edge microsoft-edge-stable; do
                   if command -v "$browser_cmd" >/dev/null 2>&1; then
-                    browser_path="$(command -v "$browser_cmd")"
-                    break
+                    command -v "$browser_cmd"
+                    return 0
                   fi
                 done
+                for browser_file in \
+                  /usr/bin/google-chrome-stable \
+                  /usr/bin/google-chrome \
+                  /usr/bin/chromium-browser \
+                  /usr/bin/chromium \
+                  /snap/bin/chromium \
+                  /opt/google/chrome/chrome \
+                  /opt/microsoft/msedge/msedge; do
+                  if [ -x "$browser_file" ]; then
+                    printf '%s\n' "$browser_file"
+                    return 0
+                  fi
+                done
+                return 1
+              }
+
+              install_browser() {
+                if ! command -v sudo >/dev/null 2>&1; then
+                  echo "::warning::sudo is unavailable; cannot install a system browser on self-hosted runner."
+                  return 1
+                fi
+                if ! sudo -n true >/dev/null 2>&1; then
+                  echo "::warning::passwordless sudo is unavailable; cannot install a system browser on self-hosted runner."
+                  return 1
+                fi
+                if ! command -v apt-get >/dev/null 2>&1; then
+                  echo "::warning::apt-get is unavailable; cannot install a system browser on self-hosted runner."
+                  return 1
+                fi
+
+                echo "Attempting to install Google Chrome for DMDW login on self-hosted runner."
+                tmp_deb="${RUNNER_TEMP:-/tmp}/google-chrome-stable_current_amd64.deb"
+                if curl -fsSL -o "$tmp_deb" https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb; then
+                  if sudo -n apt-get update && sudo -n apt-get install -y --no-install-recommends "$tmp_deb"; then
+                    return 0
+                  fi
+                fi
+
+                echo "::warning::Google Chrome install failed; trying distro Chromium packages."
+                sudo -n apt-get update || true
+                sudo -n apt-get install -y --no-install-recommends chromium || \
+                  sudo -n apt-get install -y --no-install-recommends chromium-browser || \
+                  return 1
+              }
+
+              if [ -z "$browser_path" ]; then
+                browser_path="$(find_browser || true)"
+              fi
+              if [ -z "$browser_path" ]; then
+                install_browser || true
+                browser_path="$(find_browser || true)"
               fi
               if [ -n "$browser_path" ] && [ -x "$browser_path" ]; then
                 echo "DMDW_BROWSER_EXECUTABLE=$browser_path" >> "$GITHUB_ENV"
