@@ -155,13 +155,20 @@ def read_optional_text(path: Path | None) -> str:
 
 
 def read_required_text(path: Path | None, env_name: str, label: str) -> str:
-    env_value = os.environ.get(env_name, "").strip()
-    if env_value:
-        return env_value
+    # Prefer an explicit file path over the environment variable.
+    # In GitHub Actions fresh-login mode, DMDW_COOKIE can still contain an old
+    # repository secret while --cookie-file points to the newly generated session.
     if path and path.exists():
         value = path.read_text(encoding="utf-8").strip()
         if value:
+            print(f"Using {label} from file: {path} ({len(value)} characters).")
             return value
+
+    env_value = os.environ.get(env_name, "").strip()
+    if env_value:
+        print(f"Using {label} from environment variable: {env_name} ({len(env_value)} characters).")
+        return env_value
+
     raise SystemExit(f"{label} is required via {env_name} or file path.")
 
 
@@ -868,7 +875,15 @@ def main() -> int:
         return 0
 
     cookie = read_required_text(args.cookie_file, "DMDW_COOKIE", "DMDW cookie")
-    csrf = os.environ.get("DMDW_CSRF", "").strip() or read_optional_text(args.csrf_file)
+    csrf = read_optional_text(args.csrf_file)
+    if csrf:
+        print(f"Using DMDW CSRF token from file: {args.csrf_file} ({len(csrf)} characters).")
+    else:
+        csrf = os.environ.get("DMDW_CSRF", "").strip()
+        if csrf:
+            print(f"Using DMDW CSRF token from environment variable: DMDW_CSRF ({len(csrf)} characters).")
+        else:
+            print("No DMDW CSRF token found; continuing with cookie-only authentication.")
     headers = make_headers(cookie, csrf)
     written_paths: list[Path] = []
 
