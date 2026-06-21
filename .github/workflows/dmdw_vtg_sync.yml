@@ -1,0 +1,223 @@
+name: Sync DMDW VTG source data
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      cycle:
+        description: "Optional target cycle UTC, YYYYmmddHH. Default: latest 6-hour cycle."
+        required: false
+        type: string
+      storm_kind:
+        description: "Manual storm kind when typ_seq is provided."
+        required: false
+        default: typ
+        type: choice
+        options:
+          - typ
+          - td
+      typ_seq:
+        description: "Optional manual DMDW storm number. Empty means auto-active."
+        required: false
+        type: string
+      o_tm_seq:
+        description: "Optional DMDW oTmSeq override."
+        required: false
+        type: string
+      start_time:
+        description: "Manual storm start UTC, YYYYmmddHHMM, used to derive oTmSeq when typ_seq is provided."
+        required: false
+        type: string
+      max_models:
+        description: "Optional debug limit for model requests."
+        required: false
+        type: string
+      dry_run:
+        description: "Print planned DMDW jobs without requesting or committing data."
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dmdw-vtg-sync
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DMDW_ID: ${{ secrets.DMDW_ID }}
+      DMDW_PW: ${{ secrets.DMDW_PW }}
+      DMDW_COOKIE: ${{ secrets.DMDW_COOKIE }}
+      DMDW_CSRF: ${{ secrets.DMDW_CSRF }}
+      KMA_APIHUB_AUTH_KEY: ${{ secrets.KMA_APIHUB_AUTH_KEY }}
+      CYCLE_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.cycle || '' }}
+      STORM_KIND_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.storm_kind || 'typ' }}
+      TYP_SEQ_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.typ_seq || '' }}
+      O_TM_SEQ_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.o_tm_seq || '' }}
+      START_TIME_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.start_time || '' }}
+      MAX_MODELS_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.max_models || '' }}
+      DRY_RUN_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run || false }}
+      PYTHONUNBUFFERED: "1"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-dmdw.txt
+
+      - name: Check DMDW credentials
+        id: dmdw_credentials
+        run: |
+          set -euo pipefail
+          if [ "$DRY_RUN_INPUT" = "true" ]; then
+            echo "can_sync=true" >> "$GITHUB_OUTPUT"
+            echo "Dry run requested; DMDW credentials are not required."
+            exit 0
+          fi
+
+          if [ -n "$DMDW_COOKIE" ]; then
+            echo "can_sync=true" >> "$GITHUB_OUTPUT"
+            echo "DMDW_COOKIE is configured."
+            exit 0
+          fi
+
+          if [ -n "$DMDW_ID" ] && [ -n "$DMDW_PW" ]; then
+            echo "can_sync=true" >> "$GITHUB_OUTPUT"
+            echo "DMDW_ID/DMDW_PW are configured."
+            exit 0
+          fi
+
+          echo "can_sync=false" >> "$GITHUB_OUTPUT"
+          echo "::notice::DMDW credentials are not configured. Skipping DMDW sync."
+
+      - name: Install DMDW dependencies
+        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' }}
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dmdw.txt
+          if [ "$DRY_RUN_INPUT" != "true" ] && [ -z "$DMDW_COOKIE" ]; then
+            python -m playwright install --with-deps chromium
+          fi
+
+      - name: Prepare DMDW session
+        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
+        run: |
+          set -euo pipefail
+          session_dir="$RUNNER_TEMP/dmdw_session"
+          mkdir -p "$session_dir"
+          if [ -n "$DMDW_COOKIE" ]; then
+            printf '%s' "$DMDW_COOKIE" > "$session_dir/cookie.txt"
+            if [ -n "$DMDW_CSRF" ]; then
+              printf '%s' "$DMDW_CSRF" > "$session_dir/csrf.txt"
+            fi
+            echo "Using DMDW_COOKIE secret for this sync."
+          else
+            python DMDW_VTG/auto_login_refresh_cookie.py \
+              --output-dir "$session_dir" \
+              --headless
+          fi
+
+      - name: Sync DMDW VTG source data
+        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' }}
+        run: |
+          set -euo pipefail
+          changed_paths="$RUNNER_TEMP/dmdw_changed_paths.txt"
+          rm -f "$changed_paths"
+          touch "$changed_paths"
+
+          args=(
+            --cycle "${CYCLE_INPUT:-latest}"
+            --output-root data/dmdw
+            --changed-paths-file "$changed_paths"
+          )
+
+          if [ -n "$MAX_MODELS_INPUT" ]; then
+            args+=(--max-models "$MAX_MODELS_INPUT")
+          fi
+          if [ -n "$O_TM_SEQ_INPUT" ]; then
+            args+=(--o-tm-seq "$O_TM_SEQ_INPUT")
+          fi
+          if [ -n "$START_TIME_INPUT" ]; then
+            args+=(--start-time "$START_TIME_INPUT")
+          fi
+          if [ "$DRY_RUN_INPUT" = "true" ]; then
+            args+=(--dry-run)
+          fi
+
+          if [ -n "$TYP_SEQ_INPUT" ]; then
+            year="${CYCLE_INPUT:0:4}"
+            if ! [[ "$year" =~ ^[0-9]{4}$ ]]; then
+              year="$(date -u +%Y)"
+            fi
+            args+=(--year "$year" --typ-seq "$TYP_SEQ_INPUT" --storm-kind "$STORM_KIND_INPUT")
+          else
+            args+=(--auto-active)
+          fi
+
+          if [ "$DRY_RUN_INPUT" != "true" ]; then
+            args+=(--cookie-file "$RUNNER_TEMP/dmdw_session/cookie.txt")
+            args+=(--csrf-file "$RUNNER_TEMP/dmdw_session/csrf.txt")
+          fi
+
+          python DMDW_VTG/query_models.py "${args[@]}"
+
+      - name: Validate DMDW source data
+        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
+        run: |
+          python DMDW_VTG/validate_dmdw_outputs.py --root data/dmdw
+
+      - name: Commit DMDW source data
+        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
+        run: |
+          set -euo pipefail
+          changed_paths="$RUNNER_TEMP/dmdw_changed_paths.txt"
+          if [ ! -s "$changed_paths" ]; then
+            echo "No DMDW source data changes to commit."
+            exit 0
+          fi
+
+          sort -u "$changed_paths" -o "$changed_paths"
+          git add --pathspec-from-file="$changed_paths"
+
+          if git diff --cached --quiet; then
+            echo "No staged DMDW source data changes."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update DMDW VTG source data"
+
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if ! git rebase origin/main; then
+              git status --short
+              git rebase --abort || true
+              if [ "$attempt" -eq 3 ]; then
+                exit 1
+              fi
+              sleep $((attempt * 5))
+              continue
+            fi
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            if [ "$attempt" -eq 3 ]; then
+              exit 1
+            fi
+            sleep $((attempt * 5))
+          done
