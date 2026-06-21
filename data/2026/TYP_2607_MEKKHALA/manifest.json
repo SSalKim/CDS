@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202606211249",
+  "updated_at_utc": "202606211600",
   "storm_key": "typ_2026_07",
   "stage": "TYP",
   "year": 2026,
@@ -9,8 +9,8 @@
   "linked_typ_number": null,
   "typ_name": "MEKKHALA",
   "typ_name_ko": "메칼라",
-  "latest_data_time": "202606210600",
-  "item_count": 24,
+  "latest_data_time": "202606211200",
+  "item_count": 26,
   "inventory": [
     {
       "job": {
@@ -1688,7 +1688,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260621100043",
+          "generated_at_utc": "20260621165835",
           "image_path": "data/2026/TYP_2607_MEKKHALA/images/TYP_2607_MEKKHALA_202606210000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1708,7 +1708,7 @@
           "data_time": "202606210000",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 35,
+          "model_count": 36,
           "target_model_count": 36,
           "model_labels": [
             "GALWEM",
@@ -1720,6 +1720,7 @@
             "COAMPS-TC",
             "ECMWF",
             "ECMWF AIFS",
+            "ECMWF AIFS EPS",
             "ECMWF EPS",
             "FourCastNet-ECMWF",
             "FourCastNet-KIM",
@@ -1751,8 +1752,8 @@
           "source_availability_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606210000.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "completed": true,
+      "final_check": false
     },
     {
       "job": {
@@ -1778,7 +1779,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260621100045",
+          "generated_at_utc": "20260621165838",
           "image_path": "data/2026/TYP_2607_MEKKHALA/images/TYP_2607_MEKKHALA_202606210000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1798,7 +1799,7 @@
           "data_time": "202606210000",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 35,
+          "model_count": 36,
           "target_model_count": 36,
           "model_labels": [
             "GALWEM",
@@ -1810,6 +1811,7 @@
             "COAMPS-TC",
             "ECMWF",
             "ECMWF AIFS",
+            "ECMWF AIFS EPS",
             "ECMWF EPS",
             "FourCastNet-ECMWF",
             "FourCastNet-KIM",
@@ -1841,8 +1843,8 @@
           "source_availability_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606210000.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "completed": true,
+      "final_check": false
     },
     {
       "job": {
@@ -1868,7 +1870,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260621125032",
+          "generated_at_utc": "20260621165910",
           "image_path": "data/2026/TYP_2607_MEKKHALA/images/TYP_2607_MEKKHALA_202606210600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1888,20 +1890,30 @@
           "data_time": "202606210600",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 11,
+          "model_count": 21,
           "target_model_count": 36,
           "model_labels": [
             "GALWEM",
             "AIGFS",
+            "AIGFS EPS",
+            "COAMPS-TC EPS",
+            "COAMPS-TC",
             "ECMWF",
             "ECMWF AIFS",
+            "ECMWF EPS",
             "FNV3",
+            "GenCast",
             "GFS",
             "GFS EPS",
             "HAFS",
+            "Aurora-ECMWF",
+            "FengWu-ECMWF",
+            "FuXi-ECMWF",
             "HWRF",
             "JGSM",
-            "JGSM EPS"
+            "NAVGEM",
+            "JGSM EPS",
+            "UKMO EPS"
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606210600.json"
@@ -1934,7 +1946,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260621125034",
+          "generated_at_utc": "20260621165913",
           "image_path": "data/2026/TYP_2607_MEKKHALA/images/TYP_2607_MEKKHALA_202606210600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1954,23 +1966,147 @@
           "data_time": "202606210600",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 11,
+          "model_count": 21,
           "target_model_count": 36,
           "model_labels": [
             "GALWEM",
             "AIGFS",
+            "AIGFS EPS",
+            "COAMPS-TC EPS",
+            "COAMPS-TC",
             "ECMWF",
             "ECMWF AIFS",
+            "ECMWF EPS",
             "FNV3",
+            "GenCast",
             "GFS",
             "GFS EPS",
             "HAFS",
+            "Aurora-ECMWF",
+            "FengWu-ECMWF",
+            "FuXi-ECMWF",
             "HWRF",
+            "JGSM",
+            "NAVGEM",
+            "JGSM EPS",
+            "UKMO EPS"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606210600.json"
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2026_07",
+        "stage": "TYP_LINKED",
+        "year": 2026,
+        "data_time": "202606211200",
+        "td_number": null,
+        "linked_td_number": 12,
+        "typ_number": 7,
+        "typ_name_ko": "메칼라",
+        "typ_name": "MEKKHALA",
+        "typ_en": "MEKKHALA",
+        "atcf_id": "wp072026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202606211200",
+        "cycle_time_utc": "202606211200",
+        "start_utc": "202606211600",
+        "end_utc": "202606212200"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260621165950",
+          "image_path": "data/2026/TYP_2607_MEKKHALA/images/TYP_2607_MEKKHALA_202606211200_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "MEKKHALA",
+          "typ_name_ko": "메칼라",
+          "linked_td_number": 12,
+          "linked_typ_number": null,
+          "canonical_storm_key": "typ_2026_07",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 7,
+          "canonical_typ_name": "MEKKHALA",
+          "canonical_typ_name_ko": "메칼라",
+          "atcf_id": "wp072026",
+          "extra_atcf_ids": [],
+          "data_time": "202606211200",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 2,
+          "target_model_count": 36,
+          "model_labels": [
             "JGSM",
             "JGSM EPS"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606210600.json"
+          "source_availability_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606211200.json"
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2026_07",
+        "stage": "TYP_LINKED",
+        "year": 2026,
+        "data_time": "202606211200",
+        "td_number": null,
+        "linked_td_number": 12,
+        "typ_number": 7,
+        "typ_name_ko": "메칼라",
+        "typ_name": "MEKKHALA",
+        "typ_en": "MEKKHALA",
+        "atcf_id": "wp072026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202606211200",
+        "cycle_time_utc": "202606211200",
+        "start_utc": "202606211600",
+        "end_utc": "202606212200"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260621165952",
+          "image_path": "data/2026/TYP_2607_MEKKHALA/images/TYP_2607_MEKKHALA_202606211200_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 7,
+          "data_typ_number": 7,
+          "typ_name": "MEKKHALA",
+          "typ_name_ko": "메칼라",
+          "linked_td_number": 12,
+          "linked_typ_number": null,
+          "canonical_storm_key": "typ_2026_07",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 7,
+          "canonical_typ_name": "MEKKHALA",
+          "canonical_typ_name_ko": "메칼라",
+          "atcf_id": "wp072026",
+          "extra_atcf_ids": [],
+          "data_time": "202606211200",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 2,
+          "target_model_count": 36,
+          "model_labels": [
+            "JGSM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606211200.json"
         }
       },
       "completed": false,
