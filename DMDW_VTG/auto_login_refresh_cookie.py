@@ -339,6 +339,87 @@ def click_login_button(page, login_button: str, pw_selector: str) -> None:
     page.press(pw_selector, "Enter")
 
 
+def enter_iwa_portal(page):
+    """Create the UWA/IWA session before saving cookies for DMDW REST calls."""
+    print("Entering DMDW IWA / 방재기상플랫폼 portal.")
+    active_page = page
+
+    def current_url() -> str:
+        try:
+            return str(active_page.url or "")
+        except Exception:
+            return ""
+
+    def wait_after_navigation() -> None:
+        try:
+            active_page.wait_for_load_state("domcontentloaded", timeout=15000)
+        except Exception:
+            pass
+        try:
+            active_page.wait_for_load_state("networkidle", timeout=8000)
+        except Exception:
+            pass
+        active_page.wait_for_timeout(2000)
+
+    dismiss_dmdw_overlays(active_page)
+
+    # The main DMDW page exposes this button for the AFS/IWA service.
+    # Prefer it because it can trigger service-side session initialization that a direct URL may skip.
+    clicked_button = False
+    try:
+        btn = active_page.locator("#afsOutLoginBtn").first
+        if btn.count() > 0 and btn.is_visible(timeout=1500):
+            print("Clicking #afsOutLoginBtn to initialize IWA session.")
+            try:
+                with active_page.expect_popup(timeout=3000) as popup_info:
+                    btn.click(timeout=5000, force=True)
+                popup = popup_info.value
+                print(f"IWA popup opened: {popup.url}")
+                active_page = popup
+                wait_after_navigation()
+            except Exception:
+                # No popup, blocked popup, or normal same-page navigation. Try a robust JS click too.
+                try:
+                    btn.click(timeout=5000, force=True)
+                except Exception as exc:
+                    print(f"#afsOutLoginBtn force click failed; trying DOM click. reason={exc}")
+                    active_page.evaluate(
+                        """
+                        () => {
+                          const el = document.querySelector('#afsOutLoginBtn');
+                          if (el) el.click();
+                        }
+                        """
+                    )
+                wait_after_navigation()
+            clicked_button = True
+    except Exception as exc:
+        print(f"Skipping #afsOutLoginBtn click: {exc}")
+
+    # Directly entering IWA is still useful when the button is absent or same-page navigation did not occur.
+    # This is the referer used by the subsequent /uwa/rest/iwa/... requests.
+    if "/uwa/" not in current_url().lower():
+        print("Navigating directly to /uwa/iwa/iwaMain.kaf to initialize IWA session.")
+        active_page.goto(
+            "https://dmdw.kma.go.kr/uwa/iwa/iwaMain.kaf",
+            wait_until="domcontentloaded",
+            timeout=60000,
+        )
+        wait_after_navigation()
+    elif clicked_button:
+        print("IWA navigation appears to have been triggered by #afsOutLoginBtn.")
+
+    try:
+        dismiss_dmdw_overlays(active_page)
+    except Exception as exc:
+        print(f"IWA overlay dismiss failed: {exc}")
+
+    # Stay on IWA main long enough for app bootstrap cookies/session values to be written.
+    active_page.wait_for_timeout(1500)
+    print(f"DMDW IWA url: {current_url()}")
+    return active_page
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Refresh a DMDW login cookie for VTG source sync.")
     parser.add_argument("--output-dir", type=Path, default=BASE_DIR)
@@ -446,7 +527,15 @@ def main() -> int:
             dump_login_candidates(page)
             raise RuntimeError("DMDW login did not appear to complete.")
 
+        try:
+            page = enter_iwa_portal(page)
+        except Exception:
+            save_page_debug(page, output_dir, "dmdw_iwa_enter_failed")
+            raise
+
         cookies = context.cookies(["https://dmdw.kma.go.kr"])
+        cookie_names = sorted(cookie.get("name", "") for cookie in cookies if cookie.get("name"))
+        print("DMDW cookie names:", ", ".join(cookie_names))
         cookie_header = build_cookie_header(cookies)
         if not cookie_header:
             raise RuntimeError("Failed to extract DMDW cookies.")
