@@ -1503,6 +1503,22 @@ def normalized_raw_model_ids(model_name: str, source_name: str, observed_ids: It
     return cleaned
 
 
+def source_availability_point_count(group: pd.DataFrame) -> int:
+    required_columns = ("TMD", "LAT", "LON")
+    if group.empty:
+        return 0
+    if any(column not in group for column in required_columns):
+        return int(len(group))
+    point_frame = pd.DataFrame({
+        "TMD": pd.to_numeric(group["TMD"], errors="coerce").round(3),
+        "LAT": pd.to_numeric(group["LAT"], errors="coerce").round(4),
+        "LON": pd.to_numeric(group["LON"], errors="coerce").round(4),
+    }).dropna()
+    if point_frame.empty:
+        return int(len(group))
+    return int(point_frame.drop_duplicates().shape[0])
+
+
 def source_priority_for_model(model_name: str, settings: Settings) -> tuple[str, ...]:
     priority = list(MODEL_SOURCE_PRIORITY_OVERRIDES.get(model_name, SOURCE_ORDER))
     overrides = dict(settings.source_overrides)
@@ -2126,7 +2142,7 @@ def source_availability_entries(
                 "selected_source": source_name,
                 "selected_source_label": source_display_name(source_name),
                 "max_lead_hour": max(leads) if leads else None,
-                "point_count": int(len(group)),
+                "point_count": source_availability_point_count(group),
             }
 
     entries: list[dict] = []
@@ -2153,7 +2169,7 @@ def source_availability_entries(
             "source": source_name,
             "source_label": source_display_name(source_name),
             "selected": (model_name, source_name) in selected_pairs,
-            "point_count": int(len(group)),
+            "point_count": source_availability_point_count(group),
             "max_lead_hour": max(leads),
             "has_pressure": bool(ps_values.gt(0).any()) if not ps_values.empty else False,
             "has_wind": bool(ws_values.gt(0).any()) if not ws_values.empty else False,
