@@ -283,7 +283,8 @@ jobs:
                   /usr/bin/chromium \
                   /snap/bin/chromium \
                   /opt/google/chrome/chrome \
-                  /opt/microsoft/msedge/msedge; do
+                  /opt/microsoft/msedge/msedge \
+                  "$cache_root/chrome-for-testing/chrome-linux64/chrome"; do
                   if [ -x "$browser_file" ]; then
                     printf '%s\n' "$browser_file"
                     return 0
@@ -292,7 +293,58 @@ jobs:
                 return 1
               }
 
+              install_chrome_for_testing() {
+                cft_root="$cache_root/chrome-for-testing"
+                cft_exe="$cft_root/chrome-linux64/chrome"
+                if [ -x "$cft_exe" ]; then
+                  return 0
+                fi
+                mkdir -p "$cft_root"
+                python - "$cft_root" <<'PY'
+          import json
+          import os
+          import pathlib
+          import shutil
+          import sys
+          import urllib.request
+          import zipfile
+
+          root = pathlib.Path(sys.argv[1])
+          metadata_url = "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json"
+          print("Downloading Chrome for Testing metadata.")
+          with urllib.request.urlopen(metadata_url, timeout=30) as response:
+              metadata = json.load(response)
+
+          downloads = metadata["channels"]["Stable"]["downloads"]["chrome"]
+          chrome_url = next(item["url"] for item in downloads if item["platform"] == "linux64")
+          archive = root / "chrome-linux64.zip"
+          tmp_extract = root / "extracting"
+          target = root / "chrome-linux64"
+
+          print(f"Downloading Chrome for Testing: {chrome_url}")
+          with urllib.request.urlopen(chrome_url, timeout=180) as response, archive.open("wb") as handle:
+              shutil.copyfileobj(response, handle)
+
+          shutil.rmtree(tmp_extract, ignore_errors=True)
+          tmp_extract.mkdir(parents=True, exist_ok=True)
+          with zipfile.ZipFile(archive) as zf:
+              zf.extractall(tmp_extract)
+
+          shutil.rmtree(target, ignore_errors=True)
+          shutil.move(str(tmp_extract / "chrome-linux64"), str(target))
+          shutil.rmtree(tmp_extract, ignore_errors=True)
+          archive.unlink(missing_ok=True)
+          chrome = target / "chrome"
+          os.chmod(chrome, 0o755)
+          print(f"Chrome for Testing ready: {chrome}")
+          PY
+              }
+
               install_browser() {
+                if install_chrome_for_testing; then
+                  return 0
+                fi
+
                 if ! command -v sudo >/dev/null 2>&1; then
                   echo "::warning::sudo is unavailable; cannot install a system browser on self-hosted runner."
                   return 1
