@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       cycle:
-        description: "Optional target cycle UTC, YYYYmmddHH. Default: latest 6-hour cycle."
+        description: "Optional target cycle UTC, YYYYmmddHH. Default: latest DMDW KST collection window."
         required: false
         type: string
       storm_kind:

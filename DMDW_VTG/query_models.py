@@ -26,6 +26,7 @@ DATA_URL = "https://dmdw.kma.go.kr/uwa/rest/iwa/ObservationSite/retTyphoonDataIm
 
 DEFAULT_OUTPUT_ROOT = PROJECT_ROOT / "data" / "dmdw"
 DEFAULT_REQUEST_DELAY = 0.15
+KST = timezone(timedelta(hours=9), "KST")
 
 REQUEST_EXTENT = {
     "PROJ": "LCC",
@@ -97,9 +98,42 @@ def floor_to_cycle(value: datetime) -> datetime:
     return base
 
 
+def latest_dmdw_collection_cycle(value: datetime | None = None) -> datetime:
+    """Return the DMDW cycle expected to be available in the current KST window."""
+    now_kst = (value or utc_now()).astimezone(KST)
+    local_date = now_kst.date()
+    hour = now_kst.hour
+
+    if hour < 1:
+        target_date = local_date - timedelta(days=1)
+        target_hour = 6
+    elif hour < 7:
+        target_date = local_date - timedelta(days=1)
+        target_hour = 12
+    elif hour < 13:
+        target_date = local_date - timedelta(days=1)
+        target_hour = 18
+    elif hour < 19:
+        target_date = local_date
+        target_hour = 0
+    else:
+        target_date = local_date
+        target_hour = 6
+
+    return datetime(
+        target_date.year,
+        target_date.month,
+        target_date.day,
+        target_hour,
+        tzinfo=timezone.utc,
+    )
+
+
 def parse_cycle(value: str | None) -> datetime:
     text = str(value or "").strip()
-    if not text or text.lower() == "latest":
+    if not text or text.lower() in {"latest", "latest-dmdw", "latest-kst"}:
+        return latest_dmdw_collection_cycle()
+    if text.lower() in {"latest-6h", "latest-floor"}:
         return floor_to_cycle(utc_now())
     if re.fullmatch(r"\d{10}", text):
         fmt = "%Y%m%d%H"
@@ -509,6 +543,9 @@ def extract_track_points(data: dict[str, Any], *, candidate: dict[str, str], cyc
         if not isinstance(point, dict):
             continue
         row = normalized_point(point, cycle=cycle)
+        lead_hour = row.get("lead_hour")
+        if not isinstance(lead_hour, int) or lead_hour < 0:
+            continue
         row["raw_model_id"] = row.get("raw_model_id") or fallback_model
         rows.append(row)
     return rows
@@ -613,7 +650,7 @@ def fetch_one_storm(
         "source": "DMDW",
         "cycle": cycle_key(cycle),
         "cycle_utc": stamp(cycle),
-        "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime.",
+        "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored.",
         "request": {
             "year": year,
             "storm_kind": storm_kind.lower(),
@@ -826,7 +863,14 @@ def update_index(output_root: Path, written_paths: list[Path]) -> Path | None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Sync DMDW typhoon model tracks into sanitized JSON files.")
     parser.add_argument("--auto-active", action="store_true", help="Use APIHUB active TD/TYP rows to choose storms.")
-    parser.add_argument("--cycle", default="latest", help="Target cycle UTC: YYYYmmddHH, YYYYmmddHHMM, or latest.")
+    parser.add_argument(
+        "--cycle",
+        default="latest",
+        help=(
+            "Target cycle UTC: YYYYmmddHH, YYYYmmddHHMM, latest "
+            "(KST DMDW collection window), or latest-6h."
+        ),
+    )
     parser.add_argument("--year", type=int, default=None)
     parser.add_argument("--typ-seq", type=int, default=None)
     parser.add_argument("--storm-kind", choices=["typ", "td"], default="typ")
@@ -839,8 +883,23 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--request-delay", type=float, default=DEFAULT_REQUEST_DELAY)
     parser.add_argument("--max-models", type=int, default=None, help="Debug limit for model requests.")
     parser.add_argument("--changed-paths-file", type=Path, default=None)
+    parser.add_argument(
+        "--allow-empty-models",
+        action="store_true",
+        help="Write files even when DMDW returns no forecast model points.",
+    )
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args()
+
+
+def forecast_point_total(payload: dict[str, Any]) -> int:
+    total = 0
+    for model in payload.get("models") or []:
+        if isinstance(model, dict):
+            points = model.get("points")
+            if isinstance(points, list):
+                total += len(points)
+    return total
 
 
 def main() -> int:
@@ -918,6 +977,9 @@ def main() -> int:
                 "dmdw_o_tm_seq": job_o_tm_seq,
             }
             out_path = storm_output_path(args.output_root, cycle=cycle, job=job)
+            if not args.allow_empty_models and forecast_point_total(payload) == 0:
+                print(f"Skipping {out_path}: DMDW returned no forecast model points.")
+                continue
             if write_json_if_changed(out_path, payload):
                 print(f"Wrote {out_path}")
                 written_paths.append(out_path)
