@@ -276,7 +276,81 @@ jobs:
               echo "$req_hash" > "$hash_file"
             fi
 
+            echo "Self-hosted DMDW browser setup is deferred until cached session probing fails."
+          else
+            python -m pip install --upgrade pip
+            python -m pip install -r requirements-dmdw.txt
             if [ "${{ steps.dmdw_credentials.outputs.auth_mode }}" = "login" ]; then
+              python -m playwright install --with-deps chromium
+            fi
+          fi
+
+      - name: Diagnose DMDW connectivity
+        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
+        continue-on-error: true
+        run: |
+          set +e
+          echo "Runner public IP:"
+          curl -sS --connect-timeout 10 --max-time 15 https://api.ipify.org || true
+          echo
+          echo "DMDW DNS results:"
+          getent ahosts dmdw.kma.go.kr | awk '{print $1}' | sort -u || true
+          echo "DMDW home probe:"
+          curl -sS -o /tmp/dmdw_home_probe.html \
+            --connect-timeout 20 \
+            --max-time 60 \
+            -w 'http_code=%{http_code} remote_ip=%{remote_ip} namelookup=%{time_namelookup}s connect=%{time_connect}s tls=%{time_appconnect}s starttransfer=%{time_starttransfer}s total=%{time_total}s error="%{errormsg}"\n' \
+            https://dmdw.kma.go.kr/ || true
+          wc -c /tmp/dmdw_home_probe.html || true
+
+      - name: Probe cached DMDW session
+        id: dmdw_session_cache
+        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' && steps.dmdw_credentials.outputs.auth_mode == 'login' && env.RUNNER_KIND == 'self-hosted' }}
+        run: |
+          set -euo pipefail
+          session_dir="$RUNNER_TEMP/dmdw_session"
+          cache_dir="$HOME/.cache/cds-vtg/dmdw-session"
+          mkdir -p "$session_dir"
+
+          if [ ! -s "$cache_dir/cookie.txt" ]; then
+            echo "cache_hit=false" >> "$GITHUB_OUTPUT"
+            echo "No cached DMDW session cookie found."
+            exit 0
+          fi
+
+          cp "$cache_dir/cookie.txt" "$session_dir/cookie.txt"
+          if [ -s "$cache_dir/csrf.txt" ]; then
+            cp "$cache_dir/csrf.txt" "$session_dir/csrf.txt"
+          else
+            rm -f "$session_dir/csrf.txt"
+          fi
+
+          if python DMDW_VTG/probe_dmdw_session.py \
+            --cookie-file "$session_dir/cookie.txt" \
+            --csrf-file "$session_dir/csrf.txt"; then
+            echo "cache_hit=true" >> "$GITHUB_OUTPUT"
+            echo "Using cached DMDW session."
+          else
+            echo "cache_hit=false" >> "$GITHUB_OUTPUT"
+            rm -f "$session_dir/cookie.txt" "$session_dir/csrf.txt"
+            echo "Cached DMDW session is expired or unusable."
+          fi
+
+      - name: Prepare DMDW session
+        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
+        env:
+          CACHED_DMDW_SESSION: ${{ steps.dmdw_session_cache.outputs.cache_hit || 'false' }}
+        run: |
+          set -euo pipefail
+          session_dir="$RUNNER_TEMP/dmdw_session"
+          mkdir -p "$session_dir"
+          if [ "${{ steps.dmdw_credentials.outputs.auth_mode }}" = "login" ]; then
+            if [ "$CACHED_DMDW_SESSION" = "true" ]; then
+              echo "Cached DMDW session passed probe; skipping fresh login."
+              exit 0
+            fi
+
+            if [ "$RUNNER_KIND" = "self-hosted" ]; then
               browser_path="${DMDW_BROWSER_EXECUTABLE:-}"
 
               find_system_browser() {
@@ -313,6 +387,7 @@ jobs:
               fi
 
               if [ -n "$browser_path" ]; then
+                export DMDW_BROWSER_EXECUTABLE="$browser_path"
                 echo "DMDW_BROWSER_EXECUTABLE=$browser_path" >> "$GITHUB_ENV"
                 echo "Using system browser for DMDW login: $browser_path"
               else
@@ -330,39 +405,7 @@ jobs:
                 echo "::warning::If browser launch fails with libnspr4/libnss3/GTK errors, install Chromium dependencies on the runner host."
               fi
             fi
-          else
-            python -m pip install --upgrade pip
-            python -m pip install -r requirements-dmdw.txt
-            if [ "${{ steps.dmdw_credentials.outputs.auth_mode }}" = "login" ]; then
-              python -m playwright install --with-deps chromium
-            fi
-          fi
 
-      - name: Diagnose DMDW connectivity
-        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
-        continue-on-error: true
-        run: |
-          set +e
-          echo "Runner public IP:"
-          curl -sS --connect-timeout 10 --max-time 15 https://api.ipify.org || true
-          echo
-          echo "DMDW DNS results:"
-          getent ahosts dmdw.kma.go.kr | awk '{print $1}' | sort -u || true
-          echo "DMDW home probe:"
-          curl -sS -o /tmp/dmdw_home_probe.html \
-            --connect-timeout 20 \
-            --max-time 60 \
-            -w 'http_code=%{http_code} remote_ip=%{remote_ip} namelookup=%{time_namelookup}s connect=%{time_connect}s tls=%{time_appconnect}s starttransfer=%{time_starttransfer}s total=%{time_total}s error="%{errormsg}"\n' \
-            https://dmdw.kma.go.kr/ || true
-          wc -c /tmp/dmdw_home_probe.html || true
-
-      - name: Prepare DMDW session
-        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
-        run: |
-          set -euo pipefail
-          session_dir="$RUNNER_TEMP/dmdw_session"
-          mkdir -p "$session_dir"
-          if [ "${{ steps.dmdw_credentials.outputs.auth_mode }}" = "login" ]; then
             login_status=1
             login_args=(
               --output-dir "$session_dir"
@@ -380,6 +423,18 @@ jobs:
 
             if [ "$login_status" -eq 0 ]; then
               echo "DMDW fresh login succeeded."
+              if [ "$RUNNER_KIND" = "self-hosted" ]; then
+                cache_dir="$HOME/.cache/cds-vtg/dmdw-session"
+                mkdir -p "$cache_dir"
+                cp "$session_dir/cookie.txt" "$cache_dir/cookie.txt"
+                if [ -s "$session_dir/csrf.txt" ]; then
+                  cp "$session_dir/csrf.txt" "$cache_dir/csrf.txt"
+                else
+                  rm -f "$cache_dir/csrf.txt"
+                fi
+                chmod 600 "$cache_dir/cookie.txt" "$cache_dir/csrf.txt" 2>/dev/null || true
+                echo "Cached fresh DMDW session for the self-hosted runner."
+              fi
             elif [ -n "$DMDW_COOKIE" ] && [ "${DMDW_ALLOW_COOKIE_FALLBACK:-false}" = "true" ]; then
               echo "::warning::DMDW fresh login failed; falling back to DMDW_COOKIE secret because DMDW_ALLOW_COOKIE_FALLBACK=true."
               printf '%s' "$DMDW_COOKIE" > "$session_dir/cookie.txt"

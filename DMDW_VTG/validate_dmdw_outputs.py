@@ -79,6 +79,8 @@ def validate_point(path: Path, stats: ValidationStats, cycle_dt: datetime, point
         return
 
     lead = point.get("lead_hour")
+    if isinstance(lead, (int, float)) and lead < 0:
+        issue(stats, path, f"negative lead_hour valid_time={valid_time} lead={lead}")
     expected_lead = int(round((valid_dt - cycle_dt).total_seconds() / 3600.0))
     if lead != expected_lead:
         issue(stats, path, f"lead_hour mismatch valid_time={valid_time} lead={lead} expected={expected_lead}")
@@ -91,29 +93,7 @@ def validate_point(path: Path, stats: ValidationStats, cycle_dt: datetime, point
         issue(stats, path, f"out-of-range lat/lon valid_time={valid_time} lat={lat} lon={lon}")
 
 
-def validate_file(path: Path, stats: ValidationStats) -> None:
-    stats.files += 1
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except Exception as exc:
-        issue(stats, path, f"failed to parse JSON: {exc}")
-        return
-
-    marker = has_secret_marker(payload)
-    if marker:
-        issue(stats, path, f"secret/session marker found: {marker}")
-
-    if payload.get("schema_version") != 1:
-        issue(stats, path, "schema_version must be 1")
-    if payload.get("source") != "DMDW":
-        issue(stats, path, "source must be DMDW")
-
-    cycle_utc = str(payload.get("cycle_utc") or "")
-    cycle_dt = parse_stamp(cycle_utc)
-    if cycle_dt is None:
-        issue(stats, path, f"invalid cycle_utc={cycle_utc!r}")
-        return
-
+def validate_schema_v1(path: Path, stats: ValidationStats, cycle_dt: datetime, payload: dict[str, Any]) -> None:
     models = payload.get("models")
     if not isinstance(models, list):
         issue(stats, path, "models must be a list")
@@ -137,6 +117,91 @@ def validate_file(path: Path, stats: ValidationStats) -> None:
                 issue(stats, path, f"point entry is not an object for raw_model_id={model.get('raw_model_id')}")
                 continue
             validate_point(path, stats, cycle_dt, point)
+
+
+def validate_schema_v2(path: Path, stats: ValidationStats, cycle_dt: datetime, payload: dict[str, Any]) -> None:
+    models = payload.get("models")
+    if not isinstance(models, list):
+        issue(stats, path, "models must be a list")
+        return
+    stats.models += len(models)
+    stats.models_with_points += sum(
+        1 for model in models
+        if isinstance(model, dict) and int(model.get("point_count") or 0) > 0
+    )
+
+    point_columns = payload.get("point_columns")
+    points = payload.get("points")
+    if not isinstance(point_columns, list) or not all(isinstance(col, str) for col in point_columns):
+        issue(stats, path, "point_columns must be a string list")
+        return
+    if not isinstance(points, list):
+        issue(stats, path, "points must be a list")
+        return
+    if not points:
+        warn(stats, path, "no DMDW forecast points in file")
+
+    column_index = {column: idx for idx, column in enumerate(point_columns)}
+    required = {"model_index", "lead_hour", "valid_time", "lat", "lon"}
+    missing = sorted(required - set(column_index))
+    if missing:
+        issue(stats, path, f"missing point_columns={','.join(missing)}")
+        return
+
+    for row in points:
+        if not isinstance(row, list):
+            issue(stats, path, "compact point row is not a list")
+            continue
+        if len(row) < len(point_columns):
+            issue(stats, path, f"compact point row has {len(row)} values for {len(point_columns)} columns")
+            continue
+
+        model_index = row[column_index["model_index"]]
+        if not isinstance(model_index, int) or not (0 <= model_index < len(models)):
+            issue(stats, path, f"invalid model_index={model_index!r}")
+            continue
+
+        validate_point(
+            path,
+            stats,
+            cycle_dt,
+            {
+                "lead_hour": row[column_index["lead_hour"]],
+                "valid_time": row[column_index["valid_time"]],
+                "lat": row[column_index["lat"]],
+                "lon": row[column_index["lon"]],
+            },
+        )
+
+
+def validate_file(path: Path, stats: ValidationStats) -> None:
+    stats.files += 1
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        issue(stats, path, f"failed to parse JSON: {exc}")
+        return
+
+    marker = has_secret_marker(payload)
+    if marker:
+        issue(stats, path, f"secret/session marker found: {marker}")
+
+    schema_version = payload.get("schema_version")
+    if schema_version not in {1, 2}:
+        issue(stats, path, "schema_version must be 1 or 2")
+    if payload.get("source") != "DMDW":
+        issue(stats, path, "source must be DMDW")
+
+    cycle_utc = str(payload.get("cycle_utc") or "")
+    cycle_dt = parse_stamp(cycle_utc)
+    if cycle_dt is None:
+        issue(stats, path, f"invalid cycle_utc={cycle_utc!r}")
+        return
+
+    if schema_version == 1:
+        validate_schema_v1(path, stats, cycle_dt, payload)
+    else:
+        validate_schema_v2(path, stats, cycle_dt, payload)
 
 
 def candidate_files(root: Path, cycle: str | None) -> list[Path]:

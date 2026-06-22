@@ -27,6 +27,18 @@ DATA_URL = "https://dmdw.kma.go.kr/uwa/rest/iwa/ObservationSite/retTyphoonDataIm
 DEFAULT_OUTPUT_ROOT = PROJECT_ROOT / "data" / "dmdw"
 DEFAULT_REQUEST_DELAY = 0.15
 KST = timezone(timedelta(hours=9), "KST")
+DMDW_POINT_COLUMNS = [
+    "model_index",
+    "lead_hour",
+    "valid_time",
+    "lat",
+    "lon",
+    "pressure_hpa",
+    "wind",
+    "speed",
+    "direction",
+    "radius_15",
+]
 
 REQUEST_EXTENT = {
     "PROJ": "LCC",
@@ -569,6 +581,157 @@ def max_lead(points: list[dict[str, Any]]) -> int | None:
     return max(leads) if leads else None
 
 
+def compact_number(value: Any) -> int | float | None:
+    number = safe_float(value)
+    if number is None:
+        return None
+    if float(number).is_integer():
+        return int(number)
+    return round(float(number), 4)
+
+
+def compact_schema_v2_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    point_columns = payload.get("point_columns") or []
+    points = payload.get("points") or []
+    source_models = payload.get("models") or []
+    column_index = {str(column): idx for idx, column in enumerate(point_columns)}
+    required = {"model_index", "lead_hour", "valid_time", "lat", "lon"}
+    if not isinstance(points, list) or not isinstance(source_models, list) or not required <= set(column_index):
+        return payload
+
+    compact_models: list[dict[str, Any]] = []
+    compact_points: list[list[Any]] = []
+    model_index_map: dict[int, int] = {}
+
+    def value(row: list[Any], column: str) -> Any:
+        index = column_index.get(column)
+        if index is None or index >= len(row):
+            return None
+        return row[index]
+
+    for row in points:
+        if not isinstance(row, list):
+            continue
+        lead_hour = value(row, "lead_hour")
+        if not isinstance(lead_hour, int) or lead_hour < 0:
+            continue
+        old_model_index = value(row, "model_index")
+        if not isinstance(old_model_index, int) or not (0 <= old_model_index < len(source_models)):
+            continue
+
+        if old_model_index not in model_index_map:
+            source_model = source_models[old_model_index]
+            if not isinstance(source_model, dict):
+                source_model = {}
+            new_model_index = len(compact_models)
+            model_index_map[old_model_index] = new_model_index
+            compact_models.append({
+                "index": new_model_index,
+                "raw_model_id": source_model.get("raw_model_id"),
+                "model_id": source_model.get("model_id"),
+                "member_id": source_model.get("member_id"),
+                "point_count": 0,
+                "row_count": 0,
+                "max_lead_hour": None,
+            })
+
+        new_model_index = model_index_map[old_model_index]
+        compact_points.append([
+            new_model_index,
+            lead_hour,
+            value(row, "valid_time"),
+            compact_number(value(row, "lat")),
+            compact_number(value(row, "lon")),
+            compact_number(value(row, "pressure_hpa")),
+            compact_number(value(row, "wind")),
+            compact_number(value(row, "speed")),
+            compact_number(value(row, "direction")),
+            compact_number(value(row, "radius_15")),
+        ])
+        model = compact_models[new_model_index]
+        model["point_count"] += 1
+        model["row_count"] += 1
+        model["max_lead_hour"] = max(
+            lead_hour,
+            model["max_lead_hour"] if isinstance(model.get("max_lead_hour"), int) else lead_hour,
+        )
+
+    return {
+        "schema_version": 2,
+        "source": "DMDW",
+        "cycle": payload.get("cycle"),
+        "cycle_utc": payload.get("cycle_utc"),
+        "time_basis": payload.get("time_basis"),
+        "request": payload.get("request"),
+        "storm": payload.get("storm"),
+        "layer_candidate_count": payload.get("layer_candidate_count"),
+        "model_count": len(compact_models),
+        "point_count": len(compact_points),
+        "models": compact_models,
+        "point_columns": DMDW_POINT_COLUMNS,
+        "points": compact_points,
+    }
+
+
+def compact_dmdw_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    if payload.get("schema_version") == 2:
+        return compact_schema_v2_payload(payload)
+
+    compact_models: list[dict[str, Any]] = []
+    compact_points: list[list[Any]] = []
+    for model in payload.get("models") or []:
+        if not isinstance(model, dict):
+            continue
+        points = [
+            point for point in (model.get("points") or [])
+            if isinstance(point, dict)
+            and isinstance(point.get("lead_hour"), int)
+            and point.get("lead_hour") >= 0
+        ]
+        if not points:
+            continue
+
+        model_index = len(compact_models)
+        compact_models.append({
+            "index": model_index,
+            "raw_model_id": model.get("raw_model_id"),
+            "model_id": model.get("model_id"),
+            "member_id": model.get("member_id"),
+            "point_count": point_count(points),
+            "row_count": len(points),
+            "max_lead_hour": max_lead(points),
+        })
+        for point in points:
+            compact_points.append([
+                model_index,
+                point.get("lead_hour"),
+                point.get("valid_time"),
+                compact_number(point.get("lat")),
+                compact_number(point.get("lon")),
+                compact_number(point.get("pressure_hpa")),
+                compact_number(point.get("wind")),
+                compact_number(point.get("speed")),
+                compact_number(point.get("direction")),
+                compact_number(point.get("radius_15")),
+            ])
+
+    return {
+        "schema_version": 2,
+        "source": "DMDW",
+        "cycle": payload.get("cycle"),
+        "cycle_utc": payload.get("cycle_utc"),
+        "time_basis": payload.get("time_basis"),
+        "request": payload.get("request"),
+        "storm": payload.get("storm"),
+        "layer_candidate_count": payload.get("layer_candidate_count"),
+        "model_count": len(compact_models),
+        "point_count": len(compact_points),
+        "models": compact_models,
+        "point_columns": DMDW_POINT_COLUMNS,
+        "points": compact_points,
+    }
+
+
 def fetch_one_storm(
     *,
     session: Any,
@@ -664,7 +827,7 @@ def fetch_one_storm(
 
 
 def write_json_if_changed(path: Path, payload: dict[str, Any]) -> bool:
-    text = json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n"
+    text = json.dumps(payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True) + "\n"
     previous = path.read_text(encoding="utf-8") if path.exists() else None
     if previous == text:
         return False
@@ -893,6 +1056,10 @@ def parse_args() -> argparse.Namespace:
 
 
 def forecast_point_total(payload: dict[str, Any]) -> int:
+    points = payload.get("points")
+    if isinstance(points, list):
+        return len(points)
+
     total = 0
     for model in payload.get("models") or []:
         if isinstance(model, dict):
@@ -976,6 +1143,7 @@ def main() -> int:
                 "dmdw_start_time": job_value(job, "dmdw_start_time", ""),
                 "dmdw_o_tm_seq": job_o_tm_seq,
             }
+            payload = compact_dmdw_payload(payload)
             out_path = storm_output_path(args.output_root, cycle=cycle, job=job)
             if not args.allow_empty_models and forecast_point_total(payload) == 0:
                 print(f"Skipping {out_path}: DMDW returned no forecast model points.")
