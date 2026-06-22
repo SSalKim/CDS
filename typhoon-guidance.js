@@ -1032,7 +1032,9 @@ box-shadow:0 2px 8px rgba(15,23,42,.04);
 .typhoon-model-detail-table-wrap{
 min-height:0;
 overflow-y:auto;
-overflow-x:hidden;
+overflow-x:auto;
+overscroll-behavior:contain;
+-webkit-overflow-scrolling:touch;
 border:1px solid rgba(148,163,184,.28);
 border-radius:16px;
 background:#fff;
@@ -1040,6 +1042,7 @@ box-shadow:0 8px 24px rgba(15,23,42,.06);
 }
 .typhoon-model-detail-table{
 width:100%;
+min-width:1080px;
 border-collapse:separate;
 border-spacing:0;
 font-size:11.7px;
@@ -1111,8 +1114,6 @@ to{opacity:1;transform:translateY(0) scale(1);}
 }
 @media (max-width: 1280px){
 .typhoon-model-detail-table{font-size:11.5px;}
-.typhoon-model-detail-table thead th,
-.typhoon-model-detail-table tbody td{white-space:normal;}
 .typhoon-model-detail-note{min-width:0;}
 }
 @media (max-width: 900px){
@@ -1121,7 +1122,7 @@ to{opacity:1;transform:translateY(0) scale(1);}
 .typhoon-model-detail-header{padding:18px 18px 15px;}
 .typhoon-model-detail-title{font-size:20px;}
 .typhoon-model-detail-body{padding:14px;}
-.typhoon-model-detail-table{font-size:11.5px;}
+.typhoon-model-detail-table{font-size:11.5px;min-width:1040px;}
 }
 `;
 document.head.appendChild(style);

@@ -3788,3 +3788,221 @@ select option.unsupported-option{
   opacity:1;
   transform:translate(-50%,0);
 }
+
+/* Typhoon mobile portrait layout must win over shared timeline hotfixes above. */
+@media (max-width: 700px) and (orientation: portrait){
+  .typhoon-page-body,
+  #typhoonGuidanceApp,
+  .typhoon-page{
+    min-height:100dvh;
+    height:100dvh;
+  }
+
+  .typhoon-page{
+    overflow:hidden;
+  }
+
+  .typhoon-header{
+    flex:0 0 auto;
+    display:grid;
+    grid-template-columns:minmax(78px,88px) minmax(78px,92px) minmax(0,1fr);
+    align-items:stretch;
+    gap:6px;
+    padding:6px;
+  }
+
+  .typhoon-title-wrap{
+    grid-column:1;
+    width:auto;
+    min-width:0;
+    min-height:34px;
+    margin:0;
+    padding:5px 8px;
+    border-right:1px solid var(--line);
+    border-bottom:none;
+    border-radius:8px 0 0 8px;
+  }
+
+  .typhoon-title{
+    flex-direction:column;
+    gap:0;
+    font-size:15px;
+    line-height:1.05;
+    white-space:nowrap;
+  }
+
+  .typhoon-select-controls{
+    display:contents;
+  }
+
+  .typhoon-year-select,
+  .typhoon-storm-select{
+    width:100%;
+    height:34px;
+    min-width:0;
+    max-width:none;
+    border-radius:8px;
+    font-size:14px;
+    padding-left:9px;
+  }
+
+  .typhoon-fcst-toggle{
+    grid-column:1 / -1;
+    width:100%;
+    height:34px;
+    min-width:0;
+    border-radius:8px;
+  }
+
+  .typhoon-fcst-option{
+    min-width:0;
+    flex:1 1 50%;
+    padding:0 6px;
+    font-size:13px;
+    line-height:1;
+  }
+
+  .typhoon-page .typhoon-time-bar{
+    flex:0 0 auto;
+    padding-top:4px !important;
+    padding-bottom:4px !important;
+  }
+
+  .typhoon-page .typhoon-time-shell{
+    min-height:42px !important;
+  }
+
+  .typhoon-page .typhoon-timeline .compare-timeline-list,
+  .typhoon-page .typhoon-timeline .single-timeline-list{
+    padding-top:14px !important;
+    padding-bottom:14px !important;
+  }
+
+  .typhoon-content{
+    flex:1 1 auto;
+    min-height:0;
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:minmax(0,1fr) clamp(210px,34dvh,300px);
+  }
+
+  .typhoon-viewer{
+    min-height:0;
+    align-items:flex-start;
+    justify-content:center;
+    overflow:auto;
+    padding:8px 4px 4px;
+  }
+
+  .typhoon-guidance-image{
+    max-width:100%;
+    max-height:100%;
+  }
+
+  .typhoon-model-info-panel{
+    width:100%;
+    min-width:0;
+    min-height:0;
+    border-left:none;
+    border-top:1px solid var(--line);
+  }
+
+  .typhoon-model-info-list{
+    min-height:0;
+    padding:7px 10px 5px;
+  }
+
+  .typhoon-model-info-row{
+    grid-template-columns:minmax(108px,34%) minmax(0,1fr);
+    min-width:0;
+    gap:9px;
+    padding:3px 0;
+  }
+
+  .typhoon-model-info-name,
+  .typhoon-model-info-description{
+    font-size:12px;
+    line-height:1.25;
+  }
+
+  .typhoon-model-info-name{
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+
+  .typhoon-model-info-description{
+    white-space:normal;
+    word-break:keep-all;
+    overflow-wrap:anywhere;
+  }
+
+  .typhoon-model-info-actions{
+    flex:0 0 auto !important;
+    gap:8px !important;
+    padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px)) !important;
+  }
+
+  .typhoon-model-info-actions .typhoon-updated-time{
+    font-size:11px !important;
+    line-height:1.3 !important;
+    letter-spacing:0 !important;
+  }
+
+  .typhoon-model-detail-button{
+    min-height:32px !important;
+    padding:7px 11px !important;
+    font-size:12px !important;
+    white-space:nowrap !important;
+  }
+}
+
+@media (max-width: 380px) and (orientation: portrait){
+  .typhoon-header{
+    display:flex;
+    flex-direction:column;
+  }
+
+  .typhoon-title-wrap{
+    width:100%;
+    min-height:32px;
+    border-right:none;
+    border-bottom:1px solid var(--line);
+    border-radius:0;
+  }
+
+  .typhoon-title{
+    flex-direction:row;
+    gap:4px;
+    font-size:16px;
+    line-height:1;
+  }
+
+  .typhoon-select-controls{
+    width:100%;
+    flex:0 0 auto;
+    display:grid;
+    grid-template-columns:minmax(74px,84px) minmax(0,1fr);
+    gap:6px;
+    padding-left:0;
+    overflow:visible;
+  }
+
+  .typhoon-year-select,
+  .typhoon-storm-select{
+    height:32px;
+    font-size:13px;
+  }
+
+  .typhoon-fcst-toggle{
+    height:32px;
+  }
+
+  .typhoon-content{
+    grid-template-rows:minmax(0,1fr) clamp(195px,32dvh,260px);
+  }
+
+  .typhoon-model-info-row{
+    grid-template-columns:minmax(96px,33%) minmax(0,1fr);
+    gap:7px;
+  }
+}
