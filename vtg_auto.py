@@ -678,6 +678,19 @@ def kma_gts_row_source(row: list[str]) -> str:
     return ""
 
 
+def is_apihub_model_zero_source(source: str) -> bool:
+    source_text = str(source or "").strip().upper()
+    return bool(source_text and source_text != "KMA")
+
+
+def mean_track_point(points: list[TrackPoint], *, time_utc: str) -> TrackPoint | None:
+    if not points:
+        return None
+    lat = sum(point.lat for point in points) / len(points)
+    lon = sum(point.lon for point in points) / len(points)
+    return TrackPoint(time_utc=time_utc, lat=lat, lon=lon)
+
+
 def fetch_kma_reference_point(
     *,
     typ_number: int,
@@ -694,6 +707,8 @@ def fetch_kma_reference_point(
     else:
         text = gts_text
 
+    model_zero_points: list[TrackPoint] = []
+    unlabeled_zero_points: list[TrackPoint] = []
     for row in parse_kma_csv_lines(text or "", fixed_columns=19):
         if safe_int(row[2]) != typ_number:
             continue
@@ -711,6 +726,28 @@ def fetch_kma_reference_point(
         point = TrackPoint(time_utc=ft_time, lat=lat, lon=lon)
         if source == "KMA":
             return point
+        if is_apihub_model_zero_source(source):
+            model_zero_points.append(point)
+        else:
+            unlabeled_zero_points.append(point)
+
+    mean_point = mean_track_point(model_zero_points, time_utc=f"{data_time[:10]}00")
+    if mean_point is not None:
+        print(
+            "KMA 0h reference point is missing from typ_gts_now; using the mean of "
+            f"{len(model_zero_points)} APIHUB model 0h point(s): "
+            f"{mean_point.lat:.2f}N, {mean_point.lon:.2f}E."
+        )
+        return mean_point
+
+    mean_point = mean_track_point(unlabeled_zero_points, time_utc=f"{data_time[:10]}00")
+    if mean_point is not None:
+        print(
+            "KMA 0h reference point is missing from typ_gts_now; using the mean of "
+            f"{len(unlabeled_zero_points)} unlabeled 0h point(s): "
+            f"{mean_point.lat:.2f}N, {mean_point.lon:.2f}E."
+        )
+        return mean_point
 
     return fetch_kma_now_reference_point(
         typ_number=typ_number,
