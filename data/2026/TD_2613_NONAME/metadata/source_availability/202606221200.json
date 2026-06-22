@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260622203949",
-  "generated_at_kst": "2026-06-23 05:39 KST",
+  "generated_at_utc": "20260622204951",
+  "generated_at_kst": "2026-06-23 05:49 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_13",
   "storm_stage": "TD",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 52,
+  "model_source_count": 60,
   "selected_model_count": 26,
   "active_target_model_count": 36,
   "model_sources": [
@@ -202,6 +202,23 @@
       "first_seen_kst": "2026-06-23 04:59 KST"
     },
     {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CEMN"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": false,
+      "point_count": 22,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260622204951",
+      "first_seen_kst": "2026-06-23 05:49 KST"
+    },
+    {
       "model_id": "CTCX",
       "model_label": "COAMPS-TC",
       "raw_model_ids": [
@@ -243,7 +260,7 @@
       ],
       "source": "FTP.NHC",
       "source_label": "FTP.NHC ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 17,
       "max_lead_hour": 96,
       "has_pressure": true,
@@ -251,6 +268,23 @@
       "is_official": false,
       "first_seen_utc": "20260622195949",
       "first_seen_kst": "2026-06-23 04:59 KST"
+    },
+    {
+      "model_id": "COAMPS_EPS",
+      "model_label": "COAMPS-TC EPS",
+      "raw_model_ids": [
+        "CTMN"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": true,
+      "point_count": 17,
+      "max_lead_hour": 96,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260622204951",
+      "first_seen_kst": "2026-06-23 05:49 KST"
     },
     {
       "model_id": "ECMWF",
@@ -268,6 +302,23 @@
       "is_official": false,
       "first_seen_utc": "20260622190950",
       "first_seen_kst": "2026-06-23 04:09 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMF"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": false,
+      "point_count": 24,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260622204951",
+      "first_seen_kst": "2026-06-23 05:49 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -302,6 +353,23 @@
       "is_official": false,
       "first_seen_utc": "20260622195949",
       "first_seen_kst": "2026-06-23 04:59 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": false,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260622204951",
+      "first_seen_kst": "2026-06-23 05:49 KST"
     },
     {
       "model_id": "ECMWF_EPS",
@@ -353,6 +421,23 @@
       "is_official": false,
       "first_seen_utc": "20260622195949",
       "first_seen_kst": "2026-06-23 04:59 KST"
+    },
+    {
+      "model_id": "FNV3",
+      "model_label": "FNV3",
+      "raw_model_ids": [
+        "FGNE"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": false,
+      "point_count": 19,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260622204951",
+      "first_seen_kst": "2026-06-23 05:49 KST"
     },
     {
       "model_id": "AFUM",
@@ -821,7 +906,7 @@
       ],
       "source": "FTP.NHC",
       "source_label": "FTP.NHC ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 12,
       "max_lead_hour": 66,
       "has_pressure": true,
@@ -829,6 +914,40 @@
       "is_official": false,
       "first_seen_utc": "20260622195949",
       "first_seen_kst": "2026-06-23 04:59 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260622204951",
+      "first_seen_kst": "2026-06-23 05:49 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NVGM"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": false,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260622204951",
+      "first_seen_kst": "2026-06-23 05:49 KST"
     },
     {
       "model_id": "FNMOC_EPS",
@@ -907,7 +1026,7 @@
       ],
       "source": "FTP.NHC",
       "source_label": "FTP.NHC ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 20,
       "max_lead_hour": 114,
       "has_pressure": false,
@@ -915,6 +1034,23 @@
       "is_official": false,
       "first_seen_utc": "20260622195949",
       "first_seen_kst": "2026-06-23 04:59 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": true,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260622204951",
+      "first_seen_kst": "2026-06-23 05:49 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2613_NONAME/metadata/source_availability/202606221200.json"
