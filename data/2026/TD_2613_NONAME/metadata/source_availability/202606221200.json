@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260622181949",
-  "generated_at_kst": "2026-06-23 03:19 KST",
+  "generated_at_utc": "20260622182955",
+  "generated_at_kst": "2026-06-23 03:29 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_13",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 12,
-  "selected_model_count": 9,
+  "model_source_count": 15,
+  "selected_model_count": 12,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -64,6 +64,23 @@
       "is_official": false,
       "first_seen_utc": "20260622173953",
       "first_seen_kst": "2026-06-23 02:39 KST"
+    },
+    {
+      "model_id": "FNV3",
+      "model_label": "FNV3",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 19,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260622182955",
+      "first_seen_kst": "2026-06-23 03:29 KST"
     },
     {
       "model_id": "AFUM",
@@ -200,6 +217,40 @@
       "is_official": false,
       "first_seen_utc": "20260622170948",
       "first_seen_kst": "2026-06-23 02:09 KST"
+    },
+    {
+      "model_id": "KIM_3h",
+      "model_label": "KIM",
+      "raw_model_ids": [
+        "KIM_3h"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260622182955",
+      "first_seen_kst": "2026-06-23 03:29 KST"
+    },
+    {
+      "model_id": "KIM_6h",
+      "model_label": "KIM",
+      "raw_model_ids": [
+        "KIM_6h"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260622182955",
+      "first_seen_kst": "2026-06-23 03:29 KST"
     },
     {
       "model_id": "KMA",
