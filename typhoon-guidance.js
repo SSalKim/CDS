@@ -78,8 +78,8 @@ const TYPHOON_MODEL_INFO=[
 {name:'ECMWF EPS',description:'유럽중기예보센터(ECMWF) 앙상블모델 평균'},
 {name:'KIM',description:'기상청 전구모델'},
 {name:'KIM EPS',description:'기상청 앙상블모델 평균'},
-{name:'UKMO',description:'영국기상청(UKMO) 전구모델'},
-{name:'UKMO EPS',description:'영국기상청(UKMO) 앙상블모델 평균'},
+{name:'UKMO',description:'영국기상청(UKMET) 전구모델'},
+{name:'UKMO EPS',description:'영국기상청(UKMET) 앙상블모델 평균'},
 {name:'GFS',description:'미해양대기청(NOAA NCEP) 전구모델'},
 {name:'GFS EPS',description:'미해양대기청(NOAA NCEP) 앙상블모델 평균'},
 {name:'CMC',description:'캐나다기상센터(CMC) 전구모델'},
@@ -239,7 +239,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
   },
   {
     "표출명칭": "UKMO",
-    "운영기관": "영국기상청(UKMO)",
+    "운영기관": "영국기상청(UKMET)",
     "모델명": "UM",
     "도메인": "전지구",
     "구분": "결정론적 모델",
@@ -250,7 +250,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
   },
   {
     "표출명칭": "UKMO EPS",
-    "운영기관": "영국기상청(UKMO)",
+    "운영기관": "영국기상청(UKMET)",
     "모델명": "UM (MOGREPS-G)",
     "도메인": "전지구",
     "구분": "앙상블 모델 평균 (M25)",

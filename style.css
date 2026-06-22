@@ -1831,7 +1831,7 @@ option.group-header{
 }
 
 .typhoon-page-body{
-  background:#eef2f7;
+  background:#fff;
 }
 
 #typhoonGuidanceApp{
@@ -3791,7 +3791,7 @@ select option.unsupported-option{
 
 /* Typhoon mobile portrait layout must win over shared timeline hotfixes above. */
 @media (max-width: 700px) and (orientation: portrait){
-  .typhoon-page-body,
+  body.typhoon-page-body,
   #typhoonGuidanceApp,
   .typhoon-page{
     min-height:100dvh;
@@ -3800,33 +3800,41 @@ select option.unsupported-option{
 
   .typhoon-page{
     overflow:hidden;
+    border-top-left-radius:0;
+    border-top-right-radius:0;
   }
 
   .typhoon-header{
     flex:0 0 auto;
     display:grid;
-    grid-template-columns:minmax(78px,88px) minmax(78px,92px) minmax(0,1fr);
+    grid-template-columns:72px minmax(72px,78px) minmax(0,1fr);
+    grid-template-rows:36px 36px;
     align-items:stretch;
     gap:6px;
-    padding:6px;
+    padding:0 6px 0 0;
+    row-gap:4px;
   }
 
   .typhoon-title-wrap{
     grid-column:1;
+    grid-row:1 / 3;
     width:auto;
     min-width:0;
-    min-height:34px;
+    min-height:0;
     margin:0;
-    padding:5px 8px;
+    padding:0 6px;
+    border:none;
     border-right:1px solid var(--line);
     border-bottom:none;
-    border-radius:8px 0 0 8px;
+    border-radius:0;
+    background:#ffffff;
   }
 
   .typhoon-title{
     flex-direction:column;
+    flex-wrap:nowrap;
     gap:0;
-    font-size:15px;
+    font-size:14px;
     line-height:1.05;
     white-space:nowrap;
   }
@@ -3838,20 +3846,34 @@ select option.unsupported-option{
   .typhoon-year-select,
   .typhoon-storm-select{
     width:100%;
-    height:34px;
+    height:32px;
     min-width:0;
     max-width:none;
     border-radius:8px;
-    font-size:14px;
-    padding-left:9px;
+    font-size:13px;
+    padding-left:8px;
+    align-self:start;
+    margin-top:4px;
+  }
+
+  .typhoon-year-select{
+    padding-right:22px;
+  }
+
+  .typhoon-storm-select{
+    padding-right:24px;
   }
 
   .typhoon-fcst-toggle{
-    grid-column:1 / -1;
+    grid-column:2 / -1;
     width:100%;
-    height:34px;
+    height:32px;
     min-width:0;
     border-radius:8px;
+    margin-top:0;
+    margin-bottom:4px;
+    align-self:end;
+    border-top:1px solid var(--line-soft);
   }
 
   .typhoon-fcst-option{
@@ -3864,7 +3886,7 @@ select option.unsupported-option{
 
   .typhoon-page .typhoon-time-bar{
     flex:0 0 auto;
-    padding-top:4px !important;
+    padding-top:3px !important;
     padding-bottom:4px !important;
   }
 
@@ -3881,34 +3903,43 @@ select option.unsupported-option{
   .typhoon-content{
     flex:1 1 auto;
     min-height:0;
-    display:grid;
-    grid-template-columns:minmax(0,1fr);
-    grid-template-rows:minmax(0,1fr) clamp(210px,34dvh,300px);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
   }
 
   .typhoon-viewer{
+    flex:0 0 auto;
     min-height:0;
     align-items:flex-start;
     justify-content:center;
-    overflow:auto;
-    padding:8px 4px 4px;
+    overflow:visible;
+    padding:0;
   }
 
   .typhoon-guidance-image{
+    width:100%;
+    height:auto;
     max-width:100%;
-    max-height:100%;
+    max-height:none;
+    object-fit:contain;
   }
 
   .typhoon-model-info-panel{
+    flex:1 1 0;
     width:100%;
     min-width:0;
     min-height:0;
+    display:flex;
+    flex-direction:column;
     border-left:none;
     border-top:1px solid var(--line);
   }
 
   .typhoon-model-info-list{
+    flex:1 1 auto;
     min-height:0;
+    overflow:auto;
     padding:7px 10px 5px;
   }
 
@@ -3936,69 +3967,108 @@ select option.unsupported-option{
     overflow-wrap:anywhere;
   }
 
-  .typhoon-model-info-actions{
-    flex:0 0 auto !important;
-    gap:8px !important;
-    padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px)) !important;
+  .typhoon-page .typhoon-model-info-actions{
+    flex:0 0 auto;
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:8px;
+    margin-top:0;
+    padding:7px 10px;
+    position:relative;
+    bottom:auto;
   }
 
-  .typhoon-model-info-actions .typhoon-updated-time{
-    font-size:11px !important;
-    line-height:1.3 !important;
-    letter-spacing:0 !important;
+  .typhoon-page .typhoon-model-info-actions .typhoon-updated-time{
+    flex:0 1 auto;
+    align-self:center;
+    width:auto;
+    max-width:none;
+    min-width:0;
+    height:32px;
+    min-height:32px;
+    display:grid;
+    grid-template-rows:12px 12px;
+    align-content:center;
+    align-items:center;
+    justify-items:start;
+    row-gap:0;
+    margin:0;
+    padding:0;
+    text-align:left;
+    font-size:11px;
+    line-height:1.18;
+    letter-spacing:0;
   }
 
-  .typhoon-model-detail-button{
-    min-height:32px !important;
-    padding:7px 11px !important;
-    font-size:12px !important;
-    white-space:nowrap !important;
+  .typhoon-page .typhoon-updated-time .typhoon-updated-time-line,
+  .typhoon-page .typhoon-updated-time .typhoon-update-schedule{
+    width:auto;
+    height:12px;
+    line-height:12px;
+    margin-top:0;
+    text-align:left;
+    white-space:nowrap;
+  }
+
+  .typhoon-page .typhoon-model-detail-button{
+    flex:0 0 auto;
+    margin-left:auto;
+    min-height:32px;
+    padding:7px 11px;
+    font-size:12px;
+    white-space:nowrap;
   }
 }
 
 @media (max-width: 380px) and (orientation: portrait){
   .typhoon-header{
-    display:flex;
-    flex-direction:column;
+    display:grid;
+    grid-template-columns:68px minmax(68px,74px) minmax(0,1fr);
+    grid-template-rows:35px 35px;
+    row-gap:4px;
+    padding-top:0;
+    padding-bottom:0;
   }
 
   .typhoon-title-wrap{
-    width:100%;
-    min-height:32px;
-    border-right:none;
-    border-bottom:1px solid var(--line);
+    grid-column:1;
+    grid-row:1 / 3;
+    width:auto;
+    min-height:0;
+    padding:0 5px;
+    border-right:1px solid var(--line);
+    border-bottom:none;
     border-radius:0;
   }
 
   .typhoon-title{
-    flex-direction:row;
-    gap:4px;
-    font-size:16px;
-    line-height:1;
+    flex-direction:column;
+    gap:0;
+    font-size:13px;
+    line-height:1.05;
   }
 
   .typhoon-select-controls{
-    width:100%;
-    flex:0 0 auto;
-    display:grid;
-    grid-template-columns:minmax(74px,84px) minmax(0,1fr);
-    gap:6px;
-    padding-left:0;
-    overflow:visible;
+    display:contents;
   }
 
   .typhoon-year-select,
   .typhoon-storm-select{
-    height:32px;
-    font-size:13px;
+    height:31px;
+    font-size:12px;
+    align-self:start;
+    margin-top:4px;
   }
 
   .typhoon-fcst-toggle{
-    height:32px;
+    grid-column:2 / -1;
+    height:31px;
+    margin-bottom:4px;
   }
 
-  .typhoon-content{
-    grid-template-rows:minmax(0,1fr) clamp(195px,32dvh,260px);
+  .typhoon-model-info-panel{
+    flex-basis:0;
   }
 
   .typhoon-model-info-row{
