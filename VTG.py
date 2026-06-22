@@ -250,13 +250,14 @@ MODEL_TRACK_MAX_SPEED_KMH = float(os.getenv("VTG_MODEL_TRACK_MAX_SPEED_KMH", "10
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
-SOURCE_ORDER = ("APIHUB", "NOAA", "FTP.NHC", "RAL.UCAR", "RAW.GITHUB")
+SOURCE_ORDER = ("APIHUB", "DMDW", "NOAA", "FTP.NHC", "RAL.UCAR", "RAW.GITHUB")
 MODEL_SOURCE_PRIORITY_OVERRIDES = {
-    "GENC": ("RAW.GITHUB", "APIHUB", "NOAA", "FTP.NHC", "RAL.UCAR"),
-    "FNV3": ("RAW.GITHUB", "APIHUB", "NOAA", "FTP.NHC", "RAL.UCAR"),
+    "GENC": ("RAW.GITHUB", "APIHUB", "DMDW", "NOAA", "FTP.NHC", "RAL.UCAR"),
+    "FNV3": ("RAW.GITHUB", "APIHUB", "DMDW", "NOAA", "FTP.NHC", "RAL.UCAR"),
 }
 SOURCE_DISPLAY_NAMES = {
     "APIHUB": "KMA APIHUB",
+    "DMDW": "KMA DMDW",
     "NOAA": "NOAA ATCF",
     "FTP.NHC": "FTP.NHC ATCF",
     "RAL.UCAR": "RAL UCAR ATCF",
@@ -265,6 +266,8 @@ SOURCE_DISPLAY_NAMES = {
 SOURCE_ALIASES = {
     "APIHUB": "APIHUB",
     "KMAAPIHUB": "APIHUB",
+    "DMDW": "DMDW",
+    "KMADMDW": "DMDW",
     "NOAA": "NOAA",
     "ATCF": "NOAA",
     "NCEP": "NOAA",
@@ -285,6 +288,7 @@ SOURCE_ALIASES = {
 }
 SOURCE_IDENTIFIER_COLUMNS = {
     "APIHUB": "apihub",
+    "DMDW": "dmdw",
     "NOAA": "noaa",
     "FTP.NHC": "ftp_nhc",
     "RAL.UCAR": "ral_ucar",
@@ -607,7 +611,7 @@ def parse_args() -> Settings:
         metavar="MODEL=SOURCE",
         help="Prefer a source for this run, e.g. ECMWF_EPS=NOAA. Repeat or comma-separate.",
     )
-    parser.add_argument("--skip-atcf", action="store_true", help="Use KMA APIHUB data only.")
+    parser.add_argument("--skip-atcf", action="store_true", help="Skip ATCF fallback sources.")
     parser.add_argument("--analysis-lat", type=float, default=Settings.analysis_lat)
     parser.add_argument("--analysis-lon", type=float, default=Settings.analysis_lon)
     parser.add_argument("--analysis-time", default=Settings.analysis_time)
@@ -1021,6 +1025,157 @@ def read_kma_csv(text: str | None, settings: Settings, *, forecast_only: bool) -
 
 def kma_data_typ_number(settings: Settings) -> int:
     return settings.data_typ_number or settings.typ_number
+
+
+def dmdw_data_root() -> Path:
+    return PROJECT_ROOT / "data" / "dmdw"
+
+
+def dmdw_cycle_key(settings: Settings) -> str:
+    return settings.data_time[:10]
+
+
+def dmdw_storm_key_aliases(settings: Settings) -> set[str]:
+    year = storm_year(settings)
+    aliases = {key.lower() for key in storm_history_keys(settings) if key}
+    aliases.add(f"{settings.storm_stage.lower()}_{year}_{settings.typ_number:02d}")
+    aliases.add(f"typ_{year}_{kma_data_typ_number(settings):02d}")
+    if settings.linked_typ_number:
+        aliases.add(f"typ_{year}_{settings.linked_typ_number:02d}")
+    if settings.linked_td_number:
+        aliases.add(f"td_{year}_{settings.linked_td_number:02d}")
+    return aliases
+
+
+def dmdw_candidate_paths(settings: Settings) -> list[Path]:
+    root = dmdw_data_root()
+    year = settings.data_time[:4]
+    cycle = dmdw_cycle_key(settings)
+    cycle_dir = root / year / cycle
+    aliases = dmdw_storm_key_aliases(settings)
+
+    direct_paths = [
+        cycle_dir / f"{alias}.json"
+        for alias in sorted(aliases)
+        if alias.startswith(("typ_", "td_"))
+    ]
+    existing = [path for path in direct_paths if path.exists()]
+    if existing:
+        return existing
+
+    index_path = root / "index.json"
+    try:
+        index = json.loads(index_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return []
+    rels = index.get("cycles", {}).get(f"{year}/{cycle}", [])
+    paths: list[Path] = []
+    for rel in rels if isinstance(rels, list) else []:
+        path = root / str(rel)
+        if not path.exists():
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        storm_key = str((payload.get("storm") or {}).get("storm_key") or "").lower()
+        if storm_key in aliases:
+            paths.append(path)
+    return paths
+
+
+def dmdw_value(row: list, column_index: dict[str, int], column: str):
+    index = column_index.get(column)
+    if index is None or index >= len(row):
+        return None
+    return row[index]
+
+
+def read_dmdw_json(path: Path, settings: Settings) -> pd.DataFrame:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"Warning: failed to read DMDW source {path}: {exc}")
+        return pd.DataFrame(columns=[*KMA_COLUMNS, DATA_SOURCE_COLUMN])
+
+    if payload.get("schema_version") != 2 or payload.get("source") != "DMDW":
+        print(f"Warning: unsupported DMDW schema in {path}")
+        return pd.DataFrame(columns=[*KMA_COLUMNS, DATA_SOURCE_COLUMN])
+
+    cycle_utc = str(payload.get("cycle_utc") or settings.data_time)
+    point_columns = payload.get("point_columns") or []
+    points = payload.get("points") or []
+    models = payload.get("models") or []
+    if not isinstance(point_columns, list) or not isinstance(points, list) or not isinstance(models, list):
+        return pd.DataFrame(columns=[*KMA_COLUMNS, DATA_SOURCE_COLUMN])
+
+    column_index = {str(column): idx for idx, column in enumerate(point_columns)}
+    rows: list[dict] = []
+    for point in points:
+        if not isinstance(point, list):
+            continue
+        model_index = dmdw_value(point, column_index, "model_index")
+        if not isinstance(model_index, int) or not (0 <= model_index < len(models)):
+            continue
+        model = models[model_index] if isinstance(models[model_index], dict) else {}
+        member_id = model.get("member_id")
+        if member_id not in (None, "", "MEAN"):
+            continue
+
+        model_id = str(model.get("model_id") or "").strip()
+        if model_id not in MODEL_NAMES:
+            continue
+        lead_hour = dmdw_value(point, column_index, "lead_hour")
+        if not isinstance(lead_hour, int) or lead_hour < 0 or lead_hour > settings.fcst_hours:
+            continue
+        valid_time = str(dmdw_value(point, column_index, "valid_time") or "")
+        rows.append({
+            "FT": 1 if lead_hour > 0 else 0,
+            "YY": int(settings.data_time[:4]),
+            "TYP": kma_data_typ_number(settings),
+            "SEQ": lead_hour,
+            "TMD": lead_hour,
+            "TYP_TM(UTC)": cycle_utc,
+            "FT_TM(UTC)": valid_time,
+            "LAT": dmdw_value(point, column_index, "lat"),
+            "LON": dmdw_value(point, column_index, "lon"),
+            "DIR": dmdw_value(point, column_index, "direction"),
+            "SP": dmdw_value(point, column_index, "speed"),
+            "PS": dmdw_value(point, column_index, "pressure_hpa"),
+            "WS": dmdw_value(point, column_index, "wind"),
+            "T15": dmdw_value(point, column_index, "radius_15"),
+            "T25": "",
+            "RAD": "",
+            "15D": "",
+            "15R": "",
+            "SRC": model_id,
+            RAW_MODEL_COLUMN: str(model.get("raw_model_id") or model_id),
+            DATA_SOURCE_COLUMN: "DMDW",
+            MODEL_ALIAS_PRIORITY_COLUMN: 0,
+            "": "",
+        })
+
+    if not rows:
+        return pd.DataFrame(columns=[*KMA_COLUMNS, RAW_MODEL_COLUMN, DATA_SOURCE_COLUMN, MODEL_ALIAS_PRIORITY_COLUMN])
+
+    df = pd.DataFrame(rows)
+    for column in ("TMD", "LAT", "LON", "DIR", "SP", "PS", "WS", "T15", "SEQ"):
+        if column in df:
+            df[column] = pd.to_numeric(df[column], errors="coerce")
+    df = df.dropna(subset=["TMD", "FT_TM(UTC)", "LAT", "LON"])
+    return df
+
+
+def read_dmdw_data(settings: Settings) -> pd.DataFrame:
+    frames = []
+    for path in dmdw_candidate_paths(settings):
+        frame = read_dmdw_json(path, settings)
+        if not frame.empty:
+            print(f"Loaded DMDW source data: {relative_project_path(path)} rows={len(frame)}")
+            frames.append(frame)
+    if not frames:
+        return pd.DataFrame(columns=[*KMA_COLUMNS, RAW_MODEL_COLUMN, DATA_SOURCE_COLUMN, MODEL_ALIAS_PRIORITY_COLUMN])
+    return pd.concat(frames, ignore_index=True, sort=False)
 
 
 def storm_numbers(settings: Settings) -> set[int]:
@@ -1718,6 +1873,8 @@ def source_display_name(source: str) -> str:
 
 
 def expected_raw_model_id(model_name: str, source_name: str) -> str:
+    if source_name == "DMDW":
+        return ""
     source_column = SOURCE_IDENTIFIER_COLUMNS.get(source_name)
     if not source_column:
         return ""
@@ -1909,8 +2066,13 @@ def select_model_sources_by_priority(df: pd.DataFrame, settings: Settings) -> pd
     return pd.concat(selected_frames, ignore_index=True)
 
 
-def normalize_track_data(kma_df: pd.DataFrame, atcf_df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
-    df = pd.concat([kma_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)
+def normalize_track_data(
+    kma_df: pd.DataFrame,
+    dmdw_df: pd.DataFrame,
+    atcf_df: pd.DataFrame,
+    settings: Settings,
+) -> pd.DataFrame:
+    df = pd.concat([kma_df, dmdw_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)
     if df.empty:
         return df
 
@@ -2389,10 +2551,17 @@ def availability_write_json(path: Path, payload) -> None:
             pass
 
 
-def source_availability_frame(kma_df: pd.DataFrame, atcf_df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+def source_availability_frame(
+    kma_df: pd.DataFrame,
+    dmdw_df: pd.DataFrame,
+    atcf_df: pd.DataFrame,
+    settings: Settings,
+) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
     if not kma_df.empty:
         frames.append(kma_df.copy())
+    if not dmdw_df.empty:
+        frames.append(dmdw_df.copy())
     if not atcf_df.empty:
         frames.append(atcf_to_kma_schema(atcf_df, settings))
     if not frames:
@@ -3770,7 +3939,7 @@ def draw_header(
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
     credit_x = 0.995 if legend_side == "left" else 0.005
     credit_ha = "right" if legend_side == "left" else "left"
-    ax.text(credit_x, 0.006, "Plotted by WooJin Kim\nData sourced from KMA APIHUB & NRL ATCF", transform=ax.transAxes,
+    ax.text(credit_x, 0.006, "Plotted by WooJin Kim\nData sourced from KMA APIHUB/DMDW & ATCF", transform=ax.transAxes,
             fontsize=12, color="aliceblue", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="bottom", horizontalalignment=credit_ha, zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
@@ -4067,11 +4236,12 @@ def main() -> None:
         if kma_df.empty and not fetch_settings.skip_atcf:
             print(
                 "KMA APIHUB has no forecast model rows for this storm/time; "
-                "trying ATCF-only guidance sources."
+                "trying DMDW/ATCF guidance sources."
             )
+        dmdw_df = read_dmdw_data(fetch_settings)
         atcf_df = empty_atcf_frame() if fetch_settings.skip_atcf else fetch_atcf_data(session, fetch_settings)
-        source_availability_raw_df = source_availability_frame(kma_df, atcf_df, fetch_settings)
-        df = normalize_track_data(kma_df, atcf_df, fetch_settings)
+        source_availability_raw_df = source_availability_frame(kma_df, dmdw_df, atcf_df, fetch_settings)
+        df = normalize_track_data(kma_df, dmdw_df, atcf_df, fetch_settings)
         try:
             write_source_availability_outputs(
                 raw_df=source_availability_raw_df,
