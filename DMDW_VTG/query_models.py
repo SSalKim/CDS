@@ -38,7 +38,16 @@ DMDW_POINT_COLUMNS = [
     "speed",
     "direction",
     "radius_15",
+    "member_count",
 ]
+ENSEMBLE_MEAN_MODEL_IDS = {
+    "CMC_EPS",
+    "GFS_EPS",
+    "ECMWF_EPS",
+    "ECMWF_AIFS_EPS",
+    "KIM_EPS",
+    "FNMOC_EPS",
+}
 
 REQUEST_EXTENT = {
     "PROJ": "LCC",
@@ -581,6 +590,117 @@ def max_lead(points: list[dict[str, Any]]) -> int | None:
     return max(leads) if leads else None
 
 
+def numeric_values(points: list[dict[str, Any]], key: str) -> list[float]:
+    values: list[float] = []
+    for point in points:
+        value = safe_float(point.get(key))
+        if value is not None:
+            values.append(value)
+    return values
+
+
+def arithmetic_mean(points: list[dict[str, Any]], key: str) -> float | None:
+    values = numeric_values(points, key)
+    if not values:
+        return None
+    return sum(values) / len(values)
+
+
+def circular_mean(values: list[float], period: float) -> float | None:
+    if not values:
+        return None
+    radians = [2.0 * math.pi * (value % period) / period for value in values]
+    sin_sum = sum(math.sin(value) for value in radians)
+    cos_sum = sum(math.cos(value) for value in radians)
+    if abs(sin_sum) < 1e-12 and abs(cos_sum) < 1e-12:
+        return None
+    mean = math.atan2(sin_sum / len(radians), cos_sum / len(radians))
+    if mean < 0:
+        mean += 2.0 * math.pi
+    return mean * period / (2.0 * math.pi)
+
+
+def mean_ensemble_point(model_id: str, lead_hour: int, points: list[dict[str, Any]]) -> dict[str, Any] | None:
+    usable = [
+        point for point in points
+        if safe_float(point.get("lat")) is not None
+        and safe_float(point.get("lon")) is not None
+    ]
+    if len(usable) < 2:
+        return None
+
+    valid_times = sorted({str(point.get("valid_time") or "") for point in usable if point.get("valid_time")})
+    lon = circular_mean(numeric_values(usable, "lon"), 360.0)
+    direction = circular_mean(numeric_values(usable, "direction"), 360.0)
+    return {
+        "valid_time": valid_times[0] if valid_times else "",
+        "lead_hour": lead_hour,
+        "raw_lead_hour": lead_hour,
+        "lat": arithmetic_mean(usable, "lat"),
+        "lon": lon,
+        "pressure_hpa": arithmetic_mean(usable, "pressure_hpa"),
+        "wind": arithmetic_mean(usable, "wind"),
+        "speed": arithmetic_mean(usable, "speed"),
+        "direction": direction,
+        "radius_15": arithmetic_mean(usable, "radius_15"),
+        "raw_model_id": f"{model_id}_MEAN",
+        "member_count": len(usable),
+    }
+
+
+def build_ensemble_mean_models(models: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[str, dict[int, list[dict[str, Any]]]] = defaultdict(lambda: defaultdict(list))
+    for model in models:
+        model_id = str(model.get("model_id") or "")
+        member = model.get("member_id")
+        if model_id not in ENSEMBLE_MEAN_MODEL_IDS or member in (None, "", "MEAN"):
+            continue
+        for point in model.get("points") or []:
+            if not isinstance(point, dict):
+                continue
+            lead_hour = point.get("lead_hour")
+            if isinstance(lead_hour, int):
+                grouped[model_id][lead_hour].append(point)
+
+    mean_models: list[dict[str, Any]] = []
+    for model_id in sorted(grouped):
+        mean_points: list[dict[str, Any]] = []
+        for lead_hour in sorted(grouped[model_id]):
+            point = mean_ensemble_point(model_id, lead_hour, grouped[model_id][lead_hour])
+            if point is not None:
+                mean_points.append(point)
+        if not mean_points:
+            continue
+        mean_models.append({
+            "raw_model_id": f"{model_id}_MEAN",
+            "model_id": model_id,
+            "member_id": "MEAN",
+            "is_ensemble_mean": True,
+            "source_member_count": max(
+                int(point.get("member_count") or 0) for point in mean_points
+            ),
+            "points": mean_points,
+        })
+    return mean_models
+
+
+def model_summary(model: dict[str, Any], *, status_code: Any = None, message: Any = "", error: str = "") -> dict[str, Any]:
+    points = model.get("points") if isinstance(model.get("points"), list) else []
+    return {
+        "raw_model_id": model.get("raw_model_id"),
+        "model_id": model.get("model_id"),
+        "member_id": model.get("member_id"),
+        "is_ensemble_mean": bool(model.get("is_ensemble_mean")),
+        "source_member_count": model.get("source_member_count"),
+        "statusCode": status_code,
+        "message": message,
+        "point_count": point_count(points),
+        "row_count": len(points),
+        "max_lead_hour": max_lead(points),
+        "error": error,
+    }
+
+
 def compact_number(value: Any) -> int | float | None:
     number = safe_float(value)
     if number is None:
@@ -590,96 +710,10 @@ def compact_number(value: Any) -> int | float | None:
     return round(float(number), 4)
 
 
-def compact_schema_v2_payload(payload: dict[str, Any]) -> dict[str, Any]:
-    point_columns = payload.get("point_columns") or []
-    points = payload.get("points") or []
-    source_models = payload.get("models") or []
-    column_index = {str(column): idx for idx, column in enumerate(point_columns)}
-    required = {"model_index", "lead_hour", "valid_time", "lat", "lon"}
-    if not isinstance(points, list) or not isinstance(source_models, list) or not required <= set(column_index):
-        return payload
-
+def compact_models_payload(payload: dict[str, Any], models: list[dict[str, Any]]) -> dict[str, Any]:
     compact_models: list[dict[str, Any]] = []
     compact_points: list[list[Any]] = []
-    model_index_map: dict[int, int] = {}
-
-    def value(row: list[Any], column: str) -> Any:
-        index = column_index.get(column)
-        if index is None or index >= len(row):
-            return None
-        return row[index]
-
-    for row in points:
-        if not isinstance(row, list):
-            continue
-        lead_hour = value(row, "lead_hour")
-        if not isinstance(lead_hour, int) or lead_hour < 0:
-            continue
-        old_model_index = value(row, "model_index")
-        if not isinstance(old_model_index, int) or not (0 <= old_model_index < len(source_models)):
-            continue
-
-        if old_model_index not in model_index_map:
-            source_model = source_models[old_model_index]
-            if not isinstance(source_model, dict):
-                source_model = {}
-            new_model_index = len(compact_models)
-            model_index_map[old_model_index] = new_model_index
-            compact_models.append({
-                "index": new_model_index,
-                "raw_model_id": source_model.get("raw_model_id"),
-                "model_id": source_model.get("model_id"),
-                "member_id": source_model.get("member_id"),
-                "point_count": 0,
-                "row_count": 0,
-                "max_lead_hour": None,
-            })
-
-        new_model_index = model_index_map[old_model_index]
-        compact_points.append([
-            new_model_index,
-            lead_hour,
-            value(row, "valid_time"),
-            compact_number(value(row, "lat")),
-            compact_number(value(row, "lon")),
-            compact_number(value(row, "pressure_hpa")),
-            compact_number(value(row, "wind")),
-            compact_number(value(row, "speed")),
-            compact_number(value(row, "direction")),
-            compact_number(value(row, "radius_15")),
-        ])
-        model = compact_models[new_model_index]
-        model["point_count"] += 1
-        model["row_count"] += 1
-        model["max_lead_hour"] = max(
-            lead_hour,
-            model["max_lead_hour"] if isinstance(model.get("max_lead_hour"), int) else lead_hour,
-        )
-
-    return {
-        "schema_version": 2,
-        "source": "DMDW",
-        "cycle": payload.get("cycle"),
-        "cycle_utc": payload.get("cycle_utc"),
-        "time_basis": payload.get("time_basis"),
-        "request": payload.get("request"),
-        "storm": payload.get("storm"),
-        "layer_candidate_count": payload.get("layer_candidate_count"),
-        "model_count": len(compact_models),
-        "point_count": len(compact_points),
-        "models": compact_models,
-        "point_columns": DMDW_POINT_COLUMNS,
-        "points": compact_points,
-    }
-
-
-def compact_dmdw_payload(payload: dict[str, Any]) -> dict[str, Any]:
-    if payload.get("schema_version") == 2:
-        return compact_schema_v2_payload(payload)
-
-    compact_models: list[dict[str, Any]] = []
-    compact_points: list[list[Any]] = []
-    for model in payload.get("models") or []:
+    for model in models:
         if not isinstance(model, dict):
             continue
         points = [
@@ -697,6 +731,8 @@ def compact_dmdw_payload(payload: dict[str, Any]) -> dict[str, Any]:
             "raw_model_id": model.get("raw_model_id"),
             "model_id": model.get("model_id"),
             "member_id": model.get("member_id"),
+            "is_ensemble_mean": bool(model.get("is_ensemble_mean")),
+            "source_member_count": model.get("source_member_count"),
             "point_count": point_count(points),
             "row_count": len(points),
             "max_lead_hour": max_lead(points),
@@ -713,6 +749,7 @@ def compact_dmdw_payload(payload: dict[str, Any]) -> dict[str, Any]:
                 compact_number(point.get("speed")),
                 compact_number(point.get("direction")),
                 compact_number(point.get("radius_15")),
+                compact_number(point.get("member_count")),
             ])
 
     return {
@@ -730,6 +767,77 @@ def compact_dmdw_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "point_columns": DMDW_POINT_COLUMNS,
         "points": compact_points,
     }
+
+
+def expand_schema_v2_models(payload: dict[str, Any]) -> list[dict[str, Any]] | None:
+    point_columns = payload.get("point_columns") or []
+    points = payload.get("points") or []
+    source_models = payload.get("models") or []
+    column_index = {str(column): idx for idx, column in enumerate(point_columns)}
+    required = {"model_index", "lead_hour", "valid_time", "lat", "lon"}
+    if not isinstance(points, list) or not isinstance(source_models, list) or not required <= set(column_index):
+        return None
+
+    expanded: list[dict[str, Any]] = []
+    for source_model in source_models:
+        if not isinstance(source_model, dict):
+            source_model = {}
+        expanded.append({
+            "raw_model_id": source_model.get("raw_model_id"),
+            "model_id": source_model.get("model_id"),
+            "member_id": source_model.get("member_id"),
+            "is_ensemble_mean": bool(source_model.get("is_ensemble_mean")),
+            "source_member_count": source_model.get("source_member_count"),
+            "points": [],
+        })
+
+    def value(row: list[Any], column: str) -> Any:
+        index = column_index.get(column)
+        if index is None or index >= len(row):
+            return None
+        return row[index]
+
+    for row in points:
+        if not isinstance(row, list):
+            continue
+        model_index = value(row, "model_index")
+        if not isinstance(model_index, int) or not (0 <= model_index < len(expanded)):
+            continue
+        lead_hour = value(row, "lead_hour")
+        if not isinstance(lead_hour, int) or lead_hour < 0:
+            continue
+        expanded[model_index]["points"].append({
+            "valid_time": value(row, "valid_time"),
+            "lead_hour": lead_hour,
+            "raw_lead_hour": lead_hour,
+            "lat": compact_number(value(row, "lat")),
+            "lon": compact_number(value(row, "lon")),
+            "pressure_hpa": compact_number(value(row, "pressure_hpa")),
+            "wind": compact_number(value(row, "wind")),
+            "speed": compact_number(value(row, "speed")),
+            "direction": compact_number(value(row, "direction")),
+            "radius_15": compact_number(value(row, "radius_15")),
+            "raw_model_id": expanded[model_index].get("raw_model_id"),
+            "member_count": compact_number(value(row, "member_count")),
+        })
+
+    return expanded
+
+
+def compact_dmdw_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    if payload.get("schema_version") == 2:
+        models = expand_schema_v2_models(payload)
+        if models is None:
+            return payload
+    else:
+        models = [model for model in (payload.get("models") or []) if isinstance(model, dict)]
+
+    source_models = [
+        model for model in models
+        if not bool(model.get("is_ensemble_mean")) and model.get("member_id") != "MEAN"
+    ]
+    models_with_means = source_models + build_ensemble_mean_models(source_models)
+    return compact_models_payload(payload, models_with_means)
 
 
 def fetch_one_storm(
@@ -794,19 +902,18 @@ def fetch_one_storm(
             "points": points,
         }
         models.append(model)
-        summary.append({
-            "raw_model_id": normalized_raw,
-            "model_id": model["model_id"],
-            "member_id": model["member_id"],
-            "statusCode": status_code,
-            "message": message,
-            "point_count": point_count(points),
-            "row_count": len(points),
-            "max_lead_hour": max_lead(points),
-            "error": error,
-        })
+        summary.append(model_summary(model, status_code=status_code, message=message, error=error))
         if request_delay > 0:
             time.sleep(request_delay)
+
+    mean_models = build_ensemble_mean_models(models)
+    for model in mean_models:
+        models.append(model)
+        summary.append(model_summary(
+            model,
+            status_code="derived",
+            message="DMDW ensemble member mean",
+        ))
 
     return {
         "schema_version": 1,
