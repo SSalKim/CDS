@@ -44,6 +44,7 @@ MODEL_INFO = [
     {"name": "ECMWF_EPS", "color": "#FC6C85", "style": "-", "label": "ECMWF EPS", "zorder": 88},
     {"name": "KIM_3h", "color": "#FA8128", "style": "-", "label": "KIM", "zorder": 87},
     {"name": "KIM_6h", "color": "#FA8128", "style": "-", "label": "KIM", "zorder": 87},
+    {"name": "KIM_GFDL_6h", "color": "#FA8128", "style": "-", "label": "KIM", "zorder": 87},
     {"name": "KIM_EPS", "color": "#FFB347", "style": "-", "label": "KIM EPS", "zorder": 86},
     {"name": "UM", "color": "#FFF200", "style": "-", "label": "UM ", "zorder": 85},
     {"name": "UM_GFDL_6h", "color": "#FFF200", "style": "-", "label": "UM", "zorder": 85},
@@ -90,6 +91,7 @@ MODEL_SOURCES = [
     {"name": "ECMWF_EPS", "apihub": "ECMWF_EPS", "noaa": "EEMN"},
     {"name": "KIM_3h", "apihub": "KIM_3h", "noaa": None},
     {"name": "KIM_6h", "apihub": "KIM_6h", "noaa": None},
+    {"name": "KIM_GFDL_6h", "apihub": "KIM_GFDL_6h", "noaa": None},
     {"name": "KIM_EPS", "apihub": "KIM_EPS", "noaa": None},
     {"name": "UM", "apihub": "UM", "noaa": None},
     {"name": "UM_GFDL_6h", "apihub": "UM_GFDL_6h", "noaa": None},
@@ -136,6 +138,7 @@ MODEL_CATEGORIES = {
     "ECMWF_EPS": ("DYNAMICAL", "ENSEMBLE"),
     "KIM_3h": ("DYNAMICAL", "DETERMINISTIC"),
     "KIM_6h": ("DYNAMICAL", "DETERMINISTIC"),
+    "KIM_GFDL_6h": ("DYNAMICAL", "DETERMINISTIC"),
     "KIM_EPS": ("DYNAMICAL", "ENSEMBLE"),
     "UM": ("DYNAMICAL", "DETERMINISTIC"),
     "UM_GFDL_6h": ("DYNAMICAL", "DETERMINISTIC"),
@@ -2338,6 +2341,7 @@ def excluded_models_for(df: pd.DataFrame) -> set[str]:
 
     has_kim_3h = "KIM_3h" in grouped and has_forecast_points(grouped["KIM_3h"])
     has_kim_6h = "KIM_6h" in grouped and has_forecast_points(grouped["KIM_6h"])
+    has_kim_gfdl = "KIM_GFDL_6h" in grouped and has_forecast_points(grouped["KIM_GFDL_6h"])
 
     has_um = "UM" in grouped and has_forecast_points(grouped["UM"])
     has_um_gfdl = "UM_GFDL_6h" in grouped and has_forecast_points(grouped["UM_GFDL_6h"])
@@ -2345,11 +2349,13 @@ def excluded_models_for(df: pd.DataFrame) -> set[str]:
     excluded = {"KMA"}
 
     if has_kim_3h:
-        excluded.add("KIM_6h")
+        excluded.update({"KIM_6h", "KIM_GFDL_6h"})
     elif has_kim_6h:
-        excluded.add("KIM_3h")
+        excluded.update({"KIM_3h", "KIM_GFDL_6h"})
+    elif has_kim_gfdl:
+        excluded.update({"KIM_3h", "KIM_6h"})
     else:
-        excluded.add("KIM_6h")
+        excluded.update({"KIM_6h", "KIM_GFDL_6h"})
 
     if has_um:
         excluded.update({"UM_GFDL_6h", "UKM"})
@@ -2381,8 +2387,9 @@ def active_model_names(settings: Settings) -> set[str]:
 def active_model_target_count(settings: Settings) -> int:
     active = active_model_names(settings)
     count = len(active)
-    if {"KIM_3h", "KIM_6h"}.issubset(active):
-        count -= 1
+    kim_active_count = len({"KIM_3h", "KIM_6h", "KIM_GFDL_6h"} & active)
+    if kim_active_count > 1:
+        count -= kim_active_count - 1
     if {"UM", "UM_GFDL_6h"}.issubset(active):
         count -= 1
     return count
