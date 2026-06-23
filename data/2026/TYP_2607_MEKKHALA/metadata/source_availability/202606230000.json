@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260623060029",
-  "generated_at_kst": "2026-06-23 15:00 KST",
+  "generated_at_utc": "20260623061032",
+  "generated_at_kst": "2026-06-23 15:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_07",
   "storm_stage": "TYP",
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 9,
-  "selected_model_count": 4,
+  "model_source_count": 11,
+  "selected_model_count": 6,
   "active_target_model_count": 36,
   "model_sources": [
+    {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 16,
+      "max_lead_hour": 90,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623061032",
+      "first_seen_kst": "2026-06-23 15:10 KST"
+    },
     {
       "model_id": "GFS",
       "model_label": "GFS",
@@ -99,6 +116,23 @@
       "is_official": false,
       "first_seen_utc": "20260623055033",
       "first_seen_kst": "2026-06-23 14:50 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 29,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623061032",
+      "first_seen_kst": "2026-06-23 15:10 KST"
     },
     {
       "model_id": "JGSM",
