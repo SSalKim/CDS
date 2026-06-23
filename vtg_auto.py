@@ -2582,7 +2582,15 @@ def canonical_target_for_linked_td_metadata(
 ) -> tuple[Path, dict] | None:
     if normalized_metadata_stage(metadata) != "TD":
         return None
-    linked_typ_number = metadata_int(metadata.get("linked_typ_number")) or fallback_linked_typ_number
+    linked_typ_number = (
+        metadata_int(metadata.get("linked_typ_number"))
+        or (
+            metadata_int(metadata.get("canonical_typ_number"))
+            if str(metadata.get("canonical_storm_stage") or "").strip().upper() == "TYP"
+            else None
+        )
+        or fallback_linked_typ_number
+    )
     if not linked_typ_number:
         return None
     data_time = str(metadata.get("data_time") or "")
@@ -3314,7 +3322,7 @@ def metadata_from_image_path(path: Path, output_root: Path) -> dict | None:
         generated_at = ""
 
     stage = match.group("stage").upper()
-    return {
+    metadata = {
         "generated_at_utc": generated_at,
         "image_path": relative_asset_path(path),
         "storm_stage": stage,
@@ -3329,6 +3337,37 @@ def metadata_from_image_path(path: Path, output_root: Path) -> dict | None:
         "models": [],
         "skip_atcf": False,
     }
+
+    # Image-only fallback compatibility:
+    # after TD -> TYP promotion, old or mixed-layout assets can live in a
+    # canonical TYP system folder while the PNG filename still starts with TD.
+    # Recover the canonical identity from the parent system folder so these
+    # images remain attached to the promoted TYP dropdown/manifest.
+    try:
+        system_dir_name = path.parents[1].name
+    except IndexError:
+        system_dir_name = ""
+    folder_match = re.match(
+        r"^(?P<stage>TYP|TD)_(?P<cyclone_id>\d{4})_(?P<name>.+)$",
+        system_dir_name,
+        re.IGNORECASE,
+    )
+    if folder_match:
+        folder_stage = folder_match.group("stage").upper()
+        folder_number = int(folder_match.group("cyclone_id")[-2:])
+        folder_name = folder_match.group("name")
+        if folder_stage == "TYP":
+            metadata["canonical_storm_key"] = f"typ_{storm_year}_{folder_number:02d}"
+            metadata["canonical_storm_stage"] = "TYP"
+            metadata["canonical_typ_number"] = folder_number
+            metadata["canonical_typ_name"] = folder_name
+            metadata["canonical_typ_name_ko"] = ""
+            if stage == "TD":
+                metadata.setdefault("linked_typ_number", folder_number)
+        elif folder_stage == "TD" and stage == "TD":
+            metadata.setdefault("canonical_storm_stage", "TD")
+
+    return metadata
 
 
 def manifest_inventory_key(metadata: dict) -> str:
@@ -3761,6 +3800,7 @@ def storm_summary_from_inventory(storm_key: str, inventory: list[dict]) -> dict:
     return {
         "storm_key": storm_key,
         "stage": canonical_stage or job.get("stage") or metadata.get("storm_stage") or "",
+        "actual_stage": actual_stage or canonical_stage or job.get("stage") or metadata.get("storm_stage") or "",
         "year": job.get("year") or metadata.get("storm_year") or "",
         "typ_number": canonical_typ_number or job.get("typ_number") or metadata.get("typ_number") or 0,
         "linked_td_number": linked_td_number,
