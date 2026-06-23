@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260623185949",
-  "generated_at_kst": "2026-06-24 03:59 KST",
+  "generated_at_utc": "20260623190946",
+  "generated_at_kst": "2026-06-24 04:09 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_08",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 37,
-  "selected_model_count": 21,
+  "model_source_count": 40,
+  "selected_model_count": 23,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -133,6 +133,40 @@
       "is_official": false,
       "first_seen_utc": "20260623185949",
       "first_seen_kst": "2026-06-24 03:59 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623190946",
+      "first_seen_kst": "2026-06-24 04:09 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623190946",
+      "first_seen_kst": "2026-06-24 04:09 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -323,6 +357,23 @@
       "first_seen_kst": "2026-06-24 03:59 KST"
     },
     {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 13,
+      "max_lead_hour": 72,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623190946",
+      "first_seen_kst": "2026-06-24 04:09 KST"
+    },
+    {
       "model_id": "GCEC_AI",
       "model_label": "GraphCast-ECMWF",
       "raw_model_ids": [
@@ -331,8 +382,8 @@
       "source": "APIHUB",
       "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 12,
-      "max_lead_hour": 66,
+      "point_count": 13,
+      "max_lead_hour": 72,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -621,8 +672,8 @@
       "source": "APIHUB",
       "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 12,
-      "max_lead_hour": 66,
+      "point_count": 13,
+      "max_lead_hour": 72,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
