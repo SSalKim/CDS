@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260623200949",
-  "generated_at_kst": "2026-06-24 05:09 KST",
+  "generated_at_utc": "20260623201953",
+  "generated_at_kst": "2026-06-24 05:19 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_08",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 59,
-  "selected_model_count": 31,
+  "model_source_count": 62,
+  "selected_model_count": 32,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -903,6 +903,23 @@
       "first_seen_kst": "2026-06-24 03:39 KST"
     },
     {
+      "model_id": "IFEC_AI",
+      "model_label": "KMA AIFS-ECMWF",
+      "raw_model_ids": [
+        "IFEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623201953",
+      "first_seen_kst": "2026-06-24 05:19 KST"
+    },
+    {
       "model_id": "IFKM_AI",
       "model_label": "KMA AIFS-KIM",
       "raw_model_ids": [
@@ -944,7 +961,7 @@
       ],
       "source": "FTP.NHC",
       "source_label": "FTP.NHC ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 13,
       "max_lead_hour": 72,
       "has_pressure": true,
@@ -952,6 +969,40 @@
       "is_official": false,
       "first_seen_utc": "20260623200949",
       "first_seen_kst": "2026-06-24 05:09 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 13,
+      "max_lead_hour": 72,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623201953",
+      "first_seen_kst": "2026-06-24 05:19 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 13,
+      "max_lead_hour": 72,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623201953",
+      "first_seen_kst": "2026-06-24 05:19 KST"
     },
     {
       "model_id": "PGEC_AI",
