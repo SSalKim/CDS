@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260623064028",
-  "generated_at_kst": "2026-06-23 15:40 KST",
+  "generated_at_utc": "20260623065037",
+  "generated_at_kst": "2026-06-23 15:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_07",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 25,
+  "model_source_count": 27,
   "selected_model_count": 14,
   "active_target_model_count": 36,
   "model_sources": [
@@ -83,6 +83,24 @@
       "first_seen_kst": "2026-06-23 15:40 KST"
     },
     {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_EPS",
+        "CMC_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 62,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623065037",
+      "first_seen_kst": "2026-06-23 15:50 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
       "raw_model_ids": [
@@ -125,8 +143,8 @@
       "source": "DMDW",
       "source_label": "KMA DMDW",
       "selected": true,
-      "point_count": 26,
-      "max_lead_hour": 150,
+      "point_count": 29,
+      "max_lead_hour": 180,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -269,6 +287,23 @@
       "is_official": false,
       "first_seen_utc": "20260623064028",
       "first_seen_kst": "2026-06-23 15:40 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "HWRF"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623065037",
+      "first_seen_kst": "2026-06-23 15:50 KST"
     },
     {
       "model_id": "JGSM",
