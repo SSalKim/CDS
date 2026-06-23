@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260623125008",
-  "generated_at_kst": "2026-06-23 21:50 KST",
+  "generated_at_utc": "20260623130012",
+  "generated_at_kst": "2026-06-23 22:00 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_07",
   "storm_stage": "TYP",
@@ -27,11 +27,62 @@
     120,
     240
   ],
-  "model_source_count": 19,
-  "selected_model_count": 10,
+  "model_source_count": 33,
+  "selected_model_count": 15,
   "active_target_model_count": 36,
   "model_sources": [
     {
+      "model_id": "AGFS",
+      "model_label": "AIGFS",
+      "raw_model_ids": [
+        "AGFS"
+      ],
+      "source": "FTP.NHC",
+      "source_label": "FTP.NHC ATCF",
+      "selected": true,
+      "point_count": 39,
+      "max_lead_hour": 228,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623130012",
+      "first_seen_kst": "2026-06-23 22:00 KST"
+    },
+    {
+      "model_id": "AIGEFS",
+      "model_label": "AIGFS EPS",
+      "raw_model_ids": [
+        "AIMN"
+      ],
+      "source": "FTP.NHC",
+      "source_label": "FTP.NHC ATCF",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623130012",
+      "first_seen_kst": "2026-06-23 22:00 KST"
+    },
+    {
+      "model_id": "CTCX",
+      "model_label": "COAMPS-TC",
+      "raw_model_ids": [
+        "CTCX"
+      ],
+      "source": "FTP.NHC",
+      "source_label": "FTP.NHC ATCF",
+      "selected": true,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623130012",
+      "first_seen_kst": "2026-06-23 22:00 KST"
+    },
+    {
       "model_id": "ECMWF",
       "model_label": "ECMWF",
       "raw_model_ids": [
@@ -98,6 +149,23 @@
       "is_official": false,
       "first_seen_utc": "20260623122011",
       "first_seen_kst": "2026-06-23 21:20 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "FTP.NHC",
+      "source_label": "FTP.NHC ATCF",
+      "selected": false,
+      "point_count": 21,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623130012",
+      "first_seen_kst": "2026-06-23 22:00 KST"
     },
     {
       "model_id": "ECMWF_AIFS_EPS",
@@ -134,6 +202,23 @@
       "first_seen_kst": "2026-06-23 21:20 KST"
     },
     {
+      "model_id": "FNV3",
+      "model_label": "FNV3",
+      "raw_model_ids": [
+        "FGNE"
+      ],
+      "source": "FTP.NHC",
+      "source_label": "FTP.NHC ATCF",
+      "selected": false,
+      "point_count": 22,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623130012",
+      "first_seen_kst": "2026-06-23 22:00 KST"
+    },
+    {
       "model_id": "GFS",
       "model_label": "GFS",
       "raw_model_ids": [
@@ -166,6 +251,23 @@
       "is_official": false,
       "first_seen_utc": "20260623112008",
       "first_seen_kst": "2026-06-23 20:20 KST"
+    },
+    {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "AVNO"
+      ],
+      "source": "FTP.NHC",
+      "source_label": "FTP.NHC ATCF",
+      "selected": false,
+      "point_count": 34,
+      "max_lead_hour": 198,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623130012",
+      "first_seen_kst": "2026-06-23 22:00 KST"
     },
     {
       "model_id": "GFS_EPS",
@@ -203,6 +305,40 @@
       "first_seen_kst": "2026-06-23 21:00 KST"
     },
     {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "FTP.NHC",
+      "source_label": "FTP.NHC ATCF",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623130012",
+      "first_seen_kst": "2026-06-23 22:00 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623130012",
+      "first_seen_kst": "2026-06-23 22:00 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -235,6 +371,23 @@
       "is_official": false,
       "first_seen_utc": "20260623121006",
       "first_seen_kst": "2026-06-23 21:10 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HFSA"
+      ],
+      "source": "FTP.NHC",
+      "source_label": "FTP.NHC ATCF",
+      "selected": false,
+      "point_count": 19,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623130012",
+      "first_seen_kst": "2026-06-23 22:00 KST"
     },
     {
       "model_id": "HWRF",
@@ -271,6 +424,23 @@
       "first_seen_kst": "2026-06-23 21:50 KST"
     },
     {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "HWRF"
+      ],
+      "source": "FTP.NHC",
+      "source_label": "FTP.NHC ATCF",
+      "selected": false,
+      "point_count": 22,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623130012",
+      "first_seen_kst": "2026-06-23 22:00 KST"
+    },
+    {
       "model_id": "JGSM",
       "model_label": "JGSM",
       "raw_model_ids": [
@@ -303,6 +473,23 @@
       "is_official": false,
       "first_seen_utc": "20260623101011",
       "first_seen_kst": "2026-06-23 19:10 KST"
+    },
+    {
+      "model_id": "JGSM",
+      "model_label": "JGSM",
+      "raw_model_ids": [
+        "JGSM"
+      ],
+      "source": "FTP.NHC",
+      "source_label": "FTP.NHC ATCF",
+      "selected": false,
+      "point_count": 23,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623130012",
+      "first_seen_kst": "2026-06-23 22:00 KST"
     },
     {
       "model_id": "TEPS",
@@ -339,6 +526,23 @@
       "first_seen_kst": "2026-06-23 19:30 KST"
     },
     {
+      "model_id": "TEPS",
+      "model_label": "JGSM EPS",
+      "raw_model_ids": [
+        "JENS"
+      ],
+      "source": "FTP.NHC",
+      "source_label": "FTP.NHC ATCF",
+      "selected": false,
+      "point_count": 23,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623130012",
+      "first_seen_kst": "2026-06-23 22:00 KST"
+    },
+    {
       "model_id": "KMA",
       "model_label": "KMA OFCL",
       "raw_model_ids": [
@@ -354,6 +558,40 @@
       "is_official": true,
       "first_seen_utc": "20260623100307",
       "first_seen_kst": "2026-06-23 19:03 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NVGM"
+      ],
+      "source": "FTP.NHC",
+      "source_label": "FTP.NHC ATCF",
+      "selected": true,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260623130012",
+      "first_seen_kst": "2026-06-23 22:00 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "FTP.NHC",
+      "source_label": "FTP.NHC ATCF",
+      "selected": true,
+      "point_count": 40,
+      "max_lead_hour": 234,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260623130012",
+      "first_seen_kst": "2026-06-23 22:00 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606230600.json"
