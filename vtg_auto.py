@@ -2573,6 +2573,48 @@ def existing_typ_name_lookup(output_root: Path) -> dict[tuple[str, int], tuple[s
     return lookup
 
 
+def td_typ_link_lookup(td_rows: list[dict], typ_rows: list[dict]) -> dict[tuple[str, int], dict]:
+    """Map KMA TD rows to their promoted TYP identity.
+
+    This is intentionally independent from current activity state. When a TD
+    has already been promoted, older TD output folders often have no
+    linked_typ_number in their stored metadata because the promotion was not
+    known at render time. The KMA td_lst row is the authoritative bridge.
+    """
+    typ_names: dict[tuple[str, int], tuple[str, str]] = {}
+    for row in typ_rows or []:
+        try:
+            year = str(int(row.get("YY", 0)))
+            typ_number = int(row.get("SEQ", 0))
+        except (TypeError, ValueError):
+            continue
+        if typ_number <= 0:
+            continue
+        typ_names[(year, typ_number)] = (
+            str(row.get("TYP_EN") or row.get("TYP_NAME") or "").strip().upper(),
+            str(row.get("TYP_NAME") or "").strip(),
+        )
+
+    links: dict[tuple[str, int], dict] = {}
+    for row in td_rows or []:
+        try:
+            year = str(int(row.get("YY", 0)))
+            td_number = int(row.get("TD", 0))
+            typ_number = int(row.get("TYP", 0))
+        except (TypeError, ValueError):
+            continue
+        if td_number <= 0 or typ_number <= 0:
+            continue
+        typ_name, typ_name_ko = typ_names.get((year, typ_number), ("", ""))
+        links[(year, td_number)] = {
+            "linked_typ_number": typ_number,
+            "canonical_typ_number": typ_number,
+            "canonical_typ_name": typ_name or "NONAME",
+            "canonical_typ_name_ko": typ_name_ko,
+        }
+    return links
+
+
 def canonical_target_for_linked_td_metadata(
     output_root: Path,
     metadata: dict,
@@ -2703,10 +2745,16 @@ def merge_drive_archive_payload(target: dict, source: dict, source_dir: Path, ta
     return merged
 
 
-def canonicalize_linked_td_outputs(output_root: Path, *, dry_run: bool = False) -> list[Path]:
+def canonicalize_linked_td_outputs(
+    output_root: Path,
+    *,
+    dry_run: bool = False,
+    td_typ_links: dict[tuple[str, int], dict] | None = None,
+) -> list[Path]:
     if not output_root.exists():
         return []
     typ_names = existing_typ_name_lookup(output_root)
+    td_typ_links = td_typ_links or {}
     changed_paths: set[Path] = set()
     for td_dir in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/TD_*")):
         if not td_dir.is_dir():
@@ -2716,6 +2764,12 @@ def canonicalize_linked_td_outputs(output_root: Path, *, dry_run: bool = False) 
             continue
         folder_manifest = load_json(td_dir / "manifest.json", {})
         fallback_linked_typ_number = metadata_int(folder_manifest.get("linked_typ_number")) if isinstance(folder_manifest, dict) else None
+        folder_match = re.match(r"^TD_(\d{2})(\d{2})_", td_dir.name, re.IGNORECASE)
+        folder_td_number = int(folder_match.group(2)) if folder_match else None
+        folder_year = str(td_dir.parent.name)
+        row_link = td_typ_links.get((folder_year, folder_td_number)) if folder_td_number is not None else None
+        if fallback_linked_typ_number is None and isinstance(row_link, dict):
+            fallback_linked_typ_number = metadata_int(row_link.get("linked_typ_number"))
         target_dirs: set[Path] = set()
         migrated_any = False
         skipped_any = False
@@ -2724,6 +2778,15 @@ def canonicalize_linked_td_outputs(output_root: Path, *, dry_run: bool = False) 
             if not isinstance(metadata, dict):
                 skipped_any = True
                 continue
+            if isinstance(row_link, dict):
+                metadata = {
+                    **metadata,
+                    "linked_typ_number": metadata.get("linked_typ_number") or row_link.get("linked_typ_number"),
+                    "canonical_storm_stage": metadata.get("canonical_storm_stage") or "TYP",
+                    "canonical_typ_number": metadata.get("canonical_typ_number") or row_link.get("canonical_typ_number"),
+                    "canonical_typ_name": metadata.get("canonical_typ_name") or row_link.get("canonical_typ_name"),
+                    "canonical_typ_name_ko": metadata.get("canonical_typ_name_ko") or row_link.get("canonical_typ_name_ko"),
+                }
             target = canonical_target_for_linked_td_metadata(
                 output_root,
                 metadata,
@@ -2765,6 +2828,15 @@ def canonicalize_linked_td_outputs(output_root: Path, *, dry_run: bool = False) 
                     continue
                 payload = load_json(source_path, None)
                 if isinstance(payload, dict):
+                    if isinstance(row_link, dict):
+                        payload = {
+                            **payload,
+                            "linked_typ_number": payload.get("linked_typ_number") or row_link.get("linked_typ_number"),
+                            "canonical_storm_stage": payload.get("canonical_storm_stage") or "TYP",
+                            "canonical_typ_number": payload.get("canonical_typ_number") or row_link.get("canonical_typ_number"),
+                            "canonical_typ_name": payload.get("canonical_typ_name") or row_link.get("canonical_typ_name"),
+                            "canonical_typ_name_ko": payload.get("canonical_typ_name_ko") or row_link.get("canonical_typ_name_ko"),
+                        }
                     target = canonical_target_for_linked_td_metadata(
                         output_root,
                         payload,
@@ -3322,7 +3394,7 @@ def metadata_from_image_path(path: Path, output_root: Path) -> dict | None:
         generated_at = ""
 
     stage = match.group("stage").upper()
-    metadata = {
+    return {
         "generated_at_utc": generated_at,
         "image_path": relative_asset_path(path),
         "storm_stage": stage,
@@ -3337,37 +3409,6 @@ def metadata_from_image_path(path: Path, output_root: Path) -> dict | None:
         "models": [],
         "skip_atcf": False,
     }
-
-    # Image-only fallback compatibility:
-    # after TD -> TYP promotion, old or mixed-layout assets can live in a
-    # canonical TYP system folder while the PNG filename still starts with TD.
-    # Recover the canonical identity from the parent system folder so these
-    # images remain attached to the promoted TYP dropdown/manifest.
-    try:
-        system_dir_name = path.parents[1].name
-    except IndexError:
-        system_dir_name = ""
-    folder_match = re.match(
-        r"^(?P<stage>TYP|TD)_(?P<cyclone_id>\d{4})_(?P<name>.+)$",
-        system_dir_name,
-        re.IGNORECASE,
-    )
-    if folder_match:
-        folder_stage = folder_match.group("stage").upper()
-        folder_number = int(folder_match.group("cyclone_id")[-2:])
-        folder_name = folder_match.group("name")
-        if folder_stage == "TYP":
-            metadata["canonical_storm_key"] = f"typ_{storm_year}_{folder_number:02d}"
-            metadata["canonical_storm_stage"] = "TYP"
-            metadata["canonical_typ_number"] = folder_number
-            metadata["canonical_typ_name"] = folder_name
-            metadata["canonical_typ_name_ko"] = ""
-            if stage == "TD":
-                metadata.setdefault("linked_typ_number", folder_number)
-        elif folder_stage == "TD" and stage == "TD":
-            metadata.setdefault("canonical_storm_stage", "TD")
-
-    return metadata
 
 
 def manifest_inventory_key(metadata: dict) -> str:
@@ -3800,7 +3841,6 @@ def storm_summary_from_inventory(storm_key: str, inventory: list[dict]) -> dict:
     return {
         "storm_key": storm_key,
         "stage": canonical_stage or job.get("stage") or metadata.get("storm_stage") or "",
-        "actual_stage": actual_stage or canonical_stage or job.get("stage") or metadata.get("storm_stage") or "",
         "year": job.get("year") or metadata.get("storm_year") or "",
         "typ_number": canonical_typ_number or job.get("typ_number") or metadata.get("typ_number") or 0,
         "linked_td_number": linked_td_number,
@@ -4137,7 +4177,29 @@ def main() -> int:
 
     if args.index_only:
         updated_at_utc = format_utc_stamp(now)
-        canonicalized_paths = canonicalize_linked_td_outputs(output_root, dry_run=args.dry_run)
+        td_typ_links: dict[tuple[str, int], dict] = {}
+        if args.auth_key:
+            years_for_index = {
+                int(path.name)
+                for path in output_root.glob("[0-9][0-9][0-9][0-9]")
+                if path.is_dir() and path.name.isdigit()
+            }
+            if not years_for_index:
+                years_for_index.add(now.year)
+            td_rows_for_index: list[dict] = []
+            typ_rows_for_index: list[dict] = []
+            for year in sorted(years_for_index):
+                try:
+                    td_rows_for_index.extend(fetch_td_rows(year, args.auth_key, cache_dir=kma_cache_dir))
+                    typ_rows_for_index.extend(fetch_typ_rows(year, args.auth_key, cache_dir=kma_cache_dir))
+                except Exception as exc:
+                    print(f"Warning: failed to load KMA TD/TYP rows for index-only canonicalization {year}: {exc}")
+            td_typ_links = td_typ_link_lookup(td_rows_for_index, typ_rows_for_index)
+        canonicalized_paths = canonicalize_linked_td_outputs(
+            output_root,
+            dry_run=args.dry_run,
+            td_typ_links=td_typ_links,
+        )
         canonicalized_paths.extend(normalize_track_history_primary_keys(output_root, dry_run=args.dry_run))
         inventory = build_manifest_inventory(output_root, [])
         split_paths = [] if args.dry_run else rebuild_split_manifest_files(output_root, inventory, updated_at_utc=updated_at_utc)
@@ -4201,6 +4263,8 @@ def main() -> int:
     for year in sorted(years):
         td_rows.extend(fetch_td_rows(year, args.auth_key, cache_dir=kma_cache_dir))
         typ_rows.extend(fetch_typ_rows(year, args.auth_key, cache_dir=kma_cache_dir))
+
+    td_typ_links = td_typ_link_lookup(td_rows, typ_rows)
 
     run_entries = []
     actual_run_count = 0
@@ -4430,7 +4494,11 @@ def main() -> int:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
         return 0
 
-    canonicalized_paths = canonicalize_linked_td_outputs(output_root, dry_run=args.dry_run)
+    canonicalized_paths = canonicalize_linked_td_outputs(
+        output_root,
+        dry_run=args.dry_run,
+        td_typ_links=td_typ_links,
+    )
     canonicalized_paths.extend(normalize_track_history_primary_keys(output_root, dry_run=args.dry_run))
     previous_manifest = load_json(manifest_path, {})
     compact_runs = compact_manifest_runs(run_entries)

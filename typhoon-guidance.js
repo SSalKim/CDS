@@ -1507,7 +1507,6 @@ return dedupeLinkedTyphoonEntries(linkTdEntriesToTyphoons(entries))
 function summaryEntryFromYearSystem(system,index=0){
 let year=String(system?.year || '').trim();
 let stage=normalizeTyphoonStage(system?.stage || 'TYP');
-let actualStage=normalizeTyphoonStage(system?.actual_stage || stage);
 let typNumber=Number(system?.typ_number || 0);
 let typName=normalizeTyphoonName(system?.typ_name || 'NONAME');
 let typNameKo=system?.typ_name_ko || koreanTyphoonName(typName);
@@ -1527,7 +1526,6 @@ generatedAt:'',
 fcstHours:typhoonState.selectedFcstHours || 120,
 year,
 stage,
-originalStage:actualStage!==stage ? actualStage : undefined,
 typNumber,
 tdNumber:system?.linked_td_number || null,
 linkedTypNumber:system?.linked_typ_number || null,
@@ -1574,12 +1572,7 @@ if(entry.stormKey===selectedKey){
 return true;
 }
 let linkedTypNumber=Number(entry.linkedTypNumber || entry.linked_typ_number || 0);
-let actualStage=normalizeTyphoonStage(entry.originalStage || entry.actualStage || entry.stage || '');
-if(
-selected.stage!=='TD' &&
-actualStage==='TD' &&
-(linkedTypNumber===selected.typNumber || Number(entry.typNumber || 0)===selected.typNumber)
-){
+if(selected.stage!=='TD' && entry.stage==='TD' && linkedTypNumber===selected.typNumber){
 return true;
 }
 return false;
@@ -1935,7 +1928,7 @@ typNumber:linked.typNumber,
 typName:linked.typName,
 typNameKo:linked.typNameKo,
 tdNumber:entry.typNumber,
-linkedTypNumber:entry.linkedTypNumber || linked.typNumber,
+linkedTypNumber:entry.linkedTypNumber,
 stormKey:linked.stormKey
 });
 });
