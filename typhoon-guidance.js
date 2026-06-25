@@ -23,7 +23,8 @@ const TYPHOON_FCST_OPTIONS=[
 ];
 
 const TYPHOON_KO_NAME_FALLBACK={
-JANGMI:'장미'
+JANGMI:'장미',
+HIGOS:'히고스'
 };
 
 const TYPHOON_MODEL_LABELS={
@@ -2117,12 +2118,15 @@ sourceEntries
 .forEach(entry=>{
 let isNamedTypEntry=entry.stage!=='TD' && entry.originalStage!=='TD';
 let impactEff=typhoonImpactEffectForEntry(entry);
+let entryLabel=stormDropdownLabel(entry);
+let entryLabelHasKo=Boolean(String(entry.typNameKo || '').trim());
 if(!byKey.has(entry.stormKey)){
 byKey.set(entry.stormKey,{
 key:entry.stormKey,
 typNumber:entry.typNumber,
 stage:entry.stage,
-label:stormDropdownLabel(entry),
+label:entryLabel,
+labelHasKo:entryLabelHasKo,
 first:entry.dataTime,
 latest:entry.dataTime,
 typFirst:isNamedTypEntry ? entry.dataTime : '',
@@ -2133,6 +2137,10 @@ manifestPaths:new Set()
 });
 }
 let storm=byKey.get(entry.stormKey);
+if(entryLabelHasKo && !storm.labelHasKo){
+storm.label=entryLabel;
+storm.labelHasKo=true;
+}
 if(entry.manifestPath){
 storm.manifestPaths.add(entry.manifestPath);
 }
