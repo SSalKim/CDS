@@ -851,6 +851,59 @@ def atcf_storm_number(atcf_id: str) -> int | None:
     return int(match.group(1))
 
 
+def regular_atcf_storm_number(atcf_id: str) -> int | None:
+    number = atcf_storm_number(atcf_id)
+    if number is None or not (1 <= number <= 89):
+        return None
+    return number
+
+
+def typ_row_for_number(typ_rows: list[dict], *, year: int | str, typ_number: int | None) -> dict | None:
+    if not typ_number:
+        return None
+    year_int = safe_int(year)
+    if year_int is None:
+        return None
+    for row in typ_rows or []:
+        if safe_int(row.get("YY")) == year_int and safe_int(row.get("SEQ")) == typ_number:
+            return row
+    return None
+
+
+def typ_identity_from_row(row: dict | None) -> tuple[str, str, datetime | None]:
+    if not isinstance(row, dict):
+        return "", "", None
+    typ_en = str(row.get("TYP_EN") or "").strip().upper()
+    typ_name_ko = str(row.get("TYP_NAME") or "").strip()
+    typ_start = parse_utc_stamp(str(row.get("TM_ST") or ""))
+    return typ_en, typ_name_ko, typ_start
+
+
+def typ_link_payload(typ_number: int, typ_row: dict | None) -> dict:
+    typ_en, typ_name_ko, _ = typ_identity_from_row(typ_row)
+    return {
+        "linked_typ_number": typ_number,
+        "canonical_typ_number": typ_number,
+        "canonical_typ_name": typ_en or typ_name_ko or "NONAME",
+        "canonical_typ_name_ko": typ_name_ko,
+    }
+
+
+def infer_typ_link_from_atcf_id(
+    atcf_id: str | None,
+    *,
+    year: int | str,
+    typ_rows: list[dict],
+) -> tuple[int, dict] | None:
+    atcf_number = regular_atcf_storm_number(atcf_id or "")
+    if not atcf_number:
+        return None
+    typ_row = typ_row_for_number(typ_rows, year=year, typ_number=atcf_number)
+    if not typ_row:
+        return None
+    return atcf_number, typ_row
+
+
 def is_invest_atcf_id(atcf_id: str) -> bool:
     number = atcf_storm_number(atcf_id)
     return number is not None and 90 <= number <= 99
@@ -2027,17 +2080,8 @@ def build_storm_jobs(
         linked_typ_name_ko = ""
         linked_typ_start = None
         if typ_number != 0:
-            linked_typ_row = next(
-                (
-                    item for item in typ_rows
-                    if safe_int(item.get("YY")) == year and safe_int(item.get("SEQ")) == typ_number
-                ),
-                None,
-            )
-            if linked_typ_row:
-                linked_typ_en = str(linked_typ_row.get("TYP_EN") or "").strip().upper()
-                linked_typ_name_ko = str(linked_typ_row.get("TYP_NAME") or "").strip()
-                linked_typ_start = parse_utc_stamp(str(linked_typ_row.get("TM_ST") or ""))
+            linked_typ_row = typ_row_for_number(typ_rows, year=year, typ_number=typ_number)
+            linked_typ_en, linked_typ_name_ko, linked_typ_start = typ_identity_from_row(linked_typ_row)
 
         td_is_active = row_active_for_time(row, probe_time=now, cycle_time=activity_cycle_time)
         # KMA td_lst sometimes ends the pre-typhoon TD row before typ_lst starts,
@@ -2054,10 +2098,10 @@ def build_storm_jobs(
                 )
         if not td_is_active:
             continue
-        if (year, typ_number) in active_typhoon_set:
-            continue
 
         linked_typ_has_started = bool(typ_number and linked_typ_start and data_dt >= linked_typ_start)
+        if typ_number and (year, typ_number) in active_typhoon_set and linked_typ_has_started:
+            continue
         display_typ_en = linked_typ_en if linked_typ_has_started else ""
         display_typ_name_ko = linked_typ_name_ko if linked_typ_has_started else ""
         matching_typ_en = linked_typ_en if typ_number else display_typ_en
@@ -2128,6 +2172,23 @@ def build_storm_jobs(
             )
         atcf_id = atcf_match.atcf_id if atcf_match else None
         atcf_method = atcf_match.method if atcf_match else ""
+        if typ_number == 0:
+            inferred_typ_link = infer_typ_link_from_atcf_id(atcf_id, year=year, typ_rows=typ_rows)
+            if inferred_typ_link:
+                typ_number, linked_typ_row = inferred_typ_link
+                linked_typ_en, linked_typ_name_ko, linked_typ_start = typ_identity_from_row(linked_typ_row)
+                linked_typ_has_started = bool(typ_number and linked_typ_start and data_dt >= linked_typ_start)
+                display_typ_en = linked_typ_en if linked_typ_has_started else ""
+                display_typ_name_ko = linked_typ_name_ko if linked_typ_has_started else ""
+                matching_typ_en = linked_typ_en
+                td_storm_key = f"td_{year}_{td_number:02d}_typ_{typ_number:02d}"
+                td_base_atcf_number = max(1, min(89, typ_number))
+                print(
+                    f"Inferred TD{td_number:02d}->TYP{typ_number:02d} link "
+                    f"from ATCF {atcf_id} at {data_time}."
+                )
+                if (year, typ_number) in active_typhoon_set and linked_typ_has_started:
+                    continue
         analysis_point = atcf_match.point if atcf_match and atcf_match.method == "position" else None
         if analysis_point is None and atcf_id:
             started_at = time.monotonic()
@@ -2605,13 +2666,14 @@ def td_typ_link_lookup(td_rows: list[dict], typ_rows: list[dict]) -> dict[tuple[
             continue
         if td_number <= 0 or typ_number <= 0:
             continue
+        typ_row = typ_row_for_number(typ_rows, year=year, typ_number=typ_number)
         typ_name, typ_name_ko = typ_names.get((year, typ_number), ("", ""))
-        links[(year, td_number)] = {
-            "linked_typ_number": typ_number,
-            "canonical_typ_number": typ_number,
-            "canonical_typ_name": typ_name or "NONAME",
-            "canonical_typ_name_ko": typ_name_ko,
-        }
+        payload = typ_link_payload(typ_number, typ_row)
+        if typ_name and payload["canonical_typ_name"] == "NONAME":
+            payload["canonical_typ_name"] = typ_name
+        if typ_name_ko and not payload["canonical_typ_name_ko"]:
+            payload["canonical_typ_name_ko"] = typ_name_ko
+        links[(year, td_number)] = payload
     return links
 
 
@@ -2624,6 +2686,10 @@ def canonical_target_for_linked_td_metadata(
 ) -> tuple[Path, dict] | None:
     if normalized_metadata_stage(metadata) != "TD":
         return None
+    data_time = str(metadata.get("data_time") or "")
+    year = str(metadata.get("storm_year") or data_time[:4] or "").strip()
+    if not year:
+        return None
     linked_typ_number = (
         metadata_int(metadata.get("linked_typ_number"))
         or (
@@ -2634,10 +2700,15 @@ def canonical_target_for_linked_td_metadata(
         or fallback_linked_typ_number
     )
     if not linked_typ_number:
-        return None
-    data_time = str(metadata.get("data_time") or "")
-    year = str(metadata.get("storm_year") or data_time[:4] or "").strip()
-    if not year:
+        atcf_number = regular_atcf_storm_number(
+            metadata.get("atcf_id")
+            or metadata.get("analysis_atcf_id")
+            or metadata.get("primary_atcf_id")
+            or ""
+        )
+        if atcf_number and typ_names.get((year, atcf_number)):
+            linked_typ_number = atcf_number
+    if not linked_typ_number:
         return None
     canonical_name = str(metadata.get("canonical_typ_name") or "").strip()
     canonical_name_ko = str(metadata.get("canonical_typ_name_ko") or "").strip()
