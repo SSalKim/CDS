@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260626144041",
-  "generated_at_kst": "2026-06-26 23:40 KST",
+  "generated_at_utc": "20260626145041",
+  "generated_at_kst": "2026-06-26 23:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_07",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 40,
-  "selected_model_count": 20,
+  "model_source_count": 43,
+  "selected_model_count": 22,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -100,6 +100,23 @@
       "first_seen_kst": "2026-06-26 22:50 KST"
     },
     {
+      "model_id": "COAMPS_EPS",
+      "model_label": "COAMPS-TC EPS",
+      "raw_model_ids": [
+        "CTMN"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": true,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260626145041",
+      "first_seen_kst": "2026-06-26 23:50 KST"
+    },
+    {
       "model_id": "ECMWF",
       "model_label": "ECMWF",
       "raw_model_ids": [
@@ -142,8 +159,8 @@
       "source": "NOAA",
       "source_label": "NOAA ATCF",
       "selected": false,
-      "point_count": 7,
-      "max_lead_hour": 36,
+      "point_count": 6,
+      "max_lead_hour": 30,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -252,6 +269,23 @@
       "is_official": false,
       "first_seen_utc": "20260626134041",
       "first_seen_kst": "2026-06-26 22:40 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EEMN"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": false,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260626145041",
+      "first_seen_kst": "2026-06-26 23:50 KST"
     },
     {
       "model_id": "FNV3",
@@ -712,6 +746,23 @@
       "is_official": false,
       "first_seen_utc": "20260626135041",
       "first_seen_kst": "2026-06-26 22:50 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": true,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260626145041",
+      "first_seen_kst": "2026-06-26 23:50 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606260600.json"
