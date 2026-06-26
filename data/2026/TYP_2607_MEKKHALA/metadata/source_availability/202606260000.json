@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260626065047",
-  "generated_at_kst": "2026-06-26 15:50 KST",
+  "generated_at_utc": "20260626070040",
+  "generated_at_kst": "2026-06-26 16:00 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_07",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 26,
-  "selected_model_count": 14,
+  "model_source_count": 32,
+  "selected_model_count": 16,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -66,6 +66,23 @@
       "first_seen_kst": "2026-06-26 15:20 KST"
     },
     {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 24,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260626070040",
+      "first_seen_kst": "2026-06-26 16:00 KST"
+    },
+    {
       "model_id": "CMC_EPS",
       "model_label": "CMC EPS",
       "raw_model_ids": [
@@ -81,6 +98,41 @@
       "is_official": false,
       "first_seen_utc": "20260626064043",
       "first_seen_kst": "2026-06-26 15:40 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_EPS",
+        "CMC_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 44,
+      "max_lead_hour": 186,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260626070040",
+      "first_seen_kst": "2026-06-26 16:00 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 13,
+      "max_lead_hour": 72,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260626070040",
+      "first_seen_kst": "2026-06-26 16:00 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -125,8 +177,8 @@
       "source": "DMDW",
       "source_label": "KMA DMDW",
       "selected": true,
-      "point_count": 10,
-      "max_lead_hour": 54,
+      "point_count": 11,
+      "max_lead_hour": 60,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -218,6 +270,40 @@
       "is_official": false,
       "first_seen_utc": "20260626055041",
       "first_seen_kst": "2026-06-26 14:50 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260626070040",
+      "first_seen_kst": "2026-06-26 16:00 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260626070040",
+      "first_seen_kst": "2026-06-26 16:00 KST"
     },
     {
       "model_id": "HAFS",
@@ -474,6 +560,23 @@
       "is_official": true,
       "first_seen_utc": "20260626041046",
       "first_seen_kst": "2026-06-26 13:10 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKM"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": true,
+      "point_count": 10,
+      "max_lead_hour": 54,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260626070040",
+      "first_seen_kst": "2026-06-26 16:00 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2607_MEKKHALA/metadata/source_availability/202606260000.json"
