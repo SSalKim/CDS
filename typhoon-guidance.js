@@ -748,7 +748,21 @@ timeBar.appendChild(shell);
 
 let viewer=document.createElement('div');
 viewer.className='typhoon-viewer';
-viewer.dataset.role='viewer';
+
+let viewerStage=document.createElement('div');
+viewerStage.className='typhoon-viewer-stage';
+viewerStage.dataset.role='viewer';
+
+let viewerLoading=document.createElement('div');
+viewerLoading.className='loading typhoon-viewer-loading hidden';
+viewerLoading.dataset.role='viewerLoading';
+viewerLoading.setAttribute('role','status');
+viewerLoading.setAttribute('aria-live','polite');
+viewerLoading.setAttribute('aria-hidden','true');
+viewerLoading.innerHTML='<div class="spinner"></div><div class="loading-text">이미지 로딩 중</div>';
+
+viewer.appendChild(viewerStage);
+viewer.appendChild(viewerLoading);
 
 let content=document.createElement('div');
 content.className='typhoon-content';
@@ -1292,11 +1306,11 @@ input.name='typhoonFcstHours';
 input.value=String(option.hours);
 input.dataset.role='fcstOption';
 input.checked=isActiveOption;
-input.onchange=()=>{
+input.onchange=async()=>{
 let currentDataTime=getSelectedTyphoonDataTime();
 typhoonState.selectedFcstHours=option.hours;
 selectLatestSlotForStorm(currentDataTime);
-renderTyphoonManifest();
+await renderTyphoonManifest();
 };
 
 let text=document.createElement('span');
@@ -1317,6 +1331,7 @@ return;
 }
 
 root.classList.add('typhoon-loading-state');
+setTyphoonViewerLoading(true);
 
 try{
 let previousYear=typhoonState.selectedYear;
@@ -1367,7 +1382,7 @@ await ensureSelectedTyphoonStormManifest();
 rebuildTyphoonEntries();
 syncTyphoonSelection({preferredYear:previousYear,preferredStormKey:previousStormKey,preferredDataTime:previousDataTime});
 pruneTyphoonImageCache();
-renderTyphoonManifest();
+await renderTyphoonManifest();
 }
 catch(error){
 typhoonState.manifest=null;
@@ -1395,6 +1410,7 @@ typhoonState.selectedYear=String(year || '');
 typhoonState.selectedStormKey='';
 typhoonState.selectedSlotIndex=0;
 root?.classList.add('typhoon-loading-state');
+setTyphoonViewerLoading(true);
 try{
 await ensureTyphoonYearIndex(typhoonState.selectedYear);
 await loadTyphoonImpactMapsForYears([typhoonState.selectedYear]);
@@ -1406,10 +1422,13 @@ return;
 rebuildTyphoonEntries();
 syncTyphoonSelection();
 pruneTyphoonImageCache();
-renderTyphoonManifest();
+await renderTyphoonManifest();
 }
 finally{
 root?.classList.remove('typhoon-loading-state');
+if(requestId===typhoonState.selectionLoadSeq){
+setTyphoonViewerLoading(false);
+}
 }
 }
 
@@ -1419,6 +1438,7 @@ let requestId=++typhoonState.selectionLoadSeq;
 typhoonState.selectedStormKey=String(stormKey || '');
 typhoonState.selectedSlotIndex=0;
 root?.classList.add('typhoon-loading-state');
+setTyphoonViewerLoading(true);
 try{
 await ensureSelectedTyphoonStormManifest();
 if(requestId!==typhoonState.selectionLoadSeq){
@@ -1427,10 +1447,13 @@ return;
 rebuildTyphoonEntries();
 selectLatestSlotForStorm();
 pruneTyphoonImageCache();
-renderTyphoonManifest();
+await renderTyphoonManifest();
 }
 finally{
 root?.classList.remove('typhoon-loading-state');
+if(requestId===typhoonState.selectionLoadSeq){
+setTyphoonViewerLoading(false);
+}
 }
 }
 
@@ -2281,7 +2304,7 @@ slots.push({dataTime,entry:byTime.get(dataTime) || null});
 return slots;
 }
 
-function renderTyphoonManifest(){
+async function renderTyphoonManifest(){
 updateTyphoonSubtitle();
 renderTyphoonSelects();
 renderTyphoonTimeline();
@@ -2291,7 +2314,7 @@ renderTyphoonEmpty('표출 가능한 자료 없음');
 return;
 }
 
-renderTyphoonSelectedRun();
+await renderTyphoonSelectedRun();
 }
 
 function renderTyphoonSelects(){
@@ -2572,7 +2595,7 @@ moveTyphoonSelection(1);
 }
 }
 
-function renderTyphoonSelectedRun(){
+async function renderTyphoonSelectedRun(){
 let selected=getSelectedTyphoonSlot();
 if(!selected){
 updateTyphoonSubtitle(null);
@@ -2586,7 +2609,7 @@ renderTyphoonMissingSlot(selected.dataTime);
 return;
 }
 
-renderTyphoonRun(selected.entry);
+await renderTyphoonRun(selected.entry);
 }
 
 function getTyphoonImageUrl(run){
@@ -2885,6 +2908,37 @@ return panel;
 
 }
 
+function setTyphoonViewerLoading(isLoading,message='이미지 로딩 중'){
+let viewer=typhoonState.root?.querySelector('.typhoon-viewer');
+let loading=typhoonState.root?.querySelector('[data-role="viewerLoading"]');
+viewer?.classList.toggle('is-loading',!!isLoading);
+if(!loading){
+return;
+}
+loading.classList.toggle('hidden',!isLoading);
+loading.setAttribute('aria-hidden',isLoading?'false':'true');
+let text=loading.querySelector('.loading-text');
+if(text){
+text.textContent=message;
+}
+}
+
+function waitForTyphoonImagePaint(){
+return new Promise(resolve=>{
+let done=false;
+let finish=()=>{
+if(done){return;}
+done=true;
+clearTimeout(timer);
+resolve();
+};
+let timer=setTimeout(finish,250);
+window.requestAnimationFrame(()=>{
+window.requestAnimationFrame(finish);
+});
+});
+}
+
 async function renderTyphoonRun(run){
 let viewer=typhoonState.root?.querySelector('[data-role="viewer"]');
 if(!viewer){
@@ -2894,7 +2948,9 @@ return;
 updateTyphoonSubtitle(run);
 
 let requestId=++typhoonState.imageRequestSeq;
+setTyphoonViewerLoading(true);
 
+try{
 if(!run.imagePath){
 renderTyphoonMissingSlot(run.dataTime);
 return;
@@ -2913,12 +2969,13 @@ let currentImage=viewer.querySelector('.typhoon-guidance-image');
 preloadNearbyTyphoonImages(typhoonState.selectedSlotIndex);
 
 if(currentImage?.dataset.cacheUrl && urls.includes(currentImage.dataset.cacheUrl) && currentImage.complete){
+await waitForTyphoonImagePaint();
 trackTyphoonImageView(run,{url:currentImage.dataset.cacheUrl});
 return;
 }
 
 if(!currentImage){
-viewer.replaceChildren(createTyphoonStatusPanel('이미지 로딩 중'));
+viewer.replaceChildren(createTyphoonStatusPanel(''));
 }
 
 let result=await loadTyphoonCachedImage(run);
@@ -2934,40 +2991,24 @@ trackTyphoonImageFailure(run,result,urls);
 if(result.ok && result.image){
 let error=createTyphoonStatusPanel('이미지 로드 실패',{hidden:true});
 viewer.replaceChildren(result.image,error);
+await waitForTyphoonImagePaint();
 trackTyphoonImageView(run,result);
 return;
 }
 
 viewer.replaceChildren(createTyphoonStatusPanel('이미지 로드 실패'));
 return;
-
-viewer.innerHTML='';
-
-if(!run.imagePath){
-renderTyphoonMissingSlot(run.dataTime);
-return;
 }
-
-let image=document.createElement('img');
-image.className='typhoon-guidance-image';
-image.alt='태풍 모델예측 이미지';
-image.decoding='async';
-image.src=cacheBustedTyphoonPath(run.imagePath,run.generatedAt);
-
-let error=document.createElement('div');
-error.className='typhoon-status-panel hidden';
-error.textContent='이미지 로드 실패';
-
-image.onerror=()=>{
-error.classList.remove('hidden');
-};
-
-viewer.appendChild(image);
-viewer.appendChild(error);
+finally{
+if(requestId===typhoonState.imageRequestSeq){
+setTyphoonViewerLoading(false);
+}
+}
 }
 
 function renderTyphoonMissingSlot(dataTime){
 typhoonState.imageRequestSeq++;
+setTyphoonViewerLoading(false);
 let viewer=typhoonState.root?.querySelector('[data-role="viewer"]');
 if(viewer){
 viewer.innerHTML=`<div class="typhoon-status-panel">${escapeHtml(formatTyphoonTime(dataTime))} 자료 없음</div>`;
@@ -2976,6 +3017,7 @@ viewer.innerHTML=`<div class="typhoon-status-panel">${escapeHtml(formatTyphoonTi
 
 function renderTyphoonEmpty(message){
 typhoonState.imageRequestSeq++;
+setTyphoonViewerLoading(false);
 let viewer=typhoonState.root?.querySelector('[data-role="viewer"]');
 let timeline=typhoonState.root?.querySelector('[data-role="timeline"]');
 if(timeline){
