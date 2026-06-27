@@ -2025,7 +2025,8 @@ let preferredSlotIndex=preferredDataTime
 if(preferredSlotIndex>=0){
 typhoonState.selectedSlotIndex=preferredSlotIndex;
 }
-else if(typhoonState.selectedSlotIndex<0 || typhoonState.selectedSlotIndex>=typhoonState.slots.length){
+// Initial summary entries and the full storm manifest can have different slot counts.
+else if(!preferredDataTime || typhoonState.selectedSlotIndex<0 || typhoonState.selectedSlotIndex>=typhoonState.slots.length || !typhoonState.slots[typhoonState.selectedSlotIndex]?.entry){
 selectLatestSlotForStorm();
 }
 }
