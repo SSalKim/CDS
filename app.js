@@ -1153,6 +1153,7 @@ stack.classList.remove('nmsc-wait-for-ko');
 
 modelStatus.textContent='';
 modelStatus.classList.add('hidden');
+setViewerLoading(false);
 
 if(loadedImages.length<urls.length){
 let warn=document.createElement('div');
@@ -1245,6 +1246,7 @@ stack.appendChild(warn);
 
 modelStatus.textContent='';
 modelStatus.classList.add('hidden');
+setViewerLoading(false);
 trackCurrentForecastViewAnalytics({
 urls,
 loadedImages,
@@ -1269,6 +1271,7 @@ revealPreparedImages(chartImages);
 
 modelStatus.textContent='';
 modelStatus.classList.add('hidden');
+setViewerLoading(false);
 trackCurrentForecastViewAnalytics({
 urls,
 loadedImages,
@@ -1503,6 +1506,7 @@ let next=forecastTimelineState.clampIndex(index);
 
 slider.value=String(next);
 updateForecastLabel();
+setViewerLoading(forecastTimelineState.getLoadState(next)!=='available','이미지 로딩 중');
 displayCurrentForecastImage();
 
 }
@@ -1836,7 +1840,7 @@ let availableCount=0;
 resetForecastImageCache();
 setAllForecastLoadStates(count,'loading');
 renderForecastTimeline();
-setViewerLoading(true,'이미지 로딩 중');
+setViewerLoading(forecastTimelineState.getLoadState(Number(slider.value || 0))!=='available','이미지 로딩 중');
 
 await CDSImagePipeline.runConcurrentRange({
 count:preloadOrder.length,
@@ -1881,7 +1885,6 @@ await jumpOlderAvailableRunForMissingSelection()
 return;
 }
 
-setViewerLoading(false);
 displayCurrentForecastImage();
 
 }

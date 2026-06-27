@@ -613,11 +613,13 @@ selectedFcstHours:120,
 timer:null,
 keyboardBound:false,
 imageCaches:new Map(),
+imageLoadStates:new Map(),
 imageRequestSeq:0,
 initialLoadComplete:false,
 modelDetailLastFocus:null,
 typImpactByYear:new Map(),
-selectionLoadSeq:0
+selectionLoadSeq:0,
+slotLoadSeq:0
 };
 
 function openTyphoonGuidancePage(){
@@ -1312,6 +1314,8 @@ let requestId=++typhoonState.selectionLoadSeq;
 let currentDataTime=getSelectedTyphoonDataTime();
 typhoonState.selectedFcstHours=option.hours;
 selectLatestSlotForStorm(currentDataTime);
+renderTyphoonSelects();
+renderTyphoonTimeline();
 setTyphoonViewerLoading(true);
 try{
 await preloadTyphoonStormImages(typhoonState.selectedStormKey,option.hours,{
@@ -1394,12 +1398,15 @@ typhoonState.driveArchivePathsLoaded=new Set();
 typhoonState.driveArchiveLoadPromises=new Map();
 rebuildTyphoonEntries();
 syncTyphoonSelection({preferredYear:previousYear,preferredStormKey:previousStormKey,preferredDataTime:previousDataTime});
+renderTyphoonSelects();
 await ensureTyphoonYearIndex(typhoonState.selectedYear);
 await loadTyphoonImpactMapsForYears([typhoonState.selectedYear]);
 syncTyphoonSelection({preferredYear:previousYear,preferredStormKey:previousStormKey,preferredDataTime:previousDataTime});
 await ensureSelectedTyphoonStormManifest();
 rebuildTyphoonEntries();
 syncTyphoonSelection({preferredYear:previousYear,preferredStormKey:previousStormKey,preferredDataTime:previousDataTime});
+renderTyphoonSelects();
+renderTyphoonTimeline();
 await preloadTyphoonStormImages(typhoonState.selectedStormKey,typhoonState.selectedFcstHours);
 await renderTyphoonManifest();
 }
@@ -1433,34 +1440,22 @@ typhoonState.selectedYear=String(year || '');
 typhoonState.selectedStormKey='';
 typhoonState.selectedSlotIndex=0;
 root?.classList.add('typhoon-loading-state');
-setTyphoonViewerLoading(true);
+rebuildTyphoonEntries();
+syncTyphoonSelection({preferredYear:typhoonState.selectedYear,selectDefaultStorm:false});
+renderTyphoonEmpty('태풍을 선택하세요');
 try{
 await ensureTyphoonYearIndex(typhoonState.selectedYear);
 await loadTyphoonImpactMapsForYears([typhoonState.selectedYear]);
-syncTyphoonSelection();
-await ensureSelectedTyphoonStormManifest();
-if(requestId!==typhoonState.selectionLoadSeq){
-return;
-}
 rebuildTyphoonEntries();
-syncTyphoonSelection();
-if(requestId!==typhoonState.selectionLoadSeq){
-return;
-}
-await preloadTyphoonStormImages(typhoonState.selectedStormKey,typhoonState.selectedFcstHours,{
-isCancelled:()=>requestId!==typhoonState.selectionLoadSeq
-});
+syncTyphoonSelection({preferredYear:typhoonState.selectedYear,selectDefaultStorm:false});
 if(requestId!==typhoonState.selectionLoadSeq){
 return;
 }
 pruneTyphoonImageCache();
-await renderTyphoonManifest();
+renderTyphoonEmpty('태풍을 선택하세요');
 }
 finally{
 root?.classList.remove('typhoon-loading-state');
-if(requestId===typhoonState.selectionLoadSeq){
-setTyphoonViewerLoading(false);
-}
 }
 }
 
@@ -1478,6 +1473,8 @@ return;
 }
 rebuildTyphoonEntries();
 selectLatestSlotForStorm();
+renderTyphoonSelects();
+renderTyphoonTimeline();
 await preloadTyphoonStormImages(typhoonState.selectedStormKey,typhoonState.selectedFcstHours,{
 isCancelled:()=>requestId!==typhoonState.selectionLoadSeq
 });
@@ -2057,7 +2054,7 @@ result:{status:record.last_status || 'status',metadata}
 return entries;
 }
 
-function syncTyphoonSelection({preferredYear='',preferredStormKey='',preferredDataTime=''}={}){
+function syncTyphoonSelection({preferredYear='',preferredStormKey='',preferredDataTime='',selectDefaultStorm=true}={}){
 typhoonState.years=typhoonManifestYears();
 
 let preferredYearText=String(preferredYear || '');
@@ -2075,7 +2072,13 @@ if(preferredStormText && typhoonState.storms.some(storm=>storm.key===preferredSt
 typhoonState.selectedStormKey=preferredStormText;
 }
 else if(!typhoonState.storms.some(storm=>storm.key===typhoonState.selectedStormKey)){
+if(selectDefaultStorm){
 selectDefaultStormForYear();
+}
+else{
+typhoonState.selectedStormKey='';
+typhoonState.selectedSlotIndex=0;
+}
 }
 
 typhoonState.slots=buildTyphoonSlotsForStorm(typhoonState.selectedStormKey);
@@ -2302,15 +2305,23 @@ function getSelectedTyphoonDataTime(){
 return getSelectedTyphoonSlot()?.dataTime || '';
 }
 
-function setTyphoonSlotIndex(index){
+async function setTyphoonSlotIndex(index){
 let maxIndex=Math.max(0,typhoonState.slots.length-1);
 let nextIndex=Math.max(0,Math.min(Number(index)||0,maxIndex));
-if(nextIndex===typhoonState.selectedSlotIndex){
-return;
-}
 typhoonState.selectedSlotIndex=nextIndex;
-renderTyphoonSelectedRun();
 renderTyphoonTimeline();
+let run=getSelectedTyphoonRun();
+let requestId=++typhoonState.slotLoadSeq;
+let showLoading=!!run && getTyphoonRunLoadState(run)!=='available';
+setTyphoonViewerLoading(showLoading);
+try{
+await renderTyphoonSelectedRun();
+}
+finally{
+if(requestId===typhoonState.slotLoadSeq){
+setTyphoonViewerLoading(false);
+}
+}
 }
 
 function moveTyphoonSelection(offset){
@@ -2372,6 +2383,14 @@ yearSelect.appendChild(option);
 yearSelect.value=typhoonState.selectedYear;
 
 stormSelect.innerHTML='';
+if(!typhoonState.selectedStormKey){
+let placeholder=document.createElement('option');
+placeholder.value='';
+placeholder.textContent='태풍 선택';
+placeholder.disabled=true;
+placeholder.selected=true;
+stormSelect.appendChild(placeholder);
+}
 typhoonState.storms.forEach(storm=>{
 let option=document.createElement('option');
 option.value=storm.key;
@@ -2471,7 +2490,8 @@ track.style.gridTemplateColumns=`repeat(${Math.max(1,slots.length)}, minmax(4px,
 slots.forEach((slot,index)=>{
 let segment=document.createElement('button');
 segment.type='button';
-let classes=['compare-segment','forecast-segment',slot.entry?'state-available':'state-missing'];
+let loadState=slot.entry ? getTyphoonRunLoadState(slot.entry) : 'missing';
+let classes=['compare-segment','forecast-segment',`state-${loadState}`];
 if(index===typhoonState.selectedSlotIndex){
 classes.push('active','active-time-label','active-lead-label');
 }
@@ -2828,6 +2848,49 @@ typhoonState.imageCaches.set(horizon,new Map());
 return typhoonState.imageCaches.get(horizon);
 }
 
+function getTyphoonRunCacheKey(run){
+if(!run){
+return '';
+}
+return [
+typhoonCacheHorizon(run.fcstHours),
+run.stormKey || '',
+run.dataTime || '',
+run.imagePath || '',
+run.generatedAt || run.metadata?.generated_at_utc || ''
+].join('|');
+}
+
+function getTyphoonRunLoadState(run){
+if(!run?.imagePath){
+return 'missing';
+}
+return typhoonState.imageLoadStates.get(getTyphoonRunCacheKey(run)) || 'loading';
+}
+
+function setTyphoonRunLoadState(run,state){
+let key=getTyphoonRunCacheKey(run);
+if(!key){
+return;
+}
+typhoonState.imageLoadStates.set(key,state);
+updateTyphoonTimelineRunState(run,state);
+}
+
+function updateTyphoonTimelineRunState(run,state=getTyphoonRunLoadState(run)){
+let key=getTyphoonRunCacheKey(run);
+let index=typhoonState.slots.findIndex(slot=>slot.entry && getTyphoonRunCacheKey(slot.entry)===key);
+if(index<0){
+return;
+}
+let segment=typhoonState.root?.querySelector(`[data-role="timeline"] .forecast-segment[data-index="${index}"]`);
+if(!segment){
+return;
+}
+segment.classList.remove('state-loading','state-available','state-missing');
+segment.classList.add(`state-${state}`);
+}
+
 function getTyphoonActiveImageUrls(fcstHours){
 let horizon=typhoonCacheHorizon(fcstHours);
 
@@ -2879,17 +2942,21 @@ let urls=getTyphoonImageUrls(run);
 let horizon=typhoonCacheHorizon(run.fcstHours);
 
 if(!urls.length){
+setTyphoonRunLoadState(run,'missing');
 return Promise.resolve({ok:false,url:'',image:null});
 }
 
+setTyphoonRunLoadState(run,'loading');
 let lastResult={ok:false,url:urls[0] || '',image:null};
 for(let url of urls){
 let result=await loadTyphoonCachedImageUrl(url,horizon);
 if(result?.ok){
+setTyphoonRunLoadState(run,'available');
 return result;
 }
 lastResult=result || lastResult;
 }
+setTyphoonRunLoadState(run,'missing');
 return lastResult;
 
 }
@@ -3056,6 +3123,7 @@ let url=urls[0] || '';
 let currentImage=viewer.querySelector('.typhoon-guidance-image');
 
 if(currentImage?.dataset.cacheUrl && urls.includes(currentImage.dataset.cacheUrl) && currentImage.complete){
+setTyphoonRunLoadState(run,'available');
 await waitForTyphoonImagePaint();
 trackTyphoonImageView(run,{url:currentImage.dataset.cacheUrl});
 return;
