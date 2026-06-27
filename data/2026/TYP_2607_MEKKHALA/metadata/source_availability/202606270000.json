@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260627080036",
-  "generated_at_kst": "2026-06-27 17:00 KST",
+  "generated_at_utc": "20260627081040",
+  "generated_at_kst": "2026-06-27 17:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_07",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 49,
-  "selected_model_count": 22,
+  "model_source_count": 53,
+  "selected_model_count": 24,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -303,6 +303,41 @@
       "is_official": false,
       "first_seen_utc": "20260627064036",
       "first_seen_kst": "2026-06-27 15:40 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "ECMWF_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 7,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260627081040",
+      "first_seen_kst": "2026-06-27 17:10 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "ECMWF_EPS",
+        "ECMWF_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 13,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260627081040",
+      "first_seen_kst": "2026-06-27 17:10 KST"
     },
     {
       "model_id": "FNV3",
@@ -824,7 +859,7 @@
       ],
       "source": "NOAA",
       "source_label": "NOAA ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 7,
       "max_lead_hour": 36,
       "has_pressure": true,
@@ -832,6 +867,40 @@
       "is_official": false,
       "first_seen_utc": "20260627073034",
       "first_seen_kst": "2026-06-27 16:30 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 7,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260627081040",
+      "first_seen_kst": "2026-06-27 17:10 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "FNMOC_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260627081040",
+      "first_seen_kst": "2026-06-27 17:10 KST"
     },
     {
       "model_id": "UKM",
