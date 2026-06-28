@@ -618,6 +618,7 @@ imageRequestSeq:0,
 initialLoadComplete:false,
 modelDetailLastFocus:null,
 typImpactByYear:new Map(),
+typNowByYear:new Map(),
 selectionLoadSeq:0,
 slotLoadSeq:0
 };
@@ -1418,6 +1419,7 @@ typhoonState.entries=[];
 typhoonState.yearIndexes=new Map();
 typhoonState.stormManifestCache=new Map();
 typhoonState.typImpactByYear=new Map();
+typhoonState.typNowByYear=new Map();
 typhoonState.driveArchiveImages=new Map();
 typhoonState.driveArchivePathsLoaded=new Set();
 typhoonState.driveArchiveLoadPromises=new Map();
@@ -2098,36 +2100,53 @@ selectLatestSlotForStorm();
 
 async function loadTyphoonImpactMapsForYears(years){
 let uniqueYears=[...new Set((years || []).map(year=>String(year || '').trim()).filter(Boolean))];
-let nextMap=new Map();
+let nextImpactMap=new Map();
+let nextNowMap=new Map();
 await Promise.all(uniqueYears.map(async year=>{
-nextMap.set(year,await fetchTyphoonImpactMapForYear(year));
+let maps=await fetchTyphoonListMapsForYear(year);
+nextImpactMap.set(year,maps.impact);
+nextNowMap.set(year,maps.now);
 }));
-typhoonState.typImpactByYear=nextMap;
+typhoonState.typImpactByYear=nextImpactMap;
+typhoonState.typNowByYear=nextNowMap;
 }
 
-async function fetchTyphoonImpactMapForYear(year){
+async function fetchTyphoonListMapsForYear(year){
 let path=`${TYPHOON_TYP_LIST_CACHE_PREFIX}${year}${TYPHOON_TYP_LIST_CACHE_SUFFIX}`;
 try{
 let payload=await fetchTyphoonJson(path,typhoonState.manifestBaseUrl);
 let rows=Array.isArray(payload?.rows) ? payload.rows : [];
-let result=new Map();
+let impact=new Map();
+let now=new Map();
 rows.forEach(row=>{
 let seq=Number(row?.SEQ);
 let eff=normalizeTyphoonImpactEff(row?.EFF);
-if(Number.isFinite(seq) && seq>0 && eff){
-result.set(String(seq),eff);
+let status=normalizeTyphoonNowStatus(row?.NOW);
+if(!Number.isFinite(seq) || seq<=0){
+return;
+}
+if(eff){
+impact.set(String(seq),eff);
+}
+if(status){
+now.set(String(seq),status);
 }
 });
-return result;
+return {impact,now};
 }
 catch(error){
-return new Map();
+return {impact:new Map(),now:new Map()};
 }
 }
 
 function normalizeTyphoonImpactEff(value){
 let text=String(value ?? '').trim();
 return ['1','2','3','4'].includes(text) ? text : '';
+}
+
+function normalizeTyphoonNowStatus(value){
+let text=String(value ?? '').trim();
+return ['1','2'].includes(text) ? text : '';
 }
 
 function typhoonImpactEffLabel(eff){
@@ -2166,6 +2185,22 @@ if(!year || !Number.isFinite(typNumber) || typNumber<=0){
 return '';
 }
 let yearMap=typhoonState.typImpactByYear instanceof Map ? typhoonState.typImpactByYear.get(year) : null;
+return yearMap instanceof Map ? (yearMap.get(String(typNumber)) || '') : '';
+}
+
+function typhoonNowStatusForEntry(entry){
+let metadata=entry?.metadata || {};
+let job=entry?.job || {};
+let rawStage=normalizeTyphoonStage(entry?.originalStage || entry?.stage || metadata.storm_stage || job.stage || '');
+if(rawStage==='TD'){
+return '';
+}
+let year=String(entry?.year || metadata.storm_year || job.year || '').trim();
+let typNumber=Number(entry?.typNumber || metadata.canonical_typ_number || metadata.typ_number || job.canonical_typ_number || job.typ_number || 0);
+if(!year || !Number.isFinite(typNumber) || typNumber<=0){
+return '';
+}
+let yearMap=typhoonState.typNowByYear instanceof Map ? typhoonState.typNowByYear.get(year) : null;
 return yearMap instanceof Map ? (yearMap.get(String(typNumber)) || '') : '';
 }
 
@@ -2229,6 +2264,14 @@ if(TYPHOON_IMPACT_EFF_VALUES.has(storm.impactEff)){
 storm.impact=true;
 }
 });
+typhoonState.entries
+.filter(entry=>entry.year===year)
+.forEach(entry=>{
+let storm=byKey.get(entry.stormKey);
+if(storm && isActiveTyphoonStormEntry(entry,activeWindowTimes)){
+storm.active=true;
+}
+});
 return [...byKey.values()]
 .map(storm=>({
 ...storm,
@@ -2257,6 +2300,10 @@ return times;
 }
 
 function isActiveTyphoonStormEntry(entry,activeWindowTimes=typhoonActiveWindowDataTimes()){
+let nowStatus=typhoonNowStatusForEntry(entry);
+if(nowStatus){
+return nowStatus==='1';
+}
 let dataTime=String(entry?.dataTime || '');
 return Boolean(dataTime && (activeWindowTimes.has(dataTime) || activeWindowTimes.has(dataTime.slice(0,10))));
 }
