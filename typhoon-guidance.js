@@ -1398,7 +1398,12 @@ typhoonState.driveArchiveImages=new Map();
 typhoonState.driveArchivePathsLoaded=new Set();
 typhoonState.driveArchiveLoadPromises=new Map();
 rebuildTyphoonEntries();
-syncTyphoonSelection({preferredYear:previousYear,preferredStormKey:previousStormKey,preferredDataTime:previousDataTime});
+syncTyphoonSelection({
+preferredYear:previousYear,
+preferredStormKey:previousStormKey,
+preferredDataTime:previousDataTime,
+selectDefaultStorm:Boolean(previousStormKey)
+});
 renderTyphoonSelects();
 await ensureTyphoonYearIndex(typhoonState.selectedYear);
 await loadTyphoonImpactMapsForYears([typhoonState.selectedYear]);
@@ -2208,6 +2213,38 @@ function isKoreaImpactTyphoonEntry(entry){
 return TYPHOON_IMPACT_EFF_VALUES.has(typhoonImpactEffectForEntry(entry));
 }
 
+function compareTyphoonStormRecency(a,b){
+return (
+String(b.sortTime || '').localeCompare(String(a.sortTime || '')) ||
+String(b.latest || '').localeCompare(String(a.latest || '')) ||
+Number(b.typNumber || 0)-Number(a.typNumber || 0) ||
+a.label.localeCompare(b.label)
+);
+}
+
+function compareTyphoonStormOrder(a,b){
+let activeOrder=Number(Boolean(b.active))-Number(Boolean(a.active));
+if(activeOrder){
+return activeOrder;
+}
+if(a.active && b.active){
+return compareTyphoonStormRecency(a,b);
+}
+
+let aIsTyp=a.stage!=='TD';
+let bIsTyp=b.stage!=='TD';
+if(aIsTyp!==bIsTyp){
+return aIsTyp ? -1 : 1;
+}
+if(aIsTyp){
+return (
+Number(b.typNumber || 0)-Number(a.typNumber || 0) ||
+compareTyphoonStormRecency(a,b)
+);
+}
+return compareTyphoonStormRecency(a,b);
+}
+
 function buildTyphoonStormsForYear(year){
 let byKey=new Map();
 let activeWindowTimes=typhoonActiveWindowDataTimes();
@@ -2278,12 +2315,7 @@ return [...byKey.values()]
 manifestPaths:[...storm.manifestPaths],
 sortTime:(storm.stage==='TD' ? storm.first : (storm.typFirst || storm.first)) || storm.first
 }))
-.sort((a,b)=>
-String(b.sortTime || '').localeCompare(String(a.sortTime || '')) ||
-String(b.latest || '').localeCompare(String(a.latest || '')) ||
-Number(b.typNumber || 0)-Number(a.typNumber || 0) ||
-a.label.localeCompare(b.label)
-);
+.sort(compareTyphoonStormOrder);
 }
 
 function typhoonActiveWindowDataTimes(){
