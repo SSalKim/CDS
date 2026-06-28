@@ -442,6 +442,15 @@ def kma_cache_path(cache_dir: Path, endpoint: str, year: int) -> Path:
     return cache_dir / f"{Path(endpoint).stem}_{year}.json"
 
 
+def kma_cache_asset_paths(cache_dir: Path, years: set[int]) -> list[Path]:
+    return [
+        path
+        for year in sorted(years)
+        for endpoint in (TD_LIST_ENDPOINT, TYP_LIST_ENDPOINT)
+        if (path := kma_cache_path(cache_dir, endpoint, year)).exists()
+    ]
+
+
 def load_cached_kma_rows(cache_dir: Path | None, endpoint: str, year: int) -> list[dict] | None:
     if cache_dir is None:
         return None
@@ -1739,6 +1748,16 @@ def active_cycle_windows(now: datetime) -> list[CycleWindow]:
     return sorted(windows, key=lambda item: item.data_time)
 
 
+def kma_list_years_for_windows(windows: list[CycleWindow], fallback_time: datetime) -> set[int]:
+    cycle_times = [parse_utc_stamp(window.data_time) for window in windows]
+    cycle_times = [value for value in cycle_times if value is not None]
+    if not cycle_times:
+        cycle_times = [fallback_time]
+    years = {value.year for value in cycle_times}
+    years.update(value.year - 1 for value in cycle_times if value.month == 1)
+    return years
+
+
 def load_json(path: Path, fallback):
     if not path.exists():
         return fallback
@@ -2607,11 +2626,6 @@ def canonical_typ_name_ko_for_job(job: StormJob) -> str:
     return str(job.canonical_typ_name_ko or job.typ_name_ko or "").strip()
 
 
-def metadata_storm_key_for(job: StormJob) -> str:
-    prefix = "td" if canonical_stage_for_job(job) == "TD" else "typ"
-    return f"{prefix}_{job.year}_{canonical_typ_number_for_job(job):02d}"
-
-
 def system_dir_name_for_parts(year: int | str, stage: str, typ_number: int | str, typ_name: str = "NONAME") -> str:
     year_value = safe_int(year)
     year_suffix = year_value % 100 if year_value is not None else 0
@@ -2628,21 +2642,6 @@ def system_dir_name_for_job(job: StormJob) -> str:
         canonical_typ_number_for_job(job),
         canonical_typ_name_for_job(job),
     )
-
-
-def system_dir_name_from_metadata(metadata: dict) -> str:
-    data_time = str(metadata.get("data_time") or "")
-    year = str(metadata.get("storm_year") or data_time[:4] or "0")
-    stage = "TD" if str(metadata.get("storm_stage") or "TYP").upper() == "TD" else "TYP"
-    typ_number = safe_int(metadata.get("typ_number")) or 0
-    typ_name = str(metadata.get("typ_name") or "NONAME")
-    return system_dir_name_for_parts(year, stage, typ_number, typ_name)
-
-
-def system_dir_from_metadata(output_root: Path, metadata: dict) -> Path:
-    data_time = str(metadata.get("data_time") or "")
-    year = str(metadata.get("storm_year") or data_time[:4] or "0")
-    return output_root / year / system_dir_name_from_metadata(metadata)
 
 
 def system_dir_from_job(output_root: Path, job: StormJob) -> Path:
@@ -2870,7 +2869,11 @@ def track_history_paths_from_metadata(output_root: Path, metadata: dict) -> list
     return [system_dir / "metadata" / "track_history.json"]
 
 
-def existing_typ_name_lookup(output_root: Path) -> dict[tuple[str, int], tuple[str, str]]:
+def existing_typ_name_lookup(
+    output_root: Path,
+    *,
+    years: set[str] | None = None,
+) -> dict[tuple[str, int], tuple[str, str]]:
     lookup: dict[tuple[str, int], tuple[str, str]] = {}
 
     def remember(year: str, typ_number: int | None, typ_name: str, typ_name_ko: str = "") -> None:
@@ -2885,7 +2888,12 @@ def existing_typ_name_lookup(output_root: Path) -> dict[tuple[str, int], tuple[s
             return
         lookup[key] = (name, str(typ_name_ko or "").strip())
 
-    for path in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/index.json")):
+    year_dirs = (
+        [output_root / year for year in sorted(years)]
+        if years is not None
+        else sorted(output_root.glob("[0-9][0-9][0-9][0-9]"))
+    )
+    for path in [year_dir / "index.json" for year_dir in year_dirs if (year_dir / "index.json").exists()]:
         payload = load_json(path, {})
         systems = payload.get("systems") if isinstance(payload, dict) else []
         if not isinstance(systems, list):
@@ -2903,18 +2911,19 @@ def existing_typ_name_lookup(output_root: Path) -> dict[tuple[str, int], tuple[s
                 str(system.get("typ_name_ko") or ""),
             )
 
-    for path in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/TYP_*/manifest.json")):
-        payload = load_json(path, {})
-        if isinstance(payload, dict):
-            remember(
-                str(payload.get("year") or path.parents[1].name),
-                metadata_int(payload.get("typ_number")),
-                str(payload.get("typ_name") or ""),
-                str(payload.get("typ_name_ko") or ""),
-            )
-        match = re.match(r"^TYP_(\d{2})(\d{2})_(.+)$", path.parent.name)
-        if match:
-            remember(path.parents[1].name, int(match.group(2)), match.group(3), "")
+    for year_dir in year_dirs:
+        for path in sorted(year_dir.glob("TYP_*/manifest.json")):
+            payload = load_json(path, {})
+            if isinstance(payload, dict):
+                remember(
+                    str(payload.get("year") or path.parents[1].name),
+                    metadata_int(payload.get("typ_number")),
+                    str(payload.get("typ_name") or ""),
+                    str(payload.get("typ_name_ko") or ""),
+                )
+            match = re.match(r"^TYP_(\d{2})(\d{2})_(.+)$", path.parent.name)
+            if match:
+                remember(path.parents[1].name, int(match.group(2)), match.group(3), "")
     return lookup
 
 
@@ -3105,24 +3114,30 @@ def canonicalize_linked_td_outputs(
     *,
     dry_run: bool = False,
     td_typ_links: dict[tuple[str, int], dict] | None = None,
+    restrict_to_linked_rows: bool = False,
 ) -> list[Path]:
     if not output_root.exists():
         return []
-    typ_names = existing_typ_name_lookup(output_root)
     td_typ_links = td_typ_links or {}
+    if restrict_to_linked_rows and not td_typ_links:
+        return []
+    linked_years = {year for year, _ in td_typ_links} if restrict_to_linked_rows else None
+    typ_names = existing_typ_name_lookup(output_root, years=linked_years)
     changed_paths: set[Path] = set()
     for td_dir in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/TD_*")):
         if not td_dir.is_dir():
+            continue
+        folder_match = re.match(r"^TD_(\d{2})(\d{2})_", td_dir.name, re.IGNORECASE)
+        folder_td_number = int(folder_match.group(2)) if folder_match else None
+        folder_year = str(td_dir.parent.name)
+        row_link = td_typ_links.get((folder_year, folder_td_number)) if folder_td_number is not None else None
+        if restrict_to_linked_rows and not isinstance(row_link, dict):
             continue
         run_paths = sorted((td_dir / "metadata" / "runs").glob("*.json"))
         if not run_paths:
             continue
         folder_manifest = load_json(td_dir / "manifest.json", {})
         fallback_linked_typ_number = metadata_int(folder_manifest.get("linked_typ_number")) if isinstance(folder_manifest, dict) else None
-        folder_match = re.match(r"^TD_(\d{2})(\d{2})_", td_dir.name, re.IGNORECASE)
-        folder_td_number = int(folder_match.group(2)) if folder_match else None
-        folder_year = str(td_dir.parent.name)
-        row_link = td_typ_links.get((folder_year, folder_td_number)) if folder_td_number is not None else None
         if fallback_linked_typ_number is None and isinstance(row_link, dict):
             fallback_linked_typ_number = metadata_int(row_link.get("linked_typ_number"))
         target_dirs: set[Path] = set()
@@ -3699,18 +3714,6 @@ def relative_asset_path(path: Path) -> str:
         return path.as_posix()
 
 
-def relative_existing_asset_path(path: Path) -> str:
-    return relative_asset_path(path) if path.exists() else ""
-
-
-def set_metadata_path_if_exists(metadata: dict, key: str, path: Path) -> None:
-    value = relative_existing_asset_path(path)
-    if value:
-        metadata[key] = value
-    else:
-        metadata.pop(key, None)
-
-
 def metadata_referenced_path_exists(metadata: dict, key: str) -> bool:
     value = str(metadata.get(key) or "").strip()
     if not value:
@@ -4098,14 +4101,6 @@ def manifest_storm_key_from_entry(entry: dict) -> str:
     return "unknown"
 
 
-def storm_manifest_path(output_root: Path, year: int | str, storm_key: str) -> Path:
-    parts = str(storm_key or "").split("_")
-    if len(parts) >= 3 and parts[1].isdigit() and parts[2].isdigit():
-        stage = "TD" if parts[0].lower() == "td" else "TYP"
-        return output_root / str(year) / system_dir_name_for_parts(year, stage, int(parts[2]), "NONAME") / "manifest.json"
-    return output_root / str(year) / str(storm_key or "unknown") / "manifest.json"
-
-
 def storm_manifest_path_from_summary(output_root: Path, summary: dict) -> Path:
     year = summary.get("year") or ""
     stage = summary.get("stage") or "TYP"
@@ -4218,6 +4213,32 @@ def manifest_payload_changed(previous: dict, payload: dict) -> bool:
     return True
 
 
+def storm_manifest_payload(
+    storm_key: str,
+    inventory: list[dict],
+    *,
+    updated_at_utc: str,
+) -> tuple[dict, dict] | None:
+    summary = storm_summary_from_inventory(storm_key, inventory)
+    if not valid_storm_summary(summary):
+        return None
+    return summary, {
+        "version": 2,
+        "updated_at_utc": updated_at_utc,
+        **summary,
+        "inventory": inventory,
+    }
+
+
+def year_manifest_payload(year: str, systems: list[dict], *, updated_at_utc: str) -> dict:
+    return {
+        "version": 2,
+        "updated_at_utc": updated_at_utc,
+        "year": int(year) if year.isdigit() else year,
+        "systems": sorted(systems, key=lambda item: (item.get("typ_number") or 0, item.get("storm_key") or "")),
+    }
+
+
 def write_split_manifest_files(output_root: Path, run_entries: list[dict], *, updated_at_utc: str) -> list[Path]:
     changed_paths: list[Path] = []
     entries_by_storm: dict[tuple[str, str], list[dict]] = {}
@@ -4240,15 +4261,10 @@ def write_split_manifest_files(output_root: Path, run_entries: list[dict], *, up
         if not isinstance(previous_inventory, list):
             previous_inventory = []
         inventory = merge_manifest_inventory(previous_inventory, entries)
-        summary = storm_summary_from_inventory(storm_key, inventory)
-        if not valid_storm_summary(summary):
+        manifest_parts = storm_manifest_payload(storm_key, inventory, updated_at_utc=updated_at_utc)
+        if manifest_parts is None:
             continue
-        payload = {
-            "version": 2,
-            "updated_at_utc": updated_at_utc,
-            **summary,
-            "inventory": inventory,
-        }
+        summary, payload = manifest_parts
         if manifest_payload_changed(previous, payload):
             write_json(path, payload)
             changed_paths.append(path)
@@ -4269,12 +4285,7 @@ def write_split_manifest_files(output_root: Path, run_entries: list[dict], *, up
         }
         for item in touched_systems.get(year, []):
             by_key[str(item["storm_key"])] = item
-        payload = {
-            "version": 2,
-            "updated_at_utc": updated_at_utc,
-            "year": int(year) if str(year).isdigit() else year,
-            "systems": sorted(by_key.values(), key=lambda item: (item.get("typ_number") or 0, item.get("storm_key") or "")),
-        }
+        payload = year_manifest_payload(year, list(by_key.values()), updated_at_utc=updated_at_utc)
         if manifest_payload_changed(previous, payload):
             write_json(path, payload)
             changed_paths.append(path)
@@ -4298,16 +4309,11 @@ def rebuild_split_manifest_files(output_root: Path, inventory: list[dict], *, up
     systems_by_year: dict[str, list[dict]] = {}
     for (year, storm_key), entries in sorted(grouped.items()):
         storm_inventory = sort_manifest_inventory(entries)
-        summary = storm_summary_from_inventory(storm_key, storm_inventory)
-        if not valid_storm_summary(summary):
+        manifest_parts = storm_manifest_payload(storm_key, storm_inventory, updated_at_utc=updated_at_utc)
+        if manifest_parts is None:
             continue
+        summary, payload = manifest_parts
         path = storm_manifest_path_from_summary(output_root, summary)
-        payload = {
-            "version": 2,
-            "updated_at_utc": updated_at_utc,
-            **summary,
-            "inventory": storm_inventory,
-        }
         previous = load_json(path, {})
         if manifest_payload_changed(previous, payload):
             write_json(path, payload)
@@ -4317,12 +4323,7 @@ def rebuild_split_manifest_files(output_root: Path, inventory: list[dict], *, up
 
     for year, systems in sorted(systems_by_year.items()):
         path = year_manifest_index_path(output_root, year)
-        payload = {
-            "version": 2,
-            "updated_at_utc": updated_at_utc,
-            "year": int(year) if str(year).isdigit() else year,
-            "systems": sorted(systems, key=lambda item: (item.get("typ_number") or 0, item.get("storm_key") or "")),
-        }
+        payload = year_manifest_payload(year, systems, updated_at_utc=updated_at_utc)
         previous = load_json(path, {})
         if manifest_payload_changed(previous, payload):
             write_json(path, payload)
@@ -4340,9 +4341,9 @@ def root_manifest_indexes(output_root: Path) -> list[dict]:
     return indexes
 
 
-def split_manifest_inventory_count(output_root: Path) -> int:
+def split_manifest_inventory_count(output_root: Path, indexes: list[dict] | None = None) -> int:
     total = 0
-    for item in root_manifest_indexes(output_root):
+    for item in indexes if indexes is not None else root_manifest_indexes(output_root):
         path = PROJECT_ROOT / str(item.get("path") or "")
         payload = load_json(path, {})
         systems = payload.get("systems") if isinstance(payload, dict) else []
@@ -4366,6 +4367,7 @@ def root_manifest_payload(
     runs: list[dict],
     output_root: Path,
     inventory_count: int = 0,
+    manifest_indexes: list[dict] | None = None,
 ) -> dict:
     return {
         "version": 3,
@@ -4377,15 +4379,8 @@ def root_manifest_payload(
         "active_windows": [asdict(window) for window in windows],
         "runs": runs,
         "inventory_count": inventory_count,
-        "manifest_indexes": root_manifest_indexes(output_root),
+        "manifest_indexes": manifest_indexes if manifest_indexes is not None else root_manifest_indexes(output_root),
     }
-
-
-def relative_changed_path(path: Path) -> str:
-    try:
-        return path.resolve().relative_to(PROJECT_ROOT.resolve()).as_posix()
-    except ValueError:
-        return path.as_posix()
 
 
 def collect_changed_asset_paths(
@@ -4400,28 +4395,28 @@ def collect_changed_asset_paths(
     paths: set[str] = set()
     output_root = manifest_path.parent
     if include_manifest:
-        paths.add(relative_changed_path(manifest_path))
+        paths.add(relative_asset_path(manifest_path))
     if include_status:
-        paths.add(relative_changed_path(status_path))
+        paths.add(relative_asset_path(status_path))
     for path in split_manifest_paths:
-        paths.add(relative_changed_path(path))
+        paths.add(relative_asset_path(path))
     for entry in run_entries:
         result = entry.get("result") if isinstance(entry, dict) else {}
         if isinstance(result, dict):
             metadata_path = result.get("metadata_path")
             if metadata_path:
-                paths.add(relative_changed_path(Path(str(metadata_path))))
+                paths.add(relative_asset_path(Path(str(metadata_path))))
             metadata = result.get("metadata")
             if isinstance(metadata, dict):
                 image_path = str(metadata.get("image_path") or "").strip()
                 if image_path:
-                    paths.add(relative_changed_path(PROJECT_ROOT / image_path))
+                    paths.add(relative_asset_path(PROJECT_ROOT / image_path))
                 for availability_key in ("source_availability_path",):
                     availability_path = str(metadata.get(availability_key) or "").strip()
                     if availability_path and (PROJECT_ROOT / availability_path).exists():
-                        paths.add(relative_changed_path(PROJECT_ROOT / availability_path))
+                        paths.add(relative_asset_path(PROJECT_ROOT / availability_path))
                 for history_path in track_history_paths_from_metadata(output_root, metadata):
-                    paths.add(relative_changed_path(history_path))
+                    paths.add(relative_asset_path(history_path))
     return sorted(paths)
 
 
@@ -4558,6 +4553,7 @@ def main() -> int:
         canonicalized_paths.extend(normalize_track_history_primary_keys(output_root, dry_run=args.dry_run))
         inventory = build_manifest_inventory(output_root, [])
         split_paths = [] if args.dry_run else rebuild_split_manifest_files(output_root, inventory, updated_at_utc=updated_at_utc)
+        manifest_indexes = root_manifest_indexes(output_root)
         manifest = root_manifest_payload(
             updated_at_utc=updated_at_utc,
             windows=windows,
@@ -4566,6 +4562,7 @@ def main() -> int:
             runs=[],
             output_root=output_root,
             inventory_count=len(inventory),
+            manifest_indexes=manifest_indexes,
         )
         status_for_write = prune_status_for_persistence(
             status,
@@ -4581,7 +4578,8 @@ def main() -> int:
             include_manifest=True,
             include_status=status_for_write != status,
         )
-        changed_paths.extend(relative_changed_path(path) for path in canonicalized_paths)
+        changed_paths.extend(relative_asset_path(path) for path in canonicalized_paths)
+        changed_paths.extend(relative_asset_path(path) for path in kma_cache_asset_paths(kma_cache_dir, years_for_index))
         changed_paths = sorted(set(changed_paths))
         if not args.dry_run:
             write_json(manifest_path, manifest)
@@ -4606,12 +4604,7 @@ def main() -> int:
         else args.atcf_search_negative_radius
     )
 
-    years: set[int] = set()
-    for window in windows:
-        year = int(window.data_time[:4])
-        years.update({year - 1, year, year + 1})
-    if not years:
-        years.add(now.year)
+    years = kma_list_years_for_windows(windows, now)
 
     td_rows: list[dict] = []
     typ_rows: list[dict] = []
@@ -4853,8 +4846,8 @@ def main() -> int:
         output_root,
         dry_run=args.dry_run,
         td_typ_links=td_typ_links,
+        restrict_to_linked_rows=True,
     )
-    canonicalized_paths.extend(normalize_track_history_primary_keys(output_root, dry_run=args.dry_run))
     previous_manifest = load_json(manifest_path, {})
     compact_runs = compact_manifest_runs(run_entries)
     updated_at_utc = format_utc_stamp(now)
@@ -4871,10 +4864,11 @@ def main() -> int:
         split_paths = rebuild_split_manifest_files(output_root, inventory, updated_at_utc=updated_at_utc)
     else:
         split_paths = write_split_manifest_files(output_root, run_entries, updated_at_utc=updated_at_utc)
+    manifest_indexes = root_manifest_indexes(output_root)
     if args.full_manifest_scan or canonicalized_paths or previous_inventory:
         inventory_count = len(inventory)
     else:
-        inventory_count = split_manifest_inventory_count(output_root)
+        inventory_count = split_manifest_inventory_count(output_root, manifest_indexes)
     manifest = root_manifest_payload(
         updated_at_utc=updated_at_utc,
         windows=windows,
@@ -4883,6 +4877,7 @@ def main() -> int:
         runs=compact_runs,
         output_root=output_root,
         inventory_count=inventory_count,
+        manifest_indexes=manifest_indexes,
     )
     status_for_write = prune_status_for_persistence(
         status,
@@ -4905,7 +4900,8 @@ def main() -> int:
         include_manifest=should_write_outputs,
         include_status=status_changed,
     )
-    changed_paths.extend(relative_changed_path(path) for path in canonicalized_paths)
+    changed_paths.extend(relative_asset_path(path) for path in canonicalized_paths)
+    changed_paths.extend(relative_asset_path(path) for path in kma_cache_asset_paths(kma_cache_dir, years))
     changed_paths = sorted(set(changed_paths))
     if should_write_outputs:
         write_json(manifest_path, manifest)

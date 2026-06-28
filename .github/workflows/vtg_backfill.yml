@@ -233,6 +233,13 @@ jobs:
           cache: pip
           cache-dependency-path: requirements-vtg.txt
 
+      - name: Restore Cartopy map cache
+        if: ${{ env.RUNNER_KIND != 'self-hosted' }}
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/cartopy
+          key: cartopy-natural-earth-50m-v1
+
       - name: Prepare self-hosted Python
         if: ${{ env.RUNNER_KIND == 'self-hosted' }}
         run: |
@@ -282,15 +289,6 @@ jobs:
           probe "typ_lst" "https://${host}/api/typ01/url/typ_lst.php?YY=${year}&disp=1&help=1&authKey=${KMA_APIHUB_AUTH_KEY}"
           probe "typ_gts_now" "https://${host}/api/typ01/url/typ_gts_now.php?src=&tm=${now_utc}&mode=2&disp=1&help=0&authKey=${KMA_APIHUB_AUTH_KEY}"
 
-      - name: Install system dependencies
-        if: ${{ env.RUNNER_KIND != 'self-hosted' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libgeos-dev libproj-dev proj-bin proj-data fonts-nanum
-          fc-cache -f
-          echo "Installed Korean fonts:"
-          fc-list | grep -i "nanum" || true
-
       - name: Install Python dependencies
         run: |
           if [ "$RUNNER_KIND" = "self-hosted" ]; then
@@ -301,11 +299,10 @@ jobs:
               echo "Self-hosted Python requirements unchanged; skipping pip install."
               exit 0
             fi
-            python -m pip install -r requirements-vtg.txt
+            python -m pip install --only-binary=:all: -r requirements-vtg.txt
             echo "$req_hash" > "$hash_file"
           else
-            python -m pip install --upgrade pip
-            python -m pip install -r requirements-vtg.txt
+            python -m pip install --only-binary=:all: -r requirements-vtg.txt
           fi
 
       - name: Generate cycle list
@@ -394,11 +391,16 @@ jobs:
           commit_and_push() {
             local message="$1"
             local changed_file="$2"
+            local discover_changes="${3:-false}"
             local filtered_file="$RUNNER_TEMP/vtg_changed_paths_filtered.txt"
 
-            echo "Supplementing generated changed-path list with current VTG data git status."
-            git diff --name-only -- data >> "$changed_file" || true
-            git ls-files --others --exclude-standard -- data >> "$changed_file" || true
+            if [ "$discover_changes" = "true" ]; then
+              echo "Recovery commit: supplementing the generated path list from git status."
+              git diff --name-only -- data >> "$changed_file" || true
+              git ls-files --others --exclude-standard -- data >> "$changed_file" || true
+            else
+              echo "Using the exact changed-path list from vtg_auto.py."
+            fi
             filter_changed_paths "$changed_file" "$filtered_file"
 
             if [ -s "$filtered_file" ]; then
@@ -476,7 +478,7 @@ jobs:
 
             if [ -s "$partial_changed_file" ]; then
               local label="${CURRENT_RANGE_LABEL:-interrupted}"
-              if ! commit_and_push "Partial backfill VTG images $label" "$partial_changed_file"; then
+              if ! commit_and_push "Partial backfill VTG images $label" "$partial_changed_file" true; then
                 echo "Partial commit/push failed during exit cleanup."
               fi
             else
@@ -541,11 +543,6 @@ jobs:
           if [ -f "$FINAL_CHANGED_PATHS_FILE" ] && [ -s "$FINAL_CHANGED_PATHS_FILE" ]; then
             commit_and_push "Rebuild VTG manifest index" "$FINAL_CHANGED_PATHS_FILE"
           else
-            git add data/manifest.json data || true
-            if git diff --cached --quiet; then
-              echo "No manifest index changes after backfill."
-            else
-              commit_and_push "Rebuild VTG manifest index" "$FINAL_CHANGED_PATHS_FILE"
-            fi
+            echo "No manifest index changes after backfill."
           fi
           echo "::endgroup::"

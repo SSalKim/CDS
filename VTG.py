@@ -372,6 +372,9 @@ TRACK_HISTORY_MAX_LOOKBACK_DAYS = 45
 PROJECT_ROOT = Path(__file__).resolve().parent
 PLOT_FONT_FAMILY = "DejaVu Sans"
 PREFERRED_PLOT_FONT_FILE = PROJECT_ROOT / "fonts" / "NanumSquareB.ttf"
+MAP_FEATURE_SCALE = os.getenv("VTG_MAP_FEATURE_SCALE", "50m").strip().lower()
+if MAP_FEATURE_SCALE not in {"10m", "50m", "110m"}:
+    MAP_FEATURE_SCALE = "50m"
 REQUEST_HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -751,7 +754,7 @@ def kma_now_url(settings: Settings, endpoint_url: str, typ_number: int | None) -
     return f"{endpoint_url}?{urlencode(params)}"
 
 
-def normalize_kma_now_time(value: str) -> str:
+def normalize_utc_stamp(value: str) -> str:
     text = str(value or "").strip().split(".", 1)[0]
     if len(text) >= 12 and text[:12].isdigit():
         return text[:12]
@@ -773,9 +776,9 @@ def kma_now_row_numbers(row: list[str]) -> set[int]:
 
 
 def kma_now_row_time(row: list[str], data_time: str) -> str:
-    target = normalize_kma_now_time(data_time)
+    target = normalize_utc_stamp(data_time)
     for value in row:
-        time_text = normalize_kma_now_time(value)
+        time_text = normalize_utc_stamp(value)
         if time_text and time_text[:10] == target[:10]:
             return time_text
     return ""
@@ -1526,17 +1529,8 @@ def parse_ft_time(series: pd.Series) -> pd.Series:
     return pd.to_datetime(clean, format="%Y%m%d%H%M", errors="coerce")
 
 
-def normalize_history_time(value: str) -> str:
-    text = str(value or "").strip().split(".", 1)[0]
-    if len(text) >= 12 and text[:12].isdigit():
-        return text[:12]
-    if len(text) >= 10 and text[:10].isdigit():
-        return f"{text[:10]}00"
-    return ""
-
-
 def history_time_to_datetime(value: str) -> datetime | None:
-    text = normalize_history_time(value)
+    text = normalize_utc_stamp(value)
     if not text:
         return None
     try:
@@ -1657,7 +1651,7 @@ def load_track_history(settings: Settings) -> dict:
 
 def history_point_payload(point: AnalysisPoint) -> dict:
     payload = {
-        "time_utc": normalize_history_time(point.time_utc),
+        "time_utc": normalize_utc_stamp(point.time_utc),
         "lat": round(float(point.lat), 4),
         "lon": round(float(point.lon), 4),
         "source": point.source,
@@ -1673,7 +1667,7 @@ def history_point_payload(point: AnalysisPoint) -> dict:
 
 def upsert_history_point(history: dict, point: dict | AnalysisPoint) -> bool:
     payload = history_point_payload(point) if isinstance(point, AnalysisPoint) else dict(point)
-    payload["time_utc"] = normalize_history_time(str(payload.get("time_utc") or ""))
+    payload["time_utc"] = normalize_utc_stamp(str(payload.get("time_utc") or ""))
     if not payload["time_utc"]:
         return False
     try:
@@ -1685,7 +1679,7 @@ def upsert_history_point(history: dict, point: dict | AnalysisPoint) -> bool:
 
     points = history.setdefault("points", [])
     for index, existing in enumerate(points):
-        if normalize_history_time(str(existing.get("time_utc") or "")) != payload["time_utc"]:
+        if normalize_utc_stamp(str(existing.get("time_utc") or "")) != payload["time_utc"]:
             continue
         existing_priority = analysis_source_priority(str(existing.get("source") or ""))
         payload_priority = analysis_source_priority(payload["source"])
@@ -1728,7 +1722,7 @@ def save_track_history(settings: Settings, history: dict, *, original: dict) -> 
     history["aliases"] = sorted(aliases)
     history["points"] = sorted(
         filter_history_points_for_settings(settings, history.get("points", [])),
-        key=lambda item: normalize_history_time(str(item.get("time_utc") or "")),
+        key=lambda item: normalize_utc_stamp(str(item.get("time_utc") or "")),
     )
     if history == original:
         return
@@ -1745,7 +1739,7 @@ def save_track_history(settings: Settings, history: dict, *, original: dict) -> 
 def cli_analysis_point(settings: Settings) -> AnalysisPoint | None:
     if settings.analysis_lat is None or settings.analysis_lon is None:
         return None
-    time_utc = normalize_history_time(settings.analysis_time or settings.data_time)
+    time_utc = normalize_utc_stamp(settings.analysis_time or settings.data_time)
     if not time_utc or time_utc[:10] != settings.data_time[:10]:
         print(
             "Warning: analysis point time does not match data_time; "
@@ -1781,7 +1775,7 @@ def kma_start_analysis_point(df: pd.DataFrame, settings: Settings) -> AnalysisPo
     elif not source:
         source = "MODEL_0H_MEAN"
     return AnalysisPoint(
-        time_utc=normalize_history_time(str(row.get("FT_TM(UTC)") or settings.data_time)),
+        time_utc=normalize_utc_stamp(str(row.get("FT_TM(UTC)") or settings.data_time)),
         lat=lat,
         lon=lon,
         source=source,
@@ -1801,7 +1795,7 @@ def official_points_from_past_kma(past_kma: pd.DataFrame) -> list[AnalysisPoint]
             lon = float(row["LON"])
         except (TypeError, ValueError):
             continue
-        time_utc = normalize_history_time(str(row.get("FT_TM(UTC)") or ""))
+        time_utc = normalize_utc_stamp(str(row.get("FT_TM(UTC)") or ""))
         if not time_utc:
             continue
         points.append(AnalysisPoint(time_utc=time_utc, lat=lat, lon=lon, source="KMA_OFFICIAL"))
@@ -1811,7 +1805,7 @@ def official_points_from_past_kma(past_kma: pd.DataFrame) -> list[AnalysisPoint]
 def history_to_past_track(history: dict, current_dt: datetime | None) -> pd.DataFrame:
     rows = []
     for point in history.get("points", []):
-        time_utc = normalize_history_time(str(point.get("time_utc") or ""))
+        time_utc = normalize_utc_stamp(str(point.get("time_utc") or ""))
         if not time_utc:
             continue
         try:
@@ -3078,16 +3072,6 @@ def system_metadata_dir(settings: Settings) -> Path:
     return system_output_dir(settings) / "metadata"
 
 
-def system_metadata_dir_for_key(settings: Settings, key: str) -> Path:
-    parts = str(key or "").split("_")
-    if len(parts) >= 3 and parts[1].isdigit() and parts[2].isdigit():
-        stage = "TD" if parts[0].lower() == "td" else "TYP"
-        number = int(parts[2])
-        name = settings.typ_name if stage == "TYP" else "NONAME"
-        return settings.output_root / parts[1] / system_dir_name_for_parts(parts[1], stage, number, name) / "metadata"
-    return system_metadata_dir(settings)
-
-
 def output_path(settings: Settings) -> Path:
     cyclone_id = tc_id(settings)
     stage = settings.storm_stage.upper()
@@ -3814,9 +3798,9 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     header_ax.set_axis_off()
     header_ax.set_facecolor("none")
 
-    ax.add_feature(cfeature.OCEAN.with_scale("10m"), zorder=0, facecolor="#262626", edgecolor="none")
-    ax.add_feature(cfeature.LAND.with_scale("10m"), zorder=0, facecolor="#656565")
-    ax.add_feature(cfeature.BORDERS.with_scale("10m"), edgecolor="gray", linestyle="-", linewidth=1)
+    ax.add_feature(cfeature.OCEAN.with_scale(MAP_FEATURE_SCALE), zorder=0, facecolor="#262626", edgecolor="none")
+    ax.add_feature(cfeature.LAND.with_scale(MAP_FEATURE_SCALE), zorder=0, facecolor="#656565")
+    ax.add_feature(cfeature.BORDERS.with_scale(MAP_FEATURE_SCALE), edgecolor="gray", linestyle="-", linewidth=1)
 
     gl = ax.gridlines(draw_labels=True, color="gray", alpha=0.3)
     gl.top_labels = False
@@ -3898,15 +3882,6 @@ def draw_header(
         zorder=100,
     )
 
-    fig.canvas.draw()
-    bbox = title_text.get_window_extent().transformed(ax.transAxes.inverted())
-    storm_x = bbox.x1 + 0.004
-
-    if storm_number:
-        ax.text(storm_x, 0.966, storm_number, transform=ax.transAxes, fontsize=17.5 if not display_name else 16.5,
-                color="#AAF7F4", fontweight="700", fontfamily=PLOT_FONT_FAMILY, verticalalignment="top",
-                horizontalalignment="left", zorder=100)
-
     start = df.loc[(df["SRC"] == "KMA") & (df["TMD"] == 0), "TYP_TM(UTC)"].dropna()
     start_time = str(start.iloc[0]).split(".")[0] if not start.empty else settings.data_time
     start_date = f"{start_time[:4]}-{start_time[4:6]}-{start_time[6:8]}"
@@ -3926,16 +3901,34 @@ def draw_header(
             fontsize=34, color="white", fontweight="1000", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="top", horizontalalignment=right_header_ha, zorder=100,
             bbox=dict(boxstyle="square,pad=0.5", facecolor="none", linewidth=0))
-    ax.text(0.024, 0.932, "VORTEX TRACK GUIDANCE", transform=ax.transAxes,
-            fontsize=22.5, color="white", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
-            verticalalignment="top", zorder=100,
-            bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
-    fig.canvas.draw()
-    guidance_probe = ax.text(0.024, 0.932, "VORTEX TRACK GUIDANCE", transform=ax.transAxes,
-                             fontsize=22.5, fontweight="800", fontfamily=PLOT_FONT_FAMILY, alpha=0)
-    fig.canvas.draw()
-    guidance_bbox = guidance_probe.get_window_extent().transformed(ax.transAxes.inverted())
-    guidance_probe.remove()
+    guidance_text = ax.text(
+        0.024,
+        0.932,
+        "VORTEX TRACK GUIDANCE",
+        transform=ax.transAxes,
+        fontsize=22.5,
+        color="white",
+        fontweight="800",
+        fontfamily=PLOT_FONT_FAMILY,
+        verticalalignment="top",
+        zorder=100,
+        bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0),
+    )
+
+    # Measure text directly through the backend renderer. Calling canvas.draw()
+    # here would render the full Cartopy map before savefig renders it again.
+    get_renderer = getattr(fig.canvas, "get_renderer", None)
+    if get_renderer is None:
+        fig.canvas.draw()
+        renderer = None
+    else:
+        renderer = get_renderer()
+    title_bbox = title_text.get_window_extent(renderer=renderer).transformed(ax.transAxes.inverted())
+    guidance_bbox = guidance_text.get_window_extent(renderer=renderer).transformed(ax.transAxes.inverted())
+    if storm_number:
+        ax.text(title_bbox.x1 + 0.004, 0.966, storm_number, transform=ax.transAxes,
+                fontsize=17.5 if not display_name else 16.5, color="#AAF7F4", fontweight="700",
+                fontfamily=PLOT_FONT_FAMILY, verticalalignment="top", horizontalalignment="left", zorder=100)
     ax.text(guidance_bbox.x1 + 0.006, 0.932, "+", transform=ax.transAxes,
             fontsize=22.5, color="white", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="top", zorder=100,

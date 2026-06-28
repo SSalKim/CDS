@@ -156,6 +156,13 @@ jobs:
           cache: pip
           cache-dependency-path: requirements-vtg.txt
 
+      - name: Restore Cartopy map cache
+        if: ${{ env.RUNNER_KIND != 'self-hosted' }}
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/cartopy
+          key: cartopy-natural-earth-50m-v1
+
       - name: Prepare self-hosted Python
         if: ${{ env.RUNNER_KIND == 'self-hosted' }}
         run: |
@@ -233,13 +240,6 @@ jobs:
             echo "run_step_needed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Install system dependencies
-        if: ${{ steps.vtg_precheck.outputs.deps_needed == 'true' && env.RUNNER_KIND != 'self-hosted' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libgeos-dev libproj-dev proj-bin proj-data fonts-nanum
-          fc-cache -f
-
       - name: Install Python dependencies
         if: ${{ steps.vtg_precheck.outputs.deps_needed == 'true' }}
         run: |
@@ -251,11 +251,10 @@ jobs:
               echo "Self-hosted Python requirements unchanged; skipping pip install."
               exit 0
             fi
-            python -m pip install -r requirements-vtg.txt
+            python -m pip install --only-binary=:all: -r requirements-vtg.txt
             echo "$req_hash" > "$hash_file"
           else
-            python -m pip install --upgrade pip
-            python -m pip install -r requirements-vtg.txt
+            python -m pip install --only-binary=:all: -r requirements-vtg.txt
           fi
 
       - name: Run VTG automation
@@ -344,9 +343,13 @@ jobs:
           CHANGED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths.txt"
           FILTERED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths_existing.txt"
           touch "$CHANGED_PATHS_FILE"
-          echo "Supplementing generated changed-path list with current VTG data git status."
-          git diff --name-only -- data VTG_IMG >> "$CHANGED_PATHS_FILE" || true
-          git ls-files --others --exclude-standard -- data >> "$CHANGED_PATHS_FILE" || true
+          if [ -n "$MANUAL_VTG_ARGS" ]; then
+            echo "Manual VTG run: discovering generated paths from git status."
+            git diff --name-only -- data VTG_IMG >> "$CHANGED_PATHS_FILE" || true
+            git ls-files --others --exclude-standard -- data >> "$CHANGED_PATHS_FILE" || true
+          else
+            echo "Automatic VTG run: using the exact changed-path list from vtg_auto.py."
+          fi
           sort -u "$CHANGED_PATHS_FILE" -o "$CHANGED_PATHS_FILE"
 
           : > "$FILTERED_PATHS_FILE"
