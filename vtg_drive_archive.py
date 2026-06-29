@@ -83,6 +83,9 @@ def metadata_int(value: Any) -> int | None:
 
 
 def storm_key_from_metadata(metadata: dict) -> str:
+    canonical = str(metadata.get("canonical_storm_key") or "").strip().lower()
+    if canonical:
+        return canonical
     data_time = str(metadata.get("data_time") or "")
     year = str(metadata.get("storm_year") or data_time[:4] or "").strip()
     number = metadata_int(metadata.get("typ_number"))
@@ -180,14 +183,25 @@ def collect_archive_candidates(
     manifest: dict,
     archived_images: dict[str, dict],
     active_recency_hours: float,
+    target_storm_key: str = "",
+    target_is_officially_ended: bool = False,
+    target_system_dir: Path | None = None,
 ) -> list[ArchiveCandidate]:
     active_data_times = active_window_data_times(manifest)
     now = utc_now()
     candidates: dict[str, ArchiveCandidate] = {}
 
-    for metadata_path in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/*/metadata/runs/*.json")):
+    metadata_paths = (
+        sorted((target_system_dir / "metadata" / "runs").glob("*.json"))
+        if target_system_dir is not None
+        else sorted(output_root.glob("[0-9][0-9][0-9][0-9]/*/metadata/runs/*.json"))
+    )
+    for metadata_path in metadata_paths:
         metadata = load_json(metadata_path, None)
         if not isinstance(metadata, dict):
+            continue
+        storm_key = storm_key_from_metadata(metadata)
+        if target_storm_key and storm_key != target_storm_key:
             continue
         image_path = normalize_asset_path(metadata.get("image_path") or "")
         if not image_path or not image_path.lower().endswith(".png"):
@@ -195,7 +209,7 @@ def collect_archive_candidates(
         local_path = local_path_for_asset(image_path, output_root)
         if not local_path.exists():
             continue
-        if metadata_is_active(
+        if not target_is_officially_ended and metadata_is_active(
             metadata,
             active_data_times=active_data_times,
             now=now,
@@ -210,7 +224,7 @@ def collect_archive_candidates(
             image_path=image_path,
             local_path=local_path,
             data_time=str(metadata.get("data_time") or ""),
-            storm_key=storm_key_from_metadata(metadata),
+            storm_key=storm_key,
             size=size,
         )
 
@@ -287,7 +301,17 @@ class DriveClient:
             timeout=60,
         )
         if response.status_code >= 400:
-            raise RuntimeError(f"Google OAuth token refresh failed: HTTP {response.status_code} {response.text[:500]}")
+            details = response.text[:500]
+            try:
+                error_code = str(response.json().get("error") or "")
+            except (TypeError, ValueError):
+                error_code = ""
+            if error_code == "invalid_grant":
+                details += (
+                    " The refresh token has expired or was revoked. If the OAuth app is in Testing, "
+                    "publish it as In production, authorize again, and replace GOOGLE_DRIVE_REFRESH_TOKEN."
+                )
+            raise RuntimeError(f"Google OAuth token refresh failed: HTTP {response.status_code} {details}")
         payload = response.json()
         access_token = str(payload.get("access_token") or "").strip()
         if not access_token:
@@ -530,12 +554,18 @@ def append_changed_paths(path: Path | None, changed_paths: set[str]) -> None:
 
 
 def build_archive_manifest(base_payload: dict, images: dict[str, dict], *, folder_id: str) -> dict:
-    return {
-        "version": 1,
+    payload = {
+        key: value
+        for key, value in base_payload.items()
+        if key not in {"version", "updated_at_utc", "drive_folder_id", "images"}
+    }
+    payload.update({
+        "version": max(1, int(base_payload.get("version") or 1)),
         "updated_at_utc": format_utc_stamp(),
         "drive_folder_id": folder_id,
         "images": {path: images[path] for path in sorted(images)},
-    }
+    })
+    return payload
 
 
 def load_archive_manifests(output_root: Path, explicit_path: Path | None) -> tuple[dict[Path, dict], dict[str, dict]]:
@@ -551,6 +581,34 @@ def load_archive_manifests(output_root: Path, explicit_path: Path | None) -> tup
     return payloads, merged_images
 
 
+def archive_target_state(
+    output_root: Path,
+    storm_key: str,
+) -> tuple[Path | None, dict]:
+    normalized_key = str(storm_key or "").strip().lower()
+    if not normalized_key:
+        return None, {}
+    for path in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/*/metadata/archive_status.json")):
+        status = load_json(path, {})
+        if isinstance(status, dict) and str(status.get("storm_key") or "").strip().lower() == normalized_key:
+            return path.parent.parent / "drive_archive.json", status
+    return None, {}
+
+
+def target_has_unarchived_local_images(
+    target_archive_path: Path | None,
+    archived_images: dict[str, dict],
+) -> bool:
+    if target_archive_path is None:
+        return False
+    image_dir = target_archive_path.parent / "images"
+    for path in image_dir.glob("*.png"):
+        image_path = relative_asset_path(path)
+        if not archived_images.get(image_path, {}).get("file_id"):
+            return True
+    return False
+
+
 def run(args: argparse.Namespace) -> int:
     if args.repair_only:
         args.repair_permissions = True
@@ -559,12 +617,28 @@ def run(args: argparse.Namespace) -> int:
     manifest = load_json(manifest_path, {})
     if not isinstance(manifest, dict):
         manifest = {}
-    archive_payloads, archived_images = load_archive_manifests(output_root, args.archive_manifest_path)
+    target_storm_key = str(args.storm_key or "").strip().lower()
+    target_archive_path, target_status = archive_target_state(output_root, target_storm_key)
+    target_is_officially_ended = bool(
+        target_storm_key
+        and isinstance(target_status, dict)
+        and str(target_status.get("official_status") or "").strip().lower() == "ended"
+    )
+    if target_storm_key and not target_is_officially_ended:
+        raise SystemExit(
+            f"Refusing targeted archive for {target_storm_key}: "
+            "its per-system metadata/archive_status.json does not confirm official_status=ended."
+        )
+    archive_manifest_path = target_archive_path if target_storm_key else args.archive_manifest_path
+    archive_payloads, archived_images = load_archive_manifests(output_root, archive_manifest_path)
     candidates = collect_archive_candidates(
         output_root=output_root,
         manifest=manifest,
         archived_images=archived_images,
         active_recency_hours=args.active_recency_hours,
+        target_storm_key=target_storm_key,
+        target_is_officially_ended=target_is_officially_ended,
+        target_system_dir=target_archive_path.parent if target_archive_path is not None else None,
     )
     already_archived = [item for item in candidates if archived_images.get(item.image_path, {}).get("file_id")]
     upload_candidates = [item for item in candidates if item not in already_archived]
@@ -586,6 +660,8 @@ def run(args: argparse.Namespace) -> int:
         "already_archived_count": len(already_archived),
         "upload_candidate_count": len(upload_candidates),
         "upload_candidate_bytes": total_upload_bytes,
+        "target_storm_key": target_storm_key,
+        "target_is_officially_ended": target_is_officially_ended,
         "auth_mode": "oauth_refresh_token" if str(args.oauth_refresh_token or "").strip() else "service_account",
         "delete_local_after_upload": bool(args.delete_local_after_upload),
         "repair_permissions": bool(args.repair_permissions),
@@ -669,6 +745,10 @@ def run(args: argparse.Namespace) -> int:
             changed_paths.add(relative_asset_path(archive_manifest_path))
 
     append_changed_paths(args.changed_paths_file, changed_paths)
+    target_incomplete = bool(
+        target_storm_key
+        and target_has_unarchived_local_images(target_archive_path, archived_images)
+    )
     print(json.dumps({
         "uploaded_count": uploaded_count,
         "reused_count": reused_count,
@@ -676,8 +756,9 @@ def run(args: argparse.Namespace) -> int:
         "deleted_local_count": deleted_count,
         "archive_manifest_count": len(touched_archive_paths),
         "changed_path_count": len(changed_paths),
+        "target_incomplete": target_incomplete,
     }, ensure_ascii=False, indent=2))
-    return 0
+    return 2 if target_incomplete else 0
 
 
 def parse_args() -> argparse.Namespace:
@@ -685,6 +766,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-root", type=Path, default=DEFAULT_OUTPUT_ROOT)
     parser.add_argument("--manifest-path", type=Path, default=None)
     parser.add_argument("--archive-manifest-path", type=Path, default=None, help="Legacy single archive manifest path. Default writes per-system drive_archive.json files.")
+    parser.add_argument("--storm-key", default="", help="Archive only one officially ended canonical system, for example typ_2026_07.")
     parser.add_argument("--service-account-json", default=os.getenv("GOOGLE_DRIVE_SERVICE_ACCOUNT_JSON", ""))
     parser.add_argument("--service-account-json-file", type=Path, default=None)
     parser.add_argument("--oauth-client-id", default=os.getenv("GOOGLE_DRIVE_CLIENT_ID", ""))
