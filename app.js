@@ -1835,20 +1835,15 @@ imageRefreshToken=''
 
 let seq=++imagePreloadSeq;
 let count=currentForecastList.length || 1;
-let preloadOrder=getForecastPreloadOrder(count);
+let priorityIndex=forecastTimelineState.clampIndex(Number(slider.value || 0));
+let preloadOrder=getForecastPreloadOrder(count).filter(index=>index!==priorityIndex);
 let availableCount=0;
 resetForecastImageCache();
 setAllForecastLoadStates(count,'loading');
 renderForecastTimeline();
 setViewerLoading(forecastTimelineState.getLoadState(Number(slider.value || 0))!=='available','이미지 로딩 중');
 
-await CDSImagePipeline.runConcurrentRange({
-count:preloadOrder.length,
-concurrency:IMAGE_PRELOAD_CONCURRENCY,
-isCancelled:()=>seq!==imagePreloadSeq,
-task:async orderIndex=>{
-let i=preloadOrder[orderIndex];
-let result=await preloadForecastIndex(i,seq,{imageRefreshToken});
+let applyPreloadResult=(index,result)=>{
 
 if(seq!==imagePreloadSeq || result.cancelled){
 return false;
@@ -1858,15 +1853,40 @@ if(result.ok){
 availableCount++;
 }
 
-setForecastLoadState(i,result.ok ? 'available' : 'missing');
-setForecastImageCacheEntry(i,{
+setForecastLoadState(index,result.ok ? 'available' : 'missing');
+setForecastImageCacheEntry(index,{
 urls:result.urls,
 baseUrls:result.baseUrls,
 ok:result.ok,
 quiet:!!result.quiet,
 future:!!result.future
 });
-updateForecastSegmentState(i);
+updateForecastSegmentState(index);
+return true;
+
+};
+
+let priorityResult=await preloadForecastIndex(priorityIndex,seq,{imageRefreshToken});
+
+if(!applyPreloadResult(priorityIndex,priorityResult)){
+return;
+}
+
+if(priorityIndex===Number(slider.value || 0)){
+await displayCurrentForecastImage();
+}
+
+await CDSImagePipeline.runConcurrentRange({
+count:preloadOrder.length,
+concurrency:IMAGE_PRELOAD_CONCURRENCY,
+isCancelled:()=>seq!==imagePreloadSeq,
+task:async orderIndex=>{
+let i=preloadOrder[orderIndex];
+let result=await preloadForecastIndex(i,seq,{imageRefreshToken});
+
+if(!applyPreloadResult(i,result)){
+return false;
+}
 
 if(i===Number(slider.value || 0)){
 displayCurrentForecastImage();

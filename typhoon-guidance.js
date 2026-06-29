@@ -1314,7 +1314,7 @@ input.onchange=async()=>{
 let requestId=++typhoonState.selectionLoadSeq;
 let currentDataTime=getSelectedTyphoonDataTime();
 typhoonState.selectedFcstHours=option.hours;
-selectLatestSlotForStorm(currentDataTime);
+selectDefaultSlotForStorm(currentDataTime);
 renderTyphoonSelects();
 renderTyphoonTimeline();
 setTyphoonViewerLoading(true);
@@ -1479,7 +1479,7 @@ if(requestId!==typhoonState.selectionLoadSeq){
 return;
 }
 rebuildTyphoonEntries();
-selectLatestSlotForStorm();
+selectDefaultSlotForStorm();
 renderTyphoonSelects();
 renderTyphoonTimeline();
 await preloadTyphoonStormImages(typhoonState.selectedStormKey,typhoonState.selectedFcstHours,{
@@ -2098,7 +2098,7 @@ typhoonState.selectedSlotIndex=preferredSlotIndex;
 }
 // Initial summary entries and the full storm manifest can have different slot counts.
 else if(!preferredDataTime || typhoonState.selectedSlotIndex<0 || typhoonState.selectedSlotIndex>=typhoonState.slots.length || !typhoonState.slots[typhoonState.selectedSlotIndex]?.entry){
-selectLatestSlotForStorm();
+selectDefaultSlotForStorm();
 }
 }
 
@@ -2345,31 +2345,44 @@ let stormKey=String(run?.stormKey || '');
 if(!stormKey){
 return isActiveTyphoonStormEntry(run,activeWindowTimes);
 }
+return isActiveTyphoonStorm(stormKey,activeWindowTimes);
+}
+
+function isActiveTyphoonStorm(stormKey,activeWindowTimes=typhoonActiveWindowDataTimes()){
+let normalizedStormKey=String(stormKey || '');
+if(!normalizedStormKey){
+return false;
+}
 let storms=Array.isArray(typhoonState.storms) ? typhoonState.storms : [];
-if(storms.some(storm=>storm.key===stormKey && storm.active)){
+if(storms.some(storm=>storm.key===normalizedStormKey && storm.active)){
 return true;
 }
 let entries=Array.isArray(typhoonState.entries) ? typhoonState.entries : [];
-return entries.some(entry=>entry.stormKey===stormKey && isActiveTyphoonStormEntry(entry,activeWindowTimes));
+return entries.some(entry=>entry.stormKey===normalizedStormKey && isActiveTyphoonStormEntry(entry,activeWindowTimes));
 }
 
 function selectDefaultStormForYear(){
 let storms=buildTyphoonStormsForYear(typhoonState.selectedYear);
 typhoonState.storms=storms;
 typhoonState.selectedStormKey=storms.length ? storms[0].key : '';
-selectLatestSlotForStorm();
+selectDefaultSlotForStorm();
 }
 
-function selectLatestSlotForStorm(preferredDataTime=''){
+function selectDefaultSlotForStorm(preferredDataTime=''){
 typhoonState.slots=buildTyphoonSlotsForStorm(typhoonState.selectedStormKey);
+let firstAvailable=-1;
 let latestAvailable=-1;
 typhoonState.slots.forEach((slot,index)=>{
 if(slot.entry){
+if(firstAvailable<0){
+firstAvailable=index;
+}
 latestAvailable=index;
 }
 });
 let preferredIndex=preferredDataTime ? typhoonState.slots.findIndex(slot=>slot.dataTime===preferredDataTime && slot.entry) : -1;
-typhoonState.selectedSlotIndex=Math.max(0,preferredIndex>=0 ? preferredIndex : latestAvailable);
+let defaultIndex=isActiveTyphoonStorm(typhoonState.selectedStormKey) ? latestAvailable : firstAvailable;
+typhoonState.selectedSlotIndex=Math.max(0,preferredIndex>=0 ? preferredIndex : defaultIndex);
 }
 
 function getSelectedTyphoonSlot(){
