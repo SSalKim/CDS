@@ -15,12 +15,14 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
+from functools import lru_cache
 from pathlib import Path
 from typing import Iterable
 from urllib.parse import urlencode
 
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
+from cartopy.io import shapereader
 import matplotlib.font_manager as fm
 import matplotlib.lines as mlines
 import matplotlib.patches as mpatches
@@ -376,6 +378,7 @@ MAP_FEATURE_SCALE = os.getenv("VTG_MAP_FEATURE_SCALE", "10m").strip().lower()
 if MAP_FEATURE_SCALE not in {"10m", "50m", "110m"}:
     MAP_FEATURE_SCALE = "10m"
 ATCF_RECENT_RANGE_BYTES = 2 * 1024 * 1024
+HOKKAIDO_EAST_BORDER_MASK = (145.0, 42.8, 146.2, 45.0)
 REQUEST_HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -3833,6 +3836,42 @@ def finalize_map_extent(
     return legacy_extent
 
 
+def bounds_intersect(left: tuple[float, float, float, float], right: tuple[float, float, float, float]) -> bool:
+    left_min_x, left_min_y, left_max_x, left_max_y = left
+    right_min_x, right_min_y, right_max_x, right_max_y = right
+    return not (
+        left_max_x < right_min_x
+        or left_min_x > right_max_x
+        or left_max_y < right_min_y
+        or left_min_y > right_max_y
+    )
+
+
+def hide_hokkaido_east_border_record(record) -> bool:
+    attributes = record.attributes
+    if attributes.get("FEATURECLA") != "Disputed (please verify)":
+        return False
+    if attributes.get("TYPE") != "Water Indicator":
+        return False
+    geometry = record.geometry
+    return geometry is not None and bounds_intersect(geometry.bounds, HOKKAIDO_EAST_BORDER_MASK)
+
+
+@lru_cache(maxsize=3)
+def filtered_country_borders(scale: str) -> cfeature.ShapelyFeature:
+    path = shapereader.natural_earth(
+        resolution=scale,
+        category="cultural",
+        name="admin_0_boundary_lines_land",
+    )
+    geometries = tuple(
+        record.geometry
+        for record in shapereader.Reader(path).records()
+        if record.geometry is not None and not hide_hokkaido_east_border_record(record)
+    )
+    return cfeature.ShapelyFeature(geometries, ccrs.PlateCarree(), facecolor="none")
+
+
 def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, intensity: str) -> Path:
     df = df.copy()
     df["FT_TIME"] = parse_ft_time(df["FT_TM(UTC)"])
@@ -3905,7 +3944,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
 
     ax.add_feature(cfeature.OCEAN.with_scale(MAP_FEATURE_SCALE), zorder=0, facecolor="#262626", edgecolor="none")
     ax.add_feature(cfeature.LAND.with_scale(MAP_FEATURE_SCALE), zorder=0, facecolor="#656565")
-    ax.add_feature(cfeature.BORDERS.with_scale(MAP_FEATURE_SCALE), edgecolor="gray", linestyle="-", linewidth=1)
+    ax.add_feature(filtered_country_borders(MAP_FEATURE_SCALE), edgecolor="gray", linestyle="-", linewidth=1)
 
     gl = ax.gridlines(draw_labels=True, color="gray", alpha=0.3)
     gl.top_labels = False
