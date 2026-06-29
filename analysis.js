@@ -1166,12 +1166,12 @@ const ANALYSIS_DETAIL_PATTERN_MAP={
   },
   "typh:surf": {
     "kim_anal": {
-      "satir1": "kim_surf_anlmod_satir1_typh_{run}.gif",
-      "satir3": "kim_surf_anlmod_satir3_typh_{run}.gif"
+      "satir1": "kim_surf_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "kim_surf_anlmod_satir3_typh_pb4_{run}.gif"
     },
     "um_anal": {
-      "satir1": "surf_anlmod_satir1_typh_{run}.gif",
-      "satir3": "surf_anlmod_satir3_typh_{run}.gif"
+      "satir1": "surf_anlmod_satir1_typh_pb4_{run}.gif",
+      "satir3": "surf_anlmod_satir3_typh_pb4_{run}.gif"
     }
   },
   "typh:up92": {
