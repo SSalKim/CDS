@@ -3366,6 +3366,15 @@ def print_process_output_tail(
         print(stdout_tail, file=sys.stderr)
 
 
+def print_process_timings(stdout: str | None, *, prefix: str) -> None:
+    timing_lines = [line for line in str(stdout or "").splitlines() if line.startswith("[timing]")]
+    if not timing_lines:
+        return
+    print(f"--- {prefix} timing ---")
+    for line in timing_lines:
+        print(line)
+
+
 def looks_like_transient_network_error(text: str) -> bool:
     haystack = str(text or "").lower()
     markers = (
@@ -3570,6 +3579,7 @@ def run_vtg_batch(
         retries=1,
         retry_delay_seconds=60,
     )
+    print_process_timings(completed.stdout, prefix=f"VTG.py {job.storm_key}")
     log_timing(f"VTG.py {job.storm_key} hours={','.join(str(item) for item in metadata_paths)}", timing_started_at)
     results: dict[int, dict] = {}
     for fcst_hours, metadata_path in metadata_paths.items():

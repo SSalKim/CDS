@@ -372,9 +372,10 @@ TRACK_HISTORY_MAX_LOOKBACK_DAYS = 45
 PROJECT_ROOT = Path(__file__).resolve().parent
 PLOT_FONT_FAMILY = "DejaVu Sans"
 PREFERRED_PLOT_FONT_FILE = PROJECT_ROOT / "fonts" / "NanumSquareB.ttf"
-MAP_FEATURE_SCALE = os.getenv("VTG_MAP_FEATURE_SCALE", "50m").strip().lower()
+MAP_FEATURE_SCALE = os.getenv("VTG_MAP_FEATURE_SCALE", "10m").strip().lower()
 if MAP_FEATURE_SCALE not in {"10m", "50m", "110m"}:
-    MAP_FEATURE_SCALE = "50m"
+    MAP_FEATURE_SCALE = "10m"
+ATCF_RECENT_RANGE_BYTES = 2 * 1024 * 1024
 REQUEST_HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -954,6 +955,11 @@ def read_text_file(path: Path | None) -> str | None:
         return None
 
 
+def log_timing(label: str, started_at: float, **details) -> None:
+    suffix = " ".join(f"{key}={value}" for key, value in details.items())
+    print(f"[timing] {label}: {time.monotonic() - started_at:.1f}s{(' ' + suffix) if suffix else ''}")
+
+
 def fetch_text(
     session: requests.Session,
     url: str,
@@ -980,10 +986,88 @@ def fetch_text(
             text = response.text
             write_cached_text(cache_path, text)
             return text
+        except requests.exceptions.HTTPError as exc:
+            print(f"[attempt {attempt}/{retries}] request failed: {url} ({exc})")
+            status_code = exc.response.status_code if exc.response is not None else None
+            if status_code is not None and 400 <= status_code < 500 and status_code not in {408, 429}:
+                break
+            if attempt < retries:
+                time.sleep(retry_delay)
         except requests.exceptions.RequestException as exc:
             print(f"[attempt {attempt}/{retries}] request failed: {url} ({exc})")
             if attempt < retries:
                 time.sleep(retry_delay)
+    return None
+
+
+def atcf_cycle_from_line(line: str) -> str:
+    parts = line.split(",", 3)
+    return parts[2].strip() if len(parts) >= 3 else ""
+
+
+def filter_atcf_cycle_text(text: str, target_cycle: str) -> tuple[str, list[str]]:
+    lines = text.splitlines()
+    cycles = [cycle for line in lines if (cycle := atcf_cycle_from_line(line)).isdigit() and len(cycle) == 10]
+    selected = [line for line in lines if atcf_cycle_from_line(line) == target_cycle]
+    return ("\n".join(selected) + ("\n" if selected else "")), cycles
+
+
+def fetch_recent_atcf_cycle_text(
+    session: requests.Session,
+    url: str,
+    target_cycle: str,
+    *,
+    cache_dir: Path | None,
+    cache_ttl_seconds: int,
+    timeout: float = 15,
+) -> str | None:
+    cycle_cache_path = http_cache_path(cache_dir, f"{url}#cycle={target_cycle}")
+    cached = read_cached_text(cycle_cache_path, ttl_seconds=cache_ttl_seconds)
+    if cached is not None:
+        return cached
+
+    try:
+        head = session.head(url, timeout=timeout, allow_redirects=True)
+        head.raise_for_status()
+        content_length = int(head.headers.get("Content-Length") or 0)
+        supports_ranges = "bytes" in str(head.headers.get("Accept-Ranges") or "").lower()
+    except (requests.exceptions.RequestException, TypeError, ValueError):
+        return None
+
+    if not supports_ranges or content_length <= ATCF_RECENT_RANGE_BYTES:
+        return None
+
+    range_start = max(0, content_length - ATCF_RECENT_RANGE_BYTES)
+    try:
+        response = session.get(
+            url,
+            headers={"Range": f"bytes={range_start}-{content_length - 1}"},
+            timeout=timeout,
+        )
+        response.raise_for_status()
+    except requests.exceptions.RequestException:
+        return None
+    if response.status_code != 206:
+        return None
+
+    selected_text, cycles = filter_atcf_cycle_text(response.content.decode("utf-8", errors="replace"), target_cycle)
+    if not cycles:
+        return None
+    minimum_cycle = min(cycles)
+    maximum_cycle = max(cycles)
+    has_complete_lower_boundary = range_start == 0 or minimum_cycle < target_cycle
+    has_complete_upper_boundary = (
+        maximum_cycle > target_cycle
+        or response.headers.get("Content-Range", "").endswith(f"/{content_length}")
+    )
+    if selected_text:
+        if has_complete_lower_boundary and has_complete_upper_boundary:
+            write_cached_text(cycle_cache_path, selected_text)
+            return selected_text
+        return None
+    if minimum_cycle <= target_cycle <= maximum_cycle or target_cycle > maximum_cycle:
+        write_cached_text(cycle_cache_path, "")
+        return ""
     return None
 
 
@@ -1282,23 +1366,44 @@ def read_atcf_csv(text: str | None, *, source: str, skiprows: int = 0) -> pd.Dat
 
 def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
-    with ThreadPoolExecutor(max_workers=4) as executor:
-        futures = {
-            executor.submit(
-                fetch_text,
+    url_specs = atcf_urls(settings)
+    target_cycle = settings.data_time[:10]
+
+    def fetch_source(source: str, url: str) -> str | None:
+        if source in {"NOAA", "RAL.UCAR"}:
+            recent_text = fetch_recent_atcf_cycle_text(
                 session,
                 url,
-                retries=2,
-                timeout=15,
+                target_cycle,
                 cache_dir=settings.http_cache_dir,
                 cache_ttl_seconds=settings.http_cache_ttl_seconds,
-            ): (source, url, skiprows)
-            for source, url, skiprows in atcf_urls(settings)
+            )
+            if recent_text is not None:
+                return recent_text
+        return fetch_text(
+            session,
+            url,
+            retries=2,
+            timeout=15,
+            cache_dir=settings.http_cache_dir,
+            cache_ttl_seconds=settings.http_cache_ttl_seconds,
+        )
+
+    with ThreadPoolExecutor(max_workers=min(8, len(url_specs))) as executor:
+        futures = {
+            executor.submit(fetch_source, source, url): (source, url, skiprows, time.monotonic())
+            for source, url, skiprows in url_specs
         }
         for future in as_completed(futures):
-            source, url, skiprows = futures[future]
+            source, url, skiprows, started_at = futures[future]
             try:
                 frame = read_atcf_csv(future.result(), source=source, skiprows=skiprows)
+                log_timing(
+                    f"ATCF source {source}",
+                    started_at,
+                    rows=len(frame),
+                    file=url.rsplit("/", 1)[-1],
+                )
                 if not frame.empty:
                     frames.append(frame)
             except Exception as exc:
@@ -4208,17 +4313,21 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
 
 
 def main() -> None:
+    main_started_at = time.monotonic()
     settings = parse_args()
     if not settings.auth_key:
         raise SystemExit("KMA_APIHUB_AUTH_KEY or --auth-key is required.")
 
+    stage_started_at = time.monotonic()
     configure_plot_fonts()
+    log_timing("configure plot fonts", stage_started_at, scale=MAP_FEATURE_SCALE)
     requested_hours = settings.fcst_hours_options or (settings.fcst_hours,)
     fetch_hour = max(settings.fcst_hours, 240) if settings.auto_fcst_hours else max(requested_hours)
     fetch_settings = replace(settings, fcst_hours=fetch_hour)
 
     with requests.Session() as session:
         session.headers.update(REQUEST_HEADERS)
+        stage_started_at = time.monotonic()
         kma_forecast_text = read_text_file(fetch_settings.kma_forecast_text_path)
         if kma_forecast_text is None:
             kma_forecast_text = fetch_text(
@@ -4232,16 +4341,30 @@ def main() -> None:
                 cache_ttl_seconds=fetch_settings.http_cache_ttl_seconds,
             )
         kma_df = read_kma_csv(kma_forecast_text, fetch_settings, forecast_only=True)
+        log_timing("load KMA forecast", stage_started_at, rows=len(kma_df))
+
+        stage_started_at = time.monotonic()
         fetch_settings = settings_with_bdeck_analysis_if_needed(session, fetch_settings, kma_df)
+        log_timing("resolve analysis point", stage_started_at)
         if kma_df.empty and not fetch_settings.skip_atcf:
             print(
                 "KMA APIHUB has no forecast model rows for this storm/time; "
                 "trying DMDW/ATCF guidance sources."
             )
+        stage_started_at = time.monotonic()
         dmdw_df = read_dmdw_data(fetch_settings)
+        log_timing("load DMDW guidance", stage_started_at, rows=len(dmdw_df))
+
+        stage_started_at = time.monotonic()
         atcf_df = empty_atcf_frame() if fetch_settings.skip_atcf else fetch_atcf_data(session, fetch_settings)
+        log_timing("load ATCF guidance", stage_started_at, rows=len(atcf_df))
+
+        stage_started_at = time.monotonic()
         source_availability_raw_df = source_availability_frame(kma_df, dmdw_df, atcf_df, fetch_settings)
         df = normalize_track_data(kma_df, dmdw_df, atcf_df, fetch_settings)
+        log_timing("normalize guidance", stage_started_at, rows=len(df))
+
+        stage_started_at = time.monotonic()
         try:
             write_source_availability_outputs(
                 raw_df=source_availability_raw_df,
@@ -4252,7 +4375,9 @@ def main() -> None:
             )
         except Exception as exc:
             print(f"Warning: failed to write source availability metadata: {exc}")
+        log_timing("write source availability", stage_started_at)
 
+        stage_started_at = time.monotonic()
         kma_past_text = read_text_file(fetch_settings.kma_past_text_path)
         if kma_past_text is None:
             kma_past_text = fetch_text(
@@ -4266,12 +4391,15 @@ def main() -> None:
                 cache_ttl_seconds=fetch_settings.http_cache_ttl_seconds,
             )
         past_kma = build_past_kma_track(read_kma_csv(kma_past_text, fetch_settings, forecast_only=False))
+        log_timing("load KMA past track", stage_started_at, rows=len(past_kma))
 
+    stage_started_at = time.monotonic()
     past_kma = update_and_merge_past_track(
         df=df,
         official_past=past_kma,
         settings=fetch_settings,
     )
+    log_timing("update track history", stage_started_at, rows=len(past_kma))
 
     if df.empty:
         reason = "No forecast data matched the requested storm/time/model configuration."
@@ -4292,6 +4420,7 @@ def main() -> None:
                     reason=reason,
                 )
             print(f"{fcst_hours}h: {reason}")
+        log_timing("VTG.py total", main_started_at)
         return
 
     if settings.auto_fcst_hours:
@@ -4321,8 +4450,15 @@ def main() -> None:
             print(f"{fcst_hours}h: {reason}")
             continue
 
+        stage_started_at = time.monotonic()
         target = plot_guidance(hour_df, past_kma, hour_settings, intensity)
+        log_timing(
+            f"render {fcst_hours}h image",
+            stage_started_at,
+            models=len(plotted_model_names(hour_df, hour_settings)),
+        )
         if metadata_path:
+            stage_started_at = time.monotonic()
             write_run_metadata(
                 metadata_path,
                 target=target,
@@ -4330,7 +4466,10 @@ def main() -> None:
                 settings=hour_settings,
                 intensity=intensity,
             )
+            log_timing(f"write {fcst_hours}h metadata", stage_started_at)
         print(f"Saved: {target}")
+
+    log_timing("VTG.py total", main_started_at)
 
 
 if __name__ == "__main__":
