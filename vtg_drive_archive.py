@@ -177,6 +177,20 @@ def metadata_is_active(metadata: dict, *, active_data_times: set[str], now: date
     return -6.0 <= diff_hours <= recency_hours
 
 
+def system_manifest_metadata(system_dir: Path) -> list[dict]:
+    payload = load_json(system_dir / "manifest.json", {})
+    inventory = payload.get("inventory") if isinstance(payload, dict) else None
+    if not isinstance(inventory, list):
+        return []
+    records: list[dict] = []
+    for entry in inventory:
+        result = entry.get("result") if isinstance(entry, dict) else None
+        metadata = result.get("metadata") if isinstance(result, dict) else None
+        if isinstance(metadata, dict):
+            records.append(metadata)
+    return records
+
+
 def collect_archive_candidates(
     *,
     output_root: Path,
@@ -191,13 +205,15 @@ def collect_archive_candidates(
     now = utc_now()
     candidates: dict[str, ArchiveCandidate] = {}
 
-    metadata_paths = (
-        sorted((target_system_dir / "metadata" / "runs").glob("*.json"))
+    metadata_records = system_manifest_metadata(target_system_dir) if target_system_dir is not None else []
+    metadata_paths = sorted(
+        (target_system_dir / "metadata" / "runs").glob("*.json")
         if target_system_dir is not None
-        else sorted(output_root.glob("[0-9][0-9][0-9][0-9]/*/metadata/runs/*.json"))
+        else output_root.glob("[0-9][0-9][0-9][0-9]/*/metadata/runs/*.json")
     )
-    for metadata_path in metadata_paths:
-        metadata = load_json(metadata_path, None)
+    metadata_records.extend(load_json(path, None) for path in metadata_paths)
+
+    for metadata in metadata_records:
         if not isinstance(metadata, dict):
             continue
         storm_key = storm_key_from_metadata(metadata)
@@ -595,18 +611,15 @@ def archive_target_state(
     return None, {}
 
 
-def target_has_unarchived_local_images(
-    target_archive_path: Path | None,
+def candidates_are_incomplete(
+    candidates: list[ArchiveCandidate],
     archived_images: dict[str, dict],
 ) -> bool:
-    if target_archive_path is None:
-        return False
-    image_dir = target_archive_path.parent / "images"
-    for path in image_dir.glob("*.png"):
-        image_path = relative_asset_path(path)
-        if not archived_images.get(image_path, {}).get("file_id"):
-            return True
-    return False
+    return any(
+        candidate.local_path.exists()
+        and not archived_images.get(candidate.image_path, {}).get("file_id")
+        for candidate in candidates
+    )
 
 
 def run(args: argparse.Namespace) -> int:
@@ -747,7 +760,7 @@ def run(args: argparse.Namespace) -> int:
     append_changed_paths(args.changed_paths_file, changed_paths)
     target_incomplete = bool(
         target_storm_key
-        and target_has_unarchived_local_images(target_archive_path, archived_images)
+        and candidates_are_incomplete(candidates, archived_images)
     )
     print(json.dumps({
         "uploaded_count": uploaded_count,

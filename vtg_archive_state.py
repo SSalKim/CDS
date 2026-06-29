@@ -349,6 +349,7 @@ def command_mark(args: argparse.Namespace) -> int:
         state["failure_reason"] = str(args.message or "Archive workflow failed.")[:500]
     elif args.state == "pending":
         state.pop("failure_reason", None)
+        state.pop("failed_at_utc", None)
 
     changed_paths: set[str] = set()
     save_archive_state(system_dir, state, changed_paths)
