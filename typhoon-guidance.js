@@ -608,6 +608,8 @@ storms:[],
 slots:[],
 selectedYear:'',
 selectedStormKey:'',
+pendingStormKey:'',
+stormSelectFocused:false,
 selectedSlotIndex:0,
 selectedFcstHours:120,
 timer:null,
@@ -710,7 +712,26 @@ yearSelect.onchange=event=>handleTyphoonYearChange(event.target.value);
 let stormSelect=document.createElement('select');
 stormSelect.className='typhoon-storm-select';
 stormSelect.dataset.role='stormSelect';
-stormSelect.onchange=event=>handleTyphoonStormChange(event.target.value);
+stormSelect.onfocus=()=>{
+typhoonState.stormSelectFocused=true;
+};
+stormSelect.onchange=event=>{
+typhoonState.stormSelectFocused=true;
+stageTyphoonStormSelection(event.target.value);
+};
+stormSelect.onblur=commitStagedTyphoonStormSelection;
+stormSelect.onfocusout=commitStagedTyphoonStormSelection;
+
+root.onfocusin=event=>{
+if(event.target!==stormSelect){
+commitStagedTyphoonStormSelection();
+}
+};
+root.onclick=event=>{
+if(!stormSelect.contains(event.target)){
+commitStagedTyphoonStormSelection();
+}
+};
 
 controls.appendChild(yearSelect);
 controls.appendChild(stormSelect);
@@ -1402,7 +1423,7 @@ syncTyphoonSelection({
 preferredYear:previousYear,
 preferredStormKey:previousStormKey,
 preferredDataTime:previousDataTime,
-selectDefaultStorm:Boolean(previousStormKey)
+selectDefaultStorm:true
 });
 renderTyphoonSelects();
 await ensureTyphoonYearIndex(typhoonState.selectedYear);
@@ -1444,26 +1465,45 @@ async function handleTyphoonYearChange(year){
 let root=typhoonState.root;
 let requestId=++typhoonState.selectionLoadSeq;
 typhoonState.selectedYear=String(year || '');
-typhoonState.selectedStormKey='';
+typhoonState.pendingStormKey='';
+typhoonState.stormSelectFocused=false;
 typhoonState.selectedSlotIndex=0;
 root?.classList.add('typhoon-loading-state');
 rebuildTyphoonEntries();
-syncTyphoonSelection({preferredYear:typhoonState.selectedYear,selectDefaultStorm:false});
-renderTyphoonEmpty('태풍을 선택하세요');
+syncTyphoonSelection({preferredYear:typhoonState.selectedYear,selectDefaultStorm:true});
+typhoonState.pendingStormKey=typhoonState.selectedStormKey;
+renderTyphoonSelects();
 try{
 await ensureTyphoonYearIndex(typhoonState.selectedYear);
 await loadTyphoonImpactMapsForYears([typhoonState.selectedYear]);
 rebuildTyphoonEntries();
-syncTyphoonSelection({preferredYear:typhoonState.selectedYear,selectDefaultStorm:false});
+syncTyphoonSelection({preferredYear:typhoonState.selectedYear,selectDefaultStorm:true});
 if(requestId!==typhoonState.selectionLoadSeq){
 return;
 }
 pruneTyphoonImageCache();
-renderTyphoonEmpty('태풍을 선택하세요');
+renderTyphoonSelects();
+typhoonState.pendingStormKey=typhoonState.selectedStormKey;
 }
 finally{
 root?.classList.remove('typhoon-loading-state');
 }
+}
+
+function stageTyphoonStormSelection(stormKey){
+typhoonState.selectedStormKey=String(stormKey || '');
+typhoonState.pendingStormKey=typhoonState.selectedStormKey;
+typhoonState.selectedSlotIndex=0;
+}
+
+function commitStagedTyphoonStormSelection(){
+let stormKey=String(typhoonState.pendingStormKey || '');
+if(!stormKey || !typhoonState.stormSelectFocused){
+return;
+}
+typhoonState.pendingStormKey='';
+typhoonState.stormSelectFocused=false;
+void handleTyphoonStormChange(stormKey);
 }
 
 async function handleTyphoonStormChange(stormKey){
@@ -2234,7 +2274,7 @@ return compareTyphoonStormRecency(a,b);
 let aIsTyp=a.stage!=='TD';
 let bIsTyp=b.stage!=='TD';
 if(aIsTyp!==bIsTyp){
-return aIsTyp ? -1 : 1;
+return compareTyphoonStormRecency(a,b);
 }
 if(aIsTyp){
 return (
@@ -2371,17 +2411,22 @@ selectDefaultSlotForStorm();
 function selectDefaultSlotForStorm(preferredDataTime=''){
 typhoonState.slots=buildTyphoonSlotsForStorm(typhoonState.selectedStormKey);
 let firstAvailable=-1;
+let firstTypAvailable=-1;
 let latestAvailable=-1;
 typhoonState.slots.forEach((slot,index)=>{
 if(slot.entry){
 if(firstAvailable<0){
 firstAvailable=index;
 }
+if(firstTypAvailable<0 && slot.entry.stage!=='TD' && slot.entry.originalStage!=='TD'){
+firstTypAvailable=index;
+}
 latestAvailable=index;
 }
 });
 let preferredIndex=preferredDataTime ? typhoonState.slots.findIndex(slot=>slot.dataTime===preferredDataTime && slot.entry) : -1;
-let defaultIndex=isActiveTyphoonStorm(typhoonState.selectedStormKey) ? latestAvailable : firstAvailable;
+let endedDefaultIndex=firstTypAvailable>=0 ? firstTypAvailable : firstAvailable;
+let defaultIndex=isActiveTyphoonStorm(typhoonState.selectedStormKey) ? latestAvailable : endedDefaultIndex;
 typhoonState.selectedSlotIndex=Math.max(0,preferredIndex>=0 ? preferredIndex : defaultIndex);
 }
 
@@ -2475,14 +2520,6 @@ yearSelect.appendChild(option);
 yearSelect.value=typhoonState.selectedYear;
 
 stormSelect.innerHTML='';
-if(!typhoonState.selectedStormKey){
-let placeholder=document.createElement('option');
-placeholder.value='';
-placeholder.textContent='태풍 선택';
-placeholder.disabled=true;
-placeholder.selected=true;
-stormSelect.appendChild(placeholder);
-}
 typhoonState.storms.forEach(storm=>{
 let option=document.createElement('option');
 option.value=storm.key;
