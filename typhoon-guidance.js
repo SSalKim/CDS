@@ -608,8 +608,6 @@ storms:[],
 slots:[],
 selectedYear:'',
 selectedStormKey:'',
-pendingStormKey:'',
-stormSelectFocused:false,
 selectedSlotIndex:0,
 selectedFcstHours:120,
 timer:null,
@@ -712,26 +710,7 @@ yearSelect.onchange=event=>handleTyphoonYearChange(event.target.value);
 let stormSelect=document.createElement('select');
 stormSelect.className='typhoon-storm-select';
 stormSelect.dataset.role='stormSelect';
-stormSelect.onfocus=()=>{
-typhoonState.stormSelectFocused=true;
-};
-stormSelect.onchange=event=>{
-typhoonState.stormSelectFocused=true;
-stageTyphoonStormSelection(event.target.value);
-};
-stormSelect.onblur=commitStagedTyphoonStormSelection;
-stormSelect.onfocusout=commitStagedTyphoonStormSelection;
-
-root.onfocusin=event=>{
-if(event.target!==stormSelect){
-commitStagedTyphoonStormSelection();
-}
-};
-root.onclick=event=>{
-if(!stormSelect.contains(event.target)){
-commitStagedTyphoonStormSelection();
-}
-};
+stormSelect.onchange=event=>handleTyphoonStormChange(event.target.value);
 
 controls.appendChild(yearSelect);
 controls.appendChild(stormSelect);
@@ -1341,7 +1320,8 @@ renderTyphoonTimeline();
 setTyphoonViewerLoading(true);
 try{
 await preloadTyphoonStormImages(typhoonState.selectedStormKey,option.hours,{
-isCancelled:()=>requestId!==typhoonState.selectionLoadSeq
+isCancelled:()=>requestId!==typhoonState.selectionLoadSeq,
+onPriorityLoaded:()=>renderPriorityTyphoonSelection(requestId)
 });
 if(requestId!==typhoonState.selectionLoadSeq){
 return;
@@ -1364,6 +1344,16 @@ group.appendChild(label);
 });
 
 return group;
+}
+
+async function renderPriorityTyphoonSelection(requestId){
+if(requestId!==typhoonState.selectionLoadSeq){
+return;
+}
+await renderTyphoonSelectedRun();
+if(requestId===typhoonState.selectionLoadSeq){
+setTyphoonViewerLoading(false);
+}
 }
 
 async function loadTyphoonManifest(){
@@ -1434,7 +1424,14 @@ rebuildTyphoonEntries();
 syncTyphoonSelection({preferredYear:previousYear,preferredStormKey:previousStormKey,preferredDataTime:previousDataTime});
 renderTyphoonSelects();
 renderTyphoonTimeline();
-await preloadTyphoonStormImages(typhoonState.selectedStormKey,typhoonState.selectedFcstHours);
+let requestId=typhoonState.selectionLoadSeq;
+await preloadTyphoonStormImages(typhoonState.selectedStormKey,typhoonState.selectedFcstHours,{
+isCancelled:()=>requestId!==typhoonState.selectionLoadSeq,
+onPriorityLoaded:()=>renderPriorityTyphoonSelection(requestId)
+});
+if(requestId!==typhoonState.selectionLoadSeq){
+return;
+}
 await renderTyphoonManifest();
 }
 catch(error){
@@ -1465,13 +1462,10 @@ async function handleTyphoonYearChange(year){
 let root=typhoonState.root;
 let requestId=++typhoonState.selectionLoadSeq;
 typhoonState.selectedYear=String(year || '');
-typhoonState.pendingStormKey='';
-typhoonState.stormSelectFocused=false;
 typhoonState.selectedSlotIndex=0;
 root?.classList.add('typhoon-loading-state');
 rebuildTyphoonEntries();
 syncTyphoonSelection({preferredYear:typhoonState.selectedYear,selectDefaultStorm:true});
-typhoonState.pendingStormKey=typhoonState.selectedStormKey;
 renderTyphoonSelects();
 try{
 await ensureTyphoonYearIndex(typhoonState.selectedYear);
@@ -1483,32 +1477,16 @@ return;
 }
 pruneTyphoonImageCache();
 renderTyphoonSelects();
-typhoonState.pendingStormKey=typhoonState.selectedStormKey;
 }
 finally{
 root?.classList.remove('typhoon-loading-state');
 }
 }
 
-function stageTyphoonStormSelection(stormKey){
-typhoonState.selectedStormKey=String(stormKey || '');
-typhoonState.pendingStormKey=typhoonState.selectedStormKey;
-typhoonState.selectedSlotIndex=0;
-}
-
-function commitStagedTyphoonStormSelection(){
-let stormKey=String(typhoonState.pendingStormKey || '');
-if(!stormKey || !typhoonState.stormSelectFocused){
-return;
-}
-typhoonState.pendingStormKey='';
-typhoonState.stormSelectFocused=false;
-void handleTyphoonStormChange(stormKey);
-}
-
 async function handleTyphoonStormChange(stormKey){
 let root=typhoonState.root;
 let requestId=++typhoonState.selectionLoadSeq;
+let preferredDataTime=getSelectedTyphoonDataTime();
 typhoonState.selectedStormKey=String(stormKey || '');
 typhoonState.selectedSlotIndex=0;
 root?.classList.add('typhoon-loading-state');
@@ -1519,11 +1497,12 @@ if(requestId!==typhoonState.selectionLoadSeq){
 return;
 }
 rebuildTyphoonEntries();
-selectDefaultSlotForStorm();
+selectDefaultSlotForStorm(preferredDataTime);
 renderTyphoonSelects();
 renderTyphoonTimeline();
 await preloadTyphoonStormImages(typhoonState.selectedStormKey,typhoonState.selectedFcstHours,{
-isCancelled:()=>requestId!==typhoonState.selectionLoadSeq
+isCancelled:()=>requestId!==typhoonState.selectionLoadSeq,
+onPriorityLoaded:()=>renderPriorityTyphoonSelection(requestId)
 });
 if(requestId!==typhoonState.selectionLoadSeq){
 return;
@@ -3147,7 +3126,10 @@ return promise;
 
 }
 
-async function preloadTyphoonStormImages(stormKey,fcstHours,{isCancelled=()=>false}={}){
+async function preloadTyphoonStormImages(stormKey,fcstHours,{
+isCancelled=()=>false,
+onPriorityLoaded=null
+}={}){
 let runs=[];
 let seen=new Set();
 let horizon=typhoonCacheHorizon(fcstHours);
@@ -3162,15 +3144,40 @@ return;
 seen.add(key);
 runs.push(run);
 });
+let total=runs.length;
+let loaded=0;
+let priorityRun=getSelectedTyphoonRun();
+let priorityKey=getTyphoonRunCacheKey(priorityRun);
+let priorityIndex=priorityKey ? runs.findIndex(run=>getTyphoonRunCacheKey(run)===priorityKey) : -1;
+
+if(priorityIndex>=0){
+priorityRun=runs.splice(priorityIndex,1)[0];
+await ensureTyphoonDriveArchiveImagesForRun(priorityRun);
+if(isCancelled()){
+return {total,loaded,cancelled:true};
+}
+let result=await loadTyphoonCachedImage(priorityRun);
+if(result?.ok){
+loaded++;
+}
+if(isCancelled()){
+return {total,loaded,cancelled:true};
+}
+if(typeof onPriorityLoaded==='function'){
+await onPriorityLoaded(priorityRun,result);
+}
+if(isCancelled()){
+return {total,loaded,cancelled:true};
+}
+}
 
 let archivePaths=[...new Set(runs.map(typhoonDriveArchivePathForRun).filter(Boolean))];
 await Promise.all(archivePaths.map(path=>ensureTyphoonDriveArchiveImagesForPath(path)));
 if(isCancelled()){
-return {total:runs.length,loaded:0,cancelled:true};
+return {total,loaded,cancelled:true};
 }
 
 let nextIndex=0;
-let loaded=0;
 let worker=async()=>{
 while(nextIndex<runs.length && !isCancelled()){
 let index=nextIndex++;
@@ -3183,7 +3190,7 @@ loaded++;
 let workerCount=Math.min(TYPHOON_IMAGE_PRELOAD_CONCURRENCY,runs.length);
 await Promise.all(Array.from({length:workerCount},worker));
 pruneTyphoonImageCache();
-return {total:runs.length,loaded,cancelled:isCancelled()};
+return {total,loaded,cancelled:isCancelled()};
 }
 
 function createTyphoonStatusPanel(message,{hidden=false}={}){
