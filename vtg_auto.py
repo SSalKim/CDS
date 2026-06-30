@@ -486,7 +486,16 @@ def write_cached_kma_rows(cache_dir: Path | None, endpoint: str, year: int, rows
 
 def fetch_kma_list_text(endpoint: str, year: int, auth_key: str, *, cache_dir: Path | None) -> str | None:
     try:
-        return fetch_text(kma_list_url(endpoint, year, auth_key), timeout=20, retries=2, retry_delay=5.0)
+        # Activity lists change whenever a TD forms or a storm changes stage.
+        # The persisted parsed-row cache below is only an outage fallback; never
+        # let the generic HTTP cache hide a newly issued system for up to 6 hours.
+        return fetch_text(
+            kma_list_url(endpoint, year, auth_key),
+            timeout=20,
+            retries=2,
+            retry_delay=5.0,
+            use_cache=False,
+        )
     except HTTPError as exc:
         if exc.code < 500:
             raise
@@ -4621,6 +4630,14 @@ def main() -> int:
     for year in sorted(years):
         td_rows.extend(fetch_td_rows(year, args.auth_key, cache_dir=kma_cache_dir))
         typ_rows.extend(fetch_typ_rows(year, args.auth_key, cache_dir=kma_cache_dir))
+
+    latest_td_number = max((safe_int(row.get("TD")) or 0 for row in td_rows), default=0)
+    latest_typ_number = max((safe_int(row.get("SEQ")) or 0 for row in typ_rows), default=0)
+    print(
+        "KMA activity lists: "
+        f"td_rows={len(td_rows)} latest_td={latest_td_number:02d} "
+        f"typ_rows={len(typ_rows)} latest_typ={latest_typ_number:02d}"
+    )
 
     td_typ_links = td_typ_link_lookup(td_rows, typ_rows)
 
