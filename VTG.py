@@ -98,25 +98,25 @@ MODEL_SOURCES = [
     {"name": "UM", "apihub": "UM", "noaa": None},
     {"name": "UM_GFDL_6h", "apihub": "UM_GFDL_6h", "noaa": None},
     {"name": "UM_KEPS", "apihub": "UM_KEPS", "noaa": None},
-    {"name": "UKM", "apihub": "UKX", "noaa": "UKM", "ftp_nhc": "EGRR", "ral_ucar": "UKM"},
-    {"name": "UKMO_EPS", "apihub": "EGRR_EPS", "noaa": "UEMN", "ftp_nhc": "UEMN"},
-    {"name": "GFS", "apihub": "GFS", "noaa": "AVNO", "ftp_nhc": "AVNO"},
-    {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "ftp_nhc": "AEMN", "ral_ucar": "AEMN"},
+    {"name": "UKM", "apihub": "UKX", "noaa": "UKM", "ral_ucar": "UKM"},
+    {"name": "UKMO_EPS", "apihub": "EGRR_EPS", "noaa": "UEMN"},
+    {"name": "GFS", "apihub": "GFS", "noaa": "AVNO"},
+    {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "ral_ucar": "AEMN"},
     {"name": "CMC", "apihub": "CMC", "noaa": "CMC", "ral_ucar": "CMC"},
-    {"name": "CMC_EPS", "apihub": "CMC_EPS", "noaa": "CEMN", "ftp_nhc": "CEMN", "ral_ucar": "CEMN"},
-    {"name": "JGSM", "apihub": "JGSM", "noaa": "JGSM", "ftp_nhc": "JGSM"},
-    {"name": "TEPS", "apihub": "TEPS", "noaa": "JENS", "ftp_nhc": "JENS"},
-    {"name": "NAVGEM", "apihub": "NAVGEM", "noaa": "NVGM", "ftp_nhc": "NVGM", "ral_ucar": "NVGM"},
+    {"name": "CMC_EPS", "apihub": "CMC_EPS", "noaa": "CEMN", "ral_ucar": "CEMN"},
+    {"name": "JGSM", "apihub": "JGSM", "noaa": "JGSM"},
+    {"name": "TEPS", "apihub": "TEPS", "noaa": "JENS"},
+    {"name": "NAVGEM", "apihub": "NAVGEM", "noaa": "NVGM", "ral_ucar": "NVGM"},
     {"name": "FNMOC_EPS", "apihub": "FNMOC_EPS", "noaa": "NEMN", "ral_ucar": "NEMN"},
-    {"name": "CTCX", "apihub": None, "noaa": "CTCX", "ftp_nhc": "CTCX"},
-    {"name": "COAMPS_EPS", "apihub": None, "noaa": "CTMN", "ftp_nhc": "CTMN"},
-    {"name": "AFUM", "apihub": None, "noaa": "AFUM", "ftp_nhc": "AFUM"},
-    {"name": "HWRF", "apihub": "HWRF", "noaa": "HWRF", "ftp_nhc": "HWRF"},
-    {"name": "HAFS", "apihub": "HAFS", "noaa": "HFSA", "ftp_nhc": "HFSA"},
-    {"name": "ECMWF_AIFS", "apihub": "ECMWF_AIFS", "noaa": "AIFS", "ftp_nhc": "AIFS"},
-    {"name": "ECMWF_AIFS_EPS", "apihub": None, "noaa": "EAIM", "ftp_nhc": "EAIM"},
-    {"name": "AGFS", "apihub": None, "noaa": "AGFS", "ftp_nhc": "AGFS"},
-    {"name": "AIGEFS", "apihub": None, "noaa": "AIMN", "ftp_nhc": "AIMN"},
+    {"name": "CTCX", "apihub": None, "noaa": "CTCX"},
+    {"name": "COAMPS_EPS", "apihub": None, "noaa": "CTMN"},
+    {"name": "AFUM", "apihub": None, "noaa": "AFUM"},
+    {"name": "HWRF", "apihub": "HWRF", "noaa": "HWRF"},
+    {"name": "HAFS", "apihub": "HAFS", "noaa": "HFSA"},
+    {"name": "ECMWF_AIFS", "apihub": "ECMWF_AIFS", "noaa": "AIFS"},
+    {"name": "ECMWF_AIFS_EPS", "apihub": None, "noaa": "EAIM"},
+    {"name": "AGFS", "apihub": None, "noaa": "AGFS"},
+    {"name": "AIGEFS", "apihub": None, "noaa": "AIMN"},
     {"name": "IFEC_AI", "apihub": "IFEC_AI", "noaa": None},
     {"name": "IFKM_AI", "apihub": "IFKM_AI", "noaa": None},
     {"name": "FNEC_AI", "apihub": "FNEC_AI", "noaa": None},
@@ -129,7 +129,7 @@ MODEL_SOURCES = [
     {"name": "GCKM_AI", "apihub": "GCKM_AI", "noaa": None},
     {"name": "GCUM_AI", "apihub": "GCUM_AI", "noaa": None},
     {"name": "GENC", "apihub": None, "noaa": None, "raw_github": "GENC"},
-    {"name": "FNV3", "apihub": None, "noaa": "FGNE", "ftp_nhc": "FGNE", "raw_github": "FNV3"},
+    {"name": "FNV3", "apihub": None, "noaa": "FGNE", "raw_github": "FNV3"},
     {"name": "HKO_AREC", "apihub": "HKO_AREC", "noaa": None},
     {"name": "HKO_FXEC", "apihub": "HKO_FXEC", "noaa": None},
     {"name": "HKO_FWEC", "apihub": "HKO_FWEC", "noaa": None},
@@ -255,16 +255,15 @@ MODEL_TRACK_MAX_SPEED_KMH = float(os.getenv("VTG_MODEL_TRACK_MAX_SPEED_KMH", "10
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
-SOURCE_ORDER = ("APIHUB", "DMDW", "NOAA", "FTP.NHC", "RAL.UCAR", "RAW.GITHUB")
+SOURCE_ORDER = ("APIHUB", "DMDW", "NOAA", "RAL.UCAR", "RAW.GITHUB")
 MODEL_SOURCE_PRIORITY_OVERRIDES = {
-    "GENC": ("RAW.GITHUB", "APIHUB", "DMDW", "NOAA", "FTP.NHC", "RAL.UCAR"),
-    "FNV3": ("RAW.GITHUB", "APIHUB", "DMDW", "NOAA", "FTP.NHC", "RAL.UCAR"),
+    "GENC": ("RAW.GITHUB", "APIHUB", "DMDW", "NOAA", "RAL.UCAR"),
+    "FNV3": ("RAW.GITHUB", "APIHUB", "DMDW", "NOAA", "RAL.UCAR"),
 }
 SOURCE_DISPLAY_NAMES = {
     "APIHUB": "KMA APIHUB",
     "DMDW": "KMA DMDW",
     "NOAA": "NOAA ATCF",
-    "FTP.NHC": "FTP.NHC ATCF",
     "RAL.UCAR": "RAL UCAR ATCF",
     "RAW.GITHUB": "GITHUB",
 }
@@ -277,10 +276,6 @@ SOURCE_ALIASES = {
     "ATCF": "NOAA",
     "NCEP": "NOAA",
     "NOAAATCF": "NOAA",
-    "FTPNHC": "FTP.NHC",
-    "NHCFTP": "FTP.NHC",
-    "NHC": "FTP.NHC",
-    "NHCATCF": "FTP.NHC",
     "RALUCAR": "RAL.UCAR",
     "UCAR": "RAL.UCAR",
     "RAL": "RAL.UCAR",
@@ -295,7 +290,6 @@ SOURCE_IDENTIFIER_COLUMNS = {
     "APIHUB": "apihub",
     "DMDW": "dmdw",
     "NOAA": "noaa",
-    "FTP.NHC": "ftp_nhc",
     "RAL.UCAR": "ral_ucar",
     "RAW.GITHUB": "raw_github",
 }
@@ -1295,27 +1289,15 @@ def ral_ucar_url(atcf_id: str) -> str:
     )
 
 
-def ftp_nhc_atcf_url(atcf_id: str) -> str:
-    atcf_id = str(atcf_id or "").strip().lower()
-    return f"https://ftp.nhc.noaa.gov/atcf/jtwc/a{atcf_id}.dat"
-
-
 def bdeck_url(atcf_id: str) -> str:
     atcf_id = str(atcf_id or "").strip().lower()
     return f"https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/b{atcf_id}.dat"
-
-
-def ftp_nhc_bdeck_url(atcf_id: str) -> str:
-    atcf_id = str(atcf_id or "").strip().lower()
-    return f"https://ftp.nhc.noaa.gov/atcf/jtwc/b{atcf_id}.dat"
 
 
 def atcf_urls(settings: Settings) -> list[tuple[str, str, int]]:
     urls = []
     for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
         urls.append(("NOAA", f"https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/a{atcf_id}.dat", 0))
-    for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
-        urls.append(("FTP.NHC", ftp_nhc_atcf_url(atcf_id), 0))
     for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
         urls.append(("RAL.UCAR", ral_ucar_url(atcf_id), 0))
     urls.extend([
@@ -1509,25 +1491,6 @@ def select_bdeck_analysis_row(
     if not noaa_exact.empty:
         return noaa_exact.iloc[0], "NOAA"
 
-    ftp_frame = fetch_bdeck_analysis_candidates(
-        session,
-        settings,
-        url=ftp_nhc_bdeck_url(settings.atcf_id),
-        max_offset_hours=max_offset_hours,
-    )
-    ftp_exact = exact_bdeck_rows(ftp_frame)
-    if not ftp_exact.empty:
-        print(
-            "BDECK exact analysis point missing from NOAA source; "
-            f"using FTP.NHC for {settings.atcf_id} at {settings.data_time}."
-        )
-        return ftp_exact.iloc[0], "FTP.NHC"
-    if not ftp_frame.empty:
-        print(
-            "BDECK exact analysis point missing from NOAA source; "
-            f"using nearest FTP.NHC point for {settings.atcf_id} at {settings.data_time}."
-        )
-        return ftp_frame.iloc[0], "FTP.NHC"
     if not noaa_frame.empty:
         return noaa_frame.iloc[0], "NOAA"
     return None

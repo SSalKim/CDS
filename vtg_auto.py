@@ -26,11 +26,9 @@ KMA_LIST_BASE_URL = "https://apihub-pub.kma.go.kr/api/typ01/url"
 TD_LIST_ENDPOINT = "td_lst.php"
 TYP_LIST_ENDPOINT = "typ_lst.php"
 NOAA_BDECK_URL = "https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/b{atcf_id}.dat"
-FTP_NHC_BDECK_URL = "https://ftp.nhc.noaa.gov/atcf/jtwc/b{atcf_id}.dat"
 NRL_ATCF_SECTOR_URL = "https://science.nrlmry.navy.mil/geoips/tcdat/sectors/atcf_sector_file"
 BDECK_SOURCE_URLS = (
     ("NOAA", NOAA_BDECK_URL),
-    ("FTP.NHC", FTP_NHC_BDECK_URL),
 )
 KMA_GTS_NOW_URL = f"{KMA_LIST_BASE_URL}/typ_gts_now.php"
 KMA_TYP_NOW_URL = f"{KMA_LIST_BASE_URL}/typ_now.php"
@@ -1303,28 +1301,8 @@ def fetch_bdeck_text_for_reference_time(
     if text and bdeck_track_points(text, reference_time=reference_time):
         return text
 
-    ftp_text = fetch_bdeck_text_from_source(
-        normalized,
-        source="FTP.NHC",
-        url_template=FTP_NHC_BDECK_URL,
-        timeout=timeout,
-    )
-    if ftp_text and bdeck_track_points(ftp_text, reference_time=reference_time):
-        BDECK_FETCH_STATS["fallbacks"] += 1
-        print(
-            "BDECK exact-time point missing from NOAA source; "
-            f"using FTP.NHC for {normalized} at {reference_time[:10]}."
-        )
-        BDECK_TEXT_CACHE[normalized] = ftp_text
-        return ftp_text
-
     if text:
         return text
-
-    if ftp_text:
-        BDECK_FETCH_STATS["fallbacks"] += 1
-        BDECK_TEXT_CACHE[normalized] = ftp_text
-        return ftp_text
 
     BDECK_TEXT_CACHE[normalized] = None
     return None
