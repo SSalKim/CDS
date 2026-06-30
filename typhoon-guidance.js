@@ -1372,6 +1372,7 @@ try{
 let previousYear=typhoonState.selectedYear;
 let previousStormKey=typhoonState.selectedStormKey;
 let previousDataTime=getSelectedTyphoonDataTime();
+let hasPreviousStormSelection=Boolean(previousStormKey);
 let manifest=null;
 let status=null;
 let manifestError=null;
@@ -1418,7 +1419,15 @@ selectDefaultStorm:true
 renderTyphoonSelects();
 await ensureTyphoonYearIndex(typhoonState.selectedYear);
 await loadTyphoonImpactMapsForYears([typhoonState.selectedYear]);
-syncTyphoonSelection({preferredYear:previousYear,preferredStormKey:previousStormKey,preferredDataTime:previousDataTime});
+if(!hasPreviousStormSelection){
+typhoonState.selectedStormKey='';
+}
+syncTyphoonSelection({
+preferredYear:previousYear,
+preferredStormKey:previousStormKey,
+preferredDataTime:previousDataTime,
+selectDefaultStorm:true
+});
 await ensureSelectedTyphoonStormManifest();
 rebuildTyphoonEntries();
 syncTyphoonSelection({preferredYear:previousYear,preferredStormKey:previousStormKey,preferredDataTime:previousDataTime});
