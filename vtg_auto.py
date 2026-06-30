@@ -4925,7 +4925,7 @@ def main() -> int:
         status_path=status_path,
         split_manifest_paths=split_paths,
         include_manifest=should_write_outputs,
-        include_status=status_changed,
+        include_status=status_changed or actual_run_count > 0,
     )
     changed_paths.extend(relative_asset_path(path) for path in canonicalized_paths)
     changed_paths.extend(relative_asset_path(path) for path in kma_cache_asset_paths(kma_cache_dir, years))
