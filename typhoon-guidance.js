@@ -2513,15 +2513,15 @@ let option=document.createElement('option');
 option.value=storm.key;
 option.textContent=storm.label;
 let optionClasses=[];
-let allowStormHighlight=storm.stage!=='TD';
-if(allowStormHighlight && storm.impact){
+let allowImpactHighlight=storm.stage!=='TD';
+if(allowImpactHighlight && storm.impact){
 optionClasses.push('typhoon-impact-storm-option');
 option.style.backgroundColor=TYPHOON_IMPACT_OPTION_BG;
 option.style.color=TYPHOON_IMPACT_OPTION_COLOR;
 option.style.fontWeight=TYPHOON_IMPACT_OPTION_WEIGHT;
 option.title=`한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}`;
 }
-if(allowStormHighlight && storm.active){
+if(storm.active){
 optionClasses.push('typhoon-active-storm-option');
 option.style.backgroundColor='#F9E5FF';
 option.style.color='#5d2b66';
