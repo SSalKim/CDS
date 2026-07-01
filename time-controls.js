@@ -1,5 +1,7 @@
 /* Date/time, cycle-hour, and run-time control helpers. Depends on app.js globals at call time. */
 
+let lastRunSelectionUTC=null;
+
 function pad2(value){
 return String(value).padStart(2,'0');
 }
@@ -65,6 +67,58 @@ return new Date(Date.UTC(y,m-1,d,h-9));
 }
 
 return new Date(Date.UTC(y,m-1,d,h));
+
+}
+
+
+function rememberSelectedRunUTC(runUTC=getSelectedUTCDate()){
+
+if(!(runUTC instanceof Date) || Number.isNaN(runUTC.getTime())){
+return;
+}
+
+lastRunSelectionUTC=new Date(runUTC.getTime());
+
+}
+
+
+function getRememberedRunUTC(){
+
+if(lastRunSelectionUTC instanceof Date && !Number.isNaN(lastRunSelectionUTC.getTime())){
+return new Date(lastRunSelectionUTC.getTime());
+}
+
+return getSelectedUTCDate();
+
+}
+
+
+function getForecastHourForRunChange(previousRunUTC,nextRunUTC){
+
+let currentLead=typeof getSelectedTimelineHourForPreserve==='function'
+?getSelectedTimelineHourForPreserve()
+:null;
+
+if(!Number.isFinite(currentLead)){
+return null;
+}
+
+if(typeof productUsesForecastHour==='function' && !productUsesForecastHour()){
+return currentLead;
+}
+
+if(
+!(previousRunUTC instanceof Date) || Number.isNaN(previousRunUTC.getTime()) ||
+!(nextRunUTC instanceof Date) || Number.isNaN(nextRunUTC.getTime())
+){
+return currentLead;
+}
+
+let runDifferenceHours=(previousRunUTC.getTime()-nextRunUTC.getTime())/(60*60*1000);
+let nextLead=currentLead+runDifferenceHours;
+let roundedLead=Math.round(nextLead);
+
+return Math.abs(nextLead-roundedLead)<1e-6 ? roundedLead : nextLead;
 
 }
 
@@ -226,6 +280,7 @@ timeMode
 );
 
 populateHours(runUTC);
+rememberSelectedRunUTC(runUTC);
 
 }
 
@@ -251,6 +306,7 @@ runHour.appendChild(option);
 }
 
 runHour.value=desiredHour;
+rememberSelectedRunUTC(runUTC);
 
 }
 
@@ -265,9 +321,13 @@ return;
 invalidateSelectionAsyncWork();
 stopCompareAnimation();
 
+let previousRunUTC=getSelectedUTCDate();
+
 let nextUTC=new Date(
-getSelectedUTCDate().getTime()+delta*60*60*1000
+previousRunUTC.getTime()+delta*60*60*1000
 );
+
+let preserveForecastHour=getForecastHourForRunChange(previousRunUTC,nextUTC);
 
 setRunControlsToUTCAllowUnsupported(nextUTC);
 
@@ -276,6 +336,7 @@ updateCategories:false,
 updateProducts:true,
 updateHours:false,
 resetSlider:true,
+preserveForecastHour,
 updateChartAfter:true
 });
 
@@ -299,6 +360,7 @@ utcBtn.classList.toggle('active',timeMode==='UTC');
 
 setControlsFromUTCDate(selectedUTC,timeMode);
 populateHours(selectedUTC);
+rememberSelectedRunUTC(selectedUTC);
 
 slider.value=String(forecastTimelineState.clampIndex(currentIndex));
 
@@ -309,15 +371,20 @@ refreshForecastTimelineLabels();
 
 function handleRunDateChanged(){
 
+let previousRunUTC=getRememberedRunUTC();
 normalizeRunDateYearInput();
 
 invalidateSelectionAsyncWork();
 populateHours();
+let nextRunUTC=getSelectedUTCDate();
+let preserveForecastHour=getForecastHourForRunChange(previousRunUTC,nextRunUTC);
+rememberSelectedRunUTC(nextRunUTC);
 refreshViewAfterSelectionChange({
   updateCategories:false,
   updateProducts:true,
   updateHours:false,
   resetSlider:true,
+  preserveForecastHour,
   updateChartAfter:true
 });
 
@@ -325,12 +392,17 @@ refreshViewAfterSelectionChange({
 
 function handleRunHourChanged(){
 
+let previousRunUTC=getRememberedRunUTC();
 invalidateSelectionAsyncWork();
+let nextRunUTC=getSelectedUTCDate();
+let preserveForecastHour=getForecastHourForRunChange(previousRunUTC,nextRunUTC);
+rememberSelectedRunUTC(nextRunUTC);
 refreshViewAfterSelectionChange({
   updateCategories:false,
   updateProducts:true,
   updateHours:false,
   resetSlider:true,
+  preserveForecastHour,
   updateChartAfter:true
 });
 

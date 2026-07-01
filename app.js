@@ -2612,6 +2612,8 @@ updateChartAfter:true
 
 function bindEvents(){
 
+rememberSelectedRunUTC();
+
 if(appTitleReset){
 
 let resetToInitialPage=()=>{
