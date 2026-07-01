@@ -3602,7 +3602,7 @@ def legend_row_count_for(df: pd.DataFrame, settings: Settings) -> int:
 
 
 def fixed_240_map_extent(settings: Settings) -> list[float]:
-    """Stable 240h West-Pacific view used instead of dynamic 240h camera fitting."""
+    """Stable long-range West-Pacific view used instead of dynamic camera fitting."""
     return list(FIXED_240_MAP_EXTENT)
 
 
@@ -3678,7 +3678,7 @@ def match_extent_to_canvas_aspect(
 def canvas_east_expand_ratio(settings: Settings) -> float:
     if not settings.auto_extent:
         return 0.75
-    if settings.fcst_hours == 240:
+    if settings.fcst_hours >= 240:
         return 0.62
     return 0.68
 
@@ -3829,11 +3829,11 @@ def finalize_map_extent(
 ) -> list[float]:
     """Finalize the viewport with one explicit camera priority.
 
-    240h keeps its fixed domain.  Every other case first uses the original
+    240h and longer forecasts keep their fixed domain. Every other case first uses the original
     pre-hard-domain camera.  Only an automatic 120h viewport that crosses the
     hard domain receives one final crop-and-zoom pass.
     """
-    if settings.fcst_hours == 240:
+    if settings.fcst_hours >= 240:
         return fixed_240_map_extent(settings)
 
     legacy_extent = aspect_match_and_clamp_extent(
@@ -3900,7 +3900,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     current_dt = pd.to_datetime(settings.data_time, format="%Y%m%d%H%M", errors="coerce")
     current_dt = None if pd.isna(current_dt) else current_dt.to_pydatetime()
 
-    if settings.fcst_hours == 240:
+    if settings.fcst_hours >= 240:
         extent = fixed_240_map_extent(settings)
     else:
         if settings.auto_extent:
