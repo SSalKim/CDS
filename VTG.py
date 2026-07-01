@@ -1421,7 +1421,7 @@ def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFra
             session,
             url,
             retries=1 if is_knackwx else 2,
-            timeout=8 if is_knackwx else 15,
+            timeout=15,
             # This endpoint has no date in its URL and replaces same-hour data
             # daily, so a persistent cache could replay yesterday's cycle.
             cache_dir=None if is_knackwx else settings.http_cache_dir,
