@@ -2906,6 +2906,8 @@ return window.CDSAnalytics?.sourceFromUrl
 
 function getTyphoonAnalyticsParams(run,{url='',urls=[]}={}){
 let stormStatus=shouldUseRawTyphoonImage(run) ? 'active' : 'ended';
+let fcstHours=Number(run?.fcstHours || 0);
+let forecastRange=fcstHours===120 ? '5일예측' : (fcstHours===240 ? '10일예측' : `${fcstHours}시간예측`);
 let archiveUrl=run?.imagePath ? typhoonState.driveArchiveImages.get(run.imagePath) : '';
 let archiveSource=stormStatus==='active'
 ?'github_raw'
@@ -2927,7 +2929,9 @@ storm_number:Number(run?.typNumber || 0),
 storm_name:run?.typName || '',
 storm_label:stormDropdownLabel(run),
 storm_status:stormStatus,
-fcst_hours:Number(run?.fcstHours || 0),
+fcst_hours:fcstHours,
+forecast_days:fcstHours ? fcstHours/24 : 0,
+forecast_range:forecastRange,
 data_time:run?.dataTime || '',
 image_source:getTyphoonAnalyticsSource(url || urls?.[0] || ''),
 archive_source:archiveSource,

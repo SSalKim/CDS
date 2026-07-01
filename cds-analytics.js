@@ -215,6 +215,7 @@ function withProductHierarchy(params,type){
 let out={...(params || {})};
 let group='';
 let label='';
+let variant='';
 
 if(type==='radar'){
 group='레이더';
@@ -223,6 +224,7 @@ label=out.radar_label || out.radar_product || '';
 else if(type==='vtg'){
 group='태풍모델예측';
 label=out.storm_label || out.storm_name || out.storm_key || '';
+variant=out.forecast_range || '';
 }
 else{
 group=PRODUCT_GROUP_LABELS[out.menu] || out.menu || '';
@@ -235,8 +237,11 @@ out.product_group=group;
 if(label){
 out.product_label=label;
 }
+if(variant){
+out.product_variant=variant;
+}
 if(group && label){
-out.product_name=`${group}-${label}`;
+out.product_name=[group,label,variant].filter(Boolean).join('-');
 }
 
 return out;
