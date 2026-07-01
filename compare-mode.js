@@ -11,6 +11,14 @@ let compareImageAvailabilityMap=new Map();
 let compareImageAvailabilityContextKey='';
 let compareImageRenderFrame=null;
 
+const MOBILE_COMPARE_LAYOUT_QUERY='(max-width: 700px) and (orientation: portrait)';
+
+function usesMobileCompareLayout(){
+
+return typeof window.matchMedia==='function' && window.matchMedia(MOBILE_COMPARE_LAYOUT_QUERY).matches;
+
+}
+
 function supportsModelCompareInCurrentMenu(){
 
 return !['edit','analysis'].includes(currentMainMenu);
@@ -95,6 +103,13 @@ return [
 
 function normalizeCompareLayout(){
 
+if(usesMobileCompareLayout()){
+compareFitToScreen=true;
+compareLayoutMode='auto';
+compareManualLayout=null;
+return;
+}
+
 let options=getCompareLayoutOptions(compareModels.length);
 
 if(compareLayoutMode!=='manual'){
@@ -117,8 +132,34 @@ compareManualLayout=options[0] || {cols:1,rows:1,label:'1×1'};
 
 function getAutoCompareColumns(){
 
+if(usesMobileCompareLayout()){
+return 1;
+}
+
 let n=Math.max(1,compareModels.length || 1);
 return Math.min(n,3);
+
+}
+
+function getMobileCompareImageColumns(items){
+
+if(!usesMobileCompareLayout()){
+return null;
+}
+
+let itemList=Array.isArray(items) ? items : [];
+if(itemList.length<=1){
+return 1;
+}
+
+let images=itemList.flatMap(item=>[...item.querySelectorAll('img')]);
+let hasOnlyPortraitImages=images.length>0 && images.every(img=>{
+let width=Number(img.naturalWidth || img.width || 0);
+let height=Number(img.naturalHeight || img.height || 0);
+return width>0 && height>width;
+});
+
+return hasOnlyPortraitImages ? 2 : 1;
 
 }
 
@@ -287,6 +328,10 @@ return !!runDate && runDate>=archiveStart;
 }
 
 function shouldUseWinterCompareVariant(modelId,baseProduct,runUTC){
+
+if(usesMobileCompareLayout()){
+return false;
+}
 
 if(COMPARE_WINTER_VARIANT_UNSUPPORTED_MODELS.has(modelId)){
 return false;
@@ -1686,6 +1731,8 @@ loaded_count:Number(payload.loadedCount || 0)
 
 async function renderCompareImages(){
 
+normalizeCompareLayout();
+
 let requestId=++forecastDisplayRequest;
 let index=Number(slider.value || 0);
 let fh=currentForecastList[index] ?? 0;
@@ -1772,6 +1819,15 @@ let items=await Promise.all(itemPromises);
 
 if(requestId!==forecastDisplayRequest){
 return;
+}
+
+let mobileColumns=getMobileCompareImageColumns(items);
+if(mobileColumns){
+chartImages.style.setProperty('--compare-columns',String(mobileColumns));
+chartImages.classList.toggle('mobile-portrait-grid',mobileColumns===2);
+}
+else{
+chartImages.classList.remove('mobile-portrait-grid');
 }
 
 clearCompareImageItemHeights();

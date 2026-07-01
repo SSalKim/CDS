@@ -354,6 +354,7 @@ groups.forEach(group=>{
 
 let section=document.createElement('div');
 section.className='model-section'+(isCollapsibleModelGroup(group)?' collapsible-model-section':'');
+section.dataset.modelGroup=group.id;
 
 let collapsed=isModelGroupCollapsed(group);
 

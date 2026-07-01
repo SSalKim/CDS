@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=3.4.2">
+<link rel="stylesheet" href="style.css?v=3.4.6">
 </head>
 <body>
 <div class="app-shell">
@@ -16,7 +16,7 @@
 
 <div class="logo-block" id="appTitleReset" role="button" tabindex="0">
 <span class="title">수치일기도<br>표출시스템</span>
-<div class="subtitle">Chart Display System 3.4</div>
+<div class="subtitle"><span>Chart Display</span> <span>System 3.4</span></div>
 </div>
 
 <nav class="main-menu" id="mainMenu">
@@ -38,6 +38,8 @@
 <div class="toolbar">
 
 <div class="toolbar-left">
+
+<div class="toolbar-time-row">
 
 <button id="nowBtn">NOW</button>
 
@@ -66,10 +68,16 @@ max="2099-12-31"
   <button type="button" data-shift-hours="24">+24H</button>
 </div>
 
+</div>
+
+<div class="toolbar-product-row">
+
 <select id="productCategory"></select>
 <select id="productSelect"></select>
 
 <div id="timelineTopControls" class="timeline-top-controls"></div>
+
+</div>
 
 </div>
 
@@ -130,13 +138,13 @@ max="2099-12-31"
 <script src="image-pipeline.js?v=3.4.2"></script>
 <script src="time-controls.js?v=3.4.2"></script>
 <script src="catalog-core.js?v=3.4.2"></script>
-<script src="model-menu.js?v=3.4.2"></script>
+<script src="model-menu.js?v=3.4.3"></script>
 <script src="product-menu.js?v=3.4.2"></script>
 <script src="main-menu.js?v=3.4.2"></script>
 <script src="aux-panel.js?v=3.4.2"></script>
 <script src="catalog-selection.js?v=3.4.2"></script>
 <script src="forecast-domain.js?v=3.4.2"></script>
-<script src="compare-mode.js?v=3.4.3"></script>
+<script src="compare-mode.js?v=3.4.5"></script>
 <script src="radar-analysis.js?v=3.4.3"></script>
 <script src="typhoon-guidance.js?v=3.4.10"></script>
 <script src="app.js?v=3.4.3"></script>

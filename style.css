@@ -288,6 +288,11 @@ select{
   flex-wrap:nowrap;
 }
 
+.toolbar-time-row,
+.toolbar-product-row{
+  display:contents;
+}
+
 .toolbar-right{
   display:none;
 }
@@ -4095,5 +4100,624 @@ select option.unsupported-option{
   .typhoon-model-info-row{
     grid-template-columns:minmax(96px,33%) minmax(0,1fr);
     gap:7px;
+  }
+}
+
+/* CDS mobile portrait workspace */
+@media (max-width: 700px) and (orientation: portrait){
+  body:has(.app-shell){
+    height:100dvh;
+    overflow:hidden;
+    background:#ffffff;
+  }
+
+  .app-shell{
+    display:grid;
+    grid-template-columns:72px minmax(0,1fr);
+    grid-template-rows:auto auto auto minmax(150px,1fr) auto;
+    width:100%;
+    height:100dvh;
+    min-width:0;
+    overflow:hidden;
+    background:#ffffff;
+  }
+
+  .app-shell > .sidebar,
+  .app-shell > .main-panel{
+    display:contents;
+  }
+
+  .app-shell .logo-block{
+    grid-column:1;
+    grid-row:1 / 3;
+    min-width:0;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    padding:5px 4px;
+    border-right:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+    border-radius:0;
+    background:#ffffff;
+  }
+
+  .app-shell .logo-block .title{
+    display:block;
+    font-size:14px;
+    line-height:1.08;
+    white-space:nowrap;
+  }
+
+  .app-shell .logo-block .subtitle{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:1px;
+    margin:0;
+    font-size:9px;
+    line-height:1.1;
+    white-space:nowrap;
+  }
+
+  .app-shell .main-menu{
+    grid-column:2;
+    grid-row:1;
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:0;
+    min-width:0;
+    border-bottom:1px solid var(--line);
+    background:#ffffff;
+  }
+
+  .app-shell .menu-btn{
+    min-width:0;
+    height:28px;
+    padding:0 3px;
+    border-right:1px solid var(--line);
+    border-radius:0;
+    background:#ffffff;
+    font-size:11px;
+    line-height:1;
+  }
+
+  .app-shell .menu-btn:last-child{
+    border-right:none;
+  }
+
+  .app-shell .menu-btn.active{
+    background:#dbeafe;
+    color:#1d4ed8;
+    box-shadow:inset 0 -2px 0 #3b82f6;
+  }
+
+  .app-shell .toolbar{
+    grid-column:2;
+    grid-row:2;
+    min-width:0;
+    min-height:0;
+    display:block;
+    padding:3px;
+    border-bottom:1px solid var(--line);
+    background:#ffffff;
+  }
+
+  .app-shell .toolbar-left{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:26px 27px;
+    align-items:stretch;
+    gap:2px;
+    width:100%;
+    min-width:0;
+  }
+
+  .app-shell .toolbar-time-row{
+    grid-row:1;
+    display:grid;
+    grid-template-columns:40px 92px 58px 28px minmax(100px,1fr);
+    align-items:stretch;
+    gap:2px;
+    min-width:0;
+  }
+
+  .app-shell .toolbar-product-row{
+    grid-row:2;
+    display:grid;
+    grid-template-columns:90px minmax(0,1fr) 81px;
+    align-items:stretch;
+    gap:2px;
+    min-width:0;
+  }
+
+  .app-shell #nowBtn{
+    grid-column:auto;
+    grid-row:auto;
+    width:100%;
+    height:26px !important;
+    min-height:26px !important;
+    padding:0 4px !important;
+    border-radius:6px;
+    font-size:10px;
+  }
+
+  .app-shell .main-datetime-group{
+    display:contents;
+  }
+
+  .app-shell #runDate,
+  .app-shell #runHour{
+    width:100%;
+    min-width:0;
+    height:26px !important;
+    min-height:26px !important;
+    padding:3px 5px;
+    border:1px solid #cfd8e3 !important;
+    border-radius:6px !important;
+    font-size:10px;
+  }
+
+  .app-shell #productSelect,
+  .app-shell #productCategory{
+    width:100%;
+    min-width:0;
+    height:27px !important;
+    min-height:27px !important;
+    padding:3px 5px;
+    border-radius:6px;
+    font-size:10px;
+  }
+
+  .app-shell .time-toggle-stack{
+    grid-column:auto;
+    grid-row:auto;
+    width:100%;
+    height:26px;
+    min-width:0;
+  }
+
+  .app-shell .time-mode{
+    flex:1 1 50%;
+    min-height:0;
+    padding:0 4px;
+    font-size:7px;
+  }
+
+  .app-shell .run-shift-group{
+    grid-column:auto;
+    grid-row:auto;
+    display:grid;
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    width:100%;
+    height:26px !important;
+  }
+
+  .app-shell .run-shift-group button{
+    width:100%;
+    min-width:0;
+    height:26px !important;
+    min-height:26px !important;
+    padding:0 1px;
+    border-radius:0;
+    font-size:8px;
+  }
+
+  .app-shell .run-shift-group button:first-child{
+    border-radius:7px 0 0 7px;
+  }
+
+  .app-shell .run-shift-group button:last-child{
+    border-radius:0 7px 7px 0;
+  }
+
+  .app-shell #productCategory{
+    grid-column:1;
+    grid-row:1;
+  }
+
+  .app-shell #productSelect{
+    grid-column:2;
+    grid-row:1;
+  }
+
+  .app-shell .timeline-top-controls{
+    grid-column:3;
+    grid-row:1;
+    width:auto;
+    min-width:0;
+    justify-content:flex-end;
+    align-items:stretch;
+    height:27px !important;
+    min-height:27px !important;
+    padding:0;
+  }
+
+  .app-shell .timeline-top-controls .compare-controls{
+    gap:3px !important;
+    align-items:stretch !important;
+    height:27px !important;
+    min-height:27px !important;
+  }
+
+  .app-shell .timeline-top-controls .compare-fit-toggle,
+  .app-shell .timeline-top-controls .compare-layout-control{
+    display:none !important;
+  }
+
+  .app-shell .timeline-playback-controls,
+  .app-shell .timeline-top-controls .compare-playback-controls{
+    grid-template-columns:repeat(3,27px) !important;
+    gap:0 !important;
+  }
+
+  .app-shell .timeline-playback-controls button,
+  .app-shell .timeline-top-controls .compare-playback-controls button{
+    width:27px !important;
+    min-width:27px !important;
+    height:27px !important;
+    min-height:27px !important;
+    border-right:none !important;
+    border-radius:0 !important;
+    font-size:10px !important;
+  }
+
+  .app-shell .timeline-playback-controls button:first-child,
+  .app-shell .timeline-top-controls .compare-playback-controls button:first-child{
+    border-radius:6px 0 0 6px !important;
+  }
+
+  .app-shell .timeline-playback-controls button:last-child,
+  .app-shell .timeline-top-controls .compare-playback-controls button:last-child{
+    border-right:1px solid var(--line-soft) !important;
+    border-radius:0 6px 6px 0 !important;
+  }
+
+  .app-shell .forecast-bar{
+    grid-column:1 / -1;
+    grid-row:3;
+    width:100%;
+    min-width:0;
+    padding:3px 5px !important;
+    border-bottom:1px solid var(--line);
+    background:#ffffff;
+  }
+
+  .app-shell .forecast-shell,
+  .app-shell .forecast-shell.compare-active{
+    min-height:42px !important;
+  }
+
+  .app-shell .viewer-layout{
+    grid-column:1 / -1;
+    grid-row:4;
+    min-width:0;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    background:var(--bg-viewer);
+  }
+
+  .app-shell .viewer-wrap{
+    flex:1 1 auto;
+    width:100%;
+    min-width:0;
+    min-height:0;
+    padding:0;
+    border-bottom:1px solid var(--line);
+  }
+
+  .app-shell .aux-sidebar:not(.hidden){
+    flex:0 0 auto;
+    width:100%;
+    max-width:none;
+    max-height:34%;
+    border-left:none;
+    border-top:1px solid var(--line);
+  }
+
+  .app-shell .chart-images.compare-images,
+  .app-shell .chart-images.compare-images.fit-screen,
+  .app-shell .chart-images.compare-images.fixed-size,
+  .app-shell .chart-images.compare-images.layout-auto,
+  .app-shell .chart-images.compare-images.layout-manual{
+    display:grid !important;
+    grid-template-columns:repeat(var(--compare-columns,1),minmax(0,1fr)) !important;
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  .app-shell .chart-images.compare-images .compare-image-item,
+  .app-shell .chart-images.compare-images img{
+    width:100% !important;
+    max-width:100% !important;
+    height:auto !important;
+  }
+
+  .app-shell .chart-images.single-images{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+  }
+
+  .app-shell .chart-images.single-images > .single-image-item:only-child{
+    width:100% !important;
+    max-width:100% !important;
+    padding:0 !important;
+    border:none !important;
+    border-radius:0 !important;
+  }
+
+  .app-shell .chart-images.single-images > .single-image-item:only-child > .single-image-stack:has(> img:only-child),
+  .app-shell .chart-images.single-images > .single-image-item:only-child > .single-image-stack:has(> img:only-child) > img{
+    width:100% !important;
+    max-width:100% !important;
+    height:auto !important;
+  }
+
+  .app-shell .model-box{
+    grid-column:1 / -1;
+    grid-row:5;
+    min-width:0;
+    max-height:178px;
+    overflow:auto;
+    padding:5px 6px 6px;
+    border-top:1px solid var(--line);
+    border-radius:0;
+    background:#ffffff;
+  }
+
+  .app-shell .model-grid{
+    display:grid;
+    grid-template-columns:72px repeat(5,minmax(0,1fr));
+    grid-auto-flow:row;
+    align-items:stretch;
+    gap:5px 4px;
+    margin:0;
+  }
+
+  .app-shell .model-section{
+    min-width:0;
+    gap:2px;
+  }
+
+  .app-shell .model-section-title,
+  .app-shell .model-section-toggle{
+    min-height:13px;
+    padding:0 1px;
+    font-size:9px;
+    line-height:1.1;
+  }
+
+  .app-shell .model-button-list{
+    display:flex;
+    flex-direction:row;
+    flex-wrap:wrap;
+    gap:2px;
+  }
+
+  .app-shell .model-section[data-model-group="global"]{
+    grid-column:2 / span 3;
+    grid-row:1;
+  }
+
+  .app-shell .model-section[data-model-group="regional"]{
+    grid-column:5;
+    grid-row:1;
+  }
+
+  .app-shell .model-section[data-model-group="local"]{
+    grid-column:6;
+    grid-row:1;
+  }
+
+  .app-shell .model-section[data-model-group="nowcast"]{
+    grid-column:2;
+    grid-row:2;
+  }
+
+  .app-shell .model-section[data-model-group="ended"]{
+    grid-column:3 / 7;
+    grid-row:2;
+  }
+
+  .app-shell .model-section[data-model-group="global"] .model-button-list{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:4px;
+  }
+
+  .app-shell .model-section[data-model-group="ended"] .model-button-list{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:4px;
+  }
+
+  .app-shell .model-section[data-model-group="gens"]{
+    grid-column:2 / span 2;
+  }
+
+  .app-shell .model-section[data-model-group="lens"]{
+    grid-column:4;
+  }
+
+  .app-shell .model-section[data-model-group="ended_ens"]{
+    grid-column:5 / 7;
+  }
+
+  .app-shell .model-section[data-model-group="gens"] .model-button-list,
+  .app-shell .model-section[data-model-group="ended_ens"] .model-button-list{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:4px;
+  }
+
+  .app-shell .model-section[data-model-group="model_analysis"]{
+    grid-column:1 / span 3;
+  }
+
+  .app-shell .model-section[data-model-group="ended_analysis"]{
+    grid-column:4 / span 3;
+  }
+
+  .app-shell .model-section[data-model-group="model_analysis"] .model-button-list,
+  .app-shell .model-section[data-model-group="ended_analysis"] .model-button-list{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:4px;
+  }
+
+  .app-shell .model-cell{
+    flex:none;
+    width:100%;
+    min-width:0;
+    min-height:24px;
+    padding:3px 2px;
+    border-radius:6px;
+    font-size:9px;
+    line-height:1.05;
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+
+  .app-shell .model-compare-section{
+    grid-column:1;
+    grid-row:span 2;
+    margin:0 !important;
+    padding:0 !important;
+    border:none !important;
+  }
+
+  .app-shell .model-compare-toggle{
+    height:100% !important;
+    min-height:52px !important;
+    padding:4px !important;
+    white-space:normal !important;
+    line-height:1.15;
+  }
+
+  .app-shell .radar-analysis-section,
+  .app-shell .typhoon-guidance-section{
+    grid-column:span 3;
+    margin:0;
+    padding-top:5px;
+    border-top:1px solid var(--line);
+  }
+
+  .app-shell .radar-analysis-launcher,
+  .app-shell .typhoon-guidance-launcher{
+    min-height:30px;
+    height:30px;
+    border-radius:7px;
+    font-size:10px;
+  }
+
+  .app-shell .radar-launcher-text,
+  .app-shell .typhoon-launcher-text{
+    flex-direction:row;
+    gap:3px;
+    line-height:1;
+  }
+
+  .app-shell .radar-launcher-text small,
+  .app-shell .typhoon-launcher-text small{
+    margin:0;
+    font-size:8px;
+  }
+
+  .selection-toast{
+    top:8px;
+    max-width:calc(100vw - 16px);
+    font-size:11px;
+  }
+}
+
+@media (max-width: 450px) and (orientation: portrait){
+  .app-shell .run-shift-group button{
+    font-size:0;
+  }
+
+  .app-shell .run-shift-group button::after{
+    content:attr(data-shift-hours);
+    font-size:7px;
+    line-height:1;
+  }
+
+  .app-shell .run-shift-group button[data-shift-hours="6"]::after,
+  .app-shell .run-shift-group button[data-shift-hours="12"]::after,
+  .app-shell .run-shift-group button[data-shift-hours="24"]::after{
+    content:"+" attr(data-shift-hours);
+  }
+}
+
+@media (max-width: 400px) and (orientation: portrait){
+  .app-shell{
+    grid-template-columns:54px minmax(0,1fr);
+  }
+
+  .app-shell .logo-block{
+    gap:3px;
+    padding-left:2px;
+    padding-right:2px;
+  }
+
+  .app-shell .logo-block .title{
+    font-size:11px;
+  }
+
+  .app-shell .logo-block .subtitle{
+    font-size:7px;
+  }
+
+  .app-shell .menu-btn{
+    padding:0 1px;
+    font-size:10px;
+  }
+
+  .app-shell .toolbar{
+    padding-left:3px;
+    padding-right:3px;
+  }
+
+  .app-shell .toolbar-time-row{
+    grid-template-columns:38px 84px 54px 24px minmax(72px,1fr);
+  }
+
+  .app-shell .toolbar-product-row{
+    grid-template-columns:78px minmax(0,1fr) 81px;
+  }
+
+  .app-shell #nowBtn,
+  .app-shell #runDate,
+  .app-shell #runHour,
+  .app-shell #productSelect,
+  .app-shell #productCategory{
+    padding-left:3px !important;
+    padding-right:3px !important;
+    font-size:9px;
+  }
+
+  .app-shell .timeline-playback-controls,
+  .app-shell .timeline-top-controls .compare-playback-controls{
+    grid-template-columns:repeat(3,27px) !important;
+  }
+
+  .app-shell .timeline-playback-controls button,
+  .app-shell .timeline-top-controls .compare-playback-controls button{
+    width:27px !important;
+    min-width:27px !important;
+    height:27px !important;
+    min-height:27px !important;
+  }
+
+  .app-shell .model-grid{
+    grid-template-columns:54px repeat(5,minmax(0,1fr));
+  }
+
+  .app-shell .model-cell{
+    font-size:8px;
   }
 }
