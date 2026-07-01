@@ -4731,24 +4731,6 @@ def main() -> int:
                     continue
                 due_hours.append(fcst_hours)
 
-            special_360_path = deterministic_output_path_for(output_root, job, 360)
-            special_360_due = (
-                job.storm_key == "td_2026_14"
-                and job.data_time == "202607011200"
-                and not special_360_path.exists()
-            )
-            if special_360_due:
-                if args.check_run_needed:
-                    actual_run_count += 1
-                    run_entries.append({
-                        "job": asdict(job),
-                        "window": asdict(window),
-                        "result": {"status": "planned_special_360h"},
-                    })
-                else:
-                    due_hours.append(360)
-                    print(f"One-time special 360h image requested: {special_360_path}")
-
             if args.check_run_needed or not due_hours:
                 continue
             pending_batches.append((job, due_hours, final_check_window))
