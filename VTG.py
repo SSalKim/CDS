@@ -364,6 +364,7 @@ KMA_TYP_NOW_URL = f"{KMA_URL_BASE}/typ_now.php"
 KMA_TD_NOW_URL = f"{KMA_URL_BASE}/td_now.php"
 DEFAULT_AUTH_KEY = ""
 VALID_FCST_HOURS = (120, 240)
+CLI_FCST_HOURS = (*VALID_FCST_HOURS, 360)
 TRACK_HISTORY_MAX_LOOKBACK_DAYS = 45
 PROJECT_ROOT = Path(__file__).resolve().parent
 PLOT_FONT_FAMILY = "DejaVu Sans"
@@ -525,8 +526,8 @@ def parse_fcst_hours_value(value: str) -> tuple[int, ...]:
             hour = int(token)
         except ValueError as exc:
             raise ValueError("--fcst-hours must be a comma/space separated list of integers.") from exc
-        if hour not in VALID_FCST_HOURS:
-            allowed = ", ".join(f"{item}h" for item in VALID_FCST_HOURS)
+        if hour not in CLI_FCST_HOURS:
+            allowed = ", ".join(f"{item}h" for item in CLI_FCST_HOURS)
             raise ValueError(f"--fcst-hours only supports {allowed}.")
         if hour not in hours:
             hours.append(hour)
