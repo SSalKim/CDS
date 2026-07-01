@@ -77,8 +77,8 @@ HKO_FWEC: 'FengWu-ECMWF',
 const TYPHOON_MODEL_INFO=[
 {name:'ECMWF',description:'유럽중기예보센터(ECMWF) 전구모델'},
 {name:'ECMWF EPS',description:'유럽중기예보센터(ECMWF) 앙상블모델 평균'},
-{name:'KIM',description:'기상청 전구모델'},
-{name:'KIM EPS',description:'기상청 앙상블모델 평균'},
+{name:'KIM',description:'기상청(KMA) 전구모델'},
+{name:'KIM EPS',description:'기상청(KMA) 앙상블모델 평균'},
 {name:'UKMO',description:'영국기상청(UKMET) 전구모델'},
 {name:'UKMO EPS',description:'영국기상청(UKMET) 앙상블모델 평균'},
 {name:'GFS',description:'미해양대기청(NOAA NCEP) 전구모델'},
@@ -87,7 +87,7 @@ const TYPHOON_MODEL_INFO=[
 {name:'CMC EPS',description:'캐나다기상센터(CMC) 앙상블모델 평균'},
 {name:'NAVGEM',description:'미해군(FNMOC) 전구모델'},
 {name:'NAVGEM EPS',description:'미해군(FNMOC) 앙상블모델 평균'},
-{name:'JGSM',description:'일본기상청(JMA) 전구모델(GSM)'},
+{name:'JGSM',description:'일본기상청(JMA) 전구모델'},
 {name:'JGSM EPS',description:'일본기상청(JMA) 앙상블모델 평균'},
 {name:'COAMPS-TC',description:'미해군연구소(NRL) 태풍모델'},
 {name:'COAMPS-TC EPS',description:'미해군연구소(NRL) 앙상블모델 평균'},
@@ -95,7 +95,7 @@ const TYPHOON_MODEL_INFO=[
 {name:'HAFS',description:'미해양대기청(NOAA EMC) 태풍모델(신)'},
 {name:'HWRF',description:'미해양대기청(NOAA EMC) 태풍모델(구)'},
 {name:'ECMWF AIFS',description:'[AI] 유럽중기예보센터(ECMWF) AI 전구모델'},
-{name:'ECMWF AIFS EPS',description:'[AI] 유럽중기예보센터(ECMWF) AI 앙상블모델'},
+{name:'ECMWF AIFS EPS',description:'[AI] 유럽중기예보센터(ECMWF) AI 앙상블모델 평균'},
 {name:'KMA AIFS-ECMWF',description:'[AI] 기상청 수행 AIFS (ECMWF 초기장)'},
 {name:'KMA AIFS-KIM',description:'[AI] 기상청 수행 AIFS (KIM 초기장)'},
 {name:'AIGFS',description:'[AI] 미해양대기청(NOAA NCEP) AI 전구모델'},
@@ -1404,8 +1404,13 @@ throw manifestError || new Error('HTTP 404');
 typhoonState.manifest=manifest;
 typhoonState.manifestBaseUrl=manifestResult?.baseUrl || '';
 typhoonState.status=status;
-typhoonState.yearIndexes=new Map();
 typhoonState.stormManifestCache=new Map();
+let latestManifestYear=typhoonManifestYears()[0] || '';
+if(latestManifestYear){
+typhoonState.yearIndexes.delete(latestManifestYear);
+typhoonState.typImpactByYear.delete(latestManifestYear);
+typhoonState.typNowByYear.delete(latestManifestYear);
+}
 typhoonState.driveArchiveImages=new Map();
 typhoonState.driveArchivePathsLoaded=new Set();
 typhoonState.driveArchiveLoadPromises=new Map();
@@ -1417,8 +1422,7 @@ preferredDataTime:previousDataTime,
 selectDefaultStorm:true
 });
 renderTyphoonSelects();
-await ensureTyphoonYearIndex(typhoonState.selectedYear);
-await loadTyphoonImpactMapsForYears([typhoonState.selectedYear]);
+await preloadTyphoonDropdownData();
 if(!hasPreviousStormSelection){
 typhoonState.selectedStormKey='';
 }
@@ -1478,7 +1482,9 @@ syncTyphoonSelection({preferredYear:typhoonState.selectedYear,selectDefaultStorm
 renderTyphoonSelects();
 try{
 await ensureTyphoonYearIndex(typhoonState.selectedYear);
+if(!typhoonState.typImpactByYear.has(typhoonState.selectedYear) || !typhoonState.typNowByYear.has(typhoonState.selectedYear)){
 await loadTyphoonImpactMapsForYears([typhoonState.selectedYear]);
+}
 rebuildTyphoonEntries();
 syncTyphoonSelection({preferredYear:typhoonState.selectedYear,selectDefaultStorm:true});
 if(requestId!==typhoonState.selectionLoadSeq){
@@ -1565,6 +1571,7 @@ let key=String(year || '').trim();
 if(!key || typhoonState.yearIndexes.has(key)){
 return typhoonState.yearIndexes.get(key) || null;
 }
+
 let indexes=Array.isArray(typhoonState.manifest?.manifest_indexes) ? typhoonState.manifest.manifest_indexes : [];
 let item=indexes.find(index=>String(index?.year || '').trim()===key);
 let path=String(item?.path || '').trim();
@@ -1582,6 +1589,14 @@ console.warn(`?쒗뭾 year index 濡쒕뱶 ?ㅽ뙣: ${path}`,error);
 typhoonState.yearIndexes.set(key,null);
 return null;
 }
+}
+
+async function preloadTyphoonDropdownData(){
+let years=typhoonManifestYears();
+await Promise.all([
+Promise.all(years.map(year=>ensureTyphoonYearIndex(year))),
+loadTyphoonImpactMapsForYears(years)
+]);
 }
 
 function typhoonYearSummaryEntries(year){
@@ -2132,9 +2147,10 @@ selectDefaultSlotForStorm();
 
 
 async function loadTyphoonImpactMapsForYears(years){
-let uniqueYears=[...new Set((years || []).map(year=>String(year || '').trim()).filter(Boolean))];
-let nextImpactMap=new Map();
-let nextNowMap=new Map();
+let uniqueYears=[...new Set((years || []).map(year=>String(year || '').trim()).filter(Boolean))]
+.filter(year=>!typhoonState.typImpactByYear.has(year) || !typhoonState.typNowByYear.has(year));
+let nextImpactMap=new Map(typhoonState.typImpactByYear);
+let nextNowMap=new Map(typhoonState.typNowByYear);
 await Promise.all(uniqueYears.map(async year=>{
 let maps=await fetchTyphoonListMapsForYear(year);
 nextImpactMap.set(year,maps.impact);
