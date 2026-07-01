@@ -216,7 +216,59 @@ function isProductVisuallySupportedForDropdown(product,modelId=currentModel){
 if(!product || product.type==='header'){
 return false;
 }
+
 return productSupportsModel(product,modelId) || suppressAnalysisObservationUnsupportedStyling(product.category,modelId);
+}
+
+let productCategoryWidthMeasureCanvas=null;
+
+function syncMobileProductCategoryWidth(){
+
+let row=document.querySelector('.toolbar-product-row');
+
+if(!row || !productCategory){
+return;
+}
+
+let isMobilePortrait=typeof window.matchMedia==='function' &&
+window.matchMedia('(max-width: 700px) and (orientation: portrait)').matches;
+
+if(!isMobilePortrait){
+row.style.removeProperty('--product-category-width');
+return;
+}
+
+let option=productCategory.options[productCategory.selectedIndex];
+let text=option?.textContent?.trim() || '';
+let style=window.getComputedStyle(productCategory);
+
+productCategoryWidthMeasureCanvas ||= document.createElement('canvas');
+let context=productCategoryWidthMeasureCanvas.getContext('2d');
+
+if(!context){
+return;
+}
+
+context.font=`${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+
+let padding=(parseFloat(style.paddingLeft)||0)+(parseFloat(style.paddingRight)||0);
+let desiredWidth=Math.ceil(context.measureText(text).width+padding+26);
+let rowStyle=window.getComputedStyle(row);
+let gap=parseFloat(rowStyle.columnGap)||2;
+let controlsWidth=81;
+let minimumCategoryWidth=72;
+let minimumProductWidth=96;
+let maximumCategoryWidth=Math.max(
+minimumCategoryWidth,
+row.clientWidth-controlsWidth-(gap*2)-minimumProductWidth
+);
+let categoryWidth=Math.max(
+minimumCategoryWidth,
+Math.min(desiredWidth,maximumCategoryWidth)
+);
+
+row.style.setProperty('--product-category-width',`${categoryWidth}px`);
+
 }
 
 
@@ -301,6 +353,8 @@ productCategory.value=prevCategory;
 if(!productCategory.value && selectableCategories.length){
 productCategory.value=selectableCategories[0].id;
 }
+
+syncMobileProductCategoryWidth();
 
 }
 

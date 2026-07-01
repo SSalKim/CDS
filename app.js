@@ -2651,6 +2651,11 @@ button.onclick=()=>shiftRunTimeByHours(button.dataset.shiftHours);
 
 productCategory.onchange=handleCategoryChange;
 productSelect.onchange=handleProductChange;
+window.addEventListener('resize',syncMobileProductCategoryWidth,{passive:true});
+
+if(document.fonts?.ready){
+document.fonts.ready.then(syncMobileProductCategoryWidth);
+}
 
 slider.addEventListener('input',()=>{
 

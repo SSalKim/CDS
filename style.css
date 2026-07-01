@@ -4227,7 +4227,7 @@ select option.unsupported-option{
   .app-shell .toolbar-product-row{
     grid-row:2;
     display:grid;
-    grid-template-columns:90px minmax(0,1fr) 81px;
+    grid-template-columns:var(--product-category-width,90px) minmax(0,1fr) 81px;
     align-items:stretch;
     gap:2px;
     min-width:0;
@@ -4435,6 +4435,11 @@ select option.unsupported-option{
     width:100% !important;
     max-width:100% !important;
     height:auto !important;
+  }
+
+  .app-shell .chart-images.compare-images.fit-screen.compare-single .compare-image-item{
+    width:100% !important;
+    max-width:100% !important;
   }
 
   .app-shell .chart-images.single-images{
@@ -4684,10 +4689,6 @@ select option.unsupported-option{
 
   .app-shell .toolbar-time-row{
     grid-template-columns:38px 84px 54px 24px minmax(72px,1fr);
-  }
-
-  .app-shell .toolbar-product-row{
-    grid-template-columns:78px minmax(0,1fr) 81px;
   }
 
   .app-shell #nowBtn,
