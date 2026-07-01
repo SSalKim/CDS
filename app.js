@@ -2418,6 +2418,7 @@ return true;
 async function jumpLatestAvailableForCurrentSelection({
 silent=false,
 preserveForecastHour=getSelectedTimelineHourForPreserve(),
+preserveValidTimeFromRunUTC=null,
 forceImageRefresh=false,
 baseDate=null,
 skipRunUTC=null
@@ -2464,6 +2465,19 @@ return false;
 
 if(result.exists){
 
+let targetForecastHour=preserveForecastHour;
+
+if(
+preserveValidTimeFromRunUTC instanceof Date &&
+!Number.isNaN(preserveValidTimeFromRunUTC.getTime()) &&
+typeof getForecastHourForRunChange==='function'
+){
+targetForecastHour=getForecastHourForRunChange(
+preserveValidTimeFromRunUTC,
+runUTC
+);
+}
+
 setRunControlsToUTC(runUTC);
 
 refreshView({
@@ -2471,7 +2485,7 @@ updateCategories:false,
 updateProducts:true,
 updateHours:false,
 resetSlider:true,
-preserveForecastHour,
+preserveForecastHour:targetForecastHour,
 imageRefreshToken,
 updateChartAfter:true
 });
@@ -2751,8 +2765,11 @@ kstBtn.onclick=()=>switchTimeMode('KST');
 utcBtn.onclick=()=>switchTimeMode('UTC');
 nowBtn.onclick=()=>{
 
+let previousRunUTC=getSelectedUTCDate();
+
 jumpLatestAvailableForCurrentSelection({
 silent:false,
+preserveValidTimeFromRunUTC:previousRunUTC,
 forceImageRefresh:true
 });
 
