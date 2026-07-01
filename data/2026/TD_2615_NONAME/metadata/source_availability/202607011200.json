@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260701182939",
-  "generated_at_kst": "2026-07-02 03:29 KST",
+  "generated_at_utc": "20260701183937",
+  "generated_at_kst": "2026-07-02 03:39 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_15",
   "storm_stage": "TD",
@@ -27,10 +27,61 @@
     120,
     240
   ],
-  "model_source_count": 6,
-  "selected_model_count": 5,
+  "model_source_count": 10,
+  "selected_model_count": 9,
   "active_target_model_count": 36,
   "model_sources": [
+    {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260701183937",
+      "first_seen_kst": "2026-07-02 03:39 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 19,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260701183937",
+      "first_seen_kst": "2026-07-02 03:39 KST"
+    },
+    {
+      "model_id": "FNV3",
+      "model_label": "FNV3",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260701183937",
+      "first_seen_kst": "2026-07-02 03:39 KST"
+    },
     {
       "model_id": "GFS",
       "model_label": "GFS",
@@ -81,6 +132,23 @@
       "is_official": false,
       "first_seen_utc": "20260701180940",
       "first_seen_kst": "2026-07-02 03:09 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "HWRF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260701183937",
+      "first_seen_kst": "2026-07-02 03:39 KST"
     },
     {
       "model_id": "JGSM",
