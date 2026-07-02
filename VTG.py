@@ -2416,6 +2416,17 @@ def apply_common_kma_start(df: pd.DataFrame, settings: Settings) -> pd.DataFrame
         model_start = model_track[model_track["TMD"] == 0].head(1).copy()
         if model_start.empty:
             model_track["TMD"] = pd.to_numeric(model_track["TMD"], errors="coerce")
+            source_names = {
+                str(source).strip().upper()
+                for source in model_track.get(DATA_SOURCE_COLUMN, pd.Series(dtype=str)).dropna().unique()
+            }
+            if "KNACKWX" in source_names:
+                first_lead = model_track["TMD"].dropna().min()
+                print(
+                    f"{model_name} KNACKWX starts at {first_lead:g}h; "
+                    "keeping the track unanchored from KMA 0h."
+                )
+                continue
             model_start = (
                 model_track[model_track["TMD"].gt(0)]
                 .sort_values(["TMD", "FT_TM(UTC)", "SEQ"])
@@ -3054,6 +3065,30 @@ def marker_points_every_24h(track: pd.DataFrame) -> pd.DataFrame:
     base_time = track["FT_TIME"].iloc[0]
     elapsed_hours = (track["FT_TIME"] - base_time).dt.total_seconds() / 3600
     return track[elapsed_hours.mod(24).eq(0)]
+
+
+def split_knackwx_track_segments(track: pd.DataFrame, *, max_gap_hours: float = 15.0) -> list[pd.DataFrame]:
+    """Do not draw lines across forecast hours missing from the temporary KNACKWX feed."""
+    if track.empty or DATA_SOURCE_COLUMN not in track:
+        return [track]
+    sources = track[DATA_SOURCE_COLUMN].fillna("").astype(str).str.upper()
+    if not sources.eq("KNACKWX").any():
+        return [track]
+
+    ordered = track.copy()
+    ordered["TMD"] = pd.to_numeric(ordered["TMD"], errors="coerce")
+    ordered = ordered.sort_values(["TMD", "FT_TIME", "SEQ"], na_position="last")
+    gap_starts = ordered["TMD"].diff().gt(max_gap_hours).fillna(False)
+    segment_ids = gap_starts.cumsum()
+    segments = [segment.copy() for _, segment in ordered.groupby(segment_ids, sort=True) if not segment.empty]
+
+    if len(segments) > 1:
+        boundaries = [
+            (float(segments[index - 1]["TMD"].max()), float(segments[index]["TMD"].min()))
+            for index in range(1, len(segments))
+        ]
+        print(f"KNACKWX track split across missing lead interval(s): {boundaries}")
+    return segments or [ordered]
 
 
 def model_visual_style(model_name: str, model: dict) -> dict:
@@ -4133,32 +4168,33 @@ def draw_model_tracks(ax, df: pd.DataFrame, settings: Settings, *, legend_side: 
                 metric = track_intensity_summary(track, name)
 
         if has_plot_data:
-            ax.plot(
-                track["LON"],
-                track["LAT"],
-                color=style["color"],
-                linestyle=style["linestyle"],
-                linewidth=style["linewidth"],
-                alpha=style["alpha"],
-                zorder=zorder,
-                transform=ccrs.PlateCarree(),
-            )
-            markers = marker_points_every_24h(track)
-            if not markers.empty:
+            for segment in split_knackwx_track_segments(track):
                 ax.plot(
-                    markers["LON"],
-                    markers["LAT"],
-                    linestyle="None",
-                    marker=style["marker"],
+                    segment["LON"],
+                    segment["LAT"],
                     color=style["color"],
-                    markerfacecolor=style["markerfacecolor"],
-                    markeredgecolor=style["markeredgecolor"],
-                    markeredgewidth=style["markeredgewidth"],
-                    markersize=style["markersize"],
+                    linestyle=style["linestyle"],
+                    linewidth=style["linewidth"],
                     alpha=style["alpha"],
                     zorder=zorder,
                     transform=ccrs.PlateCarree(),
                 )
+                markers = marker_points_every_24h(segment)
+                if not markers.empty:
+                    ax.plot(
+                        markers["LON"],
+                        markers["LAT"],
+                        linestyle="None",
+                        marker=style["marker"],
+                        color=style["color"],
+                        markerfacecolor=style["markerfacecolor"],
+                        markeredgecolor=style["markeredgecolor"],
+                        markeredgewidth=style["markeredgewidth"],
+                        markersize=style["markersize"],
+                        alpha=style["alpha"],
+                        zorder=zorder,
+                        transform=ccrs.PlateCarree(),
+                    )
 
         legend_color = style["color"] if has_plot_data else "#B5B5B5"
         text_color = "black" if has_plot_data else "#A6A6A6"
