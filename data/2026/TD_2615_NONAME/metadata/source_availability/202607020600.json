@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260702133940",
-  "generated_at_kst": "2026-07-02 22:39 KST",
+  "generated_at_utc": "20260702134955",
+  "generated_at_kst": "2026-07-02 22:49 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_15",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 21,
-  "selected_model_count": 13,
+  "model_source_count": 22,
+  "selected_model_count": 14,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -387,6 +387,23 @@
       "is_official": true,
       "first_seen_utc": "20260702101426",
       "first_seen_kst": "2026-07-02 19:14 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 8,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260702134955",
+      "first_seen_kst": "2026-07-02 22:49 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2615_NONAME/metadata/source_availability/202607020600.json"
