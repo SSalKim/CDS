@@ -1,23 +1,23 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260702003936",
+  "generated_at_utc": "20260702003935",
   "generated_at_kst": "2026-07-02 09:39 KST",
   "storm_year": "2026",
-  "storm_key": "td_2026_15",
+  "storm_key": "typ_2026_09",
   "storm_stage": "TD",
-  "typ_number": 15,
-  "data_typ_number": 15,
+  "typ_number": 14,
+  "data_typ_number": 14,
   "typ_name": "NONAME",
   "typ_name_ko": "",
-  "canonical_storm_key": "td_2026_15",
-  "canonical_storm_stage": "TD",
-  "canonical_typ_number": 15,
-  "canonical_typ_name": "NONAME",
-  "canonical_typ_name_ko": "",
+  "canonical_storm_key": "typ_2026_09",
+  "canonical_storm_stage": "TYP",
+  "canonical_typ_number": 9,
+  "canonical_typ_name": "BAVI",
+  "canonical_typ_name_ko": "바비",
   "linked_td_number": null,
-  "linked_typ_number": null,
-  "atcf_id": "wp102026",
+  "linked_typ_number": 9,
+  "atcf_id": "wp092026",
   "extra_atcf_ids": [],
   "data_time": "202607011800",
   "cycle_time_utc": "202607011800",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 13,
+  "model_source_count": 14,
   "selected_model_count": 11,
   "active_target_model_count": 36,
   "model_sources": [
@@ -45,8 +45,8 @@
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260701224936",
-      "first_seen_kst": "2026-07-02 07:49 KST"
+      "first_seen_utc": "20260702003935",
+      "first_seen_kst": "2026-07-02 09:39 KST"
     },
     {
       "model_id": "ECMWF",
@@ -62,8 +62,8 @@
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260702002935",
-      "first_seen_kst": "2026-07-02 09:29 KST"
+      "first_seen_utc": "20260702003935",
+      "first_seen_kst": "2026-07-02 09:39 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -74,13 +74,30 @@
       "source": "APIHUB",
       "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 18,
-      "max_lead_hour": 102,
+      "point_count": 41,
+      "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260702000936",
-      "first_seen_kst": "2026-07-02 09:09 KST"
+      "first_seen_utc": "20260702003935",
+      "first_seen_kst": "2026-07-02 09:39 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 37,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260702003935",
+      "first_seen_kst": "2026-07-02 09:39 KST"
     },
     {
       "model_id": "ECMWF_AIFS_EPS",
@@ -91,13 +108,13 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": true,
-      "point_count": 15,
-      "max_lead_hour": 90,
+      "point_count": 40,
+      "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260702001935",
-      "first_seen_kst": "2026-07-02 09:19 KST"
+      "first_seen_utc": "20260702003935",
+      "first_seen_kst": "2026-07-02 09:39 KST"
     },
     {
       "model_id": "FNV3",
@@ -108,12 +125,12 @@
       "source": "RAW.GITHUB",
       "source_label": "GITHUB",
       "selected": true,
-      "point_count": 21,
-      "max_lead_hour": 120,
+      "point_count": 41,
+      "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260702003936",
+      "first_seen_utc": "20260702003935",
       "first_seen_kst": "2026-07-02 09:39 KST"
     },
     {
@@ -125,13 +142,30 @@
       "source": "APIHUB",
       "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 3,
-      "max_lead_hour": 12,
+      "point_count": 41,
+      "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260702001935",
-      "first_seen_kst": "2026-07-02 09:19 KST"
+      "first_seen_utc": "20260702003935",
+      "first_seen_kst": "2026-07-02 09:39 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GFS_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260702003935",
+      "first_seen_kst": "2026-07-02 09:39 KST"
     },
     {
       "model_id": "GFS_EPS",
@@ -147,25 +181,8 @@
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260701234934",
-      "first_seen_kst": "2026-07-02 08:49 KST"
-    },
-    {
-      "model_id": "GFS_EPS",
-      "model_label": "GFS EPS",
-      "raw_model_ids": [
-        "GFS_EPS"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 21,
-      "max_lead_hour": 120,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260702000936",
-      "first_seen_kst": "2026-07-02 09:09 KST"
+      "first_seen_utc": "20260702003935",
+      "first_seen_kst": "2026-07-02 09:39 KST"
     },
     {
       "model_id": "HAFS",
@@ -181,8 +198,8 @@
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260702000936",
-      "first_seen_kst": "2026-07-02 09:09 KST"
+      "first_seen_utc": "20260702003935",
+      "first_seen_kst": "2026-07-02 09:39 KST"
     },
     {
       "model_id": "HWRF",
@@ -198,7 +215,7 @@
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260702003936",
+      "first_seen_utc": "20260702003935",
       "first_seen_kst": "2026-07-02 09:39 KST"
     },
     {
@@ -210,13 +227,13 @@
       "source": "APIHUB",
       "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 18,
-      "max_lead_hour": 102,
+      "point_count": 1,
+      "max_lead_hour": 0,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260701220936",
-      "first_seen_kst": "2026-07-02 07:09 KST"
+      "first_seen_utc": "20260702003935",
+      "first_seen_kst": "2026-07-02 09:39 KST"
     },
     {
       "model_id": "TEPS",
@@ -232,8 +249,8 @@
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260701221935",
-      "first_seen_kst": "2026-07-02 07:19 KST"
+      "first_seen_utc": "20260702003935",
+      "first_seen_kst": "2026-07-02 09:39 KST"
     },
     {
       "model_id": "KMA",
@@ -244,14 +261,14 @@
       "source": "APIHUB",
       "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 5,
-      "max_lead_hour": 96,
+      "point_count": 6,
+      "max_lead_hour": 120,
       "has_pressure": true,
       "has_wind": true,
       "is_official": true,
-      "first_seen_utc": "20260701220936",
-      "first_seen_kst": "2026-07-02 07:09 KST"
+      "first_seen_utc": "20260702003935",
+      "first_seen_kst": "2026-07-02 09:39 KST"
     }
   ],
-  "source_availability_path": "data/2026/TD_2615_NONAME/metadata/source_availability/202607011800.json"
+  "source_availability_path": "data/2026/TYP_2609_BAVI/metadata/source_availability/202607011800.json"
 }
