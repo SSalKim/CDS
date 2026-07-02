@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=3.4.8">
+<link rel="stylesheet" href="style.css?v=3.4.12">
 </head>
 <body>
 <div class="app-shell">
@@ -107,8 +107,18 @@ max="2099-12-31"
   </div>
 
   <aside id="auxSidebar" class="aux-sidebar hidden">
+    <button id="mobileAuxTrigger" class="mobile-aux-trigger" type="button" aria-haspopup="dialog" aria-expanded="false">
+      <span id="mobileAuxTitle" class="mobile-aux-title"></span>
+      <strong id="mobileAuxValue" class="mobile-aux-value"></strong>
+      <span class="mobile-aux-chevron" aria-hidden="true">&#9662;</span>
+    </button>
+    <button id="mobileAuxBackdrop" class="mobile-aux-backdrop" type="button" aria-label="보조 선택 닫기"></button>
     <div class="aux-sidebar-inner">
-      <div id="auxSidebarTitle" class="aux-sidebar-title"></div>
+      <div class="aux-sidebar-title-row">
+        <div id="auxSidebarTitle" class="aux-sidebar-title"></div>
+        <button id="mobileAuxClose" class="mobile-aux-close" type="button" aria-label="보조 선택 닫기">&#10005;</button>
+      </div>
+      <input id="mobileAuxSearch" class="mobile-aux-search" type="search" placeholder="항목 검색" autocomplete="off">
       <div id="auxSidebarList" class="aux-sidebar-list"></div>
     </div>
   </aside>
@@ -121,7 +131,7 @@ max="2099-12-31"
 
 <div id="selectionToast" class="selection-toast hidden" role="status" aria-live="polite"></div>
 
-<script src="models.js?v=3.4.2"></script>
+<script src="models.js?v=3.4.3"></script>
 <script src="edit.js?v=3.4.2"></script>
 <script src="analysis.js?v=3.4.2"></script>
 <script src="products.js?v=3.4.2"></script>
@@ -130,7 +140,7 @@ max="2099-12-31"
 
 <script src="catalog-config.js?v=3.4.2"></script>
 <script src="aux-data.js?v=3.4.2"></script>
-<script src="aux-rules.js?v=3.4.2"></script>
+<script src="aux-rules.js?v=3.4.3"></script>
 
 <script src="cds-analytics.js?v=2"></script>
 <script src="chart-utils.js?v=3.4.2"></script>
@@ -141,13 +151,13 @@ max="2099-12-31"
 <script src="model-menu.js?v=3.4.3"></script>
 <script src="product-menu.js?v=3.4.4"></script>
 <script src="main-menu.js?v=3.4.2"></script>
-<script src="aux-panel.js?v=3.4.2"></script>
+<script src="aux-panel.js?v=3.4.3"></script>
 <script src="catalog-selection.js?v=3.4.2"></script>
 <script src="forecast-domain.js?v=3.4.2"></script>
-<script src="compare-mode.js?v=3.4.5"></script>
+<script src="compare-mode.js?v=3.4.6"></script>
 <script src="radar-analysis.js?v=3.4.3"></script>
 <script src="typhoon-guidance.js?v=3.4.11"></script>
-<script src="app.js?v=3.4.4"></script>
+<script src="app.js?v=3.4.8"></script>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q3DTERTT0J"></script>

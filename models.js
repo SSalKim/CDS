@@ -7,7 +7,8 @@ archiveStart:"2020-09-28",
 cycles:[0,6,12,18],
 forecastRules:[
 {cycles:[0,12],until:"2025-05-13",max:288},
-{cycles:[0,12],max:360},
+{from:"2025-05-14",until:"2026-06-11",cycles:[0,12],max:360},
+{from:"2026-06-12",cycles:[0,12],max:288},
 {cycles:[6,18],max:84}
 ],
 stepSchemeByCycleGroup:{
@@ -220,7 +221,8 @@ archiveStart:"2021-01-01",
 cycles:[0,12],
 forecastRules:[
 {cycles:[0,12],until:"2025-05-13",max:288},
-{cycles:[0,12],max:360},
+{from:"2025-05-14",until:"2026-06-11",cycles:[0,12],max:360},
+{from:"2026-06-12",cycles:[0,12],max:288},
 ],
 stepSchemeByCycleGroup:{
 "0,12":[

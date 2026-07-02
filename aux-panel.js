@@ -19,6 +19,58 @@ null
 
 }
 
+function isMobileAuxMode(){
+
+return window.matchMedia('(max-width: 700px) and (orientation: portrait)').matches;
+
+}
+
+function resetMobileAuxFilter(){
+
+if(mobileAuxSearch){
+mobileAuxSearch.value='';
+}
+
+auxSidebarList?.querySelectorAll('.aux-item, .aux-separator').forEach(element=>{
+element.hidden=false;
+});
+
+}
+
+function openMobileAuxSheet(){
+
+if(!isMobileAuxMode() || auxSidebar?.classList.contains('hidden')){
+return;
+}
+
+resetMobileAuxFilter();
+auxSidebar.classList.add('mobile-open');
+mobileAuxTrigger?.setAttribute('aria-expanded','true');
+
+}
+
+function closeMobileAuxSheet(){
+
+auxSidebar?.classList.remove('mobile-open');
+mobileAuxTrigger?.setAttribute('aria-expanded','false');
+resetMobileAuxFilter();
+
+}
+
+function filterMobileAuxItems(){
+
+let query=String(mobileAuxSearch?.value || '').trim().toLocaleLowerCase('ko-KR');
+
+auxSidebarList?.querySelectorAll('.aux-item').forEach(button=>{
+button.hidden=!!query && !button.textContent.toLocaleLowerCase('ko-KR').includes(query);
+});
+
+auxSidebarList?.querySelectorAll('.aux-separator').forEach(separator=>{
+separator.hidden=!!query;
+});
+
+}
+
 
 function resolveAuxItems(items,rule){
 
@@ -299,9 +351,12 @@ auxSidebar.classList.remove('aux-wide','aux-narrow');
 if(!config){
 
 currentAuxValue=null;
+closeMobileAuxSheet();
 auxSidebar.classList.add('hidden');
 auxSidebarTitle.textContent='';
 auxSidebarList.innerHTML='';
+if(mobileAuxTitle) mobileAuxTitle.textContent='';
+if(mobileAuxValue) mobileAuxValue.textContent='';
 return;
 
 }
@@ -316,6 +371,7 @@ auxSidebar.classList.add('aux-narrow');
 
 auxSidebar.classList.remove('hidden');
 auxSidebarTitle.textContent=config.title || '상세 선택';
+if(mobileAuxTitle) mobileAuxTitle.textContent=config.title || '보조 선택';
 auxSidebarList.innerHTML='';
 
 let visibleItems=getVisibleAuxItems(config);
@@ -333,6 +389,14 @@ if(!validValues.includes(currentAuxValue)){
 currentAuxValue=validValues[0] || null;
 }
 
+}
+
+let selectedItem=visibleItems.find(
+item=>item.type==='item' && item.value===currentAuxValue
+);
+
+if(mobileAuxValue){
+mobileAuxValue.textContent=selectedItem?.label || '선택';
 }
 
 visibleItems.forEach(item=>{
@@ -364,6 +428,7 @@ let previousForecastHour=getSelectedTimelineHourForPreserve();
 
 invalidateSelectionAsyncWork({latest:false});
 currentAuxValue=item.value;
+closeMobileAuxSheet();
 
 refreshView({
 updateCategories:false,

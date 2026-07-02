@@ -122,7 +122,7 @@ sstRegion:{
   title:'지역',
   widthClass:'narrow',
   optionSet:'sstRegions',
-  defaultValue:'glob'
+  defaultValue:'korea'
 },
 
 analysisAsiaOverlay:{

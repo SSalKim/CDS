@@ -10,6 +10,12 @@ const modelStatus=document.getElementById('modelStatus');
 const auxSidebar=document.getElementById('auxSidebar');
 const auxSidebarTitle=document.getElementById('auxSidebarTitle');
 const auxSidebarList=document.getElementById('auxSidebarList');
+const mobileAuxTrigger=document.getElementById('mobileAuxTrigger');
+const mobileAuxTitle=document.getElementById('mobileAuxTitle');
+const mobileAuxValue=document.getElementById('mobileAuxValue');
+const mobileAuxBackdrop=document.getElementById('mobileAuxBackdrop');
+const mobileAuxClose=document.getElementById('mobileAuxClose');
+const mobileAuxSearch=document.getElementById('mobileAuxSearch');
 const loadingOverlay=document.getElementById('loadingOverlay');
 const kstBtn=document.getElementById('kstBtn');
 const utcBtn=document.getElementById('utcBtn');
@@ -32,6 +38,7 @@ let compareModels=[];
 let compareForecastHourMap=new Map();
 let comparePlayTimer=null;
 let compareFitToScreen=true;
+let singleFitToScreen=false;
 let compareLayoutMode='auto';
 let compareManualLayout=null;
 let compareHoverIndex=null;
@@ -40,7 +47,7 @@ let imagePreloadSeq=0;
 let forecastLoadStates=forecastTimelineState.setLoadStates(['loading']);
 let forecastImageCache=forecastTimelineState.getImageCache();
 let forecastDisplayRequest=0;
-let analysisLowResolution=true;
+let highResolutionEnabled=false;
 let analysisResolutionState=null;
 let analysisResolutionCache=new Map();
 
@@ -254,7 +261,6 @@ return forecastImageCache;
 
 function resetAnalysisResolutionState(){
 
-analysisLowResolution=true;
 analysisResolutionState=null;
 
 if(typeof renderTimelineTopControls==='function'){
@@ -820,14 +826,6 @@ modelStatus.classList.remove('hidden');
 
 }
 
-function isAnalysisResolutionCandidate(urls){
-
-return currentMainMenu==='analysis' &&
-Array.isArray(urls) &&
-urls.some(url=>typeof url==='string' && url.includes('pb4'));
-
-}
-
 function makeAnalysisLowResolutionUrls(urls){
 
 return urls.map(url=>
@@ -838,10 +836,57 @@ typeof url==='string'
 
 }
 
+function makeEditHighResolutionUrls(urls){
+
+return urls.map(url=>
+typeof url==='string'
+?url.replace(/_(\d{10})(?=\.(?:png|gif)(?:[?#]|$))/i,'_pb4_$1')
+:url
+);
+
+}
+
+function getChartResolutionVariants(urls){
+
+if(!Array.isArray(urls) || !urls.length){
+return null;
+}
+
+if(
+currentMainMenu==='analysis' &&
+urls.some(url=>typeof url==='string' && url.includes('pb4'))
+){
+return {
+highUrls:urls,
+lowUrls:makeAnalysisLowResolutionUrls(urls)
+};
+}
+
+if(currentMainMenu==='edit'){
+let highUrls=makeEditHighResolutionUrls(urls);
+
+if(highUrls.some((url,index)=>url!==urls[index])){
+return {
+highUrls,
+lowUrls:urls
+};
+}
+}
+
+return null;
+
+}
+
+function isAnalysisResolutionCandidate(urls){
+
+return !!getChartResolutionVariants(urls);
+
+}
+
 function getAnalysisResolutionCacheKey(urls){
 
 return Array.isArray(urls)
-?urls.join('\n')
+?[currentMainMenu,currentProduct,...urls].join('\n')
 :'';
 
 }
@@ -852,6 +897,7 @@ if(!isAnalysisResolutionCandidate(urls)){
 return null;
 }
 
+let variants=getChartResolutionVariants(urls);
 let key=getAnalysisResolutionCacheKey(urls);
 
 if(analysisResolutionCache.has(key)){
@@ -860,16 +906,15 @@ return analysisResolutionCache.get(key);
 
 let resolutionPromise=(async()=>{
 
-let lowUrls=makeAnalysisLowResolutionUrls(urls);
 let [lowExists,highExists]=await Promise.all([
-urlsExist(lowUrls),
-urlsExist(urls)
+urlsExist(variants.lowUrls),
+urlsExist(variants.highUrls)
 ]);
 
 return {
 key,
-highUrls:urls,
-lowUrls,
+highUrls:variants.highUrls,
+lowUrls:variants.lowUrls,
 highExists,
 lowExists,
 canToggle:lowExists && highExists
@@ -889,11 +934,11 @@ if(!info){
 return baseUrls;
 }
 
-if(info.lowExists && (analysisLowResolution || !info.highExists)){
-return info.lowUrls;
+if(info.highExists && (highResolutionEnabled || !info.lowExists)){
+return info.highUrls;
 }
 
-return info.highUrls;
+return info.lowUrls;
 
 }
 
@@ -924,16 +969,16 @@ label.className='compare-fit-toggle analysis-resolution-toggle';
 
 let checkbox=document.createElement('input');
 checkbox.type='checkbox';
-checkbox.checked=analysisLowResolution;
+checkbox.checked=highResolutionEnabled;
 checkbox.onchange=()=>{
-analysisLowResolution=checkbox.checked;
+highResolutionEnabled=checkbox.checked;
 resetForecastImageCache();
 renderTimelineTopControls();
 displayCurrentForecastImage();
 };
 
 let text=document.createElement('span');
-text.textContent='저해상도';
+text.textContent='고해상도';
 
 label.appendChild(checkbox);
 label.appendChild(text);
@@ -978,12 +1023,25 @@ function setSingleImageDisplayMode(){
 
 chartImages.classList.remove('compare-images','fit-screen','fixed-size','layout-auto','layout-manual','compare-single','single-images');
 chartImages.classList.add('single-images');
+syncSingleImageFitMode();
 chartImages.classList.remove('hidden');
 
 }
 
+function syncSingleImageFitMode(){
+
+if(!chartImages?.classList.contains('single-images')){
+return;
+}
+
+chartImages.classList.toggle('fit-screen',singleFitToScreen);
+chartImages.classList.toggle('fixed-size',!singleFitToScreen);
+
+}
+
 function createSingleImageDisplayShell({
-nmsc=false
+nmsc=false,
+imageCount=1
 }={}){
 
 setSingleImageDisplayMode();
@@ -993,6 +1051,7 @@ item.className='single-image-item';
 
 let stack=document.createElement('div');
 stack.className='single-image-stack';
+stack.style.setProperty('--single-image-count',String(Math.max(1,Number(imageCount) || 1)));
 
 if(nmsc){
 stack.classList.add('nmsc-image-stack');
@@ -1065,7 +1124,7 @@ stack.style.setProperty('--nmsc-mt-max-height',`${maxHeight}px`);
 
 function renderNmscPreparedImages(urls,preparedImages){
 
-let {stack}=createSingleImageDisplayShell({nmsc:true});
+let {stack}=createSingleImageDisplayShell({nmsc:true,imageCount:urls.length});
 
 applyNmscMtStackMode(stack,urls);
 
@@ -1101,7 +1160,7 @@ return stack;
 
 async function showProgressiveCharts(urls,{requestId,attempt=0,hadPreviousImage=false}={}){
 
-let {stack}=createSingleImageDisplayShell({nmsc:true});
+let {stack}=createSingleImageDisplayShell({nmsc:true,imageCount:urls.length});
 let loadedImages=[];
 
 applyNmscMtStackMode(stack,urls);
@@ -1255,7 +1314,7 @@ viewContext:'nmsc_stack'
 return;
 }
 
-let {stack}=createSingleImageDisplayShell();
+let {stack}=createSingleImageDisplayShell({imageCount:loadedImages.length});
 loadedImages.forEach(img=>{
 stack.appendChild(img);
 });
@@ -2668,6 +2727,10 @@ button.onclick=()=>shiftRunTimeByHours(button.dataset.shiftHours);
 productCategory.onchange=handleCategoryChange;
 productSelect.onchange=handleProductChange;
 window.addEventListener('resize',syncMobileProductCategoryWidth,{passive:true});
+mobileAuxTrigger?.addEventListener('click',openMobileAuxSheet);
+mobileAuxClose?.addEventListener('click',closeMobileAuxSheet);
+mobileAuxBackdrop?.addEventListener('click',closeMobileAuxSheet);
+mobileAuxSearch?.addEventListener('input',filterMobileAuxItems);
 
 if(document.fonts?.ready){
 document.fonts.ready.then(syncMobileProductCategoryWidth);
@@ -2685,6 +2748,12 @@ displayCurrentForecastImage();
 });
 
 document.addEventListener('keydown',e=>{
+
+if(e.key==='Escape' && auxSidebar?.classList.contains('mobile-open')){
+e.preventDefault();
+closeMobileAuxSheet();
+return;
+}
 
 let active=document.activeElement;
 let tag=active?.tagName;

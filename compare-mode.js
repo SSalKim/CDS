@@ -1302,24 +1302,34 @@ return wrap;
 
 }
 
-function renderCompareControls(){
-
-let controls=document.createElement('div');
-controls.className='compare-controls';
+function renderFitToScreenToggle({checked,onChange}){
 
 let fitLabel=document.createElement('label');
 fitLabel.className='compare-fit-toggle';
 let fitCheckbox=document.createElement('input');
 fitCheckbox.type='checkbox';
-fitCheckbox.checked=compareFitToScreen;
-fitCheckbox.onchange=()=>{
-compareFitToScreen=fitCheckbox.checked;
-renderCompareImages();
-};
+fitCheckbox.checked=checked;
+fitCheckbox.onchange=()=>onChange(fitCheckbox.checked);
 let fitText=document.createElement('span');
 fitText.textContent='화면에 맞춤';
 fitLabel.appendChild(fitCheckbox);
 fitLabel.appendChild(fitText);
+return fitLabel;
+
+}
+
+function renderCompareControls(){
+
+let controls=document.createElement('div');
+controls.className='compare-controls';
+
+let fitLabel=renderFitToScreenToggle({
+checked:compareFitToScreen,
+onChange:checked=>{
+compareFitToScreen=checked;
+renderCompareImages();
+}
+});
 
 let layoutControl=renderCompareLayoutControl();
 
@@ -1345,6 +1355,14 @@ if(resolutionToggle){
 controls.appendChild(resolutionToggle);
 }
 }
+
+controls.appendChild(renderFitToScreenToggle({
+checked:singleFitToScreen,
+onChange:checked=>{
+singleFitToScreen=checked;
+syncSingleImageFitMode();
+}
+}));
 
 controls.appendChild(renderTimelinePlaybackControls());
 
