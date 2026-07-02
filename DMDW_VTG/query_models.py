@@ -933,8 +933,42 @@ def fetch_one_storm(
     }
 
 
+def render_json(payload: dict[str, Any]) -> str:
+    """Keep large DMDW row arrays readable without full pretty-print bloat."""
+    multiline_keys = {"models", "points"}
+    keys = sorted(payload)
+    lines = ["{"]
+    for key_index, key in enumerate(keys):
+        value = payload[key]
+        suffix = "," if key_index < len(keys) - 1 else ""
+        encoded_key = json.dumps(key, ensure_ascii=False)
+        if key in multiline_keys and isinstance(value, list):
+            lines.append(f"  {encoded_key}: [")
+            for item_index, item in enumerate(value):
+                item_suffix = "," if item_index < len(value) - 1 else ""
+                encoded_item = json.dumps(
+                    item,
+                    ensure_ascii=False,
+                    separators=(",", ":"),
+                    sort_keys=True,
+                )
+                lines.append(f"    {encoded_item}{item_suffix}")
+            lines.append(f"  ]{suffix}")
+            continue
+
+        encoded_value = json.dumps(
+            value,
+            ensure_ascii=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        )
+        lines.append(f"  {encoded_key}: {encoded_value}{suffix}")
+    lines.append("}")
+    return "\n".join(lines) + "\n"
+
+
 def write_json_if_changed(path: Path, payload: dict[str, Any]) -> bool:
-    text = json.dumps(payload, ensure_ascii=False, separators=(",", ":"), sort_keys=True) + "\n"
+    text = render_json(payload)
     previous = path.read_text(encoding="utf-8") if path.exists() else None
     if previous == text:
         return False
