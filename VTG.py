@@ -3062,6 +3062,34 @@ def pressure_metric_color(pressure_text: str) -> str:
 def marker_points_every_24h(track: pd.DataFrame) -> pd.DataFrame:
     if track.empty:
         return track
+    if DATA_SOURCE_COLUMN in track:
+        sources = track[DATA_SOURCE_COLUMN].fillna("").astype(str).str.upper()
+        if sources.eq("KNACKWX").any():
+            clean = track.copy()
+            clean["TMD"] = pd.to_numeric(clean["TMD"], errors="coerce")
+            clean = clean.dropna(subset=["TMD"]).sort_values(["TMD", "FT_TIME", "SEQ"])
+            clean = clean.drop_duplicates(subset=["TMD"], keep="first")
+            if clean.empty:
+                return clean
+
+            selected_indices = {clean.index[0]}
+            min_lead = float(clean["TMD"].min())
+            max_lead = float(clean["TMD"].max())
+            target = max(24.0, math.ceil(min_lead / 24.0) * 24.0)
+
+            while target <= max_lead:
+                candidates = clean.loc[~clean.index.isin(selected_indices)].copy()
+                candidates["_MARKER_DISTANCE"] = (candidates["TMD"] - target).abs()
+                candidates = candidates[candidates["_MARKER_DISTANCE"].le(12.0)]
+                if not candidates.empty:
+                    nearest = candidates.sort_values(
+                        ["_MARKER_DISTANCE", "TMD", "FT_TIME"],
+                        ascending=[True, True, True],
+                    ).iloc[0]
+                    selected_indices.add(nearest.name)
+                target += 24.0
+
+            return clean.loc[sorted(selected_indices, key=lambda index: clean.at[index, "TMD"])]
     base_time = track["FT_TIME"].iloc[0]
     elapsed_hours = (track["FT_TIME"] - base_time).dt.total_seconds() / 3600
     return track[elapsed_hours.mod(24).eq(0)]
