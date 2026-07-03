@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260703190935",
-  "generated_at_kst": "2026-07-04 04:09 KST",
+  "generated_at_utc": "20260703191935",
+  "generated_at_kst": "2026-07-04 04:19 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_10",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 42,
-  "selected_model_count": 18,
+  "model_source_count": 48,
+  "selected_model_count": 21,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -305,6 +305,23 @@
       "first_seen_kst": "2026-07-04 03:39 KST"
     },
     {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 21,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260703191935",
+      "first_seen_kst": "2026-07-04 04:19 KST"
+    },
+    {
       "model_id": "FNV3",
       "model_label": "FNV3",
       "raw_model_ids": [
@@ -371,6 +388,23 @@
       "is_official": false,
       "first_seen_utc": "20260703172143",
       "first_seen_kst": "2026-07-04 02:21 KST"
+    },
+    {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "AVNO"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 13,
+      "max_lead_hour": 72,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260703191935",
+      "first_seen_kst": "2026-07-04 04:19 KST"
     },
     {
       "model_id": "GFS_EPS",
@@ -457,6 +491,23 @@
       "is_official": false,
       "first_seen_utc": "20260703190935",
       "first_seen_kst": "2026-07-04 04:09 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260703191935",
+      "first_seen_kst": "2026-07-04 04:19 KST"
     },
     {
       "model_id": "HAFS",
@@ -715,6 +766,23 @@
       "first_seen_kst": "2026-07-04 03:49 KST"
     },
     {
+      "model_id": "IFKM_AI",
+      "model_label": "KMA AIFS-KIM",
+      "raw_model_ids": [
+        "IFKM_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260703191935",
+      "first_seen_kst": "2026-07-04 04:19 KST"
+    },
+    {
       "model_id": "KMA",
       "model_label": "KMA OFCL",
       "raw_model_ids": [
@@ -732,6 +800,23 @@
       "first_seen_kst": "2026-07-04 01:09 KST"
     },
     {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "NEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260703191935",
+      "first_seen_kst": "2026-07-04 04:19 KST"
+    },
+    {
       "model_id": "UKM",
       "model_label": "UKMO",
       "raw_model_ids": [
@@ -747,6 +832,23 @@
       "is_official": false,
       "first_seen_utc": "20260703185938",
       "first_seen_kst": "2026-07-04 03:59 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKM"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 8,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260703191935",
+      "first_seen_kst": "2026-07-04 04:19 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2610_MAYSAK/metadata/source_availability/202607031200.json"
