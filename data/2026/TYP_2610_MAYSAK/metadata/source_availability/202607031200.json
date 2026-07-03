@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260703193940",
-  "generated_at_kst": "2026-07-04 04:39 KST",
+  "generated_at_utc": "20260703194938",
+  "generated_at_kst": "2026-07-04 04:49 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_10",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 54,
-  "selected_model_count": 27,
+  "model_source_count": 56,
+  "selected_model_count": 28,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -312,7 +312,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 21,
       "max_lead_hour": 138,
       "has_pressure": true,
@@ -320,6 +320,23 @@
       "is_official": false,
       "first_seen_utc": "20260703191935",
       "first_seen_kst": "2026-07-04 04:19 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "ECMWF_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 39,
+      "max_lead_hour": 228,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260703194938",
+      "first_seen_kst": "2026-07-04 04:49 KST"
     },
     {
       "model_id": "FNV3",
@@ -951,6 +968,23 @@
       "is_official": false,
       "first_seen_utc": "20260703191935",
       "first_seen_kst": "2026-07-04 04:19 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260703194938",
+      "first_seen_kst": "2026-07-04 04:49 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2610_MAYSAK/metadata/source_availability/202607031200.json"
