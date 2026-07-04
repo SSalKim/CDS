@@ -609,7 +609,7 @@ slots:[],
 selectedYear:'',
 selectedStormKey:'',
 selectedSlotIndex:0,
-selectedFcstHours:120,
+selectedFcstHours:240,
 timer:null,
 keyboardBound:false,
 imageCaches:new Map(),
@@ -2552,7 +2552,7 @@ optionClasses.push('typhoon-active-storm-option');
 option.style.backgroundColor='#F9E5FF';
 option.style.color='#5d2b66';
 option.style.fontWeight='800';
-option.title=storm.impact ? `현재 활동중 · 한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}` : '현재 활동중';
+option.title=storm.impact ? `진행중 · 한반도 영향: ${typhoonImpactEffLabel(storm.impactEff)}` : '진행중';
 }
 option.className=optionClasses.join(' ');
 stormSelect.appendChild(option);
