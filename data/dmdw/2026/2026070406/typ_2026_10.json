@@ -1,0 +1,26 @@
+{
+  "cycle": "2026070406",
+  "cycle_utc": "202607040600",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":42,"member_id":null,"model_id":"JGSM","point_count":8,"raw_model_id":"JGSM","row_count":8,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 8,
+  "points": [
+    [0,0,"202607040600",20.5,108.1,992,23,7,0,180,null],
+    [0,6,"202607041200",21.1,107.7,988,25.2,-9,null,0,null],
+    [0,12,"202607041800",21.4,107.5,989,25.7,-9,null,0,null],
+    [0,18,"202607050000",21.8,107.8,992,24.2,-9,null,0,null],
+    [0,24,"202607050600",22.2,108.1,993,20.6,-9,null,0,null],
+    [0,30,"202607051200",22.8,108.5,995,14.4,-9,null,0,null],
+    [0,36,"202607051800",23.6,108.7,997,12.3,-9,null,0,null],
+    [0,42,"202607060000",24.4,109,998,11.8,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"7","storm_kind":"typ","typ_seq":10,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"MAYSAK","canonical_typ_name_ko":"마이삭","canonical_typ_number":10,"data_typ_number":10,"dmdw_o_tm_seq":"7","dmdw_start_time":"202607021800","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_10"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
