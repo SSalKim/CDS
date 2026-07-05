@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260705131011",
-  "generated_at_kst": "2026-07-05 22:10 KST",
+  "generated_at_utc": "20260705132010",
+  "generated_at_kst": "2026-07-05 22:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_09",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 26,
+  "model_source_count": 28,
   "selected_model_count": 12,
   "active_target_model_count": 36,
   "model_sources": [
@@ -236,6 +236,23 @@
       "first_seen_kst": "2026-07-05 20:20 KST"
     },
     {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "AVNO"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260705132010",
+      "first_seen_kst": "2026-07-05 22:20 KST"
+    },
+    {
       "model_id": "GFS_EPS",
       "model_label": "GFS EPS",
       "raw_model_ids": [
@@ -320,6 +337,23 @@
       "is_official": false,
       "first_seen_utc": "20260705130007",
       "first_seen_kst": "2026-07-05 22:00 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260705132010",
+      "first_seen_kst": "2026-07-05 22:20 KST"
     },
     {
       "model_id": "HAFS",
