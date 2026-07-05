@@ -2026,6 +2026,7 @@ def remove_obsolete_typ_artifacts_for_td_phases(
     cycle_status: dict,
     window: CycleWindow,
     dry_run: bool,
+    changed_paths: set[Path] | None = None,
 ) -> list[dict]:
     """Remove stale TYP products left by an older TD/TYP phase decision."""
     active_typ_keys = {
@@ -2065,6 +2066,8 @@ def remove_obsolete_typ_artifacts_for_td_phases(
                     else f"Would remove obsolete TYP output during linked TD phase: {image_path}"
                 )
                 if not dry_run:
+                    if changed_paths is not None:
+                        changed_paths.add(image_path)
                     try:
                         image_path.unlink()
                     except FileNotFoundError:
@@ -2080,6 +2083,8 @@ def remove_obsolete_typ_artifacts_for_td_phases(
                     else f"Would remove obsolete TYP metadata during linked TD phase: {metadata_path}"
                 )
                 if not dry_run:
+                    if changed_paths is not None:
+                        changed_paths.add(metadata_path)
                     metadata_path.unlink()
 
             cycle_status.pop(f"{status_prefix}_{fcst_hours}h", None)
@@ -4620,6 +4625,7 @@ def main() -> int:
     td_typ_links = td_typ_link_lookup(td_rows, typ_rows)
 
     run_entries = []
+    removed_artifact_paths: set[Path] = set()
     actual_run_count = 0
     render_signature = current_render_signature()
     for window in windows:
@@ -4669,6 +4675,7 @@ def main() -> int:
             cycle_status=cycle_status,
             window=window,
             dry_run=args.dry_run or args.check_run_needed,
+            changed_paths=removed_artifact_paths,
         ))
 
         pending_batches: list[tuple[StormJob, list[int], bool]] = []
@@ -4895,7 +4902,7 @@ def main() -> int:
     index_changed = previous_manifest.get("manifest_indexes") != manifest.get("manifest_indexes")
     status_changed = status_for_write != status
     should_write_outputs = not args.dry_run and (
-        actual_run_count > 0 or should_clear_previous_manifest or inventory_changed or index_changed or status_changed or bool(split_paths) or bool(canonicalized_paths)
+        actual_run_count > 0 or should_clear_previous_manifest or inventory_changed or index_changed or status_changed or bool(split_paths) or bool(canonicalized_paths) or bool(removed_artifact_paths)
     )
     changed_paths = collect_changed_asset_paths(
         run_entries=run_entries,
@@ -4905,6 +4912,7 @@ def main() -> int:
         include_manifest=should_write_outputs,
         include_status=status_changed or actual_run_count > 0,
     )
+    changed_paths.extend(relative_asset_path(path) for path in removed_artifact_paths)
     changed_paths.extend(relative_asset_path(path) for path in canonicalized_paths)
     changed_paths.extend(relative_asset_path(path) for path in kma_cache_asset_paths(kma_cache_dir, years))
     changed_paths = sorted(set(changed_paths))

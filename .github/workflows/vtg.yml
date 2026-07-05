@@ -363,6 +363,8 @@ jobs:
           else
             echo "Automatic VTG run: using the exact changed-path list from vtg_auto.py."
           fi
+          # Keep rebase safe even if a future cleanup path forgets to report a tracked deletion.
+          git diff --name-only --diff-filter=D -- data VTG_IMG >> "$CHANGED_PATHS_FILE" || true
           sort -u "$CHANGED_PATHS_FILE" -o "$CHANGED_PATHS_FILE"
 
           : > "$FILTERED_PATHS_FILE"
