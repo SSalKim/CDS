@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260706061005",
-  "generated_at_kst": "2026-07-06 15:10 KST",
+  "generated_at_utc": "20260706062007",
+  "generated_at_kst": "2026-07-06 15:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_10",
   "storm_stage": "TD",
@@ -27,27 +27,10 @@
     120,
     240
   ],
-  "model_source_count": 3,
-  "selected_model_count": 3,
+  "model_source_count": 2,
+  "selected_model_count": 2,
   "active_target_model_count": 36,
   "model_sources": [
-    {
-      "model_id": "ECMWF",
-      "model_label": "ECMWF",
-      "raw_model_ids": [
-        "ECMWF"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 10,
-      "max_lead_hour": 54,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260706041013",
-      "first_seen_kst": "2026-07-06 13:10 KST"
-    },
     {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
@@ -57,30 +40,30 @@
       "source": "APIHUB",
       "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 6,
-      "max_lead_hour": 30,
-      "has_pressure": true,
-      "has_wind": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": false,
+      "has_wind": false,
       "is_official": false,
       "first_seen_utc": "20260706041013",
       "first_seen_kst": "2026-07-06 13:10 KST"
     },
     {
-      "model_id": "ECMWF_EPS",
-      "model_label": "ECMWF EPS",
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
       "raw_model_ids": [
-        "ECMWF_EPS"
+        "AEMN"
       ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
       "selected": true,
-      "point_count": 19,
-      "max_lead_hour": 108,
+      "point_count": 21,
+      "max_lead_hour": 120,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260706041013",
-      "first_seen_kst": "2026-07-06 13:10 KST"
+      "first_seen_utc": "20260706062007",
+      "first_seen_kst": "2026-07-06 15:20 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2610_MAYSAK/metadata/source_availability/202607060000.json"
