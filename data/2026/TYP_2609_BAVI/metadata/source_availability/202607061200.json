@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260706191017",
-  "generated_at_kst": "2026-07-07 04:10 KST",
+  "generated_at_utc": "20260706192007",
+  "generated_at_kst": "2026-07-07 04:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_09",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 40,
-  "selected_model_count": 17,
+  "model_source_count": 45,
+  "selected_model_count": 21,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -91,8 +91,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 33,
-      "max_lead_hour": 192,
+      "point_count": 34,
+      "max_lead_hour": 198,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -160,8 +160,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 31,
-      "max_lead_hour": 180,
+      "point_count": 39,
+      "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -305,6 +305,23 @@
       "first_seen_kst": "2026-07-07 03:50 KST"
     },
     {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 37,
+      "max_lead_hour": 228,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260706192007",
+      "first_seen_kst": "2026-07-07 04:20 KST"
+    },
+    {
       "model_id": "FNV3",
       "model_label": "FNV3",
       "raw_model_ids": [
@@ -373,6 +390,23 @@
       "first_seen_kst": "2026-07-07 02:20 KST"
     },
     {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "AVNO"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 30,
+      "max_lead_hour": 174,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260706192007",
+      "first_seen_kst": "2026-07-07 04:20 KST"
+    },
+    {
       "model_id": "GFS_EPS",
       "model_label": "GFS EPS",
       "raw_model_ids": [
@@ -413,23 +447,6 @@
       "raw_model_ids": [
         "AEMN"
       ],
-      "source": "KNACKWX",
-      "source_label": "KNACKWX ATCF",
-      "selected": false,
-      "point_count": 33,
-      "max_lead_hour": 192,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260706175003",
-      "first_seen_kst": "2026-07-07 02:50 KST"
-    },
-    {
-      "model_id": "GFS_EPS",
-      "model_label": "GFS EPS",
-      "raw_model_ids": [
-        "AEMN"
-      ],
       "source": "RAL.UCAR",
       "source_label": "RAL UCAR ATCF",
       "selected": false,
@@ -457,6 +474,23 @@
       "is_official": false,
       "first_seen_utc": "20260706191017",
       "first_seen_kst": "2026-07-07 04:10 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260706192007",
+      "first_seen_kst": "2026-07-07 04:20 KST"
     },
     {
       "model_id": "HAFS",
@@ -698,6 +732,23 @@
       "first_seen_kst": "2026-07-07 03:50 KST"
     },
     {
+      "model_id": "IFKM_AI",
+      "model_label": "KMA AIFS-KIM",
+      "raw_model_ids": [
+        "IFKM_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260706192007",
+      "first_seen_kst": "2026-07-07 04:20 KST"
+    },
+    {
       "model_id": "KMA",
       "model_label": "KMA OFCL",
       "raw_model_ids": [
@@ -713,6 +764,40 @@
       "is_official": true,
       "first_seen_utc": "20260706161022",
       "first_seen_kst": "2026-07-07 01:10 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NVGM"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260706192007",
+      "first_seen_kst": "2026-07-07 04:20 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "NEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260706192007",
+      "first_seen_kst": "2026-07-07 04:20 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2609_BAVI/metadata/source_availability/202607061200.json"
