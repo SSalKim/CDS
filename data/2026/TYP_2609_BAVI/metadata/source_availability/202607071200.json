@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260707181002",
-  "generated_at_kst": "2026-07-08 03:10 KST",
+  "generated_at_utc": "20260707182106",
+  "generated_at_kst": "2026-07-08 03:21 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_09",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 13,
-  "selected_model_count": 6,
+  "model_source_count": 16,
+  "selected_model_count": 9,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -47,6 +47,57 @@
       "is_official": false,
       "first_seen_utc": "20260707164019",
       "first_seen_kst": "2026-07-08 01:40 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 19,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260707182106",
+      "first_seen_kst": "2026-07-08 03:21 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "EAMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 23,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260707182106",
+      "first_seen_kst": "2026-07-08 03:21 KST"
+    },
+    {
+      "model_id": "FNV3",
+      "model_label": "FNV3",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260707182106",
+      "first_seen_kst": "2026-07-08 03:21 KST"
     },
     {
       "model_id": "GFS",
