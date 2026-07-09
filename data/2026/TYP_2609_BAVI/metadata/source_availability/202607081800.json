@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260709000955",
-  "generated_at_kst": "2026-07-09 09:09 KST",
+  "generated_at_utc": "20260709001958",
+  "generated_at_kst": "2026-07-09 09:19 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_09",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 16,
-  "selected_model_count": 7,
+  "model_source_count": 19,
+  "selected_model_count": 8,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -83,6 +83,40 @@
       "first_seen_kst": "2026-07-09 09:09 KST"
     },
     {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 14,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260709001958",
+      "first_seen_kst": "2026-07-09 09:19 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "EAMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 18,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260709001958",
+      "first_seen_kst": "2026-07-09 09:19 KST"
+    },
+    {
       "model_id": "GFS",
       "model_label": "GFS",
       "raw_model_ids": [
@@ -98,6 +132,23 @@
       "is_official": false,
       "first_seen_utc": "20260709000955",
       "first_seen_kst": "2026-07-09 09:09 KST"
+    },
+    {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "GFS"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 24,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260709001958",
+      "first_seen_kst": "2026-07-09 09:19 KST"
     },
     {
       "model_id": "GFS_EPS",
@@ -143,8 +194,8 @@
       "source": "DMDW",
       "source_label": "KMA DMDW",
       "selected": false,
-      "point_count": 62,
-      "max_lead_hour": 186,
+      "point_count": 63,
+      "max_lead_hour": 192,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
