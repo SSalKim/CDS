@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260709001958",
-  "generated_at_kst": "2026-07-09 09:19 KST",
+  "generated_at_utc": "20260709002955",
+  "generated_at_kst": "2026-07-09 09:29 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_09",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 19,
-  "selected_model_count": 8,
+  "model_source_count": 22,
+  "selected_model_count": 10,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -47,6 +47,40 @@
       "is_official": false,
       "first_seen_utc": "20260708223951",
       "first_seen_kst": "2026-07-09 07:39 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 24,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260709002955",
+      "first_seen_kst": "2026-07-09 09:29 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 24,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260709002955",
+      "first_seen_kst": "2026-07-09 09:29 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -115,6 +149,23 @@
       "is_official": false,
       "first_seen_utc": "20260709001958",
       "first_seen_kst": "2026-07-09 09:19 KST"
+    },
+    {
+      "model_id": "FNV3",
+      "model_label": "FNV3",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 27,
+      "max_lead_hour": 156,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260709002955",
+      "first_seen_kst": "2026-07-09 09:29 KST"
     },
     {
       "model_id": "GFS",
