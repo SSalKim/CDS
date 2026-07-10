@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260710084031",
-  "generated_at_kst": "2026-07-10 17:40 KST",
+  "generated_at_utc": "20260710085030",
+  "generated_at_kst": "2026-07-10 17:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_09",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 82,
+  "model_source_count": 86,
   "selected_model_count": 36,
   "active_target_model_count": 36,
   "model_sources": [
@@ -47,6 +47,23 @@
       "is_official": false,
       "first_seen_utc": "20260710081030",
       "first_seen_kst": "2026-07-10 17:10 KST"
+    },
+    {
+      "model_id": "AGFS",
+      "model_label": "AIGFS",
+      "raw_model_ids": [
+        "AGFS"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260710085030",
+      "first_seen_kst": "2026-07-10 17:50 KST"
     },
     {
       "model_id": "AIGEFS",
@@ -288,6 +305,23 @@
       "first_seen_kst": "2026-07-10 17:10 KST"
     },
     {
+      "model_id": "COAMPS_EPS",
+      "model_label": "COAMPS-TC EPS",
+      "raw_model_ids": [
+        "CTMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 22,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260710085030",
+      "first_seen_kst": "2026-07-10 17:50 KST"
+    },
+    {
       "model_id": "ECMWF",
       "model_label": "ECMWF",
       "raw_model_ids": [
@@ -339,6 +373,23 @@
       "first_seen_kst": "2026-07-10 17:10 KST"
     },
     {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMF"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 21,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260710085030",
+      "first_seen_kst": "2026-07-10 17:50 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
       "raw_model_ids": [
@@ -381,8 +432,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 9,
-      "max_lead_hour": 54,
+      "point_count": 18,
+      "max_lead_hour": 102,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -449,8 +500,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 23,
-      "max_lead_hour": 138,
+      "point_count": 3,
+      "max_lead_hour": 54,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -671,8 +722,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 21,
-      "max_lead_hour": 120,
+      "point_count": 29,
+      "max_lead_hour": 168,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -722,7 +773,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 33,
+      "point_count": 7,
       "max_lead_hour": 192,
       "has_pressure": true,
       "has_wind": true,
@@ -1429,6 +1480,23 @@
       "is_official": false,
       "first_seen_utc": "20260710081030",
       "first_seen_kst": "2026-07-10 17:10 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 2,
+      "max_lead_hour": 174,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260710085030",
+      "first_seen_kst": "2026-07-10 17:50 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2609_BAVI/metadata/source_availability/202607100000.json"
