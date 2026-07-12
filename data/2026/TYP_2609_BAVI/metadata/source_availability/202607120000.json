@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260712080122",
-  "generated_at_kst": "2026-07-12 17:01 KST",
+  "generated_at_utc": "20260712081016",
+  "generated_at_kst": "2026-07-12 17:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_09",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 63,
-  "selected_model_count": 28,
+  "model_source_count": 69,
+  "selected_model_count": 31,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -271,6 +271,23 @@
       "first_seen_kst": "2026-07-12 16:10 KST"
     },
     {
+      "model_id": "COAMPS_EPS",
+      "model_label": "COAMPS-TC EPS",
+      "raw_model_ids": [
+        "CTMN"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": true,
+      "point_count": 16,
+      "max_lead_hour": 90,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260712081016",
+      "first_seen_kst": "2026-07-12 17:10 KST"
+    },
+    {
       "model_id": "ECMWF",
       "model_label": "ECMWF",
       "raw_model_ids": [
@@ -303,6 +320,23 @@
       "is_official": false,
       "first_seen_utc": "20260712071016",
       "first_seen_kst": "2026-07-12 16:10 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMF"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": false,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260712081016",
+      "first_seen_kst": "2026-07-12 17:10 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -354,6 +388,23 @@
       "is_official": false,
       "first_seen_utc": "20260712062036",
       "first_seen_kst": "2026-07-12 15:20 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": false,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260712081016",
+      "first_seen_kst": "2026-07-12 17:10 KST"
     },
     {
       "model_id": "ECMWF_AIFS_EPS",
@@ -1029,7 +1080,7 @@
       ],
       "source": "NOAA",
       "source_label": "NOAA ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 31,
       "max_lead_hour": 180,
       "has_pressure": true,
@@ -1037,6 +1088,40 @@
       "is_official": false,
       "first_seen_utc": "20260712071016",
       "first_seen_kst": "2026-07-12 16:10 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 14,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260712081016",
+      "first_seen_kst": "2026-07-12 17:10 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "FNMOC_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 24,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260712081016",
+      "first_seen_kst": "2026-07-12 17:10 KST"
     },
     {
       "model_id": "PGEC_AI",
@@ -1106,6 +1191,23 @@
       "is_official": false,
       "first_seen_utc": "20260712071016",
       "first_seen_kst": "2026-07-12 16:10 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "NOAA",
+      "source_label": "NOAA ATCF",
+      "selected": true,
+      "point_count": 19,
+      "max_lead_hour": 108,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260712081016",
+      "first_seen_kst": "2026-07-12 17:10 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2609_BAVI/metadata/source_availability/202607120000.json"
