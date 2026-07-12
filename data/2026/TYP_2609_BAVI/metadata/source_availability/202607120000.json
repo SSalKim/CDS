@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260712065012",
-  "generated_at_kst": "2026-07-12 15:50 KST",
+  "generated_at_utc": "20260712070015",
+  "generated_at_kst": "2026-07-12 16:00 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_09",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 34,
-  "selected_model_count": 15,
+  "model_source_count": 36,
+  "selected_model_count": 16,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -357,6 +357,23 @@
       "first_seen_kst": "2026-07-12 15:20 KST"
     },
     {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 21,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260712070015",
+      "first_seen_kst": "2026-07-12 16:00 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -611,6 +628,23 @@
       "is_official": true,
       "first_seen_utc": "20260712040017",
       "first_seen_kst": "2026-07-12 13:00 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKM"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": true,
+      "point_count": 18,
+      "max_lead_hour": 102,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260712070015",
+      "first_seen_kst": "2026-07-12 16:00 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2609_BAVI/metadata/source_availability/202607120000.json"
