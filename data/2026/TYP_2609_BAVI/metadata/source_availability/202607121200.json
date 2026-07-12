@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260712201015",
-  "generated_at_kst": "2026-07-13 05:10 KST",
+  "generated_at_utc": "20260712202015",
+  "generated_at_kst": "2026-07-13 05:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_09",
   "storm_stage": "TYP",
@@ -28,7 +28,7 @@
     240
   ],
   "model_source_count": 70,
-  "selected_model_count": 32,
+  "selected_model_count": 33,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -354,23 +354,6 @@
       "is_official": false,
       "first_seen_utc": "20260712184025",
       "first_seen_kst": "2026-07-13 03:40 KST"
-    },
-    {
-      "model_id": "ECMWF_EPS",
-      "model_label": "ECMWF EPS",
-      "raw_model_ids": [
-        "EEMN"
-      ],
-      "source": "KNACKWX",
-      "source_label": "KNACKWX ATCF",
-      "selected": false,
-      "point_count": 7,
-      "max_lead_hour": 60,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260712192017",
-      "first_seen_kst": "2026-07-13 04:20 KST"
     },
     {
       "model_id": "ECMWF_EPS",
@@ -1039,6 +1022,23 @@
       "first_seen_kst": "2026-07-13 03:40 KST"
     },
     {
+      "model_id": "IFEC_AI",
+      "model_label": "KMA AIFS-ECMWF",
+      "raw_model_ids": [
+        "IFEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260712202015",
+      "first_seen_kst": "2026-07-13 05:20 KST"
+    },
+    {
       "model_id": "IFKM_AI",
       "model_label": "KMA AIFS-KIM",
       "raw_model_ids": [
@@ -1082,7 +1082,7 @@
       "source_label": "KNACKWX ATCF",
       "selected": false,
       "point_count": 17,
-      "max_lead_hour": 96,
+      "max_lead_hour": 108,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
