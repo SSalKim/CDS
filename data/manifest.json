@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at_utc": "202607130720",
+  "updated_at_utc": "202607130740",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 36,
@@ -16,129 +16,18 @@
   "runs": [
     {
       "job": {
-        "storm_key": "td_2026_17",
-        "stage": "TD_UNLINKED",
-        "year": 2026,
-        "data_time": "202607130000",
-        "td_number": 17,
-        "linked_td_number": null,
-        "typ_number": 17,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp972026",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202607130000",
-        "cycle_time_utc": "202607130000",
-        "start_utc": "202607130400",
-        "end_utc": "202607131000"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20260713072236",
-          "image_path": "data/2026/TD_2617_NONAME/images/TD_2617_NONAME_202607130000_120h.png",
-          "storm_stage": "TD",
-          "storm_year": "2026",
-          "typ_number": 17,
-          "data_typ_number": 17,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": null,
-          "canonical_storm_key": "td_2026_17",
-          "canonical_storm_stage": "TD",
-          "canonical_typ_number": 17,
-          "canonical_typ_name": "NONAME",
-          "canonical_typ_name_ko": "",
-          "atcf_id": "wp972026",
-          "extra_atcf_ids": [],
-          "data_time": "202607130000",
-          "fcst_hours": 120,
-          "intensity": "TD",
-          "model_count": 1,
-          "target_model_count": 36,
-          "model_labels": [
-            "GFS EPS"
-          ],
-          "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2617_NONAME/metadata/source_availability/202607130000.json"
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "td_2026_17",
-        "stage": "TD_UNLINKED",
-        "year": 2026,
-        "data_time": "202607130000",
-        "td_number": 17,
-        "linked_td_number": null,
-        "typ_number": 17,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp972026",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202607130000",
-        "cycle_time_utc": "202607130000",
-        "start_utc": "202607130400",
-        "end_utc": "202607131000"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20260713072237",
-          "image_path": "data/2026/TD_2617_NONAME/images/TD_2617_NONAME_202607130000_240h.png",
-          "storm_stage": "TD",
-          "storm_year": "2026",
-          "typ_number": 17,
-          "data_typ_number": 17,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": null,
-          "canonical_storm_key": "td_2026_17",
-          "canonical_storm_stage": "TD",
-          "canonical_typ_number": 17,
-          "canonical_typ_name": "NONAME",
-          "canonical_typ_name_ko": "",
-          "atcf_id": "wp972026",
-          "extra_atcf_ids": [],
-          "data_time": "202607130000",
-          "fcst_hours": 240,
-          "intensity": "TD",
-          "model_count": 1,
-          "target_model_count": 36,
-          "model_labels": [
-            "GFS EPS"
-          ],
-          "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2617_NONAME/metadata/source_availability/202607130000.json"
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
         "storm_key": "typ_2026_09",
-        "stage": "TYP_LINKED",
+        "stage": "TYP_SUPPRESSED_BY_TD",
         "year": 2026,
         "data_time": "202607130000",
-        "td_number": null,
-        "linked_td_number": 14,
+        "td_number": 18,
+        "linked_td_number": 18,
         "typ_number": 9,
         "typ_name_ko": "바비",
         "typ_name": "BAVI",
         "typ_en": "BAVI",
         "atcf_id": "wp092026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
@@ -148,10 +37,10 @@
         "end_utc": "202607131000"
       },
       "result": {
-        "status": "ok",
+        "status": "suppressed_td_phase",
         "metadata": {
-          "generated_at_utc": "20260713072408",
-          "image_path": "data/2026/TYP_2609_BAVI/images/TYP_2609_BAVI_202607130000_120h.png",
+          "generated_at_utc": "202607130740",
+          "image_path": "",
           "storm_stage": "TYP",
           "storm_year": "2026",
           "typ_number": 9,
@@ -170,6 +59,201 @@
           "data_time": "202607130000",
           "fcst_hours": 120,
           "intensity": "TYP",
+          "model_count": 0,
+          "target_model_count": 36,
+          "models": [],
+          "model_labels": [],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2609_BAVI/metadata/source_availability/202607130000.json",
+          "no_output": true,
+          "no_output_reason": "Suppressed because linked TD18 phase is active."
+        }
+      }
+    },
+    {
+      "job": {
+        "storm_key": "typ_2026_09",
+        "stage": "TYP_SUPPRESSED_BY_TD",
+        "year": 2026,
+        "data_time": "202607130000",
+        "td_number": 18,
+        "linked_td_number": 18,
+        "typ_number": 9,
+        "typ_name_ko": "바비",
+        "typ_name": "BAVI",
+        "typ_en": "BAVI",
+        "atcf_id": "wp092026",
+        "fcst_hours": 240,
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202607130000",
+        "cycle_time_utc": "202607130000",
+        "start_utc": "202607130400",
+        "end_utc": "202607131000"
+      },
+      "result": {
+        "status": "suppressed_td_phase",
+        "metadata": {
+          "generated_at_utc": "202607130740",
+          "image_path": "",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 9,
+          "data_typ_number": 9,
+          "typ_name": "BAVI",
+          "typ_name_ko": "바비",
+          "linked_td_number": 14,
+          "linked_typ_number": null,
+          "canonical_storm_key": "typ_2026_09",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 9,
+          "canonical_typ_name": "BAVI",
+          "canonical_typ_name_ko": "바비",
+          "atcf_id": "wp092026",
+          "extra_atcf_ids": [],
+          "data_time": "202607130000",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 0,
+          "target_model_count": 36,
+          "models": [],
+          "model_labels": [],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2609_BAVI/metadata/source_availability/202607130000.json",
+          "no_output": true,
+          "no_output_reason": "Suppressed because linked TD18 phase is active."
+        }
+      }
+    },
+    {
+      "job": {
+        "storm_key": "typ_2026_11",
+        "stage": "TYP_SUPPRESSED_BY_TD",
+        "year": 2026,
+        "data_time": "202607130000",
+        "td_number": 17,
+        "linked_td_number": 17,
+        "typ_number": 11,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp972026",
+        "fcst_hours": 120,
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202607130000",
+        "cycle_time_utc": "202607130000",
+        "start_utc": "202607130400",
+        "end_utc": "202607131000"
+      },
+      "result": {
+        "status": "suppressed_td_phase",
+        "metadata": {
+          "generated_at_utc": "202607130740",
+          "image_path": "",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 11,
+          "data_typ_number": 11,
+          "data_time": "202607130000",
+          "fcst_hours": 120,
+          "model_count": 0,
+          "target_model_count": 36,
+          "models": [],
+          "model_labels": [],
+          "no_output": true,
+          "no_output_reason": "Suppressed because linked TD17 phase is active."
+        }
+      }
+    },
+    {
+      "job": {
+        "storm_key": "typ_2026_11",
+        "stage": "TYP_SUPPRESSED_BY_TD",
+        "year": 2026,
+        "data_time": "202607130000",
+        "td_number": 17,
+        "linked_td_number": 17,
+        "typ_number": 11,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp972026",
+        "fcst_hours": 240,
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202607130000",
+        "cycle_time_utc": "202607130000",
+        "start_utc": "202607130400",
+        "end_utc": "202607131000"
+      },
+      "result": {
+        "status": "suppressed_td_phase",
+        "metadata": {
+          "generated_at_utc": "202607130740",
+          "image_path": "",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 11,
+          "data_typ_number": 11,
+          "data_time": "202607130000",
+          "fcst_hours": 240,
+          "model_count": 0,
+          "target_model_count": 36,
+          "models": [],
+          "model_labels": [],
+          "no_output": true,
+          "no_output_reason": "Suppressed because linked TD17 phase is active."
+        }
+      }
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_18_typ_09",
+        "stage": "TD_LINKED_TYP",
+        "year": 2026,
+        "data_time": "202607130000",
+        "td_number": 18,
+        "linked_td_number": null,
+        "typ_number": 18,
+        "typ_name_ko": "바비",
+        "typ_name": "BAVI",
+        "typ_en": "BAVI",
+        "atcf_id": "wp092026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202607130000",
+        "cycle_time_utc": "202607130000",
+        "start_utc": "202607130400",
+        "end_utc": "202607131000"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260713074139",
+          "image_path": "data/2026/TYP_2609_BAVI/images/TD_2618_BAVI_202607130000_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 18,
+          "data_typ_number": 18,
+          "typ_name": "BAVI",
+          "typ_name_ko": "바비",
+          "linked_td_number": null,
+          "linked_typ_number": 9,
+          "canonical_storm_key": "typ_2026_09",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 9,
+          "canonical_typ_name": "BAVI",
+          "canonical_typ_name_ko": "바비",
+          "atcf_id": "wp092026",
+          "extra_atcf_ids": [],
+          "data_time": "202607130000",
+          "fcst_hours": 120,
+          "intensity": "TD",
           "model_count": 10,
           "target_model_count": 36,
           "model_labels": [
@@ -193,13 +277,13 @@
     },
     {
       "job": {
-        "storm_key": "typ_2026_09",
-        "stage": "TYP_LINKED",
+        "storm_key": "td_2026_18_typ_09",
+        "stage": "TD_LINKED_TYP",
         "year": 2026,
         "data_time": "202607130000",
-        "td_number": null,
-        "linked_td_number": 14,
-        "typ_number": 9,
+        "td_number": 18,
+        "linked_td_number": null,
+        "typ_number": 18,
         "typ_name_ko": "바비",
         "typ_name": "BAVI",
         "typ_en": "BAVI",
@@ -215,16 +299,16 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260713072409",
-          "image_path": "data/2026/TYP_2609_BAVI/images/TYP_2609_BAVI_202607130000_240h.png",
-          "storm_stage": "TYP",
+          "generated_at_utc": "20260713074141",
+          "image_path": "data/2026/TYP_2609_BAVI/images/TD_2618_BAVI_202607130000_240h.png",
+          "storm_stage": "TD",
           "storm_year": "2026",
-          "typ_number": 9,
-          "data_typ_number": 9,
+          "typ_number": 18,
+          "data_typ_number": 18,
           "typ_name": "BAVI",
           "typ_name_ko": "바비",
-          "linked_td_number": 14,
-          "linked_typ_number": null,
+          "linked_td_number": null,
+          "linked_typ_number": 9,
           "canonical_storm_key": "typ_2026_09",
           "canonical_storm_stage": "TYP",
           "canonical_typ_number": 9,
@@ -234,7 +318,7 @@
           "extra_atcf_ids": [],
           "data_time": "202607130000",
           "fcst_hours": 240,
-          "intensity": "TYP",
+          "intensity": "TD",
           "model_count": 10,
           "target_model_count": 36,
           "model_labels": [
@@ -251,13 +335,131 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2609_BAVI/metadata/source_availability/202607130000.json"
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_17_typ_11",
+        "stage": "TD_PRE_TYP_POSITION_ATCF",
+        "year": 2026,
+        "data_time": "202607130000",
+        "td_number": 17,
+        "linked_td_number": null,
+        "typ_number": 17,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp972026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202607130000",
+        "cycle_time_utc": "202607130000",
+        "start_utc": "202607130400",
+        "end_utc": "202607131000"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260713074133",
+          "image_path": "data/2026/TYP_2611_HAISHEN/images/TD_2617_NONAME_202607130000_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 17,
+          "data_typ_number": 17,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 11,
+          "canonical_storm_key": "typ_2026_11",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 11,
+          "canonical_typ_name": "HAISHEN",
+          "canonical_typ_name_ko": "하이선",
+          "atcf_id": "wp972026",
+          "extra_atcf_ids": [],
+          "data_time": "202607130000",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 4,
+          "target_model_count": 36,
+          "model_labels": [
+            "ECMWF AIFS",
+            "GFS EPS",
+            "KIM",
+            "KIM EPS"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2611_HAISHEN/metadata/source_availability/202607130000.json"
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_17_typ_11",
+        "stage": "TD_PRE_TYP_POSITION_ATCF",
+        "year": 2026,
+        "data_time": "202607130000",
+        "td_number": 17,
+        "linked_td_number": null,
+        "typ_number": 17,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp972026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202607130000",
+        "cycle_time_utc": "202607130000",
+        "start_utc": "202607130400",
+        "end_utc": "202607131000"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260713074144",
+          "image_path": "data/2026/TYP_2611_HAISHEN/images/TD_2617_NONAME_202607130000_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 17,
+          "data_typ_number": 17,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": 11,
+          "canonical_storm_key": "typ_2026_11",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 11,
+          "canonical_typ_name": "HAISHEN",
+          "canonical_typ_name_ko": "하이선",
+          "atcf_id": "wp972026",
+          "extra_atcf_ids": [],
+          "data_time": "202607130000",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 4,
+          "target_model_count": 36,
+          "model_labels": [
+            "ECMWF AIFS",
+            "GFS EPS",
+            "KIM",
+            "KIM EPS"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2611_HAISHEN/metadata/source_availability/202607130000.json"
         }
       },
       "completed": false,
       "final_check": false
     }
   ],
-  "inventory_count": 8528,
+  "inventory_count": 8530,
   "manifest_indexes": [
     {
       "year": 2020,
