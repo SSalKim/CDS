@@ -400,13 +400,17 @@ def fetch_kma_text(
         if not fallback_url or not should_try_kma_fallback(exc):
             raise
         print(f"KMA APIHUB {label} primary endpoint failed ({exc}); trying fallback endpoint.")
-        return fetch_text(
-            fallback_url,
-            timeout=timeout,
-            retries=retries,
-            retry_delay=retry_delay,
-            use_cache=use_cache,
-        )
+        try:
+            return fetch_text(
+                fallback_url,
+                timeout=timeout,
+                retries=retries,
+                retry_delay=retry_delay,
+                use_cache=use_cache,
+            )
+        except (HTTPError, URLError, TimeoutError, OSError) as fallback_exc:
+            print(f"KMA APIHUB {label} fallback endpoint failed ({fallback_exc}).")
+            raise exc
 
 
 def kma_endpoint_url(endpoint: str, *, base_url: str = KMA_LIST_BASE_URL) -> str:

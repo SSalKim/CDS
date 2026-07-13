@@ -1069,7 +1069,7 @@ def load_active_jobs(cycle: datetime, auth_key: str) -> list[Any]:
     data_time = stamp(cycle)
     activity_time = cycle + timedelta(hours=4)
     years = {cycle.year - 1, cycle.year, cycle.year + 1}
-    cache_dir = Path(os.environ.get("RUNNER_TEMP", tempfile.gettempdir())) / "dmdw_kma_apihub_cache"
+    cache_dir = Path(os.environ.get("KMA_APIHUB_CACHE_DIR") or PROJECT_ROOT / "data" / "cache" / "kma_apihub")
     td_rows: list[dict[str, Any]] = []
     typ_rows: list[dict[str, Any]] = []
     for year in sorted(years):
