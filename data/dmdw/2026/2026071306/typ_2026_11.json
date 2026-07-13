@@ -1,0 +1,37 @@
+{
+  "cycle": "2026071306",
+  "cycle_utc": "202607130600",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":108,"member_id":null,"model_id":"JGSM","point_count":19,"raw_model_id":"JGSM","row_count":19,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 19,
+  "points": [
+    [0,0,"202607130600",10.9,135.9,1004,18,11,292.5,200,null],
+    [0,6,"202607131200",11,135.8,1002,20.1,-9,null,0,null],
+    [0,12,"202607131800",12.1,136.2,1001,15.9,-9,null,0,null],
+    [0,18,"202607140000",13.1,135.9,1003,14.4,-9,null,0,null],
+    [0,24,"202607140600",14,135.7,1001,14.4,-9,null,0,null],
+    [0,30,"202607141200",14.8,135.6,1002,14.4,-9,null,0,null],
+    [0,36,"202607141800",15.3,135.6,1000,15.9,-9,null,0,null],
+    [0,42,"202607150000",15.9,136,1002,15.9,-9,null,0,null],
+    [0,48,"202607150600",16.6,136.5,1000,14.9,-9,null,0,null],
+    [0,54,"202607151200",17,136.8,1002,13.4,-9,null,0,null],
+    [0,60,"202607151800",17.3,137.1,1000,14.4,-9,null,0,null],
+    [0,66,"202607160000",17.6,137.7,1002,14.4,-9,null,0,null],
+    [0,72,"202607160600",17.7,138.5,1000,14.4,-9,null,0,null],
+    [0,78,"202607161200",17.9,139.4,1002,13.9,-9,null,0,null],
+    [0,84,"202607161800",18.3,140.3,1000,12.9,-9,null,0,null],
+    [0,90,"202607170000",18.6,141.3,1001,12.3,-9,null,0,null],
+    [0,96,"202607170600",19,142.3,1000,12.3,-9,null,0,null],
+    [0,102,"202607171200",19.4,143.2,1002,11.8,-9,null,0,null],
+    [0,108,"202607171800",20,144.2,1000,12.9,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"1","storm_kind":"typ","typ_seq":11,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"HAISHEN","canonical_typ_name_ko":"하이선","canonical_typ_number":11,"data_typ_number":11,"dmdw_o_tm_seq":"1","dmdw_start_time":"202607130600","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_11"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
