@@ -363,11 +363,13 @@ DATA_SOURCE_COLUMN = "_DATA_SOURCE"
 RAW_MODEL_COLUMN = "_RAW_MODEL"
 MODEL_ALIAS_PRIORITY_COLUMN = "_MODEL_ALIAS_PRIORITY"
 MS_PER_KT = 0.514444
-KMA_URL_BASE = "https://apihub-pub.kma.go.kr/api/typ01/url"
+KMA_URL_BASE = (os.getenv("KMA_APIHUB_BASE_URL") or "https://apihub-pub.kma.go.kr/api/typ01/url").rstrip("/")
+KMA_FALLBACK_URL_BASE = (os.getenv("KMA_APIHUB_FALLBACK_BASE_URL") or "https://apihub.kma.go.kr/api/typ01/url").rstrip("/")
 KMA_BASE_URL = f"{KMA_URL_BASE}/typ_gts_now.php"
 KMA_TYP_NOW_URL = f"{KMA_URL_BASE}/typ_now.php"
 KMA_TD_NOW_URL = f"{KMA_URL_BASE}/td_now.php"
 DEFAULT_AUTH_KEY = ""
+DEFAULT_FALLBACK_AUTH_KEY = os.getenv("KMA_APIHUB_FALLBACK_AUTH_KEY", "").strip()
 VALID_FCST_HOURS = (120, 240)
 CLI_FCST_HOURS = (*VALID_FCST_HOURS, 360)
 TRACK_HISTORY_MAX_LOOKBACK_DAYS = 45
@@ -435,6 +437,8 @@ class Settings:
     output_root: Path = PROJECT_ROOT / "data"
     metadata_path: Path | None = None
     auth_key: str = os.getenv("KMA_APIHUB_AUTH_KEY", DEFAULT_AUTH_KEY)
+    fallback_auth_key: str = DEFAULT_FALLBACK_AUTH_KEY
+    fallback_url_base: str = KMA_FALLBACK_URL_BASE
     base_url: str = KMA_BASE_URL
     kma_forecast_text_path: Path | None = None
     kma_past_text_path: Path | None = None
@@ -591,6 +595,11 @@ def parse_args() -> Settings:
     parser.add_argument("--metadata-path", type=Path, default=Settings.metadata_path)
     parser.add_argument("--auth-key", default=os.getenv("KMA_APIHUB_AUTH_KEY", DEFAULT_AUTH_KEY))
     parser.add_argument(
+        "--fallback-auth-key",
+        default=os.getenv("KMA_APIHUB_FALLBACK_AUTH_KEY", DEFAULT_FALLBACK_AUTH_KEY),
+        help="Optional fallback KMA APIHUB auth key for apihub.kma.go.kr.",
+    )
+    parser.add_argument(
         "--kma-forecast-text-path",
         type=Path,
         default=Settings.kma_forecast_text_path,
@@ -676,6 +685,8 @@ def parse_args() -> Settings:
         output_root=args.output_root,
         metadata_path=args.metadata_path,
         auth_key=args.auth_key,
+        fallback_auth_key=args.fallback_auth_key.strip(),
+        fallback_url_base=KMA_FALLBACK_URL_BASE,
         kma_forecast_text_path=args.kma_forecast_text_path,
         kma_past_text_path=args.kma_past_text_path,
         http_cache_dir=args.http_cache_dir,
@@ -756,6 +767,44 @@ def kma_now_url(settings: Settings, endpoint_url: str, typ_number: int | None) -
         "authKey": settings.auth_key,
     }
     return f"{endpoint_url}?{urlencode(params)}"
+
+
+def kma_fallback_endpoint_url(settings: Settings, endpoint_url: str) -> str:
+    if not settings.fallback_auth_key:
+        return ""
+    endpoint_name = endpoint_url.rsplit("/", 1)[-1]
+    return f"{settings.fallback_url_base.rstrip('/')}/{endpoint_name}"
+
+
+def kma_fallback_url(settings: Settings, mode: str) -> str:
+    endpoint_url = kma_fallback_endpoint_url(settings, settings.base_url)
+    if not endpoint_url:
+        return ""
+    params = {
+        "src": "",
+        "tm": settings.data_time,
+        "mode": mode,
+        "disp": "1",
+        "help": "0",
+        "authKey": settings.fallback_auth_key,
+    }
+    return f"{endpoint_url}?{urlencode(params)}"
+
+
+def kma_now_fallback_url(settings: Settings, endpoint_url: str, typ_number: int | None) -> str:
+    fallback_endpoint_url = kma_fallback_endpoint_url(settings, endpoint_url)
+    if not fallback_endpoint_url:
+        return ""
+    params = {
+        "src": "",
+        "typ": "" if typ_number is None else str(int(typ_number)),
+        "tm": settings.data_time,
+        "mode": "0",
+        "disp": "1",
+        "help": "0",
+        "authKey": settings.fallback_auth_key,
+    }
+    return f"{fallback_endpoint_url}?{urlencode(params)}"
 
 
 def normalize_utc_stamp(value: str) -> str:
@@ -889,9 +938,11 @@ def kma_now_endpoint_candidates(settings: Settings) -> list[tuple[str, str, int 
 def fetch_kma_now_analysis_point(session: requests.Session, settings: Settings) -> AnalysisPoint | None:
     for label, endpoint, query_number, filter_number in kma_now_endpoint_candidates(settings):
         url = kma_now_url(settings, endpoint, query_number)
-        text = fetch_text(
+        text = fetch_kma_text(
             session,
             url,
+            kma_now_fallback_url(settings, endpoint, query_number),
+            label=label,
             retries=2,
             timeout=10,
             retry_delay=2,
@@ -1001,6 +1052,44 @@ def fetch_text(
             if attempt < retries:
                 time.sleep(retry_delay)
     return None
+
+
+def fetch_kma_text(
+    session: requests.Session,
+    primary_url: str,
+    fallback_url: str,
+    *,
+    label: str,
+    retries: int = 3,
+    timeout: float = 8,
+    retry_delay: float = 1.0,
+    encoding: str | None = None,
+    cache_dir: Path | None = None,
+    cache_ttl_seconds: int = 6 * 3600,
+) -> str | None:
+    text = fetch_text(
+        session,
+        primary_url,
+        retries=retries,
+        timeout=timeout,
+        retry_delay=retry_delay,
+        encoding=encoding,
+        cache_dir=cache_dir,
+        cache_ttl_seconds=cache_ttl_seconds,
+    )
+    if text is not None or not fallback_url:
+        return text
+    print(f"KMA APIHUB {label} primary endpoint unavailable; trying fallback endpoint.")
+    return fetch_text(
+        session,
+        fallback_url,
+        retries=retries,
+        timeout=timeout,
+        retry_delay=retry_delay,
+        encoding=encoding,
+        cache_dir=cache_dir,
+        cache_ttl_seconds=cache_ttl_seconds,
+    )
 
 
 def atcf_cycle_from_line(line: str) -> str:
@@ -4455,9 +4544,11 @@ def main() -> None:
         stage_started_at = time.monotonic()
         kma_forecast_text = read_text_file(fetch_settings.kma_forecast_text_path)
         if kma_forecast_text is None:
-            kma_forecast_text = fetch_text(
+            kma_forecast_text = fetch_kma_text(
                 session,
                 kma_url(fetch_settings, "2"),
+                kma_fallback_url(fetch_settings, "2"),
+                label="typ_gts_now mode=2",
                 retries=5,
                 timeout=8,
                 retry_delay=3,
@@ -4505,9 +4596,11 @@ def main() -> None:
         stage_started_at = time.monotonic()
         kma_past_text = read_text_file(fetch_settings.kma_past_text_path)
         if kma_past_text is None:
-            kma_past_text = fetch_text(
+            kma_past_text = fetch_kma_text(
                 session,
                 kma_url(fetch_settings, "0"),
+                kma_fallback_url(fetch_settings, "0"),
+                label="typ_gts_now mode=0",
                 retries=3,
                 timeout=10,
                 retry_delay=3,

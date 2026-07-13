@@ -3201,6 +3201,442 @@ option.group-header{
   pointer-events:none;
 }
 
+.radar-mobile-control-group{
+  display:contents;
+}
+
+.radar-page .radar-controls .radar-map-mode-group .radar-overlay-modal-button{
+  display:none !important;
+}
+
+body.radar-overlay-modal-open{
+  overflow:hidden;
+}
+
+.radar-overlay-modal{
+  position:fixed;
+  inset:0;
+  z-index:10000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:14px;
+  background:rgba(15,23,42,.38);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+}
+
+.radar-overlay-modal.hidden{
+  display:none;
+}
+
+.radar-overlay-dialog{
+  width:min(440px,calc(100vw - 28px));
+  max-height:calc(100dvh - 28px);
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border:1px solid rgba(148,163,184,.4);
+  border-radius:8px;
+  background:#ffffff;
+  box-shadow:0 24px 60px rgba(2,6,23,.32);
+}
+
+.radar-overlay-dialog:focus{
+  outline:none;
+}
+
+.radar-overlay-dialog-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding:16px;
+  background:linear-gradient(135deg,#0f172a,#1e3a8a 60%,#0369a1);
+  color:#ffffff;
+}
+
+.radar-overlay-dialog-title-wrap{
+  min-width:0;
+}
+
+.radar-overlay-dialog-title{
+  margin:0;
+  font-size:19px;
+  font-weight:900;
+  line-height:1.15;
+}
+
+.radar-overlay-dialog-subtitle{
+  margin:5px 0 0;
+  color:#dbeafe;
+  font-size:11px;
+  font-weight:650;
+  line-height:1.4;
+}
+
+.radar-overlay-dialog-close{
+  width:32px;
+  height:32px;
+  flex:0 0 32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  border:1px solid rgba(255,255,255,.28);
+  border-radius:8px;
+  background:rgba(255,255,255,.12);
+  color:#ffffff;
+  font-size:23px;
+  line-height:1;
+  cursor:pointer;
+}
+
+.radar-overlay-dialog-close:hover{
+  background:rgba(255,255,255,.22);
+}
+
+.radar-overlay-dialog-body{
+  min-height:0;
+  overflow:auto;
+  padding:14px;
+}
+
+.radar-overlay-dialog-body .radar-overlay-label{
+  display:none;
+}
+
+.radar-overlay-dialog-body .radar-overlay-control,
+.radar-overlay-dialog-body .radar-check-group{
+  width:100%;
+  min-width:0;
+}
+
+.radar-overlay-dialog-body .radar-check-group{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+}
+
+.radar-overlay-dialog-body .radar-check-group > *,
+.radar-overlay-dialog-body .radar-wind-control,
+.radar-overlay-dialog-body .radar-wind-button{
+  width:100%;
+  min-width:0;
+  height:42px;
+  box-sizing:border-box;
+  border:1px solid var(--line-soft) !important;
+  border-radius:8px !important;
+}
+
+.radar-overlay-dialog-body .radar-check-group .radar-check{
+  height:40px;
+  border:none !important;
+  border-radius:8px !important;
+  padding:0 10px;
+  font-size:12px;
+}
+
+.radar-overlay-dialog-body .radar-check-group > .radar-check{
+  height:42px;
+  border:1px solid var(--line-soft) !important;
+}
+
+/* Radar mobile portrait workspace */
+@media (max-width: 700px) and (orientation: portrait){
+  html,
+  body.radar-page-body{
+    width:100%;
+    min-height:100%;
+    margin:0;
+    padding:0;
+    background:#ffffff;
+  }
+
+  html{
+    scrollbar-gutter:stable;
+  }
+
+  body.radar-page-body,
+  #radarAnalysisApp,
+  .radar-page{
+    height:auto;
+    min-height:100dvh;
+    overflow:visible;
+  }
+
+  .radar-controls{
+    display:grid;
+    grid-template-columns:72px minmax(0,1fr);
+    align-items:stretch;
+    padding:0;
+    background:#ffffff;
+  }
+
+  .radar-menu-title{
+    width:auto;
+    min-width:0;
+    margin:0;
+    justify-content:center;
+    padding:0 4px;
+    font-size:14px;
+    line-height:1.05;
+  }
+
+  .radar-controls-body{
+    gap:3px;
+    padding:4px 4px 4px 5px;
+  }
+
+  .radar-control-row{
+    gap:3px;
+    width:100%;
+    overflow:visible;
+  }
+
+  .radar-settings-row{
+    display:grid;
+    grid-template-columns:60px 82px minmax(0,1fr);
+  }
+
+  .radar-settings-row > .radar-overlay-control{
+    display:none;
+  }
+
+  .radar-page .radar-controls .radar-map-mode-group .radar-overlay-modal-button{
+    display:inline-flex !important;
+  }
+
+  .radar-settings-row .radar-map-mode-group{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    min-width:0;
+  }
+
+  .radar-settings-row .radar-map-mode-group .radar-mode-button{
+    width:100%;
+    min-width:0;
+    padding:0 2px;
+    font-size:10px;
+  }
+
+  .radar-playback-row{
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    gap:3px;
+  }
+
+  .radar-mobile-control-group{
+    display:grid;
+  }
+
+  .radar-time-row{
+    display:grid;
+    grid-template-columns:38px 116px minmax(0,1fr);
+    gap:2px;
+  }
+
+  .radar-time-row .radar-primary-now-button{
+    width:38px;
+    min-width:38px;
+    padding:0;
+    font-size:10px;
+  }
+
+  .radar-time-row .radar-datetime-group{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 16px;
+    width:116px;
+    min-width:0;
+  }
+
+  .radar-time-row .radar-datetime-input{
+    width:100% !important;
+    min-width:0;
+    padding:0 1px !important;
+    font-size:10px !important;
+    text-align:left !important;
+  }
+
+  .radar-time-row .radar-datetime-picker-control,
+  .radar-time-row .radar-time-picker-toggle{
+    width:16px;
+    min-width:16px;
+    flex-basis:16px;
+  }
+
+  .radar-time-row .radar-time-picker-toggle::before{
+    left:4px;
+  }
+
+  .radar-time-row .radar-shift-controls{
+    display:grid;
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    width:100%;
+    min-width:0;
+  }
+
+  .radar-time-row .radar-shift-controls button{
+    width:100%;
+    min-width:0 !important;
+    padding:0 !important;
+    font-size:9px;
+  }
+
+  .radar-time-row .radar-shift-controls button:not([data-shift-minutes="-360"]):not([data-shift-minutes="-60"]):not([data-shift-minutes="-10"]):not([data-shift-minutes="5"]):not([data-shift-minutes="60"]):not([data-shift-minutes="360"]){
+    display:none !important;
+  }
+
+  .radar-playback-options-row{
+    display:grid;
+    grid-template-columns:70px 70px 84px minmax(0,1fr);
+  }
+
+  .radar-playback-options-row .radar-inline-field{
+    width:100%;
+    min-width:0;
+    gap:2px;
+  }
+
+  .radar-playback-options-row .radar-inline-label{
+    flex:0 0 auto;
+    font-size:8px;
+  }
+
+  .radar-playback-options-row .radar-inline-field select{
+    width:auto !important;
+    min-width:0;
+    flex:1 1 auto;
+    padding:0 1px !important;
+    font-size:9px !important;
+  }
+
+  .radar-playback-options-row .timeline-playback-controls{
+    display:grid !important;
+    grid-template-columns:repeat(3,28px) !important;
+  }
+
+  .radar-playback-options-row .timeline-playback-controls button{
+    width:28px !important;
+    min-width:28px !important;
+  }
+
+  .radar-playback-options-row .radar-auto-refresh-button{
+    width:100%;
+    min-width:0;
+    padding:0 2px !important;
+    overflow:hidden;
+    font-size:7px;
+  }
+
+  .radar-page .radar-controls button,
+  .radar-page .radar-controls select,
+  .radar-page .radar-datetime-input,
+  .radar-page .radar-datetime-picker-control,
+  .radar-page .radar-now-button,
+  .radar-page .radar-mode-button,
+  .radar-page .radar-check,
+  .radar-page .radar-wind-control,
+  .radar-page .radar-inline-field,
+  .radar-page .radar-shift-controls,
+  .radar-page .timeline-playback-controls button{
+    height:28px !important;
+    min-height:28px !important;
+    font-size:11px;
+  }
+
+  .radar-pane-count-select{
+    width:60px;
+  }
+
+  .radar-map-select{
+    width:82px;
+  }
+
+  .radar-page .radar-datetime-input{
+    width:140px !important;
+  }
+
+  .radar-page .radar-shift-controls button{
+    height:28px !important;
+    min-height:28px !important;
+    min-width:34px;
+  }
+
+  .radar-page .radar-timeline-bar{
+    flex:0 0 auto;
+  }
+
+  .radar-pane-grid,
+  .radar-pane-grid[data-pane-count="1"],
+  .radar-pane-grid[data-pane-count="2"],
+  .radar-pane-grid[data-pane-count="3"],
+  .radar-pane-grid[data-pane-count="4"]{
+    flex:0 0 auto;
+    width:100%;
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:none;
+    align-items:start;
+    justify-content:stretch;
+    gap:6px;
+    padding:6px 4px 8px;
+    overflow:visible;
+    box-sizing:border-box;
+  }
+
+  .radar-pane-grid[data-pane-count] .radar-pane{
+    grid-column:auto;
+    grid-row:auto;
+    width:100%;
+    min-width:0;
+    height:auto;
+    border-radius:6px;
+    box-sizing:border-box;
+  }
+
+  .radar-pane-header{
+    height:37px;
+    min-height:37px;
+    padding:5px;
+    box-sizing:border-box;
+  }
+
+  .radar-pane-controls{
+    flex-wrap:nowrap;
+    align-items:center;
+    justify-content:flex-start;
+    width:100%;
+    gap:4px;
+  }
+
+  .radar-pane-controls select{
+    flex:0 0 auto;
+    width:auto;
+    min-width:0 !important;
+    padding-left:4px !important;
+    padding-right:2px !important;
+  }
+
+  .radar-pane-viewer{
+    align-self:stretch;
+    width:100% !important;
+    max-width:100%;
+    height:auto !important;
+    max-height:none;
+    min-height:0;
+    margin:0;
+    aspect-ratio:835 / 820;
+  }
+
+  .radar-pane-image{
+    width:100%;
+    max-width:100%;
+    height:auto;
+    margin:0;
+  }
+}
+
 .collapsible-model-section .model-section-title{
   display:flex;
   align-items:center;
@@ -4933,5 +5369,119 @@ select option.unsupported-option{
 
   .app-shell .model-cell{
     font-size:8px;
+  }
+}
+
+/* Keep radar portrait overrides after all shared compact-control rules. */
+@media (max-width: 700px) and (orientation: portrait){
+  .radar-page .radar-controls button,
+  .radar-page .radar-controls select,
+  .radar-page .radar-datetime-input,
+  .radar-page .radar-datetime-picker-control,
+  .radar-page .radar-now-button,
+  .radar-page .radar-mode-button,
+  .radar-page .radar-check,
+  .radar-page .radar-wind-control,
+  .radar-page .radar-inline-field,
+  .radar-page .radar-shift-controls,
+  .radar-page .radar-shift-controls button,
+  .radar-page .timeline-playback-controls button{
+    height:28px !important;
+    min-height:28px !important;
+  }
+
+  .radar-pane-grid[data-pane-count]{
+    grid-template-columns:minmax(0,1fr) !important;
+    grid-template-rows:none !important;
+  }
+
+  .radar-pane-grid[data-pane-count] > .radar-pane:nth-child(n){
+    grid-column:1 !important;
+    grid-row:auto !important;
+  }
+
+  .radar-page .radar-controls .radar-time-row .radar-datetime-group{
+    width:116px !important;
+    min-width:0 !important;
+  }
+
+  .radar-page .radar-controls .radar-time-row .radar-datetime-input{
+    width:100% !important;
+    min-width:0 !important;
+    padding-left:1px !important;
+    padding-right:0 !important;
+    font-size:10px !important;
+    text-align:left !important;
+  }
+
+  .radar-page .radar-controls .radar-time-row .radar-datetime-picker-control,
+  .radar-page .radar-controls .radar-time-row .radar-time-picker-toggle{
+    width:16px !important;
+    min-width:16px !important;
+    flex-basis:16px !important;
+  }
+
+  .radar-page .radar-controls .radar-time-row .radar-shift-controls button{
+    min-width:0 !important;
+    padding:0 !important;
+    font-size:9px !important;
+    line-height:1 !important;
+    letter-spacing:0 !important;
+  }
+
+  .radar-page .radar-controls .radar-time-row{
+    grid-template-columns:38px 116px minmax(0,1fr) !important;
+    gap:2px !important;
+  }
+
+  .radar-page .radar-controls .radar-time-row .radar-primary-now-button{
+    width:38px !important;
+    min-width:38px !important;
+    padding:0 4px !important;
+    font-size:10px !important;
+  }
+
+  .radar-page .radar-controls .radar-time-row .radar-shift-controls{
+    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+  }
+
+  .radar-page .radar-controls .radar-time-row .radar-shift-controls button[data-shift-minutes="-5"],
+  .radar-page .radar-controls .radar-time-row .radar-shift-controls button[data-shift-minutes="10"]{
+    display:none !important;
+  }
+
+  .radar-page .radar-controls .radar-time-row,
+  .radar-page .radar-controls .radar-time-row .radar-primary-now-button,
+  .radar-page .radar-controls .radar-time-row .radar-datetime-group,
+  .radar-page .radar-controls .radar-time-row .radar-datetime-input,
+  .radar-page .radar-controls .radar-time-row .radar-datetime-picker-control,
+  .radar-page .radar-controls .radar-time-row .radar-time-picker-toggle,
+  .radar-page .radar-controls .radar-time-row .radar-shift-controls,
+  .radar-page .radar-controls .radar-time-row .radar-shift-controls button{
+    height:26px !important;
+    min-height:26px !important;
+  }
+
+  .radar-page .radar-controls .radar-playback-options-row,
+  .radar-page .radar-controls .radar-playback-options-row .radar-inline-field,
+  .radar-page .radar-controls .radar-playback-options-row select,
+  .radar-page .radar-controls .radar-playback-options-row .timeline-playback-controls,
+  .radar-page .radar-controls .radar-playback-options-row .timeline-playback-controls button,
+  .radar-page .radar-controls .radar-playback-options-row .radar-auto-refresh-button,
+  .radar-page .radar-pane-controls select{
+    height:27px !important;
+    min-height:27px !important;
+  }
+
+  .radar-page .radar-controls select,
+  .radar-page .radar-controls .radar-mode-button,
+  .radar-page .radar-pane-controls select{
+    font-size:10px !important;
+  }
+
+  .radar-page .radar-controls .radar-playback-options-row select,
+  .radar-page .radar-controls .radar-playback-options-row .radar-auto-refresh-button,
+  .radar-page .radar-controls .radar-playback-options-row .timeline-playback-controls button{
+    font-size:10px !important;
   }
 }

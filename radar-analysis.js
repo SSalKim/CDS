@@ -704,7 +704,9 @@ resumeBound:false,
 resizeBound:false,
 resizeTimer:null,
 mapTool:null,
-mapModeGroup:null
+mapModeGroup:null,
+overlayModal:null,
+overlayModalLastFocus:null
 };
 
 function pad2(value){
@@ -1208,6 +1210,10 @@ function getRadarPaneImageSize(paneIndex){
 return clampRadarImageSize(radarState.paneSizes[paneIndex] || RADAR_DEFAULT_IMAGE_SIZE);
 }
 
+function isRadarMobilePortrait(){
+return window.matchMedia('(max-width: 700px) and (orientation: portrait)').matches;
+}
+
 function buildRadarUrl({pane,frameTime,size}){
 let {level1,level2,level3}=normalizeRadarPaneSelection(pane);
 let params={
@@ -1245,7 +1251,10 @@ let paneRect=paneElement?.getBoundingClientRect();
 let headerRect=header?.getBoundingClientRect();
 let size=radarState.paneSizes[index];
 
-if(paneRect?.height){
+if(isRadarMobilePortrait() && paneRect?.width){
+size=paneRect.width-RADAR_IMAGE_WIDTH_MARGIN-2;
+}
+else if(paneRect?.height){
 let availableHeight=paneRect.height-(headerRect?.height || 0);
 size=availableHeight-RADAR_IMAGE_HEIGHT_MARGIN;
 }
@@ -1921,6 +1930,12 @@ setRadarActiveIndex(radarState.activeIndex+offset);
 }
 
 function handleRadarKeydown(event){
+if(event.key==='Escape' && radarState.overlayModal && !radarState.overlayModal.classList.contains('hidden')){
+event.preventDefault();
+closeRadarOverlayModal();
+return;
+}
+
 let active=document.activeElement;
 let tag=active?.tagName;
 
@@ -3276,6 +3291,91 @@ group.appendChild(checks);
 return group;
 }
 
+function ensureRadarOverlayModal(){
+if(radarState.overlayModal){
+return radarState.overlayModal;
+}
+
+let overlay=document.createElement('div');
+overlay.className='radar-overlay-modal hidden';
+overlay.dataset.role='radarOverlayModal';
+overlay.setAttribute('aria-hidden','true');
+
+let dialog=document.createElement('section');
+dialog.className='radar-overlay-dialog';
+dialog.setAttribute('role','dialog');
+dialog.setAttribute('aria-modal','true');
+dialog.setAttribute('aria-labelledby','radarOverlayModalTitle');
+dialog.tabIndex=-1;
+
+let header=document.createElement('div');
+header.className='radar-overlay-dialog-header';
+
+let titleWrap=document.createElement('div');
+titleWrap.className='radar-overlay-dialog-title-wrap';
+
+let title=document.createElement('h2');
+title.id='radarOverlayModalTitle';
+title.className='radar-overlay-dialog-title';
+title.textContent='중첩 설정';
+
+let subtitle=document.createElement('p');
+subtitle.className='radar-overlay-dialog-subtitle';
+subtitle.textContent='레이더 영상 위에 표시할 관측 요소를 선택합니다.';
+
+let closeButton=document.createElement('button');
+closeButton.type='button';
+closeButton.className='radar-overlay-dialog-close';
+closeButton.setAttribute('aria-label','중첩 설정 닫기');
+closeButton.textContent='×';
+closeButton.onclick=()=>closeRadarOverlayModal();
+
+titleWrap.appendChild(title);
+titleWrap.appendChild(subtitle);
+header.appendChild(titleWrap);
+header.appendChild(closeButton);
+
+let body=document.createElement('div');
+body.className='radar-overlay-dialog-body';
+body.appendChild(createRadarOverlayGroup());
+
+dialog.appendChild(header);
+dialog.appendChild(body);
+overlay.appendChild(dialog);
+overlay.addEventListener('click',event=>{
+if(event.target===overlay){
+closeRadarOverlayModal();
+}
+});
+
+document.body.appendChild(overlay);
+radarState.overlayModal=overlay;
+return overlay;
+}
+
+function openRadarOverlayModal(triggerElement=null){
+let overlay=ensureRadarOverlayModal();
+radarState.overlayModalLastFocus=triggerElement || document.activeElement;
+overlay.classList.remove('hidden');
+overlay.setAttribute('aria-hidden','false');
+document.body.classList.add('radar-overlay-modal-open');
+overlay.querySelector('.radar-overlay-dialog')?.focus({preventScroll:true});
+}
+
+function closeRadarOverlayModal({restoreFocus=true}={}){
+let overlay=radarState.overlayModal;
+if(!overlay){
+return;
+}
+overlay.classList.add('hidden');
+overlay.setAttribute('aria-hidden','true');
+document.body.classList.remove('radar-overlay-modal-open');
+if(restoreFocus && radarState.overlayModalLastFocus && typeof radarState.overlayModalLastFocus.focus==='function'){
+radarState.overlayModalLastFocus.focus({preventScroll:true});
+}
+radarState.overlayModalLastFocus=null;
+}
+
 function buildRadarControls(){
 let controls=document.createElement('div');
 controls.className='radar-controls radar-loop-controls';
@@ -3291,8 +3391,14 @@ controls.appendChild(controlsBody);
 
 let settingsRow=createRadarControlRow('radar-settings-row');
 let playbackRow=createRadarControlRow('radar-playback-row');
+let timeRow=document.createElement('div');
+timeRow.className='radar-mobile-control-group radar-time-row';
+let playbackOptionsRow=document.createElement('div');
+playbackOptionsRow.className='radar-mobile-control-group radar-playback-options-row';
 controlsBody.appendChild(settingsRow);
 controlsBody.appendChild(playbackRow);
+playbackRow.appendChild(timeRow);
+playbackRow.appendChild(playbackOptionsRow);
 
 let paneCountSelect=createSelect(
 [
@@ -3334,6 +3440,9 @@ createRadarModeButton('축소',{mapTool:'zoomOut'}),
 createRadarModeButton('배율',{mapTool:'zoomIn'})
 ]);
 radarState.mapModeGroup=mapModeGroup;
+let overlayModalButton=createRadarModeButton('중첩',{onClick:()=>openRadarOverlayModal(overlayModalButton)});
+overlayModalButton.classList.add('radar-overlay-modal-button');
+mapModeGroup.appendChild(overlayModalButton);
 settingsRow.appendChild(mapModeGroup);
 settingsRow.appendChild(createRadarOverlayGroup());
 
@@ -3342,7 +3451,7 @@ nowBtn.type='button';
 nowBtn.className='radar-now-button radar-primary-now-button';
 nowBtn.textContent='NOW';
 nowBtn.onclick=setRadarNow;
-playbackRow.appendChild(nowBtn);
+timeRow.appendChild(nowBtn);
 
 let dateInput=document.createElement('input');
 dateInput.type='text';
@@ -3371,7 +3480,7 @@ event.currentTarget.blur();
 };
 radarState.dateInput=dateInput;
 
-playbackRow.appendChild(createRadarButtonGroup('radar-datetime-group',[dateInput,createRadarDateTimeControl(dateInput)]));
+timeRow.appendChild(createRadarButtonGroup('radar-datetime-group',[dateInput,createRadarDateTimeControl(dateInput)]));
 
 let shiftControls=document.createElement('div');
 shiftControls.className='radar-shift-controls';
@@ -3379,12 +3488,13 @@ RADAR_TIME_SHIFT_OPTIONS.forEach(option=>{
 let button=document.createElement('button');
 button.type='button';
 button.textContent=option.label;
+button.dataset.shiftMinutes=String(option.minutes);
 button.onclick=()=>shiftRadarBaseTime(option.minutes);
 shiftControls.appendChild(button);
 });
-playbackRow.appendChild(shiftControls);
+timeRow.appendChild(shiftControls);
 
-playbackRow.appendChild(
+playbackOptionsRow.appendChild(
 createRadarInlineField(
 ['표출','기간'],
 createSelect(RADAR_PERIOD_OPTIONS,radarState.periodMinutes,value=>{
@@ -3394,7 +3504,7 @@ rebuildRadarTimelineAroundBase({preserveCache:true});
 )
 );
 
-playbackRow.appendChild(
+playbackOptionsRow.appendChild(
 createRadarInlineField(
 ['표출','간격'],
 createSelect(RADAR_INTERVAL_OPTIONS,radarState.intervalMinutes,value=>{
@@ -3425,7 +3535,7 @@ nextBtn.textContent='›';
 nextBtn.title='다음 프레임';
 nextBtn.onclick=()=>moveRadarSelection(1);
 
-playbackRow.appendChild(createRadarButtonGroup('radar-playback-controls timeline-playback-controls',[
+playbackOptionsRow.appendChild(createRadarButtonGroup('radar-playback-controls timeline-playback-controls',[
 prevBtn,
 playBtn,
 nextBtn
@@ -3437,7 +3547,7 @@ autoRefreshBtn.className='radar-auto-refresh-button';
 autoRefreshBtn.onclick=toggleRadarAutoRefresh;
 radarState.autoRefreshButton=autoRefreshBtn;
 updateRadarAutoRefreshButton();
-playbackRow.appendChild(autoRefreshBtn);
+playbackOptionsRow.appendChild(autoRefreshBtn);
 
 return controls;
 }

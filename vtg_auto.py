@@ -22,7 +22,9 @@ from urllib.request import Request, urlopen
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
-KMA_LIST_BASE_URL = "https://apihub-pub.kma.go.kr/api/typ01/url"
+KMA_LIST_BASE_URL = (os.getenv("KMA_APIHUB_BASE_URL") or "https://apihub-pub.kma.go.kr/api/typ01/url").rstrip("/")
+KMA_FALLBACK_LIST_BASE_URL = (os.getenv("KMA_APIHUB_FALLBACK_BASE_URL") or "https://apihub.kma.go.kr/api/typ01/url").rstrip("/")
+KMA_FALLBACK_AUTH_KEY = os.getenv("KMA_APIHUB_FALLBACK_AUTH_KEY", "").strip()
 TD_LIST_ENDPOINT = "td_lst.php"
 TYP_LIST_ENDPOINT = "typ_lst.php"
 NOAA_BDECK_URL = "https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/b{atcf_id}.dat"
@@ -370,17 +372,58 @@ def fetch_text(
     return text
 
 
-def kma_list_url(endpoint: str, year: int, auth_key: str) -> str:
+def should_try_kma_fallback(exc: Exception) -> bool:
+    if isinstance(exc, HTTPError):
+        return exc.code >= 500 or exc.code in {408, 429}
+    return isinstance(exc, (URLError, TimeoutError, OSError))
+
+
+def fetch_kma_text(
+    primary_url: str,
+    fallback_url: str,
+    *,
+    label: str,
+    timeout: float = 12,
+    retries: int = 2,
+    retry_delay: float = 3.0,
+    use_cache: bool = True,
+) -> str:
+    try:
+        return fetch_text(
+            primary_url,
+            timeout=timeout,
+            retries=retries,
+            retry_delay=retry_delay,
+            use_cache=use_cache,
+        )
+    except (HTTPError, URLError, TimeoutError, OSError) as exc:
+        if not fallback_url or not should_try_kma_fallback(exc):
+            raise
+        print(f"KMA APIHUB {label} primary endpoint failed ({exc}); trying fallback endpoint.")
+        return fetch_text(
+            fallback_url,
+            timeout=timeout,
+            retries=retries,
+            retry_delay=retry_delay,
+            use_cache=use_cache,
+        )
+
+
+def kma_endpoint_url(endpoint: str, *, base_url: str = KMA_LIST_BASE_URL) -> str:
+    return f"{base_url.rstrip('/')}/{endpoint}"
+
+
+def kma_list_url(endpoint: str, year: int, auth_key: str, *, base_url: str = KMA_LIST_BASE_URL) -> str:
     query = urlencode({
         "YY": year,
         "disp": "1",
         "help": "1",
         "authKey": auth_key,
     })
-    return f"{KMA_LIST_BASE_URL}/{endpoint}?{query}"
+    return f"{kma_endpoint_url(endpoint, base_url=base_url)}?{query}"
 
 
-def kma_gts_now_url(data_time: str, auth_key: str, *, mode: str = "2") -> str:
+def kma_gts_now_url(data_time: str, auth_key: str, *, mode: str = "2", base_url: str = KMA_LIST_BASE_URL) -> str:
     query = urlencode({
         "src": "",
         "tm": data_time,
@@ -389,7 +432,7 @@ def kma_gts_now_url(data_time: str, auth_key: str, *, mode: str = "2") -> str:
         "help": "0",
         "authKey": auth_key,
     })
-    return f"{KMA_GTS_NOW_URL}?{query}"
+    return f"{kma_endpoint_url('typ_gts_now.php', base_url=base_url)}?{query}"
 
 
 def kma_now_url(endpoint_url: str, data_time: str, auth_key: str, *, typ_number: int | None) -> str:
@@ -403,6 +446,18 @@ def kma_now_url(endpoint_url: str, data_time: str, auth_key: str, *, typ_number:
         "authKey": auth_key,
     })
     return f"{endpoint_url}?{query}"
+
+
+def kma_now_fallback_url(endpoint_url: str, data_time: str, typ_number: int | None) -> str:
+    if not KMA_FALLBACK_AUTH_KEY:
+        return ""
+    endpoint = endpoint_url.rsplit("/", 1)[-1]
+    return kma_now_url(
+        kma_endpoint_url(endpoint, base_url=KMA_FALLBACK_LIST_BASE_URL),
+        data_time,
+        KMA_FALLBACK_AUTH_KEY,
+        typ_number=typ_number,
+    )
 
 
 def parse_kma_csv_lines(text: str, *, fixed_columns: int) -> list[list[str]]:
@@ -487,8 +542,11 @@ def fetch_kma_list_text(endpoint: str, year: int, auth_key: str, *, cache_dir: P
         # Activity lists change whenever a TD forms or a storm changes stage.
         # The persisted parsed-row cache below is only an outage fallback; never
         # let the generic HTTP cache hide a newly issued system for up to 6 hours.
-        return fetch_text(
+        return fetch_kma_text(
             kma_list_url(endpoint, year, auth_key),
+            kma_list_url(endpoint, year, KMA_FALLBACK_AUTH_KEY, base_url=KMA_FALLBACK_LIST_BASE_URL)
+            if KMA_FALLBACK_AUTH_KEY else "",
+            label=f"{Path(endpoint).stem} {year}",
             timeout=20,
             retries=2,
             retry_delay=5.0,
@@ -675,8 +733,10 @@ def fetch_kma_now_reference_point(
 ) -> TrackPoint | None:
     for label, endpoint, query_number, filter_number in kma_now_endpoint_candidates(typ_number=typ_number, stage=stage):
         try:
-            text = fetch_text(
+            text = fetch_kma_text(
                 kma_now_url(endpoint, data_time, auth_key, typ_number=query_number),
+                kma_now_fallback_url(endpoint, data_time, query_number),
+                label=label,
                 timeout=15,
                 retries=1,
                 retry_delay=3.0,
@@ -737,7 +797,15 @@ def fetch_kma_reference_point(
 ) -> TrackPoint | None:
     if gts_text is None:
         try:
-            text = fetch_text(kma_gts_now_url(data_time, auth_key), timeout=15, retries=1, retry_delay=3.0)
+            text = fetch_kma_text(
+                kma_gts_now_url(data_time, auth_key),
+                kma_gts_now_url(data_time, KMA_FALLBACK_AUTH_KEY, base_url=KMA_FALLBACK_LIST_BASE_URL)
+                if KMA_FALLBACK_AUTH_KEY else "",
+                label="typ_gts_now mode=2",
+                timeout=15,
+                retries=1,
+                retry_delay=3.0,
+            )
         except (HTTPError, URLError, TimeoutError, OSError):
             text = ""
     else:
@@ -1802,8 +1870,16 @@ def ensure_kma_gts_now_cache(
         return path
     started_at = time.monotonic()
     try:
-        text = fetch_text(kma_gts_now_url(data_time, auth_key, mode=mode), timeout=20, retries=1, retry_delay=3.0)
-    except (HTTPError, URLError, TimeoutError) as exc:
+        text = fetch_kma_text(
+            kma_gts_now_url(data_time, auth_key, mode=mode),
+            kma_gts_now_url(data_time, KMA_FALLBACK_AUTH_KEY, mode=mode, base_url=KMA_FALLBACK_LIST_BASE_URL)
+            if KMA_FALLBACK_AUTH_KEY else "",
+            label=f"typ_gts_now mode={mode} {data_time}",
+            timeout=20,
+            retries=1,
+            retry_delay=3.0,
+        )
+    except (HTTPError, URLError, TimeoutError, OSError) as exc:
         print(f"Warning: failed to prefetch KMA typ_gts_now mode={mode} {data_time}: {exc}")
         return None
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -3428,6 +3504,7 @@ def vtg_command(
     job: StormJob,
     output_root: Path,
     auth_key: str,
+    fallback_auth_key: str,
     python: str,
     fcst_hours_list: list[int],
     auto_fcst_hours: bool,
@@ -3464,6 +3541,8 @@ def vtg_command(
         "--overwrite",
         "--no-show",
     ]
+    if fallback_auth_key:
+        command.extend(["--fallback-auth-key", fallback_auth_key])
     if kma_forecast_text_path is not None:
         command.extend(["--kma-forecast-text-path", str(kma_forecast_text_path)])
     if kma_past_text_path is not None:
@@ -3520,6 +3599,7 @@ def run_vtg_batch(
     job: StormJob,
     output_root: Path,
     auth_key: str,
+    fallback_auth_key: str,
     python: str,
     fcst_hours_list: list[int],
     auto_fcst_hours: bool,
@@ -3534,6 +3614,7 @@ def run_vtg_batch(
         job=job,
         output_root=output_root,
         auth_key=auth_key,
+        fallback_auth_key=fallback_auth_key,
         python=python,
         fcst_hours_list=fcst_hours_list,
         auto_fcst_hours=auto_fcst_hours,
@@ -4474,6 +4555,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--manifest-path", type=Path, default=None)
     parser.add_argument("--python", default=sys.executable)
     parser.add_argument("--fcst-hours", default="120,240", help="Comma/space separated forecast hours to generate.")
+    parser.add_argument(
+        "--fallback-auth-key",
+        default=os.getenv("KMA_APIHUB_FALLBACK_AUTH_KEY", KMA_FALLBACK_AUTH_KEY),
+        help="Optional fallback KMA APIHUB auth key for apihub.kma.go.kr.",
+    )
     parser.add_argument("--auto-fcst-hours", action=argparse.BooleanOptionalAction, default=False)
     parser.add_argument("--source-override", action="append", default=[])
     parser.add_argument("--complete-model-count", type=int, default=ACTIVE_MODEL_TARGET)
@@ -4500,6 +4586,8 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    global KMA_FALLBACK_AUTH_KEY
+    KMA_FALLBACK_AUTH_KEY = str(args.fallback_auth_key or "").strip()
     explicit_cycle_time: datetime | None = None
     if args.now:
         cycle = parse_cycle_override(args.now)
@@ -4763,6 +4851,7 @@ def main() -> int:
                         job=job,
                         output_root=output_root,
                         auth_key=args.auth_key,
+                        fallback_auth_key=KMA_FALLBACK_AUTH_KEY,
                         python=args.python,
                         fcst_hours_list=due_hours,
                         auto_fcst_hours=args.auto_fcst_hours,
@@ -4793,6 +4882,7 @@ def main() -> int:
                             job=job,
                             output_root=output_root,
                             auth_key=args.auth_key,
+                            fallback_auth_key=KMA_FALLBACK_AUTH_KEY,
                             python=args.python,
                             fcst_hours_list=due_hours,
                             auto_fcst_hours=args.auto_fcst_hours,

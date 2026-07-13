@@ -133,6 +133,7 @@ jobs:
     env:
       RUNNER_KIND: ${{ needs.decide-runner.outputs.runner_kind }}
       KMA_APIHUB_AUTH_KEY: ${{ secrets.KMA_APIHUB_AUTH_KEY }}
+      KMA_APIHUB_FALLBACK_AUTH_KEY: ${{ secrets.KMA_APIHUB_FALLBACK_AUTH_KEY }}
       MPLBACKEND: Agg
       PYTHONUNBUFFERED: "1"
       NOW_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.now || '' }}
@@ -182,6 +183,7 @@ jobs:
         run: |
           set +e
           host="apihub-pub.kma.go.kr"
+          fallback_host="apihub.kma.go.kr"
           year="$(date -u +%Y)"
           now_utc="$(date -u +%Y%m%d%H)00"
 
@@ -211,6 +213,15 @@ jobs:
           probe "td_lst" "https://${host}/api/typ01/url/td_lst.php?YY=${year}&disp=1&help=1&authKey=${KMA_APIHUB_AUTH_KEY}"
           probe "typ_lst" "https://${host}/api/typ01/url/typ_lst.php?YY=${year}&disp=1&help=1&authKey=${KMA_APIHUB_AUTH_KEY}"
           probe "typ_gts_now" "https://${host}/api/typ01/url/typ_gts_now.php?src=&tm=${now_utc}&mode=2&disp=1&help=0&authKey=${KMA_APIHUB_AUTH_KEY}"
+          if [ -n "${KMA_APIHUB_FALLBACK_AUTH_KEY}" ]; then
+            echo "DNS results for ${fallback_host}:"
+            getent ahosts "$fallback_host" | awk '{print $1}' | sort -u || true
+            probe "fallback_td_lst" "https://${fallback_host}/api/typ01/url/td_lst.php?YY=${year}&disp=1&help=1&authKey=${KMA_APIHUB_FALLBACK_AUTH_KEY}"
+            probe "fallback_typ_lst" "https://${fallback_host}/api/typ01/url/typ_lst.php?YY=${year}&disp=1&help=1&authKey=${KMA_APIHUB_FALLBACK_AUTH_KEY}"
+            probe "fallback_typ_gts_now" "https://${fallback_host}/api/typ01/url/typ_gts_now.php?src=&tm=${now_utc}&mode=2&disp=1&help=0&authKey=${KMA_APIHUB_FALLBACK_AUTH_KEY}"
+          else
+            echo "KMA_APIHUB_FALLBACK_AUTH_KEY is not configured; skipping fallback probes."
+          fi
 
       - name: Precheck VTG run
         id: vtg_precheck

@@ -186,6 +186,7 @@ jobs:
       DMDW_BROWSER_EXECUTABLE: ${{ vars.DMDW_BROWSER_EXECUTABLE || secrets.DMDW_BROWSER_EXECUTABLE }}
       DMDW_ALLOW_COOKIE_FALLBACK: ${{ vars.DMDW_ALLOW_COOKIE_FALLBACK || 'false' }}
       KMA_APIHUB_AUTH_KEY: ${{ secrets.KMA_APIHUB_AUTH_KEY }}
+      KMA_APIHUB_FALLBACK_AUTH_KEY: ${{ secrets.KMA_APIHUB_FALLBACK_AUTH_KEY }}
       CYCLE_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.cycle || '' }}
       STORM_KIND_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.storm_kind || 'typ' }}
       TYP_SEQ_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.typ_seq || '' }}
