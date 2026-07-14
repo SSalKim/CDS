@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260714131046",
-  "generated_at_kst": "2026-07-14 22:10 KST",
+  "generated_at_utc": "20260714132118",
+  "generated_at_kst": "2026-07-14 22:21 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_11",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 5,
-  "selected_model_count": 3,
+  "model_source_count": 7,
+  "selected_model_count": 5,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -47,6 +47,23 @@
       "is_official": false,
       "first_seen_utc": "20260714112048",
       "first_seen_kst": "2026-07-14 20:20 KST"
+    },
+    {
+      "model_id": "FNV3",
+      "model_label": "FNV3",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 26,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260714132118",
+      "first_seen_kst": "2026-07-14 22:21 KST"
     },
     {
       "model_id": "GFS",
@@ -115,6 +132,23 @@
       "is_official": false,
       "first_seen_utc": "20260714130145",
       "first_seen_kst": "2026-07-14 22:01 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 15,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260714132118",
+      "first_seen_kst": "2026-07-14 22:21 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2611_HAISHEN/metadata/source_availability/202607140600.json"
