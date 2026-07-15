@@ -2188,7 +2188,11 @@ if(eff){
 impact.set(String(seq),eff);
 }
 if(status){
-now.set(String(seq),status);
+now.set(String(seq),{
+status,
+startTime:String(row?.TM_ST || '').trim(),
+endTime:String(row?.TM_ED || '').trim()
+});
 }
 });
 return {impact,now};
@@ -2248,19 +2252,45 @@ return yearMap instanceof Map ? (yearMap.get(String(typNumber)) || '') : '';
 }
 
 function typhoonNowStatusForEntry(entry){
+return typhoonNowStatusFromRecord(typhoonNowRecordForEntry(entry));
+}
+
+function typhoonNowRecordForEntry(entry){
 let metadata=entry?.metadata || {};
 let job=entry?.job || {};
 let rawStage=normalizeTyphoonStage(entry?.originalStage || entry?.stage || metadata.storm_stage || job.stage || '');
 if(rawStage==='TD'){
-return '';
+return null;
 }
 let year=String(entry?.year || metadata.storm_year || job.year || '').trim();
 let typNumber=Number(entry?.typNumber || metadata.canonical_typ_number || metadata.typ_number || job.canonical_typ_number || job.typ_number || 0);
 if(!year || !Number.isFinite(typNumber) || typNumber<=0){
-return '';
+return null;
 }
 let yearMap=typhoonState.typNowByYear instanceof Map ? typhoonState.typNowByYear.get(year) : null;
-return yearMap instanceof Map ? (yearMap.get(String(typNumber)) || '') : '';
+return yearMap instanceof Map ? (yearMap.get(String(typNumber)) || null) : null;
+}
+
+function typhoonNowStatusFromRecord(record){
+if(!record){
+return '';
+}
+if(typeof record==='string'){
+return normalizeTyphoonNowStatus(record);
+}
+return normalizeTyphoonNowStatus(record.status);
+}
+
+function isEndedTyphoonNowRecord(record){
+if(!record || typeof record!=='object'){
+return false;
+}
+let endTime=String(record.endTime || '').trim();
+if(!endTime){
+return false;
+}
+let endDate=parseTyphoonUtcDate(endTime);
+return Boolean(endDate && endDate.getTime()<Date.now());
 }
 
 function isKoreaImpactTyphoonEntry(entry){
@@ -2386,9 +2416,10 @@ return times;
 }
 
 function isActiveTyphoonStormEntry(entry,activeWindowTimes=typhoonActiveWindowDataTimes()){
-let nowStatus=typhoonNowStatusForEntry(entry);
+let nowRecord=typhoonNowRecordForEntry(entry);
+let nowStatus=typhoonNowStatusFromRecord(nowRecord);
 if(nowStatus){
-return nowStatus==='1';
+return nowStatus==='1' && !isEndedTyphoonNowRecord(nowRecord);
 }
 let dataTime=String(entry?.dataTime || '');
 return Boolean(dataTime && (activeWindowTimes.has(dataTime) || activeWindowTimes.has(dataTime.slice(0,10))));
