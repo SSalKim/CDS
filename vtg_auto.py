@@ -374,7 +374,7 @@ def fetch_text(
 
 def should_try_kma_fallback(exc: Exception) -> bool:
     if isinstance(exc, HTTPError):
-        return exc.code >= 500 or exc.code in {408, 429}
+        return exc.code >= 500 or exc.code in {403, 408, 429}
     return isinstance(exc, (URLError, TimeoutError, OSError))
 
 
