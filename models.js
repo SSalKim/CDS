@@ -91,7 +91,7 @@ folder:"KIMR1",
 archiveStart:"2022-05-12",
 cycles:[0,6,12,18],
 forecastRules:[
-{from:"2011-05-23",cycles:[6,18],max:72},
+{from:"2022-05-12",cycles:[0,6,12,18],max:72},
 {from:"2024-06-27",cycles:[0,12],max:120},
 ],
 stepSchemeByCycleGroup:{
