@@ -1,16 +1,16 @@
 {
   "version": 3,
-  "updated_at_utc": "202607170954",
+  "updated_at_utc": "202607171034",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 36,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202607170000",
-      "cycle_time_utc": "202607170000",
-      "start_utc": "202607170400",
-      "end_utc": "202607171000"
+      "data_time": "202607170600",
+      "cycle_time_utc": "202607170600",
+      "start_utc": "202607171000",
+      "end_utc": "202607171600"
     }
   ],
   "runs": [
@@ -19,7 +19,7 @@
         "storm_key": "td_2026_20",
         "stage": "TD_UNLINKED",
         "year": 2026,
-        "data_time": "202607170000",
+        "data_time": "202607170600",
         "td_number": 20,
         "linked_td_number": null,
         "typ_number": 20,
@@ -30,16 +30,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202607170000",
-        "cycle_time_utc": "202607170000",
-        "start_utc": "202607170400",
-        "end_utc": "202607171000"
+        "data_time": "202607170600",
+        "cycle_time_utc": "202607170600",
+        "start_utc": "202607171000",
+        "end_utc": "202607171600"
       },
       "result": {
-        "status": "ok",
+        "status": "no_output",
         "metadata": {
-          "generated_at_utc": "20260717101748",
-          "image_path": "data/2026/TD_2620_NONAME/images/TD_2620_NONAME_202607170000_120h.png",
+          "generated_at_utc": "20260717105700",
+          "image_path": "data/2026/TD_2620_NONAME/images/TD_2620_NONAME_202607170600_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 20,
@@ -55,30 +55,28 @@
           "canonical_typ_name_ko": "",
           "atcf_id": "wp902026",
           "extra_atcf_ids": [],
-          "data_time": "202607170000",
+          "data_time": "202607170600",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 4,
+          "model_count": 0,
           "target_model_count": 36,
-          "model_labels": [
-            "CMC",
-            "CMC EPS",
-            "GFS",
-            "GFS EPS"
-          ],
+          "models": [],
+          "model_labels": [],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2620_NONAME/metadata/source_availability/202607170000.json"
+          "source_availability_path": "data/2026/TD_2620_NONAME/metadata/source_availability/202607170600.json",
+          "no_output": true,
+          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2026_20",
         "stage": "TD_UNLINKED",
         "year": 2026,
-        "data_time": "202607170000",
+        "data_time": "202607170600",
         "td_number": 20,
         "linked_td_number": null,
         "typ_number": 20,
@@ -89,16 +87,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202607170000",
-        "cycle_time_utc": "202607170000",
-        "start_utc": "202607170400",
-        "end_utc": "202607171000"
+        "data_time": "202607170600",
+        "cycle_time_utc": "202607170600",
+        "start_utc": "202607171000",
+        "end_utc": "202607171600"
       },
       "result": {
-        "status": "ok",
+        "status": "no_output",
         "metadata": {
-          "generated_at_utc": "20260717101800",
-          "image_path": "data/2026/TD_2620_NONAME/images/TD_2620_NONAME_202607170000_240h.png",
+          "generated_at_utc": "20260717105700",
+          "image_path": "data/2026/TD_2620_NONAME/images/TD_2620_NONAME_202607170600_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 20,
@@ -114,25 +112,21 @@
           "canonical_typ_name_ko": "",
           "atcf_id": "wp902026",
           "extra_atcf_ids": [],
-          "data_time": "202607170000",
+          "data_time": "202607170600",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 6,
+          "model_count": 0,
           "target_model_count": 36,
-          "model_labels": [
-            "CMC",
-            "CMC EPS",
-            "ECMWF AIFS EPS",
-            "GenCast",
-            "GFS",
-            "GFS EPS"
-          ],
+          "models": [],
+          "model_labels": [],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2620_NONAME/metadata/source_availability/202607170000.json"
+          "source_availability_path": "data/2026/TD_2620_NONAME/metadata/source_availability/202607170600.json",
+          "no_output": true,
+          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     }
   ],
   "inventory_count": 8554,
