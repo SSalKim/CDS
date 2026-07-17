@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260717062336",
-  "generated_at_kst": "2026-07-17 15:23 KST",
+  "generated_at_utc": "20260717062734",
+  "generated_at_kst": "2026-07-17 15:27 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_20",
   "storm_stage": "TD",
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 2,
-  "selected_model_count": 2,
+  "model_source_count": 6,
+  "selected_model_count": 5,
   "active_target_model_count": 36,
   "model_sources": [
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "ECMWF_AIFS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260717062734",
+      "first_seen_kst": "2026-07-17 15:27 KST"
+    },
     {
       "model_id": "ECMWF_AIFS_EPS",
       "model_label": "ECMWF AIFS EPS",
@@ -64,6 +81,57 @@
       "is_official": false,
       "first_seen_utc": "20260717055430",
       "first_seen_kst": "2026-07-17 14:54 KST"
+    },
+    {
+      "model_id": "KIM_3h",
+      "model_label": "KIM",
+      "raw_model_ids": [
+        "KIM_3h"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260717062734",
+      "first_seen_kst": "2026-07-17 15:27 KST"
+    },
+    {
+      "model_id": "KIM_6h",
+      "model_label": "KIM",
+      "raw_model_ids": [
+        "KIM_6h"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260717062734",
+      "first_seen_kst": "2026-07-17 15:27 KST"
+    },
+    {
+      "model_id": "KMA",
+      "model_label": "KMA OFCL",
+      "raw_model_ids": [
+        "KMA"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": true,
+      "first_seen_utc": "20260717062734",
+      "first_seen_kst": "2026-07-17 15:27 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2620_NONAME/metadata/source_availability/202607170000.json"
