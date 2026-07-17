@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202607170815",
+  "updated_at_utc": "202607170838",
   "storm_key": "td_2026_20",
   "stage": "TD",
   "year": 2026,
@@ -401,7 +401,7 @@
     {
       "job": {
         "storm_key": "td_2026_20",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202607170000",
         "td_number": 20,
@@ -422,7 +422,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260717083744",
+          "generated_at_utc": "20260717083923",
           "image_path": "data/2026/TD_2620_NONAME/images/TD_2620_NONAME_202607170000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -442,13 +442,19 @@
           "data_time": "202607170000",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 4,
+          "model_count": 10,
           "target_model_count": 36,
           "model_labels": [
             "CMC",
             "CMC EPS",
+            "ECMWF EPS",
+            "FourCastNet-KIM",
+            "GraphCast-KIM",
             "GFS",
-            "GFS EPS"
+            "GFS EPS",
+            "KMA AIFS-ECMWF",
+            "KMA AIFS-KIM",
+            "Pangu-Weather-KIM"
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TD_2620_NONAME/metadata/source_availability/202607170000.json"
@@ -460,7 +466,7 @@
     {
       "job": {
         "storm_key": "td_2026_20",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202607170000",
         "td_number": 20,
@@ -481,7 +487,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260717083800",
+          "generated_at_utc": "20260717083932",
           "image_path": "data/2026/TD_2620_NONAME/images/TD_2620_NONAME_202607170000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -501,15 +507,21 @@
           "data_time": "202607170000",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 6,
+          "model_count": 12,
           "target_model_count": 36,
           "model_labels": [
             "CMC",
             "CMC EPS",
             "ECMWF AIFS EPS",
+            "ECMWF EPS",
+            "FourCastNet-KIM",
+            "GraphCast-KIM",
             "GenCast",
             "GFS",
-            "GFS EPS"
+            "GFS EPS",
+            "KMA AIFS-ECMWF",
+            "KMA AIFS-KIM",
+            "Pangu-Weather-KIM"
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TD_2620_NONAME/metadata/source_availability/202607170000.json"
