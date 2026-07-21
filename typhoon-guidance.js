@@ -1,6 +1,7 @@
 const TYPHOON_MANIFEST_PATH='data/manifest.json';
 const TYPHOON_STATUS_PATH='data/status.json';
 const TYPHOON_TYP_LIST_CACHE_PREFIX='data/cache/kma_apihub/typ_lst_';
+const TYPHOON_TD_LIST_CACHE_PREFIX='data/cache/kma_apihub/td_lst_';
 const TYPHOON_TYP_LIST_CACHE_SUFFIX='.json';
 const TYPHOON_RAW_REPOSITORY_BASE_URL=normalizeTyphoonBaseUrl(globalThis.CDS_TYPOON_RAW_REPOSITORY_BASE_URL || 'https://raw.githubusercontent.com/SSalKim/CDS/main/');
 const TYPHOON_LIVE_DATA_BASE_URL=normalizeTyphoonBaseUrl(globalThis.CDS_TYPOON_LIVE_DATA_BASE_URL || TYPHOON_RAW_REPOSITORY_BASE_URL);
@@ -619,6 +620,7 @@ initialLoadComplete:false,
 modelDetailLastFocus:null,
 typImpactByYear:new Map(),
 typNowByYear:new Map(),
+tdNowByYear:new Map(),
 selectionLoadSeq:0,
 slotLoadSeq:0
 };
@@ -1410,6 +1412,7 @@ if(latestManifestYear){
 typhoonState.yearIndexes.delete(latestManifestYear);
 typhoonState.typImpactByYear.delete(latestManifestYear);
 typhoonState.typNowByYear.delete(latestManifestYear);
+typhoonState.tdNowByYear.delete(latestManifestYear);
 }
 typhoonState.driveArchiveImages=new Map();
 typhoonState.driveArchivePathsLoaded=new Set();
@@ -1456,6 +1459,7 @@ typhoonState.yearIndexes=new Map();
 typhoonState.stormManifestCache=new Map();
 typhoonState.typImpactByYear=new Map();
 typhoonState.typNowByYear=new Map();
+typhoonState.tdNowByYear=new Map();
 typhoonState.driveArchiveImages=new Map();
 typhoonState.driveArchivePathsLoaded=new Set();
 typhoonState.driveArchiveLoadPromises=new Map();
@@ -1483,7 +1487,7 @@ syncTyphoonSelection({preferredYear:typhoonState.selectedYear,selectDefaultStorm
 renderTyphoonSelects();
 try{
 await ensureTyphoonYearIndex(typhoonState.selectedYear);
-if(!typhoonState.typImpactByYear.has(typhoonState.selectedYear) || !typhoonState.typNowByYear.has(typhoonState.selectedYear)){
+if(!typhoonState.typImpactByYear.has(typhoonState.selectedYear) || !typhoonState.typNowByYear.has(typhoonState.selectedYear) || !typhoonState.tdNowByYear.has(typhoonState.selectedYear)){
 await loadTyphoonImpactMapsForYears([typhoonState.selectedYear]);
 }
 rebuildTyphoonEntries();
@@ -2158,25 +2162,30 @@ selectDefaultSlotForStorm();
 
 async function loadTyphoonImpactMapsForYears(years){
 let uniqueYears=[...new Set((years || []).map(year=>String(year || '').trim()).filter(Boolean))]
-.filter(year=>!typhoonState.typImpactByYear.has(year) || !typhoonState.typNowByYear.has(year));
+.filter(year=>!typhoonState.typImpactByYear.has(year) || !typhoonState.typNowByYear.has(year) || !typhoonState.tdNowByYear.has(year));
 let nextImpactMap=new Map(typhoonState.typImpactByYear);
 let nextNowMap=new Map(typhoonState.typNowByYear);
+let nextTdNowMap=new Map(typhoonState.tdNowByYear);
 await Promise.all(uniqueYears.map(async year=>{
 let maps=await fetchTyphoonListMapsForYear(year);
 nextImpactMap.set(year,maps.impact);
 nextNowMap.set(year,maps.now);
+nextTdNowMap.set(year,maps.tdNow);
 }));
 typhoonState.typImpactByYear=nextImpactMap;
 typhoonState.typNowByYear=nextNowMap;
+typhoonState.tdNowByYear=nextTdNowMap;
 }
 
 async function fetchTyphoonListMapsForYear(year){
 let path=`${TYPHOON_TYP_LIST_CACHE_PREFIX}${year}${TYPHOON_TYP_LIST_CACHE_SUFFIX}`;
+let tdPath=`${TYPHOON_TD_LIST_CACHE_PREFIX}${year}${TYPHOON_TYP_LIST_CACHE_SUFFIX}`;
+let impact=new Map();
+let now=new Map();
+let tdNow=new Map();
 try{
 let payload=await fetchTyphoonJson(path,typhoonState.manifestBaseUrl);
 let rows=Array.isArray(payload?.rows) ? payload.rows : [];
-let impact=new Map();
-let now=new Map();
 rows.forEach(row=>{
 let seq=Number(row?.SEQ);
 let eff=normalizeTyphoonImpactEff(row?.EFF);
@@ -2195,11 +2204,27 @@ endTime:String(row?.TM_ED || '').trim()
 });
 }
 });
-return {impact,now};
 }
 catch(error){
-return {impact:new Map(),now:new Map()};
 }
+try{
+let tdPayload=await fetchTyphoonJson(tdPath,typhoonState.manifestBaseUrl);
+let tdRows=Array.isArray(tdPayload?.rows) ? tdPayload.rows : [];
+tdRows.forEach(row=>{
+let td=Number(row?.TD);
+if(!Number.isFinite(td) || td<=0){
+return;
+}
+tdNow.set(String(td),{
+status:'1',
+startTime:String(row?.TM_ST || '').trim(),
+endTime:String(row?.TM_ED || '').trim()
+});
+});
+}
+catch(error){
+}
+return {impact,now,tdNow};
 }
 
 function normalizeTyphoonImpactEff(value){
@@ -2259,10 +2284,15 @@ function typhoonNowRecordForEntry(entry){
 let metadata=entry?.metadata || {};
 let job=entry?.job || {};
 let rawStage=normalizeTyphoonStage(entry?.originalStage || entry?.stage || metadata.storm_stage || job.stage || '');
+let year=String(entry?.year || metadata.storm_year || job.year || '').trim();
 if(rawStage==='TD'){
+let tdNumber=Number(entry?.tdNumber || metadata.td_number || job.td_number || metadata.data_typ_number || metadata.typ_number || job.typ_number || entry?.typNumber || 0);
+if(!year || !Number.isFinite(tdNumber) || tdNumber<=0){
 return null;
 }
-let year=String(entry?.year || metadata.storm_year || job.year || '').trim();
+let tdYearMap=typhoonState.tdNowByYear instanceof Map ? typhoonState.tdNowByYear.get(year) : null;
+return tdYearMap instanceof Map ? (tdYearMap.get(String(tdNumber)) || null) : null;
+}
 let typNumber=Number(entry?.typNumber || metadata.canonical_typ_number || metadata.typ_number || job.canonical_typ_number || job.typ_number || 0);
 if(!year || !Number.isFinite(typNumber) || typNumber<=0){
 return null;
@@ -2279,6 +2309,23 @@ if(typeof record==='string'){
 return normalizeTyphoonNowStatus(record);
 }
 return normalizeTyphoonNowStatus(record.status);
+}
+
+function isActiveTyphoonNowRecord(record){
+let status=typhoonNowStatusFromRecord(record);
+if(status!=='1' || isEndedTyphoonNowRecord(record)){
+return false;
+}
+if(record && typeof record==='object'){
+let startTime=String(record.startTime || '').trim();
+if(startTime){
+let startDate=parseTyphoonUtcDate(startTime);
+if(startDate && startDate.getTime()>Date.now()){
+return false;
+}
+}
+}
+return true;
 }
 
 function isEndedTyphoonNowRecord(record){
@@ -2419,7 +2466,7 @@ function isActiveTyphoonStormEntry(entry,activeWindowTimes=typhoonActiveWindowDa
 let nowRecord=typhoonNowRecordForEntry(entry);
 let nowStatus=typhoonNowStatusFromRecord(nowRecord);
 if(nowStatus){
-return nowStatus==='1' && !isEndedTyphoonNowRecord(nowRecord);
+return isActiveTyphoonNowRecord(nowRecord);
 }
 let dataTime=String(entry?.dataTime || '');
 return Boolean(dataTime && (activeWindowTimes.has(dataTime) || activeWindowTimes.has(dataTime.slice(0,10))));

@@ -225,8 +225,132 @@ jobs:
           echo "$venv_path/bin" >> "$GITHUB_PATH"
           "$venv_path/bin/python" --version
 
+      - name: Check active TYP gate
+        id: active_typ_gate
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os
+          from datetime import datetime, timedelta, timezone
+          from pathlib import Path
+
+          import vtg_auto
+
+          KST = timezone(timedelta(hours=9))
+
+
+          def write_output(name: str, value: str) -> None:
+              with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
+                  handle.write(f"{name}={value}\n")
+
+
+          def parse_cycle(value: str) -> datetime | None:
+              text = str(value or "").strip()
+              if not text:
+                  return None
+              if text.lower() == "latest":
+                  return None
+              if text.lower() == "latest-6h":
+                  return latest_dmdw_collection_cycle() - timedelta(hours=6)
+              for fmt in ("%Y%m%d%H", "%Y%m%d%H%M"):
+                  try:
+                      return datetime.strptime(text, fmt).replace(tzinfo=timezone.utc)
+                  except ValueError:
+                      pass
+              return None
+
+
+          def latest_dmdw_collection_cycle(value: datetime | None = None) -> datetime:
+              now_kst = (value or datetime.now(timezone.utc)).astimezone(KST)
+              local_date = now_kst.date()
+              hour = now_kst.hour
+              if hour < 1:
+                  target_date, target_hour = local_date - timedelta(days=1), 6
+              elif hour < 7:
+                  target_date, target_hour = local_date - timedelta(days=1), 12
+              elif hour < 13:
+                  target_date, target_hour = local_date - timedelta(days=1), 18
+              elif hour < 19:
+                  target_date, target_hour = local_date, 0
+              else:
+                  target_date, target_hour = local_date, 6
+              return datetime(
+                  target_date.year,
+                  target_date.month,
+                  target_date.day,
+                  target_hour,
+                  tzinfo=timezone.utc,
+              )
+
+
+          dry_run = str(os.environ.get("DRY_RUN_INPUT", "")).lower() == "true"
+          manual_typ = bool(str(os.environ.get("TYP_SEQ_INPUT", "")).strip())
+          if dry_run or manual_typ:
+              reason = "dry_run" if dry_run else "manual_typ_seq"
+              write_output("should_sync", "true")
+              write_output("reason", reason)
+              print(f"DMDW active TYP gate bypassed: {reason}.")
+              raise SystemExit(0)
+
+          auth_key = str(os.environ.get("KMA_APIHUB_AUTH_KEY", "")).strip()
+          if not auth_key:
+              write_output("should_sync", "true")
+              write_output("reason", "missing_auth_key")
+              print("KMA_APIHUB_AUTH_KEY is missing; keeping workflow enabled so credential handling can report it.")
+              raise SystemExit(0)
+
+          cycle = parse_cycle(os.environ.get("CYCLE_INPUT", "")) or latest_dmdw_collection_cycle()
+          data_time = cycle.strftime("%Y%m%d%H")
+          activity_time = cycle + timedelta(hours=4)
+          years = {cycle.year - 1, cycle.year, cycle.year + 1}
+          cache_dir = Path(os.environ.get("KMA_APIHUB_CACHE_DIR") or "data/cache/kma_apihub")
+
+          try:
+              td_rows = []
+              typ_rows = []
+              for year in sorted(years):
+                  td_rows.extend(vtg_auto.fetch_td_rows(year, auth_key, cache_dir=cache_dir))
+                  typ_rows.extend(vtg_auto.fetch_typ_rows(year, auth_key, cache_dir=cache_dir))
+              jobs = vtg_auto.build_storm_jobs(
+                  now=activity_time,
+                  data_time=data_time,
+                  td_rows=td_rows,
+                  typ_rows=typ_rows,
+                  manual_map=vtg_auto.load_manual_map(Path("vtg_manual_atcf_map.json")),
+                  auth_key=auth_key,
+                  atcf_search_positive_radius=vtg_auto.DEFAULT_ATCF_SEARCH_POSITIVE_RADIUS,
+                  atcf_search_negative_radius=vtg_auto.DEFAULT_ATCF_SEARCH_NEGATIVE_RADIUS,
+                  atcf_position_max_distance_km=vtg_auto.DEFAULT_ATCF_POSITION_MAX_DISTANCE_KM,
+                  atcf_position_min_distance_gap_km=vtg_auto.DEFAULT_ATCF_POSITION_MIN_DISTANCE_GAP_KM,
+                  resolve_atcf=False,
+                  activity_cycle_time=cycle,
+              )
+          except Exception as exc:
+              write_output("should_sync", "true")
+              write_output("reason", "precheck_failed")
+              print(f"Warning: active TYP gate failed ({exc}); keeping DMDW sync enabled.")
+              raise SystemExit(0)
+
+          typ_jobs = [job for job in jobs if not str(getattr(job, "stage", "")).upper().startswith("TD")]
+          if typ_jobs:
+              labels = ", ".join(str(getattr(job, "storm_key", "")) for job in typ_jobs)
+              write_output("should_sync", "true")
+              write_output("reason", "active_typ")
+              print(f"Active TYP DMDW jobs found for {data_time}: {labels}")
+          else:
+              write_output("should_sync", "false")
+              write_output("reason", "no_active_typ")
+              print(f"No active TYP DMDW jobs for {data_time}; skipping DMDW login and sync.")
+          PY
+
+      - name: Skip DMDW sync without active TYP
+        if: ${{ steps.active_typ_gate.outputs.should_sync != 'true' }}
+        run: |
+          echo "No active TYP storm is present; DMDW login/source collection is skipped."
+
       - name: Check DMDW credentials
         id: dmdw_credentials
+        if: ${{ steps.active_typ_gate.outputs.should_sync == 'true' }}
         run: |
           set -euo pipefail
           if [ "$DRY_RUN_INPUT" = "true" ]; then
@@ -254,7 +378,7 @@ jobs:
           echo "::notice::DMDW credentials are not configured. Skipping DMDW sync."
 
       - name: Install DMDW dependencies
-        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
+        if: ${{ steps.active_typ_gate.outputs.should_sync == 'true' && steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
         env:
           PLAYWRIGHT_HOST_PLATFORM_OVERRIDE: ubuntu24.04-x64
         run: |
@@ -285,7 +409,7 @@ jobs:
           fi
 
       - name: Diagnose DMDW connectivity
-        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
+        if: ${{ steps.active_typ_gate.outputs.should_sync == 'true' && steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
         continue-on-error: true
         run: |
           set +e
@@ -304,7 +428,7 @@ jobs:
 
       - name: Probe cached DMDW session
         id: dmdw_session_cache
-        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' && steps.dmdw_credentials.outputs.auth_mode == 'login' && env.RUNNER_KIND == 'self-hosted' }}
+        if: ${{ steps.active_typ_gate.outputs.should_sync == 'true' && steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' && steps.dmdw_credentials.outputs.auth_mode == 'login' && env.RUNNER_KIND == 'self-hosted' }}
         run: |
           set -euo pipefail
           session_dir="$RUNNER_TEMP/dmdw_session"
@@ -336,7 +460,7 @@ jobs:
           fi
 
       - name: Prepare DMDW session
-        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
+        if: ${{ steps.active_typ_gate.outputs.should_sync == 'true' && steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
         env:
           CACHED_DMDW_SESSION: ${{ steps.dmdw_session_cache.outputs.cache_hit || 'false' }}
         run: |
@@ -454,7 +578,7 @@ jobs:
           fi
 
       - name: Sync DMDW VTG source data
-        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' }}
+        if: ${{ steps.active_typ_gate.outputs.should_sync == 'true' && steps.dmdw_credentials.outputs.can_sync == 'true' }}
         run: |
           set -euo pipefail
           changed_paths="$RUNNER_TEMP/dmdw_changed_paths.txt"
@@ -498,12 +622,12 @@ jobs:
           python DMDW_VTG/query_models.py "${args[@]}"
 
       - name: Validate DMDW source data
-        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
+        if: ${{ steps.active_typ_gate.outputs.should_sync == 'true' && steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
         run: |
           python DMDW_VTG/validate_dmdw_outputs.py --root data/dmdw
 
       - name: Commit DMDW source data
-        if: ${{ steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
+        if: ${{ steps.active_typ_gate.outputs.should_sync == 'true' && steps.dmdw_credentials.outputs.can_sync == 'true' && env.DRY_RUN_INPUT != 'true' }}
         run: |
           set -euo pipefail
           changed_paths="$RUNNER_TEMP/dmdw_changed_paths.txt"

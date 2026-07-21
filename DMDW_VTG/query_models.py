@@ -1089,6 +1089,7 @@ def load_active_jobs(cycle: datetime, auth_key: str) -> list[Any]:
         resolve_atcf=False,
         activity_cycle_time=cycle,
     )
+    jobs = [job for job in jobs if storm_kind_for_job(job) == "typ"]
     return annotate_jobs_with_dmdw_sequence(jobs, td_rows=td_rows, typ_rows=typ_rows, cycle=cycle)
 
 
