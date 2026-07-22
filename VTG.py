@@ -251,6 +251,7 @@ DISPLAY_120_LAT_MIN = 0.0
 DISPLAY_120_LAT_MAX = 50.0
 APIHUB_MODEL_START_MAX_DISTANCE_KM = float(os.getenv("VTG_APIHUB_START_MAX_DISTANCE_KM", "850"))
 MODEL_TRACK_MAX_SPEED_KMH = float(os.getenv("VTG_MODEL_TRACK_MAX_SPEED_KMH", "100"))
+KNACKWX_MAX_LEAD_GAP_HOURS = float(os.getenv("VTG_KNACKWX_MAX_LEAD_GAP_HOURS", "12"))
 
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
@@ -2053,15 +2054,39 @@ def current_intensity(settings: Settings) -> str:
     return "TD" if settings.storm_stage.upper() == "TD" else "TYP"
 
 
+def trim_knackwx_forecast_gaps(group: pd.DataFrame, *, max_gap_hours: float = KNACKWX_MAX_LEAD_GAP_HOURS) -> pd.DataFrame:
+    """Drop the tail after KNACKWX skips more than the allowed lead interval."""
+    clean = group.copy()
+    clean["TMD"] = pd.to_numeric(clean["TMD"], errors="coerce")
+    leads = sorted(clean["TMD"].dropna().unique())
+    if leads and leads[0] > max_gap_hours:
+        print(
+            f"{clean['SRC'].iloc[0]} KNACKWX: "
+            f"dropped because first forecast lead is {leads[0]:g}h "
+            f"(>{max_gap_hours:g}h)."
+        )
+        return clean.iloc[0:0].copy()
+    if len(leads) < 2:
+        return clean
+
+    for previous_lead, next_lead in zip(leads, leads[1:]):
+        gap = next_lead - previous_lead
+        if gap > max_gap_hours:
+            print(
+                f"{clean['SRC'].iloc[0]} KNACKWX: "
+                f"trimmed after {previous_lead:g}h due to forecast gap to {next_lead:g}h "
+                f"(>{max_gap_hours:g}h)."
+            )
+            return clean[clean["TMD"].le(previous_lead)].copy()
+    return clean
+
+
 def trim_discontinuous_forecast(group: pd.DataFrame, *, gap_factor: float = 2.5) -> pd.DataFrame:
     """Keep the first continuous forecast segment when late-hour outliers appear."""
     clean = group.copy()
     clean["TMD"] = pd.to_numeric(clean["TMD"], errors="coerce")
     if DATA_SOURCE_COLUMN in clean and clean[DATA_SOURCE_COLUMN].eq("KNACKWX").any():
-        # KNACKWX is an early, temporary feed and can legitimately begin after
-        # 0h or omit intermediate leads. Keep available points; downstream
-        # motion QC evaluates them using their actual elapsed hours.
-        return clean
+        return trim_knackwx_forecast_gaps(clean)
     leads = sorted(clean["TMD"].dropna().unique())
     if len(leads) < 3:
         return clean
@@ -3184,7 +3209,7 @@ def marker_points_every_24h(track: pd.DataFrame) -> pd.DataFrame:
     return track[elapsed_hours.mod(24).eq(0)]
 
 
-def split_knackwx_track_segments(track: pd.DataFrame, *, max_gap_hours: float = 15.0) -> list[pd.DataFrame]:
+def split_knackwx_track_segments(track: pd.DataFrame, *, max_gap_hours: float = KNACKWX_MAX_LEAD_GAP_HOURS) -> list[pd.DataFrame]:
     """Do not draw lines across forecast hours missing from the temporary KNACKWX feed."""
     if track.empty or DATA_SOURCE_COLUMN not in track:
         return [track]
