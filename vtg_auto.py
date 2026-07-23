@@ -1194,21 +1194,6 @@ def typ_link_payload(typ_number: int, typ_row: dict | None) -> dict:
     }
 
 
-def infer_typ_link_from_atcf_id(
-    atcf_id: str | None,
-    *,
-    year: int | str,
-    typ_rows: list[dict],
-) -> tuple[int, dict] | None:
-    atcf_number = regular_atcf_storm_number(atcf_id or "")
-    if not atcf_number:
-        return None
-    typ_row = typ_row_for_number(typ_rows, year=year, typ_number=atcf_number)
-    if not typ_row:
-        return None
-    return atcf_number, typ_row
-
-
 def is_invest_atcf_id(atcf_id: str) -> bool:
     number = atcf_storm_number(atcf_id)
     return number is not None and 90 <= number <= 99
@@ -2546,23 +2531,6 @@ def build_storm_jobs(
             )
         atcf_id = atcf_match.atcf_id if atcf_match else None
         atcf_method = atcf_match.method if atcf_match else ""
-        if typ_number == 0:
-            inferred_typ_link = infer_typ_link_from_atcf_id(atcf_id, year=year, typ_rows=typ_rows)
-            if inferred_typ_link:
-                typ_number, linked_typ_row = inferred_typ_link
-                linked_typ_en, linked_typ_name_ko, linked_typ_start = typ_identity_from_row(linked_typ_row)
-                linked_typ_has_started = bool(typ_number and linked_typ_start and data_dt >= linked_typ_start)
-                display_typ_en = linked_typ_en if linked_typ_has_started else ""
-                display_typ_name_ko = linked_typ_name_ko if linked_typ_has_started else ""
-                matching_typ_en = linked_typ_en
-                td_storm_key = f"td_{year}_{td_number:02d}_typ_{typ_number:02d}"
-                td_base_atcf_number = max(1, min(89, typ_number))
-                print(
-                    f"Inferred TD{td_number:02d}->TYP{typ_number:02d} link "
-                    f"from ATCF {atcf_id} at {data_time}."
-                )
-                if (year, typ_number) in active_typhoon_set and linked_typ_has_started:
-                    continue
         analysis_point = atcf_match.point if atcf_match and atcf_match.method == "position" else None
         if analysis_point is None and atcf_id:
             started_at = time.monotonic()
@@ -3055,6 +3023,8 @@ def canonical_target_for_linked_td_metadata(
     year = str(metadata.get("storm_year") or data_time[:4] or "").strip()
     if not year:
         return None
+    # ATCF IDs (for example 11W) are basin sequence numbers, not KMA TYP numbers.
+    # Canonical TD->TYP absorption must come only from explicit KMA linkage metadata.
     linked_typ_number = (
         metadata_int(metadata.get("linked_typ_number"))
         or (
@@ -3064,15 +3034,6 @@ def canonical_target_for_linked_td_metadata(
         )
         or fallback_linked_typ_number
     )
-    if not linked_typ_number:
-        atcf_number = regular_atcf_storm_number(
-            metadata.get("atcf_id")
-            or metadata.get("analysis_atcf_id")
-            or metadata.get("primary_atcf_id")
-            or ""
-        )
-        if atcf_number and typ_names.get((year, atcf_number)):
-            linked_typ_number = atcf_number
     if not linked_typ_number:
         return None
     canonical_name = str(metadata.get("canonical_typ_name") or "").strip()
@@ -4622,14 +4583,14 @@ def main() -> int:
     if args.index_only:
         updated_at_utc = format_utc_stamp(now)
         td_typ_links: dict[tuple[str, int], dict] = {}
+        years_for_index = {
+            int(path.name)
+            for path in output_root.glob("[0-9][0-9][0-9][0-9]")
+            if path.is_dir() and path.name.isdigit()
+        }
+        if not years_for_index:
+            years_for_index.add(now.year)
         if args.auth_key:
-            years_for_index = {
-                int(path.name)
-                for path in output_root.glob("[0-9][0-9][0-9][0-9]")
-                if path.is_dir() and path.name.isdigit()
-            }
-            if not years_for_index:
-                years_for_index.add(now.year)
             td_rows_for_index: list[dict] = []
             typ_rows_for_index: list[dict] = []
             for year in sorted(years_for_index):
