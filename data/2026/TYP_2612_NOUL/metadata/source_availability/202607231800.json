@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260724013924",
-  "generated_at_kst": "2026-07-24 10:39 KST",
+  "generated_at_utc": "20260724014925",
+  "generated_at_kst": "2026-07-24 10:49 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_12",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 20,
-  "selected_model_count": 12,
+  "model_source_count": 21,
+  "selected_model_count": 13,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -125,8 +125,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 12,
-      "max_lead_hour": 72,
+      "point_count": 1,
+      "max_lead_hour": 6,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -370,6 +370,23 @@
       "is_official": true,
       "first_seen_utc": "20260723220923",
       "first_seen_kst": "2026-07-24 07:09 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 19,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260724014925",
+      "first_seen_kst": "2026-07-24 10:49 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2612_NOUL/metadata/source_availability/202607231800.json"
