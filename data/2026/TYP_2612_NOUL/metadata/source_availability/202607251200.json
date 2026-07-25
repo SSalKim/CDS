@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260725183954",
-  "generated_at_kst": "2026-07-26 03:39 KST",
+  "generated_at_utc": "20260725185000",
+  "generated_at_kst": "2026-07-26 03:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_12",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 24,
-  "selected_model_count": 14,
+  "model_source_count": 34,
+  "selected_model_count": 15,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -40,8 +40,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": true,
-      "point_count": 28,
-      "max_lead_hour": 162,
+      "point_count": 38,
+      "max_lead_hour": 222,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -66,6 +66,40 @@
       "first_seen_kst": "2026-07-26 03:39 KST"
     },
     {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260725185000",
+      "first_seen_kst": "2026-07-26 03:50 KST"
+    },
+    {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260725185000",
+      "first_seen_kst": "2026-07-26 03:50 KST"
+    },
+    {
       "model_id": "CMC_EPS",
       "model_label": "CMC EPS",
       "raw_model_ids": [
@@ -81,6 +115,92 @@
       "is_official": false,
       "first_seen_utc": "20260725183954",
       "first_seen_kst": "2026-07-26 03:39 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_EPS",
+        "CMC_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 26,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260725185000",
+      "first_seen_kst": "2026-07-26 03:50 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260725185000",
+      "first_seen_kst": "2026-07-26 03:50 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "ECMWF_AIFS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260725185000",
+      "first_seen_kst": "2026-07-26 03:50 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "ECMWF_AIFS"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260725185000",
+      "first_seen_kst": "2026-07-26 03:50 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 1,
+      "max_lead_hour": 6,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260725185000",
+      "first_seen_kst": "2026-07-26 03:50 KST"
     },
     {
       "model_id": "ECMWF_AIFS_EPS",
@@ -100,6 +220,23 @@
       "first_seen_kst": "2026-07-26 03:39 KST"
     },
     {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "EAMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 2,
+      "max_lead_hour": 12,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260725185000",
+      "first_seen_kst": "2026-07-26 03:50 KST"
+    },
+    {
       "model_id": "FNV3",
       "model_label": "FNV3",
       "raw_model_ids": [
@@ -115,6 +252,23 @@
       "is_official": false,
       "first_seen_utc": "20260725181956",
       "first_seen_kst": "2026-07-26 03:19 KST"
+    },
+    {
+      "model_id": "FNV3",
+      "model_label": "FNV3",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260725185000",
+      "first_seen_kst": "2026-07-26 03:50 KST"
     },
     {
       "model_id": "GFS",
@@ -184,6 +338,23 @@
       "is_official": false,
       "first_seen_utc": "20260725180040",
       "first_seen_kst": "2026-07-26 03:00 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260725185000",
+      "first_seen_kst": "2026-07-26 03:50 KST"
     },
     {
       "model_id": "HAFS",
