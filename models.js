@@ -37,7 +37,8 @@ forecastRules:[
 {until:"2010-05-13",cycles:[0,12],max:240},
 {from:"2010-05-14",until:"2013-09-30",cycles:[0,12],max:252},
 {from:"2013-10-01",cycles:[0,12],max:288},
-{from:"2011-05-23",cycles:[6,18],max:84}
+{from:"2011-05-23",until:"2013-09-30",cycles:[6,18],max:72,stepSchemeKey:"6,18_legacy"},
+{from:"2013-10-01",cycles:[6,18],max:84}
 ],
 stepSchemeByCycleGroup:{
 "0,12":[
@@ -47,6 +48,9 @@ stepSchemeByCycleGroup:{
 ],
 "6,18":[
 {start:0,end:84,step:3}
+],
+"6,18_legacy":[
+{start:0,end:72,step:6}
 ]
 }
 },
@@ -389,10 +393,18 @@ out.push(h);
 return [...new Set(out)];
 }
 
-function getCycleScheme(modelId,cycleHour){
+function getCycleScheme(modelId,cycleHour,rule=null){
 let groups=MODELS[modelId]?.stepSchemeByCycleGroup || {};
+
+if(rule?.stepSchemeKey && groups[rule.stepSchemeKey]){
+return groups[rule.stepSchemeKey];
+}
+
 for(let key in groups){
 let members=key.split(',').map(Number);
+if(members.some(member=>Number.isNaN(member))){
+continue;
+}
 if(members.includes(cycleHour)){
 return groups[key];
 }
@@ -412,7 +424,7 @@ if(!rule.cycles.includes(cycleHour)) continue;
 if(rule.from && runDate<new Date(rule.from)) continue;
 if(rule.until && runDate>new Date(rule.until)) continue;
 return expandSteps(
-getCycleScheme(modelId,cycleHour),
+getCycleScheme(modelId,cycleHour,rule),
 rule.max
 );
 }

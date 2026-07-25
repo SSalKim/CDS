@@ -257,6 +257,11 @@ const PRODUCTS=[
         kim_rdps:"2026-05-12",
         um_ldps:"2018-01-18"
     },
+    forecastStepByModel:{
+        kim_rdps:[
+            {start:0,end:144,step:3}
+        ]
+    },
 },
 {category:"asia", id:"rain3h", label:"3시간 누적강수량",
     patternByModel:{
