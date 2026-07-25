@@ -87,6 +87,52 @@ return month>=11 || month<=4;
 
 }
 
+function getUTCDateKey(runUTC){
+
+if(!(runUTC instanceof Date) || Number.isNaN(runUTC.getTime())){
+return '';
+}
+
+return [
+runUTC.getUTCFullYear(),
+String(runUTC.getUTCMonth()+1).padStart(2,'0'),
+String(runUTC.getUTCDate()).padStart(2,'0')
+].join('-');
+
+}
+
+function getDatedPatternForModel(product,modelId,runUTC){
+
+let rules=product?.datedPatternByModel?.[modelId];
+
+if(!rules){
+return null;
+}
+
+let dateKey=getUTCDateKey(runUTC);
+
+if(!dateKey){
+return null;
+}
+
+let ruleList=Array.isArray(rules) ? rules : [rules];
+let matched=ruleList.find(rule=>{
+
+if(!rule){
+return false;
+}
+
+let from=rule.from || rule.start || '';
+let until=rule.until || rule.end || '';
+
+return (!from || dateKey>=from) && (!until || dateKey<=until);
+
+});
+
+return matched?.pattern ?? matched?.patterns ?? null;
+
+}
+
 function getSeasonalPatternForModel(product,modelId,runUTC){
 
 let seasonal=product?.seasonalPatternByModel?.[modelId];
@@ -104,6 +150,7 @@ return isWinterSeasonRunDate(runUTC)
 function getProductPatternsForDetail(product,modelId,detailToken,runUTC=null){
 
 let basePattern=
+getDatedPatternForModel(product,modelId,runUTC) ||
 getSeasonalPatternForModel(product,modelId,runUTC) ||
 product?.patternByModel?.[modelId];
 
@@ -211,7 +258,7 @@ return [];
 }
 
 let patternList=normalizePatternList(
-patterns ?? product.patternByModel?.[modelId]
+patterns ?? getProductPatternsForDetail(product,modelId,detailToken,runUTC)
 ).filter(pattern=>typeof pattern==='string');
 
 if(!patternList.length){
@@ -460,6 +507,8 @@ DEFAULT_CHART_BACKUP_BASE_URLS,
 getChartBaseUrls,
 getChartUrlCandidates,
 normalizePatternList,
+getUTCDateKey,
+getDatedPatternForModel,
 isWinterSeasonRunDate,
 getSeasonalPatternForModel,
 getProductPatternsForDetail,

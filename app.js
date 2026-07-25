@@ -1803,6 +1803,10 @@ if(latestSearchInProgress || modelCompareMode){
 return false;
 }
 
+if(!shouldJumpOlderAvailableRunForMissingSelection()){
+return false;
+}
+
 let baseRunUTC=getSelectedUTCDate();
 
 await jumpLatestAvailableForCurrentSelection({
@@ -1813,6 +1817,28 @@ skipRunUTC:baseRunUTC
 });
 
 return true;
+
+}
+
+function shouldJumpOlderAvailableRunForMissingSelection(){
+
+let selectedRunUTC=getSelectedUTCDate();
+
+if(!(selectedRunUTC instanceof Date) || Number.isNaN(selectedRunUTC.getTime())){
+return false;
+}
+
+let product=getCurrentProduct();
+let baseDate=getDefaultLatestSearchBaseDate(product);
+
+if(!(baseDate instanceof Date) || Number.isNaN(baseDate.getTime())){
+return false;
+}
+
+let lookbackHours=getLatestSearchLookbackHours(product);
+let selectedAgeHours=(baseDate.getTime()-selectedRunUTC.getTime())/(60*60*1000);
+
+return selectedAgeHours>=0 && selectedAgeHours<=lookbackHours;
 
 }
 

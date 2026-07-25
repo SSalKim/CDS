@@ -844,6 +844,14 @@ const PRODUCTS=[
         kwrf_rdps: "kwrf_lc10_hkor_surfce_s{fh}_{run}.gif",
         kim_ldps: "kim_ldps_erly_hkor_acptot_s{fh}_{run}.png",
         um_ldps: "ldps_lc06_acptot_s{fh}_{run}.gif"
+    },
+    datedPatternByModel:{
+        um_gdps:[
+            {from:"2011-05-23", until:"2012-11-29", pattern:"gdps_erly_hkor_surfce_s{fh}_{run}.gif"}
+        ],
+        um_ldps:[
+            {until:"2012-12-11", pattern:"ldps_lc06_surfce_s{fh}_{run}.gif"}
+        ]
     }
 },
 {category:"hkor", id:"prcp3h", label:"3시간 누적강수량",
