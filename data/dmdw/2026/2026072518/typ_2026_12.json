@@ -1,0 +1,24 @@
+{
+  "cycle": "2026072518",
+  "cycle_utc": "202607251800",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":30,"member_id":null,"model_id":"JGSM","point_count":6,"raw_model_id":"JGSM","row_count":6,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 6,
+  "points": [
+    [0,0,"202607251800",22.5,115.1,960,39,18,315,280,null],
+    [0,6,"202607260000",23.2,114.6,967,27.3,-9,null,0,null],
+    [0,12,"202607260600",23.7,114.2,972,21.6,-9,null,0,null],
+    [0,18,"202607261200",24.4,114.1,976,20.1,-9,null,0,null],
+    [0,24,"202607261800",25.3,113.9,978,19,-9,null,0,null],
+    [0,30,"202607270000",26.5,113.8,981,17,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"9","storm_kind":"typ","typ_seq":12,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"NOUL","canonical_typ_name_ko":"노을","canonical_typ_number":12,"data_typ_number":12,"dmdw_o_tm_seq":"9","dmdw_start_time":"202607231800","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_12"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
