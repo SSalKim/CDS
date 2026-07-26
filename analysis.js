@@ -970,21 +970,6 @@ product.category==="kas0" && product.id===productId
 );
 }
 
-function removeKas0Product(productId){
-
-let index=ANALYSIS_PRODUCTS.findIndex(product=>
-product.category==="kas0" && product.id===productId
-);
-
-if(index<0){
-return null;
-}
-
-let [product]=ANALYSIS_PRODUCTS.splice(index,1);
-return product;
-
-}
-
 function insertKas0ProductsBefore(beforeId,products){
 
 let insertIndex=ANALYSIS_PRODUCTS.findIndex(product=>
@@ -1034,15 +1019,13 @@ if(tmpwndProduct){
 tmpwndProduct.id="tmpwnd";
 }
 
-let gph700Product=removeKas0Product("gph700");
-
 insertKas0ProductsBefore("wnd200",[
 makeKas0Product({id:"surfce",label:"해면기압"}),
 makeKas0Product({id:"gph925",label:"925 고도,기온,비습"}),
 makeKas0Product({id:"gph850",label:"850 고도,기온,비습"}),
-makeKas0Product({id:"thk700",label:"1000-700 층후"}),
-gph700Product
-].filter(Boolean));
+makeKas0Product({id:"thk700",label:"1000-700 층후, 850 상당온위"}),
+{category:"kas0",type:"header",label:"──────────────────"}
+]);
 
 insertKas0ProductsAfter("dft925",[
 makeKas0Product({id:"vel700",label:"700 상승속도",includeKas:true}),
@@ -1052,7 +1035,6 @@ makeKas0Product({id:"adv925",label:"925 온도이류",includeKas:true,includeKlp
 
 [
 "gph500",
-"gph700",
 "tmpwnd",
 "con925",
 "con850",
