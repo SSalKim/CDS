@@ -31,6 +31,10 @@ let h=pad2(date.getUTCHours());
 return `${y}${m}${d}${h}`;
 }
 
+function formatUTCMinuteStampFromDate(date){
+return `${formatUTCStampFromDate(date)}${pad2(date.getUTCMinutes())}`;
+}
+
 
 function setToday(){
 runDate.value=formatDateInputLocal(new Date());
@@ -56,17 +60,17 @@ return new Date();
 }
 
 let [y,m,d]=runDate.value.split('-').map(Number);
-let h=parseInt(runHour.value || '0',10);
+let {hour:h,minute}=parseRunTimeValue(runHour.value || '0');
 
 if(Number.isNaN(h)){
 h=0;
 }
 
 if(timeMode==='KST'){
-return new Date(Date.UTC(y,m-1,d,h-9));
+return new Date(Date.UTC(y,m-1,d,h-9,minute));
 }
 
-return new Date(Date.UTC(y,m-1,d,h));
+return new Date(Date.UTC(y,m-1,d,h,minute));
 
 }
 
@@ -135,7 +139,7 @@ displayDate=new Date(utcDate.getTime());
 }
 
 runDate.value=formatDateInputFromUTCParts(displayDate);
-runHour.value=pad2(displayDate.getUTCHours());
+runHour.value=formatRunTimeValue(displayDate);
 
 
 }
@@ -143,6 +147,75 @@ runHour.value=pad2(displayDate.getUTCHours());
 
 function getUTCStamp(){
 return formatUTCStampFromDate(getSelectedUTCDate());
+}
+
+function parseRunTimeValue(value){
+
+let text=String(value ?? '0').trim();
+
+if(text.includes(':')){
+let [hourText,minuteText='0']=text.split(':');
+let hour=parseInt(hourText,10);
+let minute=parseInt(minuteText,10);
+
+return {
+hour:Number.isFinite(hour) ? hour : 0,
+minute:Number.isFinite(minute) ? minute : 0
+};
+}
+
+let numeric=Number(text);
+
+if(Number.isFinite(numeric)){
+let hour=Math.floor(numeric);
+let minute=Math.round((numeric-hour)*60);
+return {hour,minute};
+}
+
+return {hour:0,minute:0};
+
+}
+
+function getCycleValueFromDate(date){
+
+if(!(date instanceof Date) || Number.isNaN(date.getTime())){
+return 0;
+}
+
+return date.getUTCHours()+date.getUTCMinutes()/60;
+
+}
+
+function formatCycleValue(cycleValue){
+
+let numeric=Number(cycleValue);
+
+if(!Number.isFinite(numeric)){
+numeric=0;
+}
+
+let totalMinutes=((Math.round(numeric*60)%(24*60))+(24*60))%(24*60);
+let hour=Math.floor(totalMinutes/60);
+let minute=totalMinutes%60;
+
+return `${pad2(hour)}:${pad2(minute)}`;
+
+}
+
+function formatRunTimeValue(date){
+
+return formatCycleValue(getCycleValueFromDate(date));
+
+}
+
+function cyclesIncludeValue(cycles,value){
+
+let numericValue=Number(value);
+
+return (cycles || []).some(cycle=>
+Math.abs(Number(cycle)-numericValue)<1e-6
+);
+
 }
 
 
@@ -179,7 +252,7 @@ date
 function populateHours(preferredUTCDate=null){
 
 let previousUTC=preferredUTCDate || getSelectedUTCDate();
-let previousUTCStamp=formatUTCStampFromDate(previousUTC);
+let previousUTCStamp=formatUTCMinuteStampFromDate(previousUTC);
 
 runHour.innerHTML='';
 
@@ -189,8 +262,18 @@ let optionItems=[];
 
 cycles.forEach(cycleHour=>{
 
+let cycleValue=Number(cycleHour);
+
+if(!Number.isFinite(cycleValue)){
+return;
+}
+
+let cycleMinutes=Math.round(cycleValue*60);
+let cycleHourPart=Math.floor(cycleMinutes/60);
+let cycleMinutePart=((cycleMinutes%60)+60)%60;
 let displayUTC;
 let displayHour;
+let displayMinute;
 
 if(timeMode==='KST'){
 /*
@@ -201,37 +284,42 @@ displayUTC=new Date(Date.UTC(
 displayDate.getUTCFullYear(),
 displayDate.getUTCMonth(),
 displayDate.getUTCDate(),
-cycleHour+9
+cycleHourPart+9,
+cycleMinutePart
 ));
 displayHour=displayUTC.getUTCHours();
+displayMinute=displayUTC.getUTCMinutes();
 }
 else{
 displayUTC=new Date(Date.UTC(
 displayDate.getUTCFullYear(),
 displayDate.getUTCMonth(),
 displayDate.getUTCDate(),
-cycleHour
+cycleHourPart,
+cycleMinutePart
 ));
-displayHour=cycleHour;
+displayHour=displayUTC.getUTCHours();
+displayMinute=displayUTC.getUTCMinutes();
 }
 
-let value=pad2(displayHour);
+let value=formatCycleValue(displayHour+displayMinute/60);
 let candidateUTC=timeMode==='KST'
 ?new Date(Date.UTC(
 displayDate.getUTCFullYear(),
 displayDate.getUTCMonth(),
 displayDate.getUTCDate(),
-displayHour-9
+displayHour-9,
+displayMinute
 ))
 :new Date(Date.UTC(
-displayDate.getUTCFullYear(),displayDate.getUTCMonth(),displayDate.getUTCDate(),displayHour));
+displayDate.getUTCFullYear(),displayDate.getUTCMonth(),displayDate.getUTCDate(),displayHour,displayMinute));
 
 optionItems.push({
 value,
-text:`${value}:00`,
-utcHour:pad2(cycleHour),
-utcStamp:formatUTCStampFromDate(candidateUTC),
-sortHour:displayHour
+text:value,
+utcHour:formatCycleValue(cycleValue),
+utcStamp:formatUTCMinuteStampFromDate(candidateUTC),
+sortHour:displayHour+displayMinute/60
 });
 
 });
@@ -294,13 +382,13 @@ let display=timeMode==='KST'
 runDate.value=formatDateInputFromUTCParts(display);
 populateHours(runUTC);
 
-let desiredHour=pad2(display.getUTCHours());
+let desiredHour=formatRunTimeValue(display);
 let hasOption=[...runHour.options].some(option=>option.value===desiredHour);
 
 if(!hasOption){
 let option=document.createElement('option');
 option.value=desiredHour;
-option.textContent=`${desiredHour}:00`;
+option.textContent=desiredHour;
 option.dataset.unsupported='true';
 runHour.appendChild(option);
 }

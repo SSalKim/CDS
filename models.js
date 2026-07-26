@@ -1,3 +1,15 @@
+const HOURLY_MODEL_CYCLES=[
+0,1,2,3,4,5,6,7,8,9,10,11,
+12,13,14,15,16,17,18,19,20,21,22,23
+];
+
+const HALF_HOURLY_MODEL_CYCLES=[
+0,0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,
+6,6.5,7,7.5,8,8.5,9,9.5,10,10.5,11,11.5,
+12,12.5,13,13.5,14,14.5,15,15.5,16,16.5,17,17.5,
+18,18.5,19,19.5,20,20.5,21,21.5,22,22.5,23,23.5
+];
+
 const MODELS={
 
 kim_gdps:{
@@ -337,15 +349,20 @@ cycles:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
 kim_klps:{
 name:"KLPS_KIM",
 folder:"ANAL",
-archiveStart:"2023-02-22",
-cycles:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
+archiveStart:"2023-02-23",
+cycles:HALF_HOURLY_MODEL_CYCLES,
 },
 
 um_klps:{
 name:"KLPS_UM",
 folder:"ANAL",
 archiveStart:"2010-03-16",
-cycles:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23],
+archiveEnd:"2026-03-31",
+cycles:HALF_HOURLY_MODEL_CYCLES,
+cycleAvailability:[
+{until:"2020-07-08",cycles:HOURLY_MODEL_CYCLES},
+{from:"2020-07-09",cycles:HALF_HOURLY_MODEL_CYCLES}
+],
 },
 
 obs_upper:{

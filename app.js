@@ -1903,10 +1903,10 @@ let display=timeMode==='KST'
 ?new Date(runUTC.getTime()+9*60*60*1000)
 :new Date(runUTC.getTime());
 let displayDate=formatDateInputFromUTCParts(display);
-let displayHour=pad2(display.getUTCHours());
+let displayTime=formatRunTimeValue(display);
 
 return (
-`${getCurrentMainMenuLabel()} / ${displayDate} ${displayHour}:00 ${timeMode}
+`${getCurrentMainMenuLabel()} / ${displayDate} ${displayTime} ${timeMode}
 `+
 `현재 시각 이후 자료시각입니다. 아직 생산되지 않은 자료라 이미지 요청을 건너뜁니다.`
 );
@@ -2007,9 +2007,9 @@ product,
 runDateOnly
 ) || [];
 
-let cycleHour=runUTC.getUTCHours();
+let cycleHour=getCycleValueFromDate(runUTC);
 
-if(cycles.includes(cycleHour)){
+if(cyclesIncludeValue(cycles,cycleHour)){
 return {supported:true,message:''};
 }
 
@@ -2018,18 +2018,18 @@ let displayRun=timeMode==='KST'
 ?new Date(runUTC.getTime()+9*60*60*1000)
 :new Date(runUTC.getTime());
 let displayDate=formatDateInputFromUTCParts(displayRun);
-let displayHour=pad2(displayRun.getUTCHours());
+let displayTime=formatRunTimeValue(displayRun);
 let supportedText=cycles.length
 ?cycles.map(h=>{
-let shown=timeMode==='KST' ? (Number(h)+9)%24 : Number(h);
-return pad2(shown)+'시';
+let shown=timeMode==='KST' ? Number(h)+9 : Number(h);
+return formatCycleValue(shown);
 }).join(', ')
 :'없음';
 
 return {
 supported:false,
 message:
-`${modelName}은(는) ${displayDate} ${displayHour}:00 ${timeMode} 자료시각을 지원하지 않습니다.
+`${modelName}은(는) ${displayDate} ${displayTime} ${timeMode} 자료시각을 지원하지 않습니다.
 `+
 `지원 시각: ${supportedText}`
 };
@@ -2047,13 +2047,13 @@ let display=timeMode==='KST'
 ?new Date(runUTC.getTime()+9*60*60*1000)
 :new Date(runUTC.getTime());
 let displayDate=formatDateInputFromUTCParts(display);
-let displayHour=pad2(display.getUTCHours());
+let displayTime=formatRunTimeValue(display);
 let lead=getForecastLeadLabel(index);
 
 return (
 `${getCurrentMainMenuLabel()} / ${modelName}
 `+
-`${productLabel} / ${displayDate} ${displayHour}:00 ${timeMode} / ${lead}
+`${productLabel} / ${displayDate} ${displayTime} ${timeMode} / ${lead}
 `+
 `모델·산출물·자료시각 조합은 유효하지만 이미지 파일을 찾지 못했습니다.
 `+
@@ -2177,7 +2177,7 @@ if(!usesForecastHour){
 return [0];
 }
 
-let cycleHour=runUTC.getUTCHours();
+let cycleHour=getCycleValueFromDate(runUTC);
 
 let runDateOnly=parseDateOnly(
 formatDateInputFromUTCParts(runUTC)
@@ -2366,12 +2366,12 @@ maxCandidates=NOW_MAX_CANDIDATES
 let candidates=[];
 
 let base=new Date(baseDate.getTime());
-base.setUTCMinutes(0,0,0);
+base.setUTCMinutes(base.getUTCMinutes()>=30 ? 30 : 0,0,0);
 
-for(let i=0;i<=lookbackHours;i++){
+for(let i=0;i<=lookbackHours*2;i++){
 
 let d=new Date(
-base.getTime()-i*60*60*1000
+base.getTime()-i*30*60*1000
 );
 
 let dateOnly=parseDateOnly(
@@ -2384,9 +2384,9 @@ getCurrentProduct(),
 dateOnly
 );
 
-let cycleHour=d.getUTCHours();
+let cycleHour=getCycleValueFromDate(d);
 
-if(!cycles.includes(cycleHour)){
+if(!cyclesIncludeValue(cycles,cycleHour)){
 continue;
 }
 
@@ -2418,12 +2418,12 @@ lookbackHours=24
 ){
 
 let base=new Date(baseDate.getTime());
-base.setUTCMinutes(0,0,0);
+base.setUTCMinutes(base.getUTCMinutes()>=30 ? 30 : 0,0,0);
 
-for(let i=0;i<=lookbackHours;i++){
+for(let i=0;i<=lookbackHours*2;i++){
 
 let d=new Date(
-base.getTime()-i*60*60*1000
+base.getTime()-i*30*60*1000
 );
 
 let dateOnly=parseDateOnly(
@@ -2436,7 +2436,7 @@ getCurrentProduct(),
 dateOnly
 );
 
-if(cycles.includes(d.getUTCHours())){
+if(cyclesIncludeValue(cycles,getCycleValueFromDate(d))){
 return d;
 }
 

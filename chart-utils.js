@@ -175,10 +175,17 @@ return product?.folderByModel?.[modelId] || models?.[modelId]?.folder || '';
 function getChartUrlParts(runUTC,formatUTCStampFromDate){
 
 let run=formatUTCStampFromDate(runUTC);
+let runmin=[
+runUTC.getUTCFullYear(),
+String(runUTC.getUTCMonth()+1).padStart(2,'0'),
+String(runUTC.getUTCDate()).padStart(2,'0'),
+String(runUTC.getUTCHours()).padStart(2,'0'),
+String(runUTC.getUTCMinutes()).padStart(2,'0')
+].join('');
 
 return {
 run,
-runmin:run+'00',
+runmin,
 ym:run.slice(0,6),
 day:run.slice(6,8),
 hour:run.slice(8,10)

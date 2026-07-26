@@ -903,6 +903,148 @@ const ANALYSIS_PRODUCTS=[
 ];
 
 
+const KLPS_RUNMIN_START_DATE="2020-07-09";
+
+function makeKlpsAnalysisPattern(productId,modelId,stampToken){
+let prefix=modelId==="kim_klps" ? "kim_klps" : "klps";
+return `${prefix}_lc05_korea_${productId}_ft01_pa4_s000_${stampToken}.gif`;
+}
+
+function attachKlpsAnalysisPattern(product,klpsId=product?.id){
+
+if(!product || !klpsId){
+return;
+}
+
+product.patternByModel={
+...(product.patternByModel || {}),
+kim_klps:makeKlpsAnalysisPattern(klpsId,"kim_klps","{runmin}"),
+um_klps:makeKlpsAnalysisPattern(klpsId,"um_klps","{runmin}")
+};
+
+product.datedPatternByModel={
+...(product.datedPatternByModel || {}),
+um_klps:[
+{until:"2020-07-08",pattern:makeKlpsAnalysisPattern(klpsId,"um_klps","{run}")},
+{from:KLPS_RUNMIN_START_DATE,pattern:makeKlpsAnalysisPattern(klpsId,"um_klps","{runmin}")}
+]
+};
+
+}
+
+function makeKas0HkorPattern(productId){
+return `kas0_hkor_${productId}_{run}.png`;
+}
+
+function makeKas0Product({
+id,
+label,
+kasId=null,
+klpsId=null,
+includeKas=false,
+includeKlps=true
+}){
+
+let product={
+category:"kas0",
+id,
+label,
+patternByModel:{}
+};
+
+if(includeKas){
+product.patternByModel.kas=makeKas0HkorPattern(kasId || id);
+}
+
+if(includeKlps){
+attachKlpsAnalysisPattern(product,klpsId || id);
+}
+
+return product;
+
+}
+
+function findKas0Product(productId){
+return ANALYSIS_PRODUCTS.find(product=>
+product.category==="kas0" && product.id===productId
+);
+}
+
+function insertKas0ProductsBefore(beforeId,products){
+
+let insertIndex=ANALYSIS_PRODUCTS.findIndex(product=>
+product.category==="kas0" && product.id===beforeId
+);
+
+if(insertIndex<0){
+return;
+}
+
+ANALYSIS_PRODUCTS.splice(insertIndex,0,...products);
+
+}
+
+function insertKas0ProductsBeforeCategory(categoryId,products){
+
+let insertIndex=ANALYSIS_PRODUCTS.findIndex(product=>
+product.category===categoryId
+);
+
+if(insertIndex<0){
+return;
+}
+
+ANALYSIS_PRODUCTS.splice(insertIndex,0,...products);
+
+}
+
+function extendKas0KlpsProducts(){
+
+let tmpwndProduct=findKas0Product("tgc2d");
+if(tmpwndProduct){
+tmpwndProduct.id="tmpwnd";
+}
+
+insertKas0ProductsBefore("gph500",[
+makeKas0Product({id:"surfce",label:"해면기압"}),
+makeKas0Product({id:"gph925",label:"925 고도,기온,비습"}),
+makeKas0Product({id:"gph850",label:"850 고도,기온,비습"})
+]);
+
+insertKas0ProductsBefore("wnd200",[
+makeKas0Product({id:"thk700",label:"1000-700 층후"})
+]);
+
+[
+"gph500",
+"gph700",
+"tmpwnd",
+"con925",
+"con850",
+"wnd850",
+"moflux",
+"anlsfc",
+"anl925",
+"anl850",
+"ttd700"
+].forEach(productId=>attachKlpsAnalysisPattern(findKas0Product(productId)));
+
+insertKas0ProductsBeforeCategory("axas",[
+makeKas0Product({id:"vel700",label:"700 상승속도",includeKas:true}),
+makeKas0Product({id:"vel850",label:"850 상승속도",includeKas:true}),
+makeKas0Product({id:"adv925",label:"925 온도이류",includeKas:true,includeKlps:false}),
+{category:"kas0",type:"header",label:"──────────────────"},
+makeKas0Product({id:"kindex",label:"K-index"}),
+makeKas0Product({id:"sindex",label:"쇼월터 Index"}),
+makeKas0Product({id:"lindex",label:"Lifted Index"}),
+makeKas0Product({id:"pcptyp",label:"강수유형"})
+]);
+
+}
+
+extendKas0KlpsProducts();
+
+
 /* CDS 3.4.1: 분석장 합성/관측 보조 패널 파일 매핑
    - CSV의 신규 산출물만 별도 패턴으로 등록한다.
    - 기본 항목은 기존 patternByModel을 그대로 사용한다.
