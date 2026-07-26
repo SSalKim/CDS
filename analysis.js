@@ -970,6 +970,21 @@ product.category==="kas0" && product.id===productId
 );
 }
 
+function removeKas0Product(productId){
+
+let index=ANALYSIS_PRODUCTS.findIndex(product=>
+product.category==="kas0" && product.id===productId
+);
+
+if(index<0){
+return null;
+}
+
+let [product]=ANALYSIS_PRODUCTS.splice(index,1);
+return product;
+
+}
+
 function insertKas0ProductsBefore(beforeId,products){
 
 let insertIndex=ANALYSIS_PRODUCTS.findIndex(product=>
@@ -981,6 +996,20 @@ return;
 }
 
 ANALYSIS_PRODUCTS.splice(insertIndex,0,...products);
+
+}
+
+function insertKas0ProductsAfter(afterId,products){
+
+let insertIndex=ANALYSIS_PRODUCTS.findIndex(product=>
+product.category==="kas0" && product.id===afterId
+);
+
+if(insertIndex<0){
+return;
+}
+
+ANALYSIS_PRODUCTS.splice(insertIndex+1,0,...products);
 
 }
 
@@ -1005,14 +1034,20 @@ if(tmpwndProduct){
 tmpwndProduct.id="tmpwnd";
 }
 
-insertKas0ProductsBefore("gph500",[
-makeKas0Product({id:"surfce",label:"해면기압"}),
-makeKas0Product({id:"gph925",label:"925 고도,기온,비습"}),
-makeKas0Product({id:"gph850",label:"850 고도,기온,비습"})
-]);
+let gph700Product=removeKas0Product("gph700");
 
 insertKas0ProductsBefore("wnd200",[
-makeKas0Product({id:"thk700",label:"1000-700 층후"})
+makeKas0Product({id:"surfce",label:"해면기압"}),
+makeKas0Product({id:"gph925",label:"925 고도,기온,비습"}),
+makeKas0Product({id:"gph850",label:"850 고도,기온,비습"}),
+makeKas0Product({id:"thk700",label:"1000-700 층후"}),
+gph700Product
+].filter(Boolean));
+
+insertKas0ProductsAfter("dft925",[
+makeKas0Product({id:"vel700",label:"700 상승속도",includeKas:true}),
+makeKas0Product({id:"vel850",label:"850 상승속도",includeKas:true}),
+makeKas0Product({id:"adv925",label:"925 온도이류",includeKas:true,includeKlps:false})
 ]);
 
 [
@@ -1030,9 +1065,6 @@ makeKas0Product({id:"thk700",label:"1000-700 층후"})
 ].forEach(productId=>attachKlpsAnalysisPattern(findKas0Product(productId)));
 
 insertKas0ProductsBeforeCategory("axas",[
-makeKas0Product({id:"vel700",label:"700 상승속도",includeKas:true}),
-makeKas0Product({id:"vel850",label:"850 상승속도",includeKas:true}),
-makeKas0Product({id:"adv925",label:"925 온도이류",includeKas:true,includeKlps:false}),
 {category:"kas0",type:"header",label:"──────────────────"},
 makeKas0Product({id:"kindex",label:"K-index"}),
 makeKas0Product({id:"sindex",label:"쇼월터 Index"}),
@@ -1412,7 +1444,8 @@ ANALYSIS_PRODUCTS.forEach(product=>{
 
 
 const ANALYSIS_DEFAULT_PRODUCT_BY_CATEGORY={
-asia:"surf"
+asia:"surf",
+kas0:"gph500"
 };
 
 
@@ -1426,6 +1459,11 @@ grtopo:{hideProductSelect:true},
 
 
 const ANALYSIS_CATEGORY_MODEL_RESTRICTIONS={
+
+kas0:{
+allowedModels:["kas","kim_klps","um_klps"],
+fallbackModel:"kas"
+},
 
 skewob:{
 allowedModels:["obs_upper"],
