@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260726020949",
-  "generated_at_kst": "2026-07-26 11:09 KST",
+  "generated_at_utc": "20260726021928",
+  "generated_at_kst": "2026-07-26 11:19 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_12",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 31,
+  "model_source_count": 33,
   "selected_model_count": 14,
   "active_target_model_count": 36,
   "model_sources": [
@@ -142,8 +142,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 1,
-      "max_lead_hour": 6,
+      "point_count": 2,
+      "max_lead_hour": 78,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -218,6 +218,23 @@
       "is_official": false,
       "first_seen_utc": "20260726013929",
       "first_seen_kst": "2026-07-26 10:39 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 3,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260726021928",
+      "first_seen_kst": "2026-07-26 11:19 KST"
     },
     {
       "model_id": "FNV3",
@@ -508,6 +525,23 @@
       "is_official": false,
       "first_seen_utc": "20260725220929",
       "first_seen_kst": "2026-07-26 07:09 KST"
+    },
+    {
+      "model_id": "JGSM",
+      "model_label": "JGSM",
+      "raw_model_ids": [
+        "JGSM"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 3,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260726021928",
+      "first_seen_kst": "2026-07-26 11:19 KST"
     },
     {
       "model_id": "TEPS",
