@@ -1029,7 +1029,7 @@ makeKas0Product({id:"thk700",label:"1000-700 층후, 850 상당온위"}),
 
 insertKas0ProductsAfter("dft925",[
 makeKas0Product({id:"vel700",label:"700 상승속도",includeKas:true}),
-makeKas0Product({id:"vel850",label:"850 상승속도",includeKas:true}),
+makeKas0Product({id:"vel850",label:"850 상승속도",includeKas:true,includeKlps:false}),
 makeKas0Product({id:"adv925",label:"925 온도이류",includeKas:true,includeKlps:false})
 ]);
 
