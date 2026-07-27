@@ -31,6 +31,8 @@ NOAA_BDECK_URL = "https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/b{atcf_id}.dat"
 NRL_ATCF_SECTOR_URL = "https://science.nrlmry.navy.mil/geoips/tcdat/sectors/atcf_sector_file"
 BDECK_SOURCE_URLS = (
     ("NOAA", NOAA_BDECK_URL),
+    ("RAL.UCAR", "https://hurricanes.ral.ucar.edu/realtime/plots/{ral_basin_dir}/{year}/{atcf_id}/b{atcf_id}.dat"),
+    ("NATYPHOON", "https://www.natyphoon.top/atcf/temp/b{atcf_id}.dat"),
 )
 KMA_GTS_NOW_URL = f"{KMA_LIST_BASE_URL}/typ_gts_now.php"
 KMA_TYP_NOW_URL = f"{KMA_LIST_BASE_URL}/typ_now.php"
@@ -41,6 +43,7 @@ DEFAULT_ATCF_SEARCH_NEGATIVE_RADIUS = 5
 DEFAULT_ATCF_POSITION_MAX_DISTANCE_KM = 600.0
 DEFAULT_ATCF_POSITION_MIN_DISTANCE_GAP_KM = 100.0
 DEFAULT_ATCF_SECTOR_POSITION_MAX_AGE_HOURS = 36
+DEFAULT_DATELINE_CANDIDATE_LONGITUDE_DEGREES = float(os.getenv("VTG_DATELINE_CANDIDATE_LONGITUDE_DEGREES", "170"))
 # Rare cross-basin systems or known KMA/JTWC mapping exceptions.
 # User manual map values still override these defaults.
 BUILTIN_MANUAL_ATCF_MAP = {
@@ -948,13 +951,69 @@ def fetch_atcf_sector_entries() -> list[AtcfSectorEntry]:
     return ATCF_SECTOR_ENTRIES_CACHE
 
 
-def atcf_sector_entries_for_year(entries: list[AtcfSectorEntry], year: int) -> list[AtcfSectorEntry]:
+RAL_UCAR_BASIN_DIRS = {
+    "al": "northatlantic",
+    "cp": "northcentralpacific",
+    "ep": "northeastpacific",
+    "io": "northindian",
+    "sh": "southernhemisphere",
+    "wp": "northwestpacific",
+}
+
+
+def ral_ucar_basin_dir(atcf_id: str) -> str:
+    return RAL_UCAR_BASIN_DIRS.get(str(atcf_id or "").strip().lower()[:2], "northwestpacific")
+
+
+def normalized_longitude(lon: float) -> float:
+    return ((float(lon) + 180.0) % 360.0) - 180.0
+
+
+def is_near_dateline(point: TrackPoint | None) -> bool:
+    if point is None:
+        return False
+    return abs(normalized_longitude(point.lon)) >= DEFAULT_DATELINE_CANDIDATE_LONGITUDE_DEGREES
+
+
+def central_pacific_dateline_candidate_ids(year: int) -> list[str]:
+    return [
+        *(f"cp{candidate_number:02d}{year}" for candidate_number in range(90, 100)),
+        *(f"cp{candidate_number:02d}{year}" for candidate_number in range(1, 10)),
+    ]
+
+
+def extend_td_atcf_ids_for_dateline(atcf_ids: list[str], *, year: int, kma_point: TrackPoint | None) -> list[str]:
+    if not is_near_dateline(kma_point):
+        return atcf_ids
+
+    ids: list[str] = []
+    seen: set[str] = set()
+    for atcf_id in [*atcf_ids, *central_pacific_dateline_candidate_ids(year)]:
+        normalized = str(atcf_id or "").strip().lower()
+        if normalized and normalized not in seen:
+            seen.add(normalized)
+            ids.append(normalized)
+    print(
+        "KMA reference point is near the date line; adding Central Pacific ATCF "
+        f"candidates cp90-cp99 and cp01-cp09 for {year}."
+    )
+    return ids
+
+
+def atcf_sector_entries_for_year(
+    entries: list[AtcfSectorEntry],
+    year: int,
+    *,
+    include_central_pacific: bool = False,
+) -> list[AtcfSectorEntry]:
     # KMA TD/TYP products handled here are western North Pacific systems.
-    # Cross-basin exceptions remain explicit in the manual map.
+    # Date-line TD exceptions may keep Central Pacific ATCF IDs after entering
+    # the western Pacific.
+    prefixes = ("wp", "cp") if include_central_pacific else ("wp",)
     return [
         entry
         for entry in entries
-        if entry.atcf_id.startswith("wp")
+        if entry.atcf_id.startswith(prefixes)
         and (point_time := parse_utc_stamp(entry.point.time_utc)) is not None
         and abs(point_time.year - year) <= 1
     ]
@@ -1019,7 +1078,7 @@ def find_atcf_sector_position_match(
     if kma_point is None or data_dt is None:
         return None
     matches: list[AtcfMatch] = []
-    for entry in atcf_sector_entries_for_year(entries, year):
+    for entry in atcf_sector_entries_for_year(entries, year, include_central_pacific=is_near_dateline(kma_point)):
         point_dt = parse_utc_stamp(entry.point.time_utc)
         if point_dt is None or abs((point_dt - data_dt).total_seconds()) > max_age_hours * 3600:
             continue
@@ -1299,7 +1358,14 @@ def fetch_bdeck_text_from_source(
 
     try:
         BDECK_FETCH_STATS["fetches"] += 1
-        text = fetch_text(url_template.format(atcf_id=normalized), timeout=timeout)
+        text = fetch_text(
+            url_template.format(
+                atcf_id=normalized,
+                year=normalized[-4:],
+                ral_basin_dir=ral_ucar_basin_dir(normalized),
+            ),
+            timeout=timeout,
+        )
     except HTTPError as exc:
         if 400 <= exc.code < 500:
             BDECK_FETCH_STATS["missing"] += 1
@@ -2505,6 +2571,7 @@ def build_storm_jobs(
                     stage="TD",
                 )
                 add_timing_elapsed(timing_stats, "kma_reference", started_at)
+            td_atcf_ids = extend_td_atcf_ids_for_dateline(td_atcf_ids, year=year, kma_point=kma_point)
             started_at = time.monotonic()
             atcf_match = find_atcf_position_match(
                 typ_number=reference_typ_number,

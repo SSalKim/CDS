@@ -1376,12 +1376,26 @@ def raw_github_url(settings: Settings, model: str) -> str:
     )
 
 
+RAL_UCAR_BASIN_DIRS = {
+    "al": "northatlantic",
+    "cp": "northcentralpacific",
+    "ep": "northeastpacific",
+    "io": "northindian",
+    "sh": "southernhemisphere",
+    "wp": "northwestpacific",
+}
+
+
+def ral_ucar_basin_dir(atcf_id: str) -> str:
+    return RAL_UCAR_BASIN_DIRS.get(str(atcf_id or "").strip().lower()[:2], "northwestpacific")
+
+
 def ral_ucar_url(atcf_id: str) -> str:
     atcf_id = str(atcf_id or "").strip().lower()
     year = atcf_id[-4:]
     return (
         "https://hurricanes.ral.ucar.edu/realtime/plots/"
-        f"northwestpacific/{year}/{atcf_id}/a{atcf_id}.dat"
+        f"{ral_ucar_basin_dir(atcf_id)}/{year}/{atcf_id}/a{atcf_id}.dat"
     )
 
 
@@ -1415,6 +1429,20 @@ def knackwx_url(atcf_id: str, data_time: str) -> str:
 def bdeck_url(atcf_id: str) -> str:
     atcf_id = str(atcf_id or "").strip().lower()
     return f"https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/b{atcf_id}.dat"
+
+
+def ral_ucar_bdeck_url(atcf_id: str) -> str:
+    atcf_id = str(atcf_id or "").strip().lower()
+    year = atcf_id[-4:]
+    return (
+        "https://hurricanes.ral.ucar.edu/realtime/plots/"
+        f"{ral_ucar_basin_dir(atcf_id)}/{year}/{atcf_id}/b{atcf_id}.dat"
+    )
+
+
+def natyphoon_bdeck_url(atcf_id: str) -> str:
+    atcf_id = str(atcf_id or "").strip().lower()
+    return f"https://www.natyphoon.top/atcf/temp/b{atcf_id}.dat"
 
 
 def atcf_urls(settings: Settings) -> list[tuple[str, str, int]]:
@@ -1625,18 +1653,25 @@ def select_bdeck_analysis_row(
     *,
     max_offset_hours: int,
 ) -> tuple[pd.Series, str] | None:
-    noaa_frame = fetch_bdeck_analysis_candidates(
-        session,
-        settings,
-        url=bdeck_url(settings.atcf_id),
-        max_offset_hours=max_offset_hours,
-    )
-    noaa_exact = exact_bdeck_rows(noaa_frame)
-    if not noaa_exact.empty:
-        return noaa_exact.iloc[0], "NOAA"
-
-    if not noaa_frame.empty:
-        return noaa_frame.iloc[0], "NOAA"
+    nearest_fallback: tuple[pd.Series, str] | None = None
+    for source_name, url in (
+        ("NOAA", bdeck_url(settings.atcf_id)),
+        ("RAL.UCAR", ral_ucar_bdeck_url(settings.atcf_id)),
+        ("NATYPHOON", natyphoon_bdeck_url(settings.atcf_id)),
+    ):
+        frame = fetch_bdeck_analysis_candidates(
+            session,
+            settings,
+            url=url,
+            max_offset_hours=max_offset_hours,
+        )
+        exact = exact_bdeck_rows(frame)
+        if not exact.empty:
+            return exact.iloc[0], source_name
+        if nearest_fallback is None and not frame.empty:
+            nearest_fallback = (frame.iloc[0], source_name)
+    if nearest_fallback is not None:
+        return nearest_fallback
     return None
 
 
