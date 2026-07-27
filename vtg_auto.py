@@ -42,7 +42,6 @@ DEFAULT_ATCF_SEARCH_POSITIVE_RADIUS = 10
 DEFAULT_ATCF_SEARCH_NEGATIVE_RADIUS = 5
 DEFAULT_ATCF_POSITION_MAX_DISTANCE_KM = 600.0
 DEFAULT_ATCF_POSITION_MIN_DISTANCE_GAP_KM = 100.0
-DEFAULT_ATCF_SECTOR_POSITION_MAX_AGE_HOURS = 36
 DEFAULT_DATELINE_CANDIDATE_LONGITUDE_DEGREES = float(os.getenv("VTG_DATELINE_CANDIDATE_LONGITUDE_DEGREES", "170"))
 # Rare cross-basin systems or known KMA/JTWC mapping exceptions.
 # User manual map values still override these defaults.
@@ -1019,6 +1018,28 @@ def atcf_sector_entries_for_year(
     ]
 
 
+def atcf_sector_entries_for_cycle(
+    entries: list[AtcfSectorEntry],
+    year: int,
+    data_time: str,
+    *,
+    include_central_pacific: bool = False,
+) -> list[AtcfSectorEntry]:
+    target_dt = parse_utc_stamp(data_time)
+    if target_dt is None:
+        return []
+    target_time = format_utc_stamp(target_dt)
+    return [
+        entry
+        for entry in atcf_sector_entries_for_year(
+            entries,
+            year,
+            include_central_pacific=include_central_pacific,
+        )
+        if entry.point.time_utc == target_time
+    ]
+
+
 def atcf_sector_id_for_year(entry: AtcfSectorEntry, year: int) -> str:
     return f"{entry.atcf_id[:4]}{year}"
 
@@ -1028,6 +1049,7 @@ def find_atcf_sector_name_match(
     *,
     typ_en: str,
     year: int,
+    data_time: str,
     preferred_atcf_id: str | None = None,
 ) -> AtcfMatch | None:
     target_name = normalize_name(typ_en)
@@ -1035,7 +1057,7 @@ def find_atcf_sector_name_match(
         return None
     candidates = [
         entry
-        for entry in atcf_sector_entries_for_year(entries, year)
+        for entry in atcf_sector_entries_for_cycle(entries, year, data_time)
         if normalize_name(entry.storm_name) == target_name
     ]
     if not candidates:
@@ -1072,16 +1094,16 @@ def find_atcf_sector_position_match(
     preferred_atcf_id: str | None = None,
     max_distance_km: float = DEFAULT_ATCF_POSITION_MAX_DISTANCE_KM,
     min_distance_gap_km: float = DEFAULT_ATCF_POSITION_MIN_DISTANCE_GAP_KM,
-    max_age_hours: int = DEFAULT_ATCF_SECTOR_POSITION_MAX_AGE_HOURS,
 ) -> AtcfMatch | None:
-    data_dt = parse_utc_stamp(data_time)
-    if kma_point is None or data_dt is None:
+    if kma_point is None:
         return None
     matches: list[AtcfMatch] = []
-    for entry in atcf_sector_entries_for_year(entries, year, include_central_pacific=is_near_dateline(kma_point)):
-        point_dt = parse_utc_stamp(entry.point.time_utc)
-        if point_dt is None or abs((point_dt - data_dt).total_seconds()) > max_age_hours * 3600:
-            continue
+    for entry in atcf_sector_entries_for_cycle(
+        entries,
+        year,
+        data_time,
+        include_central_pacific=is_near_dateline(kma_point),
+    ):
         distance = haversine_km(kma_point.lat, kma_point.lon, entry.point.lat, entry.point.lon)
         if distance <= max_distance_km:
             matches.append(AtcfMatch(
@@ -2352,6 +2374,7 @@ def build_storm_jobs(
                     sector_entries,
                     typ_en=typ_en,
                     year=year,
+                    data_time=data_time,
                     preferred_atcf_id=f"wp{typ_number:02d}{year}",
                 )
         if resolve_atcf and atcf_match is None and typ_en and sector_entries:
@@ -2526,6 +2549,7 @@ def build_storm_jobs(
                     sector_entries,
                     typ_en=matching_typ_en,
                     year=year,
+                    data_time=data_time,
                     preferred_atcf_id=(f"wp{typ_number:02d}{year}" if typ_number else None),
                 )
         if resolve_atcf and atcf_match is None and sector_entries:
