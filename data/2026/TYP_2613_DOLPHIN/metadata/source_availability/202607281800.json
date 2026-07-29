@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260729030948",
-  "generated_at_kst": "2026-07-29 12:09 KST",
+  "generated_at_utc": "20260729031946",
+  "generated_at_kst": "2026-07-29 12:19 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_13",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 38,
-  "selected_model_count": 15,
+  "model_source_count": 41,
+  "selected_model_count": 19,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -81,6 +81,23 @@
       "is_official": false,
       "first_seen_utc": "20260729004951",
       "first_seen_kst": "2026-07-29 09:49 KST"
+    },
+    {
+      "model_id": "COAMPS_EPS",
+      "model_label": "COAMPS-TC EPS",
+      "raw_model_ids": [
+        "CTMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 22,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260729031946",
+      "first_seen_kst": "2026-07-29 12:19 KST"
     },
     {
       "model_id": "ECMWF",
@@ -219,6 +236,23 @@
       "first_seen_kst": "2026-07-29 09:41 KST"
     },
     {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260729031946",
+      "first_seen_kst": "2026-07-29 12:19 KST"
+    },
+    {
       "model_id": "FNV3",
       "model_label": "FNV3",
       "raw_model_ids": [
@@ -329,7 +363,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 1,
+      "point_count": 32,
       "max_lead_hour": 198,
       "has_pressure": true,
       "has_wind": true,
@@ -398,7 +432,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 1,
+      "point_count": 33,
       "max_lead_hour": 192,
       "has_pressure": true,
       "has_wind": true,
@@ -662,6 +696,23 @@
       "first_seen_kst": "2026-07-29 07:01 KST"
     },
     {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NVGM"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260729031946",
+      "first_seen_kst": "2026-07-29 12:19 KST"
+    },
+    {
       "model_id": "UKMO_EPS",
       "model_label": "UKMO EPS",
       "raw_model_ids": [
@@ -669,8 +720,8 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": false,
-      "point_count": 10,
+      "selected": true,
+      "point_count": 41,
       "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
