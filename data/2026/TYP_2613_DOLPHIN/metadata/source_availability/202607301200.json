@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260730180000",
-  "generated_at_kst": "2026-07-31 03:00 KST",
+  "generated_at_utc": "20260730181156",
+  "generated_at_kst": "2026-07-31 03:11 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_13",
   "storm_stage": "TYP",
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 12,
-  "selected_model_count": 6,
+  "model_source_count": 15,
+  "selected_model_count": 7,
   "active_target_model_count": 36,
   "model_sources": [
+    {
+      "model_id": "AGFS",
+      "model_label": "AIGFS",
+      "raw_model_ids": [
+        "AGFS"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 23,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260730181156",
+      "first_seen_kst": "2026-07-31 03:11 KST"
+    },
     {
       "model_id": "AIGEFS",
       "model_label": "AIGFS EPS",
@@ -116,6 +133,40 @@
       "is_official": false,
       "first_seen_utc": "20260730174935",
       "first_seen_kst": "2026-07-31 02:49 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260730181156",
+      "first_seen_kst": "2026-07-31 03:11 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260730181156",
+      "first_seen_kst": "2026-07-31 03:11 KST"
     },
     {
       "model_id": "JGSM",
@@ -227,9 +278,9 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
-      "point_count": 15,
-      "max_lead_hour": 168,
+      "selected": false,
+      "point_count": 1,
+      "max_lead_hour": 156,
       "has_pressure": false,
       "has_wind": false,
       "is_official": false,
