@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260731190949",
-  "generated_at_kst": "2026-08-01 04:09 KST",
+  "generated_at_utc": "20260731191957",
+  "generated_at_kst": "2026-08-01 04:19 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_24",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 7,
-  "selected_model_count": 6,
+  "model_source_count": 10,
+  "selected_model_count": 9,
   "active_target_model_count": 36,
   "model_sources": [
     {
@@ -117,6 +117,23 @@
       "first_seen_kst": "2026-08-01 03:49 KST"
     },
     {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 27,
+      "max_lead_hour": 168,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260731191957",
+      "first_seen_kst": "2026-08-01 04:19 KST"
+    },
+    {
       "model_id": "KIM_3h",
       "model_label": "KIM",
       "raw_model_ids": [
@@ -149,6 +166,40 @@
       "is_official": false,
       "first_seen_utc": "20260731184934",
       "first_seen_kst": "2026-08-01 03:49 KST"
+    },
+    {
+      "model_id": "IFKM_AI",
+      "model_label": "KMA AIFS-KIM",
+      "raw_model_ids": [
+        "IFKM_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 2,
+      "max_lead_hour": 6,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260731191957",
+      "first_seen_kst": "2026-08-01 04:19 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "NEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 16,
+      "max_lead_hour": 90,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260731191957",
+      "first_seen_kst": "2026-08-01 04:19 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2624_NONAME/metadata/source_availability/202607311200.json"
