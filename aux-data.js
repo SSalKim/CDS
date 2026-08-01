@@ -450,6 +450,11 @@ type: "station",
     },
     {
       type: "item",
+      value: "47155",
+      label: "47155 창원"
+    },
+    {
+      type: "item",
       value: "47169",
       label: "47169 흑산도"
     },
