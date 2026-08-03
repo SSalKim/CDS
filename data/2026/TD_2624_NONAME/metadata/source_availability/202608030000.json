@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260803062953",
-  "generated_at_kst": "2026-08-03 15:29 KST",
+  "generated_at_utc": "20260803063956",
+  "generated_at_kst": "2026-08-03 15:39 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_24",
   "storm_stage": "TD",
@@ -27,10 +27,44 @@
     120,
     240
   ],
-  "model_source_count": 4,
-  "selected_model_count": 4,
+  "model_source_count": 7,
+  "selected_model_count": 7,
   "active_target_model_count": 36,
   "model_sources": [
+    {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260803063956",
+      "first_seen_kst": "2026-08-03 15:39 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 17,
+      "max_lead_hour": 96,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260803063956",
+      "first_seen_kst": "2026-08-03 15:39 KST"
+    },
     {
       "model_id": "FNV3",
       "model_label": "FNV3",
@@ -98,6 +132,23 @@
       "is_official": false,
       "first_seen_utc": "20260803060946",
       "first_seen_kst": "2026-08-03 15:09 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "HWRF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260803063956",
+      "first_seen_kst": "2026-08-03 15:39 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2624_NONAME/metadata/source_availability/202608030000.json"
