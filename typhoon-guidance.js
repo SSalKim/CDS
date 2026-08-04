@@ -107,7 +107,7 @@ const TYPHOON_MODEL_INFO=[
 {name:'KMA AIFS-KIM',description:'[AI] 기상청 수행 AIFS (KIM 초기장)'},
 {name:'AIGFS',description:'[AI] 미해양대기청(NOAA NCEP) AI 전구모델'},
 {name:'AIGFS EPS',description:'[AI] 미해양대기청(NOAA NCEP) AI 앙상블모델 평균'},
-{name:'AICON',description:'[AI] SMCA.FUN 제공 AICON 태풍예측'},
+{name:'AICON',description:'[AI] 독일기상청(DWD) AI 전구모델'},
 {name:'FourCastNet-ECMWF',description:'[AI] 기상청 수행 FourCastNet (ECMWF 초기장)'},
 {name:'FourCastNet-KIM',description:'[AI] 기상청 수행 FourCastNet (KIM 초기장)'},
 {name:'Pangu-Weather-ECMWF',description:'[AI] 기상청 수행 Pangu-Weather (ECMWF 초기장)'},
@@ -161,8 +161,8 @@ const TYPHOON_MODEL_INFO_COLORS={
 'CMC EPS':'#AAF7F4',
 'NAVGEM':'#4470AD',
 'NAVGEM EPS':'#99AFD7',
-'ICON':'#6D8F5F',
-'ICON EPS':'#A8BE7A',
+'ICON':'#092d64ff',
+'ICON EPS':'#005766ff',
 'JGSM':'#997950',
 'JGSM EPS':'#654321',
 'COAMPS-TC':'#78081C',
@@ -176,7 +176,7 @@ const TYPHOON_MODEL_INFO_COLORS={
 'KMA AIFS-KIM':'#DDA520',
 'AIGFS':'#E0FF78',
 'AIGFS EPS':'#78FF8F',
-'AICON':'#20C7A8',
+'AICON':'#1b2afaff',
 'FourCastNet-ECMWF':'#004B1C',
 'FourCastNet-KIM':'#388E3C',
 'Pangu-Weather-ECMWF':'#3944BC',
@@ -344,21 +344,21 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "모델명": "ICON",
     "도메인": "전지구",
     "구분": "결정론적 모델",
-    "격자체계 (분해능)": "-",
-    "연직층수": "-",
+    "격자체계 (분해능)": "R03B07 (~13km)",
+    "연직층수": "120층",
     "기반": "역학코어",
-    "참고사항": "POLARWX 태풍예측 자료"
+    "참고사항": ""
   },
   {
     "표출명칭": "ICON EPS",
     "운영기관": "독일기상청(DWD)",
-    "모델명": "ICON-EPS",
+    "모델명": "ICON EPS",
     "도메인": "전지구",
-    "구분": "앙상블 모델 평균",
-    "격자체계 (분해능)": "-",
-    "연직층수": "-",
+    "구분": "앙상블 모델 평균 (M40)",
+    "격자체계 (분해능)": "R03B06 (~26km)",
+    "연직층수": "120층",
     "기반": "역학코어",
-    "참고사항": "POLARWX 태풍예측 자료"
+    "참고사항": ""
   },
   {
     "표출명칭": "JGSM",
@@ -505,14 +505,14 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
   },
   {
     "표출명칭": "AICON",
-    "운영기관": "SMCA.FUN 제공",
+    "운영기관": "독일기상청(DWD)",
     "모델명": "AICON",
-    "도메인": "태풍 경로",
+    "도메인": "전지구",
     "구분": "결정론적 모델",
-    "격자체계 (분해능)": "-",
-    "연직층수": "-",
+    "격자체계 (분해능)": "R03B07 (~13km)",
+    "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "SMCA.FUN 실시간 태풍예측 자료"
+    "참고사항": ""
   },
   {
     "표출명칭": "FourCastNet-ECMWF",
@@ -594,7 +594,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
   {
     "표출명칭": "FNV3",
     "운영기관": "구글 딥마인드(Google DeepMind)",
-    "모델명": "FNV3",
+    "모델명": "WeatherNext2 FNv3.2",
     "도메인": "전지구",
     "구분": "앙상블 모델 평균 (M50)",
     "격자체계 (분해능)": "0.25° (~28km)",
