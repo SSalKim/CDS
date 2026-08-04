@@ -59,6 +59,8 @@ MODEL_INFO = [
     {"name": "CMC_EPS", "color": "#AAF7F4", "style": "-", "label": "CMC EPS", "zorder": 80},
     {"name": "NAVGEM", "color": "#4470AD", "style": "-", "label": "NAVGEM", "zorder": 79},
     {"name": "FNMOC_EPS", "color": "#99AFD7", "style": "-", "label": "NAVGEM EPS", "zorder": 78},
+    {"name": "ICON", "color": "#6D8F5F", "style": "-", "label": "ICON", "zorder": 77.8},
+    {"name": "ICON_EPS", "color": "#A8BE7A", "style": "-", "label": "ICON EPS", "zorder": 77.7},
     {"name": "JGSM", "color": "#997950", "style": "-", "label": "JGSM", "zorder": 77},
     {"name": "TEPS", "color": "#654321", "style": "-", "label": "JGSM EPS", "zorder": 76},
     {"name": "CTCX", "color": "#78081C", "style": "-", "label": "COAMPS-TC ", "zorder": 75},
@@ -72,6 +74,7 @@ MODEL_INFO = [
     {"name": "IFKM_AI", "color": "#DDA520", "style": "--", "label": "KMA AIFS-KIM", "zorder": 97},
     {"name": "AGFS", "color": "#E0FF78", "style": "--", "label": "AIGFS", "zorder": 59},
     {"name": "AIGEFS", "color": "#78FF8F", "style": "--", "label": "AIGFS EPS", "zorder": 58},
+    {"name": "AICON", "color": "#20C7A8", "style": "--", "label": "AICON", "zorder": 57.5},
     {"name": "FNEC_AI", "color": "#004B1C", "style": "--", "label": "FourCastNet-ECMWF", "zorder": 62},
     {"name": "FNKM_AI", "color": "#388E3C", "style": "--", "label": "FourCastNet-KIM", "zorder": 61},
     {"name": "FNUM_AI", "color": "#4BB200", "style": "--", "label": "FourCastNet-UM", "zorder": 60},
@@ -89,8 +92,8 @@ MODEL_INFO = [
 ]
 
 MODEL_SOURCES = [
-    {"name": "ECMWF", "apihub": "ECMWF", "noaa": "ECMF", "knackwx": "ECMF"},
-    {"name": "ECMWF_EPS", "apihub": "ECMWF_EPS", "noaa": "EEMN", "knackwx": "EEMN"},
+    {"name": "ECMWF", "apihub": "ECMWF", "noaa": "ECMF", "ral_ucar": "ECMF", "knackwx": "ECMF", "polarwx": "ecm"},
+    {"name": "ECMWF_EPS", "apihub": "ECMWF_EPS", "noaa": "EEMN", "ral_ucar": "EEMN", "knackwx": "EEMN", "polarwx": "eps_mean"},
     {"name": "KIM_3h", "apihub": "KIM_3h", "noaa": None},
     {"name": "KIM_6h", "apihub": "KIM_6h", "noaa": None},
     {"name": "KIM_GFDL_6h", "apihub": "KIM_GFDL_6h", "noaa": None},
@@ -98,25 +101,28 @@ MODEL_SOURCES = [
     {"name": "UM", "apihub": "UM", "noaa": None},
     {"name": "UM_GFDL_6h", "apihub": "UM_GFDL_6h", "noaa": None},
     {"name": "UM_KEPS", "apihub": "UM_KEPS", "noaa": None},
-    {"name": "UKM", "apihub": "UKX", "noaa": "UKM", "ral_ucar": "UKM", "knackwx": "UKM"},
-    {"name": "UKMO_EPS", "apihub": "EGRR_EPS", "noaa": "UEMN", "knackwx": "UEMN"},
-    {"name": "GFS", "apihub": "GFS", "noaa": "AVNO", "knackwx": "AVNO"},
-    {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "ral_ucar": "AEMN", "knackwx": "AEMN"},
-    {"name": "CMC", "apihub": "CMC", "noaa": "CMC", "ral_ucar": "CMC", "knackwx": "CMC"},
-    {"name": "CMC_EPS", "apihub": "CMC_EPS", "noaa": "CEMN", "ral_ucar": "CEMN", "knackwx": "CEMN"},
-    {"name": "JGSM", "apihub": "JGSM", "noaa": "JGSM", "knackwx": "JGSM"},
-    {"name": "TEPS", "apihub": "TEPS", "noaa": "JENS", "knackwx": "JENS"},
+    {"name": "UKM", "apihub": "UKX", "noaa": "UKM", "ral_ucar": "UKM", "knackwx": "UKM", "polarwx": "ukmet"},
+    {"name": "UKMO_EPS", "apihub": "EGRR_EPS", "noaa": "UEMN", "ral_ucar": "UEMN", "knackwx": "UEMN"},
+    {"name": "GFS", "apihub": "GFS", "noaa": "AVNO", "ral_ucar": "AVNO", "knackwx": "AVNO", "polarwx": "gfs"},
+    {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "ral_ucar": "AEMN", "knackwx": "AEMN", "polarwx": "gefs_mean"},
+    {"name": "CMC", "apihub": "CMC", "noaa": "CMC", "ral_ucar": "CMC", "knackwx": "CMC", "polarwx": "cmc"},
+    {"name": "CMC_EPS", "apihub": "CMC_EPS", "noaa": "CEMN", "ral_ucar": "CEMN", "knackwx": "CEMN", "polarwx": "cmc_mean"},
+    {"name": "JGSM", "apihub": "JGSM", "noaa": "JGSM", "ral_ucar": "JGSM", "knackwx": "JGSM"},
+    {"name": "TEPS", "apihub": "TEPS", "noaa": "JENS", "ral_ucar": "JENS", "knackwx": "JENS"},
     {"name": "NAVGEM", "apihub": "NAVGEM", "noaa": "NVGM", "ral_ucar": "NVGM", "knackwx": "NVGM"},
     {"name": "FNMOC_EPS", "apihub": "FNMOC_EPS", "noaa": "NEMN", "ral_ucar": "NEMN", "knackwx": "NEMN"},
-    {"name": "CTCX", "apihub": None, "noaa": "CTCX", "knackwx": "CTCX"},
-    {"name": "COAMPS_EPS", "apihub": None, "noaa": "CTMN", "knackwx": "CTMN"},
-    {"name": "AFUM", "apihub": None, "noaa": "AFUM"},
-    {"name": "HWRF", "apihub": "HWRF", "noaa": "HWRF", "knackwx": "HWRF"},
-    {"name": "HAFS", "apihub": "HAFS", "noaa": "HFSA", "knackwx": "HFSA"},
-    {"name": "ECMWF_AIFS", "apihub": "ECMWF_AIFS", "noaa": "AIFS", "knackwx": "AIFS"},
-    {"name": "ECMWF_AIFS_EPS", "apihub": None, "noaa": "EAIM", "knackwx": "EAMN"},
-    {"name": "AGFS", "apihub": None, "noaa": "AGFS", "knackwx": "AGFS"},
-    {"name": "AIGEFS", "apihub": None, "noaa": "AIMN", "knackwx": "AIMN"},
+    {"name": "ICON", "apihub": None, "polarwx": "icon"},
+    {"name": "ICON_EPS", "apihub": None, "polarwx": "icon_ens_mean"},
+    {"name": "CTCX", "apihub": None, "noaa": "CTCX", "ral_ucar": "CTCX", "knackwx": "CTCX"},
+    {"name": "COAMPS_EPS", "apihub": None, "noaa": "CTMN", "ral_ucar": "CTMN", "knackwx": "CTMN"},
+    {"name": "AFUM", "apihub": None, "noaa": "AFUM", "ral_ucar": "AFUM"},
+    {"name": "HWRF", "apihub": "HWRF", "noaa": "HWRF", "ral_ucar": "HWRF", "knackwx": "HWRF", "polarwx": "hwrf"},
+    {"name": "HAFS", "apihub": "HAFS", "noaa": "HFSA", "ral_ucar": "HFSA", "knackwx": "HFSA", "polarwx": "hafsa"},
+    {"name": "ECMWF_AIFS", "apihub": "ECMWF_AIFS", "noaa": "AIFS", "ral_ucar": "AIFS", "knackwx": "AIFS", "polarwx": "aifs"},
+    {"name": "ECMWF_AIFS_EPS", "apihub": None, "noaa": "EAIM", "ral_ucar": "EAMN", "knackwx": "EAMN", "polarwx": "aifs_ens_mean"},
+    {"name": "AGFS", "apihub": None, "noaa": "AGFS", "ral_ucar": "AGFS", "knackwx": "AGFS"},
+    {"name": "AIGEFS", "apihub": None, "noaa": "AIMN", "ral_ucar": "AIMN", "knackwx": "AIMN", "smca": "AIGEFS"},
+    {"name": "AICON", "apihub": None, "smca": "AICON"},
     {"name": "IFEC_AI", "apihub": "IFEC_AI", "noaa": None},
     {"name": "IFKM_AI", "apihub": "IFKM_AI", "noaa": None},
     {"name": "FNEC_AI", "apihub": "FNEC_AI", "noaa": None},
@@ -128,8 +134,8 @@ MODEL_SOURCES = [
     {"name": "GCEC_AI", "apihub": "GCEC_AI", "noaa": None},
     {"name": "GCKM_AI", "apihub": "GCKM_AI", "noaa": None},
     {"name": "GCUM_AI", "apihub": "GCUM_AI", "noaa": None},
-    {"name": "GENC", "apihub": None, "noaa": None, "knackwx": "GENC", "raw_github": "GENC"},
-    {"name": "FNV3", "apihub": None, "noaa": "FGNE", "knackwx": "FNV3", "raw_github": "FNV3"},
+    {"name": "GENC", "apihub": None, "noaa": None, "knackwx": "GENC", "raw_github": "GENC", "polarwx": "gencast"},
+    {"name": "FNV3", "apihub": None, "noaa": "FGNE", "ral_ucar": "FGNE", "knackwx": "FNV3", "raw_github": "FNV3", "polarwx": "deepmind"},
     {"name": "HKO_AREC", "apihub": "HKO_AREC", "noaa": None},
     {"name": "HKO_FXEC", "apihub": "HKO_FXEC", "noaa": None},
     {"name": "HKO_FWEC", "apihub": "HKO_FWEC", "noaa": None},
@@ -155,6 +161,8 @@ MODEL_CATEGORIES = {
     "TEPS": ("DYNAMICAL", "ENSEMBLE"),
     "NAVGEM": ("DYNAMICAL", "DETERMINISTIC"),
     "FNMOC_EPS": ("DYNAMICAL", "ENSEMBLE"),
+    "ICON": ("DYNAMICAL", "DETERMINISTIC"),
+    "ICON_EPS": ("DYNAMICAL", "ENSEMBLE"),
     "CTCX": ("DYNAMICAL", "DETERMINISTIC"),
     "COAMPS_EPS": ("DYNAMICAL", "ENSEMBLE"),
     "AFUM": ("DYNAMICAL", "DETERMINISTIC"),
@@ -164,6 +172,7 @@ MODEL_CATEGORIES = {
     "ECMWF_AIFS_EPS": ("AI", "ENSEMBLE"),
     "AGFS": ("AI", "DETERMINISTIC"),
     "AIGEFS": ("AI", "ENSEMBLE"),
+    "AICON": ("AI", "DETERMINISTIC"),
     "IFEC_AI": ("AI", "DETERMINISTIC"),
     "IFKM_AI": ("AI", "DETERMINISTIC"),
     "FNEC_AI": ("AI", "DETERMINISTIC"),
@@ -218,6 +227,9 @@ MODEL_ACTIVE_WINDOWS = {
     "IFKM_AI": ("202601010000", None),              # 기상청(KMA) AIFS 예측자료 신규 추가(2026.4.28.~)
 
     "ECMWF_AIFS_EPS": ("202605150000", None),       # ECMWF AIFS-ENS 예측자료 신규 추가(2026.5.26.~)
+    "ICON": ("202608010000", None),                 # POLARWX ICON 예측자료 신규 추가(2026.8.~)
+    "ICON_EPS": ("202608010000", None),             # POLARWX ICON-EPS 예측자료 신규 추가(2026.8.~)
+    "AICON": ("202608010000", None),                # SMCA.FUN AI-ICON 예측자료 신규 추가(2026.8.~)
 }
 
 NO_PRESSURE_SUMMARY_MODELS = {"UKMO_EPS"}
@@ -256,15 +268,14 @@ KNACKWX_MAX_LEAD_GAP_HOURS = float(os.getenv("VTG_KNACKWX_MAX_LEAD_GAP_HOURS", "
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
-SOURCE_ORDER = ("APIHUB", "DMDW", "NOAA", "RAL.UCAR", "KNACKWX", "RAW.GITHUB")
-MODEL_SOURCE_PRIORITY_OVERRIDES = {
-    "GENC": ("RAW.GITHUB", "APIHUB", "DMDW", "NOAA", "RAL.UCAR", "KNACKWX"),
-    "FNV3": ("RAW.GITHUB", "APIHUB", "DMDW", "NOAA", "RAL.UCAR", "KNACKWX"),
-}
+SOURCE_ORDER = ("APIHUB", "DMDW", "RAW.GITHUB", "POLARWX", "SMCA.FUN", "RAL.UCAR", "KNACKWX")
+MODEL_SOURCE_PRIORITY_OVERRIDES: dict[str, tuple[str, ...]] = {}
 SOURCE_DISPLAY_NAMES = {
     "APIHUB": "KMA APIHUB",
     "DMDW": "KMA DMDW",
     "NOAA": "NOAA ATCF",
+    "POLARWX": "POLARWX",
+    "SMCA.FUN": "SMCA.FUN",
     "RAL.UCAR": "RAL UCAR ATCF",
     "KNACKWX": "KNACKWX ATCF",
     "RAW.GITHUB": "GITHUB",
@@ -278,6 +289,10 @@ SOURCE_ALIASES = {
     "ATCF": "NOAA",
     "NCEP": "NOAA",
     "NOAAATCF": "NOAA",
+    "POLARWX": "POLARWX",
+    "POLAR": "POLARWX",
+    "SMCAFUN": "SMCA.FUN",
+    "SMCA": "SMCA.FUN",
     "RALUCAR": "RAL.UCAR",
     "UCAR": "RAL.UCAR",
     "RAL": "RAL.UCAR",
@@ -295,6 +310,8 @@ SOURCE_IDENTIFIER_COLUMNS = {
     "APIHUB": "apihub",
     "DMDW": "dmdw",
     "NOAA": "noaa",
+    "POLARWX": "polarwx",
+    "SMCA.FUN": "smca",
     "RAL.UCAR": "ral_ucar",
     "KNACKWX": "knackwx",
     "RAW.GITHUB": "raw_github",
@@ -366,6 +383,7 @@ MODEL_ALIAS_PRIORITY_COLUMN = "_MODEL_ALIAS_PRIORITY"
 MS_PER_KT = 0.514444
 KMA_URL_BASE = (os.getenv("KMA_APIHUB_BASE_URL") or "https://apihub-pub.kma.go.kr/api/typ01/url").rstrip("/")
 KMA_FALLBACK_URL_BASE = (os.getenv("KMA_APIHUB_FALLBACK_BASE_URL") or "https://apihub.kma.go.kr/api/typ01/url").rstrip("/")
+SMCA_TYPHOON_API_BASE = (os.getenv("SMCA_TYPHOON_API_BASE_URL") or "https://smca.fun/api/typhoon_msg/").rstrip("/")
 KMA_BASE_URL = f"{KMA_URL_BASE}/typ_gts_now.php"
 KMA_TYP_NOW_URL = f"{KMA_URL_BASE}/typ_now.php"
 KMA_TD_NOW_URL = f"{KMA_URL_BASE}/td_now.php"
@@ -388,7 +406,7 @@ REQUEST_HEADERS = {
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/125.0.0.0 Safari/537.36"
     ),
-    "Accept": "text/csv,text/plain,*/*",
+    "Accept": "application/json,text/csv,text/plain,*/*",
     "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
     "Connection": "close",
 }
@@ -1376,6 +1394,277 @@ def raw_github_url(settings: Settings, model: str) -> str:
     )
 
 
+def polarwx_url(atcf_id: str, data_time: str) -> str:
+    atcf_id = str(atcf_id or "").strip().lower()
+    cycle = normalize_utc_stamp(data_time)[:10]
+    return f"https://polarwx.com/data/tropical/storms/{atcf_id}/ensembles/{cycle}.json"
+
+
+def polarwx_keys() -> dict[str, str]:
+    return {
+        str(row.get("polarwx") or "").strip().lower(): row["name"]
+        for row in MODEL_SOURCES
+        if str(row.get("polarwx") or "").strip()
+    }
+
+
+def empty_polarwx_frame() -> pd.DataFrame:
+    return pd.DataFrame(columns=[*KMA_COLUMNS, RAW_MODEL_COLUMN, DATA_SOURCE_COLUMN, MODEL_ALIAS_PRIORITY_COLUMN])
+
+
+def polarwx_value(values, index: int):
+    if isinstance(values, list) and 0 <= index < len(values):
+        return values[index]
+    return None
+
+
+def read_polarwx_json(text: str | None, settings: Settings, *, atcf_id: str = "") -> pd.DataFrame:
+    if not text or not text.strip():
+        return empty_polarwx_frame()
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError as exc:
+        print(f"Warning: failed to parse POLARWX JSON for {atcf_id or settings.atcf_id}: {exc}")
+        return empty_polarwx_frame()
+    if not isinstance(payload, dict):
+        return empty_polarwx_frame()
+
+    lookup = {str(key).strip().lower(): value for key, value in payload.items()}
+    rows: list[dict] = []
+    cycle_utc = normalize_utc_stamp(settings.data_time)
+    for source_key, model_name in polarwx_keys().items():
+        model = lookup.get(source_key)
+        if not isinstance(model, dict):
+            continue
+        fhrs = model.get("fhr")
+        lats = model.get("lat")
+        lons = model.get("lon")
+        if not all(isinstance(values, list) for values in (fhrs, lats, lons)):
+            continue
+        count = min(len(fhrs), len(lats), len(lons))
+        for index in range(count):
+            lead_hour = pd.to_numeric(polarwx_value(fhrs, index), errors="coerce")
+            lat = pd.to_numeric(polarwx_value(lats, index), errors="coerce")
+            lon = pd.to_numeric(polarwx_value(lons, index), errors="coerce")
+            if pd.isna(lead_hour) or pd.isna(lat) or pd.isna(lon):
+                continue
+            lead_hour = float(lead_hour)
+            if lead_hour < 0 or lead_hour > settings.fcst_hours:
+                continue
+            valid_time = normalize_utc_stamp(str(polarwx_value(model.get("time"), index) or ""))
+            if not valid_time and cycle_utc:
+                valid_dt = datetime.strptime(cycle_utc, "%Y%m%d%H%M") + timedelta(hours=lead_hour)
+                valid_time = valid_dt.strftime("%Y%m%d%H%M")
+            pressure = pd.to_numeric(polarwx_value(model.get("mslp"), index), errors="coerce")
+            wind_kt = pd.to_numeric(polarwx_value(model.get("vmax"), index), errors="coerce")
+            rows.append({
+                "FT": 1 if lead_hour > 0 else 0,
+                "YY": int(settings.data_time[:4]),
+                "TYP": settings.typ_number,
+                "SEQ": lead_hour,
+                "TMD": lead_hour,
+                "TYP_TM(UTC)": cycle_utc,
+                "FT_TM(UTC)": valid_time,
+                "LAT": float(lat),
+                "LON": float(lon),
+                "DIR": "",
+                "SP": "",
+                "PS": None if pd.isna(pressure) else float(pressure),
+                "WS": None if pd.isna(wind_kt) else round(float(wind_kt) * MS_PER_KT),
+                "T15": "",
+                "T25": "",
+                "RAD": "",
+                "15D": "",
+                "15R": "",
+                "SRC": model_name,
+                RAW_MODEL_COLUMN: source_key.upper(),
+                DATA_SOURCE_COLUMN: "POLARWX",
+                MODEL_ALIAS_PRIORITY_COLUMN: 0,
+                "": "",
+            })
+
+    if not rows:
+        return empty_polarwx_frame()
+    df = pd.DataFrame(rows)
+    for column in ("TMD", "LAT", "LON", "PS", "WS", "SEQ"):
+        df[column] = pd.to_numeric(df[column], errors="coerce")
+    df = df.dropna(subset=["TMD", "FT_TM(UTC)", "LAT", "LON"])
+    df = df.drop_duplicates(subset=["SRC", "TMD", "FT_TM(UTC)", "LAT", "LON"], keep="first")
+    return df.reset_index(drop=True)
+
+
+def fetch_polarwx_data(session: requests.Session, settings: Settings) -> pd.DataFrame:
+    frames: list[pd.DataFrame] = []
+    for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
+        if not atcf_id:
+            continue
+        url = polarwx_url(atcf_id, settings.data_time)
+        text = fetch_text(
+            session,
+            url,
+            retries=1,
+            timeout=10,
+            cache_dir=settings.http_cache_dir,
+            cache_ttl_seconds=settings.http_cache_ttl_seconds,
+        )
+        frame = read_polarwx_json(text, settings, atcf_id=atcf_id)
+        if not frame.empty:
+            print(f"Loaded POLARWX source data: {atcf_id} rows={len(frame)}")
+            frames.append(frame)
+    if not frames:
+        return empty_polarwx_frame()
+    return pd.concat(frames, ignore_index=True, sort=False).drop_duplicates(
+        subset=["SRC", "TMD", "FT_TM(UTC)", "LAT", "LON"],
+        keep="first",
+    )
+
+
+def smca_typhoon_id(settings: Settings) -> str:
+    if canonical_storm_stage(settings) != "TYP":
+        return ""
+    return f"{storm_year(settings)}{canonical_typ_number(settings):02d}"
+
+
+def smca_url(settings: Settings) -> str:
+    typhoon_id = smca_typhoon_id(settings)
+    return f"{SMCA_TYPHOON_API_BASE}/?{urlencode({'typhoonId': typhoon_id})}" if typhoon_id else ""
+
+
+def smca_keys() -> dict[str, str]:
+    return {
+        str(row.get("smca") or "").strip().upper(): row["name"]
+        for row in MODEL_SOURCES
+        if str(row.get("smca") or "").strip()
+    }
+
+
+def empty_smca_frame() -> pd.DataFrame:
+    return pd.DataFrame(columns=[*KMA_COLUMNS, RAW_MODEL_COLUMN, DATA_SOURCE_COLUMN, MODEL_ALIAS_PRIORITY_COLUMN])
+
+
+def iso_datetime_stamp(value) -> str:
+    timestamp = pd.to_datetime(value, errors="coerce")
+    if pd.isna(timestamp):
+        return ""
+    if timestamp.tzinfo is not None:
+        timestamp = timestamp.tz_convert("UTC").tz_localize(None)
+    return timestamp.strftime("%Y%m%d%H%M")
+
+
+def smca_forecast_cycle(forecast: dict) -> str:
+    cycle = iso_datetime_stamp(forecast.get("init_time_utc"))
+    if cycle:
+        return cycle
+    bjt = pd.to_datetime(forecast.get("init_time_bjt"), errors="coerce")
+    if pd.isna(bjt):
+        return ""
+    return (bjt - pd.Timedelta(hours=8)).strftime("%Y%m%d%H%M")
+
+
+def read_smca_json(text: str | None, settings: Settings, *, typhoon_id: str = "") -> pd.DataFrame:
+    if not text or not text.strip():
+        return empty_smca_frame()
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError as exc:
+        print(f"Warning: failed to parse SMCA.FUN JSON for {typhoon_id}: {exc}")
+        return empty_smca_frame()
+    if not isinstance(payload, dict) or str(payload.get("code")) != "200":
+        return empty_smca_frame()
+
+    data = payload.get("data")
+    if not isinstance(data, dict):
+        return empty_smca_frame()
+    response_id = str(data.get("ident") or data.get("tfbh") or "").strip()
+    if typhoon_id and response_id != typhoon_id:
+        print(f"Warning: SMCA.FUN storm mismatch: requested {typhoon_id}, received {response_id or 'unknown'}")
+        return empty_smca_frame()
+
+    target_cycle = normalize_utc_stamp(settings.data_time)
+    model_lookup = smca_keys()
+    rows: list[dict] = []
+    matched_forecasts = 0
+    for analysis_point in data.get("points") or []:
+        if not isinstance(analysis_point, dict):
+            continue
+        for forecast in analysis_point.get("forecast") or []:
+            if not isinstance(forecast, dict):
+                continue
+            raw_model = str(forecast.get("sets") or "").strip().upper()
+            model_name = model_lookup.get(raw_model)
+            if not model_name or smca_forecast_cycle(forecast) != target_cycle:
+                continue
+            matched_forecasts += 1
+            for point in forecast.get("points") or []:
+                if not isinstance(point, dict):
+                    continue
+                lead_hour = pd.to_numeric(point.get("forecastTime"), errors="coerce")
+                lat = pd.to_numeric(point.get("lat"), errors="coerce")
+                lon = pd.to_numeric(point.get("lng"), errors="coerce")
+                if pd.isna(lead_hour) or pd.isna(lat) or pd.isna(lon):
+                    continue
+                lead_hour = float(lead_hour)
+                if lead_hour < 0 or lead_hour > settings.fcst_hours:
+                    continue
+                valid_dt = datetime.strptime(target_cycle, "%Y%m%d%H%M") + timedelta(hours=lead_hour)
+                pressure = pd.to_numeric(point.get("pressure"), errors="coerce")
+                wind_ms = pd.to_numeric(point.get("speed"), errors="coerce")
+                rows.append({
+                    "FT": 1 if lead_hour > 0 else 0,
+                    "YY": int(target_cycle[:4]),
+                    "TYP": canonical_typ_number(settings),
+                    "SEQ": lead_hour,
+                    "TMD": lead_hour,
+                    "TYP_TM(UTC)": target_cycle,
+                    "FT_TM(UTC)": valid_dt.strftime("%Y%m%d%H%M"),
+                    "LAT": float(lat),
+                    "LON": float(lon),
+                    "DIR": "",
+                    "SP": "",
+                    "PS": None if pd.isna(pressure) else float(pressure),
+                    "WS": None if pd.isna(wind_ms) else float(wind_ms),
+                    "T15": "",
+                    "T25": "",
+                    "RAD": "",
+                    "15D": "",
+                    "15R": "",
+                    "SRC": model_name,
+                    RAW_MODEL_COLUMN: raw_model,
+                    DATA_SOURCE_COLUMN: "SMCA.FUN",
+                    MODEL_ALIAS_PRIORITY_COLUMN: 0,
+                    "": "",
+                })
+
+    if not rows:
+        if matched_forecasts == 0:
+            print(f"SMCA.FUN has no AIGEFS/AICON forecast initialized at {target_cycle} for {typhoon_id}")
+        return empty_smca_frame()
+    frame = pd.DataFrame(rows)
+    for column in ("TMD", "LAT", "LON", "PS", "WS", "SEQ"):
+        frame[column] = pd.to_numeric(frame[column], errors="coerce")
+    frame = frame.dropna(subset=["TMD", "FT_TM(UTC)", "LAT", "LON"])
+    return frame.drop_duplicates(subset=["SRC", "TMD", "LAT", "LON"], keep="first").reset_index(drop=True)
+
+
+def fetch_smca_data(session: requests.Session, settings: Settings) -> pd.DataFrame:
+    typhoon_id = smca_typhoon_id(settings)
+    url = smca_url(settings)
+    if not typhoon_id or not url:
+        return empty_smca_frame()
+    text = fetch_text(
+        session,
+        url,
+        retries=1,
+        timeout=10,
+        cache_dir=settings.http_cache_dir,
+        cache_ttl_seconds=settings.http_cache_ttl_seconds,
+    )
+    frame = read_smca_json(text, settings, typhoon_id=typhoon_id)
+    if not frame.empty:
+        print(f"Loaded SMCA.FUN source data: {typhoon_id} rows={len(frame)}")
+    return frame
+
+
 RAL_UCAR_BASIN_DIRS = {
     "al": "northatlantic",
     "cp": "northcentralpacific",
@@ -1447,8 +1736,6 @@ def natyphoon_bdeck_url(atcf_id: str) -> str:
 
 def atcf_urls(settings: Settings) -> list[tuple[str, str, int]]:
     urls = []
-    for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
-        urls.append(("NOAA", f"https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/a{atcf_id}.dat", 0))
     for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
         urls.append(("RAL.UCAR", ral_ucar_url(atcf_id), 0))
     for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
@@ -1655,7 +1942,6 @@ def select_bdeck_analysis_row(
 ) -> tuple[pd.Series, str] | None:
     nearest_fallback: tuple[pd.Series, str] | None = None
     for source_name, url in (
-        ("NOAA", bdeck_url(settings.atcf_id)),
         ("RAL.UCAR", ral_ucar_bdeck_url(settings.atcf_id)),
         ("NATYPHOON", natyphoon_bdeck_url(settings.atcf_id)),
     ):
@@ -2345,10 +2631,12 @@ def select_model_sources_by_priority(df: pd.DataFrame, settings: Settings) -> pd
 def normalize_track_data(
     kma_df: pd.DataFrame,
     dmdw_df: pd.DataFrame,
+    polarwx_df: pd.DataFrame,
+    smca_df: pd.DataFrame,
     atcf_df: pd.DataFrame,
     settings: Settings,
 ) -> pd.DataFrame:
-    df = pd.concat([kma_df, dmdw_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)
+    df = pd.concat([kma_df, dmdw_df, polarwx_df, smca_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)
     if df.empty:
         return df
 
@@ -2845,6 +3133,8 @@ def availability_write_json(path: Path, payload) -> None:
 def source_availability_frame(
     kma_df: pd.DataFrame,
     dmdw_df: pd.DataFrame,
+    polarwx_df: pd.DataFrame,
+    smca_df: pd.DataFrame,
     atcf_df: pd.DataFrame,
     settings: Settings,
 ) -> pd.DataFrame:
@@ -2853,6 +3143,10 @@ def source_availability_frame(
         frames.append(kma_df.copy())
     if not dmdw_df.empty:
         frames.append(dmdw_df.copy())
+    if not polarwx_df.empty:
+        frames.append(polarwx_df.copy())
+    if not smca_df.empty:
+        frames.append(smca_df.copy())
     if not atcf_df.empty:
         frames.append(atcf_to_kma_schema(atcf_df, settings))
     if not frames:
@@ -4317,7 +4611,7 @@ def draw_header(
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
     credit_x = 0.995 if legend_side == "left" else 0.005
     credit_ha = "right" if legend_side == "left" else "left"
-    ax.text(credit_x, 0.006, "Plotted by WooJin Kim\nData sourced from KMA APIHUB & NRL ATCF", transform=ax.transAxes,
+    ax.text(credit_x, 0.006, "Plotted by WooJin Kim\nData sourced from KMA, POLARWX, SMCA.FUN & ATCF", transform=ax.transAxes,
             fontsize=12, color="aliceblue", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
             verticalalignment="bottom", horizontalalignment=credit_ha, zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
@@ -4632,12 +4926,20 @@ def main() -> None:
         log_timing("load DMDW guidance", stage_started_at, rows=len(dmdw_df))
 
         stage_started_at = time.monotonic()
+        polarwx_df = empty_polarwx_frame() if fetch_settings.skip_atcf else fetch_polarwx_data(session, fetch_settings)
+        log_timing("load POLARWX guidance", stage_started_at, rows=len(polarwx_df))
+
+        stage_started_at = time.monotonic()
+        smca_df = empty_smca_frame() if fetch_settings.skip_atcf else fetch_smca_data(session, fetch_settings)
+        log_timing("load SMCA.FUN guidance", stage_started_at, rows=len(smca_df))
+
+        stage_started_at = time.monotonic()
         atcf_df = empty_atcf_frame() if fetch_settings.skip_atcf else fetch_atcf_data(session, fetch_settings)
         log_timing("load ATCF guidance", stage_started_at, rows=len(atcf_df))
 
         stage_started_at = time.monotonic()
-        source_availability_raw_df = source_availability_frame(kma_df, dmdw_df, atcf_df, fetch_settings)
-        df = normalize_track_data(kma_df, dmdw_df, atcf_df, fetch_settings)
+        source_availability_raw_df = source_availability_frame(kma_df, dmdw_df, polarwx_df, smca_df, atcf_df, fetch_settings)
+        df = normalize_track_data(kma_df, dmdw_df, polarwx_df, smca_df, atcf_df, fetch_settings)
         log_timing("normalize guidance", stage_started_at, rows=len(df))
 
         stage_started_at = time.monotonic()

@@ -27,17 +27,15 @@ KMA_FALLBACK_LIST_BASE_URL = (os.getenv("KMA_APIHUB_FALLBACK_BASE_URL") or "http
 KMA_FALLBACK_AUTH_KEY = os.getenv("KMA_APIHUB_FALLBACK_AUTH_KEY", "").strip()
 TD_LIST_ENDPOINT = "td_lst.php"
 TYP_LIST_ENDPOINT = "typ_lst.php"
-NOAA_BDECK_URL = "https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/b{atcf_id}.dat"
 NRL_ATCF_SECTOR_URL = "https://science.nrlmry.navy.mil/geoips/tcdat/sectors/atcf_sector_file"
 BDECK_SOURCE_URLS = (
-    ("NOAA", NOAA_BDECK_URL),
     ("RAL.UCAR", "https://hurricanes.ral.ucar.edu/realtime/plots/{ral_basin_dir}/{year}/{atcf_id}/b{atcf_id}.dat"),
     ("NATYPHOON", "https://www.natyphoon.top/atcf/temp/b{atcf_id}.dat"),
 )
 KMA_GTS_NOW_URL = f"{KMA_LIST_BASE_URL}/typ_gts_now.php"
 KMA_TYP_NOW_URL = f"{KMA_LIST_BASE_URL}/typ_now.php"
 KMA_TD_NOW_URL = f"{KMA_LIST_BASE_URL}/td_now.php"
-ACTIVE_MODEL_TARGET = 36
+ACTIVE_MODEL_TARGET = 39
 DEFAULT_ATCF_SEARCH_POSITIVE_RADIUS = 10
 DEFAULT_ATCF_SEARCH_NEGATIVE_RADIUS = 5
 DEFAULT_ATCF_POSITION_MAX_DISTANCE_KM = 600.0
