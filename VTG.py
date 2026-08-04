@@ -374,7 +374,8 @@ for row in MODEL_SOURCES:
 
         for alias_priority, alias_id in enumerate(alias_ids, start=1):
             MODEL_SOURCE_ALIASES.setdefault(alias_id, row["name"])
-            SOURCE_MODEL_IDS[source].add(alias_id)
+            if source in SOURCE_MODEL_IDS:
+                SOURCE_MODEL_IDS[source].add(alias_id)
             MODEL_ALIAS_PRIORITIES.setdefault(alias_id, alias_priority)
 
 DATA_SOURCE_COLUMN = "_DATA_SOURCE"
