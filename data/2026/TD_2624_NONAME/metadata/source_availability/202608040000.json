@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260804063948",
-  "generated_at_kst": "2026-08-04 15:39 KST",
+  "generated_at_utc": "20260804064956",
+  "generated_at_kst": "2026-08-04 15:49 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_24",
   "storm_stage": "TD",
@@ -27,43 +27,60 @@
     120,
     240
   ],
-  "model_source_count": 2,
-  "selected_model_count": 2,
+  "model_source_count": 3,
+  "selected_model_count": 3,
   "active_target_model_count": 36,
   "model_sources": [
     {
-      "model_id": "GFS",
-      "model_label": "GFS",
+      "model_id": "KIM_3h",
+      "model_label": "KIM",
       "raw_model_ids": [
-        "GFS"
+        "KIM_3h"
       ],
       "source": "APIHUB",
       "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 10,
-      "max_lead_hour": 54,
+      "point_count": 11,
+      "max_lead_hour": 30,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260804040949",
-      "first_seen_kst": "2026-08-04 13:09 KST"
+      "first_seen_utc": "20260804064956",
+      "first_seen_kst": "2026-08-04 15:49 KST"
     },
     {
-      "model_id": "GFS_EPS",
-      "model_label": "GFS EPS",
+      "model_id": "KIM_6h",
+      "model_label": "KIM",
       "raw_model_ids": [
-        "GFS_EPS"
+        "KIM_6h"
       ],
       "source": "APIHUB",
       "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 15,
-      "max_lead_hour": 84,
+      "point_count": 6,
+      "max_lead_hour": 30,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260804040949",
-      "first_seen_kst": "2026-08-04 13:09 KST"
+      "first_seen_utc": "20260804064956",
+      "first_seen_kst": "2026-08-04 15:49 KST"
+    },
+    {
+      "model_id": "KIM_EPS",
+      "model_label": "KIM EPS",
+      "raw_model_ids": [
+        "KIM_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 7,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260804064956",
+      "first_seen_kst": "2026-08-04 15:49 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2624_NONAME/metadata/source_availability/202608040000.json"
