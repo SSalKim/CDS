@@ -59,8 +59,8 @@ MODEL_INFO = [
     {"name": "CMC_EPS", "color": "#AAF7F4", "style": "-", "label": "CMC EPS", "zorder": 80},
     {"name": "NAVGEM", "color": "#4470AD", "style": "-", "label": "NAVGEM", "zorder": 79},
     {"name": "FNMOC_EPS", "color": "#99AFD7", "style": "-", "label": "NAVGEM EPS", "zorder": 78},
-    {"name": "ICON", "color": "#6D8F5F", "style": "-", "label": "ICON", "zorder": 77.8},
-    {"name": "ICON_EPS", "color": "#A8BE7A", "style": "-", "label": "ICON EPS", "zorder": 77.7},
+    {"name": "ICON", "color": "#092D64", "style": "-", "label": "ICON", "zorder": 77.8},
+    {"name": "ICON_EPS", "color": "#005766", "style": "-", "label": "ICON EPS", "zorder": 77.7},
     {"name": "JGSM", "color": "#997950", "style": "-", "label": "JGSM", "zorder": 77},
     {"name": "TEPS", "color": "#654321", "style": "-", "label": "JGSM EPS", "zorder": 76},
     {"name": "CTCX", "color": "#78081C", "style": "-", "label": "COAMPS-TC ", "zorder": 75},
@@ -74,7 +74,7 @@ MODEL_INFO = [
     {"name": "IFKM_AI", "color": "#DDA520", "style": "--", "label": "KMA AIFS-KIM", "zorder": 97},
     {"name": "AGFS", "color": "#E0FF78", "style": "--", "label": "AIGFS", "zorder": 59},
     {"name": "AIGEFS", "color": "#78FF8F", "style": "--", "label": "AIGFS EPS", "zorder": 58},
-    {"name": "AICON", "color": "#20C7A8", "style": "--", "label": "AICON", "zorder": 57.5},
+    {"name": "AICON", "color": "#1B2AFA", "style": "--", "label": "AICON", "zorder": 57.5},
     {"name": "FNEC_AI", "color": "#004B1C", "style": "--", "label": "FourCastNet-ECMWF", "zorder": 62},
     {"name": "FNKM_AI", "color": "#388E3C", "style": "--", "label": "FourCastNet-KIM", "zorder": 61},
     {"name": "FNUM_AI", "color": "#4BB200", "style": "--", "label": "FourCastNet-UM", "zorder": 60},
@@ -121,7 +121,7 @@ MODEL_SOURCES = [
     {"name": "ECMWF_AIFS", "apihub": "ECMWF_AIFS", "noaa": "AIFS", "ral_ucar": "AIFS", "knackwx": "AIFS", "polarwx": "aifs"},
     {"name": "ECMWF_AIFS_EPS", "apihub": None, "noaa": "EAIM", "ral_ucar": "EAMN", "knackwx": "EAMN", "polarwx": "aifs_ens_mean"},
     {"name": "AGFS", "apihub": None, "noaa": "AGFS", "ral_ucar": "AGFS", "knackwx": "AGFS"},
-    {"name": "AIGEFS", "apihub": None, "noaa": "AIMN", "ral_ucar": "AIMN", "knackwx": "AIMN", "smca": "AIGEFS"},
+    {"name": "AIGEFS", "apihub": None, "noaa": "AIMN", "ral_ucar": "AIMN", "knackwx": "AIMN", "smca": "AIGEFSM"},
     {"name": "AICON", "apihub": None, "smca": "AICON"},
     {"name": "IFEC_AI", "apihub": "IFEC_AI", "noaa": None},
     {"name": "IFKM_AI", "apihub": "IFKM_AI", "noaa": None},
@@ -1637,7 +1637,7 @@ def read_smca_json(text: str | None, settings: Settings, *, typhoon_id: str = ""
 
     if not rows:
         if matched_forecasts == 0:
-            print(f"SMCA.FUN has no AIGEFS/AICON forecast initialized at {target_cycle} for {typhoon_id}")
+            print(f"SMCA.FUN has no AIGEFSM/AICON forecast initialized at {target_cycle} for {typhoon_id}")
         return empty_smca_frame()
     frame = pd.DataFrame(rows)
     for column in ("TMD", "LAT", "LON", "PS", "WS", "SEQ"):
