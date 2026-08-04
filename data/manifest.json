@@ -1,25 +1,25 @@
 {
   "version": 3,
-  "updated_at_utc": "202608041449",
+  "updated_at_utc": "202608040400",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 39,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202608040600",
-      "cycle_time_utc": "202608040600",
-      "start_utc": "202608041000",
-      "end_utc": "202608041600"
+      "data_time": "202608040000",
+      "cycle_time_utc": "202608040000",
+      "start_utc": "202608040400",
+      "end_utc": "202608041000"
     }
   ],
   "runs": [
     {
       "job": {
         "storm_key": "td_2026_24",
-        "stage": "TD_POSITION_ATCF",
+        "stage": "TD_UNLINKED",
         "year": 2026,
-        "data_time": "202608040600",
+        "data_time": "202608040000",
         "td_number": 24,
         "linked_td_number": null,
         "typ_number": 24,
@@ -30,16 +30,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608040600",
-        "cycle_time_utc": "202608040600",
-        "start_utc": "202608041000",
-        "end_utc": "202608041600"
+        "data_time": "202608040000",
+        "cycle_time_utc": "202608040000",
+        "start_utc": "202608040400",
+        "end_utc": "202608041000"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260804145033",
-          "image_path": "data/2026/TD_2624_NONAME/images/TD_2624_NONAME_202608040600_120h.png",
+          "generated_at_utc": "20260804150036",
+          "image_path": "data/2026/TD_2624_NONAME/images/TD_2624_NONAME_202608040000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 24,
@@ -55,28 +55,35 @@
           "canonical_typ_name_ko": "",
           "atcf_id": "wp942026",
           "extra_atcf_ids": [],
-          "data_time": "202608040600",
+          "data_time": "202608040000",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 13,
+          "model_count": 20,
           "target_model_count": 39,
           "model_labels": [
+            "CMC",
+            "CMC EPS",
             "ECMWF",
             "ECMWF AIFS",
             "ECMWF AIFS EPS",
             "ECMWF EPS",
-            "FNV3",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
             "GFS",
             "GFS EPS",
-            "HAFS",
-            "HWRF",
             "ICON",
             "ICON EPS",
-            "JGSM",
-            "JGSM EPS"
+            "KMA AIFS-ECMWF",
+            "KMA AIFS-KIM",
+            "KIM",
+            "KIM EPS",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2624_NONAME/metadata/source_availability/202608040600.json"
+          "source_availability_path": "data/2026/TD_2624_NONAME/metadata/source_availability/202608040000.json"
         }
       },
       "completed": false,
@@ -85,9 +92,9 @@
     {
       "job": {
         "storm_key": "td_2026_24",
-        "stage": "TD_POSITION_ATCF",
+        "stage": "TD_UNLINKED",
         "year": 2026,
-        "data_time": "202608040600",
+        "data_time": "202608040000",
         "td_number": 24,
         "linked_td_number": null,
         "typ_number": 24,
@@ -98,16 +105,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608040600",
-        "cycle_time_utc": "202608040600",
-        "start_utc": "202608041000",
-        "end_utc": "202608041600"
+        "data_time": "202608040000",
+        "cycle_time_utc": "202608040000",
+        "start_utc": "202608040400",
+        "end_utc": "202608041000"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260804145034",
-          "image_path": "data/2026/TD_2624_NONAME/images/TD_2624_NONAME_202608040600_240h.png",
+          "generated_at_utc": "20260804150037",
+          "image_path": "data/2026/TD_2624_NONAME/images/TD_2624_NONAME_202608040000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 24,
@@ -123,28 +130,35 @@
           "canonical_typ_name_ko": "",
           "atcf_id": "wp942026",
           "extra_atcf_ids": [],
-          "data_time": "202608040600",
+          "data_time": "202608040000",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 13,
+          "model_count": 20,
           "target_model_count": 39,
           "model_labels": [
+            "CMC",
+            "CMC EPS",
             "ECMWF",
             "ECMWF AIFS",
             "ECMWF AIFS EPS",
             "ECMWF EPS",
-            "FNV3",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
             "GFS",
             "GFS EPS",
-            "HAFS",
-            "HWRF",
             "ICON",
             "ICON EPS",
-            "JGSM",
-            "JGSM EPS"
+            "KMA AIFS-ECMWF",
+            "KMA AIFS-KIM",
+            "KIM",
+            "KIM EPS",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2624_NONAME/metadata/source_availability/202608040600.json"
+          "source_availability_path": "data/2026/TD_2624_NONAME/metadata/source_availability/202608040000.json"
         }
       },
       "completed": false,
@@ -155,7 +169,7 @@
         "storm_key": "typ_2026_13",
         "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202608040600",
+        "data_time": "202608040000",
         "td_number": null,
         "linked_td_number": 23,
         "typ_number": 13,
@@ -166,16 +180,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608040600",
-        "cycle_time_utc": "202608040600",
-        "start_utc": "202608041000",
-        "end_utc": "202608041600"
+        "data_time": "202608040000",
+        "cycle_time_utc": "202608040000",
+        "start_utc": "202608040400",
+        "end_utc": "202608041000"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260804145037",
-          "image_path": "data/2026/TYP_2613_DOLPHIN/images/TYP_2613_DOLPHIN_202608040600_120h.png",
+          "generated_at_utc": "20260804150038",
+          "image_path": "data/2026/TYP_2613_DOLPHIN/images/TYP_2613_DOLPHIN_202608040000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
           "typ_number": 13,
@@ -191,19 +205,24 @@
           "canonical_typ_name_ko": "돌핀",
           "atcf_id": "wp122026",
           "extra_atcf_ids": [],
-          "data_time": "202608040600",
+          "data_time": "202608040000",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 19,
+          "model_count": 32,
           "target_model_count": 39,
           "model_labels": [
-            "AICON",
-            "AIGFS EPS",
+            "CMC",
+            "CMC EPS",
             "ECMWF",
             "ECMWF AIFS",
             "ECMWF AIFS EPS",
             "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "NAVGEM EPS",
             "FNV3",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
             "GenCast",
             "GFS",
             "GFS EPS",
@@ -214,11 +233,19 @@
             "HWRF",
             "ICON",
             "ICON EPS",
+            "KMA AIFS-ECMWF",
+            "KMA AIFS-KIM",
             "JGSM",
-            "JGSM EPS"
+            "KIM",
+            "KIM EPS",
+            "NAVGEM",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "JGSM EPS",
+            "UKMO"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2613_DOLPHIN/metadata/source_availability/202608040600.json"
+          "source_availability_path": "data/2026/TYP_2613_DOLPHIN/metadata/source_availability/202608040000.json"
         }
       },
       "completed": false,
@@ -229,7 +256,7 @@
         "storm_key": "typ_2026_13",
         "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202608040600",
+        "data_time": "202608040000",
         "td_number": null,
         "linked_td_number": 23,
         "typ_number": 13,
@@ -240,16 +267,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608040600",
-        "cycle_time_utc": "202608040600",
-        "start_utc": "202608041000",
-        "end_utc": "202608041600"
+        "data_time": "202608040000",
+        "cycle_time_utc": "202608040000",
+        "start_utc": "202608040400",
+        "end_utc": "202608041000"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260804145038",
-          "image_path": "data/2026/TYP_2613_DOLPHIN/images/TYP_2613_DOLPHIN_202608040600_240h.png",
+          "generated_at_utc": "20260804150039",
+          "image_path": "data/2026/TYP_2613_DOLPHIN/images/TYP_2613_DOLPHIN_202608040000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
           "typ_number": 13,
@@ -265,19 +292,24 @@
           "canonical_typ_name_ko": "돌핀",
           "atcf_id": "wp122026",
           "extra_atcf_ids": [],
-          "data_time": "202608040600",
+          "data_time": "202608040000",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 19,
+          "model_count": 32,
           "target_model_count": 39,
           "model_labels": [
-            "AICON",
-            "AIGFS EPS",
+            "CMC",
+            "CMC EPS",
             "ECMWF",
             "ECMWF AIFS",
             "ECMWF AIFS EPS",
             "ECMWF EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "NAVGEM EPS",
             "FNV3",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
             "GenCast",
             "GFS",
             "GFS EPS",
@@ -288,11 +320,19 @@
             "HWRF",
             "ICON",
             "ICON EPS",
+            "KMA AIFS-ECMWF",
+            "KMA AIFS-KIM",
             "JGSM",
-            "JGSM EPS"
+            "KIM",
+            "KIM EPS",
+            "NAVGEM",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM",
+            "JGSM EPS",
+            "UKMO"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2613_DOLPHIN/metadata/source_availability/202608040600.json"
+          "source_availability_path": "data/2026/TYP_2613_DOLPHIN/metadata/source_availability/202608040000.json"
         }
       },
       "completed": false,
