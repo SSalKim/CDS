@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at_utc": "202608041949",
+  "updated_at_utc": "202608041959",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 39,
@@ -16,8 +16,92 @@
   "runs": [
     {
       "job": {
-        "storm_key": "td_2026_24",
-        "stage": "TD_POSITION_ATCF",
+        "storm_key": "typ_2026_14",
+        "stage": "TYP_SUPPRESSED_BY_TD",
+        "year": 2026,
+        "data_time": "202608041200",
+        "td_number": 24,
+        "linked_td_number": 24,
+        "typ_number": 14,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp942026",
+        "fcst_hours": 120,
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202608041200",
+        "cycle_time_utc": "202608041200",
+        "start_utc": "202608041600",
+        "end_utc": "202608042200"
+      },
+      "result": {
+        "status": "suppressed_td_phase",
+        "metadata": {
+          "generated_at_utc": "202608042000",
+          "image_path": "",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 14,
+          "data_typ_number": 14,
+          "data_time": "202608041200",
+          "fcst_hours": 120,
+          "model_count": 0,
+          "target_model_count": 39,
+          "models": [],
+          "model_labels": [],
+          "no_output": true,
+          "no_output_reason": "Suppressed because linked TD24 phase is active."
+        }
+      }
+    },
+    {
+      "job": {
+        "storm_key": "typ_2026_14",
+        "stage": "TYP_SUPPRESSED_BY_TD",
+        "year": 2026,
+        "data_time": "202608041200",
+        "td_number": 24,
+        "linked_td_number": 24,
+        "typ_number": 14,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp942026",
+        "fcst_hours": 240,
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202608041200",
+        "cycle_time_utc": "202608041200",
+        "start_utc": "202608041600",
+        "end_utc": "202608042200"
+      },
+      "result": {
+        "status": "suppressed_td_phase",
+        "metadata": {
+          "generated_at_utc": "202608042000",
+          "image_path": "",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 14,
+          "data_typ_number": 14,
+          "data_time": "202608041200",
+          "fcst_hours": 240,
+          "model_count": 0,
+          "target_model_count": 39,
+          "models": [],
+          "model_labels": [],
+          "no_output": true,
+          "no_output_reason": "Suppressed because linked TD24 phase is active."
+        }
+      }
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_24_typ_14",
+        "stage": "TD_PRE_TYP_POSITION_ATCF",
         "year": 2026,
         "data_time": "202608041200",
         "td_number": 24,
@@ -38,8 +122,8 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260804195026",
-          "image_path": "data/2026/TD_2624_NONAME/images/TD_2624_NONAME_202608041200_120h.png",
+          "generated_at_utc": "20260804200046",
+          "image_path": "data/2026/TYP_2614_KUJIRA/images/TD_2624_NONAME_202608041200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 24,
@@ -47,20 +131,22 @@
           "typ_name": "NONAME",
           "typ_name_ko": "",
           "linked_td_number": null,
-          "linked_typ_number": null,
-          "canonical_storm_key": "td_2026_24",
-          "canonical_storm_stage": "TD",
-          "canonical_typ_number": 24,
-          "canonical_typ_name": "NONAME",
-          "canonical_typ_name_ko": "",
+          "linked_typ_number": 14,
+          "canonical_storm_key": "typ_2026_14",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 14,
+          "canonical_typ_name": "KUJIRA",
+          "canonical_typ_name_ko": "구지라",
           "atcf_id": "wp942026",
           "extra_atcf_ids": [],
           "data_time": "202608041200",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 25,
+          "model_count": 27,
           "target_model_count": 39,
           "model_labels": [
+            "AICON",
+            "AIGFS EPS",
             "CMC",
             "CMC EPS",
             "ECMWF",
@@ -88,7 +174,7 @@
             "UKMO"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2624_NONAME/metadata/source_availability/202608041200.json"
+          "source_availability_path": "data/2026/TYP_2614_KUJIRA/metadata/source_availability/202608041200.json"
         }
       },
       "completed": false,
@@ -96,8 +182,8 @@
     },
     {
       "job": {
-        "storm_key": "td_2026_24",
-        "stage": "TD_POSITION_ATCF",
+        "storm_key": "td_2026_24_typ_14",
+        "stage": "TD_PRE_TYP_POSITION_ATCF",
         "year": 2026,
         "data_time": "202608041200",
         "td_number": 24,
@@ -118,8 +204,8 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260804195027",
-          "image_path": "data/2026/TD_2624_NONAME/images/TD_2624_NONAME_202608041200_240h.png",
+          "generated_at_utc": "20260804200047",
+          "image_path": "data/2026/TYP_2614_KUJIRA/images/TD_2624_NONAME_202608041200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 24,
@@ -127,20 +213,22 @@
           "typ_name": "NONAME",
           "typ_name_ko": "",
           "linked_td_number": null,
-          "linked_typ_number": null,
-          "canonical_storm_key": "td_2026_24",
-          "canonical_storm_stage": "TD",
-          "canonical_typ_number": 24,
-          "canonical_typ_name": "NONAME",
-          "canonical_typ_name_ko": "",
+          "linked_typ_number": 14,
+          "canonical_storm_key": "typ_2026_14",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 14,
+          "canonical_typ_name": "KUJIRA",
+          "canonical_typ_name_ko": "구지라",
           "atcf_id": "wp942026",
           "extra_atcf_ids": [],
           "data_time": "202608041200",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 25,
+          "model_count": 27,
           "target_model_count": 39,
           "model_labels": [
+            "AICON",
+            "AIGFS EPS",
             "CMC",
             "CMC EPS",
             "ECMWF",
@@ -168,7 +256,7 @@
             "UKMO"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2624_NONAME/metadata/source_availability/202608041200.json"
+          "source_availability_path": "data/2026/TYP_2614_KUJIRA/metadata/source_availability/202608041200.json"
         }
       },
       "completed": false,
@@ -198,7 +286,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260804195028",
+          "generated_at_utc": "20260804200047",
           "image_path": "data/2026/TYP_2613_DOLPHIN/images/TYP_2613_DOLPHIN_202608041200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -281,7 +369,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260804195029",
+          "generated_at_utc": "20260804200048",
           "image_path": "data/2026/TYP_2613_DOLPHIN/images/TYP_2613_DOLPHIN_202608041200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -341,7 +429,7 @@
       "final_check": false
     }
   ],
-  "inventory_count": 8696,
+  "inventory_count": 8698,
   "manifest_indexes": [
     {
       "year": 2020,
