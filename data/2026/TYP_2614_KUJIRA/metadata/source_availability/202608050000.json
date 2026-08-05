@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260805070016",
-  "generated_at_kst": "2026-08-05 16:00 KST",
+  "generated_at_utc": "20260805071023",
+  "generated_at_kst": "2026-08-05 16:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_14",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 30,
-  "selected_model_count": 18,
+  "model_source_count": 37,
+  "selected_model_count": 19,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -133,6 +133,40 @@
       "is_official": false,
       "first_seen_utc": "20260805070016",
       "first_seen_kst": "2026-08-05 16:00 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 7,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260805071023",
+      "first_seen_kst": "2026-08-05 16:10 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 7,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260805071023",
+      "first_seen_kst": "2026-08-05 16:10 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -364,7 +398,7 @@
       ],
       "source": "POLARWX",
       "source_label": "POLARWX",
-      "selected": true,
+      "selected": false,
       "point_count": 43,
       "max_lead_hour": 126,
       "has_pressure": true,
@@ -372,6 +406,40 @@
       "is_official": false,
       "first_seen_utc": "20260805070016",
       "first_seen_kst": "2026-08-05 16:00 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "HWRF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260805071023",
+      "first_seen_kst": "2026-08-05 16:10 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "HWRF"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260805071023",
+      "first_seen_kst": "2026-08-05 16:10 KST"
     },
     {
       "model_id": "ICON",
@@ -493,6 +561,23 @@
       "first_seen_kst": "2026-08-05 16:00 KST"
     },
     {
+      "model_id": "KIM_3h",
+      "model_label": "KIM",
+      "raw_model_ids": [
+        "KIM_3H"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 6,
+      "max_lead_hour": 15,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260805071023",
+      "first_seen_kst": "2026-08-05 16:10 KST"
+    },
+    {
       "model_id": "KIM_6h",
       "model_label": "KIM",
       "raw_model_ids": [
@@ -510,6 +595,23 @@
       "first_seen_kst": "2026-08-05 16:00 KST"
     },
     {
+      "model_id": "KIM_6h",
+      "model_label": "KIM",
+      "raw_model_ids": [
+        "KIM_6H"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 3,
+      "max_lead_hour": 12,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260805071023",
+      "first_seen_kst": "2026-08-05 16:10 KST"
+    },
+    {
       "model_id": "KIM_EPS",
       "model_label": "KIM EPS",
       "raw_model_ids": [
@@ -525,6 +627,24 @@
       "is_official": false,
       "first_seen_utc": "20260805070016",
       "first_seen_kst": "2026-08-05 16:00 KST"
+    },
+    {
+      "model_id": "KIM_EPS",
+      "model_label": "KIM EPS",
+      "raw_model_ids": [
+        "KIM_EPS",
+        "KIM_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 6,
+      "max_lead_hour": 18,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260805071023",
+      "first_seen_kst": "2026-08-05 16:10 KST"
     },
     {
       "model_id": "KMA",
