@@ -1422,7 +1422,8 @@ def fetch_bdeck_text(atcf_id: str, *, timeout: float = 15) -> str | None:
         if text:
             if index > 0:
                 BDECK_FETCH_STATS["fallbacks"] += 1
-                print(f"BDECK NOAA source unavailable; using {source} for {normalized}.")
+                earlier_sources = ", ".join(item[0] for item in BDECK_SOURCE_URLS[:index])
+                print(f"BDECK {earlier_sources} source unavailable; using {source} for {normalized}.")
             BDECK_TEXT_CACHE[normalized] = text
             return text
 
@@ -1440,11 +1441,33 @@ def fetch_bdeck_text_for_reference_time(
     if not normalized:
         return None
 
-    text = fetch_bdeck_text(normalized, timeout=timeout)
-    if text and bdeck_track_points(text, reference_time=reference_time):
+    nearest_fallback: tuple[str, str] | None = None
+    for index, (source, url_template) in enumerate(BDECK_SOURCE_URLS):
+        text = fetch_bdeck_text_from_source(
+            normalized,
+            source=source,
+            url_template=url_template,
+            timeout=timeout,
+        )
+        if not text:
+            continue
+        if nearest_fallback is None:
+            nearest_fallback = (text, source)
+        if not bdeck_track_points(text, reference_time=reference_time):
+            continue
+        if index > 0:
+            BDECK_FETCH_STATS["fallbacks"] += 1
+            earlier_sources = ", ".join(item[0] for item in BDECK_SOURCE_URLS[:index])
+            print(
+                f"BDECK {earlier_sources} source lacks an exact {reference_time[:10]} "
+                f"analysis point; using {source} for {normalized}."
+            )
+        BDECK_TEXT_CACHE[normalized] = text
         return text
 
-    if text:
+    if nearest_fallback is not None:
+        text = nearest_fallback[0]
+        BDECK_TEXT_CACHE[normalized] = text
         return text
 
     BDECK_TEXT_CACHE[normalized] = None
