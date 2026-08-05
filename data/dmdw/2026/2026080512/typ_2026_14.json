@@ -1,22 +1,30 @@
 {
   "cycle": "2026080512",
   "cycle_utc": "202608051200",
-  "layer_candidate_count": 2,
-  "model_count": 2,
+  "layer_candidate_count": 3,
+  "model_count": 3,
   "models": [
-    {"index":0,"is_ensemble_mean":false,"max_lead_hour":12,"member_id":null,"model_id":"JGSM","point_count":3,"raw_model_id":"JGSM","row_count":3,"source_member_count":null},
-    {"index":1,"is_ensemble_mean":false,"max_lead_hour":18,"member_id":null,"model_id":"TEPS","point_count":4,"raw_model_id":"TEPS","row_count":4,"source_member_count":null}
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":36,"member_id":null,"model_id":"GFS","point_count":7,"raw_model_id":"GFS","row_count":7,"source_member_count":null},
+    {"index":1,"is_ensemble_mean":false,"max_lead_hour":12,"member_id":null,"model_id":"JGSM","point_count":3,"raw_model_id":"JGSM","row_count":3,"source_member_count":null},
+    {"index":2,"is_ensemble_mean":false,"max_lead_hour":18,"member_id":null,"model_id":"TEPS","point_count":4,"raw_model_id":"TEPS","row_count":4,"source_member_count":null}
   ],
   "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
-  "point_count": 7,
+  "point_count": 14,
   "points": [
     [0,0,"202608051200",17.8,119.4,998,19,5,135,200,null],
-    [0,6,"202608051800",17.9,119.9,992,21.6,-9,null,0,null],
-    [0,12,"202608060000",18,120.5,994,19,-9,null,0,null],
+    [0,6,"202608051800",17.8,119.7,997,19,-9,null,62,null],
+    [0,12,"202608060000",17.3,120.6,994,18,-9,null,77,null],
+    [0,18,"202608060600",16.4,122.5,998,19,-9,null,94,null],
+    [0,24,"202608061200",16.6,124.8,999,17.5,-9,null,62,null],
+    [0,30,"202608061800",17.1,127.3,996,18.5,-9,null,114,null],
+    [0,36,"202608070000",19.1,129.6,994,17,-9,null,0,null],
     [1,0,"202608051200",17.8,119.4,998,19,5,135,200,null],
-    [1,6,"202608051800",17.9,119.8,994,18,-9,null,0,null],
-    [1,12,"202608060000",17.8,120.5,996,16.5,-9,null,0,null],
-    [1,18,"202608060600",16.7,122,995,16.5,-9,null,0,null]
+    [1,6,"202608051800",17.9,119.9,992,21.6,-9,null,0,null],
+    [1,12,"202608060000",18,120.5,994,19,-9,null,0,null],
+    [2,0,"202608051200",17.8,119.4,998,19,5,135,200,null],
+    [2,6,"202608051800",17.9,119.8,994,18,-9,null,0,null],
+    [2,12,"202608060000",17.8,120.5,996,16.5,-9,null,0,null],
+    [2,18,"202608060600",16.7,122,995,16.5,-9,null,0,null]
   ],
   "request": {"o_tm_seq":"4","storm_kind":"typ","typ_seq":14,"year":2026},
   "schema_version": 2,
