@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260806122017",
-  "generated_at_kst": "2026-08-06 21:20 KST",
+  "generated_at_utc": "20260806123025",
+  "generated_at_kst": "2026-08-06 21:30 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_13",
   "storm_stage": "TYP",
@@ -28,42 +28,42 @@
     240
   ],
   "model_source_count": 20,
-  "selected_model_count": 11,
+  "selected_model_count": 10,
   "active_target_model_count": 39,
   "model_sources": [
     {
-      "model_id": "AICON",
-      "model_label": "AICON",
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
       "raw_model_ids": [
-        "AICON"
+        "ECMWF"
       ],
-      "source": "SMCA.FUN",
-      "source_label": "SMCA.FUN",
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 21,
-      "max_lead_hour": 120,
+      "point_count": 25,
+      "max_lead_hour": 144,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260806102013",
-      "first_seen_kst": "2026-08-06 19:20 KST"
+      "first_seen_utc": "20260806123025",
+      "first_seen_kst": "2026-08-06 21:30 KST"
     },
     {
-      "model_id": "AIGEFS",
-      "model_label": "AIGFS EPS",
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
       "raw_model_ids": [
-        "AIGEFSM"
+        "ECMWF"
       ],
-      "source": "SMCA.FUN",
-      "source_label": "SMCA.FUN",
-      "selected": true,
-      "point_count": 41,
-      "max_lead_hour": 240,
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 25,
+      "max_lead_hour": 144,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260806112017",
-      "first_seen_kst": "2026-08-06 20:20 KST"
+      "first_seen_utc": "20260806123025",
+      "first_seen_kst": "2026-08-06 21:30 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
