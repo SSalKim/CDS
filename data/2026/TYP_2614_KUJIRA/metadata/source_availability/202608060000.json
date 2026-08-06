@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260806065113",
-  "generated_at_kst": "2026-08-06 15:51 KST",
+  "generated_at_utc": "20260806070136",
+  "generated_at_kst": "2026-08-06 16:01 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_14",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 14,
-  "selected_model_count": 11,
+  "model_source_count": 18,
+  "selected_model_count": 12,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -49,6 +49,23 @@
       "first_seen_kst": "2026-08-06 15:41 KST"
     },
     {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806070136",
+      "first_seen_kst": "2026-08-06 16:01 KST"
+    },
+    {
       "model_id": "CMC_EPS",
       "model_label": "CMC EPS",
       "raw_model_ids": [
@@ -64,6 +81,23 @@
       "is_official": false,
       "first_seen_utc": "20260806064109",
       "first_seen_kst": "2026-08-06 15:41 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 27,
+      "max_lead_hour": 156,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806070136",
+      "first_seen_kst": "2026-08-06 16:01 KST"
     },
     {
       "model_id": "FNV3",
@@ -132,6 +166,23 @@
       "is_official": false,
       "first_seen_utc": "20260806054047",
       "first_seen_kst": "2026-08-06 14:40 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806070136",
+      "first_seen_kst": "2026-08-06 16:01 KST"
     },
     {
       "model_id": "HAFS",
@@ -268,6 +319,23 @@
       "is_official": false,
       "first_seen_utc": "20260806065113",
       "first_seen_kst": "2026-08-06 15:51 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKM"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806070136",
+      "first_seen_kst": "2026-08-06 16:01 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2614_KUJIRA/metadata/source_availability/202608060000.json"
