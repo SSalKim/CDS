@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260806120054",
-  "generated_at_kst": "2026-08-06 21:00 KST",
+  "generated_at_utc": "20260806121055",
+  "generated_at_kst": "2026-08-06 21:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_14",
   "storm_stage": "TD",
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 4,
-  "selected_model_count": 4,
+  "model_source_count": 7,
+  "selected_model_count": 6,
   "active_target_model_count": 39,
   "model_sources": [
+    {
+      "model_id": "FNV3",
+      "model_label": "FNV3",
+      "raw_model_ids": [
+        "DEEPMIND"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 28,
+      "max_lead_hour": 204,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806121055",
+      "first_seen_kst": "2026-08-06 21:10 KST"
+    },
     {
       "model_id": "GFS",
       "model_label": "GFS",
@@ -64,6 +81,40 @@
       "is_official": false,
       "first_seen_utc": "20260806114055",
       "first_seen_kst": "2026-08-06 20:40 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806121055",
+      "first_seen_kst": "2026-08-06 21:10 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFSA"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806121055",
+      "first_seen_kst": "2026-08-06 21:10 KST"
     },
     {
       "model_id": "ICON",
