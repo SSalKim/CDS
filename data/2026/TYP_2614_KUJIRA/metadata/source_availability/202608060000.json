@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260806064109",
-  "generated_at_kst": "2026-08-06 15:41 KST",
+  "generated_at_utc": "20260806065113",
+  "generated_at_kst": "2026-08-06 15:51 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_14",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 9,
-  "selected_model_count": 9,
+  "model_source_count": 14,
+  "selected_model_count": 11,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -83,6 +83,23 @@
       "first_seen_kst": "2026-08-06 15:21 KST"
     },
     {
+      "model_id": "FNV3",
+      "model_label": "FNV3",
+      "raw_model_ids": [
+        "DEEPMIND"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 22,
+      "max_lead_hour": 174,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806065113",
+      "first_seen_kst": "2026-08-06 15:51 KST"
+    },
+    {
       "model_id": "GFS",
       "model_label": "GFS",
       "raw_model_ids": [
@@ -134,6 +151,23 @@
       "first_seen_kst": "2026-08-06 15:10 KST"
     },
     {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFSA"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806065113",
+      "first_seen_kst": "2026-08-06 15:51 KST"
+    },
+    {
       "model_id": "HWRF",
       "model_label": "HWRF",
       "raw_model_ids": [
@@ -149,6 +183,23 @@
       "is_official": false,
       "first_seen_utc": "20260806064109",
       "first_seen_kst": "2026-08-06 15:41 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "hwrf"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806065113",
+      "first_seen_kst": "2026-08-06 15:51 KST"
     },
     {
       "model_id": "ICON",
@@ -183,6 +234,40 @@
       "is_official": false,
       "first_seen_utc": "20260806041052",
       "first_seen_kst": "2026-08-06 13:10 KST"
+    },
+    {
+      "model_id": "KIM_3h",
+      "model_label": "KIM",
+      "raw_model_ids": [
+        "KIM_3h"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806065113",
+      "first_seen_kst": "2026-08-06 15:51 KST"
+    },
+    {
+      "model_id": "KIM_6h",
+      "model_label": "KIM",
+      "raw_model_ids": [
+        "KIM_6h"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806065113",
+      "first_seen_kst": "2026-08-06 15:51 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2614_KUJIRA/metadata/source_availability/202608060000.json"
