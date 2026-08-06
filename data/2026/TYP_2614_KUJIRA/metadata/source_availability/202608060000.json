@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260806070136",
-  "generated_at_kst": "2026-08-06 16:01 KST",
+  "generated_at_utc": "20260806071124",
+  "generated_at_kst": "2026-08-06 16:11 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_14",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 18,
-  "selected_model_count": 12,
+  "model_source_count": 24,
+  "selected_model_count": 13,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -66,6 +66,23 @@
       "first_seen_kst": "2026-08-06 16:01 KST"
     },
     {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "cmc"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806071124",
+      "first_seen_kst": "2026-08-06 16:11 KST"
+    },
+    {
       "model_id": "CMC_EPS",
       "model_label": "CMC EPS",
       "raw_model_ids": [
@@ -98,6 +115,40 @@
       "is_official": false,
       "first_seen_utc": "20260806070136",
       "first_seen_kst": "2026-08-06 16:01 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 27,
+      "max_lead_hour": 156,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806071124",
+      "first_seen_kst": "2026-08-06 16:11 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260806071124",
+      "first_seen_kst": "2026-08-06 16:11 KST"
     },
     {
       "model_id": "FNV3",
@@ -151,6 +202,23 @@
       "first_seen_kst": "2026-08-06 14:50 KST"
     },
     {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "gfs"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 32,
+      "max_lead_hour": 228,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806071124",
+      "first_seen_kst": "2026-08-06 16:11 KST"
+    },
+    {
       "model_id": "GFS_EPS",
       "model_label": "GFS EPS",
       "raw_model_ids": [
@@ -183,6 +251,23 @@
       "is_official": false,
       "first_seen_utc": "20260806070136",
       "first_seen_kst": "2026-08-06 16:01 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GEFS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806071124",
+      "first_seen_kst": "2026-08-06 16:11 KST"
     },
     {
       "model_id": "HAFS",
@@ -328,7 +413,7 @@
       ],
       "source": "RAL.UCAR",
       "source_label": "RAL UCAR ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 1,
       "max_lead_hour": 0,
       "has_pressure": true,
@@ -336,6 +421,23 @@
       "is_official": false,
       "first_seen_utc": "20260806070136",
       "first_seen_kst": "2026-08-06 16:01 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKMET"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260806071124",
+      "first_seen_kst": "2026-08-06 16:11 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2614_KUJIRA/metadata/source_availability/202608060000.json"
