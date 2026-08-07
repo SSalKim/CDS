@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260807210406",
-  "generated_at_kst": "2026-08-08 06:04 KST",
+  "generated_at_utc": "20260807212004",
+  "generated_at_kst": "2026-08-08 06:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_13",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 86,
-  "selected_model_count": 37,
+  "model_source_count": 88,
+  "selected_model_count": 38,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -544,6 +544,23 @@
       "first_seen_kst": "2026-08-08 05:20 KST"
     },
     {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260807212004",
+      "first_seen_kst": "2026-08-08 06:20 KST"
+    },
+    {
       "model_id": "FNV3",
       "model_label": "FNV3",
       "raw_model_ids": [
@@ -705,8 +722,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 15,
-      "max_lead_hour": 168,
+      "point_count": 34,
+      "max_lead_hour": 222,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -781,6 +798,23 @@
       "is_official": false,
       "first_seen_utc": "20260807193003",
       "first_seen_kst": "2026-08-08 04:30 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260807212004",
+      "first_seen_kst": "2026-08-08 06:20 KST"
     },
     {
       "model_id": "GENC",
@@ -1131,7 +1165,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 22,
+      "point_count": 23,
       "max_lead_hour": 132,
       "has_pressure": false,
       "has_wind": true,
@@ -1353,7 +1387,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 11,
+      "point_count": 41,
       "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
@@ -1488,9 +1522,9 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": false,
-      "point_count": 5,
-      "max_lead_hour": 168,
+      "selected": true,
+      "point_count": 36,
+      "max_lead_hour": 210,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
