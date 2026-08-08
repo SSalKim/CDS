@@ -73,7 +73,7 @@ GCEC_AI:'GraphCast-ECMWF',
 GCKM_AI:'GraphCast-KIM',
 GCUM_AI:'GraphCast-UM',
 GENC:'GenCast',
-FNV3:'WN2C',
+FNV3:'WeatherNext2C',
 HKO_AREC: 'Aurora-ECMWF',
 HKO_FXEC: 'FuXi-ECMWF',
 HKO_FWEC: 'FengWu-ECMWF',
@@ -115,7 +115,7 @@ const TYPHOON_MODEL_INFO=[
 {name:'GraphCast-ECMWF',description:'[AI] 기상청 수행 GraphCast (ECMWF 초기장)'},
 {name:'GraphCast-KIM',description:'[AI] 기상청 수행 GraphCast (KIM 초기장)'},
 {name:'GenCast',description:'[AI] 구글 딥마인드 앙상블모델(GenCast) 평균'},
-{name:'WN2C',description:'[AI] 구글 딥마인드 앙상블모델(WeatherNext2 Cyclones) 평균'},
+{name:'WeatherNext2C',description:'[AI] 구글 딥마인드 앙상블모델(WeatherNext2 Cyclones) 평균'},
 {name:'Aurora-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 Aurora (ECMWF 초기장)'},
 {name:'FuXi-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FuXi (ECMWF 초기장)'},
 {name:'FengWu-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FengWu (ECMWF 초기장)'},
@@ -593,7 +593,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "참고사항": ""
   },
   {
-    "표출명칭": "WN2C",
+    "표출명칭": "WeatherNext2C",
     "운영기관": "구글 딥마인드(Google DeepMind)",
     "모델명": "WeatherNext2 Cyclones (FNv3.2)",
     "도메인": "전지구",
@@ -601,7 +601,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "'26.8.8 FNV3 현업운영 전환에 따른 모델명 변경(FNV3 → WN2C)"
+    "참고사항": "'26.8.8 FNV3 현업운영 전환에 따른 모델명 변경(FNV3 → WeatherNext2C)"
   },
   {
     "표출명칭": "Aurora-ECMWF",
