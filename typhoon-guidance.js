@@ -73,6 +73,7 @@ GCEC_AI:'GraphCast-ECMWF',
 GCKM_AI:'GraphCast-KIM',
 GCUM_AI:'GraphCast-UM',
 GENC:'GenCast',
+WNC:'WeatherNext2C',
 FNV3:'WeatherNext2C',
 HKO_AREC: 'Aurora-ECMWF',
 HKO_FXEC: 'FuXi-ECMWF',
@@ -115,7 +116,7 @@ const TYPHOON_MODEL_INFO=[
 {name:'GraphCast-ECMWF',description:'[AI] 기상청 수행 GraphCast (ECMWF 초기장)'},
 {name:'GraphCast-KIM',description:'[AI] 기상청 수행 GraphCast (KIM 초기장)'},
 {name:'GenCast',description:'[AI] 구글 딥마인드 앙상블모델(GenCast) 평균'},
-{name:'FNV3',description:'[AI] 구글 딥마인드 앙상블모델(WeatherNext2 Cyclones) 평균'},
+{modelId:'WNC',name:'WeatherNext2C',description:'[AI] 구글 딥마인드 앙상블모델(WeatherNext2 Cyclones) 평균'},
 {name:'Aurora-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 Aurora (ECMWF 초기장)'},
 {name:'FuXi-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FuXi (ECMWF 초기장)'},
 {name:'FengWu-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FengWu (ECMWF 초기장)'},
@@ -142,7 +143,7 @@ const TYPHOON_MODEL_INFO_GROUP_ENDS=new Set([
 'FourCastNet-KIM',
 'Pangu-Weather-KIM',
 'GraphCast-KIM',
-'FNV3',
+'WNC',
 'Aurora-ECMWF',
 'FuXi-ECMWF',
 'FengWu-ECMWF'
@@ -187,7 +188,9 @@ const TYPHOON_MODEL_INFO_COLORS={
 'GraphCast-KIM':'#6C33C6',
 'GraphCast-UM':'#B57AD5',
 'GenCast':'#9866C7',
+'WNC':'#DA70D6',
 'FNV3':'#DA70D6',
+'WeatherNext2C':'#DA70D6',
 'Aurora-ECMWF':'#1E90FF',
 'FuXi-ECMWF':'#20B2AA',
 'FengWu-ECMWF':'#A6C875'
@@ -593,6 +596,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "참고사항": ""
   },
   {
+    "model_id": "WNC",
     "표출명칭": "WeatherNext2C",
     "운영기관": "구글 딥마인드(Google DeepMind)",
     "모델명": "WeatherNext2 Cyclones (FNv3.2)",
@@ -601,7 +605,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "'26.8.8 FNV3 현업운영 전환에 따른 모델명 변경(FNV3 → WeatherNext2C)"
+    "참고사항": "'26.8.8 현업운영 전환에 따른 내부 ID 변경(FNV3 → WNC), 표출명 WeatherNext2C"
   },
   {
     "표출명칭": "Aurora-ECMWF",
@@ -838,10 +842,11 @@ list.className='typhoon-model-info-list';
 TYPHOON_MODEL_INFO.forEach(item=>{
 let row=document.createElement('div');
 row.className='typhoon-model-info-row';
-if(TYPHOON_MODEL_INFO_GROUP_ENDS.has(item.name)){
+let modelKey=item.modelId || item.name;
+if(TYPHOON_MODEL_INFO_GROUP_ENDS.has(modelKey)){
 row.classList.add('is-group-end');
 }
-row.style.setProperty('--typhoon-model-color',TYPHOON_MODEL_INFO_COLORS[item.name] || '#1d4ed8');
+row.style.setProperty('--typhoon-model-color',TYPHOON_MODEL_INFO_COLORS[modelKey] || '#1d4ed8');
 
 let name=document.createElement('div');
 name.className='typhoon-model-info-name';
@@ -1312,7 +1317,7 @@ let td=document.createElement('td');
 let value=row[column] || '';
 if(column==='표출명칭'){
 td.className='typhoon-model-detail-name';
-td.style.setProperty('--typhoon-model-detail-color',TYPHOON_MODEL_INFO_COLORS[value] || '#0f172a');
+td.style.setProperty('--typhoon-model-detail-color',TYPHOON_MODEL_INFO_COLORS[row.model_id || value] || '#0f172a');
 td.textContent=value;
 }
 else if(column==='기반'){

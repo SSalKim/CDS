@@ -85,7 +85,7 @@ MODEL_INFO = [
     {"name": "GCKM_AI", "color": "#6C33C6", "style": "--", "label": "GraphCast-KIM", "zorder": 67},
     {"name": "GCUM_AI", "color": "#B57AD5", "style": "--", "label": "GraphCast-UM", "zorder": 66},
     {"name": "GENC", "color": "#9866C7", "style": "--", "label": "GenCast", "zorder": 57},
-    {"name": "FNV3", "color": "#DA70D6", "style": "--", "label": "WeatherNext2C", "zorder": 99},
+    {"name": "WNC", "color": "#DA70D6", "style": "--", "label": "WeatherNext2C", "zorder": 99},
     {"name": "HKO_AREC", "color": "#1E90FF", "style": "--", "label": "Aurora-ECMWF", "zorder": 56},
     {"name": "HKO_FXEC", "color": "#20B2AA", "style": "--", "label": "FuXi-ECMWF", "zorder": 55},
     {"name": "HKO_FWEC", "color": "#A6C875", "style": "--", "label": "FengWu-ECMWF", "zorder": 54},
@@ -135,7 +135,7 @@ MODEL_SOURCES = [
     {"name": "GCKM_AI", "apihub": "GCKM_AI", "noaa": None},
     {"name": "GCUM_AI", "apihub": "GCUM_AI", "noaa": None},
     {"name": "GENC", "apihub": None, "noaa": None, "knackwx": "GENC", "raw_github": "GENC", "polarwx": "gencast"},
-    {"name": "FNV3", "apihub": None, "noaa": "FGNE", "ral_ucar": "FGNE", "knackwx": "FNV3", "raw_github": "FNV3", "polarwx": "deepmind"},
+    {"name": "WNC", "apihub": None, "noaa": "FGNE", "ral_ucar": "FGNE", "knackwx": "FNV3", "raw_github": "FNV3", "polarwx": "deepmind"},
     {"name": "HKO_AREC", "apihub": "HKO_AREC", "noaa": None},
     {"name": "HKO_FXEC", "apihub": "HKO_FXEC", "noaa": None},
     {"name": "HKO_FWEC", "apihub": "HKO_FWEC", "noaa": None},
@@ -188,7 +188,7 @@ MODEL_CATEGORIES = {
     "HKO_FXEC": ("AI", "DETERMINISTIC"),
     "HKO_FWEC": ("AI", "DETERMINISTIC"),
     "GENC": ("AI", "ENSEMBLE"),
-    "FNV3": ("AI", "ENSEMBLE"),
+    "WNC": ("AI", "ENSEMBLE"),
 }
 
 MODEL_ACTIVE_WINDOWS = {
@@ -204,7 +204,7 @@ MODEL_ACTIVE_WINDOWS = {
     "GCKM_AI": ("202405150000", None),              # 기상청(KMA) AI 예측자료 신규 추가(2025.3.17.~)
 
     "GENC": ("202506010000", None),                 # Google DeeepMind Ensemble 예측자료 신규 추가(2025.6.1.~)
-    "FNV3": ("202506010000", None),                 # Google DeeepMind Ensemble 예측자료 신규 추가(2025.6.1.~)
+    "WNC": ("202506010000", None),                  # Google DeepMind WeatherNext2 Cyclones(구 FNV3)
 
     "HKO_AREC": ("202507210000", None),             # 홍콩기상청(HKO) AI 예측자료 신규 추가(2025.8.12.~)
     "HKO_FXEC": ("202507210000", None),             # 홍콩기상청(HKO) AI 예측자료 신규 추가(2025.8.12.~)
@@ -1324,7 +1324,8 @@ def read_dmdw_json(path: Path, settings: Settings) -> pd.DataFrame:
         if member_id not in (None, "", "MEAN"):
             continue
 
-        model_id = str(model.get("model_id") or "").strip()
+        raw_model_id = str(model.get("model_id") or "").strip()
+        model_id = MODEL_SOURCE_ALIASES.get(raw_model_id, raw_model_id)
         if model_id not in MODEL_NAMES:
             continue
         lead_hour = dmdw_value(point, column_index, "lead_hour")
