@@ -115,7 +115,7 @@ const TYPHOON_MODEL_INFO=[
 {name:'GraphCast-ECMWF',description:'[AI] 기상청 수행 GraphCast (ECMWF 초기장)'},
 {name:'GraphCast-KIM',description:'[AI] 기상청 수행 GraphCast (KIM 초기장)'},
 {name:'GenCast',description:'[AI] 구글 딥마인드 앙상블모델(GenCast) 평균'},
-{name:'WeatherNext2C',description:'[AI] 구글 딥마인드 앙상블모델(WeatherNext2 Cyclones) 평균'},
+{name:'FNV3',description:'[AI] 구글 딥마인드 앙상블모델(WeatherNext2 Cyclones) 평균'},
 {name:'Aurora-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 Aurora (ECMWF 초기장)'},
 {name:'FuXi-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FuXi (ECMWF 초기장)'},
 {name:'FengWu-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FengWu (ECMWF 초기장)'},
