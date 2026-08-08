@@ -1,0 +1,311 @@
+﻿source_key,cds_label_guess,track_type,member_index,point_count,min_fhr,max_fhr,fhr_interval_counts,first_time_utc,last_time_utc,first_lat,first_lon,last_lat,last_lon,first_mslp_hpa,last_mslp_hpa,first_vmax_kt_inferred,last_vmax_kt_inferred,members_first,members_last,use_tags,has_interp,has_cone_or_spread,fields
+cmc,CMC,deterministic,,41,0,240,6h:40,2026080400,2026081400,25.2,143.1,30.6,115.5,964,998,57.0,15.0,,,track_det|mslp,True,False,fhr|lat|lon|mslp|vmax|time|use|interp
+deepmind,DeepMind,deterministic,,40,0,234,6h:39,2026080400,2026081318,25.1,143.2,37.68,122.5,947.0,990.15,99.0,31.35,50,20,track_det|mslp|wind,True,False,fhr|lat|lon|members|mslp|vmax|time|use|interp
+ecm,ECMWF,deterministic,,54,0,318,6h:53,2026080400,2026081706,25.2,143.2,37.2,110.7,961.0,1000.0,76,16,,,track_det|mslp,True,False,fhr|lat|lon|mslp|vmax|time|use|interp
+aifs,ECMWF AIFS,deterministic,,41,0,240,6h:40,2026080400,2026081400,25.0,143.0,44.75,120.75,962,995,74,15,,,track_det|mslp,True,False,fhr|lat|lon|mslp|vmax|time|use|interp
+gfs,GFS,deterministic,,41,0,240,6h:40,2026080400,2026081400,25.2,143.2,37.4,108.4,946,1001,88,22,,,track_det|mslp,True,False,fhr|lat|lon|mslp|vmax|time|use|interp
+gencast,GenCast,deterministic,,39,0,228,6h:38,2026080400,2026081312,25.21,143.0,38.34,122.18,961.76,988.22,94.0,60.56,50,27,track_det|mslp|wind,False,False,fhr|lat|lon|members|mslp|vmax|time|use
+hafsa,HAFS,deterministic,,43,0,126,3h:42,2026080400,2026080906,25.1,143.3,27.4,128.8,947,943,100,73,,,track_det|mslp,True,False,fhr|lat|lon|vmax|mslp|type|time|use|interp
+hwrf,HWRF,deterministic,,43,0,126,3h:42,2026080400,2026080906,25.1,143.1,27.4,124.5,941,948,102,76,,,track_det|mslp,True,False,fhr|lat|lon|vmax|mslp|type|time|use|interp
+icon,ICON,deterministic,,31,0,180,6h:30,2026080400,2026081112,25.12,142.88,35.62,123.75,941,896,82,90,,,track_det|mslp,True,False,fhr|lat|lon|mslp|vmax|time|use|interp
+ofcl,OFCL,deterministic,,9,0,120,12h:6;24h:2,2026080400,2026080900,25.1,143.2,27.2,125.2,947,,100,85,,,track_interp,False,False,fhr|lat|lon|vmax|mslp|type|time|use
+ukmet,UKMO,deterministic,,29,0,168,6h:28,2026080400,2026081100,25.4,143.0,33.3,115.6,941,987,79,31,,,track_det|mslp,True,False,fhr|lat|lon|vmax|mslp|type|time|use|interp
+cmc_mean,CMC EPS,mean,,41,0,240,6h:40,2026080400,2026081400,25.08,143.06,32.48,128.09,966.95,989.76,60.14,30.19,21,17,,False,False,fhr|lat|lon|members|mslp|vmax|time
+aifs_ens_mean,ECMWF AIFS EPS,mean,,35,0,204,6h:34,2026080400,2026081212,25.11,142.95,36.73,123.59,960.52,987.22,74.4,30.26,50,23,track_det|mslp,False,False,fhr|lat|lon|members|mslp|vmax|time|use
+eps_mean,ECMWF EPS,mean,,41,0,240,6h:40,2026080400,2026081400,25.2,143.2,34.34,120.3,959.3,985.73,78.48,32.68,50,34,,False,False,fhr|lat|lon|members|mslp|vmax|time
+gefs_mean,GFS EPS,mean,,41,0,240,6h:40,2026080400,2026081400,25.2,143.08,41.77,118.3,945.32,989.09,82.58,27.78,31,23,,False,False,fhr|lat|lon|members|mslp|vmax|time
+icon_ens_mean,ICON EPS,mean,,31,0,180,6h:30,2026080400,2026081112,25.09,143.0,35.29,123.4,939.15,959.03,76.1,46.35,40,34,track_det|mslp,False,False,fhr|lat|lon|members|mslp|vmax|time|use
+ens,PolarWX ENS,grand_mean,,41,0,240,6h:40,2026080400,2026081400,25.17,143.14,36.22,121.47,956.6274509803922,987.7013513513513,75.95098039215686,30.589041095890412,102,74,,False,True,ellipse_lat|ellipse_lon|fhr|lat|lon|members|mslp|vmax|use|time|generated
+grand_ens,PolarWX GRAND ENS,grand_mean,,41,0,240,6h:40,2026080400,2026081400,25.14,143.08,37.19,121.13,954.04,989.16,82.28,31.64,297,120,,False,True,fhr|lat|lon|members|mslp|vmax|use|time|suite_membership|cone|cone_25|spread|local_time|generated
+cmc_0,CMC EPS,member,0,41,0,240,6h:40,2026080400,2026081400,25.0,143.0,25.7,126.1,968,988,56.0,30.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_1,CMC EPS,member,1,41,0,240,6h:40,2026080400,2026081400,25.0,143.0,36.9,141.6,968,994,59.0,25.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_2,CMC EPS,member,2,41,0,240,6h:40,2026080400,2026081400,25.1,142.7,30.1,122.6,968,989,59.0,30.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_3,CMC EPS,member,3,38,0,222,6h:37,2026080400,2026081306,25.2,143.2,24.9,118.5,965,995,67.0,18.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_4,CMC EPS,member,4,41,0,240,6h:40,2026080400,2026081400,25.0,143.0,25.9,136.1,970,983,65.0,36.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_5,CMC EPS,member,5,41,0,240,6h:40,2026080400,2026081400,25.0,143.0,47.9,128.0,967,1000,55.0,13.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_6,CMC EPS,member,6,41,0,240,6h:40,2026080400,2026081400,25.0,143.0,31.6,127.1,969,987,54.0,32.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_7,CMC EPS,member,7,41,0,240,6h:40,2026080400,2026081400,25.1,143.1,36.4,122.1,966,992,63.0,32.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_8,CMC EPS,member,8,41,0,240,6h:40,2026080400,2026081400,25.1,143.0,29.1,140.1,963,983,60.0,33.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_9,CMC EPS,member,9,33,0,192,6h:32,2026080400,2026081200,25.1,142.7,25.0,114.6,969,996,54.0,12.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_10,CMC EPS,member,10,41,0,240,6h:40,2026080400,2026081400,25.1,143.2,36.0,118.0,968,999,63.0,27.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_11,CMC EPS,member,11,41,0,240,6h:40,2026080400,2026081400,25.1,143.1,28.1,130.3,965,978,64.0,46.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_12,CMC EPS,member,12,41,0,240,6h:40,2026080400,2026081400,25.1,143.1,31.7,135.3,969,984,59.0,31.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_13,CMC EPS,member,13,37,0,216,6h:36,2026080400,2026081300,25.1,142.9,23.2,109.5,967,1004,61.0,10.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_14,CMC EPS,member,14,41,0,240,6h:40,2026080400,2026081400,25.0,143.1,31.1,132.6,967,992,58.0,22.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_15,CMC EPS,member,15,41,0,240,6h:40,2026080400,2026081400,25.1,143.2,35.1,126.9,964,982,62.0,38.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_16,CMC EPS,member,16,34,0,198,6h:33,2026080400,2026081206,25.2,143.1,25.2,115.4,968,995,55.0,14.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_17,CMC EPS,member,17,41,0,240,6h:40,2026080400,2026081400,25.2,143.3,25.3,114.7,965,1003,71.0,,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_18,CMC EPS,member,18,41,0,240,6h:40,2026080400,2026081400,25.1,143.2,28.7,123.8,968,990,59.0,37.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_19,CMC EPS,member,19,41,0,240,6h:40,2026080400,2026081400,25.1,143.3,36.3,126.1,969,992,58.0,25.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+cmc_20,CMC EPS,member,20,41,0,240,6h:40,2026080400,2026081400,25.0,143.1,36.3,126.2,963,990,61.0,26.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+deepmind_0,DeepMind,member,0,35,0,204,6h:34,2026080400,2026081212,25.1,143.2,36.8,117.9,947,995,99,25,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_1,DeepMind,member,1,35,0,204,6h:34,2026080400,2026081212,25.1,143.2,45.2,124.6,947,989,99,29,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_2,DeepMind,member,2,36,0,210,6h:35,2026080400,2026081218,25.1,143.2,39.2,122.5,947,991,99,30,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_3,DeepMind,member,3,31,0,180,6h:30,2026080400,2026081112,25.1,143.2,29.2,114.1,947,994,99,23,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_4,DeepMind,member,4,38,0,222,6h:37,2026080400,2026081306,25.1,143.2,34.1,117.8,947,996,99,19,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_5,DeepMind,member,5,40,0,234,6h:39,2026080400,2026081318,25.1,143.2,41.4,128.1,947,997,99,34,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_6,DeepMind,member,6,35,0,204,6h:34,2026080400,2026081212,25.1,143.2,24.3,111.7,947,997,99,31,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_7,DeepMind,member,7,36,0,210,6h:35,2026080400,2026081218,25.1,143.2,41.3,119.7,947,996,99,32,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_8,DeepMind,member,8,38,0,222,6h:37,2026080400,2026081306,25.1,143.2,39.8,119.2,947,987,99,27,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_9,DeepMind,member,9,37,0,216,6h:36,2026080400,2026081300,25.1,143.2,48.4,120.3,947,995,99,27,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_10,DeepMind,member,10,51,0,300,6h:50,2026080400,2026081612,25.1,143.2,37.28,124.51,947,992,99,28,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_11,DeepMind,member,11,38,0,222,6h:37,2026080400,2026081306,25.1,143.2,36.3,117.5,947,999,99,18,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_12,DeepMind,member,12,44,0,258,6h:43,2026080400,2026081418,25.1,143.2,40.93,119.37,947,1002,99,21,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_13,DeepMind,member,13,37,0,216,6h:36,2026080400,2026081300,25.1,143.2,42.2,123.6,947,994,99,23,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_14,DeepMind,member,14,41,0,240,6h:40,2026080400,2026081400,25.1,143.2,36.5,127.4,947,1000,99,20,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_15,DeepMind,member,15,33,0,192,6h:32,2026080400,2026081200,25.1,143.2,28.5,113.5,947,999,99,16,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_16,DeepMind,member,16,33,0,192,6h:32,2026080400,2026081200,25.1,143.2,27.5,110.5,947,996,99,26,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_17,DeepMind,member,17,43,0,252,6h:42,2026080400,2026081412,25.1,143.2,44.98,138.71,947,996,99,16,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_18,DeepMind,member,18,41,0,240,6h:40,2026080400,2026081400,25.1,143.2,37.8,125.7,947,976,99,41,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_19,DeepMind,member,19,40,0,234,6h:39,2026080400,2026081318,25.1,143.2,35.8,119.2,947,998,99,18,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_20,DeepMind,member,20,32,0,186,6h:31,2026080400,2026081118,25.1,143.2,32.0,110.6,947,993,99,21,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_21,DeepMind,member,21,44,0,258,6h:43,2026080400,2026081418,25.1,143.2,33.82,115.06,947,1007,99,14,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_22,DeepMind,member,22,43,0,252,6h:42,2026080400,2026081412,25.1,143.2,42.47,123.59,947,999,99,16,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_23,DeepMind,member,23,35,0,204,6h:34,2026080400,2026081212,25.1,143.2,34.9,118.3,947,991,99,21,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_24,DeepMind,member,24,37,0,216,6h:36,2026080400,2026081300,25.1,143.2,38.3,118.5,947,991,99,28,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_25,DeepMind,member,25,46,0,270,6h:45,2026080400,2026081506,25.1,143.2,39.42,118.89,947,1002,99,22,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_26,DeepMind,member,26,31,0,180,6h:30,2026080400,2026081112,25.1,143.2,29.4,117.9,947,1000,99,21,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_27,DeepMind,member,27,37,0,216,6h:36,2026080400,2026081300,25.1,143.2,42.3,119.9,947,997,99,24,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_28,DeepMind,member,28,35,0,204,6h:34,2026080400,2026081212,25.1,143.2,38.2,118.3,947,982,99,37,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_29,DeepMind,member,29,36,0,210,6h:35,2026080400,2026081218,25.1,143.2,43.7,123.9,947,996,99,22,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_30,DeepMind,member,30,39,0,228,6h:38,2026080400,2026081312,25.1,143.2,26.3,117.3,947,996,99,21,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_31,DeepMind,member,31,47,0,276,6h:46,2026080400,2026081512,25.1,143.2,36.26,116.09,947,1004,99,15,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_32,DeepMind,member,32,43,0,252,6h:42,2026080400,2026081412,25.1,143.2,39.1,117.4,947,1000,99,18,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_33,DeepMind,member,33,35,0,204,6h:34,2026080400,2026081212,25.1,143.2,43.1,120.9,947,994,99,23,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_34,DeepMind,member,34,46,0,270,6h:45,2026080400,2026081506,25.1,143.2,42.4,123.09,947,1003,99,14,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_35,DeepMind,member,35,39,0,228,6h:38,2026080400,2026081312,25.1,143.2,38.0,122.5,947,992,99,27,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_36,DeepMind,member,36,36,0,210,6h:35,2026080400,2026081218,25.1,143.2,42.8,122.6,947,994,99,31,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_37,DeepMind,member,37,49,0,288,6h:48,2026080400,2026081600,25.1,143.2,39.88,131.37,947,998,99,21,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_38,DeepMind,member,38,32,0,186,6h:31,2026080400,2026081118,25.1,143.2,31.7,118.0,947,966,99,43,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_39,DeepMind,member,39,46,0,270,6h:45,2026080400,2026081506,25.1,143.2,37.35,127.45,947,1002,99,11,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_40,DeepMind,member,40,41,0,240,6h:40,2026080400,2026081400,25.1,143.2,39.9,116.8,947,988,99,29,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_41,DeepMind,member,41,35,0,204,6h:34,2026080400,2026081212,25.1,143.2,29.5,117.5,947,991,99,23,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_42,DeepMind,member,42,38,0,222,6h:37,2026080400,2026081306,25.1,143.2,39.3,124.5,947,990,99,32,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_43,DeepMind,member,43,44,0,258,6h:43,2026080400,2026081418,25.1,143.2,39.77,119.95,947,993,99,31,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_44,DeepMind,member,44,29,0,168,6h:28,2026080400,2026081100,25.1,143.2,30.3,112.8,947,992,99,29,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_45,DeepMind,member,45,38,0,222,6h:37,2026080400,2026081306,25.1,143.2,44.5,119.6,947,990,99,26,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_46,DeepMind,member,46,46,0,270,6h:45,2026080400,2026081506,25.1,143.2,42.68,120.72,947,999,99,25,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_47,DeepMind,member,47,42,0,246,6h:41,2026080400,2026081406,25.1,143.2,38.62,119.9,947,998,99,23,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_48,DeepMind,member,48,33,0,192,6h:32,2026080400,2026081200,25.1,143.2,36.3,116.9,947,993,99,22,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+deepmind_49,DeepMind,member,49,40,0,234,6h:39,2026080400,2026081318,25.1,143.2,38.5,125.6,947,985,99,38,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_0,ECMWF AIFS EPS,member,0,41,0,240,6h:40,2026080400,2026081400,25.0,143.0,37.25,124.5,955,1000,86,24,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_1,ECMWF AIFS EPS,member,1,27,0,156,6h:26,2026080400,2026081012,25.0,143.0,32.25,116.0,958,995,86,19,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_2,ECMWF AIFS EPS,member,2,41,0,240,6h:40,2026080400,2026081400,24.75,142.75,32.75,125.5,936,987,100,30,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_3,ECMWF AIFS EPS,member,3,30,0,174,6h:29,2026080400,2026081106,25.25,143.25,30.5,119.25,966,994,71,17,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_4,ECMWF AIFS EPS,member,4,35,0,204,6h:34,2026080400,2026081212,25.25,143.0,40.75,124.0,960,996,88,28,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_5,ECMWF AIFS EPS,member,5,23,0,132,6h:22,2026080400,2026080912,25.25,143.0,28.25,113.75,956,994,75,17,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_6,ECMWF AIFS EPS,member,6,24,0,138,6h:23,2026080400,2026080918,25.0,142.75,26.75,119.75,964,982,81,31,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_7,ECMWF AIFS EPS,member,7,37,0,216,6h:36,2026080400,2026081300,25.25,143.0,40.75,129.25,962,988,74,27,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_8,ECMWF AIFS EPS,member,8,25,0,144,6h:24,2026080400,2026081000,25.25,143.0,29.25,119.25,960,988,84,24,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_9,ECMWF AIFS EPS,member,9,37,0,216,6h:36,2026080400,2026081300,25.0,143.25,40.0,124.5,960,996,56,22,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_10,ECMWF AIFS EPS,member,10,36,0,210,6h:35,2026080400,2026081218,25.0,142.75,39.75,127.5,967,987,72,22,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_11,ECMWF AIFS EPS,member,11,32,0,186,6h:31,2026080400,2026081118,24.75,142.5,35.5,122.75,965,985,60,34,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_12,ECMWF AIFS EPS,member,12,34,0,198,6h:33,2026080400,2026081206,25.25,143.0,34.5,117.5,964,999,75,12,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_13,ECMWF AIFS EPS,member,13,41,0,240,6h:40,2026080400,2026081400,25.0,143.0,39.75,119.5,961,1000,64,22,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_14,ECMWF AIFS EPS,member,14,29,0,168,6h:28,2026080400,2026081100,25.0,143.0,36.75,116.5,965,999,81,21,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_15,ECMWF AIFS EPS,member,15,30,0,174,6h:29,2026080400,2026081106,25.0,143.0,29.5,120.0,959,991,82,25,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_16,ECMWF AIFS EPS,member,16,28,0,162,6h:27,2026080400,2026081018,25.0,143.0,28.25,117.0,966,992,56,11,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_17,ECMWF AIFS EPS,member,17,29,0,168,6h:28,2026080400,2026081100,25.0,142.75,29.5,112.25,963,999,78,,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_18,ECMWF AIFS EPS,member,18,41,0,240,6h:40,2026080400,2026081400,25.25,143.0,41.75,135.0,968,996,60,32,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_19,ECMWF AIFS EPS,member,19,29,0,168,6h:28,2026080400,2026081100,25.5,142.8,29.8,121.2,947,1003,85,18,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_20,ECMWF AIFS EPS,member,20,21,0,120,6h:20,2026080400,2026080900,25.25,143.0,26.5,119.0,962,984,84,23,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_21,ECMWF AIFS EPS,member,21,35,0,204,6h:34,2026080400,2026081212,25.0,142.75,41.75,127.25,960,987,79,24,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_22,ECMWF AIFS EPS,member,22,37,0,216,6h:36,2026080400,2026081300,25.25,143.0,43.25,120.5,952,999,71,17,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_23,ECMWF AIFS EPS,member,23,26,0,150,6h:25,2026080400,2026081006,25.25,143.0,28.75,117.5,958,988,77,26,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_24,ECMWF AIFS EPS,member,24,30,0,174,6h:29,2026080400,2026081106,25.25,142.5,31.75,113.75,963,997,66,,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_25,ECMWF AIFS EPS,member,25,34,0,198,6h:33,2026080400,2026081206,25.0,143.25,32.5,116.75,957,994,84,12,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_26,ECMWF AIFS EPS,member,26,26,0,150,6h:25,2026080400,2026081006,24.75,142.75,29.0,117.25,965,992,74,16,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_27,ECMWF AIFS EPS,member,27,27,0,156,6h:26,2026080400,2026081012,25.25,143.0,29.0,116.25,963,991,63,18,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_28,ECMWF AIFS EPS,member,28,37,0,216,6h:36,2026080400,2026081300,25.25,143.0,40.25,126.25,968,992,63,22,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_29,ECMWF AIFS EPS,member,29,35,0,204,6h:34,2026080400,2026081212,25.25,142.75,29.25,116.25,965,994,55,15,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_30,ECMWF AIFS EPS,member,30,31,0,180,6h:30,2026080400,2026081112,25.25,143.0,34.75,116.75,962,996,69,15,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_31,ECMWF AIFS EPS,member,31,41,0,240,6h:40,2026080400,2026081400,25.0,143.0,29.0,127.5,971,980,59,35,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_32,ECMWF AIFS EPS,member,32,36,0,210,6h:35,2026080400,2026081218,25.25,143.0,41.5,130.0,942,987,88,40,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_33,ECMWF AIFS EPS,member,33,35,0,204,6h:34,2026080400,2026081212,25.0,142.75,29.5,113.25,950,999,99,13,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_34,ECMWF AIFS EPS,member,34,40,0,234,6h:39,2026080400,2026081318,25.0,143.0,43.75,132.0,967,992,55,25,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_35,ECMWF AIFS EPS,member,35,32,0,186,6h:31,2026080400,2026081118,25.25,143.25,39.75,125.5,965,995,58,26,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_36,ECMWF AIFS EPS,member,36,25,0,144,6h:24,2026080400,2026081000,25.0,143.25,27.75,120.25,961,981,78,28,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_37,ECMWF AIFS EPS,member,37,32,0,186,6h:31,2026080400,2026081118,25.25,143.25,28.75,113.25,971,996,60,16,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_38,ECMWF AIFS EPS,member,38,35,0,204,6h:34,2026080400,2026081212,25.0,142.75,37.25,126.75,965,992,89,36,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_39,ECMWF AIFS EPS,member,39,32,0,186,6h:31,2026080400,2026081118,25.0,142.75,33.25,114.0,946,997,97,,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_40,ECMWF AIFS EPS,member,40,26,0,150,6h:25,2026080400,2026081006,25.0,143.0,28.5,115.75,960,991,75,15,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_41,ECMWF AIFS EPS,member,41,33,0,192,6h:32,2026080400,2026081200,25.0,142.75,29.0,112.25,959,1000,74,,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_42,ECMWF AIFS EPS,member,42,40,0,234,6h:39,2026080400,2026081318,25.25,143.5,48.75,128.0,970,988,71,16,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_43,ECMWF AIFS EPS,member,43,31,0,180,6h:30,2026080400,2026081112,25.25,143.0,34.5,119.0,954,991,78,22,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_44,ECMWF AIFS EPS,member,44,41,0,240,6h:40,2026080400,2026081400,25.0,142.75,42.0,122.75,964,991,66,25,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_45,ECMWF AIFS EPS,member,45,37,0,216,6h:36,2026080400,2026081300,25.0,143.0,39.75,124.5,956,999,82,23,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_46,ECMWF AIFS EPS,member,46,30,0,174,6h:29,2026080400,2026081106,25.0,143.0,28.25,115.25,967,996,79,14,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_47,ECMWF AIFS EPS,member,47,41,0,240,6h:40,2026080400,2026081400,25.25,142.75,28.25,128.5,966,994,66,25,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_48,ECMWF AIFS EPS,member,48,41,0,240,6h:40,2026080400,2026081400,25.25,143.25,50.5,123.0,959,994,71,13,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+aifs_49,ECMWF AIFS EPS,member,49,40,0,234,6h:39,2026080400,2026081318,25.25,142.75,28.75,116.25,956,999,76,,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+eps_1,ECMWF EPS,member,1,37,0,216,6h:36,2026080400,2026081300,25.2,143.2,36.6,123.0,953.0,987.0,94,35,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_2,ECMWF EPS,member,2,37,0,216,6h:36,2026080400,2026081300,25.2,143.2,46.0,121.7,956.0,988.0,89,26,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_3,ECMWF EPS,member,3,45,0,264,6h:44,2026080400,2026081500,25.2,143.2,39.2,127.4,933.0,993.0,110,28,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_4,ECMWF EPS,member,4,43,0,252,6h:42,2026080400,2026081412,25.2,143.2,43.9,119.4,965.0,1000.0,77,23,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_5,ECMWF EPS,member,5,40,0,234,6h:39,2026080400,2026081318,25.2,143.2,33.7,115.8,959.0,1001.0,94,18,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_6,ECMWF EPS,member,6,30,0,174,6h:29,2026080400,2026081106,25.2,143.2,26.0,113.0,954.0,996.0,78,18,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_7,ECMWF EPS,member,7,46,0,270,6h:45,2026080400,2026081506,25.2,143.2,35.1,123.8,963.0,987.0,88,39,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_8,ECMWF EPS,member,8,44,0,258,6h:43,2026080400,2026081418,25.2,143.2,43.2,113.2,961.0,1009.0,77,20,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_9,ECMWF EPS,member,9,45,0,264,6h:44,2026080400,2026081500,25.2,143.2,35.1,111.0,959.0,999.0,89,20,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_10,ECMWF EPS,member,10,43,0,252,6h:42,2026080400,2026081412,25.2,143.2,48.9,130.5,959.0,998.0,60,21,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_11,ECMWF EPS,member,11,51,0,300,6h:50,2026080400,2026081612,25.2,143.2,42.6,113.7,966.0,1006.0,76,20,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_12,ECMWF EPS,member,12,43,0,252,6h:42,2026080400,2026081412,25.2,143.2,31.2,120.0,964.0,997.0,61,20,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_13,ECMWF EPS,member,13,61,0,360,6h:60,2026080400,2026081900,25.2,143.2,18.8,106.7,963.0,949.0,80,94,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_14,ECMWF EPS,member,14,40,0,234,6h:39,2026080400,2026081318,25.2,143.2,45.3,124.4,960.0,985.0,66,21,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_15,ECMWF EPS,member,15,40,0,234,6h:39,2026080400,2026081318,25.2,143.2,45.3,111.6,964.0,997.0,83,28,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_16,ECMWF EPS,member,16,48,0,282,6h:47,2026080400,2026081518,25.2,143.2,45.0,118.1,958.0,1000.0,84,20,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_17,ECMWF EPS,member,17,44,0,258,6h:43,2026080400,2026081418,25.2,143.2,48.8,119.1,965.0,995.0,60,19,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_18,ECMWF EPS,member,18,31,0,180,6h:30,2026080400,2026081112,25.2,143.2,25.4,111.7,962.0,996.0,77,18,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_19,ECMWF EPS,member,19,33,0,192,6h:32,2026080400,2026081200,25.2,143.2,30.4,112.2,967.0,1003.0,63,12,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_20,ECMWF EPS,member,20,50,0,294,6h:49,2026080400,2026081606,25.2,143.2,26.3,114.6,945.0,996.0,96,22,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_21,ECMWF EPS,member,21,41,0,240,6h:40,2026080400,2026081400,25.2,143.2,38.8,126.0,961.0,982.0,87,35,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_22,ECMWF EPS,member,22,46,0,270,6h:45,2026080400,2026081506,25.2,143.2,40.6,124.0,959.0,993.0,82,23,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_23,ECMWF EPS,member,23,38,0,222,6h:37,2026080400,2026081306,25.2,143.2,46.2,121.0,951.0,995.0,74,21,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_24,ECMWF EPS,member,24,49,0,288,6h:48,2026080400,2026081600,25.2,143.2,44.6,139.9,957.0,1001.0,88,27,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_25,ECMWF EPS,member,25,39,0,228,6h:38,2026080400,2026081312,25.2,143.2,31.8,123.8,961.0,996.0,75,34,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_26,ECMWF EPS,member,26,54,0,318,6h:53,2026080400,2026081706,25.2,143.2,34.2,113.8,955.0,1001.0,85,16,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_27,ECMWF EPS,member,27,54,0,318,6h:53,2026080400,2026081706,25.2,143.2,42.7,147.8,964.0,996.0,80,28,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_28,ECMWF EPS,member,28,52,0,306,6h:51,2026080400,2026081618,25.2,143.2,45.9,140.7,961.0,1001.0,68,28,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_29,ECMWF EPS,member,29,48,0,282,6h:47,2026080400,2026081518,25.2,143.2,41.0,119.8,967.0,993.0,64,27,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_30,ECMWF EPS,member,30,52,0,306,6h:51,2026080400,2026081618,25.2,143.2,34.9,110.1,965.0,1000.0,56,16,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_31,ECMWF EPS,member,31,48,0,282,6h:47,2026080400,2026081518,25.2,143.2,43.9,123.4,961.0,996.0,70,27,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_32,ECMWF EPS,member,32,49,0,288,6h:48,2026080400,2026081600,25.2,143.2,29.7,113.2,970.0,1000.0,59,12,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_33,ECMWF EPS,member,33,37,0,216,6h:36,2026080400,2026081300,25.2,143.2,39.6,127.3,940.0,980.0,97,34,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_34,ECMWF EPS,member,34,47,0,276,6h:46,2026080400,2026081512,25.2,143.2,37.9,117.5,949.0,992.0,104,32,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_35,ECMWF EPS,member,35,51,0,300,6h:50,2026080400,2026081612,25.2,143.2,42.3,106.2,967.0,1002.0,60,28,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_36,ECMWF EPS,member,36,37,0,216,6h:36,2026080400,2026081300,25.2,143.2,36.3,124.1,964.0,984.0,57,34,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_37,ECMWF EPS,member,37,43,0,252,6h:42,2026080400,2026081412,25.2,143.2,38.7,118.8,960.0,982.0,81,34,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_38,ECMWF EPS,member,38,57,0,336,6h:56,2026080400,2026081800,25.2,143.2,28.0,113.2,970.0,1003.0,62,13,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_39,ECMWF EPS,member,39,38,0,222,6h:37,2026080400,2026081306,25.2,143.2,38.9,126.0,964.0,985.0,92,30,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_40,ECMWF EPS,member,40,37,0,216,6h:36,2026080400,2026081300,25.2,143.2,33.2,117.9,945.0,989.0,108,32,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_41,ECMWF EPS,member,41,40,0,234,6h:39,2026080400,2026081318,25.2,143.2,39.6,123.7,959.0,975.0,75,47,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_42,ECMWF EPS,member,42,53,0,312,6h:52,2026080400,2026081700,25.2,143.2,41.4,141.6,958.0,998.0,78,32,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_43,ECMWF EPS,member,43,37,0,216,6h:36,2026080400,2026081300,25.2,143.2,49.2,130.3,969.0,989.0,76,22,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_44,ECMWF EPS,member,44,42,0,246,6h:41,2026080400,2026081406,25.2,143.2,40.9,125.7,952.0,989.0,85,32,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_45,ECMWF EPS,member,45,47,0,276,6h:46,2026080400,2026081512,25.2,143.2,20.0,107.2,963.0,996.0,71,23,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_46,ECMWF EPS,member,46,49,0,288,6h:48,2026080400,2026081600,25.2,143.2,41.0,119.6,955.0,1003.0,89,19,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_47,ECMWF EPS,member,47,50,0,294,6h:49,2026080400,2026081606,25.2,143.2,21.4,105.2,965.0,992.0,83,20,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_48,ECMWF EPS,member,48,43,0,252,6h:42,2026080400,2026081412,25.2,143.2,39.4,118.8,965.0,993.0,68,25,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_49,ECMWF EPS,member,49,61,0,360,6h:60,2026080400,2026081900,25.2,143.2,30.6,113.7,957.0,1003.0,70,13,,,,False,False,fhr|lat|lon|mslp|vmax|time
+eps_50,ECMWF EPS,member,50,58,0,342,6h:57,2026080400,2026081806,25.2,143.2,48.7,134.1,955.0,1001.0,78,25,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_0,GFS EPS,member,0,41,0,240,6h:40,2026080400,2026081400,25.2,143.1,37.6,108.0,947,997,79,32,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_1,GFS EPS,member,1,41,0,240,6h:40,2026080400,2026081400,25.0,143.2,45.9,116.5,941,969,87,39,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_2,GFS EPS,member,2,41,0,240,6h:40,2026080400,2026081400,25.3,142.9,44.7,119.8,938,985,95,24,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_3,GFS EPS,member,3,41,0,240,6h:40,2026080400,2026081400,25.1,143.1,40.1,120.1,946,964,80,58,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_4,GFS EPS,member,4,37,0,216,6h:36,2026080400,2026081300,25.2,143.1,33.4,114.8,946,1002,83,10,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_5,GFS EPS,member,5,33,0,192,6h:32,2026080400,2026081200,25.2,143.0,27.1,114.8,949,994,80.0,10.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_6,GFS EPS,member,6,41,0,240,6h:40,2026080400,2026081400,25.4,143.4,50.0,113.7,949,993,83,16,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_7,GFS EPS,member,7,41,0,240,6h:40,2026080400,2026081400,25.5,143.1,47.4,123.0,942,994,80,25,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_8,GFS EPS,member,8,33,0,192,6h:32,2026080400,2026081200,25.1,143.0,27.0,112.9,944,995,84.0,10.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_9,GFS EPS,member,9,41,0,240,6h:40,2026080400,2026081400,25.3,143.0,41.4,120.4,949,978,78,32,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_10,GFS EPS,member,10,41,0,240,6h:40,2026080400,2026081400,25.1,143.2,38.7,109.2,948,995,78,29,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_11,GFS EPS,member,11,33,0,192,6h:32,2026080400,2026081200,25.3,143.1,34.8,117.9,939,994,90.0,36.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_12,GFS EPS,member,12,41,0,240,6h:40,2026080400,2026081400,25.1,142.8,46.2,110.6,941,1000,95,14,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_13,GFS EPS,member,13,41,0,240,6h:40,2026080400,2026081400,25.5,143.2,35.7,123.8,948,994,77,33,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_14,GFS EPS,member,14,41,0,240,6h:40,2026080400,2026081400,25.3,143.3,50.1,118.7,955,993,71,23,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_15,GFS EPS,member,15,33,0,192,6h:32,2026080400,2026081200,25.2,143.0,30.7,119.8,945,995,85.0,23.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_16,GFS EPS,member,16,41,0,240,6h:40,2026080400,2026081400,25.1,143.1,32.8,119.3,944,975,86,37,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_17,GFS EPS,member,17,33,0,192,6h:32,2026080400,2026081200,25.1,143.0,31.8,110.2,942,1001,89.0,,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_18,GFS EPS,member,18,41,0,240,6h:40,2026080400,2026081400,25.3,143.0,44.6,123.8,948,1004,75,16,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_19,GFS EPS,member,19,41,0,240,6h:40,2026080400,2026081400,25.1,143.1,34.0,119.8,948,983,80,43,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_20,GFS EPS,member,20,41,0,240,6h:40,2026080400,2026081400,25.1,143.1,42.6,119.4,945,974,79,32,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_21,GFS EPS,member,21,41,0,240,6h:40,2026080400,2026081400,25.3,143.0,37.9,119.6,951,997,73,33,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_22,GFS EPS,member,22,41,0,240,6h:40,2026080400,2026081400,25.2,143.3,35.4,122.9,943,983,89,37,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_23,GFS EPS,member,23,33,0,192,6h:32,2026080400,2026081200,25.1,143.1,38.1,117.2,944,972,82.0,44.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_24,GFS EPS,member,24,41,0,240,6h:40,2026080400,2026081400,25.1,143.2,48.7,118.2,948,989,85,23,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_25,GFS EPS,member,25,41,0,240,6h:40,2026080400,2026081400,25.1,143.0,39.4,119.6,944,1001,86,18,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_26,GFS EPS,member,26,33,0,192,6h:32,2026080400,2026081200,25.2,143.2,28.3,117.2,955,985,71.0,15.0,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_27,GFS EPS,member,27,41,0,240,6h:40,2026080400,2026081400,25.2,143.0,43.6,116.7,944,990,83,22,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_28,GFS EPS,member,28,41,0,240,6h:40,2026080400,2026081400,25.1,143.0,21.0,108.5,940,1000,91,19,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_29,GFS EPS,member,29,41,0,240,6h:40,2026080400,2026081400,25.0,143.0,50.5,118.3,941,999,83,15,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gefs_30,GFS EPS,member,30,41,0,240,6h:40,2026080400,2026081400,25.3,143.0,52.3,130.9,941,992,83,19,,,,False,False,fhr|lat|lon|mslp|vmax|time
+gencast_0,GenCast,member,0,38,0,222,6h:37,2026080400,2026081306,25.2,143.0,34.0,118.6,962,992,94,55,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_1,GenCast,member,1,39,0,228,6h:38,2026080400,2026081312,25.2,143.0,37.8,121.8,962,993,94,54,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_2,GenCast,member,2,35,0,204,6h:34,2026080400,2026081212,25.2,143.0,42.5,115.5,962,991,94,57,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_3,GenCast,member,3,37,0,216,6h:36,2026080400,2026081300,25.2,143.0,36.7,122.8,962,989,94,60,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_4,GenCast,member,4,31,0,180,6h:30,2026080400,2026081112,25.2,143.0,37.2,119.8,962,988,94,61,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_5,GenCast,member,5,43,0,252,6h:42,2026080400,2026081412,25.25,143.0,37.25,123.75,961,989,94,59,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_6,GenCast,member,6,37,0,216,6h:36,2026080400,2026081300,25.2,143.0,35.5,118.7,962,987,94,63,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_7,GenCast,member,7,35,0,204,6h:34,2026080400,2026081212,25.2,143.0,32.5,122.2,962,995,94,52,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_8,GenCast,member,8,37,0,216,6h:36,2026080400,2026081300,25.2,143.0,53.5,134.0,962,985,94,65,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_9,GenCast,member,9,41,0,240,6h:40,2026080400,2026081400,25.2,143.0,37.5,118.7,962,988,94,62,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_10,GenCast,member,10,39,0,228,6h:38,2026080400,2026081312,25.2,143.0,37.2,126.8,962,989,94,60,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_11,GenCast,member,11,35,0,204,6h:34,2026080400,2026081212,25.2,143.0,39.5,126.3,962,989,94,60,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_12,GenCast,member,12,43,0,252,6h:42,2026080400,2026081412,25.25,143.0,38.5,118.25,961,1001,94,41,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_13,GenCast,member,13,54,0,318,6h:53,2026080400,2026081706,25.25,143.0,26.58,129.38,961,989,94,58,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_14,GenCast,member,14,37,0,216,6h:36,2026080400,2026081300,25.2,143.0,43.5,124.8,962,991,94,58,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_15,GenCast,member,15,43,0,252,6h:42,2026080400,2026081412,25.25,143.0,38.5,118.0,961,995,94,50,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_16,GenCast,member,16,43,0,252,6h:42,2026080400,2026081412,25.25,143.0,39.25,124.25,961,993,94,54,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_17,GenCast,member,17,39,0,228,6h:38,2026080400,2026081312,25.2,143.0,33.8,120.8,962,993,94,54,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_18,GenCast,member,18,37,0,216,6h:36,2026080400,2026081300,25.2,143.0,35.5,123.5,962,989,94,59,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_19,GenCast,member,19,45,0,264,6h:44,2026080400,2026081500,25.25,143.0,39.0,132.25,961,1007,94,31,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_20,GenCast,member,20,37,0,216,6h:36,2026080400,2026081300,25.2,143.0,32.3,123.8,962,985,94,65,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_21,GenCast,member,21,39,0,228,6h:38,2026080400,2026081312,25.2,143.0,39.8,119.8,962,987,94,63,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_22,GenCast,member,22,37,0,216,6h:36,2026080400,2026081300,25.2,143.0,38.5,118.0,962,991,94,57,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_23,GenCast,member,23,45,0,264,6h:44,2026080400,2026081500,25.25,143.0,48.0,113.5,961,1000,94,43,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_24,GenCast,member,24,39,0,228,6h:38,2026080400,2026081312,25.2,143.0,40.8,130.3,962,983,94,68,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_25,GenCast,member,25,35,0,204,6h:34,2026080400,2026081212,25.2,143.0,32.8,118.0,962,994,94,53,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_26,GenCast,member,26,37,0,216,6h:36,2026080400,2026081300,25.2,143.0,34.5,119.5,962,988,94,62,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_27,GenCast,member,27,41,0,240,6h:40,2026080400,2026081400,25.2,143.0,38.2,119.5,962,999,94,45,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_28,GenCast,member,28,39,0,228,6h:38,2026080400,2026081312,25.2,143.0,39.8,125.2,962,996,94,51,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_29,GenCast,member,29,35,0,204,6h:34,2026080400,2026081212,25.2,143.0,38.8,125.2,962,987,94,63,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_30,GenCast,member,30,49,0,288,6h:48,2026080400,2026081600,25.25,143.0,44.75,112.75,961,998,94,46,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_31,GenCast,member,31,35,0,204,6h:34,2026080400,2026081212,25.2,143.0,45.5,122.5,962,997,94,49,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_32,GenCast,member,32,45,0,264,6h:44,2026080400,2026081500,25.25,143.0,49.5,116.25,961,995,94,51,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_33,GenCast,member,33,37,0,216,6h:36,2026080400,2026081300,25.2,143.0,36.7,119.8,962,986,94,64,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_34,GenCast,member,34,47,0,276,6h:46,2026080400,2026081512,25.25,143.0,45.25,117.0,961,991,94,57,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_35,GenCast,member,35,33,0,192,6h:32,2026080400,2026081200,25.2,143.0,39.0,119.0,962,989,94,61,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_36,GenCast,member,36,39,0,228,6h:38,2026080400,2026081312,25.2,143.0,41.3,121.8,962,985,94,66,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_37,GenCast,member,37,41,0,240,6h:40,2026080400,2026081400,25.2,143.0,34.2,119.3,962,983,94,68,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_38,GenCast,member,38,37,0,216,6h:36,2026080400,2026081300,25.2,143.0,39.8,119.5,962,985,94,66,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_39,GenCast,member,39,37,0,216,6h:36,2026080400,2026081300,25.2,143.0,38.0,116.7,962,998,94,47,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_40,GenCast,member,40,39,0,228,6h:38,2026080400,2026081312,25.2,143.0,39.0,123.8,962,979,94,74,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_41,GenCast,member,41,39,0,228,6h:38,2026080400,2026081312,25.2,143.0,37.0,118.2,962,999,94,46,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_42,GenCast,member,42,39,0,228,6h:38,2026080400,2026081312,25.2,143.0,35.8,114.5,962,997,94,48,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_43,GenCast,member,43,37,0,216,6h:36,2026080400,2026081300,25.2,143.0,42.2,123.2,962,989,94,59,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_44,GenCast,member,44,45,0,264,6h:44,2026080400,2026081500,25.25,143.0,38.5,110.75,961,994,94,51,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_45,GenCast,member,45,35,0,204,6h:34,2026080400,2026081212,25.2,143.0,39.8,119.5,962,983,94,68,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_46,GenCast,member,46,37,0,216,6h:36,2026080400,2026081300,25.2,143.0,39.8,120.8,962,982,94,69,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_47,GenCast,member,47,41,0,240,6h:40,2026080400,2026081400,25.2,143.0,43.8,121.5,962,999,94,45,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_48,GenCast,member,48,41,0,240,6h:40,2026080400,2026081400,25.2,143.0,53.2,124.8,962,995,94,52,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+gencast_49,GenCast,member,49,47,0,276,6h:46,2026080400,2026081512,25.25,143.0,45.75,124.25,961,998,94,46,,,track_det|mslp|wind,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_0,ICON EPS,member,0,31,0,180,6h:30,2026080400,2026081112,25.1,143.0,35.8,123.9,943,928,72,71,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_1,ICON EPS,member,1,31,0,180,6h:30,2026080400,2026081112,24.9,143.0,33.8,118.4,923,980,89,29,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_2,ICON EPS,member,2,31,0,180,6h:30,2026080400,2026081112,25.1,143.1,38.0,131.1,933,968,85,48,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_3,ICON EPS,member,3,31,0,180,6h:30,2026080400,2026081112,25.1,143.1,24.8,121.0,936,990,77,35,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_4,ICON EPS,member,4,31,0,180,6h:30,2026080400,2026081112,24.9,143.0,31.0,121.8,944,984,75,28,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_5,ICON EPS,member,5,31,0,180,6h:30,2026080400,2026081112,25.2,142.9,33.5,123.6,949,915,68,81,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_6,ICON EPS,member,6,31,0,180,6h:30,2026080400,2026081112,25.0,142.9,28.1,115.9,929,980,86,20,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_7,ICON EPS,member,7,31,0,180,6h:30,2026080400,2026081112,25.1,142.9,29.2,119.5,945,979,72,32,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_8,ICON EPS,member,8,31,0,180,6h:30,2026080400,2026081112,25.4,143.0,31.2,117.1,940,988,78,14,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_9,ICON EPS,member,9,31,0,180,6h:30,2026080400,2026081112,25.1,142.8,36.6,123.4,932,903,84,86,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_10,ICON EPS,member,10,31,0,180,6h:30,2026080400,2026081112,25.1,143.0,35.4,119.4,945,981,69,46,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_11,ICON EPS,member,11,31,0,180,6h:30,2026080400,2026081112,25.2,143.1,29.5,121.5,941,984,74,30,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_12,ICON EPS,member,12,31,0,180,6h:30,2026080400,2026081112,25.1,143.2,33.8,120.9,949,955,67,53,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_13,ICON EPS,member,13,31,0,180,6h:30,2026080400,2026081112,25.0,143.1,36.4,129.4,938,961,74,44,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_14,ICON EPS,member,14,31,0,180,6h:30,2026080400,2026081112,25.1,143.0,40.2,126.9,940,976,76,28,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_15,ICON EPS,member,15,31,0,180,6h:30,2026080400,2026081112,25.1,142.9,35.0,121.2,941,968,73,49,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_16,ICON EPS,member,16,23,0,132,6h:22,2026080400,2026080912,25.2,143.1,25.2,118.4,950,964,66,42,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_17,ICON EPS,member,17,31,0,180,6h:30,2026080400,2026081112,25.0,142.8,35.1,119.8,943,964,70,45,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_18,ICON EPS,member,18,31,0,180,6h:30,2026080400,2026081112,25.1,143.2,39.6,127.5,946,962,71,49,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_19,ICON EPS,member,19,31,0,180,6h:30,2026080400,2026081112,25.1,142.8,34.4,120.0,936,957,80,54,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_20,ICON EPS,member,20,31,0,180,6h:30,2026080400,2026081112,24.9,143.1,41.8,125.8,945,966,74,27,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_21,ICON EPS,member,21,31,0,180,6h:30,2026080400,2026081112,24.9,143.2,37.0,126.6,946,955,72,48,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_22,ICON EPS,member,22,25,0,144,6h:24,2026080400,2026081000,25.2,143.1,24.8,119.5,941,940,74,71,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_23,ICON EPS,member,23,31,0,180,6h:30,2026080400,2026081112,25.2,142.9,44.1,125.6,938,980,79,22,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_24,ICON EPS,member,24,31,0,180,6h:30,2026080400,2026081112,25.0,143.2,33.5,129.8,932,928,83,65,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_25,ICON EPS,member,25,29,0,168,6h:28,2026080400,2026081100,25.0,142.5,33.0,118.2,926,973,84,27,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_26,ICON EPS,member,26,31,0,180,6h:30,2026080400,2026081112,25.2,143.2,33.5,123.5,927,905,91,79,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_27,ICON EPS,member,27,27,0,156,6h:26,2026080400,2026081012,25.2,143.1,26.5,118.5,948,982,66,35,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_28,ICON EPS,member,28,31,0,180,6h:30,2026080400,2026081112,25.0,142.8,37.6,122.8,933,926,81,73,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_29,ICON EPS,member,29,23,0,132,6h:22,2026080400,2026080912,25.1,142.9,26.4,118.8,941,974,74,27,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_30,ICON EPS,member,30,31,0,180,6h:30,2026080400,2026081112,24.9,142.9,41.0,127.6,946,981,69,30,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_31,ICON EPS,member,31,31,0,180,6h:30,2026080400,2026081112,25.1,143.1,38.0,127.4,942,957,73,52,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_32,ICON EPS,member,32,31,0,180,6h:30,2026080400,2026081112,25.0,143.2,39.0,121.0,930,954,82,55,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_33,ICON EPS,member,33,31,0,180,6h:30,2026080400,2026081112,25.1,142.8,35.4,126.1,933,952,78,47,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_34,ICON EPS,member,34,31,0,180,6h:30,2026080400,2026081112,25.1,143.2,31.6,120.0,925,959,88,45,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_35,ICON EPS,member,35,31,0,180,6h:30,2026080400,2026081112,25.2,143.2,39.2,126.5,936,980,82,29,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_36,ICON EPS,member,36,29,0,168,6h:28,2026080400,2026081100,25.4,143.2,31.0,114.9,940,986,70,19,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_37,ICON EPS,member,37,31,0,180,6h:30,2026080400,2026081112,25.1,142.8,33.8,119.5,935,968,83,43,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_38,ICON EPS,member,38,31,0,180,6h:30,2026080400,2026081112,25.0,142.8,41.6,122.2,946,960,70,35,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use
+icon_39,ICON EPS,member,39,31,0,180,6h:30,2026080400,2026081112,24.9,142.9,31.4,128.9,953,913,65,84,,,track_det|mslp,False,False,fhr|lat|lon|mslp|vmax|time|use

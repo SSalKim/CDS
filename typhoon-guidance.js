@@ -115,7 +115,7 @@ const TYPHOON_MODEL_INFO=[
 {name:'GraphCast-ECMWF',description:'[AI] 기상청 수행 GraphCast (ECMWF 초기장)'},
 {name:'GraphCast-KIM',description:'[AI] 기상청 수행 GraphCast (KIM 초기장)'},
 {name:'GenCast',description:'[AI] 구글 딥마인드 앙상블모델(GenCast) 평균'},
-{name:'WN2C',description:'[AI] 구글 딥마인드 WeatherNext Cyclones 앙상블모델 평균'},
+{name:'FNV3',description:'[AI] 구글 딥마인드 앙상블모델(WeatherNext2 Cyclones) 평균'},
 {name:'Aurora-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 Aurora (ECMWF 초기장)'},
 {name:'FuXi-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FuXi (ECMWF 초기장)'},
 {name:'FengWu-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FengWu (ECMWF 초기장)'},
@@ -142,7 +142,7 @@ const TYPHOON_MODEL_INFO_GROUP_ENDS=new Set([
 'FourCastNet-KIM',
 'Pangu-Weather-KIM',
 'GraphCast-KIM',
-'WN2C',
+'FNV3',
 'Aurora-ECMWF',
 'FuXi-ECMWF',
 'FengWu-ECMWF'
@@ -187,7 +187,7 @@ const TYPHOON_MODEL_INFO_COLORS={
 'GraphCast-KIM':'#6C33C6',
 'GraphCast-UM':'#B57AD5',
 'GenCast':'#9866C7',
-'WN2C':'#DA70D6',
+'FNV3':'#DA70D6',
 'Aurora-ECMWF':'#1E90FF',
 'FuXi-ECMWF':'#20B2AA',
 'FengWu-ECMWF':'#A6C875'
@@ -595,13 +595,13 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
   {
     "표출명칭": "WN2C",
     "운영기관": "구글 딥마인드(Google DeepMind)",
-    "모델명": "WeatherNext2 FNv3.2",
+    "모델명": "WeatherNext2 Cyclones (FNv3.2)",
     "도메인": "전지구",
     "구분": "앙상블 모델 평균 (M50)",
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": ""
+    "참고사항": "'26.8.8 FNV3 현업운영 전환에 따른 모델명 변경(FNV3 → WN2C)"
   },
   {
     "표출명칭": "Aurora-ECMWF",
