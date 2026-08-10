@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260810121017",
-  "generated_at_kst": "2026-08-10 21:10 KST",
+  "generated_at_utc": "20260810122023",
+  "generated_at_kst": "2026-08-10 21:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_16",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 17,
-  "selected_model_count": 8,
+  "model_source_count": 20,
+  "selected_model_count": 10,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -64,6 +64,40 @@
       "is_official": false,
       "first_seen_utc": "20260810112021",
       "first_seen_kst": "2026-08-10 20:20 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "ECMWF_AIFS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260810122023",
+      "first_seen_kst": "2026-08-10 21:20 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "ECMWF_AIFS"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260810122023",
+      "first_seen_kst": "2026-08-10 21:20 KST"
     },
     {
       "model_id": "GFS",
@@ -320,6 +354,23 @@
       "is_official": true,
       "first_seen_utc": "20260810101013",
       "first_seen_kst": "2026-08-10 19:10 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2C",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260810122023",
+      "first_seen_kst": "2026-08-10 21:20 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608100600.json"
