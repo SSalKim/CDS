@@ -1,0 +1,24 @@
+{
+  "cycle": "2026081018",
+  "cycle_utc": "202608101800",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":30,"member_id":null,"model_id":"JGSM","point_count":6,"raw_model_id":"JGSM","row_count":6,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 6,
+  "points": [
+    [0,0,"202608101800",29.7,116.8,990,18,7,315,180,null],
+    [0,6,"202608110000",30.8,114.8,993,15.4,-9,null,0,null],
+    [0,12,"202608110600",30.8,114,994,14.9,-9,null,0,null],
+    [0,18,"202608111200",30.3,113.4,995,14.4,-9,null,0,null],
+    [0,24,"202608111800",29.8,113.2,997,12.9,-9,null,0,null],
+    [0,30,"202608120000",29.8,113.4,998,11.8,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"59","storm_kind":"typ","typ_seq":13,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"DOLPHIN","canonical_typ_name_ko":"돌핀","canonical_typ_number":13,"data_typ_number":13,"dmdw_o_tm_seq":"59","dmdw_start_time":"202607270600","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_13"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}

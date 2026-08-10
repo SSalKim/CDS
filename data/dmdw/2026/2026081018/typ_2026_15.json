@@ -1,0 +1,24 @@
+{
+  "cycle": "2026081018",
+  "cycle_utc": "202608101800",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":30,"member_id":null,"model_id":"JGSM","point_count":6,"raw_model_id":"JGSM","row_count":6,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 6,
+  "points": [
+    [0,0,"202608101800",36.6,145.8,985,24,44,292.5,340,null],
+    [0,6,"202608110000",36.6,143.9,985,24.7,-9,null,0,null],
+    [0,12,"202608110600",36.4,142,984,28.3,-9,null,0,null],
+    [0,18,"202608111200",35.9,140.1,988,28.3,-9,null,0,null],
+    [0,24,"202608111800",34.9,137.7,993,21.6,-9,null,0,null],
+    [0,30,"202608120000",36.3,136.1,996,20.6,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"23","storm_kind":"typ","typ_seq":15,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"CHAN-HOM","canonical_typ_name_ko":"찬홈","canonical_typ_number":15,"data_typ_number":15,"dmdw_o_tm_seq":"23","dmdw_start_time":"202608050600","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_15"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
