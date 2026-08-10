@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260810125953",
-  "generated_at_kst": "2026-08-10 21:59 KST",
+  "generated_at_utc": "20260810130951",
+  "generated_at_kst": "2026-08-10 22:09 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_15",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 30,
+  "model_source_count": 31,
   "selected_model_count": 13,
   "active_target_model_count": 39,
   "model_sources": [
@@ -124,7 +124,7 @@
       ],
       "source": "POLARWX",
       "source_label": "POLARWX",
-      "selected": true,
+      "selected": false,
       "point_count": 15,
       "max_lead_hour": 84,
       "has_pressure": true,
@@ -132,6 +132,23 @@
       "is_official": false,
       "first_seen_utc": "20260810124955",
       "first_seen_kst": "2026-08-10 21:49 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "ECMWF_AIFS_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260810130951",
+      "first_seen_kst": "2026-08-10 22:09 KST"
     },
     {
       "model_id": "GFS",
