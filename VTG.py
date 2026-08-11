@@ -1761,6 +1761,50 @@ def empty_atcf_frame() -> pd.DataFrame:
     return pd.DataFrame(columns=[*ATCF_COLUMNS, DATA_SOURCE_COLUMN])
 
 
+def trim_knackwx_dateline_crossings(df: pd.DataFrame) -> pd.DataFrame:
+    """Trim a KNACKWX model track before it crosses from 170E+ to 170W+."""
+    if df.empty or "LONG" not in df or "FTM" not in df:
+        return df
+
+    longitude = df["LONG"].astype("string").str.strip().str.upper()
+    hemisphere = longitude.str[-1]
+    magnitude = pd.to_numeric(longitude.str[:-1], errors="coerce") / 10
+    work = df.assign(_LON_HEMISPHERE=hemisphere, _LON_MAGNITUDE=magnitude)
+    keep = pd.Series(True, index=df.index, dtype=bool)
+    group_columns = ["ATCF_BASIN", "ATCF_NUMBER", "TM10", "MODEL"]
+
+    for _, group in work.groupby(group_columns, dropna=False, sort=False):
+        leads = pd.to_numeric(group["FTM"], errors="coerce")
+        east_leads = leads[
+            group["_LON_HEMISPHERE"].eq("E")
+            & group["_LON_MAGNITUDE"].ge(170)
+        ].dropna()
+        west_leads = leads[
+            group["_LON_HEMISPHERE"].eq("W")
+            & group["_LON_MAGNITUDE"].ge(170)
+        ].dropna()
+        if east_leads.empty or west_leads.empty:
+            continue
+
+        crossing_leads = [
+            float(west_lead)
+            for west_lead in west_leads.unique()
+            if east_leads.lt(west_lead).any()
+        ]
+        if not crossing_leads:
+            continue
+
+        crossing_lead = min(crossing_leads)
+        previous_lead = float(east_leads[east_leads.lt(crossing_lead)].max())
+        keep.loc[group.index[leads.ge(crossing_lead)]] = False
+        print(
+            f"{group['MODEL'].iloc[0]} KNACKWX: trimmed after {previous_lead:g}h "
+            f"before dateline crossing at {crossing_lead:g}h."
+        )
+
+    return df.loc[keep].copy()
+
+
 def read_atcf_csv(text: str | None, *, source: str, skiprows: int = 0) -> pd.DataFrame:
     empty = empty_atcf_frame()
     if not text or not text.strip():
@@ -1786,6 +1830,8 @@ def read_atcf_csv(text: str | None, *, source: str, skiprows: int = 0) -> pd.Dat
     df["FTM"] = pd.to_numeric(df["FTM"], errors="coerce")
     df["WS(KT)"] = pd.to_numeric(df["WS(KT)"], errors="coerce")
     df["SLP"] = pd.to_numeric(df["SLP"], errors="coerce")
+    if source == "KNACKWX":
+        df = trim_knackwx_dateline_crossings(df)
     df["LATI"] = parse_atcf_coord(df["LATI"])
     df["LONG"] = parse_atcf_coord(df["LONG"])
     df[DATA_SOURCE_COLUMN] = source
