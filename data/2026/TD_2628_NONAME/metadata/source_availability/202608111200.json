@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260811163132",
-  "generated_at_kst": "2026-08-12 01:31 KST",
+  "generated_at_utc": "20260811164139",
+  "generated_at_kst": "2026-08-12 01:41 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_28",
   "storm_stage": "TD",
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 23,
-  "selected_model_count": 23,
+  "model_source_count": 24,
+  "selected_model_count": 24,
   "active_target_model_count": 39,
   "model_sources": [
+    {
+      "model_id": "AIGEFS",
+      "model_label": "AIGFS EPS",
+      "raw_model_ids": [
+        "AIMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 13,
+      "max_lead_hour": 72,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260811164139",
+      "first_seen_kst": "2026-08-12 01:41 KST"
+    },
     {
       "model_id": "CMC",
       "model_label": "CMC",
