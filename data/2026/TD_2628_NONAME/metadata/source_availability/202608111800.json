@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260811224054",
-  "generated_at_kst": "2026-08-12 07:40 KST",
+  "generated_at_utc": "20260811225057",
+  "generated_at_kst": "2026-08-12 07:50 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_28",
   "storm_stage": "TD",
@@ -27,9 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 0,
-  "selected_model_count": 0,
+  "model_source_count": 1,
+  "selected_model_count": 1,
   "active_target_model_count": 39,
-  "model_sources": [],
+  "model_sources": [
+    {
+      "model_id": "AIGEFS",
+      "model_label": "AIGFS EPS",
+      "raw_model_ids": [
+        "AIMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260811225057",
+      "first_seen_kst": "2026-08-12 07:50 KST"
+    }
+  ],
   "source_availability_path": "data/2026/TD_2628_NONAME/metadata/source_availability/202608111800.json"
 }
