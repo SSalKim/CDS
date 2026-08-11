@@ -1,0 +1,35 @@
+{
+  "cycle": "2026081112",
+  "cycle_utc": "202608111200",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":96,"member_id":null,"model_id":"JGSM","point_count":17,"raw_model_id":"JGSM","row_count":17,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 17,
+  "points": [
+    [0,0,"202608111200",26.9,159.2,990,24,47,112.5,240,null],
+    [0,6,"202608111800",27.8,160.5,996,20.1,-9,null,0,null],
+    [0,12,"202608120000",29.2,162.1,998,20.6,-9,null,0,null],
+    [0,18,"202608120600",30.3,163.3,997,19.5,-9,null,0,null],
+    [0,24,"202608121200",31,164.1,998,18,-9,null,0,null],
+    [0,30,"202608121800",31.3,165.2,998,17.5,-9,null,0,null],
+    [0,36,"202608130000",31.5,166.6,1000,17.5,-9,null,0,null],
+    [0,42,"202608130600",31.8,168.2,999,16.5,-9,null,0,null],
+    [0,48,"202608131200",32.3,169.7,1000,15.9,-9,null,0,null],
+    [0,54,"202608131800",32.6,171.4,999,15.9,-9,null,0,null],
+    [0,60,"202608140000",33.2,173.5,999,16.5,-9,null,0,null],
+    [0,66,"202608140600",34.3,175.9,998,17,-9,null,0,null],
+    [0,72,"202608141200",35.4,178.1,998,18.5,-9,null,0,null],
+    [0,78,"202608141800",36.9,179,998,20.1,-9,null,0,null],
+    [0,84,"202608150000",37.9,176.6,1002,20.6,-9,null,0,null],
+    [0,90,"202608150600",38.8,174.4,1005,18.5,-9,null,0,null],
+    [0,96,"202608151200",39.8,172.4,1009,16.5,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"10","storm_kind":"typ","typ_seq":16,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"PEILOU","canonical_typ_name_ko":"페이러우","canonical_typ_number":16,"data_typ_number":16,"dmdw_o_tm_seq":"10","dmdw_start_time":"202608090600","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_16"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
