@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "schema": "cycle_model_source_first_seen",
+  "generated_at_utc": "20260811040105",
+  "generated_at_kst": "2026-08-11 13:01 KST",
+  "storm_year": "2026",
+  "storm_key": "typ_2026_13",
+  "storm_stage": "TD",
+  "typ_number": 29,
+  "data_typ_number": 29,
+  "typ_name": "DOLPHIN",
+  "typ_name_ko": "돌핀",
+  "canonical_storm_key": "typ_2026_13",
+  "canonical_storm_stage": "TYP",
+  "canonical_typ_number": 13,
+  "canonical_typ_name": "DOLPHIN",
+  "canonical_typ_name_ko": "돌핀",
+  "linked_td_number": null,
+  "linked_typ_number": 13,
+  "atcf_id": "wp122026",
+  "extra_atcf_ids": [],
+  "data_time": "202608110000",
+  "cycle_time_utc": "202608110000",
+  "cycle_label_utc": "2026-08-11 00UTC",
+  "fetch_hours": 240,
+  "requested_hours": [
+    120,
+    240
+  ],
+  "model_source_count": 2,
+  "selected_model_count": 2,
+  "active_target_model_count": 39,
+  "model_sources": [
+    {
+      "model_id": "ICON",
+      "model_label": "ICON",
+      "raw_model_ids": [
+        "icon"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 5,
+      "max_lead_hour": 30,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260811040105",
+      "first_seen_kst": "2026-08-11 13:01 KST"
+    },
+    {
+      "model_id": "ICON_EPS",
+      "model_label": "ICON EPS",
+      "raw_model_ids": [
+        "ICON_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 6,
+      "max_lead_hour": 30,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260811040105",
+      "first_seen_kst": "2026-08-11 13:01 KST"
+    }
+  ],
+  "source_availability_path": "data/2026/TYP_2613_DOLPHIN/metadata/source_availability/202608110000.json"
+}
