@@ -2755,12 +2755,58 @@ def suspected_dateline_reflection_cutoff(track: pd.DataFrame) -> float | None:
     return float(forecast["TMD"].iloc[peak_pos])
 
 
+def signed_dateline_crossing_cutoff(track: pd.DataFrame) -> tuple[float, float] | None:
+    """Return (crossing lead, previous lead) for a signed 170E/170W transition."""
+    clean = track.dropna(subset=["LON", "TMD"]).copy()
+    if len(clean) < 2:
+        return None
+    clean["LON"] = pd.to_numeric(clean["LON"], errors="coerce")
+    clean["TMD"] = pd.to_numeric(clean["TMD"], errors="coerce")
+    clean = (
+        clean.dropna(subset=["LON", "TMD"])
+        .sort_values(["TMD", "FT_TM(UTC)", "SEQ"], kind="stable")
+        .drop_duplicates(subset=["TMD"], keep="first")
+    )
+    forecast = clean[clean["TMD"].ge(0)].reset_index(drop=True)
+    if len(forecast) < 2:
+        return None
+
+    previous = forecast.iloc[0]
+    for _, current in forecast.iloc[1:].iterrows():
+        previous_lon = float(previous["LON"])
+        current_lon = float(current["LON"])
+        crosses_dateline = (
+            abs(previous_lon) >= 170
+            and abs(current_lon) >= 170
+            and previous_lon * current_lon < 0
+            and abs(current_lon - previous_lon) > 180
+        )
+        if crosses_dateline:
+            return float(current["TMD"]), float(previous["TMD"])
+        previous = current
+    return None
+
+
 def trim_dateline_reflected_tracks(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty or DATA_SOURCE_COLUMN not in df.columns:
         return df
 
     frames: list[pd.DataFrame] = []
     for (model_name, source_name), track in df.groupby(["SRC", DATA_SOURCE_COLUMN], dropna=False):
+        crossing = signed_dateline_crossing_cutoff(track)
+        if crossing is not None:
+            crossing_lead, previous_lead = crossing
+            tmd = pd.to_numeric(track["TMD"], errors="coerce")
+            trimmed = track[tmd.lt(crossing_lead) | tmd.isna()].copy()
+            removed = len(track) - len(trimmed)
+            print(
+                f"{model_name} {source_display_name(str(source_name))}: "
+                f"trimmed {removed} point(s) after {previous_lead:g}h "
+                f"before dateline crossing at {crossing_lead:g}h"
+            )
+            frames.append(trimmed)
+            continue
+
         cutoff = None
         if str(source_name) == "APIHUB":
             cutoff = suspected_dateline_reflection_cutoff(track)
