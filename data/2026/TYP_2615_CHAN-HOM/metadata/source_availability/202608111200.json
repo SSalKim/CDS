@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260811181014",
-  "generated_at_kst": "2026-08-12 03:10 KST",
+  "generated_at_utc": "20260811182014",
+  "generated_at_kst": "2026-08-12 03:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_15",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 15,
-  "selected_model_count": 8,
+  "model_source_count": 19,
+  "selected_model_count": 11,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -64,6 +64,40 @@
       "is_official": false,
       "first_seen_utc": "20260811172026",
       "first_seen_kst": "2026-08-12 02:20 KST"
+    },
+    {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "cmc"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 23,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260811182014",
+      "first_seen_kst": "2026-08-12 03:20 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 13,
+      "max_lead_hour": 72,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260811182014",
+      "first_seen_kst": "2026-08-12 03:20 KST"
     },
     {
       "model_id": "GFS",
@@ -167,6 +201,23 @@
       "is_official": false,
       "first_seen_utc": "20260811181014",
       "first_seen_kst": "2026-08-12 03:10 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFSA"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 28,
+      "max_lead_hour": 81,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260811182014",
+      "first_seen_kst": "2026-08-12 03:20 KST"
     },
     {
       "model_id": "ICON",
@@ -286,6 +337,23 @@
       "is_official": true,
       "first_seen_utc": "20260811160028",
       "first_seen_kst": "2026-08-12 01:00 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2C",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 2,
+      "max_lead_hour": 6,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260811182014",
+      "first_seen_kst": "2026-08-12 03:20 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2615_CHAN-HOM/metadata/source_availability/202608111200.json"
