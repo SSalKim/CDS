@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260813211021",
-  "generated_at_kst": "2026-08-14 06:10 KST",
+  "generated_at_utc": "20260813212019",
+  "generated_at_kst": "2026-08-14 06:20 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_33",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 34,
-  "selected_model_count": 19,
+  "model_source_count": 36,
+  "selected_model_count": 20,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -142,7 +142,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 15,
+      "point_count": 26,
       "max_lead_hour": 210,
       "has_pressure": true,
       "has_wind": true,
@@ -285,6 +285,23 @@
       "is_official": false,
       "first_seen_utc": "20260813202020",
       "first_seen_kst": "2026-08-14 05:20 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 19,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260813212019",
+      "first_seen_kst": "2026-08-14 06:20 KST"
     },
     {
       "model_id": "GFS",
@@ -608,6 +625,23 @@
       "is_official": false,
       "first_seen_utc": "20260813192221",
       "first_seen_kst": "2026-08-14 04:22 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 2,
+      "max_lead_hour": 12,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260813212019",
+      "first_seen_kst": "2026-08-14 06:20 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2633_NONAME/metadata/source_availability/202608131200.json"
