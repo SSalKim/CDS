@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260813183014",
-  "generated_at_kst": "2026-08-14 03:30 KST",
+  "generated_at_utc": "20260813184020",
+  "generated_at_kst": "2026-08-14 03:40 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_33",
   "storm_stage": "TD",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 11,
+  "model_source_count": 13,
   "selected_model_count": 7,
   "active_target_model_count": 39,
   "model_sources": [
@@ -56,7 +56,7 @@
       ],
       "source": "POLARWX",
       "source_label": "POLARWX",
-      "selected": true,
+      "selected": false,
       "point_count": 9,
       "max_lead_hour": 48,
       "has_pressure": true,
@@ -66,21 +66,21 @@
       "first_seen_kst": "2026-08-14 03:20 KST"
     },
     {
-      "model_id": "CMC_EPS",
-      "model_label": "CMC EPS",
+      "model_id": "CMC",
+      "model_label": "CMC",
       "raw_model_ids": [
-        "CMC_MEAN"
+        "CMC"
       ],
-      "source": "POLARWX",
-      "source_label": "POLARWX",
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 4,
-      "max_lead_hour": 18,
+      "point_count": 9,
+      "max_lead_hour": 48,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260813182017",
-      "first_seen_kst": "2026-08-14 03:20 KST"
+      "first_seen_utc": "20260813184020",
+      "first_seen_kst": "2026-08-14 03:40 KST"
     },
     {
       "model_id": "CMC_EPS",
@@ -98,6 +98,40 @@
       "is_official": false,
       "first_seen_utc": "20260813182017",
       "first_seen_kst": "2026-08-14 03:20 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 4,
+      "max_lead_hour": 18,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260813182017",
+      "first_seen_kst": "2026-08-14 03:20 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 7,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260813184020",
+      "first_seen_kst": "2026-08-14 03:40 KST"
     },
     {
       "model_id": "GFS",
