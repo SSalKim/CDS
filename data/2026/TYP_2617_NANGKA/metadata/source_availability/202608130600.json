@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260813125024",
-  "generated_at_kst": "2026-08-13 21:50 KST",
+  "generated_at_utc": "20260813130023",
+  "generated_at_kst": "2026-08-13 22:00 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_17",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 24,
+  "model_source_count": 27,
   "selected_model_count": 13,
   "active_target_model_count": 39,
   "model_sources": [
@@ -210,8 +210,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 10,
-      "max_lead_hour": 54,
+      "point_count": 41,
+      "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -262,13 +262,30 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 30,
-      "max_lead_hour": 174,
+      "point_count": 33,
+      "max_lead_hour": 192,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
       "first_seen_utc": "20260813115027",
       "first_seen_kst": "2026-08-13 20:50 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260813130023",
+      "first_seen_kst": "2026-08-13 22:00 KST"
     },
     {
       "model_id": "HAFS",
@@ -303,6 +320,23 @@
       "is_official": false,
       "first_seen_utc": "20260813121020",
       "first_seen_kst": "2026-08-13 21:10 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFSA"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260813130023",
+      "first_seen_kst": "2026-08-13 22:00 KST"
     },
     {
       "model_id": "ICON",
@@ -439,6 +473,23 @@
       "is_official": false,
       "first_seen_utc": "20260813123021",
       "first_seen_kst": "2026-08-13 21:30 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2C",
+      "raw_model_ids": [
+        "DEEPMIND"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 8,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260813130023",
+      "first_seen_kst": "2026-08-13 22:00 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2617_NANGKA/metadata/source_availability/202608130600.json"
