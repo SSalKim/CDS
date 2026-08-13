@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260813092019",
-  "generated_at_kst": "2026-08-13 18:20 KST",
+  "generated_at_utc": "20260813093019",
+  "generated_at_kst": "2026-08-13 18:30 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_17",
   "storm_stage": "TYP",
@@ -28,26 +28,9 @@
     240
   ],
   "model_source_count": 65,
-  "selected_model_count": 34,
+  "selected_model_count": 33,
   "active_target_model_count": 39,
   "model_sources": [
-    {
-      "model_id": "AICON",
-      "model_label": "AICON",
-      "raw_model_ids": [
-        "AICON"
-      ],
-      "source": "SMCA.FUN",
-      "source_label": "SMCA.FUN",
-      "selected": true,
-      "point_count": 24,
-      "max_lead_hour": 138,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260813040014",
-      "first_seen_kst": "2026-08-13 13:00 KST"
-    },
     {
       "model_id": "AIGEFS",
       "model_label": "AIGFS EPS",
@@ -1037,6 +1020,23 @@
       "is_official": false,
       "first_seen_utc": "20260813082022",
       "first_seen_kst": "2026-08-13 17:20 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "NEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 39,
+      "max_lead_hour": 228,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260813093019",
+      "first_seen_kst": "2026-08-13 18:30 KST"
     },
     {
       "model_id": "PGEC_AI",
