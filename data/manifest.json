@@ -1,25 +1,25 @@
 {
   "version": 3,
-  "updated_at_utc": "202608132150",
+  "updated_at_utc": "202608132200",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 39,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202608131200",
-      "cycle_time_utc": "202608131200",
-      "start_utc": "202608131600",
-      "end_utc": "202608132200"
+      "data_time": "202608131800",
+      "cycle_time_utc": "202608131800",
+      "start_utc": "202608132200",
+      "end_utc": "202608140400"
     }
   ],
   "runs": [
     {
       "job": {
         "storm_key": "td_2026_33",
-        "stage": "TD_POSITION_ATCF",
+        "stage": "TD_UNLINKED",
         "year": 2026,
-        "data_time": "202608131200",
+        "data_time": "202608131800",
         "td_number": 33,
         "linked_td_number": null,
         "typ_number": 33,
@@ -30,16 +30,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608131200",
-        "cycle_time_utc": "202608131200",
-        "start_utc": "202608131600",
-        "end_utc": "202608132200"
+        "data_time": "202608131800",
+        "cycle_time_utc": "202608131800",
+        "start_utc": "202608132200",
+        "end_utc": "202608140400"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260813215052",
-          "image_path": "data/2026/TD_2633_NONAME/images/TD_2633_NONAME_202608131200_120h.png",
+          "generated_at_utc": "20260813220047",
+          "image_path": "data/2026/TD_2633_NONAME/images/TD_2633_NONAME_202608131800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 33,
@@ -55,20 +55,14 @@
           "canonical_typ_name_ko": "",
           "atcf_id": "wp932026",
           "extra_atcf_ids": [],
-          "data_time": "202608131200",
+          "data_time": "202608131800",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 18,
+          "model_count": 11,
           "target_model_count": 39,
           "model_labels": [
-            "AIGFS",
-            "AIGFS EPS",
             "CMC",
             "CMC EPS",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
             "NAVGEM EPS",
             "GFS",
             "GFS EPS",
@@ -77,22 +71,21 @@
             "KMA AIFS-ECMWF",
             "KMA AIFS-KIM",
             "KIM",
-            "KIM EPS",
-            "UKMO EPS"
+            "KIM EPS"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2633_NONAME/metadata/source_availability/202608131200.json"
+          "source_availability_path": "data/2026/TD_2633_NONAME/metadata/source_availability/202608131800.json"
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2026_33",
-        "stage": "TD_POSITION_ATCF",
+        "stage": "TD_UNLINKED",
         "year": 2026,
-        "data_time": "202608131200",
+        "data_time": "202608131800",
         "td_number": 33,
         "linked_td_number": null,
         "typ_number": 33,
@@ -103,16 +96,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608131200",
-        "cycle_time_utc": "202608131200",
-        "start_utc": "202608131600",
-        "end_utc": "202608132200"
+        "data_time": "202608131800",
+        "cycle_time_utc": "202608131800",
+        "start_utc": "202608132200",
+        "end_utc": "202608140400"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260813215056",
-          "image_path": "data/2026/TD_2633_NONAME/images/TD_2633_NONAME_202608131200_240h.png",
+          "generated_at_utc": "20260813220052",
+          "image_path": "data/2026/TD_2633_NONAME/images/TD_2633_NONAME_202608131800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 33,
@@ -128,20 +121,14 @@
           "canonical_typ_name_ko": "",
           "atcf_id": "wp932026",
           "extra_atcf_ids": [],
-          "data_time": "202608131200",
+          "data_time": "202608131800",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 18,
+          "model_count": 11,
           "target_model_count": 39,
           "model_labels": [
-            "AIGFS",
-            "AIGFS EPS",
             "CMC",
             "CMC EPS",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
             "NAVGEM EPS",
             "GFS",
             "GFS EPS",
@@ -150,22 +137,21 @@
             "KMA AIFS-ECMWF",
             "KMA AIFS-KIM",
             "KIM",
-            "KIM EPS",
-            "UKMO EPS"
+            "KIM EPS"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2633_NONAME/metadata/source_availability/202608131200.json"
+          "source_availability_path": "data/2026/TD_2633_NONAME/metadata/source_availability/202608131800.json"
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2026_17",
         "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202608131200",
+        "data_time": "202608131800",
         "td_number": null,
         "linked_td_number": 30,
         "typ_number": 17,
@@ -176,16 +162,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608131200",
-        "cycle_time_utc": "202608131200",
-        "start_utc": "202608131600",
-        "end_utc": "202608132200"
+        "data_time": "202608131800",
+        "cycle_time_utc": "202608131800",
+        "start_utc": "202608132200",
+        "end_utc": "202608140400"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260813215041",
-          "image_path": "data/2026/TYP_2617_NANGKA/images/TYP_2617_NANGKA_202608131200_120h.png",
+          "generated_at_utc": "20260813220037",
+          "image_path": "data/2026/TYP_2617_NANGKA/images/TYP_2617_NANGKA_202608131800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
           "typ_number": 17,
@@ -201,51 +187,30 @@
           "canonical_typ_name_ko": "낭카",
           "atcf_id": "wp162026",
           "extra_atcf_ids": [],
-          "data_time": "202608131200",
+          "data_time": "202608131800",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 25,
+          "model_count": 4,
           "target_model_count": 39,
           "model_labels": [
-            "AIGFS EPS",
-            "CMC",
-            "CMC EPS",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "NAVGEM EPS",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "Aurora-ECMWF",
-            "FengWu-ECMWF",
-            "FuXi-ECMWF",
+            "AICON",
             "ICON",
             "ICON EPS",
-            "KMA AIFS-ECMWF",
-            "KMA AIFS-KIM",
-            "JGSM",
-            "KIM",
-            "KIM EPS",
-            "JGSM EPS",
-            "UKMO",
-            "WeatherNext2C"
+            "JGSM"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2617_NANGKA/metadata/source_availability/202608131200.json"
+          "source_availability_path": "data/2026/TYP_2617_NANGKA/metadata/source_availability/202608131800.json"
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2026_17",
         "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202608131200",
+        "data_time": "202608131800",
         "td_number": null,
         "linked_td_number": 30,
         "typ_number": 17,
@@ -256,16 +221,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608131200",
-        "cycle_time_utc": "202608131200",
-        "start_utc": "202608131600",
-        "end_utc": "202608132200"
+        "data_time": "202608131800",
+        "cycle_time_utc": "202608131800",
+        "start_utc": "202608132200",
+        "end_utc": "202608140400"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260813215056",
-          "image_path": "data/2026/TYP_2617_NANGKA/images/TYP_2617_NANGKA_202608131200_240h.png",
+          "generated_at_utc": "20260813220052",
+          "image_path": "data/2026/TYP_2617_NANGKA/images/TYP_2617_NANGKA_202608131800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
           "typ_number": 17,
@@ -281,47 +246,26 @@
           "canonical_typ_name_ko": "낭카",
           "atcf_id": "wp162026",
           "extra_atcf_ids": [],
-          "data_time": "202608131200",
+          "data_time": "202608131800",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 25,
+          "model_count": 4,
           "target_model_count": 39,
           "model_labels": [
-            "AIGFS EPS",
-            "CMC",
-            "CMC EPS",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "NAVGEM EPS",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "Aurora-ECMWF",
-            "FengWu-ECMWF",
-            "FuXi-ECMWF",
+            "AICON",
             "ICON",
             "ICON EPS",
-            "KMA AIFS-ECMWF",
-            "KMA AIFS-KIM",
-            "JGSM",
-            "KIM",
-            "KIM EPS",
-            "JGSM EPS",
-            "UKMO",
-            "WeatherNext2C"
+            "JGSM"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2617_NANGKA/metadata/source_availability/202608131200.json"
+          "source_availability_path": "data/2026/TYP_2617_NANGKA/metadata/source_availability/202608131800.json"
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     }
   ],
-  "inventory_count": 8906,
+  "inventory_count": 8910,
   "manifest_indexes": [
     {
       "year": 2020,
