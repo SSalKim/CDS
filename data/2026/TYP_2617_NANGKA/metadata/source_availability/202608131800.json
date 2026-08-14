@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260814011024",
-  "generated_at_kst": "2026-08-14 10:10 KST",
+  "generated_at_utc": "20260814012225",
+  "generated_at_kst": "2026-08-14 10:22 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_17",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 33,
+  "model_source_count": 36,
   "selected_model_count": 15,
   "active_target_model_count": 39,
   "model_sources": [
@@ -227,8 +227,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 26,
-      "max_lead_hour": 150,
+      "point_count": 29,
+      "max_lead_hour": 168,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -270,6 +270,23 @@
       "first_seen_kst": "2026-08-14 09:20 KST"
     },
     {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "AVNO"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 29,
+      "max_lead_hour": 168,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814012225",
+      "first_seen_kst": "2026-08-14 10:22 KST"
+    },
+    {
       "model_id": "GFS_EPS",
       "model_label": "GFS EPS",
       "raw_model_ids": [
@@ -278,8 +295,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 30,
-      "max_lead_hour": 174,
+      "point_count": 37,
+      "max_lead_hour": 216,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -371,6 +388,40 @@
       "is_official": false,
       "first_seen_utc": "20260814011024",
       "first_seen_kst": "2026-08-14 10:10 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 17,
+      "max_lead_hour": 96,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814012225",
+      "first_seen_kst": "2026-08-14 10:22 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 7,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814012225",
+      "first_seen_kst": "2026-08-14 10:22 KST"
     },
     {
       "model_id": "HAFS",
