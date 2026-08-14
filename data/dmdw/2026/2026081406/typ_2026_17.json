@@ -1,0 +1,35 @@
+{
+  "cycle": "2026081406",
+  "cycle_utc": "202608140600",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":96,"member_id":null,"model_id":"JGSM","point_count":17,"raw_model_id":"JGSM","row_count":17,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 17,
+  "points": [
+    [0,0,"202608140600",28.6,154.1,994,21,7,90,320,null],
+    [0,6,"202608141200",28.9,155,996,19.5,-9,null,0,null],
+    [0,12,"202608141800",29,155.3,996,17,-9,null,0,null],
+    [0,18,"202608150000",28.9,155.7,999,15.9,-9,null,0,null],
+    [0,24,"202608150600",28.8,156,999,15.9,-9,null,0,null],
+    [0,30,"202608151200",28.9,156.5,1002,13.9,-9,null,0,null],
+    [0,36,"202608151800",29.2,157.2,1002,13.9,-9,null,0,null],
+    [0,42,"202608160000",29.3,157.6,1005,14.4,-9,null,0,null],
+    [0,48,"202608160600",29.1,157.7,1006,12.9,-9,null,0,null],
+    [0,54,"202608161200",29.1,157.7,1008,12.3,-9,null,0,null],
+    [0,60,"202608161800",28.9,158,1009,12.3,-9,null,0,null],
+    [0,66,"202608170000",28.6,158.2,1011,13.4,-9,null,0,null],
+    [0,72,"202608170600",28,158.3,1010,12.9,-9,null,0,null],
+    [0,78,"202608171200",27.4,158.4,1012,11.8,-9,null,0,null],
+    [0,84,"202608171800",26.7,158.2,1011,11.3,-9,null,0,null],
+    [0,90,"202608180000",26.2,157.9,1012,11.3,-9,null,0,null],
+    [0,96,"202608180600",25.6,157.6,1011,11.3,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"10","storm_kind":"typ","typ_seq":17,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"NANGKA","canonical_typ_name_ko":"낭카","canonical_typ_number":17,"data_typ_number":17,"dmdw_o_tm_seq":"10","dmdw_start_time":"202608120000","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_17"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
