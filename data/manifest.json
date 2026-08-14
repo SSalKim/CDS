@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at_utc": "202608140000",
+  "updated_at_utc": "202608140010",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 39,
@@ -17,7 +17,7 @@
     {
       "job": {
         "storm_key": "td_2026_33",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202608131800",
         "td_number": 33,
@@ -38,7 +38,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260814000046",
+          "generated_at_utc": "20260814001041",
           "image_path": "data/2026/TD_2633_NONAME/images/TD_2633_NONAME_202608131800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -58,20 +58,14 @@
           "data_time": "202608131800",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 11,
+          "model_count": 5,
           "target_model_count": 39,
           "model_labels": [
-            "CMC",
-            "CMC EPS",
-            "NAVGEM EPS",
             "GFS",
             "GFS EPS",
+            "HAFS",
             "ICON",
-            "ICON EPS",
-            "KMA AIFS-ECMWF",
-            "KMA AIFS-KIM",
-            "KIM",
-            "KIM EPS"
+            "ICON EPS"
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TD_2633_NONAME/metadata/source_availability/202608131800.json"
@@ -83,7 +77,7 @@
     {
       "job": {
         "storm_key": "td_2026_33",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202608131800",
         "td_number": 33,
@@ -104,7 +98,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260814000050",
+          "generated_at_utc": "20260814001043",
           "image_path": "data/2026/TD_2633_NONAME/images/TD_2633_NONAME_202608131800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -124,20 +118,14 @@
           "data_time": "202608131800",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 11,
+          "model_count": 5,
           "target_model_count": 39,
           "model_labels": [
-            "CMC",
-            "CMC EPS",
-            "NAVGEM EPS",
             "GFS",
             "GFS EPS",
+            "HAFS",
             "ICON",
-            "ICON EPS",
-            "KMA AIFS-ECMWF",
-            "KMA AIFS-KIM",
-            "KIM",
-            "KIM EPS"
+            "ICON EPS"
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TD_2633_NONAME/metadata/source_availability/202608131800.json"
@@ -170,7 +158,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260814000033",
+          "generated_at_utc": "20260814001030",
           "image_path": "data/2026/TYP_2617_NANGKA/images/TYP_2617_NANGKA_202608131800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -190,13 +178,15 @@
           "data_time": "202608131800",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 8,
+          "model_count": 10,
           "target_model_count": 39,
           "model_labels": [
             "AICON",
             "AIGFS EPS",
+            "ECMWF AIFS",
             "GFS",
             "GFS EPS",
+            "HAFS",
             "ICON",
             "ICON EPS",
             "JGSM",
@@ -233,7 +223,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260814000050",
+          "generated_at_utc": "20260814001044",
           "image_path": "data/2026/TYP_2617_NANGKA/images/TYP_2617_NANGKA_202608131800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -253,13 +243,15 @@
           "data_time": "202608131800",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 8,
+          "model_count": 10,
           "target_model_count": 39,
           "model_labels": [
             "AICON",
             "AIGFS EPS",
+            "ECMWF AIFS",
             "GFS",
             "GFS EPS",
+            "HAFS",
             "ICON",
             "ICON EPS",
             "JGSM",
