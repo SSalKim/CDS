@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260814062013",
-  "generated_at_kst": "2026-08-14 15:20 KST",
+  "generated_at_utc": "20260814063010",
+  "generated_at_kst": "2026-08-14 15:30 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_17",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 23,
-  "selected_model_count": 12,
+  "model_source_count": 24,
+  "selected_model_count": 13,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -422,6 +422,23 @@
       "is_official": true,
       "first_seen_utc": "20260814040012",
       "first_seen_kst": "2026-08-14 13:00 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2C",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 8,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814063010",
+      "first_seen_kst": "2026-08-14 15:30 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2617_NANGKA/metadata/source_availability/202608140000.json"
