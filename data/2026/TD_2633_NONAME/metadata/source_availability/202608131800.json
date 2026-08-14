@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260814005011",
-  "generated_at_kst": "2026-08-14 09:50 KST",
+  "generated_at_utc": "20260814010014",
+  "generated_at_kst": "2026-08-14 10:00 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_33",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 13,
-  "selected_model_count": 8,
+  "model_source_count": 16,
+  "selected_model_count": 10,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -47,6 +47,40 @@
       "is_official": false,
       "first_seen_utc": "20260813225012",
       "first_seen_kst": "2026-08-14 07:50 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 13,
+      "max_lead_hour": 72,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814010014",
+      "first_seen_kst": "2026-08-14 10:00 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814010014",
+      "first_seen_kst": "2026-08-14 10:00 KST"
     },
     {
       "model_id": "ECMWF_EPS",
@@ -149,6 +183,23 @@
       "is_official": false,
       "first_seen_utc": "20260813235010",
       "first_seen_kst": "2026-08-14 08:50 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814010014",
+      "first_seen_kst": "2026-08-14 10:00 KST"
     },
     {
       "model_id": "HAFS",
