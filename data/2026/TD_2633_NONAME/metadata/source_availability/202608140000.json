@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260814082021",
-  "generated_at_kst": "2026-08-14 17:20 KST",
+  "generated_at_utc": "20260814083215",
+  "generated_at_kst": "2026-08-14 17:32 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_33",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 43,
-  "selected_model_count": 26,
+  "model_source_count": 45,
+  "selected_model_count": 28,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -574,6 +574,40 @@
       "is_official": false,
       "first_seen_utc": "20260814065023",
       "first_seen_kst": "2026-08-14 15:50 KST"
+    },
+    {
+      "model_id": "IFEC_AI",
+      "model_label": "KMA AIFS-ECMWF",
+      "raw_model_ids": [
+        "IFEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814083215",
+      "first_seen_kst": "2026-08-14 17:32 KST"
+    },
+    {
+      "model_id": "IFKM_AI",
+      "model_label": "KMA AIFS-KIM",
+      "raw_model_ids": [
+        "IFKM_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 8,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814083215",
+      "first_seen_kst": "2026-08-14 17:32 KST"
     },
     {
       "model_id": "NAVGEM",
