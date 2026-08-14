@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260814002013",
-  "generated_at_kst": "2026-08-14 09:20 KST",
+  "generated_at_utc": "20260814004026",
+  "generated_at_kst": "2026-08-14 09:40 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_17",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 25,
-  "selected_model_count": 11,
+  "model_source_count": 28,
+  "selected_model_count": 13,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -83,6 +83,40 @@
       "first_seen_kst": "2026-08-14 09:20 KST"
     },
     {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 18,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814004026",
+      "first_seen_kst": "2026-08-14 09:40 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 18,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814004026",
+      "first_seen_kst": "2026-08-14 09:40 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
       "raw_model_ids": [
@@ -115,6 +149,23 @@
       "is_official": false,
       "first_seen_utc": "20260814001012",
       "first_seen_kst": "2026-08-14 09:10 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "ECMWF_AIFS_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": true,
+      "point_count": 28,
+      "max_lead_hour": 162,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814004026",
+      "first_seen_kst": "2026-08-14 09:40 KST"
     },
     {
       "model_id": "GFS",
