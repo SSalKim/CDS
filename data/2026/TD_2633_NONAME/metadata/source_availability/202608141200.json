@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260814181015",
-  "generated_at_kst": "2026-08-15 03:10 KST",
+  "generated_at_utc": "20260814182017",
+  "generated_at_kst": "2026-08-15 03:20 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_33",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 8,
-  "selected_model_count": 5,
+  "model_source_count": 11,
+  "selected_model_count": 7,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -47,6 +47,57 @@
       "is_official": false,
       "first_seen_utc": "20260814172042",
       "first_seen_kst": "2026-08-15 02:20 KST"
+    },
+    {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "cmc"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 5,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814182017",
+      "first_seen_kst": "2026-08-15 03:20 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814182017",
+      "first_seen_kst": "2026-08-15 03:20 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 8,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260814182017",
+      "first_seen_kst": "2026-08-15 03:20 KST"
     },
     {
       "model_id": "GFS",
