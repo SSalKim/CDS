@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260815034023",
-  "generated_at_kst": "2026-08-15 12:40 KST",
+  "generated_at_utc": "20260815035024",
+  "generated_at_kst": "2026-08-15 12:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_17",
   "storm_stage": "TD",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 28,
+  "model_source_count": 29,
   "selected_model_count": 14,
   "active_target_model_count": 39,
   "model_sources": [
@@ -90,9 +90,9 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
-      "point_count": 11,
-      "max_lead_hour": 72,
+      "selected": false,
+      "point_count": 7,
+      "max_lead_hour": 102,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -227,8 +227,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 9,
-      "max_lead_hour": 114,
+      "point_count": 15,
+      "max_lead_hour": 138,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -278,7 +278,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 7,
+      "point_count": 8,
       "max_lead_hour": 234,
       "has_pressure": true,
       "has_wind": true,
@@ -455,6 +455,23 @@
       "is_official": false,
       "first_seen_utc": "20260815025023",
       "first_seen_kst": "2026-08-15 11:50 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260815035024",
+      "first_seen_kst": "2026-08-15 12:50 KST"
     },
     {
       "model_id": "WNC",
