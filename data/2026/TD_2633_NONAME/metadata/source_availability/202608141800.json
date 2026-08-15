@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260815024024",
-  "generated_at_kst": "2026-08-15 11:40 KST",
+  "generated_at_utc": "20260815025022",
+  "generated_at_kst": "2026-08-15 11:50 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_33",
   "storm_stage": "TD",
@@ -28,7 +28,7 @@
     240
   ],
   "model_source_count": 27,
-  "selected_model_count": 23,
+  "selected_model_count": 22,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -115,6 +115,23 @@
       "is_official": false,
       "first_seen_utc": "20260815015216",
       "first_seen_kst": "2026-08-15 10:52 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 12,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260815025022",
+      "first_seen_kst": "2026-08-15 11:50 KST"
     },
     {
       "model_id": "FNEC_AI",
@@ -472,23 +489,6 @@
       "is_official": false,
       "first_seen_utc": "20260814220012",
       "first_seen_kst": "2026-08-15 07:00 KST"
-    },
-    {
-      "model_id": "UKMO_EPS",
-      "model_label": "UKMO EPS",
-      "raw_model_ids": [
-        "UEMN"
-      ],
-      "source": "KNACKWX",
-      "source_label": "KNACKWX ATCF",
-      "selected": true,
-      "point_count": 5,
-      "max_lead_hour": 48,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815022026",
-      "first_seen_kst": "2026-08-15 11:20 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2633_NONAME/metadata/source_availability/202608141800.json"
