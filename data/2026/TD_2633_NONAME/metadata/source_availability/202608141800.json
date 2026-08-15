@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260815004015",
-  "generated_at_kst": "2026-08-15 09:40 KST",
+  "generated_at_utc": "20260815005013",
+  "generated_at_kst": "2026-08-15 09:50 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_33",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 22,
-  "selected_model_count": 19,
+  "model_source_count": 25,
+  "selected_model_count": 22,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -64,6 +64,57 @@
       "is_official": false,
       "first_seen_utc": "20260814220012",
       "first_seen_kst": "2026-08-15 07:00 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260815005013",
+      "first_seen_kst": "2026-08-15 09:50 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260815005013",
+      "first_seen_kst": "2026-08-15 09:50 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 6,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260815005013",
+      "first_seen_kst": "2026-08-15 09:50 KST"
     },
     {
       "model_id": "FNEC_AI",
