@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260815021023",
-  "generated_at_kst": "2026-08-15 11:10 KST",
+  "generated_at_utc": "20260815022027",
+  "generated_at_kst": "2026-08-15 11:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_17",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 20,
-  "selected_model_count": 11,
+  "model_source_count": 23,
+  "selected_model_count": 13,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -47,6 +47,40 @@
       "is_official": false,
       "first_seen_utc": "20260814232025",
       "first_seen_kst": "2026-08-15 08:20 KST"
+    },
+    {
+      "model_id": "CTCX",
+      "model_label": "COAMPS-TC",
+      "raw_model_ids": [
+        "CTCX"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 4,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260815022027",
+      "first_seen_kst": "2026-08-15 11:20 KST"
+    },
+    {
+      "model_id": "COAMPS_EPS",
+      "model_label": "COAMPS-TC EPS",
+      "raw_model_ids": [
+        "CTMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260815022027",
+      "first_seen_kst": "2026-08-15 11:20 KST"
     },
     {
       "model_id": "ECMWF",
@@ -319,6 +353,23 @@
       "is_official": false,
       "first_seen_utc": "20260814220013",
       "first_seen_kst": "2026-08-15 07:00 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 4,
+      "max_lead_hour": 36,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260815022027",
+      "first_seen_kst": "2026-08-15 11:20 KST"
     },
     {
       "model_id": "WNC",
