@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260815064015",
-  "generated_at_kst": "2026-08-15 15:40 KST",
+  "generated_at_utc": "20260815065017",
+  "generated_at_kst": "2026-08-15 15:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_17",
   "storm_stage": "TD",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 21,
+  "model_source_count": 22,
   "selected_model_count": 13,
   "active_target_model_count": 39,
   "model_sources": [
@@ -47,23 +47,6 @@
       "is_official": false,
       "first_seen_utc": "20260815045015",
       "first_seen_kst": "2026-08-15 13:50 KST"
-    },
-    {
-      "model_id": "CMC",
-      "model_label": "CMC",
-      "raw_model_ids": [
-        "CMC"
-      ],
-      "source": "KNACKWX",
-      "source_label": "KNACKWX ATCF",
-      "selected": false,
-      "point_count": 18,
-      "max_lead_hour": 102,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815062013",
-      "first_seen_kst": "2026-08-15 15:20 KST"
     },
     {
       "model_id": "CMC",
@@ -132,6 +115,23 @@
       "is_official": false,
       "first_seen_utc": "20260815064015",
       "first_seen_kst": "2026-08-15 15:40 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 4,
+      "max_lead_hour": 186,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260815065017",
+      "first_seen_kst": "2026-08-15 15:50 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -380,13 +380,30 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 8,
-      "max_lead_hour": 42,
+      "point_count": 3,
+      "max_lead_hour": 18,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
       "first_seen_utc": "20260815062013",
       "first_seen_kst": "2026-08-15 15:20 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2C",
+      "raw_model_ids": [
+        "DEEPMIND"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 5,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260815065017",
+      "first_seen_kst": "2026-08-15 15:50 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2617_NANGKA/metadata/source_availability/202608150000.json"
