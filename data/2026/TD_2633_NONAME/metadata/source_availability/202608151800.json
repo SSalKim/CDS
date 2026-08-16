@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260816000251",
-  "generated_at_kst": "2026-08-16 09:02 KST",
+  "generated_at_utc": "20260816000959",
+  "generated_at_kst": "2026-08-16 09:09 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_33",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 24,
-  "selected_model_count": 20,
+  "model_source_count": 9,
+  "selected_model_count": 5,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -49,74 +49,6 @@
       "first_seen_kst": "2026-08-16 07:51 KST"
     },
     {
-      "model_id": "CMC",
-      "model_label": "CMC",
-      "raw_model_ids": [
-        "CMC"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 3,
-      "max_lead_hour": 12,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
-    },
-    {
-      "model_id": "CMC_EPS",
-      "model_label": "CMC EPS",
-      "raw_model_ids": [
-        "CMC_EPS"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 10,
-      "max_lead_hour": 54,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
-    },
-    {
-      "model_id": "FNEC_AI",
-      "model_label": "FourCastNet-ECMWF",
-      "raw_model_ids": [
-        "FNEC_AI"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 5,
-      "max_lead_hour": 24,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
-    },
-    {
-      "model_id": "FNKM_AI",
-      "model_label": "FourCastNet-KIM",
-      "raw_model_ids": [
-        "FNKM_AI"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 4,
-      "max_lead_hour": 18,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
-    },
-    {
       "model_id": "GFS",
       "model_label": "GFS",
       "raw_model_ids": [
@@ -125,8 +57,8 @@
       "source": "APIHUB",
       "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 17,
-      "max_lead_hour": 96,
+      "point_count": 4,
+      "max_lead_hour": 18,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -159,8 +91,8 @@
       "source": "APIHUB",
       "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 20,
-      "max_lead_hour": 114,
+      "point_count": 16,
+      "max_lead_hour": 90,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -200,40 +132,6 @@
       "is_official": false,
       "first_seen_utc": "20260815235234",
       "first_seen_kst": "2026-08-16 08:52 KST"
-    },
-    {
-      "model_id": "GCEC_AI",
-      "model_label": "GraphCast-ECMWF",
-      "raw_model_ids": [
-        "GCEC_AI"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 4,
-      "max_lead_hour": 18,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
-    },
-    {
-      "model_id": "GCKM_AI",
-      "model_label": "GraphCast-KIM",
-      "raw_model_ids": [
-        "GCKM_AI"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 3,
-      "max_lead_hour": 12,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
     },
     {
       "model_id": "HAFS",
@@ -280,159 +178,6 @@
       "selected": true,
       "point_count": 6,
       "max_lead_hour": 30,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
-    },
-    {
-      "model_id": "KIM_3h",
-      "model_label": "KIM",
-      "raw_model_ids": [
-        "KIM_3h"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 6,
-      "max_lead_hour": 15,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
-    },
-    {
-      "model_id": "KIM_6h",
-      "model_label": "KIM",
-      "raw_model_ids": [
-        "KIM_6h"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 3,
-      "max_lead_hour": 12,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
-    },
-    {
-      "model_id": "KIM_EPS",
-      "model_label": "KIM EPS",
-      "raw_model_ids": [
-        "KIM_EPS"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 3,
-      "max_lead_hour": 12,
-      "has_pressure": true,
-      "has_wind": false,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
-    },
-    {
-      "model_id": "IFEC_AI",
-      "model_label": "KMA AIFS-ECMWF",
-      "raw_model_ids": [
-        "IFEC_AI"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 4,
-      "max_lead_hour": 18,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
-    },
-    {
-      "model_id": "IFKM_AI",
-      "model_label": "KMA AIFS-KIM",
-      "raw_model_ids": [
-        "IFKM_AI"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 3,
-      "max_lead_hour": 12,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
-    },
-    {
-      "model_id": "NAVGEM",
-      "model_label": "NAVGEM",
-      "raw_model_ids": [
-        "NAVGEM"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 1,
-      "max_lead_hour": 0,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
-    },
-    {
-      "model_id": "FNMOC_EPS",
-      "model_label": "NAVGEM EPS",
-      "raw_model_ids": [
-        "FNMOC_EPS"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 20,
-      "max_lead_hour": 114,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
-    },
-    {
-      "model_id": "PGEC_AI",
-      "model_label": "Pangu-Weather-ECMWF",
-      "raw_model_ids": [
-        "PGEC_AI"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 4,
-      "max_lead_hour": 18,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260815221322",
-      "first_seen_kst": "2026-08-16 07:13 KST"
-    },
-    {
-      "model_id": "PGKM_AI",
-      "model_label": "Pangu-Weather-KIM",
-      "raw_model_ids": [
-        "PGKM_AI"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 5,
-      "max_lead_hour": 24,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
