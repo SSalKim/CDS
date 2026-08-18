@@ -267,7 +267,10 @@ KNACKWX_MAX_LEAD_GAP_HOURS = float(os.getenv("VTG_KNACKWX_MAX_LEAD_GAP_HOURS", "
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
 SOURCE_ORDER = ("APIHUB", "DMDW", "RAW.GITHUB", "POLARWX", "SMCA.FUN", "RAL.UCAR", "KNACKWX")
-MODEL_SOURCE_PRIORITY_OVERRIDES: dict[str, tuple[str, ...]] = {}
+MODEL_SOURCE_PRIORITY_OVERRIDES: dict[str, tuple[str, ...]] = {
+    # Prefer KNACKWX so UEMN sea-level pressure is retained whenever that feed provides it.
+    "UKMO_EPS": ("APIHUB", "DMDW", "RAW.GITHUB", "POLARWX", "SMCA.FUN", "KNACKWX", "RAL.UCAR"),
+}
 SOURCE_DISPLAY_NAMES = {
     "APIHUB": "KMA APIHUB",
     "DMDW": "KMA DMDW",
