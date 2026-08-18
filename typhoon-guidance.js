@@ -115,14 +115,20 @@ const TYPHOON_MODEL_INFO=[
 {name:'Pangu-Weather-KIM',description:'[AI] 기상청 수행 Pangu-Weather (KIM 초기장)'},
 {name:'GraphCast-ECMWF',description:'[AI] 기상청 수행 GraphCast (ECMWF 초기장)'},
 {name:'GraphCast-KIM',description:'[AI] 기상청 수행 GraphCast (KIM 초기장)'},
-{name:'GenCast',description:'[AI] 구글 딥마인드 앙상블모델(GenCast) 평균'},
+{modelId:'GENC',name:'GenCast',description:'[AI] 구글 딥마인드 앙상블모델(GenCast) 평균'},
 {modelId:'WNC',name:'WeatherNext Cyclones',description:'[AI] 구글 딥마인드 앙상블모델(WeatherNext Cyclones) 평균'},
 {name:'Aurora-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 Aurora (ECMWF 초기장)'},
 {name:'FuXi-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FuXi (ECMWF 초기장)'},
 {name:'FengWu-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FengWu (ECMWF 초기장)'},
 ];
 
-const TYPHOON_DEFAULT_MODEL_TARGET=TYPHOON_MODEL_INFO.length;
+// Keep retired models in the catalog so they can be restored without rebuilding their metadata.
+const TYPHOON_INACTIVE_MODEL_IDS=new Set(['GENC']);
+
+const TYPHOON_DEFAULT_MODEL_TARGET=TYPHOON_MODEL_INFO.filter(item=>{
+let modelKey=item.modelId || item.name;
+return !TYPHOON_INACTIVE_MODEL_IDS.has(modelKey);
+}).length;
 
 const TYPHOON_MODEL_INFO_GROUP_ENDS=new Set([
 'ECMWF EPS',
@@ -585,6 +591,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "참고사항": "Google DeepMind AI모델 GraphCast 기상청 국립기상과학원 자체 수행, KIM 초기장 활용"
   },
   {
+    "model_id": "GENC",
     "표출명칭": "GenCast",
     "운영기관": "구글 딥마인드(Google DeepMind)",
     "모델명": "GenCast",
@@ -840,9 +847,13 @@ let list=document.createElement('div');
 list.className='typhoon-model-info-list';
 
 TYPHOON_MODEL_INFO.forEach(item=>{
+let modelKey=item.modelId || item.name;
+if(TYPHOON_INACTIVE_MODEL_IDS.has(modelKey)){
+return;
+}
 let row=document.createElement('div');
 row.className='typhoon-model-info-row';
-let modelKey=item.modelId || item.name;
+row.dataset.modelId=modelKey;
 if(TYPHOON_MODEL_INFO_GROUP_ENDS.has(modelKey)){
 row.classList.add('is-group-end');
 }
@@ -1276,8 +1287,12 @@ typhoonState.modelDetailLastFocus=null;
 function createTyphoonModelDetailSummary(){
 let summary=document.createElement('div');
 summary.className='typhoon-model-detail-summary';
-let total=TYPHOON_MODEL_DETAIL_ROWS.length;
-let aiCount=TYPHOON_MODEL_DETAIL_ROWS.filter(row=>String(row['기반'] || '').toUpperCase()==='AI').length;
+let activeRows=TYPHOON_MODEL_DETAIL_ROWS.filter(row=>{
+let modelKey=row.model_id || row['표출명칭'] || '';
+return !TYPHOON_INACTIVE_MODEL_IDS.has(modelKey);
+});
+let total=activeRows.length;
+let aiCount=activeRows.filter(row=>String(row['기반'] || '').toUpperCase()==='AI').length;
 let dynamicalCount=total-aiCount;
 [
 `전체 ${total}개 모델`,
@@ -1311,6 +1326,10 @@ thead.appendChild(headRow);
 
 let tbody=document.createElement('tbody');
 TYPHOON_MODEL_DETAIL_ROWS.forEach(row=>{
+let modelKey=row.model_id || row['표출명칭'] || '';
+if(TYPHOON_INACTIVE_MODEL_IDS.has(modelKey)){
+return;
+}
 let tr=document.createElement('tr');
 TYPHOON_MODEL_DETAIL_COLUMNS.forEach(column=>{
 let td=document.createElement('td');
