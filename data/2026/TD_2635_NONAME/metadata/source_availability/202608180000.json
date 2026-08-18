@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260818093938",
-  "generated_at_kst": "2026-08-18 18:39 KST",
+  "generated_at_utc": "20260818094935",
+  "generated_at_kst": "2026-08-18 18:49 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_35",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 48,
-  "selected_model_count": 23,
+  "model_source_count": 50,
+  "selected_model_count": 25,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -557,6 +557,40 @@
       "is_official": false,
       "first_seen_utc": "20260818091937",
       "first_seen_kst": "2026-08-18 18:19 KST"
+    },
+    {
+      "model_id": "ICON",
+      "model_label": "ICON",
+      "raw_model_ids": [
+        "icon"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260818094935",
+      "first_seen_kst": "2026-08-18 18:49 KST"
+    },
+    {
+      "model_id": "ICON_EPS",
+      "model_label": "ICON EPS",
+      "raw_model_ids": [
+        "ICON_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260818094935",
+      "first_seen_kst": "2026-08-18 18:49 KST"
     },
     {
       "model_id": "KIM_3h",
