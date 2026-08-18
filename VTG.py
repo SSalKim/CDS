@@ -85,7 +85,7 @@ MODEL_INFO = [
     {"name": "GCKM_AI", "color": "#6C33C6", "style": "--", "label": "GraphCast-KIM", "zorder": 67},
     {"name": "GCUM_AI", "color": "#B57AD5", "style": "--", "label": "GraphCast-UM", "zorder": 66},
     {"name": "GENC", "color": "#9866C7", "style": "--", "label": "GenCast", "zorder": 57},
-    {"name": "WNC", "color": "#DA70D6", "style": "--", "label": "WeatherNext2C", "zorder": 99},
+    {"name": "WNC", "color": "#DA70D6", "style": "--", "label": "WeatherNext Cyclones", "zorder": 99},
     {"name": "HKO_AREC", "color": "#1E90FF", "style": "--", "label": "Aurora-ECMWF", "zorder": 56},
     {"name": "HKO_FXEC", "color": "#20B2AA", "style": "--", "label": "FuXi-ECMWF", "zorder": 55},
     {"name": "HKO_FWEC", "color": "#A6C875", "style": "--", "label": "FengWu-ECMWF", "zorder": 54},
@@ -204,7 +204,7 @@ MODEL_ACTIVE_WINDOWS = {
     "GCKM_AI": ("202405150000", None),              # 기상청(KMA) AI 예측자료 신규 추가(2025.3.17.~)
 
     "GENC": ("202506010000", None),                 # Google DeeepMind Ensemble 예측자료 신규 추가(2025.6.1.~)
-    "WNC": ("202506010000", None),                  # Google DeepMind WeatherNext2 Cyclones(구 FNV3)
+    "WNC": ("202506010000", None),                  # Google DeepMind WeatherNext Cyclones (formerly FNV3)
 
     "HKO_AREC": ("202507210000", None),             # 홍콩기상청(HKO) AI 예측자료 신규 추가(2025.8.12.~)
     "HKO_FXEC": ("202507210000", None),             # 홍콩기상청(HKO) AI 예측자료 신규 추가(2025.8.12.~)
