@@ -232,8 +232,6 @@ MODEL_ACTIVE_WINDOWS = {
     "AICON": ("202608010000", None),                # SMCA.FUN AI-ICON 예측자료 신규 추가(2026.8.~)
 }
 
-NO_PRESSURE_SUMMARY_MODELS = {"UKMO_EPS"}
-
 PRESSURE_MISSING_COLOR = "#A6A6A6"
 PRESSURE_OVER_1000_COLOR = "#222222"
 PRESSURE_990_1000_COLOR = "#1595FF"
@@ -3538,10 +3536,7 @@ def track_intensity_summary(track: pd.DataFrame, model_name: str) -> str:
         return ""
 
     valid_pressure = forecast["PS"].where(forecast["PS"].gt(0))
-    has_pressure = (
-        model_name not in NO_PRESSURE_SUMMARY_MODELS
-        and valid_pressure.notna().any()
-    )
+    has_pressure = valid_pressure.notna().any()
     max_lead = int(round(float(forecast["TMD"].max())))
 
     # If pressure is missing, keep the inactive-style summary.
