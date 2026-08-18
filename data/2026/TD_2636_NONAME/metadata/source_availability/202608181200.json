@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260818190943",
-  "generated_at_kst": "2026-08-19 04:09 KST",
+  "generated_at_utc": "20260818192008",
+  "generated_at_kst": "2026-08-19 04:20 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_36",
   "storm_stage": "TD",
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 5,
-  "selected_model_count": 3,
+  "model_source_count": 7,
+  "selected_model_count": 6,
   "active_target_model_count": 38,
   "model_sources": [
+    {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 6,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260818192008",
+      "first_seen_kst": "2026-08-19 04:20 KST"
+    },
     {
       "model_id": "CMC_EPS",
       "model_label": "CMC EPS",
@@ -39,8 +56,8 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": false,
-      "point_count": 23,
+      "selected": true,
+      "point_count": 28,
       "max_lead_hour": 180,
       "has_pressure": true,
       "has_wind": true,
@@ -98,6 +115,23 @@
       "is_official": false,
       "first_seen_utc": "20260818185939",
       "first_seen_kst": "2026-08-19 03:59 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "NEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 24,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260818192008",
+      "first_seen_kst": "2026-08-19 04:20 KST"
     },
     {
       "model_id": "WNC",
