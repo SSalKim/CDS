@@ -572,7 +572,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
   {
     "표출명칭": "GraphCast-ECMWF",
     "운영기관": "기상청(KMA)",
-    "모델명": "GraphCast",
+    "모델명": "WeatherNext1 (WeatherNext Graph)",
     "도메인": "전지구",
     "구분": "결정론적 모델",
     "격자체계 (분해능)": "0.25° (~28km)",
@@ -583,7 +583,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
   {
     "표출명칭": "GraphCast-KIM",
     "운영기관": "기상청(KMA)",
-    "모델명": "GraphCast",
+    "모델명": "WeatherNext1 (WeatherNext Graph)",
     "도메인": "전지구",
     "구분": "결정론적 모델",
     "격자체계 (분해능)": "0.25° (~28km)",
@@ -595,25 +595,25 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "model_id": "GENC",
     "표출명칭": "GenCast",
     "운영기관": "구글 딥마인드(Google DeepMind)",
-    "모델명": "GenCast",
+    "모델명": "WeatherNext1 (WeatherNext Gen)",
     "도메인": "전지구",
     "구분": "앙상블 모델 평균 (M50)",
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": ""
+    "참고사항": "Google DeepMind AI모델 WeatherNext1 기반 앙상블모델(GenCast)"
   },
   {
     "model_id": "WNC",
     "표출명칭": "WeatherNext Cyclones",
     "운영기관": "구글 딥마인드(Google DeepMind)",
-    "모델명": "WeatherNext Cyclones (FNV3)",
+    "모델명": "WeatherNext2 (WeatherNext Cyclones)",
     "도메인": "전지구",
     "구분": "앙상블 모델 평균 (M50)",
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "'26.8.8 현업운영 전환에 따른 내부 ID 변경(FNV3 → WNC), 표출명 WeatherNext Cyclones"
+    "참고사항": "Google DeepMind 차세대 AI모델 WeatherNext2 기반 태풍예측모델(FNV3)"
   },
   {
     "표출명칭": "Aurora-ECMWF",
