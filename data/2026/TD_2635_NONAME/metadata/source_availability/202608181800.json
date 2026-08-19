@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260819012952",
-  "generated_at_kst": "2026-08-19 10:29 KST",
+  "generated_at_utc": "20260819013941",
+  "generated_at_kst": "2026-08-19 10:39 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_35",
   "storm_stage": "TD",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 13,
+  "model_source_count": 14,
   "selected_model_count": 9,
   "active_target_model_count": 38,
   "model_sources": [
@@ -107,7 +107,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 24,
       "max_lead_hour": 144,
       "has_pressure": true,
@@ -115,6 +115,23 @@
       "is_official": false,
       "first_seen_utc": "20260819005029",
       "first_seen_kst": "2026-08-19 09:50 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "ECMWF_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260819013941",
+      "first_seen_kst": "2026-08-19 10:39 KST"
     },
     {
       "model_id": "GFS_EPS",
