@@ -1,103 +1,17 @@
 {
-  "version": 3,
+  "version": 2,
   "updated_at_utc": "202608190909",
-  "window_start_offset_hours": 4,
-  "window_end_offset_hours": 10,
-  "complete_model_count": 39,
-  "final_check_before_window_end_minutes": 10,
-  "active_windows": [
-    {
-      "data_time": "202608190000",
-      "cycle_time_utc": "202608190000",
-      "start_utc": "202608190400",
-      "end_utc": "202608191000"
-    }
-  ],
-  "runs": [
-    {
-      "job": {
-        "storm_key": "typ_2026_18",
-        "stage": "TYP_SUPPRESSED_BY_TD",
-        "year": 2026,
-        "data_time": "202608190000",
-        "td_number": 35,
-        "linked_td_number": 35,
-        "typ_number": 18,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp172026",
-        "fcst_hours": 120,
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202608190000",
-        "cycle_time_utc": "202608190000",
-        "start_utc": "202608190400",
-        "end_utc": "202608191000"
-      },
-      "result": {
-        "status": "suppressed_td_phase",
-        "metadata": {
-          "generated_at_utc": "202608190909",
-          "image_path": "",
-          "storm_stage": "TYP",
-          "storm_year": "2026",
-          "typ_number": 18,
-          "data_typ_number": 18,
-          "data_time": "202608190000",
-          "fcst_hours": 120,
-          "model_count": 0,
-          "target_model_count": 39,
-          "models": [],
-          "model_labels": [],
-          "no_output": true,
-          "no_output_reason": "Suppressed because linked TD35 phase is active."
-        }
-      }
-    },
-    {
-      "job": {
-        "storm_key": "typ_2026_18",
-        "stage": "TYP_SUPPRESSED_BY_TD",
-        "year": 2026,
-        "data_time": "202608190000",
-        "td_number": 35,
-        "linked_td_number": 35,
-        "typ_number": 18,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
-        "atcf_id": "wp172026",
-        "fcst_hours": 240,
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202608190000",
-        "cycle_time_utc": "202608190000",
-        "start_utc": "202608190400",
-        "end_utc": "202608191000"
-      },
-      "result": {
-        "status": "suppressed_td_phase",
-        "metadata": {
-          "generated_at_utc": "202608190909",
-          "image_path": "",
-          "storm_stage": "TYP",
-          "storm_year": "2026",
-          "typ_number": 18,
-          "data_typ_number": 18,
-          "data_time": "202608190000",
-          "fcst_hours": 240,
-          "model_count": 0,
-          "target_model_count": 39,
-          "models": [],
-          "model_labels": [],
-          "no_output": true,
-          "no_output_reason": "Suppressed because linked TD35 phase is active."
-        }
-      }
-    },
+  "storm_key": "typ_2026_18",
+  "stage": "TYP",
+  "year": 2026,
+  "typ_number": 18,
+  "linked_td_number": 35,
+  "linked_typ_number": null,
+  "typ_name": "SAUDEL",
+  "typ_name_ko": "사우델",
+  "latest_data_time": "202608190000",
+  "item_count": 2,
+  "inventory": [
     {
       "job": {
         "storm_key": "td_2026_35_typ_18",
@@ -267,37 +181,6 @@
       },
       "completed": false,
       "final_check": false
-    }
-  ],
-  "inventory_count": 8954,
-  "manifest_indexes": [
-    {
-      "year": 2020,
-      "path": "data/2020/index.json"
-    },
-    {
-      "year": 2021,
-      "path": "data/2021/index.json"
-    },
-    {
-      "year": 2022,
-      "path": "data/2022/index.json"
-    },
-    {
-      "year": 2023,
-      "path": "data/2023/index.json"
-    },
-    {
-      "year": 2024,
-      "path": "data/2024/index.json"
-    },
-    {
-      "year": 2025,
-      "path": "data/2025/index.json"
-    },
-    {
-      "year": 2026,
-      "path": "data/2026/index.json"
     }
   ]
 }
