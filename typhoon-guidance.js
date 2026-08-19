@@ -122,8 +122,8 @@ const TYPHOON_MODEL_INFO=[
 {name:'FengWu-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FengWu (ECMWF 초기장)'},
 ];
 
-// Keep retired models in the catalog so they can be restored without rebuilding their metadata.
-const TYPHOON_INACTIVE_MODEL_IDS=new Set(['GENC']);
+// Keep temporary model visibility changes reversible without removing catalog metadata.
+const TYPHOON_INACTIVE_MODEL_IDS=new Set();
 
 const TYPHOON_DEFAULT_MODEL_TARGET=TYPHOON_MODEL_INFO.filter(item=>{
 let modelKey=item.modelId || item.name;

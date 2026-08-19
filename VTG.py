@@ -203,7 +203,7 @@ MODEL_ACTIVE_WINDOWS = {
     "GCEC_AI": ("202405150000", None),              # 기상청(KMA) AI 예측자료 신규 추가(2025.3.17.~)
     "GCKM_AI": ("202405150000", None),              # 기상청(KMA) AI 예측자료 신규 추가(2025.3.17.~)
 
-    "GENC": ("202506010000", "202608140000"),       # Google DeepMind GenCast; keep the end date reversible if operations resume.
+    "GENC": ("202506010000", None),                 # Google DeepMind GenCast ensemble guidance
     "WNC": ("202506010000", None),                  # Google DeepMind WeatherNext Cyclones (formerly FNV3)
 
     "HKO_AREC": ("202507210000", None),             # 홍콩기상청(HKO) AI 예측자료 신규 추가(2025.8.12.~)
