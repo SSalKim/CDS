@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260819024039",
-  "generated_at_kst": "2026-08-19 11:40 KST",
+  "generated_at_utc": "20260819025040",
+  "generated_at_kst": "2026-08-19 11:50 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_35",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 16,
-  "selected_model_count": 11,
+  "model_source_count": 20,
+  "selected_model_count": 14,
   "active_target_model_count": 38,
   "model_sources": [
     {
@@ -98,6 +98,40 @@
       "is_official": false,
       "first_seen_utc": "20260819005029",
       "first_seen_kst": "2026-08-19 09:50 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260819025040",
+      "first_seen_kst": "2026-08-19 11:50 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 40,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260819025040",
+      "first_seen_kst": "2026-08-19 11:50 KST"
     },
     {
       "model_id": "ECMWF_EPS",
@@ -200,6 +234,40 @@
       "is_official": false,
       "first_seen_utc": "20260819010959",
       "first_seen_kst": "2026-08-19 10:09 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFSA"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260819025040",
+      "first_seen_kst": "2026-08-19 11:50 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "hwrf"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260819025040",
+      "first_seen_kst": "2026-08-19 11:50 KST"
     },
     {
       "model_id": "JGSM",
