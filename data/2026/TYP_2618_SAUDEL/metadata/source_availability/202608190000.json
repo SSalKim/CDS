@@ -1,10 +1,10 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260819085938",
-  "generated_at_kst": "2026-08-19 17:59 KST",
+  "generated_at_utc": "20260819092944",
+  "generated_at_kst": "2026-08-19 18:29 KST",
   "storm_year": "2026",
-  "storm_key": "td_2026_35",
+  "storm_key": "typ_2026_18",
   "storm_stage": "TD",
   "typ_number": 35,
   "data_typ_number": 35,
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 57,
-  "selected_model_count": 30,
+  "model_source_count": 59,
+  "selected_model_count": 31,
   "active_target_model_count": 39,
   "model_sources": [
+    {
+      "model_id": "AICON",
+      "model_label": "AICON",
+      "raw_model_ids": [
+        "AICON"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 30,
+      "max_lead_hour": 174,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260819092944",
+      "first_seen_kst": "2026-08-19 18:29 KST"
+    },
     {
       "model_id": "AGFS",
       "model_label": "AIGFS",
@@ -846,6 +863,23 @@
       "is_official": false,
       "first_seen_utc": "20260819083935",
       "first_seen_kst": "2026-08-19 17:39 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "NEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260819092944",
+      "first_seen_kst": "2026-08-19 18:29 KST"
     },
     {
       "model_id": "PGEC_AI",
