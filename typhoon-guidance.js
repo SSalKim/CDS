@@ -193,6 +193,7 @@ const TYPHOON_MODEL_INFO_COLORS={
 'GraphCast-ECMWF':'#4D248D',
 'GraphCast-KIM':'#6C33C6',
 'GraphCast-UM':'#B57AD5',
+'GENC':'#9866C7',
 'GenCast':'#9866C7',
 'WNC':'#DA70D6',
 'FNV3':'#DA70D6',
