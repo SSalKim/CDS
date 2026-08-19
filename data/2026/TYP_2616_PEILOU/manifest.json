@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202608130700",
+  "updated_at_utc": "202608190919",
   "storm_key": "typ_2026_16",
   "stage": "TYP",
   "year": 2026,
@@ -85,8 +85,7 @@
             "WeatherNext2C"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608081200.json",
-          "models": []
+          "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608081200.json"
         }
       },
       "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608081200_120h.json"
@@ -164,8 +163,7 @@
             "WeatherNext2C"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608081200.json",
-          "models": []
+          "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608081200.json"
         }
       },
       "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608081200_240h.json"
@@ -239,8 +237,7 @@
             "WeatherNext2C"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608081800.json",
-          "models": []
+          "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608081800.json"
         }
       },
       "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608081800_120h.json"
@@ -314,35 +311,38 @@
             "WeatherNext2C"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608081800.json",
-          "models": []
+          "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608081800.json"
         }
       },
       "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608081800_240h.json"
     },
     {
       "job": {
-        "storm_key": "td_2026_27_typ_16",
-        "stage": "TD_PRE_TYP_POSITION_ATCF",
+        "storm_key": "typ_2026_16",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202608090000",
         "td_number": 27,
         "linked_td_number": null,
+        "linked_typ_number": 16,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 27,
+        "data_typ_number": 27,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608090000",
-        "cycle_time_utc": "202608090000",
-        "start_utc": "202608090400",
-        "end_utc": "202608091000"
+        "data_time": "202608090000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260809100125",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TD_2627_NONAME_202608090000_120h.png",
@@ -402,32 +402,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608090000.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608090000_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2026_27_typ_16",
-        "stage": "TD_PRE_TYP_POSITION_ATCF",
+        "storm_key": "typ_2026_16",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202608090000",
         "td_number": 27,
         "linked_td_number": null,
+        "linked_typ_number": 16,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 27,
+        "data_typ_number": 27,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608090000",
-        "cycle_time_utc": "202608090000",
-        "start_utc": "202608090400",
-        "end_utc": "202608091000"
+        "data_time": "202608090000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260809100126",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TD_2627_NONAME_202608090000_240h.png",
@@ -487,32 +490,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608090000.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608090000_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608090600",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608090600",
-        "cycle_time_utc": "202608090600",
-        "start_utc": "202608091000",
-        "end_utc": "202608091600"
+        "data_time": "202608090600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260809160105",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608090600_120h.png",
@@ -563,32 +569,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608090600.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608090600_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608090600",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608090600",
-        "cycle_time_utc": "202608090600",
-        "start_utc": "202608091000",
-        "end_utc": "202608091600"
+        "data_time": "202608090600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260809160108",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608090600_240h.png",
@@ -639,32 +648,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608090600.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608090600_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608091200",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608091200",
-        "cycle_time_utc": "202608091200",
-        "start_utc": "202608091600",
-        "end_utc": "202608092200"
+        "data_time": "202608091200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260809220056",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608091200_120h.png",
@@ -724,32 +736,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608091200.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608091200_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608091200",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608091200",
-        "cycle_time_utc": "202608091200",
-        "start_utc": "202608091600",
-        "end_utc": "202608092200"
+        "data_time": "202608091200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260809220059",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608091200_240h.png",
@@ -809,32 +824,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608091200.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608091200_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608091800",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608091800",
-        "cycle_time_utc": "202608091800",
-        "start_utc": "202608092200",
-        "end_utc": "202608100400"
+        "data_time": "202608091800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260810040057",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608091800_120h.png",
@@ -884,32 +902,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608091800.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608091800_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608091800",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608091800",
-        "cycle_time_utc": "202608091800",
-        "start_utc": "202608092200",
-        "end_utc": "202608100400"
+        "data_time": "202608091800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260810040101",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608091800_240h.png",
@@ -959,32 +980,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608091800.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608091800_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608100000",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608100000",
-        "cycle_time_utc": "202608100000",
-        "start_utc": "202608100400",
-        "end_utc": "202608101000"
+        "data_time": "202608100000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260810100056",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608100000_120h.png",
@@ -1049,32 +1073,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608100000.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608100000_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608100000",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608100000",
-        "cycle_time_utc": "202608100000",
-        "start_utc": "202608100400",
-        "end_utc": "202608101000"
+        "data_time": "202608100000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260810100100",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608100000_240h.png",
@@ -1139,32 +1166,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608100000.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608100000_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608100600",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608100600",
-        "cycle_time_utc": "202608100600",
-        "start_utc": "202608101000",
-        "end_utc": "202608101600"
+        "data_time": "202608100600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260810160054",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608100600_120h.png",
@@ -1213,32 +1243,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608100600.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608100600_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608100600",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608100600",
-        "cycle_time_utc": "202608100600",
-        "start_utc": "202608101000",
-        "end_utc": "202608101600"
+        "data_time": "202608100600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260810160108",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608100600_240h.png",
@@ -1287,32 +1320,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608100600.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608100600_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608101200",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608101200",
-        "cycle_time_utc": "202608101200",
-        "start_utc": "202608101600",
-        "end_utc": "202608102200"
+        "data_time": "202608101200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260810220047",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608101200_120h.png",
@@ -1373,32 +1409,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608101200.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608101200_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608101200",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608101200",
-        "cycle_time_utc": "202608101200",
-        "start_utc": "202608101600",
-        "end_utc": "202608102200"
+        "data_time": "202608101200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260810220102",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608101200_240h.png",
@@ -1459,32 +1498,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608101200.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608101200_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608101800",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608101800",
-        "cycle_time_utc": "202608101800",
-        "start_utc": "202608102200",
-        "end_utc": "202608110400"
+        "data_time": "202608101800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260811035058",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608101800_120h.png",
@@ -1532,32 +1574,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608101800.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608101800_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608101800",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608101800",
-        "cycle_time_utc": "202608101800",
-        "start_utc": "202608102200",
-        "end_utc": "202608110400"
+        "data_time": "202608101800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260811035104",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608101800_240h.png",
@@ -1605,32 +1650,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608101800.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608101800_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608110000",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608110000",
-        "cycle_time_utc": "202608110000",
-        "start_utc": "202608110400",
-        "end_utc": "202608111000"
+        "data_time": "202608110000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260811095154",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608110000_120h.png",
@@ -1695,32 +1743,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608110000.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608110000_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608110000",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608110000",
-        "cycle_time_utc": "202608110000",
-        "start_utc": "202608110400",
-        "end_utc": "202608111000"
+        "data_time": "202608110000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260811095200",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608110000_240h.png",
@@ -1785,32 +1836,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608110000.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608110000_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608110600",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608110600",
-        "cycle_time_utc": "202608110600",
-        "start_utc": "202608111000",
-        "end_utc": "202608111600"
+        "data_time": "202608110600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260811155052",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608110600_120h.png",
@@ -1858,32 +1912,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608110600.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608110600_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608110600",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608110600",
-        "cycle_time_utc": "202608110600",
-        "start_utc": "202608111000",
-        "end_utc": "202608111600"
+        "data_time": "202608110600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260811155105",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608110600_240h.png",
@@ -1931,32 +1988,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608110600.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608110600_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608111200",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608111200",
-        "cycle_time_utc": "202608111200",
-        "start_utc": "202608111600",
-        "end_utc": "202608112200"
+        "data_time": "202608111200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260811215041",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608111200_120h.png",
@@ -2017,32 +2077,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608111200.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608111200_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608111200",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608111200",
-        "cycle_time_utc": "202608111200",
-        "start_utc": "202608111600",
-        "end_utc": "202608112200"
+        "data_time": "202608111200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260811215057",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608111200_240h.png",
@@ -2103,32 +2166,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608111200.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608111200_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608111800",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608111800",
-        "cycle_time_utc": "202608111800",
-        "start_utc": "202608112200",
-        "end_utc": "202608120400"
+        "data_time": "202608111800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260812035057",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608111800_120h.png",
@@ -2175,32 +2241,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608111800.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608111800_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_16",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608111800",
         "td_number": null,
         "linked_td_number": 27,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 16,
+        "data_typ_number": 16,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608111800",
-        "cycle_time_utc": "202608111800",
-        "start_utc": "202608112200",
-        "end_utc": "202608120400"
+        "data_time": "202608111800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260812035111",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TYP_2616_PEILOU_202608111800_240h.png",
@@ -2247,32 +2316,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608111800.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608111800_240h.json"
     },
     {
       "job": {
-        "storm_key": "td_2026_32_typ_16",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "typ_2026_16",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202608120000",
         "td_number": 32,
         "linked_td_number": null,
+        "linked_typ_number": 16,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 32,
+        "data_typ_number": 32,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608120000",
-        "cycle_time_utc": "202608120000",
-        "start_utc": "202608120400",
-        "end_utc": "202608121000"
+        "data_time": "202608120000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260812095055",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TD_2632_PEILOU_202608120000_120h.png",
@@ -2321,32 +2393,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608120000.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608120000_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2026_32_typ_16",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "typ_2026_16",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202608120000",
         "td_number": 32,
         "linked_td_number": null,
+        "linked_typ_number": 16,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 32,
+        "data_typ_number": 32,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608120000",
-        "cycle_time_utc": "202608120000",
-        "start_utc": "202608120400",
-        "end_utc": "202608121000"
+        "data_time": "202608120000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260812095112",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TD_2632_PEILOU_202608120000_240h.png",
@@ -2395,32 +2470,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608120000.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608120000_240h.json"
     },
     {
       "job": {
-        "storm_key": "td_2026_32_typ_16",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "typ_2026_16",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202608120600",
         "td_number": 32,
         "linked_td_number": null,
+        "linked_typ_number": 16,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 32,
+        "data_typ_number": 32,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608120600",
-        "cycle_time_utc": "202608120600",
-        "start_utc": "202608121000",
-        "end_utc": "202608121600"
+        "data_time": "202608120600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260812155054",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TD_2632_PEILOU_202608120600_120h.png",
@@ -2461,32 +2539,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608120600.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608120600_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2026_32_typ_16",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "typ_2026_16",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202608120600",
         "td_number": 32,
         "linked_td_number": null,
+        "linked_typ_number": 16,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 32,
+        "data_typ_number": 32,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608120600",
-        "cycle_time_utc": "202608120600",
-        "start_utc": "202608121000",
-        "end_utc": "202608121600"
+        "data_time": "202608120600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260812155109",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TD_2632_PEILOU_202608120600_240h.png",
@@ -2527,32 +2608,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608120600.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608120600_240h.json"
     },
     {
       "job": {
-        "storm_key": "td_2026_32_typ_16",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "typ_2026_16",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202608121200",
         "td_number": 32,
         "linked_td_number": null,
+        "linked_typ_number": 16,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 32,
+        "data_typ_number": 32,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608121200",
-        "cycle_time_utc": "202608121200",
-        "start_utc": "202608121600",
-        "end_utc": "202608122200"
+        "data_time": "202608121200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260812215113",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TD_2632_PEILOU_202608121200_120h.png",
@@ -2605,32 +2689,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608121200.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608121200_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2026_32_typ_16",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "typ_2026_16",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202608121200",
         "td_number": 32,
         "linked_td_number": null,
+        "linked_typ_number": 16,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 32,
+        "data_typ_number": 32,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608121200",
-        "cycle_time_utc": "202608121200",
-        "start_utc": "202608121600",
-        "end_utc": "202608122200"
+        "data_time": "202608121200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260812215125",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TD_2632_PEILOU_202608121200_240h.png",
@@ -2683,32 +2770,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608121200.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608121200_240h.json"
     },
     {
       "job": {
-        "storm_key": "td_2026_32_typ_16",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "typ_2026_16",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202608121800",
         "td_number": 32,
         "linked_td_number": null,
+        "linked_typ_number": 16,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 32,
+        "data_typ_number": 32,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608121800",
-        "cycle_time_utc": "202608121800",
-        "start_utc": "202608122200",
-        "end_utc": "202608130400"
+        "data_time": "202608121800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260813035141",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TD_2632_PEILOU_202608121800_120h.png",
@@ -2750,32 +2840,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608121800.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608121800_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2026_32_typ_16",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "typ_2026_16",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202608121800",
         "td_number": 32,
         "linked_td_number": null,
+        "linked_typ_number": 16,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 32,
+        "data_typ_number": 32,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608121800",
-        "cycle_time_utc": "202608121800",
-        "start_utc": "202608122200",
-        "end_utc": "202608130400"
+        "data_time": "202608121800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260813035156",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TD_2632_PEILOU_202608121800_240h.png",
@@ -2817,32 +2910,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608121800.json"
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608121800_240h.json"
     },
     {
       "job": {
-        "storm_key": "td_2026_32_typ_16",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "typ_2026_16",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202608130000",
         "td_number": 32,
         "linked_td_number": null,
+        "linked_typ_number": 16,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 32,
+        "data_typ_number": 32,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608130000",
-        "cycle_time_utc": "202608130000",
-        "start_utc": "202608130400",
-        "end_utc": "202608131000"
+        "data_time": "202608130000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260813070107",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TD_2632_PEILOU_202608130000_120h.png",
@@ -2883,32 +2979,35 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608130000.json"
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608130000_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2026_32_typ_16",
-        "stage": "TD_LINKED_TYP",
+        "storm_key": "typ_2026_16",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202608130000",
         "td_number": 32,
         "linked_td_number": null,
+        "linked_typ_number": 16,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 16,
+        "canonical_typ_name": "PEILOU",
+        "canonical_typ_name_ko": "페이러우",
         "typ_number": 32,
+        "data_typ_number": 32,
         "typ_name_ko": "페이러우",
         "typ_name": "PEILOU",
         "typ_en": "PEILOU",
         "atcf_id": "wp132026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608130000",
-        "cycle_time_utc": "202608130000",
-        "start_utc": "202608130400",
-        "end_utc": "202608131000"
+        "data_time": "202608130000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260813070122",
           "image_path": "data/2026/TYP_2616_PEILOU/images/TD_2632_PEILOU_202608130000_240h.png",
@@ -2949,8 +3048,7 @@
           "source_availability_path": "data/2026/TYP_2616_PEILOU/metadata/source_availability/202608130000.json"
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "data/2026/TYP_2616_PEILOU/metadata/runs/202608130000_240h.json"
     }
   ]
 }
