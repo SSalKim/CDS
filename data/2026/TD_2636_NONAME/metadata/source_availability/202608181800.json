@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260819003939",
-  "generated_at_kst": "2026-08-19 09:39 KST",
+  "generated_at_utc": "20260819005021",
+  "generated_at_kst": "2026-08-19 09:50 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_36",
   "storm_stage": "TD",
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 10,
-  "selected_model_count": 9,
+  "model_source_count": 12,
+  "selected_model_count": 10,
   "active_target_model_count": 38,
   "model_sources": [
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 8,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260819005021",
+      "first_seen_kst": "2026-08-19 09:50 KST"
+    },
     {
       "model_id": "FNEC_AI",
       "model_label": "FourCastNet-ECMWF",
@@ -200,6 +217,23 @@
       "is_official": false,
       "first_seen_utc": "20260818221014",
       "first_seen_kst": "2026-08-19 07:10 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext Cyclones",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 22,
+      "max_lead_hour": 168,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260819005021",
+      "first_seen_kst": "2026-08-19 09:50 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2636_NONAME/metadata/source_availability/202608181800.json"
