@@ -386,6 +386,7 @@ MS_PER_KT = 0.514444
 KMA_URL_BASE = (os.getenv("KMA_APIHUB_BASE_URL") or "https://apihub-pub.kma.go.kr/api/typ01/url").rstrip("/")
 KMA_FALLBACK_URL_BASE = (os.getenv("KMA_APIHUB_FALLBACK_BASE_URL") or "https://apihub.kma.go.kr/api/typ01/url").rstrip("/")
 SMCA_TYPHOON_API_BASE = (os.getenv("SMCA_TYPHOON_API_BASE_URL") or "https://smca.fun/api/typhoon_msg/").rstrip("/")
+SMCA_PERSISTED_MODEL_IDS = ("AICON",)
 KMA_BASE_URL = f"{KMA_URL_BASE}/typ_gts_now.php"
 KMA_TYP_NOW_URL = f"{KMA_URL_BASE}/typ_now.php"
 KMA_TD_NOW_URL = f"{KMA_URL_BASE}/td_now.php"
@@ -1564,6 +1565,149 @@ def smca_forecast_cycle(forecast: dict) -> str:
     return (bjt - pd.Timedelta(hours=8)).strftime("%Y%m%d%H%M")
 
 
+def smca_snapshot_path(settings: Settings, raw_model: str) -> Path:
+    model_id = str(raw_model or "").strip().upper()
+    cycle = normalize_utc_stamp(settings.data_time)
+    return system_output_dir(settings) / "metadata" / "smca" / model_id / f"{cycle}.json"
+
+
+def smca_snapshot_metadata_paths(settings: Settings) -> dict[str, str]:
+    paths: dict[str, str] = {}
+    for raw_model in SMCA_PERSISTED_MODEL_IDS:
+        path = smca_snapshot_path(settings, raw_model)
+        if path.exists():
+            paths[f"smca_{raw_model.lower()}_snapshot_path"] = relative_project_path(path)
+    return paths
+
+
+def smca_payload(text: str | None) -> dict | None:
+    if not text or not text.strip():
+        return None
+    try:
+        payload = json.loads(text)
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(payload, dict) or str(payload.get("code")) != "200":
+        return None
+    return payload
+
+
+def smca_cycle_snapshot_payload(
+    text: str | None,
+    settings: Settings,
+    *,
+    typhoon_id: str,
+    raw_model: str,
+) -> dict | None:
+    payload = smca_payload(text)
+    if payload is None:
+        return None
+    data = payload.get("data")
+    if not isinstance(data, dict):
+        return None
+    response_id = str(data.get("ident") or data.get("tfbh") or "").strip()
+    if response_id != typhoon_id:
+        return None
+
+    target_cycle = normalize_utc_stamp(settings.data_time)
+    model_id = str(raw_model or "").strip().upper()
+    filtered_analysis_points: list[dict] = []
+    for analysis_point in data.get("points") or []:
+        if not isinstance(analysis_point, dict):
+            continue
+        forecasts = [
+            forecast
+            for forecast in analysis_point.get("forecast") or []
+            if isinstance(forecast, dict)
+            and str(forecast.get("sets") or "").strip().upper() == model_id
+            and smca_forecast_cycle(forecast) == target_cycle
+        ]
+        if not forecasts:
+            continue
+        filtered_point = dict(analysis_point)
+        filtered_point["forecast"] = forecasts
+        filtered_analysis_points.append(filtered_point)
+    if not filtered_analysis_points:
+        return None
+
+    snapshot_data = dict(data)
+    snapshot_data["points"] = filtered_analysis_points
+    snapshot = {key: value for key, value in payload.items() if key != "data"}
+    snapshot["data"] = snapshot_data
+    return snapshot
+
+
+def update_smca_cycle_snapshot(
+    text: str | None,
+    settings: Settings,
+    *,
+    typhoon_id: str,
+    raw_model: str,
+) -> tuple[Path | None, bool]:
+    snapshot = smca_cycle_snapshot_payload(
+        text,
+        settings,
+        typhoon_id=typhoon_id,
+        raw_model=raw_model,
+    )
+    if snapshot is None:
+        return None, False
+
+    snapshot_text = json.dumps(snapshot, ensure_ascii=False)
+    frame = read_smca_json(snapshot_text, settings, typhoon_id=typhoon_id)
+    model_id = str(raw_model or "").strip().upper()
+    model_frame = frame[frame[RAW_MODEL_COLUMN].eq(model_id)] if not frame.empty else frame
+    if len(model_frame) < 2:
+        print(
+            f"Warning: refusing incomplete SMCA.FUN {model_id} snapshot at "
+            f"{normalize_utc_stamp(settings.data_time)} for {typhoon_id}: rows={len(model_frame)}"
+        )
+        return None, False
+
+    path = smca_snapshot_path(settings, model_id)
+    existing = availability_load_json(path, {})
+    existing_data = existing.get("data") if isinstance(existing, dict) else None
+    if existing_data == snapshot.get("data"):
+        return path, False
+
+    observed_at_utc = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
+    existing_metadata = existing.get("_snapshot") if isinstance(existing, dict) else None
+    first_saved_at_utc = (
+        str(existing_metadata.get("first_saved_at_utc") or "")
+        if isinstance(existing_metadata, dict)
+        else ""
+    )
+    leads = pd.to_numeric(model_frame["TMD"], errors="coerce").dropna()
+    snapshot["_snapshot"] = {
+        "version": 1,
+        "source": "SMCA.FUN",
+        "model_id": model_id,
+        "typhoon_id": typhoon_id,
+        "cycle_time_utc": normalize_utc_stamp(settings.data_time),
+        "first_saved_at_utc": first_saved_at_utc or observed_at_utc,
+        "updated_at_utc": observed_at_utc,
+        "point_count": int(len(model_frame)),
+        "max_lead_hour": int(leads.max()) if not leads.empty else None,
+    }
+    availability_write_json(path, snapshot)
+    return path, True
+
+
+def read_smca_cycle_snapshot(
+    settings: Settings,
+    *,
+    typhoon_id: str,
+    raw_model: str,
+) -> pd.DataFrame:
+    model_id = str(raw_model or "").strip().upper()
+    path = smca_snapshot_path(settings, model_id)
+    text = read_text_file(path) if path.exists() else None
+    frame = read_smca_json(text, settings, typhoon_id=typhoon_id)
+    if frame.empty:
+        return frame
+    return frame[frame[RAW_MODEL_COLUMN].eq(model_id)].reset_index(drop=True)
+
+
 def read_smca_json(text: str | None, settings: Settings, *, typhoon_id: str = "") -> pd.DataFrame:
     if not text or not text.strip():
         return empty_smca_frame()
@@ -1659,12 +1803,59 @@ def fetch_smca_data(session: requests.Session, settings: Settings) -> pd.DataFra
         url,
         retries=1,
         timeout=10,
-        cache_dir=settings.http_cache_dir,
-        cache_ttl_seconds=settings.http_cache_ttl_seconds,
+        # The URL contains only typhoonId and changes in place when a new cycle
+        # arrives, so a URL-keyed cache can replay the wrong cycle.
+        cache_dir=None,
     )
-    frame = read_smca_json(text, settings, typhoon_id=typhoon_id)
+    live_frame = read_smca_json(text, settings, typhoon_id=typhoon_id)
+    frames = [live_frame] if not live_frame.empty else []
+    restored_rows = 0
+    for raw_model in SMCA_PERSISTED_MODEL_IDS:
+        live_model = (
+            live_frame[live_frame[RAW_MODEL_COLUMN].eq(raw_model)]
+            if not live_frame.empty
+            else live_frame
+        )
+        if not live_model.empty:
+            snapshot_path, updated = update_smca_cycle_snapshot(
+                text,
+                settings,
+                typhoon_id=typhoon_id,
+                raw_model=raw_model,
+            )
+            if updated and snapshot_path is not None:
+                print(
+                    f"Updated SMCA.FUN {raw_model} cycle snapshot: "
+                    f"{relative_project_path(snapshot_path)} rows={len(live_model)}"
+                )
+            continue
+
+        snapshot_frame = read_smca_cycle_snapshot(
+            settings,
+            typhoon_id=typhoon_id,
+            raw_model=raw_model,
+        )
+        if snapshot_frame.empty:
+            continue
+        restored_rows += len(snapshot_frame)
+        frames.append(snapshot_frame)
+        print(
+            f"SMCA.FUN live response has no {raw_model} initialized at "
+            f"{normalize_utc_stamp(settings.data_time)}; restored {len(snapshot_frame)} row(s) "
+            f"from {relative_project_path(smca_snapshot_path(settings, raw_model))}."
+        )
+
+    frame = pd.concat(frames, ignore_index=True, sort=False) if frames else empty_smca_frame()
     if not frame.empty:
-        print(f"Loaded SMCA.FUN source data: {typhoon_id} rows={len(frame)}")
+        frame = frame.drop_duplicates(
+            subset=["SRC", "TMD", "LAT", "LON"],
+            keep="first",
+        ).reset_index(drop=True)
+    if not frame.empty:
+        print(
+            f"Loaded SMCA.FUN source data: {typhoon_id} rows={len(frame)} "
+            f"snapshot_rows={restored_rows}"
+        )
     return frame
 
 
@@ -3436,6 +3627,7 @@ def source_availability_snapshot(
         "active_target_model_count": active_model_target_count(settings),
         "model_sources": entries,
         **source_availability_metadata_paths(settings, observed_at_utc, existing_only=False),
+        **smca_snapshot_metadata_paths(settings),
     }
 
 
@@ -3878,6 +4070,7 @@ def write_run_metadata(
         "model_labels": model_labels,
         "skip_atcf": settings.skip_atcf,
         **source_availability_metadata_paths(settings),
+        **smca_snapshot_metadata_paths(settings),
     }
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -3927,6 +4120,7 @@ def write_no_output_metadata(
         "model_labels": [],
         "skip_atcf": settings.skip_atcf,
         **source_availability_metadata_paths(settings),
+        **smca_snapshot_metadata_paths(settings),
         "no_output": True,
         "no_output_reason": reason,
     }
