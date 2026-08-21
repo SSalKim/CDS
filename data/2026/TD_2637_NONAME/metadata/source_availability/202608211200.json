@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260821194036",
-  "generated_at_kst": "2026-08-22 04:40 KST",
+  "generated_at_utc": "20260821195056",
+  "generated_at_kst": "2026-08-22 04:50 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_37",
   "storm_stage": "TD",
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 49,
-  "selected_model_count": 29,
+  "model_source_count": 54,
+  "selected_model_count": 32,
   "active_target_model_count": 39,
   "model_sources": [
+    {
+      "model_id": "AGFS",
+      "model_label": "AIGFS",
+      "raw_model_ids": [
+        "AGFS"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 21,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260821195056",
+      "first_seen_kst": "2026-08-22 04:50 KST"
+    },
     {
       "model_id": "AIGEFS",
       "model_label": "AIGFS EPS",
@@ -185,6 +202,23 @@
       "first_seen_kst": "2026-08-22 04:20 KST"
     },
     {
+      "model_id": "CTCX",
+      "model_label": "COAMPS-TC",
+      "raw_model_ids": [
+        "CTCX"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260821195056",
+      "first_seen_kst": "2026-08-22 04:50 KST"
+    },
+    {
       "model_id": "ECMWF",
       "model_label": "ECMWF",
       "raw_model_ids": [
@@ -260,7 +294,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 20,
       "max_lead_hour": 126,
       "has_pressure": true,
@@ -268,6 +302,23 @@
       "is_official": false,
       "first_seen_utc": "20260821192034",
       "first_seen_kst": "2026-08-22 04:20 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "ECMWF_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260821195056",
+      "first_seen_kst": "2026-08-22 04:50 KST"
     },
     {
       "model_id": "FNEC_AI",
@@ -346,8 +397,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 30,
-      "max_lead_hour": 174,
+      "point_count": 36,
+      "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -523,6 +574,23 @@
       "is_official": false,
       "first_seen_utc": "20260821184142",
       "first_seen_kst": "2026-08-22 03:41 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HFSA"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 11,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260821195056",
+      "first_seen_kst": "2026-08-22 04:50 KST"
     },
     {
       "model_id": "ICON",
@@ -720,8 +788,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": true,
-      "point_count": 26,
-      "max_lead_hour": 150,
+      "point_count": 27,
+      "max_lead_hour": 162,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -812,6 +880,23 @@
       "is_official": false,
       "first_seen_utc": "20260821192034",
       "first_seen_kst": "2026-08-22 04:20 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260821195056",
+      "first_seen_kst": "2026-08-22 04:50 KST"
     },
     {
       "model_id": "WNC",
