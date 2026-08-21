@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260821131028",
-  "generated_at_kst": "2026-08-21 22:10 KST",
+  "generated_at_utc": "20260821132033",
+  "generated_at_kst": "2026-08-21 22:20 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_37",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 20,
-  "selected_model_count": 13,
+  "model_source_count": 22,
+  "selected_model_count": 12,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -39,8 +39,8 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
-      "point_count": 23,
+      "selected": false,
+      "point_count": 13,
       "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
@@ -142,8 +142,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 21,
-      "max_lead_hour": 120,
+      "point_count": 22,
+      "max_lead_hour": 126,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -176,8 +176,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 18,
-      "max_lead_hour": 102,
+      "point_count": 25,
+      "max_lead_hour": 144,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -193,7 +193,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 33,
+      "point_count": 2,
       "max_lead_hour": 192,
       "has_pressure": true,
       "has_wind": true,
@@ -234,6 +234,23 @@
       "is_official": false,
       "first_seen_utc": "20260821131028",
       "first_seen_kst": "2026-08-21 22:10 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260821132033",
+      "first_seen_kst": "2026-08-21 22:20 KST"
     },
     {
       "model_id": "HAFS",
@@ -370,6 +387,23 @@
       "is_official": false,
       "first_seen_utc": "20260821125033",
       "first_seen_kst": "2026-08-21 21:50 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext Cyclones",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 26,
+      "max_lead_hour": 150,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260821132033",
+      "first_seen_kst": "2026-08-21 22:20 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2637_NONAME/metadata/source_availability/202608210600.json"
