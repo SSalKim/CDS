@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260822184040",
-  "generated_at_kst": "2026-08-23 03:40 KST",
+  "generated_at_utc": "20260822185128",
+  "generated_at_kst": "2026-08-23 03:51 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_20",
   "storm_stage": "TYP",
@@ -15,7 +15,7 @@
   "canonical_typ_number": 20,
   "canonical_typ_name": "GAENARI",
   "canonical_typ_name_ko": "개나리",
-  "linked_td_number": null,
+  "linked_td_number": 38,
   "linked_typ_number": null,
   "atcf_id": "wp942026",
   "extra_atcf_ids": [],
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 15,
-  "selected_model_count": 10,
+  "model_source_count": 17,
+  "selected_model_count": 11,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -47,6 +47,23 @@
       "is_official": false,
       "first_seen_utc": "20260822182044",
       "first_seen_kst": "2026-08-23 03:20 KST"
+    },
+    {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 4,
+      "max_lead_hour": 18,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822185128",
+      "first_seen_kst": "2026-08-23 03:51 KST"
     },
     {
       "model_id": "CMC_EPS",
@@ -74,13 +91,30 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 5,
-      "max_lead_hour": 30,
+      "point_count": 7,
+      "max_lead_hour": 78,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
       "first_seen_utc": "20260822182044",
       "first_seen_kst": "2026-08-23 03:20 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "ECMWF_AIFS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822185128",
+      "first_seen_kst": "2026-08-23 03:51 KST"
     },
     {
       "model_id": "ECMWF_AIFS_EPS",
