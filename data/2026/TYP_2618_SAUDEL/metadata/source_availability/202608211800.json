@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260822002216",
-  "generated_at_kst": "2026-08-22 09:22 KST",
+  "generated_at_utc": "20260822003043",
+  "generated_at_kst": "2026-08-22 09:30 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_18",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 22,
-  "selected_model_count": 11,
+  "model_source_count": 24,
+  "selected_model_count": 12,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -98,6 +98,23 @@
       "is_official": false,
       "first_seen_utc": "20260822002216",
       "first_seen_kst": "2026-08-22 09:22 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 23,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822003043",
+      "first_seen_kst": "2026-08-22 09:30 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -405,6 +422,23 @@
       "is_official": true,
       "first_seen_utc": "20260821220036",
       "first_seen_kst": "2026-08-22 07:00 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext Cyclones",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822003043",
+      "first_seen_kst": "2026-08-22 09:30 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2618_SAUDEL/metadata/source_availability/202608211800.json",
