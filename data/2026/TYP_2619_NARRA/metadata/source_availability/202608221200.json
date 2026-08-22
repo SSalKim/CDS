@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260822214113",
-  "generated_at_kst": "2026-08-23 06:41 KST",
+  "generated_at_utc": "20260822215239",
+  "generated_at_kst": "2026-08-23 06:52 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_19",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 79,
-  "selected_model_count": 33,
+  "model_source_count": 80,
+  "selected_model_count": 34,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -279,13 +279,30 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": true,
-      "point_count": 15,
+      "point_count": 16,
       "max_lead_hour": 126,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
       "first_seen_utc": "20260822205106",
       "first_seen_kst": "2026-08-23 05:51 KST"
+    },
+    {
+      "model_id": "COAMPS_EPS",
+      "model_label": "COAMPS-TC EPS",
+      "raw_model_ids": [
+        "CTMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 2,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822215239",
+      "first_seen_kst": "2026-08-23 06:52 KST"
     },
     {
       "model_id": "ECMWF",
@@ -637,8 +654,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 21,
-      "max_lead_hour": 126,
+      "point_count": 23,
+      "max_lead_hour": 132,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -927,10 +944,10 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 20,
-      "max_lead_hour": 132,
+      "point_count": 2,
+      "max_lead_hour": 126,
       "has_pressure": true,
-      "has_wind": true,
+      "has_wind": false,
       "is_official": false,
       "first_seen_utc": "20260822212212",
       "first_seen_kst": "2026-08-23 06:22 KST"
@@ -1183,8 +1200,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 20,
-      "max_lead_hour": 114,
+      "point_count": 15,
+      "max_lead_hour": 108,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -1200,8 +1217,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 24,
-      "max_lead_hour": 138,
+      "point_count": 21,
+      "max_lead_hour": 222,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -1311,21 +1328,21 @@
       "first_seen_kst": "2026-08-23 04:21 KST"
     },
     {
-      "model_id": "UKM",
-      "model_label": "UKMO",
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
       "raw_model_ids": [
-        "UKM"
+        "UEMN"
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": false,
+      "selected": true,
       "point_count": 20,
-      "max_lead_hour": 126,
+      "max_lead_hour": 114,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260822192103",
-      "first_seen_kst": "2026-08-23 04:21 KST"
+      "first_seen_utc": "20260822215239",
+      "first_seen_kst": "2026-08-23 06:52 KST"
     },
     {
       "model_id": "WNC",
