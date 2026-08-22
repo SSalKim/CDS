@@ -1,10 +1,10 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260822020115",
-  "generated_at_kst": "2026-08-22 11:01 KST",
+  "generated_at_utc": "20260822023101",
+  "generated_at_kst": "2026-08-22 11:31 KST",
   "storm_year": "2026",
-  "storm_key": "td_2026_37",
+  "storm_key": "typ_2026_19",
   "storm_stage": "TD",
   "typ_number": 37,
   "data_typ_number": 37,
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 32,
-  "selected_model_count": 18,
+  "model_source_count": 34,
+  "selected_model_count": 19,
   "active_target_model_count": 39,
   "model_sources": [
+    {
+      "model_id": "AICON",
+      "model_label": "AICON",
+      "raw_model_ids": [
+        "AICON"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 19,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822023101",
+      "first_seen_kst": "2026-08-22 11:31 KST"
+    },
     {
       "model_id": "AGFS",
       "model_label": "AIGFS",
@@ -56,7 +73,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 41,
       "max_lead_hour": 240,
       "has_pressure": true,
@@ -64,6 +81,23 @@
       "is_official": false,
       "first_seen_utc": "20260821232044",
       "first_seen_kst": "2026-08-22 08:20 KST"
+    },
+    {
+      "model_id": "AIGEFS",
+      "model_label": "AIGFS EPS",
+      "raw_model_ids": [
+        "AIGEFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 40,
+      "max_lead_hour": 234,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822023101",
+      "first_seen_kst": "2026-08-22 11:31 KST"
     },
     {
       "model_id": "CTCX",
@@ -576,5 +610,6 @@
       "first_seen_kst": "2026-08-22 09:51 KST"
     }
   ],
-  "source_availability_path": "data/2026/TYP_2619_NARRA/metadata/source_availability/202608211800.json"
+  "source_availability_path": "data/2026/TYP_2619_NARRA/metadata/source_availability/202608211800.json",
+  "smca_aicon_snapshot_path": "data/2026/TYP_2619_NARRA/metadata/smca/AICON/202608211800.json"
 }
