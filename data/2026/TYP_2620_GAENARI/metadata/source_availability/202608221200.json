@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260822190112",
-  "generated_at_kst": "2026-08-23 04:01 KST",
+  "generated_at_utc": "20260822191132",
+  "generated_at_kst": "2026-08-23 04:11 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_20",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 18,
-  "selected_model_count": 11,
+  "model_source_count": 23,
+  "selected_model_count": 15,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -98,6 +98,23 @@
       "is_official": false,
       "first_seen_utc": "20260822182044",
       "first_seen_kst": "2026-08-23 03:20 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260822191132",
+      "first_seen_kst": "2026-08-23 04:11 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -302,6 +319,75 @@
       "is_official": false,
       "first_seen_utc": "20260822164025",
       "first_seen_kst": "2026-08-23 01:40 KST"
+    },
+    {
+      "model_id": "KIM_3h",
+      "model_label": "KIM",
+      "raw_model_ids": [
+        "KIM_3h"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260822191132",
+      "first_seen_kst": "2026-08-23 04:11 KST"
+    },
+    {
+      "model_id": "KIM_6h",
+      "model_label": "KIM",
+      "raw_model_ids": [
+        "KIM_6h"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260822191132",
+      "first_seen_kst": "2026-08-23 04:11 KST"
+    },
+    {
+      "model_id": "KIM_EPS",
+      "model_label": "KIM EPS",
+      "raw_model_ids": [
+        "KIM_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260822191132",
+      "first_seen_kst": "2026-08-23 04:11 KST"
+    },
+    {
+      "model_id": "KIM_EPS",
+      "model_label": "KIM EPS",
+      "raw_model_ids": [
+        "KIM_EPS",
+        "KIM_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 59,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822191132",
+      "first_seen_kst": "2026-08-23 04:11 KST"
     },
     {
       "model_id": "KMA",
