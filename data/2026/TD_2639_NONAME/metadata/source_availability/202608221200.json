@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260822194133",
-  "generated_at_kst": "2026-08-23 04:41 KST",
+  "generated_at_utc": "20260822195116",
+  "generated_at_kst": "2026-08-23 04:51 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_39",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 44,
-  "selected_model_count": 24,
+  "model_source_count": 46,
+  "selected_model_count": 26,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -142,8 +142,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 32,
-      "max_lead_hour": 234,
+      "point_count": 41,
+      "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -268,6 +268,23 @@
       "is_official": false,
       "first_seen_utc": "20260822192157",
       "first_seen_kst": "2026-08-23 04:21 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "ECMWF_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822195116",
+      "first_seen_kst": "2026-08-23 04:51 KST"
     },
     {
       "model_id": "FNEC_AI",
@@ -727,6 +744,23 @@
       "is_official": false,
       "first_seen_utc": "20260822192157",
       "first_seen_kst": "2026-08-23 04:21 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822195116",
+      "first_seen_kst": "2026-08-23 04:51 KST"
     },
     {
       "model_id": "WNC",
