@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260822122021",
-  "generated_at_kst": "2026-08-22 21:20 KST",
+  "generated_at_utc": "20260822123020",
+  "generated_at_kst": "2026-08-22 21:30 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_20",
   "storm_stage": "TYP",
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 8,
-  "selected_model_count": 5,
+  "model_source_count": 11,
+  "selected_model_count": 8,
   "active_target_model_count": 39,
   "model_sources": [
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260822123020",
+      "first_seen_kst": "2026-08-22 21:30 KST"
+    },
     {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
@@ -81,6 +98,40 @@
       "is_official": false,
       "first_seen_utc": "20260822122021",
       "first_seen_kst": "2026-08-22 21:20 KST"
+    },
+    {
+      "model_id": "ICON",
+      "model_label": "ICON",
+      "raw_model_ids": [
+        "icon"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 5,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822123020",
+      "first_seen_kst": "2026-08-22 21:30 KST"
+    },
+    {
+      "model_id": "ICON_EPS",
+      "model_label": "ICON EPS",
+      "raw_model_ids": [
+        "ICON_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 5,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822123020",
+      "first_seen_kst": "2026-08-22 21:30 KST"
     },
     {
       "model_id": "JGSM",
