@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260822125042",
-  "generated_at_kst": "2026-08-22 21:50 KST",
+  "generated_at_utc": "20260822130032",
+  "generated_at_kst": "2026-08-22 22:00 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_18",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 29,
-  "selected_model_count": 14,
+  "model_source_count": 32,
+  "selected_model_count": 15,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -322,6 +322,40 @@
       "first_seen_kst": "2026-08-22 21:30 KST"
     },
     {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822130032",
+      "first_seen_kst": "2026-08-22 22:00 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822130032",
+      "first_seen_kst": "2026-08-22 22:00 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -524,6 +558,23 @@
       "is_official": false,
       "first_seen_utc": "20260822125042",
       "first_seen_kst": "2026-08-22 21:50 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext Cyclones",
+      "raw_model_ids": [
+        "DEEPMIND"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822130032",
+      "first_seen_kst": "2026-08-22 22:00 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2618_SAUDEL/metadata/source_availability/202608220600.json",

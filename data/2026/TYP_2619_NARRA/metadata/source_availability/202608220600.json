@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260822125115",
-  "generated_at_kst": "2026-08-22 21:51 KST",
+  "generated_at_utc": "20260822130111",
+  "generated_at_kst": "2026-08-22 22:01 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_19",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 15,
-  "selected_model_count": 11,
+  "model_source_count": 17,
+  "selected_model_count": 12,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -183,6 +183,40 @@
       "is_official": false,
       "first_seen_utc": "20260822122058",
       "first_seen_kst": "2026-08-22 21:20 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 27,
+      "max_lead_hour": 156,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822130111",
+      "first_seen_kst": "2026-08-22 22:01 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 19,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822130111",
+      "first_seen_kst": "2026-08-22 22:01 KST"
     },
     {
       "model_id": "HAFS",
