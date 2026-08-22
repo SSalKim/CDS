@@ -1,0 +1,20 @@
+{
+  "cycle": "2026082206",
+  "cycle_utc": "202608220600",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":12,"member_id":null,"model_id":"JGSM","point_count":2,"raw_model_id":"JGSM","row_count":2,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 2,
+  "points": [
+    [0,6,"202608221200",27.3,123.4,998,17.5,-9,null,0,null],
+    [0,12,"202608221800",28.6,121.9,998,15.9,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"1","storm_kind":"typ","typ_seq":20,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"GAENARI","canonical_typ_name_ko":"개나리","canonical_typ_number":20,"data_typ_number":20,"dmdw_o_tm_seq":"1","dmdw_start_time":"202608220300","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_20"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
