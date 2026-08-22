@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260822151043",
-  "generated_at_kst": "2026-08-23 00:10 KST",
+  "generated_at_utc": "20260822152040",
+  "generated_at_kst": "2026-08-23 00:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_18",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 47,
+  "model_source_count": 50,
   "selected_model_count": 22,
   "active_target_model_count": 39,
   "model_sources": [
@@ -73,7 +73,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": false,
+      "selected": true,
       "point_count": 41,
       "max_lead_hour": 240,
       "has_pressure": true,
@@ -81,23 +81,6 @@
       "is_official": false,
       "first_seen_utc": "20260822105024",
       "first_seen_kst": "2026-08-22 19:50 KST"
-    },
-    {
-      "model_id": "AIGEFS",
-      "model_label": "AIGFS EPS",
-      "raw_model_ids": [
-        "AIGEFSM"
-      ],
-      "source": "SMCA.FUN",
-      "source_label": "SMCA.FUN",
-      "selected": true,
-      "point_count": 41,
-      "max_lead_hour": 240,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260822112020",
-      "first_seen_kst": "2026-08-22 20:20 KST"
     },
     {
       "model_id": "HKO_AREC",
@@ -193,8 +176,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 6,
-      "max_lead_hour": 114,
+      "point_count": 19,
+      "max_lead_hour": 144,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -354,6 +337,23 @@
       "is_official": false,
       "first_seen_utc": "20260822135058",
       "first_seen_kst": "2026-08-22 22:50 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822152040",
+      "first_seen_kst": "2026-08-23 00:20 KST"
     },
     {
       "model_id": "HKO_FWEC",
@@ -527,6 +527,23 @@
       "first_seen_kst": "2026-08-22 22:00 KST"
     },
     {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260822152040",
+      "first_seen_kst": "2026-08-23 00:20 KST"
+    },
+    {
       "model_id": "GENC",
       "model_label": "GenCast",
       "raw_model_ids": [
@@ -697,6 +714,23 @@
       "first_seen_kst": "2026-08-22 19:21 KST"
     },
     {
+      "model_id": "JGSM",
+      "model_label": "JGSM",
+      "raw_model_ids": [
+        "JGSM"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 12,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260822152040",
+      "first_seen_kst": "2026-08-23 00:20 KST"
+    },
+    {
       "model_id": "TEPS",
       "model_label": "JGSM EPS",
       "raw_model_ids": [
@@ -729,6 +763,23 @@
       "is_official": false,
       "first_seen_utc": "20260822103226",
       "first_seen_kst": "2026-08-22 19:32 KST"
+    },
+    {
+      "model_id": "TEPS",
+      "model_label": "JGSM EPS",
+      "raw_model_ids": [
+        "JENS"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 11,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260822152040",
+      "first_seen_kst": "2026-08-23 00:20 KST"
     },
     {
       "model_id": "KMA",
