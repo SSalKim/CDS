@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260823193034",
-  "generated_at_kst": "2026-08-24 04:30 KST",
+  "generated_at_utc": "20260823194050",
+  "generated_at_kst": "2026-08-24 04:40 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_18",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 57,
-  "selected_model_count": 27,
+  "model_source_count": 59,
+  "selected_model_count": 28,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -192,7 +192,7 @@
       ],
       "source": "RAL.UCAR",
       "source_label": "RAL UCAR ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 40,
       "max_lead_hour": 234,
       "has_pressure": true,
@@ -200,6 +200,23 @@
       "is_official": false,
       "first_seen_utc": "20260823193034",
       "first_seen_kst": "2026-08-24 04:30 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 40,
+      "max_lead_hour": 234,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823194050",
+      "first_seen_kst": "2026-08-24 04:40 KST"
     },
     {
       "model_id": "CTCX",
@@ -370,6 +387,23 @@
       "is_official": false,
       "first_seen_utc": "20260823192051",
       "first_seen_kst": "2026-08-24 04:20 KST"
+    },
+    {
+      "model_id": "FNEC_AI",
+      "model_label": "FourCastNet-ECMWF",
+      "raw_model_ids": [
+        "FNEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823194050",
+      "first_seen_kst": "2026-08-24 04:40 KST"
     },
     {
       "model_id": "GFS",
