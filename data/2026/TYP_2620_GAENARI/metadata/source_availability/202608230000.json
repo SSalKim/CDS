@@ -1,0 +1,104 @@
+{
+  "version": 2,
+  "schema": "cycle_model_source_first_seen",
+  "generated_at_utc": "20260823040308",
+  "generated_at_kst": "2026-08-23 13:03 KST",
+  "storm_year": "2026",
+  "storm_key": "typ_2026_20",
+  "storm_stage": "TYP",
+  "typ_number": 20,
+  "data_typ_number": 20,
+  "typ_name": "GAENARI",
+  "typ_name_ko": "개나리",
+  "canonical_storm_key": "typ_2026_20",
+  "canonical_storm_stage": "TYP",
+  "canonical_typ_number": 20,
+  "canonical_typ_name": "GAENARI",
+  "canonical_typ_name_ko": "개나리",
+  "linked_td_number": 38,
+  "linked_typ_number": null,
+  "atcf_id": "wp942026",
+  "extra_atcf_ids": [],
+  "data_time": "202608230000",
+  "cycle_time_utc": "202608230000",
+  "cycle_label_utc": "2026-08-23 00UTC",
+  "fetch_hours": 240,
+  "requested_hours": [
+    120,
+    240
+  ],
+  "model_source_count": 4,
+  "selected_model_count": 3,
+  "active_target_model_count": 39,
+  "model_sources": [
+    {
+      "model_id": "ICON",
+      "model_label": "ICON",
+      "raw_model_ids": [
+        "icon"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 8,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823040308",
+      "first_seen_kst": "2026-08-23 13:03 KST"
+    },
+    {
+      "model_id": "ICON_EPS",
+      "model_label": "ICON EPS",
+      "raw_model_ids": [
+        "ICON_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 4,
+      "max_lead_hour": 18,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823040308",
+      "first_seen_kst": "2026-08-23 13:03 KST"
+    },
+    {
+      "model_id": "JGSM",
+      "model_label": "JGSM",
+      "raw_model_ids": [
+        "JGSM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823040308",
+      "first_seen_kst": "2026-08-23 13:03 KST"
+    },
+    {
+      "model_id": "KMA",
+      "model_label": "KMA OFCL",
+      "raw_model_ids": [
+        "KMA"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 4,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": true,
+      "first_seen_utc": "20260823040308",
+      "first_seen_kst": "2026-08-23 13:03 KST"
+    }
+  ],
+  "source_availability_path": "data/2026/TYP_2620_GAENARI/metadata/source_availability/202608230000.json"
+}
