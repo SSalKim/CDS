@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260823151044",
-  "generated_at_kst": "2026-08-24 00:10 KST",
+  "generated_at_utc": "20260823152045",
+  "generated_at_kst": "2026-08-24 00:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_18",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 49,
+  "model_source_count": 50,
   "selected_model_count": 22,
   "active_target_model_count": 39,
   "model_sources": [
@@ -125,7 +125,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": true,
-      "point_count": 11,
+      "point_count": 22,
       "max_lead_hour": 126,
       "has_pressure": true,
       "has_wind": true,
@@ -244,7 +244,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 6,
+      "point_count": 25,
       "max_lead_hour": 204,
       "has_pressure": true,
       "has_wind": true,
@@ -356,6 +356,23 @@
       "first_seen_kst": "2026-08-23 22:50 KST"
     },
     {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 24,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823152045",
+      "first_seen_kst": "2026-08-24 00:20 KST"
+    },
+    {
       "model_id": "HKO_FWEC",
       "model_label": "FengWu-ECMWF",
       "raw_model_ids": [
@@ -449,7 +466,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 39,
+      "point_count": 41,
       "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
@@ -518,7 +535,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 6,
+      "point_count": 4,
       "max_lead_hour": 180,
       "has_pressure": true,
       "has_wind": true,
@@ -758,8 +775,8 @@
       "selected": false,
       "point_count": 23,
       "max_lead_hour": 132,
-      "has_pressure": true,
-      "has_wind": false,
+      "has_pressure": false,
+      "has_wind": true,
       "is_official": false,
       "first_seen_utc": "20260823132052",
       "first_seen_kst": "2026-08-23 22:20 KST"
