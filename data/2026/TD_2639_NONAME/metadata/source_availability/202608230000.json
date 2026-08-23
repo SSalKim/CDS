@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260823070116",
-  "generated_at_kst": "2026-08-23 16:01 KST",
+  "generated_at_utc": "20260823071113",
+  "generated_at_kst": "2026-08-23 16:11 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_39",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 23,
-  "selected_model_count": 12,
+  "model_source_count": 25,
+  "selected_model_count": 14,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -185,6 +185,23 @@
       "first_seen_kst": "2026-08-23 15:51 KST"
     },
     {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823071113",
+      "first_seen_kst": "2026-08-23 16:11 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
       "raw_model_ids": [
@@ -268,6 +285,23 @@
       "is_official": false,
       "first_seen_utc": "20260823065117",
       "first_seen_kst": "2026-08-23 15:51 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 7,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823071113",
+      "first_seen_kst": "2026-08-23 16:11 KST"
     },
     {
       "model_id": "ICON",
