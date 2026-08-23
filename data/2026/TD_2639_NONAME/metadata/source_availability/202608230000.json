@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260823072128",
-  "generated_at_kst": "2026-08-23 16:21 KST",
+  "generated_at_utc": "20260823073116",
+  "generated_at_kst": "2026-08-23 16:31 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_39",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 38,
-  "selected_model_count": 22,
+  "model_source_count": 41,
+  "selected_model_count": 23,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -142,8 +142,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 14,
-      "max_lead_hour": 78,
+      "point_count": 19,
+      "max_lead_hour": 108,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -251,6 +251,40 @@
       "is_official": false,
       "first_seen_utc": "20260823061059",
       "first_seen_kst": "2026-08-23 15:10 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823073116",
+      "first_seen_kst": "2026-08-23 16:31 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 17,
+      "max_lead_hour": 96,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823073116",
+      "first_seen_kst": "2026-08-23 16:31 KST"
     },
     {
       "model_id": "ECMWF_EPS",
@@ -404,6 +438,23 @@
       "is_official": false,
       "first_seen_utc": "20260823071113",
       "first_seen_kst": "2026-08-23 16:11 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 5,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823073116",
+      "first_seen_kst": "2026-08-23 16:31 KST"
     },
     {
       "model_id": "ICON",
