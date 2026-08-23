@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260823023206",
-  "generated_at_kst": "2026-08-23 11:32 KST",
+  "generated_at_utc": "20260823024225",
+  "generated_at_kst": "2026-08-23 11:42 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_20",
   "storm_stage": "TYP",
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 24,
-  "selected_model_count": 12,
+  "model_source_count": 27,
+  "selected_model_count": 15,
   "active_target_model_count": 39,
   "model_sources": [
+    {
+      "model_id": "HKO_AREC",
+      "model_label": "Aurora-ECMWF",
+      "raw_model_ids": [
+        "HKO_AREC"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823024225",
+      "first_seen_kst": "2026-08-23 11:42 KST"
+    },
     {
       "model_id": "ECMWF",
       "model_label": "ECMWF",
@@ -218,6 +235,40 @@
       "is_official": false,
       "first_seen_utc": "20260823022120",
       "first_seen_kst": "2026-08-23 11:21 KST"
+    },
+    {
+      "model_id": "HKO_FWEC",
+      "model_label": "FengWu-ECMWF",
+      "raw_model_ids": [
+        "HKO_FWEC"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 37,
+      "max_lead_hour": 216,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823024225",
+      "first_seen_kst": "2026-08-23 11:42 KST"
+    },
+    {
+      "model_id": "HKO_FXEC",
+      "model_label": "FuXi-ECMWF",
+      "raw_model_ids": [
+        "HKO_FXEC"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 8,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823024225",
+      "first_seen_kst": "2026-08-23 11:42 KST"
     },
     {
       "model_id": "GFS",
