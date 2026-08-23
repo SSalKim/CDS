@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260823192051",
-  "generated_at_kst": "2026-08-24 04:20 KST",
+  "generated_at_utc": "20260823193036",
+  "generated_at_kst": "2026-08-24 04:30 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_19",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 45,
-  "selected_model_count": 20,
+  "model_source_count": 48,
+  "selected_model_count": 21,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -151,6 +151,23 @@
       "first_seen_kst": "2026-08-24 04:20 KST"
     },
     {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": true,
+      "point_count": 22,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823193036",
+      "first_seen_kst": "2026-08-24 04:30 KST"
+    },
+    {
       "model_id": "ECMWF",
       "model_label": "ECMWF",
       "raw_model_ids": [
@@ -219,6 +236,23 @@
       "first_seen_kst": "2026-08-24 03:50 KST"
     },
     {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823193036",
+      "first_seen_kst": "2026-08-24 04:30 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS_EPS",
       "model_label": "ECMWF AIFS EPS",
       "raw_model_ids": [
@@ -234,6 +268,23 @@
       "is_official": false,
       "first_seen_utc": "20260823184041",
       "first_seen_kst": "2026-08-24 03:40 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823193036",
+      "first_seen_kst": "2026-08-24 04:30 KST"
     },
     {
       "model_id": "GFS",
