@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260824000121",
-  "generated_at_kst": "2026-08-24 09:01 KST",
+  "generated_at_utc": "20260824001117",
+  "generated_at_kst": "2026-08-24 09:11 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_39",
   "storm_stage": "TD",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 9,
+  "model_source_count": 11,
   "selected_model_count": 7,
   "active_target_model_count": 39,
   "model_sources": [
@@ -56,7 +56,7 @@
       ],
       "source": "POLARWX",
       "source_label": "POLARWX",
-      "selected": true,
+      "selected": false,
       "point_count": 12,
       "max_lead_hour": 66,
       "has_pressure": true,
@@ -66,21 +66,21 @@
       "first_seen_kst": "2026-08-24 08:51 KST"
     },
     {
-      "model_id": "GFS_EPS",
-      "model_label": "GFS EPS",
+      "model_id": "GFS",
+      "model_label": "GFS",
       "raw_model_ids": [
-        "GEFS_MEAN"
+        "GFS"
       ],
-      "source": "POLARWX",
-      "source_label": "POLARWX",
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 12,
-      "max_lead_hour": 66,
+      "point_count": 8,
+      "max_lead_hour": 42,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260823235130",
-      "first_seen_kst": "2026-08-24 08:51 KST"
+      "first_seen_utc": "20260824001117",
+      "first_seen_kst": "2026-08-24 09:11 KST"
     },
     {
       "model_id": "GFS_EPS",
@@ -98,6 +98,40 @@
       "is_official": false,
       "first_seen_utc": "20260823235130",
       "first_seen_kst": "2026-08-24 08:51 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GEFS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260823235130",
+      "first_seen_kst": "2026-08-24 08:51 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GFS_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 10,
+      "max_lead_hour": 54,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824001117",
+      "first_seen_kst": "2026-08-24 09:11 KST"
     },
     {
       "model_id": "ICON",
