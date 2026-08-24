@@ -1,0 +1,24 @@
+{
+  "cycle": "2026082418",
+  "cycle_utc": "202608241800",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":30,"member_id":null,"model_id":"JGSM","point_count":6,"raw_model_id":"JGSM","row_count":6,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 6,
+  "points": [
+    [0,0,"202608241800",18.2,138.1,998,18,36,0,160,null],
+    [0,6,"202608250000",19.2,137.6,1000,16.5,-9,null,0,null],
+    [0,12,"202608250600",20.4,137.2,999,17,-9,null,0,null],
+    [0,18,"202608251200",21.5,136.4,1001,17.5,-9,null,0,null],
+    [0,24,"202608251800",22.9,135.6,999,16.5,-9,null,0,null],
+    [0,30,"202608260000",24.1,134.9,1001,17,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"4","storm_kind":"typ","typ_seq":21,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"ATSANI","canonical_typ_name_ko":"앗사니","canonical_typ_number":21,"data_typ_number":21,"dmdw_o_tm_seq":"4","dmdw_start_time":"202608240000","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_21"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
