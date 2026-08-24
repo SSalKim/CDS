@@ -1,0 +1,122 @@
+{
+  "version": 2,
+  "schema": "cycle_model_source_first_seen",
+  "generated_at_utc": "20260824100114",
+  "generated_at_kst": "2026-08-24 19:01 KST",
+  "storm_year": "2026",
+  "storm_key": "typ_2026_21",
+  "storm_stage": "TYP",
+  "typ_number": 21,
+  "data_typ_number": 21,
+  "typ_name": "ATSANI",
+  "typ_name_ko": "앗사니",
+  "canonical_storm_key": "typ_2026_21",
+  "canonical_storm_stage": "TYP",
+  "canonical_typ_number": 21,
+  "canonical_typ_name": "ATSANI",
+  "canonical_typ_name_ko": "앗사니",
+  "linked_td_number": 39,
+  "linked_typ_number": null,
+  "atcf_id": "wp192026",
+  "extra_atcf_ids": [],
+  "data_time": "202608240600",
+  "cycle_time_utc": "202608240600",
+  "cycle_label_utc": "2026-08-24 06UTC",
+  "fetch_hours": 240,
+  "requested_hours": [
+    120,
+    240
+  ],
+  "model_source_count": 5,
+  "selected_model_count": 4,
+  "active_target_model_count": 39,
+  "model_sources": [
+    {
+      "model_id": "AICON",
+      "model_label": "AICON",
+      "raw_model_ids": [
+        "AICON"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 5,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824100114",
+      "first_seen_kst": "2026-08-24 19:01 KST"
+    },
+    {
+      "model_id": "ICON",
+      "model_label": "ICON",
+      "raw_model_ids": [
+        "icon"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 13,
+      "max_lead_hour": 72,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824100114",
+      "first_seen_kst": "2026-08-24 19:01 KST"
+    },
+    {
+      "model_id": "ICON_EPS",
+      "model_label": "ICON EPS",
+      "raw_model_ids": [
+        "ICON_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824100114",
+      "first_seen_kst": "2026-08-24 19:01 KST"
+    },
+    {
+      "model_id": "JGSM",
+      "model_label": "JGSM",
+      "raw_model_ids": [
+        "JGSM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824100114",
+      "first_seen_kst": "2026-08-24 19:01 KST"
+    },
+    {
+      "model_id": "KMA",
+      "model_label": "KMA OFCL",
+      "raw_model_ids": [
+        "KMA"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 2,
+      "max_lead_hour": 12,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": true,
+      "first_seen_utc": "20260824100114",
+      "first_seen_kst": "2026-08-24 19:01 KST"
+    }
+  ],
+  "source_availability_path": "data/2026/TYP_2621_ATSANI/metadata/source_availability/202608240600.json",
+  "smca_aicon_snapshot_path": "data/2026/TYP_2621_ATSANI/metadata/smca/AICON/202608240600.json"
+}
