@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at_utc": "202608240201",
+  "updated_at_utc": "202608240210",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 39,
@@ -14,6 +14,90 @@
     }
   ],
   "runs": [
+    {
+      "job": {
+        "storm_key": "typ_2026_21",
+        "stage": "TYP_SUPPRESSED_BY_TD",
+        "year": 2026,
+        "data_time": "202608231800",
+        "td_number": 39,
+        "linked_td_number": 39,
+        "typ_number": 21,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp192026",
+        "fcst_hours": 120,
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202608231800",
+        "cycle_time_utc": "202608231800",
+        "start_utc": "202608232200",
+        "end_utc": "202608240400"
+      },
+      "result": {
+        "status": "suppressed_td_phase",
+        "metadata": {
+          "generated_at_utc": "202608240211",
+          "image_path": "",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 21,
+          "data_typ_number": 21,
+          "data_time": "202608231800",
+          "fcst_hours": 120,
+          "model_count": 0,
+          "target_model_count": 39,
+          "models": [],
+          "model_labels": [],
+          "no_output": true,
+          "no_output_reason": "Suppressed because linked TD39 phase is active."
+        }
+      }
+    },
+    {
+      "job": {
+        "storm_key": "typ_2026_21",
+        "stage": "TYP_SUPPRESSED_BY_TD",
+        "year": 2026,
+        "data_time": "202608231800",
+        "td_number": 39,
+        "linked_td_number": 39,
+        "typ_number": 21,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp192026",
+        "fcst_hours": 240,
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202608231800",
+        "cycle_time_utc": "202608231800",
+        "start_utc": "202608232200",
+        "end_utc": "202608240400"
+      },
+      "result": {
+        "status": "suppressed_td_phase",
+        "metadata": {
+          "generated_at_utc": "202608240211",
+          "image_path": "",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 21,
+          "data_typ_number": 21,
+          "data_time": "202608231800",
+          "fcst_hours": 240,
+          "model_count": 0,
+          "target_model_count": 39,
+          "models": [],
+          "model_labels": [],
+          "no_output": true,
+          "no_output_reason": "Suppressed because linked TD39 phase is active."
+        }
+      }
+    },
     {
       "job": {
         "storm_key": "typ_2026_19",
@@ -38,7 +122,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824020303",
+          "generated_at_utc": "20260824021217",
           "image_path": "data/2026/TYP_2619_NARRA/images/TYP_2619_NARRA_202608231800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -109,7 +193,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824020305",
+          "generated_at_utc": "20260824021219",
           "image_path": "data/2026/TYP_2619_NARRA/images/TYP_2619_NARRA_202608231800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -180,7 +264,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824020304",
+          "generated_at_utc": "20260824021220",
           "image_path": "data/2026/TYP_2618_SAUDEL/images/TYP_2618_SAUDEL_202608231800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -253,7 +337,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824020305",
+          "generated_at_utc": "20260824021221",
           "image_path": "data/2026/TYP_2618_SAUDEL/images/TYP_2618_SAUDEL_202608231800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -326,7 +410,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824020341",
+          "generated_at_utc": "20260824021303",
           "image_path": "data/2026/TYP_2620_GAENARI/images/TYP_2620_GAENARI_202608231800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -392,7 +476,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824020342",
+          "generated_at_utc": "20260824021304",
           "image_path": "data/2026/TYP_2620_GAENARI/images/TYP_2620_GAENARI_202608231800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -436,8 +520,8 @@
     },
     {
       "job": {
-        "storm_key": "td_2026_39",
-        "stage": "TD_POSITION_ATCF",
+        "storm_key": "td_2026_39_typ_21",
+        "stage": "TD_PRE_TYP_POSITION_ATCF",
         "year": 2026,
         "data_time": "202608231800",
         "td_number": 39,
@@ -458,8 +542,8 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824020341",
-          "image_path": "data/2026/TD_2639_NONAME/images/TD_2639_NONAME_202608231800_120h.png",
+          "generated_at_utc": "20260824021304",
+          "image_path": "data/2026/TYP_2621_ATSANI/images/TD_2639_NONAME_202608231800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 39,
@@ -467,12 +551,12 @@
           "typ_name": "NONAME",
           "typ_name_ko": "",
           "linked_td_number": null,
-          "linked_typ_number": null,
-          "canonical_storm_key": "td_2026_39",
-          "canonical_storm_stage": "TD",
-          "canonical_typ_number": 39,
-          "canonical_typ_name": "NONAME",
-          "canonical_typ_name_ko": "",
+          "linked_typ_number": 21,
+          "canonical_storm_key": "typ_2026_21",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 21,
+          "canonical_typ_name": "ATSANI",
+          "canonical_typ_name_ko": "앗사니",
           "atcf_id": "wp192026",
           "extra_atcf_ids": [],
           "data_time": "202608231800",
@@ -499,7 +583,7 @@
             "WeatherNext Cyclones"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2639_NONAME/metadata/source_availability/202608231800.json"
+          "source_availability_path": "data/2026/TYP_2621_ATSANI/metadata/source_availability/202608231800.json"
         }
       },
       "completed": false,
@@ -507,8 +591,8 @@
     },
     {
       "job": {
-        "storm_key": "td_2026_39",
-        "stage": "TD_POSITION_ATCF",
+        "storm_key": "td_2026_39_typ_21",
+        "stage": "TD_PRE_TYP_POSITION_ATCF",
         "year": 2026,
         "data_time": "202608231800",
         "td_number": 39,
@@ -529,8 +613,8 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824020343",
-          "image_path": "data/2026/TD_2639_NONAME/images/TD_2639_NONAME_202608231800_240h.png",
+          "generated_at_utc": "20260824021305",
+          "image_path": "data/2026/TYP_2621_ATSANI/images/TD_2639_NONAME_202608231800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 39,
@@ -538,12 +622,12 @@
           "typ_name": "NONAME",
           "typ_name_ko": "",
           "linked_td_number": null,
-          "linked_typ_number": null,
-          "canonical_storm_key": "td_2026_39",
-          "canonical_storm_stage": "TD",
-          "canonical_typ_number": 39,
-          "canonical_typ_name": "NONAME",
-          "canonical_typ_name_ko": "",
+          "linked_typ_number": 21,
+          "canonical_storm_key": "typ_2026_21",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 21,
+          "canonical_typ_name": "ATSANI",
+          "canonical_typ_name_ko": "앗사니",
           "atcf_id": "wp192026",
           "extra_atcf_ids": [],
           "data_time": "202608231800",
@@ -570,14 +654,14 @@
             "WeatherNext Cyclones"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2639_NONAME/metadata/source_availability/202608231800.json"
+          "source_availability_path": "data/2026/TYP_2621_ATSANI/metadata/source_availability/202608231800.json"
         }
       },
       "completed": false,
       "final_check": false
     }
   ],
-  "inventory_count": 9048,
+  "inventory_count": 9050,
   "manifest_indexes": [
     {
       "year": 2020,
