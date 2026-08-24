@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260824104116",
-  "generated_at_kst": "2026-08-24 19:41 KST",
+  "generated_at_utc": "20260824105121",
+  "generated_at_kst": "2026-08-24 19:51 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_20",
   "storm_stage": "TD",
@@ -27,9 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 0,
-  "selected_model_count": 0,
+  "model_source_count": 1,
+  "selected_model_count": 1,
   "active_target_model_count": 39,
-  "model_sources": [],
+  "model_sources": [
+    {
+      "model_id": "AIGEFS",
+      "model_label": "AIGFS EPS",
+      "raw_model_ids": [
+        "AIMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 8,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824105121",
+      "first_seen_kst": "2026-08-24 19:51 KST"
+    }
+  ],
   "source_availability_path": "data/2026/TYP_2620_GAENARI/metadata/source_availability/202608240600.json"
 }
