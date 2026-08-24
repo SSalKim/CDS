@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260824085042",
-  "generated_at_kst": "2026-08-24 17:50 KST",
+  "generated_at_utc": "20260824090200",
+  "generated_at_kst": "2026-08-24 18:02 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_18",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 61,
+  "model_source_count": 62,
   "selected_model_count": 22,
   "active_target_model_count": 39,
   "model_sources": [
@@ -790,7 +790,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 10,
       "max_lead_hour": 114,
       "has_pressure": true,
@@ -798,6 +798,23 @@
       "is_official": false,
       "first_seen_utc": "20260824082216",
       "first_seen_kst": "2026-08-24 17:22 KST"
+    },
+    {
+      "model_id": "JGSM",
+      "model_label": "JGSM",
+      "raw_model_ids": [
+        "JGSM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 21,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824090200",
+      "first_seen_kst": "2026-08-24 18:02 KST"
     },
     {
       "model_id": "TEPS",
