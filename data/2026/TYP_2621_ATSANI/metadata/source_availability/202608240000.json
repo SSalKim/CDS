@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260824051056",
-  "generated_at_kst": "2026-08-24 14:10 KST",
+  "generated_at_utc": "20260824052110",
+  "generated_at_kst": "2026-08-24 14:21 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_21",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 5,
-  "selected_model_count": 4,
+  "model_source_count": 7,
+  "selected_model_count": 5,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -47,6 +47,40 @@
       "is_official": false,
       "first_seen_utc": "20260824040103",
       "first_seen_kst": "2026-08-24 13:01 KST"
+    },
+    {
+      "model_id": "AIGEFS",
+      "model_label": "AIGFS EPS",
+      "raw_model_ids": [
+        "AIGEFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 10,
+      "max_lead_hour": 54,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824052110",
+      "first_seen_kst": "2026-08-24 14:21 KST"
+    },
+    {
+      "model_id": "AIGEFS",
+      "model_label": "AIGFS EPS",
+      "raw_model_ids": [
+        "AIMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824052110",
+      "first_seen_kst": "2026-08-24 14:21 KST"
     },
     {
       "model_id": "GFS",
