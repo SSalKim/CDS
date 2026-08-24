@@ -1,0 +1,34 @@
+{
+  "cycle": "2026082406",
+  "cycle_utc": "202608240600",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":90,"member_id":null,"model_id":"JGSM","point_count":16,"raw_model_id":"JGSM","row_count":16,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 16,
+  "points": [
+    [0,0,"202608240600",20.2,107.4,990,24,5,225,210,null],
+    [0,6,"202608241200",19.7,107.7,991,15.4,-9,null,0,null],
+    [0,12,"202608241800",19.8,108,992,15.4,-9,null,0,null],
+    [0,18,"202608250000",19.9,108.3,991,18,-9,null,0,null],
+    [0,24,"202608250600",20.1,108.5,989,19.5,-9,null,0,null],
+    [0,30,"202608251200",20.3,108.9,991,17,-9,null,0,null],
+    [0,36,"202608251800",20.7,109.3,994,15.9,-9,null,0,null],
+    [0,42,"202608260000",21.2,109.6,995,12.9,-9,null,0,null],
+    [0,48,"202608260600",21.7,109.7,996,8.7,-9,null,0,null],
+    [0,54,"202608261200",22.1,109.6,998,7.2,-9,null,0,null],
+    [0,60,"202608261800",22.6,109.4,998,7.2,-9,null,0,null],
+    [0,66,"202608270000",22.9,109.3,1000,6.7,-9,null,0,null],
+    [0,72,"202608270600",23.2,109.3,999,7.2,-9,null,0,null],
+    [0,78,"202608271200",23.6,109,999,5.1,-9,null,0,null],
+    [0,84,"202608271800",24,108.4,998,6.2,-9,null,0,null],
+    [0,90,"202608280000",23.8,108.1,1000,6.2,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"10","storm_kind":"typ","typ_seq":19,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"NARRA","canonical_typ_name_ko":"나라","canonical_typ_number":19,"data_typ_number":19,"dmdw_o_tm_seq":"10","dmdw_start_time":"202608220000","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_19"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
