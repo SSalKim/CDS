@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260824234054",
-  "generated_at_kst": "2026-08-25 08:40 KST",
+  "generated_at_utc": "20260824235055",
+  "generated_at_kst": "2026-08-25 08:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_21",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 8,
-  "selected_model_count": 5,
+  "model_source_count": 11,
+  "selected_model_count": 7,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -47,6 +47,57 @@
       "is_official": false,
       "first_seen_utc": "20260824225101",
       "first_seen_kst": "2026-08-25 07:51 KST"
+    },
+    {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "gfs"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824235055",
+      "first_seen_kst": "2026-08-25 08:50 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GEFS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824235055",
+      "first_seen_kst": "2026-08-25 08:50 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824235055",
+      "first_seen_kst": "2026-08-25 08:50 KST"
     },
     {
       "model_id": "ICON",
