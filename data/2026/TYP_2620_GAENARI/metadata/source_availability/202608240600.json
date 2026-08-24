@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260824124123",
-  "generated_at_kst": "2026-08-24 21:41 KST",
+  "generated_at_utc": "20260824125134",
+  "generated_at_kst": "2026-08-24 21:51 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_20",
   "storm_stage": "TD",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 10,
+  "model_source_count": 13,
   "selected_model_count": 6,
   "active_target_model_count": 39,
   "model_sources": [
@@ -185,6 +185,23 @@
       "first_seen_kst": "2026-08-24 20:51 KST"
     },
     {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 2,
+      "max_lead_hour": 6,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824125134",
+      "first_seen_kst": "2026-08-24 21:51 KST"
+    },
+    {
       "model_id": "WNC",
       "model_label": "WeatherNext Cyclones",
       "raw_model_ids": [
@@ -200,6 +217,40 @@
       "is_official": false,
       "first_seen_utc": "20260824123126",
       "first_seen_kst": "2026-08-24 21:31 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext Cyclones",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 6,
+      "max_lead_hour": 30,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824125134",
+      "first_seen_kst": "2026-08-24 21:51 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext Cyclones",
+      "raw_model_ids": [
+        "DEEPMIND"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 3,
+      "max_lead_hour": 12,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824125134",
+      "first_seen_kst": "2026-08-24 21:51 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2620_GAENARI/metadata/source_availability/202608240600.json"
