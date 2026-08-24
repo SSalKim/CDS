@@ -1,291 +1,25 @@
 {
   "version": 3,
-  "updated_at_utc": "202608240350",
+  "updated_at_utc": "202608240400",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 39,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202608231800",
-      "cycle_time_utc": "202608231800",
-      "start_utc": "202608232200",
-      "end_utc": "202608240400"
+      "data_time": "202608240000",
+      "cycle_time_utc": "202608240000",
+      "start_utc": "202608240400",
+      "end_utc": "202608241000"
     }
   ],
   "runs": [
     {
       "job": {
-        "storm_key": "typ_2026_21",
-        "stage": "TYP_SUPPRESSED_BY_TD",
-        "year": 2026,
-        "data_time": "202608231800",
-        "td_number": 39,
-        "linked_td_number": 39,
-        "typ_number": 21,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "NONAME",
-        "atcf_id": "wp192026",
-        "fcst_hours": 120,
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202608231800",
-        "cycle_time_utc": "202608231800",
-        "start_utc": "202608232200",
-        "end_utc": "202608240400"
-      },
-      "result": {
-        "status": "suppressed_td_phase",
-        "metadata": {
-          "generated_at_utc": "202608240350",
-          "image_path": "",
-          "storm_stage": "TYP",
-          "storm_year": "2026",
-          "typ_number": 21,
-          "data_typ_number": 21,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": 21,
-          "canonical_storm_key": "typ_2026_21",
-          "canonical_storm_stage": "TYP",
-          "canonical_typ_number": 21,
-          "canonical_typ_name": "ATSANI",
-          "canonical_typ_name_ko": "앗사니",
-          "atcf_id": "wp192026",
-          "extra_atcf_ids": [],
-          "data_time": "202608231800",
-          "fcst_hours": 120,
-          "intensity": "TD",
-          "model_count": 0,
-          "target_model_count": 39,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2621_ATSANI/metadata/source_availability/202608231800.json",
-          "no_output": true,
-          "no_output_reason": "Suppressed because linked TD39 phase is active."
-        }
-      }
-    },
-    {
-      "job": {
-        "storm_key": "typ_2026_21",
-        "stage": "TYP_SUPPRESSED_BY_TD",
-        "year": 2026,
-        "data_time": "202608231800",
-        "td_number": 39,
-        "linked_td_number": 39,
-        "typ_number": 21,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "NONAME",
-        "atcf_id": "wp192026",
-        "fcst_hours": 240,
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202608231800",
-        "cycle_time_utc": "202608231800",
-        "start_utc": "202608232200",
-        "end_utc": "202608240400"
-      },
-      "result": {
-        "status": "suppressed_td_phase",
-        "metadata": {
-          "generated_at_utc": "202608240350",
-          "image_path": "",
-          "storm_stage": "TYP",
-          "storm_year": "2026",
-          "typ_number": 21,
-          "data_typ_number": 21,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": 21,
-          "canonical_storm_key": "typ_2026_21",
-          "canonical_storm_stage": "TYP",
-          "canonical_typ_number": 21,
-          "canonical_typ_name": "ATSANI",
-          "canonical_typ_name_ko": "앗사니",
-          "atcf_id": "wp192026",
-          "extra_atcf_ids": [],
-          "data_time": "202608231800",
-          "fcst_hours": 240,
-          "intensity": "TD",
-          "model_count": 0,
-          "target_model_count": 39,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2621_ATSANI/metadata/source_availability/202608231800.json",
-          "no_output": true,
-          "no_output_reason": "Suppressed because linked TD39 phase is active."
-        }
-      }
-    },
-    {
-      "job": {
-        "storm_key": "typ_2026_19",
-        "stage": "TYP_LINKED",
-        "year": 2026,
-        "data_time": "202608231800",
-        "td_number": null,
-        "linked_td_number": 37,
-        "typ_number": 19,
-        "typ_name_ko": "나라",
-        "typ_name": "NARRA",
-        "typ_en": "NARRA",
-        "atcf_id": "wp182026",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202608231800",
-        "cycle_time_utc": "202608231800",
-        "start_utc": "202608232200",
-        "end_utc": "202608240400"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20260824035130",
-          "image_path": "data/2026/TYP_2619_NARRA/images/TYP_2619_NARRA_202608231800_120h.png",
-          "storm_stage": "TYP",
-          "storm_year": "2026",
-          "typ_number": 19,
-          "data_typ_number": 19,
-          "typ_name": "NARRA",
-          "typ_name_ko": "나라",
-          "linked_td_number": 37,
-          "linked_typ_number": null,
-          "canonical_storm_key": "typ_2026_19",
-          "canonical_storm_stage": "TYP",
-          "canonical_typ_number": 19,
-          "canonical_typ_name": "NARRA",
-          "canonical_typ_name_ko": "나라",
-          "atcf_id": "wp182026",
-          "extra_atcf_ids": [],
-          "data_time": "202608231800",
-          "fcst_hours": 120,
-          "intensity": "TYP",
-          "model_count": 21,
-          "target_model_count": 39,
-          "model_labels": [
-            "AICON",
-            "AIGFS EPS",
-            "COAMPS-TC",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "Aurora-ECMWF",
-            "FengWu-ECMWF",
-            "FuXi-ECMWF",
-            "ICON",
-            "ICON EPS",
-            "JGSM",
-            "NAVGEM",
-            "JGSM EPS",
-            "UKMO EPS",
-            "WeatherNext Cyclones"
-          ],
-          "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2619_NARRA/metadata/source_availability/202608231800.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2619_NARRA/metadata/smca/AICON/202608231800.json"
-        }
-      },
-      "completed": false,
-      "final_check": true
-    },
-    {
-      "job": {
-        "storm_key": "typ_2026_19",
-        "stage": "TYP_LINKED",
-        "year": 2026,
-        "data_time": "202608231800",
-        "td_number": null,
-        "linked_td_number": 37,
-        "typ_number": 19,
-        "typ_name_ko": "나라",
-        "typ_name": "NARRA",
-        "typ_en": "NARRA",
-        "atcf_id": "wp182026",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202608231800",
-        "cycle_time_utc": "202608231800",
-        "start_utc": "202608232200",
-        "end_utc": "202608240400"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20260824035132",
-          "image_path": "data/2026/TYP_2619_NARRA/images/TYP_2619_NARRA_202608231800_240h.png",
-          "storm_stage": "TYP",
-          "storm_year": "2026",
-          "typ_number": 19,
-          "data_typ_number": 19,
-          "typ_name": "NARRA",
-          "typ_name_ko": "나라",
-          "linked_td_number": 37,
-          "linked_typ_number": null,
-          "canonical_storm_key": "typ_2026_19",
-          "canonical_storm_stage": "TYP",
-          "canonical_typ_number": 19,
-          "canonical_typ_name": "NARRA",
-          "canonical_typ_name_ko": "나라",
-          "atcf_id": "wp182026",
-          "extra_atcf_ids": [],
-          "data_time": "202608231800",
-          "fcst_hours": 240,
-          "intensity": "TYP",
-          "model_count": 21,
-          "target_model_count": 39,
-          "model_labels": [
-            "AICON",
-            "AIGFS EPS",
-            "COAMPS-TC",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "Aurora-ECMWF",
-            "FengWu-ECMWF",
-            "FuXi-ECMWF",
-            "ICON",
-            "ICON EPS",
-            "JGSM",
-            "NAVGEM",
-            "JGSM EPS",
-            "UKMO EPS",
-            "WeatherNext Cyclones"
-          ],
-          "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2619_NARRA/metadata/source_availability/202608231800.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2619_NARRA/metadata/smca/AICON/202608231800.json"
-        }
-      },
-      "completed": false,
-      "final_check": true
-    },
-    {
-      "job": {
         "storm_key": "typ_2026_18",
         "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202608231800",
+        "data_time": "202608240000",
         "td_number": null,
         "linked_td_number": 35,
         "typ_number": 18,
@@ -296,16 +30,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608231800",
-        "cycle_time_utc": "202608231800",
-        "start_utc": "202608232200",
-        "end_utc": "202608240400"
+        "data_time": "202608240000",
+        "cycle_time_utc": "202608240000",
+        "start_utc": "202608240400",
+        "end_utc": "202608241000"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824035133",
-          "image_path": "data/2026/TYP_2618_SAUDEL/images/TYP_2618_SAUDEL_202608231800_120h.png",
+          "generated_at_utc": "20260824040057",
+          "image_path": "data/2026/TYP_2618_SAUDEL/images/TYP_2618_SAUDEL_202608240000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
           "typ_number": 18,
@@ -321,47 +55,30 @@
           "canonical_typ_name_ko": "사우델",
           "atcf_id": "wp172026",
           "extra_atcf_ids": [],
-          "data_time": "202608231800",
+          "data_time": "202608240000",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 20,
+          "model_count": 3,
           "target_model_count": 39,
           "model_labels": [
-            "AIGFS",
             "AICON",
-            "AIGFS EPS",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "Aurora-ECMWF",
-            "FengWu-ECMWF",
-            "FuXi-ECMWF",
             "ICON",
-            "ICON EPS",
-            "JGSM",
-            "NAVGEM",
-            "JGSM EPS",
-            "WeatherNext Cyclones"
+            "ICON EPS"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2618_SAUDEL/metadata/source_availability/202608231800.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2618_SAUDEL/metadata/smca/AICON/202608231800.json"
+          "source_availability_path": "data/2026/TYP_2618_SAUDEL/metadata/source_availability/202608240000.json",
+          "smca_aicon_snapshot_path": "data/2026/TYP_2618_SAUDEL/metadata/smca/AICON/202608240000.json"
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2026_18",
         "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202608231800",
+        "data_time": "202608240000",
         "td_number": null,
         "linked_td_number": 35,
         "typ_number": 18,
@@ -372,16 +89,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608231800",
-        "cycle_time_utc": "202608231800",
-        "start_utc": "202608232200",
-        "end_utc": "202608240400"
+        "data_time": "202608240000",
+        "cycle_time_utc": "202608240000",
+        "start_utc": "202608240400",
+        "end_utc": "202608241000"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824035134",
-          "image_path": "data/2026/TYP_2618_SAUDEL/images/TYP_2618_SAUDEL_202608231800_240h.png",
+          "generated_at_utc": "20260824040058",
+          "image_path": "data/2026/TYP_2618_SAUDEL/images/TYP_2618_SAUDEL_202608240000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
           "typ_number": 18,
@@ -397,47 +114,148 @@
           "canonical_typ_name_ko": "사우델",
           "atcf_id": "wp172026",
           "extra_atcf_ids": [],
-          "data_time": "202608231800",
+          "data_time": "202608240000",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 20,
+          "model_count": 3,
           "target_model_count": 39,
           "model_labels": [
-            "AIGFS",
             "AICON",
-            "AIGFS EPS",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "Aurora-ECMWF",
-            "FengWu-ECMWF",
-            "FuXi-ECMWF",
             "ICON",
-            "ICON EPS",
-            "JGSM",
-            "NAVGEM",
-            "JGSM EPS",
-            "WeatherNext Cyclones"
+            "ICON EPS"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2618_SAUDEL/metadata/source_availability/202608231800.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2618_SAUDEL/metadata/smca/AICON/202608231800.json"
+          "source_availability_path": "data/2026/TYP_2618_SAUDEL/metadata/source_availability/202608240000.json",
+          "smca_aicon_snapshot_path": "data/2026/TYP_2618_SAUDEL/metadata/smca/AICON/202608240000.json"
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2026_19",
+        "stage": "TYP_LINKED",
+        "year": 2026,
+        "data_time": "202608240000",
+        "td_number": null,
+        "linked_td_number": 37,
+        "typ_number": 19,
+        "typ_name_ko": "나라",
+        "typ_name": "NARRA",
+        "typ_en": "NARRA",
+        "atcf_id": "wp182026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202608240000",
+        "cycle_time_utc": "202608240000",
+        "start_utc": "202608240400",
+        "end_utc": "202608241000"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260824040058",
+          "image_path": "data/2026/TYP_2619_NARRA/images/TYP_2619_NARRA_202608240000_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 19,
+          "data_typ_number": 19,
+          "typ_name": "NARRA",
+          "typ_name_ko": "나라",
+          "linked_td_number": 37,
+          "linked_typ_number": null,
+          "canonical_storm_key": "typ_2026_19",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 19,
+          "canonical_typ_name": "NARRA",
+          "canonical_typ_name_ko": "나라",
+          "atcf_id": "wp182026",
+          "extra_atcf_ids": [],
+          "data_time": "202608240000",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 3,
+          "target_model_count": 39,
+          "model_labels": [
+            "AICON",
+            "ICON",
+            "ICON EPS"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2619_NARRA/metadata/source_availability/202608240000.json",
+          "smca_aicon_snapshot_path": "data/2026/TYP_2619_NARRA/metadata/smca/AICON/202608240000.json"
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2026_19",
+        "stage": "TYP_LINKED",
+        "year": 2026,
+        "data_time": "202608240000",
+        "td_number": null,
+        "linked_td_number": 37,
+        "typ_number": 19,
+        "typ_name_ko": "나라",
+        "typ_name": "NARRA",
+        "typ_en": "NARRA",
+        "atcf_id": "wp182026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202608240000",
+        "cycle_time_utc": "202608240000",
+        "start_utc": "202608240400",
+        "end_utc": "202608241000"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260824040059",
+          "image_path": "data/2026/TYP_2619_NARRA/images/TYP_2619_NARRA_202608240000_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 19,
+          "data_typ_number": 19,
+          "typ_name": "NARRA",
+          "typ_name_ko": "나라",
+          "linked_td_number": 37,
+          "linked_typ_number": null,
+          "canonical_storm_key": "typ_2026_19",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 19,
+          "canonical_typ_name": "NARRA",
+          "canonical_typ_name_ko": "나라",
+          "atcf_id": "wp182026",
+          "extra_atcf_ids": [],
+          "data_time": "202608240000",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 3,
+          "target_model_count": 39,
+          "model_labels": [
+            "AICON",
+            "ICON",
+            "ICON EPS"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2619_NARRA/metadata/source_availability/202608240000.json",
+          "smca_aicon_snapshot_path": "data/2026/TYP_2619_NARRA/metadata/smca/AICON/202608240000.json"
+        }
+      },
+      "completed": false,
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2026_20",
         "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202608231800",
+        "data_time": "202608240000",
         "td_number": null,
         "linked_td_number": 38,
         "typ_number": 20,
@@ -448,16 +266,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608231800",
-        "cycle_time_utc": "202608231800",
-        "start_utc": "202608232200",
-        "end_utc": "202608240400"
+        "data_time": "202608240000",
+        "cycle_time_utc": "202608240000",
+        "start_utc": "202608240400",
+        "end_utc": "202608241000"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824035208",
-          "image_path": "data/2026/TYP_2620_GAENARI/images/TYP_2620_GAENARI_202608231800_120h.png",
+          "generated_at_utc": "20260824040134",
+          "image_path": "data/2026/TYP_2620_GAENARI/images/TYP_2620_GAENARI_202608240000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
           "typ_number": 20,
@@ -473,40 +291,28 @@
           "canonical_typ_name_ko": "개나리",
           "atcf_id": "wp982026",
           "extra_atcf_ids": [],
-          "data_time": "202608231800",
+          "data_time": "202608240000",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 14,
+          "model_count": 2,
           "target_model_count": 39,
           "model_labels": [
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "GFS",
-            "GFS EPS",
-            "Aurora-ECMWF",
-            "FengWu-ECMWF",
-            "FuXi-ECMWF",
             "ICON",
-            "ICON EPS",
-            "JGSM",
-            "JGSM EPS",
-            "UKMO EPS"
+            "ICON EPS"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2620_GAENARI/metadata/source_availability/202608231800.json"
+          "source_availability_path": "data/2026/TYP_2620_GAENARI/metadata/source_availability/202608240000.json"
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "typ_2026_20",
         "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202608231800",
+        "data_time": "202608240000",
         "td_number": null,
         "linked_td_number": 38,
         "typ_number": 20,
@@ -517,16 +323,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608231800",
-        "cycle_time_utc": "202608231800",
-        "start_utc": "202608232200",
-        "end_utc": "202608240400"
+        "data_time": "202608240000",
+        "cycle_time_utc": "202608240000",
+        "start_utc": "202608240400",
+        "end_utc": "202608241000"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824035209",
-          "image_path": "data/2026/TYP_2620_GAENARI/images/TYP_2620_GAENARI_202608231800_240h.png",
+          "generated_at_utc": "20260824040135",
+          "image_path": "data/2026/TYP_2620_GAENARI/images/TYP_2620_GAENARI_202608240000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
           "typ_number": 20,
@@ -542,68 +348,56 @@
           "canonical_typ_name_ko": "개나리",
           "atcf_id": "wp982026",
           "extra_atcf_ids": [],
-          "data_time": "202608231800",
+          "data_time": "202608240000",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 14,
+          "model_count": 2,
           "target_model_count": 39,
           "model_labels": [
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "GFS",
-            "GFS EPS",
-            "Aurora-ECMWF",
-            "FengWu-ECMWF",
-            "FuXi-ECMWF",
             "ICON",
-            "ICON EPS",
-            "JGSM",
-            "JGSM EPS",
-            "UKMO EPS"
+            "ICON EPS"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2620_GAENARI/metadata/source_availability/202608231800.json"
+          "source_availability_path": "data/2026/TYP_2620_GAENARI/metadata/source_availability/202608240000.json"
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2026_39_typ_21",
-        "stage": "TD_PRE_TYP_POSITION_ATCF",
+        "storm_key": "typ_2026_21",
+        "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202608231800",
-        "td_number": 39,
-        "linked_td_number": null,
-        "typ_number": 39,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
+        "data_time": "202608240000",
+        "td_number": null,
+        "linked_td_number": 39,
+        "typ_number": 21,
+        "typ_name_ko": "앗사니",
+        "typ_name": "ATSANI",
+        "typ_en": "ATSANI",
         "atcf_id": "wp192026",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608231800",
-        "cycle_time_utc": "202608231800",
-        "start_utc": "202608232200",
-        "end_utc": "202608240400"
+        "data_time": "202608240000",
+        "cycle_time_utc": "202608240000",
+        "start_utc": "202608240400",
+        "end_utc": "202608241000"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824035211",
-          "image_path": "data/2026/TYP_2621_ATSANI/images/TD_2639_NONAME_202608231800_120h.png",
-          "storm_stage": "TD",
+          "generated_at_utc": "20260824040135",
+          "image_path": "data/2026/TYP_2621_ATSANI/images/TYP_2621_ATSANI_202608240000_120h.png",
+          "storm_stage": "TYP",
           "storm_year": "2026",
-          "typ_number": 39,
-          "data_typ_number": 39,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": 21,
+          "typ_number": 21,
+          "data_typ_number": 21,
+          "typ_name": "ATSANI",
+          "typ_name_ko": "앗사니",
+          "linked_td_number": 39,
+          "linked_typ_number": null,
           "canonical_storm_key": "typ_2026_21",
           "canonical_storm_stage": "TYP",
           "canonical_typ_number": 21,
@@ -611,70 +405,58 @@
           "canonical_typ_name_ko": "앗사니",
           "atcf_id": "wp192026",
           "extra_atcf_ids": [],
-          "data_time": "202608231800",
+          "data_time": "202608240000",
           "fcst_hours": 120,
-          "intensity": "TD",
-          "model_count": 16,
+          "intensity": "TYP",
+          "model_count": 3,
           "target_model_count": 39,
           "model_labels": [
-            "AIGFS EPS",
-            "COAMPS-TC",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
+            "AICON",
             "ICON",
-            "ICON EPS",
-            "JGSM",
-            "NAVGEM",
-            "JGSM EPS",
-            "UKMO EPS",
-            "WeatherNext Cyclones"
+            "ICON EPS"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2621_ATSANI/metadata/source_availability/202608231800.json"
+          "source_availability_path": "data/2026/TYP_2621_ATSANI/metadata/source_availability/202608240000.json",
+          "smca_aicon_snapshot_path": "data/2026/TYP_2621_ATSANI/metadata/smca/AICON/202608240000.json"
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     },
     {
       "job": {
-        "storm_key": "td_2026_39_typ_21",
-        "stage": "TD_PRE_TYP_POSITION_ATCF",
+        "storm_key": "typ_2026_21",
+        "stage": "TYP_LINKED",
         "year": 2026,
-        "data_time": "202608231800",
-        "td_number": 39,
-        "linked_td_number": null,
-        "typ_number": 39,
-        "typ_name_ko": "",
-        "typ_name": "NONAME",
-        "typ_en": "",
+        "data_time": "202608240000",
+        "td_number": null,
+        "linked_td_number": 39,
+        "typ_number": 21,
+        "typ_name_ko": "앗사니",
+        "typ_name": "ATSANI",
+        "typ_en": "ATSANI",
         "atcf_id": "wp192026",
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608231800",
-        "cycle_time_utc": "202608231800",
-        "start_utc": "202608232200",
-        "end_utc": "202608240400"
+        "data_time": "202608240000",
+        "cycle_time_utc": "202608240000",
+        "start_utc": "202608240400",
+        "end_utc": "202608241000"
       },
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824035212",
-          "image_path": "data/2026/TYP_2621_ATSANI/images/TD_2639_NONAME_202608231800_240h.png",
-          "storm_stage": "TD",
+          "generated_at_utc": "20260824040137",
+          "image_path": "data/2026/TYP_2621_ATSANI/images/TYP_2621_ATSANI_202608240000_240h.png",
+          "storm_stage": "TYP",
           "storm_year": "2026",
-          "typ_number": 39,
-          "data_typ_number": 39,
-          "typ_name": "NONAME",
-          "typ_name_ko": "",
-          "linked_td_number": null,
-          "linked_typ_number": 21,
+          "typ_number": 21,
+          "data_typ_number": 21,
+          "typ_name": "ATSANI",
+          "typ_name_ko": "앗사니",
+          "linked_td_number": 39,
+          "linked_typ_number": null,
           "canonical_storm_key": "typ_2026_21",
           "canonical_storm_stage": "TYP",
           "canonical_typ_number": 21,
@@ -682,38 +464,26 @@
           "canonical_typ_name_ko": "앗사니",
           "atcf_id": "wp192026",
           "extra_atcf_ids": [],
-          "data_time": "202608231800",
+          "data_time": "202608240000",
           "fcst_hours": 240,
-          "intensity": "TD",
-          "model_count": 16,
+          "intensity": "TYP",
+          "model_count": 3,
           "target_model_count": 39,
           "model_labels": [
-            "AIGFS EPS",
-            "COAMPS-TC",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
+            "AICON",
             "ICON",
-            "ICON EPS",
-            "JGSM",
-            "NAVGEM",
-            "JGSM EPS",
-            "UKMO EPS",
-            "WeatherNext Cyclones"
+            "ICON EPS"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2621_ATSANI/metadata/source_availability/202608231800.json"
+          "source_availability_path": "data/2026/TYP_2621_ATSANI/metadata/source_availability/202608240000.json",
+          "smca_aicon_snapshot_path": "data/2026/TYP_2621_ATSANI/metadata/smca/AICON/202608240000.json"
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     }
   ],
-  "inventory_count": 9048,
+  "inventory_count": 9056,
   "manifest_indexes": [
     {
       "year": 2020,
