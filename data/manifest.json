@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at_utc": "202608240910",
+  "updated_at_utc": "202608240920",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 39,
@@ -14,6 +14,118 @@
     }
   ],
   "runs": [
+    {
+      "job": {
+        "storm_key": "typ_2026_20",
+        "stage": "TYP_SUPPRESSED_BY_TD",
+        "year": 2026,
+        "data_time": "202608240000",
+        "td_number": 40,
+        "linked_td_number": 40,
+        "typ_number": 20,
+        "typ_name_ko": "개나리",
+        "typ_name": "GAENARI",
+        "typ_en": "GAENARI",
+        "atcf_id": "wp982026",
+        "fcst_hours": 120,
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202608240000",
+        "cycle_time_utc": "202608240000",
+        "start_utc": "202608240400",
+        "end_utc": "202608241000"
+      },
+      "result": {
+        "status": "suppressed_td_phase",
+        "metadata": {
+          "generated_at_utc": "202608240921",
+          "image_path": "",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 20,
+          "data_typ_number": 20,
+          "typ_name": "GAENARI",
+          "typ_name_ko": "개나리",
+          "linked_td_number": 38,
+          "linked_typ_number": null,
+          "canonical_storm_key": "typ_2026_20",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 20,
+          "canonical_typ_name": "GAENARI",
+          "canonical_typ_name_ko": "개나리",
+          "atcf_id": "wp982026",
+          "extra_atcf_ids": [],
+          "data_time": "202608240000",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 0,
+          "target_model_count": 39,
+          "models": [],
+          "model_labels": [],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2620_GAENARI/metadata/source_availability/202608240000.json",
+          "no_output": true,
+          "no_output_reason": "Suppressed because linked TD40 phase is active."
+        }
+      }
+    },
+    {
+      "job": {
+        "storm_key": "typ_2026_20",
+        "stage": "TYP_SUPPRESSED_BY_TD",
+        "year": 2026,
+        "data_time": "202608240000",
+        "td_number": 40,
+        "linked_td_number": 40,
+        "typ_number": 20,
+        "typ_name_ko": "개나리",
+        "typ_name": "GAENARI",
+        "typ_en": "GAENARI",
+        "atcf_id": "wp982026",
+        "fcst_hours": 240,
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202608240000",
+        "cycle_time_utc": "202608240000",
+        "start_utc": "202608240400",
+        "end_utc": "202608241000"
+      },
+      "result": {
+        "status": "suppressed_td_phase",
+        "metadata": {
+          "generated_at_utc": "202608240921",
+          "image_path": "",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 20,
+          "data_typ_number": 20,
+          "typ_name": "GAENARI",
+          "typ_name_ko": "개나리",
+          "linked_td_number": 38,
+          "linked_typ_number": null,
+          "canonical_storm_key": "typ_2026_20",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 20,
+          "canonical_typ_name": "GAENARI",
+          "canonical_typ_name_ko": "개나리",
+          "atcf_id": "wp982026",
+          "extra_atcf_ids": [],
+          "data_time": "202608240000",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 0,
+          "target_model_count": 39,
+          "models": [],
+          "model_labels": [],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2620_GAENARI/metadata/source_availability/202608240000.json",
+          "no_output": true,
+          "no_output_reason": "Suppressed because linked TD40 phase is active."
+        }
+      }
+    },
     {
       "job": {
         "storm_key": "typ_2026_18",
@@ -38,7 +150,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824091102",
+          "generated_at_utc": "20260824092214",
           "image_path": "data/2026/TYP_2618_SAUDEL/images/TYP_2618_SAUDEL_202608240000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -116,7 +228,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824091103",
+          "generated_at_utc": "20260824092215",
           "image_path": "data/2026/TYP_2618_SAUDEL/images/TYP_2618_SAUDEL_202608240000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -194,7 +306,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824091102",
+          "generated_at_utc": "20260824092213",
           "image_path": "data/2026/TYP_2619_NARRA/images/TYP_2619_NARRA_202608240000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -214,7 +326,7 @@
           "data_time": "202608240000",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 23,
+          "model_count": 22,
           "target_model_count": 39,
           "model_labels": [
             "AIGFS",
@@ -222,6 +334,7 @@
             "AIGFS EPS",
             "CMC",
             "CMC EPS",
+            "COAMPS-TC EPS",
             "ECMWF",
             "ECMWF AIFS",
             "ECMWF AIFS EPS",
@@ -234,9 +347,7 @@
             "ICON",
             "ICON EPS",
             "KMA AIFS-ECMWF",
-            "JGSM",
             "NAVGEM",
-            "JGSM EPS",
             "UKMO",
             "UKMO EPS",
             "WeatherNext Cyclones"
@@ -273,7 +384,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824091104",
+          "generated_at_utc": "20260824092216",
           "image_path": "data/2026/TYP_2619_NARRA/images/TYP_2619_NARRA_202608240000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -293,7 +404,7 @@
           "data_time": "202608240000",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 23,
+          "model_count": 22,
           "target_model_count": 39,
           "model_labels": [
             "AIGFS",
@@ -301,6 +412,7 @@
             "AIGFS EPS",
             "CMC",
             "CMC EPS",
+            "COAMPS-TC EPS",
             "ECMWF",
             "ECMWF AIFS",
             "ECMWF AIFS EPS",
@@ -313,9 +425,7 @@
             "ICON",
             "ICON EPS",
             "KMA AIFS-ECMWF",
-            "JGSM",
             "NAVGEM",
-            "JGSM EPS",
             "UKMO",
             "UKMO EPS",
             "WeatherNext Cyclones"
@@ -352,7 +462,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824091138",
+          "generated_at_utc": "20260824092310",
           "image_path": "data/2026/TYP_2621_ATSANI/images/TYP_2621_ATSANI_202608240000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -372,7 +482,7 @@
           "data_time": "202608240000",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 17,
+          "model_count": 18,
           "target_model_count": 39,
           "model_labels": [
             "AICON",
@@ -389,6 +499,7 @@
             "ICON",
             "ICON EPS",
             "KMA AIFS-ECMWF",
+            "JGSM",
             "NAVGEM",
             "UKMO",
             "WeatherNext Cyclones"
@@ -425,7 +536,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260824091139",
+          "generated_at_utc": "20260824092312",
           "image_path": "data/2026/TYP_2621_ATSANI/images/TYP_2621_ATSANI_202608240000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -445,7 +556,7 @@
           "data_time": "202608240000",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 17,
+          "model_count": 18,
           "target_model_count": 39,
           "model_labels": [
             "AICON",
@@ -462,6 +573,7 @@
             "ICON",
             "ICON EPS",
             "KMA AIFS-ECMWF",
+            "JGSM",
             "NAVGEM",
             "UKMO",
             "WeatherNext Cyclones"
@@ -469,6 +581,148 @@
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2621_ATSANI/metadata/source_availability/202608240000.json",
           "smca_aicon_snapshot_path": "data/2026/TYP_2621_ATSANI/metadata/smca/AICON/202608240000.json"
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_40_typ_20",
+        "stage": "TD_LINKED_TYP",
+        "year": 2026,
+        "data_time": "202608240000",
+        "td_number": 40,
+        "linked_td_number": null,
+        "typ_number": 40,
+        "typ_name_ko": "개나리",
+        "typ_name": "GAENARI",
+        "typ_en": "GAENARI",
+        "atcf_id": "wp982026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202608240000",
+        "cycle_time_utc": "202608240000",
+        "start_utc": "202608240400",
+        "end_utc": "202608241000"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260824092311",
+          "image_path": "data/2026/TYP_2620_GAENARI/images/TD_2640_GAENARI_202608240000_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 40,
+          "data_typ_number": 40,
+          "typ_name": "GAENARI",
+          "typ_name_ko": "개나리",
+          "linked_td_number": null,
+          "linked_typ_number": 20,
+          "canonical_storm_key": "typ_2026_20",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 20,
+          "canonical_typ_name": "GAENARI",
+          "canonical_typ_name_ko": "개나리",
+          "atcf_id": "wp982026",
+          "extra_atcf_ids": [],
+          "data_time": "202608240000",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 16,
+          "target_model_count": 39,
+          "model_labels": [
+            "AIGFS",
+            "AIGFS EPS",
+            "CMC",
+            "CMC EPS",
+            "ECMWF AIFS",
+            "ECMWF AIFS EPS",
+            "ECMWF EPS",
+            "NAVGEM EPS",
+            "GFS",
+            "GFS EPS",
+            "ICON",
+            "ICON EPS",
+            "JGSM",
+            "NAVGEM",
+            "UKMO EPS",
+            "WeatherNext Cyclones"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2620_GAENARI/metadata/source_availability/202608240000.json"
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_40_typ_20",
+        "stage": "TD_LINKED_TYP",
+        "year": 2026,
+        "data_time": "202608240000",
+        "td_number": 40,
+        "linked_td_number": null,
+        "typ_number": 40,
+        "typ_name_ko": "개나리",
+        "typ_name": "GAENARI",
+        "typ_en": "GAENARI",
+        "atcf_id": "wp982026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202608240000",
+        "cycle_time_utc": "202608240000",
+        "start_utc": "202608240400",
+        "end_utc": "202608241000"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20260824092313",
+          "image_path": "data/2026/TYP_2620_GAENARI/images/TD_2640_GAENARI_202608240000_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 40,
+          "data_typ_number": 40,
+          "typ_name": "GAENARI",
+          "typ_name_ko": "개나리",
+          "linked_td_number": null,
+          "linked_typ_number": 20,
+          "canonical_storm_key": "typ_2026_20",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 20,
+          "canonical_typ_name": "GAENARI",
+          "canonical_typ_name_ko": "개나리",
+          "atcf_id": "wp982026",
+          "extra_atcf_ids": [],
+          "data_time": "202608240000",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 16,
+          "target_model_count": 39,
+          "model_labels": [
+            "AIGFS",
+            "AIGFS EPS",
+            "CMC",
+            "CMC EPS",
+            "ECMWF AIFS",
+            "ECMWF AIFS EPS",
+            "ECMWF EPS",
+            "NAVGEM EPS",
+            "GFS",
+            "GFS EPS",
+            "ICON",
+            "ICON EPS",
+            "JGSM",
+            "NAVGEM",
+            "UKMO EPS",
+            "WeatherNext Cyclones"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2620_GAENARI/metadata/source_availability/202608240000.json"
         }
       },
       "completed": false,

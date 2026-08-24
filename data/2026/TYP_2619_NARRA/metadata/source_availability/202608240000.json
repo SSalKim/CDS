@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260824091030",
-  "generated_at_kst": "2026-08-24 18:10 KST",
+  "generated_at_utc": "20260824092125",
+  "generated_at_kst": "2026-08-24 18:21 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_19",
   "storm_stage": "TYP",
@@ -28,7 +28,7 @@
     240
   ],
   "model_source_count": 58,
-  "selected_model_count": 23,
+  "selected_model_count": 22,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -271,6 +271,23 @@
       "first_seen_kst": "2026-08-24 16:31 KST"
     },
     {
+      "model_id": "COAMPS_EPS",
+      "model_label": "COAMPS-TC EPS",
+      "raw_model_ids": [
+        "CTMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 17,
+      "max_lead_hour": 96,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824092125",
+      "first_seen_kst": "2026-08-24 18:21 KST"
+    },
+    {
       "model_id": "ECMWF",
       "model_label": "ECMWF",
       "raw_model_ids": [
@@ -467,7 +484,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 9,
+      "point_count": 25,
       "max_lead_hour": 144,
       "has_pressure": true,
       "has_wind": true,
@@ -525,6 +542,23 @@
       "is_official": false,
       "first_seen_utc": "20260824072214",
       "first_seen_kst": "2026-08-24 16:22 KST"
+    },
+    {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "AVNO"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 16,
+      "max_lead_hour": 90,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260824092125",
+      "first_seen_kst": "2026-08-24 18:21 KST"
     },
     {
       "model_id": "GFS_EPS",
@@ -732,40 +766,6 @@
       "first_seen_kst": "2026-08-24 13:00 KST"
     },
     {
-      "model_id": "JGSM",
-      "model_label": "JGSM",
-      "raw_model_ids": [
-        "JGSM"
-      ],
-      "source": "KNACKWX",
-      "source_label": "KNACKWX ATCF",
-      "selected": true,
-      "point_count": 2,
-      "max_lead_hour": 60,
-      "has_pressure": true,
-      "has_wind": false,
-      "is_official": false,
-      "first_seen_utc": "20260824085034",
-      "first_seen_kst": "2026-08-24 17:50 KST"
-    },
-    {
-      "model_id": "TEPS",
-      "model_label": "JGSM EPS",
-      "raw_model_ids": [
-        "JENS"
-      ],
-      "source": "KNACKWX",
-      "source_label": "KNACKWX ATCF",
-      "selected": true,
-      "point_count": 3,
-      "max_lead_hour": 132,
-      "has_pressure": true,
-      "has_wind": false,
-      "is_official": false,
-      "first_seen_utc": "20260824085034",
-      "first_seen_kst": "2026-08-24 17:50 KST"
-    },
-    {
       "model_id": "IFEC_AI",
       "model_label": "KMA AIFS-ECMWF",
       "raw_model_ids": [
@@ -808,7 +808,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 4,
+      "point_count": 19,
       "max_lead_hour": 108,
       "has_pressure": true,
       "has_wind": true,
@@ -859,7 +859,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 2,
+      "point_count": 27,
       "max_lead_hour": 156,
       "has_pressure": true,
       "has_wind": true,
@@ -944,7 +944,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 10,
+      "point_count": 7,
       "max_lead_hour": 54,
       "has_pressure": true,
       "has_wind": true,
@@ -963,8 +963,8 @@
       "selected": true,
       "point_count": 3,
       "max_lead_hour": 78,
-      "has_pressure": true,
-      "has_wind": true,
+      "has_pressure": false,
+      "has_wind": false,
       "is_official": false,
       "first_seen_utc": "20260824085034",
       "first_seen_kst": "2026-08-24 17:50 KST"
