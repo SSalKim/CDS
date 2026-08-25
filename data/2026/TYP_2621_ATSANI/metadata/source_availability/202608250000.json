@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "schema": "cycle_model_source_first_seen",
+  "generated_at_utc": "20260825040056",
+  "generated_at_kst": "2026-08-25 13:00 KST",
+  "storm_year": "2026",
+  "storm_key": "typ_2026_21",
+  "storm_stage": "TD",
+  "typ_number": 41,
+  "data_typ_number": 41,
+  "typ_name": "ATSANI",
+  "typ_name_ko": "앗사니",
+  "canonical_storm_key": "typ_2026_21",
+  "canonical_storm_stage": "TYP",
+  "canonical_typ_number": 21,
+  "canonical_typ_name": "ATSANI",
+  "canonical_typ_name_ko": "앗사니",
+  "linked_td_number": null,
+  "linked_typ_number": 21,
+  "atcf_id": "wp192026",
+  "extra_atcf_ids": [],
+  "data_time": "202608250000",
+  "cycle_time_utc": "202608250000",
+  "cycle_label_utc": "2026-08-25 00UTC",
+  "fetch_hours": 240,
+  "requested_hours": [
+    120,
+    240
+  ],
+  "model_source_count": 2,
+  "selected_model_count": 2,
+  "active_target_model_count": 39,
+  "model_sources": [
+    {
+      "model_id": "ICON",
+      "model_label": "ICON",
+      "raw_model_ids": [
+        "icon"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 8,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260825040056",
+      "first_seen_kst": "2026-08-25 13:00 KST"
+    },
+    {
+      "model_id": "ICON_EPS",
+      "model_label": "ICON EPS",
+      "raw_model_ids": [
+        "ICON_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260825040056",
+      "first_seen_kst": "2026-08-25 13:00 KST"
+    }
+  ],
+  "source_availability_path": "data/2026/TYP_2621_ATSANI/metadata/source_availability/202608250000.json"
+}
