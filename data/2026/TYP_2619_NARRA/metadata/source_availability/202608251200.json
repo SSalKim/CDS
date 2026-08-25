@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260825201026",
-  "generated_at_kst": "2026-08-26 05:10 KST",
+  "generated_at_utc": "20260825202030",
+  "generated_at_kst": "2026-08-26 05:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_19",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 56,
-  "selected_model_count": 27,
+  "model_source_count": 59,
+  "selected_model_count": 29,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -784,6 +784,23 @@
       "first_seen_kst": "2026-08-26 04:10 KST"
     },
     {
+      "model_id": "IFEC_AI",
+      "model_label": "KMA AIFS-ECMWF",
+      "raw_model_ids": [
+        "IFEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260825202030",
+      "first_seen_kst": "2026-08-26 05:20 KST"
+    },
+    {
       "model_id": "IFKM_AI",
       "model_label": "KMA AIFS-KIM",
       "raw_model_ids": [
@@ -816,6 +833,40 @@
       "is_official": true,
       "first_seen_utc": "20260825160032",
       "first_seen_kst": "2026-08-26 01:00 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260825202030",
+      "first_seen_kst": "2026-08-26 05:20 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260825202030",
+      "first_seen_kst": "2026-08-26 05:20 KST"
     },
     {
       "model_id": "FNMOC_EPS",
