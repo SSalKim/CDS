@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260825070050",
-  "generated_at_kst": "2026-08-25 16:00 KST",
+  "generated_at_utc": "20260825071036",
+  "generated_at_kst": "2026-08-25 16:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_18",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 44,
-  "selected_model_count": 18,
+  "model_source_count": 48,
+  "selected_model_count": 20,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -56,7 +56,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 41,
       "max_lead_hour": 240,
       "has_pressure": true,
@@ -64,6 +64,23 @@
       "is_official": false,
       "first_seen_utc": "20260825045022",
       "first_seen_kst": "2026-08-25 13:50 KST"
+    },
+    {
+      "model_id": "AIGEFS",
+      "model_label": "AIGFS EPS",
+      "raw_model_ids": [
+        "AIGEFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260825071036",
+      "first_seen_kst": "2026-08-25 16:10 KST"
     },
     {
       "model_id": "CMC",
@@ -235,6 +252,40 @@
       "is_official": false,
       "first_seen_utc": "20260825070050",
       "first_seen_kst": "2026-08-25 16:00 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 26,
+      "max_lead_hour": 150,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260825071036",
+      "first_seen_kst": "2026-08-25 16:10 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 25,
+      "max_lead_hour": 150,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260825071036",
+      "first_seen_kst": "2026-08-25 16:10 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -440,6 +491,23 @@
       "is_official": false,
       "first_seen_utc": "20260825070050",
       "first_seen_kst": "2026-08-25 16:00 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 19,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260825071036",
+      "first_seen_kst": "2026-08-25 16:10 KST"
     },
     {
       "model_id": "HAFS",

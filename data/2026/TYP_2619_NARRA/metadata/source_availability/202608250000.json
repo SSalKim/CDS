@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260825070058",
-  "generated_at_kst": "2026-08-25 16:00 KST",
+  "generated_at_utc": "20260825071035",
+  "generated_at_kst": "2026-08-25 16:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_19",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 44,
-  "selected_model_count": 18,
+  "model_source_count": 46,
+  "selected_model_count": 20,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -254,6 +254,23 @@
       "first_seen_kst": "2026-08-25 16:00 KST"
     },
     {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260825071035",
+      "first_seen_kst": "2026-08-25 16:10 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
       "raw_model_ids": [
@@ -440,6 +457,23 @@
       "is_official": false,
       "first_seen_utc": "20260825070058",
       "first_seen_kst": "2026-08-25 16:00 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260825071035",
+      "first_seen_kst": "2026-08-25 16:10 KST"
     },
     {
       "model_id": "HAFS",
