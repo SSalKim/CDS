@@ -1,0 +1,25 @@
+{
+  "cycle": "2026082512",
+  "cycle_utc": "202608251200",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":36,"member_id":null,"model_id":"JGSM","point_count":7,"raw_model_id":"JGSM","row_count":7,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 7,
+  "points": [
+    [0,0,"202608251200",19.6,108.9,994,18,7,67.5,120,null],
+    [0,6,"202608251800",20.7,109.8,996,12.9,-9,null,0,null],
+    [0,12,"202608260000",21.3,110,996,10.3,-9,null,0,null],
+    [0,18,"202608260600",21.9,109.9,996,9.3,-9,null,0,null],
+    [0,24,"202608261200",22.1,109.5,997,8.7,-9,null,0,null],
+    [0,30,"202608261800",22.3,109.4,997,8.2,-9,null,0,null],
+    [0,36,"202608270000",22.6,109.5,998,8.2,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"15","storm_kind":"typ","typ_seq":19,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"NARRA","canonical_typ_name_ko":"나라","canonical_typ_number":19,"data_typ_number":19,"dmdw_o_tm_seq":"15","dmdw_start_time":"202608220000","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_19"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
