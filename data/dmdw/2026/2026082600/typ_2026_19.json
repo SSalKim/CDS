@@ -1,20 +1,31 @@
 {
   "cycle": "2026082600",
   "cycle_utc": "202608260000",
-  "layer_candidate_count": 1,
-  "model_count": 1,
+  "layer_candidate_count": 2,
+  "model_count": 2,
   "models": [
-    {"index":0,"is_ensemble_mean":false,"max_lead_hour":30,"member_id":null,"model_id":"JGSM","point_count":6,"raw_model_id":"JGSM","row_count":6,"source_member_count":null}
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":30,"member_id":null,"model_id":"JGSM","point_count":6,"raw_model_id":"JGSM","row_count":6,"source_member_count":null},
+    {"index":1,"is_ensemble_mean":false,"max_lead_hour":54,"member_id":null,"model_id":"TEPS","point_count":10,"raw_model_id":"TEPS","row_count":10,"source_member_count":null}
   ],
   "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
-  "point_count": 6,
+  "point_count": 16,
   "points": [
     [0,0,"202608260000",21.2,110.1,998,15,26,22.5,0,null],
     [0,6,"202608260600",22.1,110.1,998,15.4,-9,null,0,null],
     [0,12,"202608261200",22.2,109.8,999,14.9,-9,null,0,null],
     [0,18,"202608261800",22.5,109.9,999,14.4,-9,null,0,null],
     [0,24,"202608270000",23.1,110.3,999,13.9,-9,null,0,null],
-    [0,30,"202608270600",23.4,110.1,998,13.9,-9,null,0,null]
+    [0,30,"202608270600",23.4,110.1,998,13.9,-9,null,0,null],
+    [1,0,"202608260000",21.2,110.1,998,15,26,22.5,0,null],
+    [1,6,"202608260600",22.2,110.2,997,15.9,-9,null,0,null],
+    [1,12,"202608261200",22.4,109.9,998,15.9,-9,null,0,null],
+    [1,18,"202608261800",22.7,109.9,999,15.4,-9,null,0,null],
+    [1,24,"202608270000",23,109.9,1000,14.9,-9,null,0,null],
+    [1,30,"202608270600",23.1,110.2,997,15.4,-9,null,0,null],
+    [1,36,"202608271200",23.4,109.3,997,13.9,-9,null,0,null],
+    [1,42,"202608271800",23.3,108.8,999,15.4,-9,null,0,null],
+    [1,48,"202608280000",23.1,108.3,999,15.4,-9,null,0,null],
+    [1,54,"202608280600",22.7,108.5,996,15.4,-9,null,0,null]
   ],
   "request": {"o_tm_seq":"17","storm_kind":"typ","typ_seq":19,"year":2026},
   "schema_version": 2,
