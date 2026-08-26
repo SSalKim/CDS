@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at_utc": "202608260500",
+  "updated_at_utc": "202608260510",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 39,
@@ -17,7 +17,7 @@
     {
       "job": {
         "storm_key": "td_2026_42",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202608260000",
         "td_number": 42,
@@ -38,7 +38,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260826050039",
+          "generated_at_utc": "20260826051037",
           "image_path": "data/2026/TD_2642_NONAME/images/TD_2642_NONAME_202608260000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -58,13 +58,11 @@
           "data_time": "202608260000",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 6,
+          "model_count": 4,
           "target_model_count": 39,
           "model_labels": [
             "AIGFS EPS",
             "GFS",
-            "GFS EPS",
-            "HAFS",
             "ICON",
             "ICON EPS"
           ],
@@ -78,7 +76,7 @@
     {
       "job": {
         "storm_key": "td_2026_42",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202608260000",
         "td_number": 42,
@@ -99,7 +97,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260826050050",
+          "generated_at_utc": "20260826051050",
           "image_path": "data/2026/TD_2642_NONAME/images/TD_2642_NONAME_202608260000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -119,13 +117,11 @@
           "data_time": "202608260000",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 6,
+          "model_count": 4,
           "target_model_count": 39,
           "model_labels": [
             "AIGFS EPS",
             "GFS",
-            "GFS EPS",
-            "HAFS",
             "ICON",
             "ICON EPS"
           ],
@@ -160,7 +156,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260826050050",
+          "generated_at_utc": "20260826051052",
           "image_path": "data/2026/TYP_2618_SAUDEL/images/TYP_2618_SAUDEL_202608260000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -180,10 +176,12 @@
           "data_time": "202608260000",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 5,
+          "model_count": 7,
           "target_model_count": 39,
           "model_labels": [
             "AICON",
+            "AIGFS EPS",
+            "GFS",
             "ICON",
             "ICON EPS",
             "JGSM",
@@ -221,7 +219,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260826050051",
+          "generated_at_utc": "20260826051053",
           "image_path": "data/2026/TYP_2618_SAUDEL/images/TYP_2618_SAUDEL_202608260000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -241,10 +239,12 @@
           "data_time": "202608260000",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 5,
+          "model_count": 7,
           "target_model_count": 39,
           "model_labels": [
             "AICON",
+            "AIGFS EPS",
+            "GFS",
             "ICON",
             "ICON EPS",
             "JGSM",
@@ -261,7 +261,7 @@
     {
       "job": {
         "storm_key": "td_2026_43",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202608260000",
         "td_number": 43,
@@ -270,8 +270,8 @@
         "typ_name_ko": "",
         "typ_name": "NONAME",
         "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true
+        "atcf_id": "wp182026",
+        "skip_atcf": false
       },
       "window": {
         "data_time": "202608260000",
@@ -280,9 +280,9 @@
         "end_utc": "202608261000"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260826050051",
+          "generated_at_utc": "20260826051121",
           "image_path": "data/2026/TD_2643_NONAME/images/TD_2643_NONAME_202608260000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -297,19 +297,21 @@
           "canonical_typ_number": 43,
           "canonical_typ_name": "NONAME",
           "canonical_typ_name_ko": "",
-          "atcf_id": "",
+          "atcf_id": "wp182026",
           "extra_atcf_ids": [],
           "data_time": "202608260000",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 4,
           "target_model_count": 39,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": true,
-          "source_availability_path": "data/2026/TD_2643_NONAME/metadata/source_availability/202608260000.json",
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+          "model_labels": [
+            "AIGFS EPS",
+            "GFS",
+            "ICON",
+            "ICON EPS"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TD_2643_NONAME/metadata/source_availability/202608260000.json"
         }
       },
       "completed": false,
@@ -318,7 +320,7 @@
     {
       "job": {
         "storm_key": "td_2026_43",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202608260000",
         "td_number": 43,
@@ -327,8 +329,8 @@
         "typ_name_ko": "",
         "typ_name": "NONAME",
         "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true
+        "atcf_id": "wp182026",
+        "skip_atcf": false
       },
       "window": {
         "data_time": "202608260000",
@@ -337,9 +339,9 @@
         "end_utc": "202608261000"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260826050051",
+          "generated_at_utc": "20260826051123",
           "image_path": "data/2026/TD_2643_NONAME/images/TD_2643_NONAME_202608260000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -354,26 +356,28 @@
           "canonical_typ_number": 43,
           "canonical_typ_name": "NONAME",
           "canonical_typ_name_ko": "",
-          "atcf_id": "",
+          "atcf_id": "wp182026",
           "extra_atcf_ids": [],
           "data_time": "202608260000",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 4,
           "target_model_count": 39,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": true,
-          "source_availability_path": "data/2026/TD_2643_NONAME/metadata/source_availability/202608260000.json",
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+          "model_labels": [
+            "AIGFS EPS",
+            "GFS",
+            "ICON",
+            "ICON EPS"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TD_2643_NONAME/metadata/source_availability/202608260000.json"
         }
       },
       "completed": false,
       "final_check": false
     }
   ],
-  "inventory_count": 9106,
+  "inventory_count": 9108,
   "manifest_indexes": [
     {
       "year": 2020,
