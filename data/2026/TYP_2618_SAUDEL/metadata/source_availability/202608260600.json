@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260826131038",
-  "generated_at_kst": "2026-08-26 22:10 KST",
+  "generated_at_utc": "20260826132033",
+  "generated_at_kst": "2026-08-26 22:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_18",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 27,
-  "selected_model_count": 12,
+  "model_source_count": 29,
+  "selected_model_count": 13,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -210,8 +210,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 9,
-      "max_lead_hour": 48,
+      "point_count": 14,
+      "max_lead_hour": 78,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -262,8 +262,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 11,
-      "max_lead_hour": 60,
+      "point_count": 21,
+      "max_lead_hour": 120,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -286,6 +286,40 @@
       "is_official": false,
       "first_seen_utc": "20260826130030",
       "first_seen_kst": "2026-08-26 22:00 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 35,
+      "max_lead_hour": 204,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260826132033",
+      "first_seen_kst": "2026-08-26 22:20 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260826132033",
+      "first_seen_kst": "2026-08-26 22:20 KST"
     },
     {
       "model_id": "HAFS",
