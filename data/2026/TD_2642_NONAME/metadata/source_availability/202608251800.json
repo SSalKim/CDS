@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260826014026",
-  "generated_at_kst": "2026-08-26 10:40 KST",
+  "generated_at_utc": "20260826015023",
+  "generated_at_kst": "2026-08-26 10:50 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_42",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 19,
-  "selected_model_count": 10,
+  "model_source_count": 21,
+  "selected_model_count": 12,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -100,6 +100,23 @@
       "first_seen_kst": "2026-08-26 10:21 KST"
     },
     {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECM"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 7,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260826015023",
+      "first_seen_kst": "2026-08-26 10:50 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
       "raw_model_ids": [
@@ -166,6 +183,23 @@
       "is_official": false,
       "first_seen_utc": "20260826005108",
       "first_seen_kst": "2026-08-26 09:51 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EPS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 19,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260826015023",
+      "first_seen_kst": "2026-08-26 10:50 KST"
     },
     {
       "model_id": "GFS",
@@ -245,7 +279,7 @@
       "source_label": "POLARWX",
       "selected": false,
       "point_count": 27,
-      "max_lead_hour": 162,
+      "max_lead_hour": 156,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
