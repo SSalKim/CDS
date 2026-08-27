@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260827180223",
-  "generated_at_kst": "2026-08-28 03:02 KST",
+  "generated_at_utc": "20260827181017",
+  "generated_at_kst": "2026-08-28 03:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_18",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 12,
-  "selected_model_count": 8,
+  "model_source_count": 15,
+  "selected_model_count": 9,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -107,7 +107,7 @@
       ],
       "source": "DMDW",
       "source_label": "KMA DMDW",
-      "selected": true,
+      "selected": false,
       "point_count": 32,
       "max_lead_hour": 192,
       "has_pressure": true,
@@ -115,6 +115,57 @@
       "is_official": false,
       "first_seen_utc": "20260827175022",
       "first_seen_kst": "2026-08-28 02:50 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GFS_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 17,
+      "max_lead_hour": 96,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260827181017",
+      "first_seen_kst": "2026-08-28 03:10 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260827181017",
+      "first_seen_kst": "2026-08-28 03:10 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFS"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 42,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260827181017",
+      "first_seen_kst": "2026-08-28 03:10 KST"
     },
     {
       "model_id": "ICON",
