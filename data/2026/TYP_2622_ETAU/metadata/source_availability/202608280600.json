@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260828125031",
-  "generated_at_kst": "2026-08-28 21:50 KST",
+  "generated_at_utc": "20260828130030",
+  "generated_at_kst": "2026-08-28 22:00 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_22",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 22,
-  "selected_model_count": 12,
+  "model_source_count": 28,
+  "selected_model_count": 13,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -100,6 +100,23 @@
       "first_seen_kst": "2026-08-28 21:30 KST"
     },
     {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECM"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 12,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260828130030",
+      "first_seen_kst": "2026-08-28 22:00 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
       "raw_model_ids": [
@@ -132,6 +149,40 @@
       "is_official": false,
       "first_seen_utc": "20260828122038",
       "first_seen_kst": "2026-08-28 21:20 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260828130030",
+      "first_seen_kst": "2026-08-28 22:00 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 18,
+      "max_lead_hour": 102,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260828130030",
+      "first_seen_kst": "2026-08-28 22:00 KST"
     },
     {
       "model_id": "GFS",
@@ -237,6 +288,23 @@
       "first_seen_kst": "2026-08-28 20:50 KST"
     },
     {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260828130030",
+      "first_seen_kst": "2026-08-28 22:00 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -269,6 +337,23 @@
       "is_official": false,
       "first_seen_utc": "20260828121044",
       "first_seen_kst": "2026-08-28 21:10 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFSA"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 31,
+      "max_lead_hour": 90,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260828130030",
+      "first_seen_kst": "2026-08-28 22:00 KST"
     },
     {
       "model_id": "ICON",
@@ -405,6 +490,23 @@
       "is_official": false,
       "first_seen_utc": "20260828122038",
       "first_seen_kst": "2026-08-28 21:20 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext Cyclones",
+      "raw_model_ids": [
+        "DEEPMIND"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260828130030",
+      "first_seen_kst": "2026-08-28 22:00 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608280600.json",
