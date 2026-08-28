@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260828072109",
-  "generated_at_kst": "2026-08-28 16:21 KST",
+  "generated_at_utc": "20260828073112",
+  "generated_at_kst": "2026-08-28 16:31 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_42",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 27,
-  "selected_model_count": 17,
+  "model_source_count": 30,
+  "selected_model_count": 18,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -66,6 +66,23 @@
       "first_seen_kst": "2026-08-28 15:41 KST"
     },
     {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 24,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260828073112",
+      "first_seen_kst": "2026-08-28 16:31 KST"
+    },
+    {
       "model_id": "CMC_EPS",
       "model_label": "CMC EPS",
       "raw_model_ids": [
@@ -98,6 +115,23 @@
       "is_official": false,
       "first_seen_utc": "20260828064111",
       "first_seen_kst": "2026-08-28 15:41 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260828073112",
+      "first_seen_kst": "2026-08-28 16:31 KST"
     },
     {
       "model_id": "ECMWF",
@@ -251,6 +285,23 @@
       "is_official": false,
       "first_seen_utc": "20260828070111",
       "first_seen_kst": "2026-08-28 16:01 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260828073112",
+      "first_seen_kst": "2026-08-28 16:31 KST"
     },
     {
       "model_id": "HAFS",
