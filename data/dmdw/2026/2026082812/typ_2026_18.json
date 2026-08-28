@@ -1,0 +1,26 @@
+{
+  "cycle": "2026082812",
+  "cycle_utc": "202608281200",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":48,"member_id":null,"model_id":"JGSM","point_count":8,"raw_model_id":"JGSM","row_count":8,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 8,
+  "points": [
+    [0,6,"202608281800",27.1,116.4,995,16.5,-9,null,0,null],
+    [0,12,"202608290000",26.9,115.7,996,15.4,-9,null,0,null],
+    [0,18,"202608290600",26.6,114.8,996,14.9,-9,null,0,null],
+    [0,24,"202608291200",26.1,113.8,996,14.4,-9,null,0,null],
+    [0,30,"202608291800",25.6,112.7,996,15.4,-9,null,0,null],
+    [0,36,"202608300000",24.5,111.7,998,16.5,-9,null,0,null],
+    [0,42,"202608300600",23,111.5,996,20.6,-9,null,0,null],
+    [0,48,"202608301200",22.1,111.5,998,20.1,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"38","storm_kind":"typ","typ_seq":18,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"SAUDEL","canonical_typ_name_ko":"사우델","canonical_typ_number":18,"data_typ_number":18,"dmdw_o_tm_seq":"38","dmdw_start_time":"202608190300","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_18"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
