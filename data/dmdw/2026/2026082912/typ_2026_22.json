@@ -1,0 +1,41 @@
+{
+  "cycle": "2026082912",
+  "cycle_utc": "202608291200",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":132,"member_id":null,"model_id":"JGSM","point_count":23,"raw_model_id":"JGSM","row_count":23,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 23,
+  "points": [
+    [0,0,"202608291200",29.8,165.4,992,23,27,337.5,320,null],
+    [0,6,"202608291800",30.9,164.8,991,19.5,-9,null,0,null],
+    [0,12,"202608300000",31.4,164.3,991,19.5,-9,null,0,null],
+    [0,18,"202608300600",31.2,164.2,988,28.8,-9,null,0,null],
+    [0,24,"202608301200",30.8,164.8,988,29.8,-9,null,0,null],
+    [0,30,"202608301800",30.7,165.9,985,23.7,-9,null,0,null],
+    [0,36,"202608310000",31,166.8,983,27.8,-9,null,0,null],
+    [0,42,"202608310600",31.5,167.8,982,26.7,-9,null,0,null],
+    [0,48,"202608311200",32.1,168.5,984,26.7,-9,null,0,null],
+    [0,54,"202608311800",32.9,169.1,985,25.2,-9,null,0,null],
+    [0,60,"202609010000",33.8,169.5,986,24.2,-9,null,0,null],
+    [0,66,"202609010600",34.8,170.4,985,22.6,-9,null,0,null],
+    [0,72,"202609011200",35.8,171.4,990,20.1,-9,null,0,null],
+    [0,78,"202609011800",37.6,173,988,20.6,-9,null,0,null],
+    [0,84,"202609020000",40.5,175.3,977,29.8,-9,null,0,null],
+    [0,90,"202609020600",44.7,176.8,973,28.3,-9,null,0,null],
+    [0,96,"202609021200",48.7,177,963,31.9,-9,null,0,null],
+    [0,102,"202609021800",52.7,176.9,960,26.2,-9,null,0,null],
+    [0,108,"202609030000",55.6,174.2,958,22.1,-9,null,0,null],
+    [0,114,"202609030600",56.4,170.9,958,23.7,-9,null,0,null],
+    [0,120,"202609031200",54.6,169.3,960,19.5,-9,null,0,null],
+    [0,126,"202609031800",53.3,171.7,966,17.5,-9,null,0,null],
+    [0,132,"202609040000",53.9,175.6,972,18,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"10","storm_kind":"typ","typ_seq":22,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"ETAU","canonical_typ_name_ko":"아타우","canonical_typ_number":22,"data_typ_number":22,"dmdw_o_tm_seq":"10","dmdw_start_time":"202608270600","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_22"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
