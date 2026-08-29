@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260829144042",
-  "generated_at_kst": "2026-08-29 23:40 KST",
+  "generated_at_utc": "20260829145054",
+  "generated_at_kst": "2026-08-29 23:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_23",
   "storm_stage": "TYP",
@@ -28,26 +28,9 @@
     240
   ],
   "model_source_count": 34,
-  "selected_model_count": 17,
+  "selected_model_count": 16,
   "active_target_model_count": 39,
   "model_sources": [
-    {
-      "model_id": "AIGEFS",
-      "model_label": "AIGFS EPS",
-      "raw_model_ids": [
-        "AIGEFSM"
-      ],
-      "source": "SMCA.FUN",
-      "source_label": "SMCA.FUN",
-      "selected": true,
-      "point_count": 39,
-      "max_lead_hour": 228,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260829112024",
-      "first_seen_kst": "2026-08-29 20:20 KST"
-    },
     {
       "model_id": "HKO_AREC",
       "model_label": "Aurora-ECMWF",
@@ -406,6 +389,23 @@
       "is_official": false,
       "first_seen_utc": "20260829143045",
       "first_seen_kst": "2026-08-29 23:30 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 5,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260829145054",
+      "first_seen_kst": "2026-08-29 23:50 KST"
     },
     {
       "model_id": "HAFS",
