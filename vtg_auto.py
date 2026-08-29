@@ -3255,12 +3255,62 @@ def merge_drive_archive_payload(target: dict, source: dict, source_dir: Path, ta
     return merged
 
 
+def canonicalize_linked_td_status_records(
+    output_root: Path,
+    status: dict,
+    td_typ_links: dict[tuple[str, int], dict],
+    typ_names: dict[tuple[str, int], tuple[str, str]],
+    *,
+    dry_run: bool = False,
+) -> bool:
+    cycles = status.get("cycles") if isinstance(status, dict) else None
+    if not isinstance(cycles, dict) or not td_typ_links:
+        return False
+
+    changed = False
+    for cycle_key, cycle_records in cycles.items():
+        if not isinstance(cycle_records, dict):
+            continue
+        for record in cycle_records.values():
+            metadata = record.get("metadata") if isinstance(record, dict) else None
+            if not isinstance(metadata, dict) or normalized_metadata_stage(metadata) != "TD":
+                continue
+            data_time = str(metadata.get("data_time") or cycle_key or "").strip()
+            year = str(metadata.get("storm_year") or data_time[:4] or "").strip()
+            td_number = metadata_int(metadata.get("typ_number"))
+            row_link = td_typ_links.get((year, td_number)) if year and td_number else None
+            if not isinstance(row_link, dict):
+                continue
+
+            linked_metadata = {
+                **metadata,
+                "linked_typ_number": row_link.get("linked_typ_number") or row_link.get("canonical_typ_number"),
+                "canonical_storm_stage": "TYP",
+                "canonical_typ_number": row_link.get("canonical_typ_number") or row_link.get("linked_typ_number"),
+                "canonical_typ_name": row_link.get("canonical_typ_name") or metadata.get("canonical_typ_name"),
+                "canonical_typ_name_ko": row_link.get("canonical_typ_name_ko") or metadata.get("canonical_typ_name_ko"),
+            }
+            target = canonical_target_for_linked_td_metadata(output_root, linked_metadata, typ_names)
+            if target is None:
+                continue
+            target_dir, canonical_fields = target
+            updated_metadata = rewrite_metadata_for_canonical_target(linked_metadata, target_dir, canonical_fields)
+            if updated_metadata == metadata:
+                continue
+            changed = True
+            if not dry_run:
+                record["metadata"] = updated_metadata
+    return changed
+
+
 def canonicalize_linked_td_outputs(
     output_root: Path,
     *,
     dry_run: bool = False,
     td_typ_links: dict[tuple[str, int], dict] | None = None,
     restrict_to_linked_rows: bool = False,
+    status: dict | None = None,
+    status_path: Path | None = None,
 ) -> list[Path]:
     if not output_root.exists():
         return []
@@ -3270,6 +3320,14 @@ def canonicalize_linked_td_outputs(
     linked_years = {year for year, _ in td_typ_links} if restrict_to_linked_rows else None
     typ_names = existing_typ_name_lookup(output_root, years=linked_years)
     changed_paths: set[Path] = set()
+    if canonicalize_linked_td_status_records(
+        output_root,
+        status or {},
+        td_typ_links,
+        typ_names,
+        dry_run=dry_run,
+    ):
+        changed_paths.add(status_path or output_root / "status.json")
     for td_dir in sorted(output_root.glob("[0-9][0-9][0-9][0-9]/TD_*")):
         if not td_dir.is_dir():
             continue
@@ -4717,7 +4775,10 @@ def main() -> int:
             output_root,
             dry_run=args.dry_run,
             td_typ_links=td_typ_links,
+            status=status,
+            status_path=status_path,
         )
+        canonical_status_changed = status_path in canonicalized_paths
         canonicalized_paths.extend(normalize_track_history_primary_keys(output_root, dry_run=args.dry_run))
         inventory = build_manifest_inventory(output_root, [])
         split_paths = [] if args.dry_run else rebuild_split_manifest_files(output_root, inventory, updated_at_utc=updated_at_utc)
@@ -4744,14 +4805,14 @@ def main() -> int:
             status_path=status_path,
             split_manifest_paths=split_paths,
             include_manifest=True,
-            include_status=status_for_write != status,
+            include_status=status_for_write != status or canonical_status_changed,
         )
         changed_paths.extend(relative_asset_path(path) for path in canonicalized_paths)
         changed_paths.extend(relative_asset_path(path) for path in kma_cache_asset_paths(kma_cache_dir, years_for_index))
         changed_paths = sorted(set(changed_paths))
         if not args.dry_run:
             write_json(manifest_path, manifest)
-            if status_for_write != status:
+            if status_for_write != status or canonical_status_changed:
                 write_json(status_path, status_for_write)
         write_changed_paths(args.changed_paths_file, changed_paths)
         print_manifest_or_summary(manifest, verbose=args.verbose_manifest, changed_paths=changed_paths)
@@ -5027,7 +5088,10 @@ def main() -> int:
         dry_run=args.dry_run,
         td_typ_links=td_typ_links,
         restrict_to_linked_rows=True,
+        status=status,
+        status_path=status_path,
     )
+    canonical_status_changed = status_path in canonicalized_paths
     previous_manifest = load_json(manifest_path, {})
     compact_runs = compact_manifest_runs(run_entries)
     updated_at_utc = format_utc_stamp(now)
@@ -5078,7 +5142,7 @@ def main() -> int:
         status_path=status_path,
         split_manifest_paths=split_paths,
         include_manifest=should_write_outputs,
-        include_status=status_changed or actual_run_count > 0,
+        include_status=status_changed or canonical_status_changed or actual_run_count > 0,
     )
     changed_paths.extend(relative_asset_path(path) for path in removed_artifact_paths)
     changed_paths.extend(relative_asset_path(path) for path in canonicalized_paths)
@@ -5086,7 +5150,7 @@ def main() -> int:
     changed_paths = sorted(set(changed_paths))
     if should_write_outputs:
         write_json(manifest_path, manifest)
-        if status_changed or actual_run_count > 0:
+        if status_changed or canonical_status_changed or actual_run_count > 0:
             write_json(status_path, status_for_write)
     write_changed_paths(args.changed_paths_file, changed_paths)
     print_manifest_or_summary(manifest, verbose=args.verbose_manifest, changed_paths=changed_paths)
