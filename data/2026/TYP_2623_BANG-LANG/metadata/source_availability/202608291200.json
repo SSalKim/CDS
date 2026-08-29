@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260829204038",
-  "generated_at_kst": "2026-08-30 05:40 KST",
+  "generated_at_utc": "20260829205041",
+  "generated_at_kst": "2026-08-30 05:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_23",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 58,
-  "selected_model_count": 32,
+  "model_source_count": 63,
+  "selected_model_count": 33,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -357,6 +357,23 @@
       "first_seen_kst": "2026-08-30 05:00 KST"
     },
     {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EPS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 10,
+      "max_lead_hour": 54,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260829205041",
+      "first_seen_kst": "2026-08-30 05:50 KST"
+    },
+    {
       "model_id": "HKO_FWEC",
       "model_label": "FengWu-ECMWF",
       "raw_model_ids": [
@@ -560,6 +577,23 @@
       "is_official": false,
       "first_seen_utc": "20260829192039",
       "first_seen_kst": "2026-08-30 04:20 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 3,
+      "max_lead_hour": 12,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260829205041",
+      "first_seen_kst": "2026-08-30 05:50 KST"
     },
     {
       "model_id": "GCEC_AI",
@@ -903,6 +937,40 @@
       "first_seen_kst": "2026-08-30 01:00 KST"
     },
     {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 8,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260829205041",
+      "first_seen_kst": "2026-08-30 05:50 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 7,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260829205041",
+      "first_seen_kst": "2026-08-30 05:50 KST"
+    },
+    {
       "model_id": "FNMOC_EPS",
       "model_label": "NAVGEM EPS",
       "raw_model_ids": [
@@ -918,6 +986,23 @@
       "is_official": false,
       "first_seen_utc": "20260829204038",
       "first_seen_kst": "2026-08-30 05:40 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "FNMOC_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 24,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260829205041",
+      "first_seen_kst": "2026-08-30 05:50 KST"
     },
     {
       "model_id": "PGEC_AI",
