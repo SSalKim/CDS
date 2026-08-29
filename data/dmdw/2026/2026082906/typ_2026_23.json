@@ -1,0 +1,21 @@
+{
+  "cycle": "2026082906",
+  "cycle_utc": "202608290600",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":18,"member_id":null,"model_id":"JGSM","point_count":3,"raw_model_id":"JGSM","row_count":3,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 3,
+  "points": [
+    [0,6,"202608291200",25.8,168.7,981,35.5,-9,null,0,null],
+    [0,12,"202608291800",27.9,169,979,39.1,-9,null,0,null],
+    [0,18,"202608300000",30.4,168.6,981,36.5,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"5","storm_kind":"typ","typ_seq":23,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"BANG-LANG","canonical_typ_name_ko":"방랑","canonical_typ_number":23,"data_typ_number":23,"dmdw_o_tm_seq":"5","dmdw_start_time":"202608280300","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_23"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
