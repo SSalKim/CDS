@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202608291030",
+  "updated_at_utc": "202608291040",
   "storm_key": "typ_2026_22",
   "stage": "TYP",
   "year": 2026,
@@ -314,27 +314,31 @@
     },
     {
       "job": {
-        "storm_key": "td_2026_44_typ_22",
-        "stage": "TD_PRE_TYP_POSITION_ATCF",
+        "storm_key": "typ_2026_22",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202608270000",
         "td_number": 44,
         "linked_td_number": null,
+        "linked_typ_number": 22,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 44,
+        "data_typ_number": 44,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp212026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608270000",
-        "cycle_time_utc": "202608270000",
-        "start_utc": "202608270400",
-        "end_utc": "202608271000"
+        "data_time": "202608270000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260827094122",
           "image_path": "data/2026/TYP_2622_ETAU/images/TD_2644_NONAME_202608270000_120h.png",
@@ -389,35 +393,39 @@
             "WeatherNext Cyclones"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608270000.json"
+          "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608270000.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608270000_120h.json"
     },
     {
       "job": {
-        "storm_key": "td_2026_44_typ_22",
-        "stage": "TD_PRE_TYP_POSITION_ATCF",
+        "storm_key": "typ_2026_22",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202608270000",
         "td_number": 44,
         "linked_td_number": null,
+        "linked_typ_number": 22,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 44,
+        "data_typ_number": 44,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp212026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608270000",
-        "cycle_time_utc": "202608270000",
-        "start_utc": "202608270400",
-        "end_utc": "202608271000"
+        "data_time": "202608270000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260827094134",
           "image_path": "data/2026/TYP_2622_ETAU/images/TD_2644_NONAME_202608270000_240h.png",
@@ -472,35 +480,39 @@
             "WeatherNext Cyclones"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608270000.json"
+          "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608270000.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": false
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608270000_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608270600",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608270600",
-        "cycle_time_utc": "202608270600",
-        "start_utc": "202608271000",
-        "end_utc": "202608271600"
+        "data_time": "202608270600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260827155105",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608270600_120h.png",
@@ -545,35 +557,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608270600.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608270600.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608270600.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608270600_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608270600",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608270600",
-        "cycle_time_utc": "202608270600",
-        "start_utc": "202608271000",
-        "end_utc": "202608271600"
+        "data_time": "202608270600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260827155111",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608270600_240h.png",
@@ -618,35 +634,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608270600.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608270600.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608270600.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608270600_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608271200",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608271200",
-        "cycle_time_utc": "202608271200",
-        "start_utc": "202608271600",
-        "end_utc": "202608272200"
+        "data_time": "202608271200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260827215054",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608271200_120h.png",
@@ -706,35 +726,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608271200.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608271200.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608271200.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608271200_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608271200",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608271200",
-        "cycle_time_utc": "202608271200",
-        "start_utc": "202608271600",
-        "end_utc": "202608272200"
+        "data_time": "202608271200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260827215109",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608271200_240h.png",
@@ -794,35 +818,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608271200.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608271200.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608271200.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608271200_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608271800",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608271800",
-        "cycle_time_utc": "202608271800",
-        "start_utc": "202608272200",
-        "end_utc": "202608280400"
+        "data_time": "202608271800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260828035053",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608271800_120h.png",
@@ -867,35 +895,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608271800.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608271800.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608271800.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608271800_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608271800",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608271800",
-        "cycle_time_utc": "202608271800",
-        "start_utc": "202608272200",
-        "end_utc": "202608280400"
+        "data_time": "202608271800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260828035106",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608271800_240h.png",
@@ -940,35 +972,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608271800.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608271800.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608271800.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608271800_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608280000",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608280000",
-        "cycle_time_utc": "202608280000",
-        "start_utc": "202608280400",
-        "end_utc": "202608281000"
+        "data_time": "202608280000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260828095107",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608280000_120h.png",
@@ -1028,35 +1064,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608280000.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608280000.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608280000.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608280000_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608280000",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608280000",
-        "cycle_time_utc": "202608280000",
-        "start_utc": "202608280400",
-        "end_utc": "202608281000"
+        "data_time": "202608280000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260828095109",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608280000_240h.png",
@@ -1116,35 +1156,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608280000.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608280000.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608280000.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608280000_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608280600",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608280600",
-        "cycle_time_utc": "202608280600",
-        "start_utc": "202608281000",
-        "end_utc": "202608281600"
+        "data_time": "202608280600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260828155106",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608280600_120h.png",
@@ -1189,35 +1233,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608280600.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608280600.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608280600.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608280600_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608280600",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608280600",
-        "cycle_time_utc": "202608280600",
-        "start_utc": "202608281000",
-        "end_utc": "202608281600"
+        "data_time": "202608280600"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260828155107",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608280600_240h.png",
@@ -1262,35 +1310,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608280600.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608280600.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608280600.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608280600_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608281200",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608281200",
-        "cycle_time_utc": "202608281200",
-        "start_utc": "202608281600",
-        "end_utc": "202608282200"
+        "data_time": "202608281200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260828215114",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608281200_120h.png",
@@ -1349,35 +1401,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608281200.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608281200.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608281200.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608281200_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608281200",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608281200",
-        "cycle_time_utc": "202608281200",
-        "start_utc": "202608281600",
-        "end_utc": "202608282200"
+        "data_time": "202608281200"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260828215116",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608281200_240h.png",
@@ -1436,35 +1492,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608281200.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608281200.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608281200.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608281200_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608281800",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608281800",
-        "cycle_time_utc": "202608281800",
-        "start_utc": "202608282200",
-        "end_utc": "202608290400"
+        "data_time": "202608281800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260829035104",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608281800_120h.png",
@@ -1509,35 +1569,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608281800.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608281800.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608281800.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608281800_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608281800",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608281800",
-        "cycle_time_utc": "202608281800",
-        "start_utc": "202608282200",
-        "end_utc": "202608290400"
+        "data_time": "202608281800"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260829035105",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608281800_240h.png",
@@ -1582,35 +1646,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608281800.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608281800.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608281800.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608281800_240h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608290000",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608290000",
-        "cycle_time_utc": "202608290000",
-        "start_utc": "202608290400",
-        "end_utc": "202608291000"
+        "data_time": "202608290000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260829095117",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608290000_120h.png",
@@ -1670,35 +1738,39 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608290000.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608290000.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608290000.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608290000_120h.json"
     },
     {
       "job": {
         "storm_key": "typ_2026_22",
-        "stage": "TYP_LINKED",
+        "stage": "TYP",
         "year": 2026,
         "data_time": "202608290000",
         "td_number": null,
         "linked_td_number": 44,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TYP",
+        "canonical_typ_number": 22,
+        "canonical_typ_name": "ETAU",
+        "canonical_typ_name_ko": "아타우",
         "typ_number": 22,
+        "data_typ_number": 22,
         "typ_name_ko": "아타우",
         "typ_name": "ETAU",
         "typ_en": "ETAU",
         "atcf_id": "wp212026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202608290000",
-        "cycle_time_utc": "202608290000",
-        "start_utc": "202608290400",
-        "end_utc": "202608291000"
+        "data_time": "202608290000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20260829095118",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608290000_240h.png",
@@ -1758,11 +1830,11 @@
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2622_ETAU/metadata/source_availability/202608290000.json",
-          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608290000.json"
+          "smca_aicon_snapshot_path": "data/2026/TYP_2622_ETAU/metadata/smca/AICON/202608290000.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TYP_2622_ETAU/metadata/runs/202608290000_240h.json"
     },
     {
       "job": {
@@ -1788,7 +1860,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260829103055",
+          "generated_at_utc": "20260829104101",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608290600_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -1849,7 +1921,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260829103058",
+          "generated_at_utc": "20260829104104",
           "image_path": "data/2026/TYP_2622_ETAU/images/TYP_2622_ETAU_202608290600_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
