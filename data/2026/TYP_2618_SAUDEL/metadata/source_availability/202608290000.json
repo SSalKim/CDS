@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260829070118",
-  "generated_at_kst": "2026-08-29 16:01 KST",
+  "generated_at_utc": "20260829071133",
+  "generated_at_kst": "2026-08-29 16:11 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_18",
   "storm_stage": "TD",
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 4,
-  "selected_model_count": 4,
+  "model_source_count": 8,
+  "selected_model_count": 8,
   "active_target_model_count": 39,
   "model_sources": [
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 34,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260829071133",
+      "first_seen_kst": "2026-08-29 16:11 KST"
+    },
     {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
@@ -81,6 +98,57 @@
       "is_official": false,
       "first_seen_utc": "20260829040118",
       "first_seen_kst": "2026-08-29 13:01 KST"
+    },
+    {
+      "model_id": "KIM_3h",
+      "model_label": "KIM",
+      "raw_model_ids": [
+        "KIM_3h"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 34,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260829071133",
+      "first_seen_kst": "2026-08-29 16:11 KST"
+    },
+    {
+      "model_id": "KIM_6h",
+      "model_label": "KIM",
+      "raw_model_ids": [
+        "KIM_6h"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260829071133",
+      "first_seen_kst": "2026-08-29 16:11 KST"
+    },
+    {
+      "model_id": "KIM_EPS",
+      "model_label": "KIM EPS",
+      "raw_model_ids": [
+        "KIM_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20260829071133",
+      "first_seen_kst": "2026-08-29 16:11 KST"
     },
     {
       "model_id": "WNC",
