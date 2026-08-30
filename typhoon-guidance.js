@@ -3314,6 +3314,14 @@ return promise;
 
 }
 
+function sortTyphoonRunsNewestFirst(runs){
+
+return runs.sort((a,b)=>
+String(b?.dataTime || '').localeCompare(String(a?.dataTime || ''))
+);
+
+}
+
 async function preloadTyphoonStormImages(stormKey,fcstHours,{
 isCancelled=()=>false,
 onPriorityLoaded=null
@@ -3358,6 +3366,8 @@ if(isCancelled()){
 return {total,loaded,cancelled:true};
 }
 }
+
+sortTyphoonRunsNewestFirst(runs);
 
 let archivePaths=[...new Set(runs.map(typhoonDriveArchivePathForRun).filter(Boolean))];
 await Promise.all(archivePaths.map(path=>ensureTyphoonDriveArchiveImagesForPath(path)));
