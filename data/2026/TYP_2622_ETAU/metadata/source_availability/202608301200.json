@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260830192041",
-  "generated_at_kst": "2026-08-31 04:20 KST",
+  "generated_at_utc": "20260830193040",
+  "generated_at_kst": "2026-08-31 04:30 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_22",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 30,
-  "selected_model_count": 13,
+  "model_source_count": 32,
+  "selected_model_count": 14,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -218,6 +218,40 @@
       "is_official": false,
       "first_seen_utc": "20260830184040",
       "first_seen_kst": "2026-08-31 03:40 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 3,
+      "max_lead_hour": 12,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830193040",
+      "first_seen_kst": "2026-08-31 04:30 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 10,
+      "max_lead_hour": 54,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830193040",
+      "first_seen_kst": "2026-08-31 04:30 KST"
     },
     {
       "model_id": "GFS",
