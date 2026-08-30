@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260830064115",
-  "generated_at_kst": "2026-08-30 15:41 KST",
+  "generated_at_utc": "20260830065122",
+  "generated_at_kst": "2026-08-30 15:51 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_46",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 12,
-  "selected_model_count": 8,
+  "model_source_count": 18,
+  "selected_model_count": 9,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -66,6 +66,23 @@
       "first_seen_kst": "2026-08-30 15:41 KST"
     },
     {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830065122",
+      "first_seen_kst": "2026-08-30 15:51 KST"
+    },
+    {
       "model_id": "CMC_EPS",
       "model_label": "CMC EPS",
       "raw_model_ids": [
@@ -98,6 +115,23 @@
       "is_official": false,
       "first_seen_utc": "20260830064115",
       "first_seen_kst": "2026-08-30 15:41 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830065122",
+      "first_seen_kst": "2026-08-30 15:51 KST"
     },
     {
       "model_id": "GFS",
@@ -168,6 +202,23 @@
       "first_seen_kst": "2026-08-30 14:51 KST"
     },
     {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830065122",
+      "first_seen_kst": "2026-08-30 15:51 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -183,6 +234,23 @@
       "is_official": false,
       "first_seen_utc": "20260830061105",
       "first_seen_kst": "2026-08-30 15:11 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFSA"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830065122",
+      "first_seen_kst": "2026-08-30 15:51 KST"
     },
     {
       "model_id": "ICON",
@@ -219,6 +287,23 @@
       "first_seen_kst": "2026-08-30 13:01 KST"
     },
     {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKM"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": true,
+      "point_count": 5,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830065122",
+      "first_seen_kst": "2026-08-30 15:51 KST"
+    },
+    {
       "model_id": "WNC",
       "model_label": "WeatherNext Cyclones",
       "raw_model_ids": [
@@ -234,6 +319,23 @@
       "is_official": false,
       "first_seen_utc": "20260830062102",
       "first_seen_kst": "2026-08-30 15:21 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext Cyclones",
+      "raw_model_ids": [
+        "DEEPMIND"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 36,
+      "max_lead_hour": 210,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830065122",
+      "first_seen_kst": "2026-08-30 15:51 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2646_NONAME/metadata/source_availability/202608300000.json"
