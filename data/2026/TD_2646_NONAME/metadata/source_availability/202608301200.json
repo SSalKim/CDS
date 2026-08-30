@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260830191123",
-  "generated_at_kst": "2026-08-31 04:11 KST",
+  "generated_at_utc": "20260830192119",
+  "generated_at_kst": "2026-08-31 04:21 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_46",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 18,
-  "selected_model_count": 9,
+  "model_source_count": 20,
+  "selected_model_count": 10,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -193,8 +193,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 18,
-      "max_lead_hour": 144,
+      "point_count": 32,
+      "max_lead_hour": 186,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -287,6 +287,23 @@
       "first_seen_kst": "2026-08-31 01:11 KST"
     },
     {
+      "model_id": "IFKM_AI",
+      "model_label": "KMA AIFS-KIM",
+      "raw_model_ids": [
+        "IFKM_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 8,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830192119",
+      "first_seen_kst": "2026-08-31 04:21 KST"
+    },
+    {
       "model_id": "UKM",
       "model_label": "UKMO",
       "raw_model_ids": [
@@ -294,7 +311,7 @@
       ],
       "source": "RAL.UCAR",
       "source_label": "RAL UCAR ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 5,
       "max_lead_hour": 24,
       "has_pressure": true,
@@ -302,6 +319,23 @@
       "is_official": false,
       "first_seen_utc": "20260830185118",
       "first_seen_kst": "2026-08-31 03:51 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKMET"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 5,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830192119",
+      "first_seen_kst": "2026-08-31 04:21 KST"
     },
     {
       "model_id": "WNC",
