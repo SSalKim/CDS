@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260830204128",
-  "generated_at_kst": "2026-08-31 05:41 KST",
+  "generated_at_utc": "20260830205121",
+  "generated_at_kst": "2026-08-31 05:51 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_22",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 22,
-  "selected_model_count": 13,
+  "model_source_count": 24,
+  "selected_model_count": 15,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -390,6 +390,40 @@
       "is_official": false,
       "first_seen_utc": "20260830164024",
       "first_seen_kst": "2026-08-31 01:40 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830205121",
+      "first_seen_kst": "2026-08-31 05:51 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "FNMOC_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": true,
+      "point_count": 30,
+      "max_lead_hour": 174,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830205121",
+      "first_seen_kst": "2026-08-31 05:51 KST"
     },
     {
       "model_id": "WNC",
