@@ -2,6 +2,8 @@
 
 let lastRunSelectionUTC=null;
 
+const ANALYSIS_AUTO_LATEST_SEARCH_MAX_AGE_HOURS=5*24;
+
 function pad2(value){
 return String(value).padStart(2,'0');
 }
@@ -71,6 +73,25 @@ return new Date(Date.UTC(y,m-1,d,h-9,minute));
 }
 
 return new Date(Date.UTC(y,m-1,d,h,minute));
+
+}
+
+
+function isOlderThanAnalysisAutoLatestSearchWindow(
+runUTC,
+referenceUTC=new Date()
+){
+
+if(
+!(runUTC instanceof Date) || Number.isNaN(runUTC.getTime()) ||
+!(referenceUTC instanceof Date) || Number.isNaN(referenceUTC.getTime())
+){
+return false;
+}
+
+let ageHours=(referenceUTC.getTime()-runUTC.getTime())/(60*60*1000);
+
+return ageHours>ANALYSIS_AUTO_LATEST_SEARCH_MAX_AGE_HOURS;
 
 }
 

@@ -138,8 +138,13 @@ setTimeout(()=>selectionToast.classList.add('hidden'),180);
 
 function refreshViewAfterSelectionChange(options={}){
 
-let shouldSearchAnalysis=currentMainMenu==='analysis';
 let baseDate=options.analysisBaseDate || getSelectedUTCDate();
+let shouldSearchAnalysis=
+currentMainMenu==='analysis' &&
+!(
+typeof isOlderThanAnalysisAutoLatestSearchWindow==='function' &&
+isOlderThanAnalysisAutoLatestSearchWindow(baseDate)
+);
 let preserveForecastHour=options.preserveForecastHour ?? getSelectedTimelineHourForPreserve();
 let refreshPromise=refreshView({
 ...options,
@@ -2411,95 +2416,6 @@ return candidates;
 
 }
 
-function getRecentRunCandidateIgnoringAvailability(
-modelId,
-baseDate=new Date(),
-lookbackHours=24
-){
-
-let base=new Date(baseDate.getTime());
-base.setUTCMinutes(base.getUTCMinutes()>=30 ? 30 : 0,0,0);
-
-for(let i=0;i<=lookbackHours*2;i++){
-
-let d=new Date(
-base.getTime()-i*30*60*1000
-);
-
-let dateOnly=parseDateOnly(
-formatDateInputFromUTCParts(d)
-);
-
-let cycles=getCyclesForSelection(
-modelId,
-getCurrentProduct(),
-dateOnly
-);
-
-if(cyclesIncludeValue(cycles,getCycleValueFromDate(d))){
-return d;
-}
-
-}
-
-return null;
-
-}
-
-function currentSelectionArchiveUnavailableAtRun(runUTC){
-
-let product=getCurrentProduct();
-
-if(!runUTC || !product){
-return false;
-}
-
-let modelStatus=getEffectiveModelStatus(
-currentModel,
-runUTC,
-product
-);
-
-if(!modelStatus.available){
-return true;
-}
-
-let productStatus=getProductArchiveStatus(
-product,
-currentModel,
-parseDateOnly(formatDateInputFromUTCParts(runUTC))
-);
-
-return !productStatus.available;
-
-}
-
-function jumpCurrentCycleForArchiveUnavailableSelection(){
-
-let currentRun=getRecentRunCandidateIgnoringAvailability(
-currentModel,
-new Date()
-);
-
-if(!currentRun || !currentSelectionArchiveUnavailableAtRun(currentRun)){
-return false;
-}
-
-setRunControlsToUTC(currentRun);
-
-refreshView({
-updateCategories:false,
-updateProducts:true,
-updateHours:false,
-resetSlider:true,
-updateChartAfter:true
-});
-
-return true;
-
-}
-
-
 async function jumpLatestAvailableForCurrentSelection({
 silent=false,
 preserveForecastHour=getSelectedTimelineHourForPreserve(),
@@ -2579,10 +2495,6 @@ return true;
 
 }
 
-}
-
-if(jumpCurrentCycleForArchiveUnavailableSelection()){
-return false;
 }
 
 if(!silent){
