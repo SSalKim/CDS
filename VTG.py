@@ -102,7 +102,7 @@ MODEL_SOURCES = [
     {"name": "UM_GFDL_6h", "apihub": "UM_GFDL_6h", "noaa": None},
     {"name": "UM_KEPS", "apihub": "UM_KEPS", "noaa": None},
     {"name": "UKM", "apihub": "UKX", "noaa": "UKM", "ral_ucar": "UKM", "knackwx": "UKM", "polarwx": "ukmet"},
-    {"name": "UKMO_EPS", "apihub": "EGRR_EPS", "noaa": "UEMN", "ral_ucar": "UEMN", "knackwx": "UEMN"},
+    {"name": "UKMO_EPS", "apihub": "EGRR_EPS", "noaa": "UEMN", "ral_ucar": "UEMN", "knackwx": "UEMN", "polarwx": "ukmet_mean"},
     {"name": "GFS", "apihub": "GFS", "noaa": "AVNO", "ral_ucar": "AVNO", "knackwx": "AVNO", "polarwx": "gfs"},
     {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "ral_ucar": "AEMN", "knackwx": "AEMN", "polarwx": "gefs_mean"},
     {"name": "CMC", "apihub": "CMC", "noaa": "CMC", "ral_ucar": "CMC", "knackwx": "CMC", "polarwx": "cmc"},
@@ -268,8 +268,8 @@ MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
 SOURCE_ORDER = ("APIHUB", "DMDW", "RAW.GITHUB", "POLARWX", "SMCA.FUN", "RAL.UCAR", "KNACKWX")
 MODEL_SOURCE_PRIORITY_OVERRIDES: dict[str, tuple[str, ...]] = {
-    # Prefer KNACKWX so UEMN sea-level pressure is retained whenever that feed provides it.
-    "UKMO_EPS": ("APIHUB", "DMDW", "RAW.GITHUB", "POLARWX", "SMCA.FUN", "KNACKWX", "RAL.UCAR"),
+    # Among backup feeds, prefer complete pressure/wind tracks before RAL's track-only UEMN.
+    "UKMO_EPS": ("APIHUB", "DMDW", "KNACKWX", "POLARWX", "RAL.UCAR", "RAW.GITHUB", "SMCA.FUN"),
 }
 SOURCE_DISPLAY_NAMES = {
     "APIHUB": "KMA APIHUB",
