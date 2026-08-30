@@ -1216,6 +1216,7 @@ def read_kma_csv(text: str | None, settings: Settings, *, forecast_only: bool) -
     df = df.loc[mask].copy()
     if forecast_only:
         df = df[df["SRC"].isin(SOURCE_MODEL_IDS["APIHUB"]) | df["SRC"].eq("KMA")].copy()
+        df = filter_kma_forecast_rows_to_requested_cycle(df, settings)
         df[MODEL_ALIAS_PRIORITY_COLUMN] = (
             df["SRC"].map(MODEL_ALIAS_PRIORITIES).fillna(0).astype(int)
         )
@@ -1225,6 +1226,29 @@ def read_kma_csv(text: str | None, settings: Settings, *, forecast_only: bool) -
 
     df[DATA_SOURCE_COLUMN] = "APIHUB"
     return df
+
+
+def filter_kma_forecast_rows_to_requested_cycle(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    if df.empty:
+        return df
+
+    target_cycle = normalize_utc_stamp(settings.data_time)[:10]
+    row_cycles = df["TYP_TM(UTC)"].map(normalize_utc_stamp).str[:10]
+    exact_cycle = row_cycles.eq(target_cycle)
+    if exact_cycle.all():
+        return df
+
+    mismatched = df.loc[~exact_cycle].copy()
+    mismatched["_OBSERVED_CYCLE"] = row_cycles.loc[mismatched.index].replace("", "invalid")
+    details = []
+    for model_name, group in mismatched.groupby("SRC", dropna=False):
+        observed_cycles = "/".join(sorted(set(group["_OBSERVED_CYCLE"].astype(str))))
+        details.append(f"{model_name or 'UNKNOWN'}[{observed_cycles}]={len(group)}")
+    print(
+        f"Dropped {len(mismatched)} KMA APIHUB forecast row(s) that do not match "
+        f"requested cycle {target_cycle}: " + ", ".join(details)
+    )
+    return df.loc[exact_cycle].copy()
 
 
 def kma_data_typ_number(settings: Settings) -> int:
