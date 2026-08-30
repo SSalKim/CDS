@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260830212117",
-  "generated_at_kst": "2026-08-31 06:21 KST",
+  "generated_at_utc": "20260830213126",
+  "generated_at_kst": "2026-08-31 06:31 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_22",
   "storm_stage": "TD",
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 24,
-  "selected_model_count": 15,
+  "model_source_count": 28,
+  "selected_model_count": 17,
   "active_target_model_count": 39,
   "model_sources": [
+    {
+      "model_id": "AGFS",
+      "model_label": "AIGFS",
+      "raw_model_ids": [
+        "AIGFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 8,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830213126",
+      "first_seen_kst": "2026-08-31 06:31 KST"
+    },
     {
       "model_id": "CMC",
       "model_label": "CMC",
@@ -204,6 +221,23 @@
       "first_seen_kst": "2026-08-31 05:11 KST"
     },
     {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EPS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 6,
+      "max_lead_hour": 30,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830213126",
+      "first_seen_kst": "2026-08-31 06:31 KST"
+    },
+    {
       "model_id": "GFS",
       "model_label": "GFS",
       "raw_model_ids": [
@@ -288,6 +322,23 @@
       "is_official": false,
       "first_seen_utc": "20260830190042",
       "first_seen_kst": "2026-08-31 04:00 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 3,
+      "max_lead_hour": 12,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830213126",
+      "first_seen_kst": "2026-08-31 06:31 KST"
     },
     {
       "model_id": "HAFS",
@@ -424,6 +475,23 @@
       "is_official": false,
       "first_seen_utc": "20260830205121",
       "first_seen_kst": "2026-08-31 05:51 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "NEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830213126",
+      "first_seen_kst": "2026-08-31 06:31 KST"
     },
     {
       "model_id": "WNC",
