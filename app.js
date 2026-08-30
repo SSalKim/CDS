@@ -2553,6 +2553,17 @@ return;
 invalidateSelectionAsyncWork();
 let cat=getCurrentCategory();
 let products=getActiveProducts();
+let previousCategory=productCategory.dataset.selectedCategory || cat;
+
+let transitionedProductId=resolveProductIdForCategoryTransition(
+previousCategory,
+cat,
+currentProduct
+);
+
+if(getProductByIdInCategory(cat,transitionedProductId)){
+currentProduct=transitionedProductId;
+}
 
 let hasSameProductInCategory=products.some(
 p=>p.category===cat && p.id===currentProduct && p.type!=='header'

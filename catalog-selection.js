@@ -1,5 +1,25 @@
 /* Catalog, product, and model selection helpers. Depends on app.js globals at call time. */
 
+const FORECAST_CATEGORY_PRODUCT_TRANSITIONS={
+"hkor:asia":{
+acptot:"surfce"
+}
+};
+
+
+function resolveProductIdForCategoryTransition(fromCategory,toCategory,productId){
+
+if(!isForecastCatalog()){
+return productId;
+}
+
+return (
+FORECAST_CATEGORY_PRODUCT_TRANSITIONS[`${fromCategory}:${toCategory}`]?.[productId] ||
+productId
+);
+
+}
+
 function syncProductCategoryVisibility(){
 productCategory.classList.remove('hidden');
 }

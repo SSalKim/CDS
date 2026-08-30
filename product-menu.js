@@ -354,6 +354,8 @@ if(!productCategory.value && selectableCategories.length){
 productCategory.value=selectableCategories[0].id;
 }
 
+productCategory.dataset.selectedCategory=productCategory.value;
+
 syncMobileProductCategoryWidth();
 
 }
