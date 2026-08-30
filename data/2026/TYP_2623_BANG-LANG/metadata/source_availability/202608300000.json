@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260830074059",
-  "generated_at_kst": "2026-08-30 16:40 KST",
+  "generated_at_utc": "20260830075039",
+  "generated_at_kst": "2026-08-30 16:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_23",
   "storm_stage": "TYP",
@@ -27,10 +27,44 @@
     120,
     240
   ],
-  "model_source_count": 44,
-  "selected_model_count": 21,
+  "model_source_count": 48,
+  "selected_model_count": 24,
   "active_target_model_count": 39,
   "model_sources": [
+    {
+      "model_id": "AGFS",
+      "model_label": "AIGFS",
+      "raw_model_ids": [
+        "AIGFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830075039",
+      "first_seen_kst": "2026-08-30 16:50 KST"
+    },
+    {
+      "model_id": "AIGEFS",
+      "model_label": "AIGFS EPS",
+      "raw_model_ids": [
+        "AIGEFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830075039",
+      "first_seen_kst": "2026-08-30 16:50 KST"
+    },
     {
       "model_id": "CMC",
       "model_label": "CMC",
@@ -286,6 +320,41 @@
       "is_official": false,
       "first_seen_utc": "20260830072043",
       "first_seen_kst": "2026-08-30 16:20 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "ECMWF_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830075039",
+      "first_seen_kst": "2026-08-30 16:50 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "ECMWF_EPS",
+        "ECMWF_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 20,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260830075039",
+      "first_seen_kst": "2026-08-30 16:50 KST"
     },
     {
       "model_id": "FNEC_AI",
