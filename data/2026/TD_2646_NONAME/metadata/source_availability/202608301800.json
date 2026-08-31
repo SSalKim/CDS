@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260831004119",
-  "generated_at_kst": "2026-08-31 09:41 KST",
+  "generated_at_utc": "20260831005122",
+  "generated_at_kst": "2026-08-31 09:51 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_46",
   "storm_stage": "TD",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 8,
+  "model_source_count": 11,
   "selected_model_count": 6,
   "active_target_model_count": 39,
   "model_sources": [
@@ -100,6 +100,23 @@
       "first_seen_kst": "2026-08-31 09:11 KST"
     },
     {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 29,
+      "max_lead_hour": 168,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260831005122",
+      "first_seen_kst": "2026-08-31 09:51 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -115,6 +132,23 @@
       "is_official": false,
       "first_seen_utc": "20260831001101",
       "first_seen_kst": "2026-08-31 09:11 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFSA"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260831005122",
+      "first_seen_kst": "2026-08-31 09:51 KST"
     },
     {
       "model_id": "ICON",
@@ -166,6 +200,23 @@
       "is_official": false,
       "first_seen_utc": "20260831003108",
       "first_seen_kst": "2026-08-31 09:31 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext Cyclones",
+      "raw_model_ids": [
+        "DEEPMIND"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260831005122",
+      "first_seen_kst": "2026-08-31 09:51 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2646_NONAME/metadata/source_availability/202608301800.json"
