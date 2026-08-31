@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260831150038",
-  "generated_at_kst": "2026-09-01 00:00 KST",
+  "generated_at_utc": "20260831151050",
+  "generated_at_kst": "2026-09-01 00:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_18",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 20,
-  "selected_model_count": 13,
+  "model_source_count": 24,
+  "selected_model_count": 17,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -304,6 +304,40 @@
       "first_seen_kst": "2026-08-31 23:50 KST"
     },
     {
+      "model_id": "ICON",
+      "model_label": "ICON",
+      "raw_model_ids": [
+        "icon"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 21,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260831151050",
+      "first_seen_kst": "2026-09-01 00:10 KST"
+    },
+    {
+      "model_id": "ICON_EPS",
+      "model_label": "ICON EPS",
+      "raw_model_ids": [
+        "ICON_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 21,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260831151050",
+      "first_seen_kst": "2026-09-01 00:10 KST"
+    },
+    {
       "model_id": "JGSM",
       "model_label": "JGSM",
       "raw_model_ids": [
@@ -336,6 +370,40 @@
       "is_official": false,
       "first_seen_utc": "20260831102026",
       "first_seen_kst": "2026-08-31 19:20 KST"
+    },
+    {
+      "model_id": "KIM_3h",
+      "model_label": "KIM",
+      "raw_model_ids": [
+        "KIM_3h"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 29,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260831151050",
+      "first_seen_kst": "2026-09-01 00:10 KST"
+    },
+    {
+      "model_id": "KIM_6h",
+      "model_label": "KIM",
+      "raw_model_ids": [
+        "KIM_6h"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260831151050",
+      "first_seen_kst": "2026-09-01 00:10 KST"
     },
     {
       "model_id": "WNC",
