@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260901040023",
-  "generated_at_kst": "2026-09-01 13:00 KST",
+  "generated_at_utc": "20260901041025",
+  "generated_at_kst": "2026-09-01 13:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_24",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 3,
-  "selected_model_count": 2,
+  "model_source_count": 6,
+  "selected_model_count": 4,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -49,6 +49,40 @@
       "first_seen_kst": "2026-09-01 13:00 KST"
     },
     {
+      "model_id": "ICON",
+      "model_label": "ICON",
+      "raw_model_ids": [
+        "icon"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 30,
+      "max_lead_hour": 174,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260901041025",
+      "first_seen_kst": "2026-09-01 13:10 KST"
+    },
+    {
+      "model_id": "ICON_EPS",
+      "model_label": "ICON EPS",
+      "raw_model_ids": [
+        "ICON_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 29,
+      "max_lead_hour": 168,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260901041025",
+      "first_seen_kst": "2026-09-01 13:10 KST"
+    },
+    {
       "model_id": "JGSM",
       "model_label": "JGSM",
       "raw_model_ids": [
@@ -64,6 +98,23 @@
       "is_official": false,
       "first_seen_utc": "20260901040023",
       "first_seen_kst": "2026-09-01 13:00 KST"
+    },
+    {
+      "model_id": "JGSM",
+      "model_label": "JGSM",
+      "raw_model_ids": [
+        "JGSM"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 23,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260901041025",
+      "first_seen_kst": "2026-09-01 13:10 KST"
     },
     {
       "model_id": "KMA",
