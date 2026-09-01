@@ -1,0 +1,39 @@
+{
+  "cycle": "2026090106",
+  "cycle_utc": "202609010600",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":120,"member_id":null,"model_id":"JGSM","point_count":21,"raw_model_id":"JGSM","row_count":21,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 21,
+  "points": [
+    [0,0,"202609010600",22.5,131.5,996,20,10,270,240,null],
+    [0,6,"202609011200",22.3,131.9,996,19,-9,null,0,null],
+    [0,12,"202609011800",22.6,132.3,994,18,-9,null,0,null],
+    [0,18,"202609020000",23.2,132.1,994,17.5,-9,null,0,null],
+    [0,24,"202609020600",24,131.8,992,17.5,-9,null,0,null],
+    [0,30,"202609021200",24.7,131.2,994,17.5,-9,null,0,null],
+    [0,36,"202609021800",25.5,130.7,993,17.5,-9,null,0,null],
+    [0,42,"202609030000",26.4,130.3,994,17.5,-9,null,0,null],
+    [0,48,"202609030600",27.4,130,993,17,-9,null,0,null],
+    [0,54,"202609031200",28.4,129.9,995,17,-9,null,0,null],
+    [0,60,"202609031800",29.3,129.8,993,17,-9,null,0,null],
+    [0,66,"202609040000",30.1,130.3,995,19,-9,null,0,null],
+    [0,72,"202609040600",30.7,131,994,20.6,-9,null,0,null],
+    [0,78,"202609041200",31.1,132.1,995,22.6,-9,null,0,null],
+    [0,84,"202609041800",31.8,133.2,993,25.7,-9,null,0,null],
+    [0,90,"202609050000",32.2,134.1,994,26.7,-9,null,0,null],
+    [0,96,"202609050600",32.8,135,993,23.7,-9,null,0,null],
+    [0,102,"202609051200",33.2,134.7,996,21.6,-9,null,0,null],
+    [0,108,"202609051800",33.2,133.5,1000,18,-9,null,0,null],
+    [0,114,"202609060000",31.9,133,1001,17.5,-9,null,0,null],
+    [0,120,"202609060600",31.7,132.9,1000,18.5,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"2","storm_kind":"typ","typ_seq":24,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"KROVANH","canonical_typ_name_ko":"크로반","canonical_typ_number":24,"data_typ_number":24,"dmdw_o_tm_seq":"2","dmdw_start_time":"202609010000","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_24"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
