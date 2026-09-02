@@ -2043,6 +2043,7 @@ def previous_atcf_match_from_status(
     *,
     storm_keys: list[str],
     data_time: str,
+    regular_only: bool = False,
 ) -> AtcfMatch | None:
     cycles = status.get("cycles") if isinstance(status, dict) else None
     if not isinstance(cycles, dict):
@@ -2066,10 +2067,48 @@ def previous_atcf_match_from_status(
                     metadata = record.get("metadata")
                     if isinstance(metadata, dict):
                         atcf_id = str(metadata.get("atcf_id") or "").strip().lower()
+                if regular_only and regular_atcf_storm_number(atcf_id) is None:
+                    continue
                 if atcf_id:
                     print(f"Reusing previous ATCF ID from status for {storm_key}: {atcf_id}")
                     return AtcfMatch(atcf_id=atcf_id, method="previous_status")
     return None
+
+
+def retain_previous_named_regular_atcf_match(
+    current_match: AtcfMatch | None,
+    status: dict | None,
+    *,
+    storm_keys: list[str],
+    data_time: str,
+    typ_en: str,
+) -> AtcfMatch | None:
+    """Keep a named storm's established regular ID ahead of a nearby INVEST."""
+    if current_match is not None and not is_invest_atcf_id(current_match.atcf_id):
+        return current_match
+
+    target_name = normalize_name(typ_en)
+    if not target_name:
+        return current_match
+    previous = previous_atcf_match_from_status(
+        status,
+        storm_keys=storm_keys,
+        data_time=data_time,
+        regular_only=True,
+    )
+    if previous is None or (current_match is not None and previous.atcf_id == current_match.atcf_id):
+        return current_match
+
+    text = fetch_bdeck_text(previous.atcf_id, timeout=15)
+    if not text or target_name not in normalize_name(text):
+        return current_match
+
+    replaced = f" instead of nearby {current_match.atcf_id}" if current_match is not None else ""
+    print(
+        f"Retaining established regular ATCF ID {previous.atcf_id}{replaced}; "
+        f"B-deck name still matches {typ_en}."
+    )
+    return AtcfMatch(atcf_id=previous.atcf_id, method="previous_regular_name")
 
 
 def linked_td_number_for_typ(
@@ -2381,6 +2420,7 @@ def build_storm_jobs(
         manual_id = None
         atcf_match = None
         kma_point = None
+        typ_status_keys = [f"typ_{year}_{typ_number:02d}"]
         if resolve_atcf:
             manual_id = manual_atcf_id(
                 manual_map,
@@ -2398,6 +2438,14 @@ def build_storm_jobs(
                     year=year,
                     data_time=data_time,
                     preferred_atcf_id=f"wp{typ_number:02d}{year}",
+                )
+            if not manual_id:
+                atcf_match = retain_previous_named_regular_atcf_match(
+                    atcf_match,
+                    status,
+                    storm_keys=typ_status_keys,
+                    data_time=data_time,
+                    typ_en=typ_en,
                 )
         if resolve_atcf and atcf_match is None and typ_en and sector_entries:
             started_at = time.monotonic()
@@ -2457,7 +2505,7 @@ def build_storm_jobs(
         if resolve_atcf and atcf_match is None:
             atcf_match = previous_atcf_match_from_status(
                 status,
-                storm_keys=[f"typ_{year}_{typ_number:02d}"],
+                storm_keys=typ_status_keys,
                 data_time=data_time,
             )
         atcf_id = atcf_match.atcf_id if atcf_match else None
@@ -2550,6 +2598,12 @@ def build_storm_jobs(
             if typ_number
             else f"td_{year}_{td_number:02d}"
         )
+        status_keys = [td_storm_key]
+        if typ_number:
+            status_keys.extend([
+                f"typ_{year}_{typ_number:02d}",
+                f"td_{year}_{td_number:02d}",
+            ])
 
         td_atcf_ids = candidate_td_atcf_ids(td_number=td_number, year=year, linked_typ_number=(typ_number or None))
         td_base_atcf_number = max(1, min(89, typ_number or math.ceil(td_number / 2)))
@@ -2573,6 +2627,14 @@ def build_storm_jobs(
                     year=year,
                     data_time=data_time,
                     preferred_atcf_id=(f"wp{typ_number:02d}{year}" if typ_number else None),
+                )
+            if not manual_id and matching_typ_en:
+                atcf_match = retain_previous_named_regular_atcf_match(
+                    atcf_match,
+                    status,
+                    storm_keys=status_keys,
+                    data_time=data_time,
+                    typ_en=matching_typ_en,
                 )
         if resolve_atcf and atcf_match is None and sector_entries:
             started_at = time.monotonic()
@@ -2631,12 +2693,6 @@ def build_storm_jobs(
             )
             add_timing_elapsed(timing_stats, "atcf_position", started_at)
         if resolve_atcf and atcf_match is None:
-            status_keys = [td_storm_key]
-            if typ_number:
-                status_keys.extend([
-                    f"typ_{year}_{typ_number:02d}",
-                    f"td_{year}_{td_number:02d}",
-                ])
             atcf_match = previous_atcf_match_from_status(
                 status,
                 storm_keys=status_keys,
