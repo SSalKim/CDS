@@ -1,0 +1,30 @@
+{
+  "cycle": "2026090212",
+  "cycle_utc": "202609021200",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":72,"member_id":null,"model_id":"JGSM","point_count":12,"raw_model_id":"JGSM","row_count":12,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 12,
+  "points": [
+    [0,0,"202609021200",23,118.1,992,23,26,337.5,290,null],
+    [0,12,"202609030000",23.3,118.5,993,17,-9,null,0,null],
+    [0,18,"202609030600",23.8,117.9,993,21.1,-9,null,0,null],
+    [0,24,"202609031200",23.8,117.1,994,16.5,-9,null,0,null],
+    [0,30,"202609031800",23.9,116.2,997,12.3,-9,null,0,null],
+    [0,36,"202609040000",23.8,115.4,1000,11.3,-9,null,0,null],
+    [0,42,"202609040600",23.4,115,1001,10.8,-9,null,0,null],
+    [0,48,"202609041200",23,114.1,1003,10.3,-9,null,0,null],
+    [0,54,"202609041800",22.9,113.7,1003,9.8,-9,null,0,null],
+    [0,60,"202609050000",22.7,113.5,1005,11.3,-9,null,0,null],
+    [0,66,"202609050600",22.9,113.3,1004,10.3,-9,null,0,null],
+    [0,72,"202609051200",21.6,111.7,1005,10.3,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"58","storm_kind":"typ","typ_seq":18,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"SAUDEL","canonical_typ_name_ko":"사우델","canonical_typ_number":18,"data_typ_number":18,"dmdw_o_tm_seq":"58","dmdw_start_time":"202608190300","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_18"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
