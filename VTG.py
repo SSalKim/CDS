@@ -2346,6 +2346,52 @@ def clean_history_alias(alias: str) -> str:
     return text
 
 
+def atcf_history_storm_number(atcf_id: str) -> int | None:
+    text = clean_history_alias(atcf_id)
+    if len(text) != 8 or not text[:2].isalpha() or not text[2:].isdigit():
+        return None
+    return int(text[2:4])
+
+
+def discard_post_upgrade_invest_points(points: list[dict], current_atcf_id: str) -> list[dict]:
+    current_id = clean_history_alias(current_atcf_id)
+    current_number = atcf_history_storm_number(current_id)
+    if current_number is None or not 1 <= current_number <= 89:
+        return points
+
+    established_times = [
+        point_dt
+        for point in points
+        if clean_history_alias(str(point.get("atcf_id") or "")) == current_id
+        if (point_dt := history_time_to_datetime(str(point.get("time_utc") or ""))) is not None
+    ]
+    if not established_times:
+        return points
+
+    established_at = min(established_times)
+    filtered: list[dict] = []
+    removed: list[str] = []
+    for point in points:
+        point_dt = history_time_to_datetime(str(point.get("time_utc") or ""))
+        point_number = atcf_history_storm_number(str(point.get("atcf_id") or ""))
+        if (
+            point_dt is not None
+            and point_dt >= established_at
+            and point_number is not None
+            and 90 <= point_number <= 99
+        ):
+            removed.append(f"{point.get('time_utc')}:{point.get('atcf_id')}")
+            continue
+        filtered.append(point)
+
+    if removed:
+        print(
+            f"Discarded {len(removed)} post-upgrade INVEST past-track point(s) "
+            f"after {current_id} was established: {', '.join(removed)}"
+        )
+    return filtered
+
+
 def analysis_source_priority(source: str) -> int:
     return ANALYSIS_SOURCE_PRIORITY.get(str(source or "").strip().upper(), 0)
 
@@ -2507,7 +2553,7 @@ def filter_history_points_for_settings(settings: Settings, points: list[dict]) -
             continue
         if min_dt <= point_dt <= max_dt:
             filtered.append(point)
-    return filtered
+    return discard_post_upgrade_invest_points(filtered, settings.atcf_id)
 
 
 def save_track_history(settings: Settings, history: dict, *, original: dict) -> None:
