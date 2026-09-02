@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260902011023",
-  "generated_at_kst": "2026-09-02 10:10 KST",
+  "generated_at_utc": "20260902012021",
+  "generated_at_kst": "2026-09-02 10:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_18",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 30,
+  "model_source_count": 31,
   "selected_model_count": 14,
   "active_target_model_count": 39,
   "model_sources": [
@@ -278,8 +278,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 14,
-      "max_lead_hour": 78,
+      "point_count": 30,
+      "max_lead_hour": 174,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -354,6 +354,23 @@
       "is_official": false,
       "first_seen_utc": "20260902011023",
       "first_seen_kst": "2026-09-02 10:10 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260902012021",
+      "first_seen_kst": "2026-09-02 10:20 KST"
     },
     {
       "model_id": "HAFS",
