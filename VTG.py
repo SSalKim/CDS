@@ -119,7 +119,7 @@ MODEL_SOURCES = [
     {"name": "HWRF", "apihub": "HWRF", "noaa": "HWRF", "ral_ucar": "HWRF", "knackwx": "HWRF", "polarwx": "hwrf"},
     {"name": "HAFS", "apihub": "HAFS", "noaa": "HFSA", "ral_ucar": "HFSA", "knackwx": "HFSA", "polarwx": "hafsa"},
     {"name": "ECMWF_AIFS", "apihub": "ECMWF_AIFS", "noaa": "AIFS", "ral_ucar": "AIFS", "knackwx": "AIFS", "polarwx": "aifs"},
-    {"name": "ECMWF_AIFS_EPS", "apihub": None, "noaa": "EAIM", "ral_ucar": "EAMN", "knackwx": "EAMN", "polarwx": "aifs_ens_mean"},
+    {"name": "ECMWF_AIFS_EPS", "apihub": None, "noaa": "EAIM", "ral_ucar": "EAMN", "knackwx": "EAMN", "polarwx": "aifs_ens_mean", "smca": "AIFSM"},
     {"name": "AGFS", "apihub": None, "noaa": "AGFS", "ral_ucar": "AGFS", "knackwx": "AGFS", "polarwx": "aigfs"},
     {"name": "AIGEFS", "apihub": None, "noaa": "AIMN", "ral_ucar": "AIMN", "knackwx": "AIMN", "smca": "AIGEFSM"},
     {"name": "AICON", "apihub": None, "smca": "AICON"},
@@ -386,7 +386,7 @@ MS_PER_KT = 0.514444
 KMA_URL_BASE = (os.getenv("KMA_APIHUB_BASE_URL") or "https://apihub-pub.kma.go.kr/api/typ01/url").rstrip("/")
 KMA_FALLBACK_URL_BASE = (os.getenv("KMA_APIHUB_FALLBACK_BASE_URL") or "https://apihub.kma.go.kr/api/typ01/url").rstrip("/")
 SMCA_TYPHOON_API_BASE = (os.getenv("SMCA_TYPHOON_API_BASE_URL") or "https://smca.fun/api/typhoon_msg/").rstrip("/")
-SMCA_PERSISTED_MODEL_IDS = ("AICON",)
+SMCA_PERSISTED_MODEL_IDS = ("AICON", "AIFSM")
 KMA_BASE_URL = f"{KMA_URL_BASE}/typ_gts_now.php"
 KMA_TYP_NOW_URL = f"{KMA_URL_BASE}/typ_now.php"
 KMA_TD_NOW_URL = f"{KMA_URL_BASE}/td_now.php"
@@ -1808,7 +1808,7 @@ def read_smca_json(text: str | None, settings: Settings, *, typhoon_id: str = ""
 
     if not rows:
         if matched_forecasts == 0:
-            print(f"SMCA.FUN has no AIGEFSM/AICON forecast initialized at {target_cycle} for {typhoon_id}")
+            print(f"SMCA.FUN has no supported forecast initialized at {target_cycle} for {typhoon_id}")
         return empty_smca_frame()
     frame = pd.DataFrame(rows)
     for column in ("TMD", "LAT", "LON", "PS", "WS", "SEQ"):

@@ -80,6 +80,7 @@ MANIFEST_METADATA_KEYS = (
     "skip_atcf",
     "source_availability_path",
     "smca_aicon_snapshot_path",
+    "smca_aifsm_snapshot_path",
     "no_output",
     "no_output_reason",
 )
@@ -4686,7 +4687,11 @@ def collect_changed_asset_paths(
                 image_path = str(metadata.get("image_path") or "").strip()
                 if image_path:
                     paths.add(relative_asset_path(PROJECT_ROOT / image_path))
-                for availability_key in ("source_availability_path", "smca_aicon_snapshot_path"):
+                for availability_key in (
+                    "source_availability_path",
+                    "smca_aicon_snapshot_path",
+                    "smca_aifsm_snapshot_path",
+                ):
                     availability_path = str(metadata.get(availability_key) or "").strip()
                     if availability_path and (PROJECT_ROOT / availability_path).exists():
                         paths.add(relative_asset_path(PROJECT_ROOT / availability_path))
