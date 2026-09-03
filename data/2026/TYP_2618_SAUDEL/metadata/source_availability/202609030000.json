@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260903073010",
-  "generated_at_kst": "2026-09-03 16:30 KST",
+  "generated_at_utc": "20260903074016",
+  "generated_at_kst": "2026-09-03 16:40 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_18",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 42,
+  "model_source_count": 43,
   "selected_model_count": 20,
   "active_target_model_count": 39,
   "model_sources": [
@@ -269,6 +269,23 @@
       "is_official": false,
       "first_seen_utc": "20260903072045",
       "first_seen_kst": "2026-09-03 16:20 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 3,
+      "max_lead_hour": 12,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260903074016",
+      "first_seen_kst": "2026-09-03 16:40 KST"
     },
     {
       "model_id": "GFS",
@@ -749,5 +766,6 @@
       "first_seen_kst": "2026-09-03 15:50 KST"
     }
   ],
-  "source_availability_path": "data/2026/TYP_2618_SAUDEL/metadata/source_availability/202609030000.json"
+  "source_availability_path": "data/2026/TYP_2618_SAUDEL/metadata/source_availability/202609030000.json",
+  "smca_aifsm_snapshot_path": "data/2026/TYP_2618_SAUDEL/metadata/smca/AIFSM/202609030000.json"
 }
