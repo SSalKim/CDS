@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260903063010",
-  "generated_at_kst": "2026-09-03 15:30 KST",
+  "generated_at_utc": "20260903064008",
+  "generated_at_kst": "2026-09-03 15:40 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_18",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 21,
+  "model_source_count": 23,
   "selected_model_count": 13,
   "active_target_model_count": 39,
   "model_sources": [
@@ -73,7 +73,41 @@
       ],
       "source": "POLARWX",
       "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 3,
+      "max_lead_hour": 12,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260903055007",
+      "first_seen_kst": "2026-09-03 14:50 KST"
+    },
+    {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
       "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260903064008",
+      "first_seen_kst": "2026-09-03 15:40 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
       "point_count": 3,
       "max_lead_hour": 12,
       "has_pressure": true,
@@ -86,18 +120,18 @@
       "model_id": "CMC_EPS",
       "model_label": "CMC EPS",
       "raw_model_ids": [
-        "CMC_MEAN"
+        "CMC_EPS"
       ],
-      "source": "POLARWX",
-      "source_label": "POLARWX",
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 3,
-      "max_lead_hour": 12,
+      "point_count": 16,
+      "max_lead_hour": 90,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260903055007",
-      "first_seen_kst": "2026-09-03 14:50 KST"
+      "first_seen_utc": "20260903064008",
+      "first_seen_kst": "2026-09-03 15:40 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
