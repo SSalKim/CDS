@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260904122934",
-  "generated_at_kst": "2026-09-04 21:29 KST",
+  "generated_at_utc": "20260904123930",
+  "generated_at_kst": "2026-09-04 21:39 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_24",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 21,
-  "selected_model_count": 13,
+  "model_source_count": 22,
+  "selected_model_count": 14,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -149,6 +149,23 @@
       "is_official": false,
       "first_seen_utc": "20260904121929",
       "first_seen_kst": "2026-09-04 21:19 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260904123930",
+      "first_seen_kst": "2026-09-04 21:39 KST"
     },
     {
       "model_id": "GFS",
@@ -391,5 +408,6 @@
     }
   ],
   "source_availability_path": "data/2026/TYP_2624_KROVANH/metadata/source_availability/202609040600.json",
-  "smca_aicon_snapshot_path": "data/2026/TYP_2624_KROVANH/metadata/smca/AICON/202609040600.json"
+  "smca_aicon_snapshot_path": "data/2026/TYP_2624_KROVANH/metadata/smca/AICON/202609040600.json",
+  "smca_aifsm_snapshot_path": "data/2026/TYP_2624_KROVANH/metadata/smca/AIFSM/202609040600.json"
 }
