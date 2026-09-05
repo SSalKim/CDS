@@ -17,7 +17,7 @@ const catalog=JSON.parse(vm.runInContext(`JSON.stringify({
 const backend=fs.readFileSync(path.join(__dirname,'..','VTG.py'),'utf8');
 for(const id of ['WNC','WNV3']){
   const match=backend.match(new RegExp('\\{"name": "'+id+'", "color": "[^"]+"[^\\n]+'));
-  const model=JSON.parse(match[0].replace(/,$/,''));
+  const model=JSON.parse(match[0].trim().replace(/,$/,''));
   const brief=catalog.rows.find(row=>row.modelId===id);
   const detail=catalog.details.find(row=>row.model_id===id);
   assert.equal(catalog.labels[id],model.label);
