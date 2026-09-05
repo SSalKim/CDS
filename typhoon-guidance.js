@@ -614,7 +614,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "운영기관": "구글 딥마인드(Google DeepMind)",
     "모델명": "WeatherNext2 (WeatherNext Cyclones)",
     "도메인": "전지구",
-    "구분": "앙상블 모델 평균",
+    "구분": "앙상블 모델 평균 (M50)",
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
