@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260905124007",
-  "generated_at_kst": "2026-09-05 21:40 KST",
+  "generated_at_utc": "20260905124200",
+  "generated_at_kst": "2026-09-05 21:42 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_24",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 23,
+  "model_source_count": 26,
   "selected_model_count": 13,
   "active_target_model_count": 40,
   "model_sources": [
@@ -115,6 +115,23 @@
       "is_official": false,
       "first_seen_utc": "20260905123004",
       "first_seen_kst": "2026-09-05 21:30 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECM"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 19,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905124200",
+      "first_seen_kst": "2026-09-05 21:42 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -288,6 +305,23 @@
       "first_seen_kst": "2026-09-05 21:09 KST"
     },
     {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFSA"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905124200",
+      "first_seen_kst": "2026-09-05 21:42 KST"
+    },
+    {
       "model_id": "ICON",
       "model_label": "ICON",
       "raw_model_ids": [
@@ -422,6 +456,23 @@
       "is_official": false,
       "first_seen_utc": "20260905123004",
       "first_seen_kst": "2026-09-05 21:30 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "DEEPMIND"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 24,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905124200",
+      "first_seen_kst": "2026-09-05 21:42 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2624_KROVANH/metadata/source_availability/202609050600.json",
