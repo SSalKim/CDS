@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260905060000",
-  "generated_at_kst": "2026-09-05 15:00 KST",
+  "generated_at_utc": "20260905061227",
+  "generated_at_kst": "2026-09-05 15:12 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_24",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 16,
-  "selected_model_count": 8,
+  "model_source_count": 19,
+  "selected_model_count": 10,
   "active_target_model_count": 39,
   "model_sources": [
     {
@@ -81,6 +81,23 @@
       "is_official": false,
       "first_seen_utc": "20260905055000",
       "first_seen_kst": "2026-09-05 14:50 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "ECMWF_AIFS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 24,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905061227",
+      "first_seen_kst": "2026-09-05 15:12 KST"
     },
     {
       "model_id": "GFS",
@@ -167,6 +184,40 @@
       "is_official": false,
       "first_seen_utc": "20260905055000",
       "first_seen_kst": "2026-09-05 14:50 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905061227",
+      "first_seen_kst": "2026-09-05 15:12 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFS"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905061227",
+      "first_seen_kst": "2026-09-05 15:12 KST"
     },
     {
       "model_id": "ICON",
