@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260905181003",
-  "generated_at_kst": "2026-09-06 03:10 KST",
+  "generated_at_utc": "20260905182001",
+  "generated_at_kst": "2026-09-06 03:20 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_50",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 5,
-  "selected_model_count": 4,
+  "model_source_count": 7,
+  "selected_model_count": 5,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -115,6 +115,40 @@
       "is_official": false,
       "first_seen_utc": "20260905181003",
       "first_seen_kst": "2026-09-06 03:10 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFSA"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905182001",
+      "first_seen_kst": "2026-09-06 03:20 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 2,
+      "max_lead_hour": 6,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905182001",
+      "first_seen_kst": "2026-09-06 03:20 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2650_NONAME/metadata/source_availability/202609051200.json"
