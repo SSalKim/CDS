@@ -624,7 +624,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "model_id": "WNV3",
     "표출명칭": "WeatherNext3 Cyclones",
     "운영기관": "구글 딥마인드(Google DeepMind)",
-    "모델명": "WeatherNext3 (WeatherNext WNV3)",
+    "모델명": "WeatherNext3 (WeatherNext Cyclones)",
     "도메인": "전지구",
     "구분": "앙상블 모델 평균 (M64)",
     "격자체계 (분해능)": "0.25° (~28km)",
