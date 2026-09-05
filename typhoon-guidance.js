@@ -612,25 +612,25 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "model_id": "WNC",
     "표출명칭": "WeatherNext2 Cyclones",
     "운영기관": "구글 딥마인드(Google DeepMind)",
-    "모델명": "WeatherNext2 (FNV3P2)",
+    "모델명": "WeatherNext2 (WeatherNext Cyclones)",
     "도메인": "전지구",
     "구분": "앙상블 모델 평균",
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "Google DeepMind WeatherNext2 기반 태풍예측모델. 최신 수집 버전 FNV3P2, ATCF 코드 FNV3"
+    "참고사항": "Google DeepMind AI모델 WeatherNext2 기반 태풍예측모델(FNV3)"
   },
   {
     "model_id": "WNV3",
     "표출명칭": "WeatherNext3 Cyclones",
     "운영기관": "구글 딥마인드(Google DeepMind)",
-    "모델명": "WeatherNext3 (WNV3)",
+    "모델명": "WeatherNext3 (WeatherNext WNV3)",
     "도메인": "전지구",
-    "구분": "앙상블 모델 평균",
-    "격자체계 (분해능)": "상층 0.25° / 지상 0.1°",
+    "구분": "앙상블 모델 평균 (M64)",
+    "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "Google DeepMind WeatherNext3 기반 태풍예측모델(WNV3). 위성관측 입력을 활용한 실험적 예측자료"
+    "참고사항": "Google DeepMind 차세대 AI모델 WeatherNext3 기반 태풍예측모델(시험운영)"
   },
   {
     "표출명칭": "Aurora-ECMWF",
