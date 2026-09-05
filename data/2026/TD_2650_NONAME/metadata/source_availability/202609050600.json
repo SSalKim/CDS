@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260905134008",
-  "generated_at_kst": "2026-09-05 22:40 KST",
+  "generated_at_utc": "20260905135004",
+  "generated_at_kst": "2026-09-05 22:50 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_50",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 17,
-  "selected_model_count": 11,
+  "model_source_count": 20,
+  "selected_model_count": 13,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -115,6 +115,23 @@
       "is_official": false,
       "first_seen_utc": "20260905125018",
       "first_seen_kst": "2026-09-05 21:50 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 24,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905135004",
+      "first_seen_kst": "2026-09-05 22:50 KST"
     },
     {
       "model_id": "GFS",
@@ -287,6 +304,23 @@
       "first_seen_kst": "2026-09-05 19:09 KST"
     },
     {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 0,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905135004",
+      "first_seen_kst": "2026-09-05 22:50 KST"
+    },
+    {
       "model_id": "WNC",
       "model_label": "WeatherNext2 Cyclones",
       "raw_model_ids": [
@@ -302,6 +336,23 @@
       "is_official": false,
       "first_seen_utc": "20260905122959",
       "first_seen_kst": "2026-09-05 21:29 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 4,
+      "max_lead_hour": 18,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905135004",
+      "first_seen_kst": "2026-09-05 22:50 KST"
     },
     {
       "model_id": "WNV3",
