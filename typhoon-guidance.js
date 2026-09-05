@@ -73,8 +73,9 @@ GCEC_AI:'GraphCast-ECMWF',
 GCKM_AI:'GraphCast-KIM',
 GCUM_AI:'GraphCast-UM',
 GENC:'GenCast',
-WNC:'WeatherNext Cyclones',
-FNV3:'WeatherNext Cyclones',
+WNC:'WeatherNext2 Cyclones',
+FNV3:'WeatherNext2 Cyclones',
+WNV3:'WeatherNext3 Cyclones',
 HKO_AREC: 'Aurora-ECMWF',
 HKO_FXEC: 'FuXi-ECMWF',
 HKO_FWEC: 'FengWu-ECMWF',
@@ -116,7 +117,8 @@ const TYPHOON_MODEL_INFO=[
 {name:'GraphCast-ECMWF',description:'[AI] 기상청 수행 GraphCast (ECMWF 초기장)'},
 {name:'GraphCast-KIM',description:'[AI] 기상청 수행 GraphCast (KIM 초기장)'},
 {modelId:'GENC',name:'GenCast',description:'[AI] 구글 딥마인드 앙상블모델(GenCast) 평균'},
-{modelId:'WNC',name:'WeatherNext Cyclones',description:'[AI] 구글 딥마인드 앙상블모델(WeatherNext Cyclones) 평균'},
+{modelId:'WNC',name:'WeatherNext2 Cyclones',description:'[AI] 구글 딥마인드 WeatherNext2 기반 태풍예측 앙상블 평균'},
+{modelId:'WNV3',name:'WeatherNext3 Cyclones',description:'[AI] 구글 딥마인드 WeatherNext3 기반 태풍예측 앙상블 평균'},
 {name:'Aurora-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 Aurora (ECMWF 초기장)'},
 {name:'FuXi-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FuXi (ECMWF 초기장)'},
 {name:'FengWu-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FengWu (ECMWF 초기장)'},
@@ -149,7 +151,7 @@ const TYPHOON_MODEL_INFO_GROUP_ENDS=new Set([
 'FourCastNet-KIM',
 'Pangu-Weather-KIM',
 'GraphCast-KIM',
-'WNC',
+'WNV3',
 'Aurora-ECMWF',
 'FuXi-ECMWF',
 'FengWu-ECMWF'
@@ -198,6 +200,9 @@ const TYPHOON_MODEL_INFO_COLORS={
 'WNC':'#DA70D6',
 'FNV3':'#DA70D6',
 'WeatherNext Cyclones':'#DA70D6',
+'WeatherNext2 Cyclones':'#DA70D6',
+'WNV3':'#FF9F80',
+'WeatherNext3 Cyclones':'#FF9F80',
 'Aurora-ECMWF':'#1E90FF',
 'FuXi-ECMWF':'#20B2AA',
 'FengWu-ECMWF':'#A6C875'
@@ -605,15 +610,27 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
   },
   {
     "model_id": "WNC",
-    "표출명칭": "WeatherNext Cyclones",
+    "표출명칭": "WeatherNext2 Cyclones",
     "운영기관": "구글 딥마인드(Google DeepMind)",
     "모델명": "WeatherNext2 (WeatherNext Cyclones)",
     "도메인": "전지구",
-    "구분": "앙상블 모델 평균 (M50)",
+    "구분": "앙상블 모델 평균",
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "Google DeepMind 차세대 AI모델 WeatherNext2 기반 태풍예측모델(FNV3)"
+    "참고사항": "Google DeepMind WeatherNext2 기반 태풍예측모델. 최신 수집 버전 FNV3P2, ATCF 코드 FNV3"
+  },
+  {
+    "model_id": "WNV3",
+    "표출명칭": "WeatherNext3 Cyclones",
+    "운영기관": "구글 딥마인드(Google DeepMind)",
+    "모델명": "WeatherNext3",
+    "도메인": "전지구",
+    "구분": "앙상블 모델 평균",
+    "격자체계 (분해능)": "상층 0.25° / 지상 0.1°",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": "Google DeepMind WeatherNext3 기반 태풍예측모델(WNV3). 위성관측 입력을 활용한 실험적 예측자료"
   },
   {
     "표출명칭": "Aurora-ECMWF",
@@ -1241,7 +1258,7 @@ title.textContent='모델 상세정보';
 
 let subtitle=document.createElement('p');
 subtitle.className='typhoon-model-detail-subtitle';
-subtitle.textContent='2026년 6월 기준 표출 모델';
+subtitle.textContent='2026년 9월 기준 표출 모델';
 
 titleWrap.appendChild(title);
 titleWrap.appendChild(subtitle);

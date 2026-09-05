@@ -85,7 +85,8 @@ MODEL_INFO = [
     {"name": "GCKM_AI", "color": "#6C33C6", "style": "--", "label": "GraphCast-KIM", "zorder": 67},
     {"name": "GCUM_AI", "color": "#B57AD5", "style": "--", "label": "GraphCast-UM", "zorder": 66},
     {"name": "GENC", "color": "#9866C7", "style": "--", "label": "GenCast", "zorder": 57},
-    {"name": "WNC", "color": "#DA70D6", "style": "--", "label": "WeatherNext Cyclones", "zorder": 99},
+    {"name": "WNC", "color": "#DA70D6", "style": "--", "label": "WeatherNext2 Cyclones", "zorder": 99},
+    {"name": "WNV3", "color": "#FF9F80", "style": "--", "label": "WeatherNext3 Cyclones", "zorder": 100},
     {"name": "HKO_AREC", "color": "#1E90FF", "style": "--", "label": "Aurora-ECMWF", "zorder": 56},
     {"name": "HKO_FXEC", "color": "#20B2AA", "style": "--", "label": "FuXi-ECMWF", "zorder": 55},
     {"name": "HKO_FWEC", "color": "#A6C875", "style": "--", "label": "FengWu-ECMWF", "zorder": 54},
@@ -136,6 +137,7 @@ MODEL_SOURCES = [
     {"name": "GCUM_AI", "apihub": "GCUM_AI", "noaa": None},
     {"name": "GENC", "apihub": None, "noaa": None, "knackwx": "GENC", "raw_github": "GENC", "polarwx": "gencast"},
     {"name": "WNC", "apihub": None, "noaa": "FGNE", "ral_ucar": "FGNE", "knackwx": "FNV3", "raw_github": "FNV3", "polarwx": "deepmind"},
+    {"name": "WNV3", "apihub": None, "raw_github": "WNV3"},
     {"name": "HKO_AREC", "apihub": "HKO_AREC", "noaa": None},
     {"name": "HKO_FXEC", "apihub": "HKO_FXEC", "noaa": None},
     {"name": "HKO_FWEC", "apihub": "HKO_FWEC", "noaa": None},
@@ -189,6 +191,7 @@ MODEL_CATEGORIES = {
     "HKO_FWEC": ("AI", "DETERMINISTIC"),
     "GENC": ("AI", "ENSEMBLE"),
     "WNC": ("AI", "ENSEMBLE"),
+    "WNV3": ("AI", "ENSEMBLE"),
 }
 
 MODEL_ACTIVE_WINDOWS = {
@@ -204,7 +207,7 @@ MODEL_ACTIVE_WINDOWS = {
     "GCKM_AI": ("202405150000", None),              # 기상청(KMA) AI 예측자료 신규 추가(2025.3.17.~)
 
     "GENC": ("202506010000", None),                 # Google DeepMind GenCast ensemble guidance
-    "WNC": ("202506010000", None),                  # Google DeepMind WeatherNext Cyclones (formerly FNV3)
+    "WNC": ("202506010000", None),                  # Google DeepMind WeatherNext2 Cyclones (FNV3)
 
     "HKO_AREC": ("202507210000", None),             # 홍콩기상청(HKO) AI 예측자료 신규 추가(2025.8.12.~)
     "HKO_FXEC": ("202507210000", None),             # 홍콩기상청(HKO) AI 예측자료 신규 추가(2025.8.12.~)
@@ -1412,14 +1415,47 @@ def storm_numbers(settings: Settings) -> set[int]:
     return {int(atcf_id[2:4]) for atcf_id in ids}
 
 
+RAW_GITHUB_MODELS = ("GENC", "FNV3", "WNV3")
+
+
 def raw_github_url(settings: Settings, model: str) -> str:
     data_dt = datetime.strptime(settings.data_time, "%Y%m%d%H%M")
-    date_path = data_dt.strftime("%Y_%m_%d")
+    date_path = data_dt.strftime("%Y/%m/%d")
     init_time = data_dt.strftime("%Y_%m_%dT%H_00")
     return (
         "https://raw.githubusercontent.com/SSalKim/GDM/main/"
         f"forecast_files/{date_path}/{model}_{init_time}_atcf_a_deck.txt"
     )
+
+
+def raw_github_candidate_urls(settings: Settings, model: str) -> list[str]:
+    urls = [raw_github_url(settings, model)]
+    if model == "WNV3":
+        return urls
+    data_dt = datetime.strptime(settings.data_time, "%Y%m%d%H%M")
+    date_path = data_dt.strftime("%Y_%m_%d")
+    init_time = data_dt.strftime("%Y_%m_%dT%H_00")
+    urls.append(
+        "https://raw.githubusercontent.com/SSalKim/GDM/main/"
+        f"forecast_files/{date_path}/{model}_{init_time}_atcf_a_deck.txt"
+    )
+    return urls
+
+
+def fetch_raw_github_text(session: requests.Session, settings: Settings, model: str) -> str | None:
+    for url in raw_github_candidate_urls(settings, model):
+        text = fetch_text(
+            session, url, retries=2, timeout=15,
+            # GDM republishes these cycle files as upstream forecasts improve.
+            cache_dir=None,
+            cache_ttl_seconds=settings.http_cache_ttl_seconds,
+        )
+        frame = read_atcf_csv(text, source="RAW.GITHUB")
+        if not frame.empty and (
+            frame["MODEL"].eq(model) & frame["TM10"].eq(int(settings.data_time[:10]))
+        ).any():
+            return text
+    return None
 
 
 def polarwx_url(atcf_id: str, data_time: str) -> str:
@@ -1959,10 +1995,8 @@ def atcf_urls(settings: Settings) -> list[tuple[str, str, int]]:
     for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
         if url := knackwx_url(atcf_id, settings.data_time):
             urls.append(("KNACKWX", url, 0))
-    urls.extend([
-        ("RAW.GITHUB", raw_github_url(settings, "GENC"), 6),
-        ("RAW.GITHUB", raw_github_url(settings, "FNV3"), 6),
-    ])
+    urls.extend(("RAW.GITHUB", raw_github_url(settings, model), 0)
+                for model in RAW_GITHUB_MODELS)
     return urls
 
 
@@ -2033,6 +2067,7 @@ def read_atcf_csv(text: str | None, *, source: str, skiprows: int = 0) -> pd.Dat
             usecols=[0, 1, 2, 4, 5, 6, 7, 8, 9],
             on_bad_lines="skip",
             skiprows=skiprows,
+            comment="#",
         )
     except (pd.errors.EmptyDataError, ValueError):
         return empty
@@ -2075,6 +2110,10 @@ def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFra
     target_cycle = settings.data_time[:10]
 
     def fetch_source(source: str, url: str) -> str | None:
+        if source == "RAW.GITHUB":
+            model = next(model for model in RAW_GITHUB_MODELS
+                         if raw_github_url(settings, model) == url)
+            return fetch_raw_github_text(session, settings, model)
         if source in {"NOAA", "RAL.UCAR"}:
             recent_text = fetch_recent_atcf_cycle_text(
                 session,
@@ -2121,7 +2160,13 @@ def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFra
         return empty_atcf_frame()
 
     raw = pd.concat(frames, ignore_index=True)
-    target_storm_nums = storm_numbers(settings)
+    target_storms = {(atcf_id[:2].upper(), int(atcf_id[2:4]))
+                     for atcf_id in (settings.atcf_id, *settings.extra_atcf_ids)}
+    storm_mask = pd.Series(
+        [(basin, number) in target_storms
+         for basin, number in zip(raw["ATCF_BASIN"], raw["ATCF_NUMBER"])],
+        index=raw.index,
+    )
     data_time_10 = int(settings.data_time[:10])
     source_model_mask = pd.Series(False, index=raw.index)
     for source, model_ids in SOURCE_MODEL_IDS.items():
@@ -2132,7 +2177,7 @@ def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFra
         source_model_mask
         & raw["FTM"].le(settings.fcst_hours)
         & raw["TM10"].eq(data_time_10)
-        & raw["ATCF_NUMBER"].isin(target_storm_nums)
+        & storm_mask
     )
     return raw.loc[mask].copy()
 
