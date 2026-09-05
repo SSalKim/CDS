@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260905171649",
-  "generated_at_kst": "2026-09-06 02:16 KST",
+  "generated_at_utc": "20260905171929",
+  "generated_at_kst": "2026-09-06 02:19 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_24",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 6,
-  "selected_model_count": 6,
+  "model_source_count": 11,
+  "selected_model_count": 7,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -64,6 +64,40 @@
       "is_official": false,
       "first_seen_utc": "20260905171649",
       "first_seen_kst": "2026-09-06 02:16 KST"
+    },
+    {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "GFS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905171929",
+      "first_seen_kst": "2026-09-06 02:19 KST"
+    },
+    {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "GFS"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905171929",
+      "first_seen_kst": "2026-09-06 02:19 KST"
     },
     {
       "model_id": "ICON",
@@ -107,7 +141,7 @@
       ],
       "source": "DMDW",
       "source_label": "KMA DMDW",
-      "selected": true,
+      "selected": false,
       "point_count": 18,
       "max_lead_hour": 102,
       "has_pressure": true,
@@ -117,6 +151,23 @@
       "first_seen_kst": "2026-09-06 01:13 KST"
     },
     {
+      "model_id": "JGSM",
+      "model_label": "JGSM",
+      "raw_model_ids": [
+        "JGSM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 18,
+      "max_lead_hour": 102,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905171929",
+      "first_seen_kst": "2026-09-06 02:19 KST"
+    },
+    {
       "model_id": "TEPS",
       "model_label": "JGSM EPS",
       "raw_model_ids": [
@@ -124,7 +175,7 @@
       ],
       "source": "DMDW",
       "source_label": "KMA DMDW",
-      "selected": true,
+      "selected": false,
       "point_count": 23,
       "max_lead_hour": 132,
       "has_pressure": true,
@@ -132,6 +183,40 @@
       "is_official": false,
       "first_seen_utc": "20260905164122",
       "first_seen_kst": "2026-09-06 01:41 KST"
+    },
+    {
+      "model_id": "TEPS",
+      "model_label": "JGSM EPS",
+      "raw_model_ids": [
+        "TEPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 23,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260905171929",
+      "first_seen_kst": "2026-09-06 02:19 KST"
+    },
+    {
+      "model_id": "KMA",
+      "model_label": "KMA OFCL",
+      "raw_model_ids": [
+        "KMA"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 5,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": true,
+      "first_seen_utc": "20260905171929",
+      "first_seen_kst": "2026-09-06 02:19 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2624_KROVANH/metadata/source_availability/202609051200.json",
