@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260906091002",
-  "generated_at_kst": "2026-09-06 18:10 KST",
+  "generated_at_utc": "20260906092002",
+  "generated_at_kst": "2026-09-06 18:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_24",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 71,
+  "model_source_count": 72,
   "selected_model_count": 27,
   "active_target_model_count": 40,
   "model_sources": [
@@ -473,6 +473,23 @@
       "is_official": false,
       "first_seen_utc": "20260906080003",
       "first_seen_kst": "2026-09-06 17:00 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 16,
+      "max_lead_hour": 90,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260906092002",
+      "first_seen_kst": "2026-09-06 18:20 KST"
     },
     {
       "model_id": "ECMWF_EPS",
@@ -1243,5 +1260,6 @@
       "first_seen_kst": "2026-09-06 16:20 KST"
     }
   ],
-  "source_availability_path": "data/2026/TYP_2624_KROVANH/metadata/source_availability/202609060000.json"
+  "source_availability_path": "data/2026/TYP_2624_KROVANH/metadata/source_availability/202609060000.json",
+  "smca_aifsm_snapshot_path": "data/2026/TYP_2624_KROVANH/metadata/smca/AIFSM/202609060000.json"
 }
