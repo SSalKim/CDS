@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260906094001",
-  "generated_at_kst": "2026-09-06 18:40 KST",
+  "generated_at_utc": "20260906095003",
+  "generated_at_kst": "2026-09-06 18:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_24",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 74,
+  "model_source_count": 76,
   "selected_model_count": 28,
   "active_target_model_count": 40,
   "model_sources": [
@@ -654,8 +654,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 16,
-      "max_lead_hour": 90,
+      "point_count": 23,
+      "max_lead_hour": 174,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -766,6 +766,23 @@
       "first_seen_kst": "2026-09-06 18:30 KST"
     },
     {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260906095003",
+      "first_seen_kst": "2026-09-06 18:50 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -815,6 +832,23 @@
       "is_official": false,
       "first_seen_utc": "20260906062002",
       "first_seen_kst": "2026-09-06 15:20 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HFSA"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 11,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260906095003",
+      "first_seen_kst": "2026-09-06 18:50 KST"
     },
     {
       "model_id": "JGSM",
