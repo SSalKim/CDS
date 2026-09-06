@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260906124959",
-  "generated_at_kst": "2026-09-06 21:49 KST",
+  "generated_at_utc": "20260906130203",
+  "generated_at_kst": "2026-09-06 22:02 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_24",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 31,
-  "selected_model_count": 15,
+  "model_source_count": 33,
+  "selected_model_count": 16,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -339,6 +339,23 @@
       "first_seen_kst": "2026-09-06 21:00 KST"
     },
     {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 18,
+      "max_lead_hour": 102,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260906130203",
+      "first_seen_kst": "2026-09-06 22:02 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -558,6 +575,23 @@
       "is_official": false,
       "first_seen_utc": "20260906124959",
       "first_seen_kst": "2026-09-06 21:49 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260906130203",
+      "first_seen_kst": "2026-09-06 22:02 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2624_KROVANH/metadata/source_availability/202609060600.json",
