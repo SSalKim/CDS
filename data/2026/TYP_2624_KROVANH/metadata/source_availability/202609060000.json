@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260906092002",
-  "generated_at_kst": "2026-09-06 18:20 KST",
+  "generated_at_utc": "20260906093002",
+  "generated_at_kst": "2026-09-06 18:30 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_24",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 72,
-  "selected_model_count": 27,
+  "model_source_count": 74,
+  "selected_model_count": 28,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -749,6 +749,23 @@
       "first_seen_kst": "2026-09-06 16:00 KST"
     },
     {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 17,
+      "max_lead_hour": 96,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260906093002",
+      "first_seen_kst": "2026-09-06 18:30 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -1122,6 +1139,23 @@
       "is_official": false,
       "first_seen_utc": "20260906085036",
       "first_seen_kst": "2026-09-06 17:50 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "NEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 22,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260906093002",
+      "first_seen_kst": "2026-09-06 18:30 KST"
     },
     {
       "model_id": "UKM",
