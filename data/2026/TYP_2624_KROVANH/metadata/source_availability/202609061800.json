@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260907014001",
-  "generated_at_kst": "2026-09-07 10:40 KST",
+  "generated_at_utc": "20260907014959",
+  "generated_at_kst": "2026-09-07 10:49 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_24",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 20,
-  "selected_model_count": 14,
+  "model_source_count": 22,
+  "selected_model_count": 15,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -203,6 +203,23 @@
       "first_seen_kst": "2026-09-07 09:20 KST"
     },
     {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "AVNO"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260907014959",
+      "first_seen_kst": "2026-09-07 10:49 KST"
+    },
+    {
       "model_id": "GFS_EPS",
       "model_label": "GFS EPS",
       "raw_model_ids": [
@@ -211,8 +228,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 21,
-      "max_lead_hour": 120,
+      "point_count": 27,
+      "max_lead_hour": 156,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -321,6 +338,23 @@
       "is_official": false,
       "first_seen_utc": "20260906223000",
       "first_seen_kst": "2026-09-07 07:30 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 22,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260907014959",
+      "first_seen_kst": "2026-09-07 10:49 KST"
     },
     {
       "model_id": "WNC",
