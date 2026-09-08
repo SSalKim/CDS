@@ -5125,6 +5125,11 @@ def main() -> int:
         log_timing(f"cycle total before manifest {window.data_time}", window_started_at)
 
     if args.check_run_needed:
+        # The live activity-list refresh writes caches even when rendering is skipped.
+        changed_paths = [
+            relative_asset_path(path) for path in kma_cache_asset_paths(kma_cache_dir, years)
+        ]
+        write_changed_paths(args.changed_paths_file, changed_paths)
         run_needed = actual_run_count > 0
         payload = {
             "updated_at_utc": format_utc_stamp(now),
@@ -5132,6 +5137,8 @@ def main() -> int:
             "deps_needed": run_needed,
             "run_step_needed": run_needed,
             "planned_run_count": actual_run_count,
+            "changed_path_count": len(changed_paths),
+            "changed_paths_preview": changed_paths,
             "active_windows": [asdict(window) for window in windows],
             "runs": run_entries,
         }

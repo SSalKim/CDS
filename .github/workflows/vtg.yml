@@ -226,6 +226,8 @@ jobs:
       - name: Precheck VTG run
         id: vtg_precheck
         run: |
+          CHANGED_PATHS_FILE="$RUNNER_TEMP/vtg_changed_paths.txt"
+          : > "$CHANGED_PATHS_FILE"
           if [ "$DRY_RUN_INPUT" = "true" ]; then
             echo "deps_needed=false" >> "$GITHUB_OUTPUT"
             echo "run_step_needed=true" >> "$GITHUB_OUTPUT"
@@ -240,7 +242,7 @@ jobs:
             exit 0
           fi
 
-          args=(--fcst-hours "120,240" --no-auto-fcst-hours --min-run-interval-minutes 8 --check-run-needed --github-output "$GITHUB_OUTPUT")
+          args=(--fcst-hours "120,240" --no-auto-fcst-hours --min-run-interval-minutes 8 --check-run-needed --github-output "$GITHUB_OUTPUT" --changed-paths-file "$CHANGED_PATHS_FILE")
           if [ -n "$NOW_INPUT" ]; then
             args+=(--now "$NOW_INPUT")
           fi
