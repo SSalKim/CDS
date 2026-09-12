@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260912173410",
-  "generated_at_kst": "2026-09-13 02:34 KST",
+  "generated_at_utc": "20260912175055",
+  "generated_at_kst": "2026-09-13 02:50 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_52",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 1,
-  "selected_model_count": 1,
+  "model_source_count": 2,
+  "selected_model_count": 2,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -47,6 +47,23 @@
       "is_official": false,
       "first_seen_utc": "20260912170918",
       "first_seen_kst": "2026-09-13 02:09 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GFS_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260912175055",
+      "first_seen_kst": "2026-09-13 02:50 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2652_NONAME/metadata/source_availability/202609121200.json"
