@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260912181101",
-  "generated_at_kst": "2026-09-13 03:11 KST",
+  "generated_at_utc": "20260912184630",
+  "generated_at_kst": "2026-09-13 03:46 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_52",
   "storm_stage": "TD",
@@ -27,60 +27,26 @@
     120,
     240
   ],
-  "model_source_count": 3,
-  "selected_model_count": 3,
+  "model_source_count": 1,
+  "selected_model_count": 1,
   "active_target_model_count": 40,
   "model_sources": [
     {
-      "model_id": "GFS",
-      "model_label": "GFS",
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
       "raw_model_ids": [
-        "GFS"
+        "FNV3"
       ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
       "selected": true,
-      "point_count": 10,
-      "max_lead_hour": 54,
+      "point_count": 8,
+      "max_lead_hour": 42,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260912170918",
-      "first_seen_kst": "2026-09-13 02:09 KST"
-    },
-    {
-      "model_id": "GFS_EPS",
-      "model_label": "GFS EPS",
-      "raw_model_ids": [
-        "GFS_EPS"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 11,
-      "max_lead_hour": 60,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260912175055",
-      "first_seen_kst": "2026-09-13 02:50 KST"
-    },
-    {
-      "model_id": "HAFS",
-      "model_label": "HAFS",
-      "raw_model_ids": [
-        "HAFS"
-      ],
-      "source": "APIHUB",
-      "source_label": "KMA APIHUB",
-      "selected": true,
-      "point_count": 43,
-      "max_lead_hour": 126,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20260912181101",
-      "first_seen_kst": "2026-09-13 03:11 KST"
+      "first_seen_utc": "20260912184630",
+      "first_seen_kst": "2026-09-13 03:46 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2652_NONAME/metadata/source_availability/202609121200.json"
