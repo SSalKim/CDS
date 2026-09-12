@@ -1,16 +1,16 @@
 {
   "version": 3,
-  "updated_at_utc": "202609122150",
+  "updated_at_utc": "202609122200",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 39,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202609121200",
-      "cycle_time_utc": "202609121200",
-      "start_utc": "202609121600",
-      "end_utc": "202609122200"
+      "data_time": "202609121800",
+      "cycle_time_utc": "202609121800",
+      "start_utc": "202609122200",
+      "end_utc": "202609130400"
     }
   ],
   "runs": [
@@ -19,7 +19,7 @@
         "storm_key": "td_2026_52",
         "stage": "TD_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202609121200",
+        "data_time": "202609121800",
         "td_number": 52,
         "linked_td_number": null,
         "typ_number": 52,
@@ -30,16 +30,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202609121200",
-        "cycle_time_utc": "202609121200",
-        "start_utc": "202609121600",
-        "end_utc": "202609122200"
+        "data_time": "202609121800",
+        "cycle_time_utc": "202609121800",
+        "start_utc": "202609122200",
+        "end_utc": "202609130400"
       },
       "result": {
-        "status": "ok",
+        "status": "no_output",
         "metadata": {
-          "generated_at_utc": "20260912215131",
-          "image_path": "data/2026/TD_2652_NONAME/images/TD_2652_NONAME_202609121200_120h.png",
+          "generated_at_utc": "20260912220055",
+          "image_path": "data/2026/TD_2652_NONAME/images/TD_2652_NONAME_202609121800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 52,
@@ -55,45 +55,28 @@
           "canonical_typ_name_ko": "",
           "atcf_id": "wp982026",
           "extra_atcf_ids": [],
-          "data_time": "202609121200",
+          "data_time": "202609121800",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 19,
+          "model_count": 0,
           "target_model_count": 40,
-          "model_labels": [
-            "CMC",
-            "CMC EPS",
-            "FourCastNet-ECMWF",
-            "FourCastNet-KIM",
-            "GraphCast-ECMWF",
-            "GraphCast-KIM",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "HWRF",
-            "KMA AIFS-ECMWF",
-            "KMA AIFS-KIM",
-            "KIM",
-            "KIM EPS",
-            "Pangu-Weather-ECMWF",
-            "Pangu-Weather-KIM",
-            "UKMO",
-            "WeatherNext2 Cyclones",
-            "WeatherNext3 Cyclones"
-          ],
+          "models": [],
+          "model_labels": [],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2652_NONAME/metadata/source_availability/202609121200.json"
+          "source_availability_path": "data/2026/TD_2652_NONAME/metadata/source_availability/202609121800.json",
+          "no_output": true,
+          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2026_52",
         "stage": "TD_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202609121200",
+        "data_time": "202609121800",
         "td_number": 52,
         "linked_td_number": null,
         "typ_number": 52,
@@ -104,16 +87,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202609121200",
-        "cycle_time_utc": "202609121200",
-        "start_utc": "202609121600",
-        "end_utc": "202609122200"
+        "data_time": "202609121800",
+        "cycle_time_utc": "202609121800",
+        "start_utc": "202609122200",
+        "end_utc": "202609130400"
       },
       "result": {
-        "status": "ok",
+        "status": "no_output",
         "metadata": {
-          "generated_at_utc": "20260912215132",
-          "image_path": "data/2026/TD_2652_NONAME/images/TD_2652_NONAME_202609121200_240h.png",
+          "generated_at_utc": "20260912220055",
+          "image_path": "data/2026/TD_2652_NONAME/images/TD_2652_NONAME_202609121800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 52,
@@ -129,38 +112,21 @@
           "canonical_typ_name_ko": "",
           "atcf_id": "wp982026",
           "extra_atcf_ids": [],
-          "data_time": "202609121200",
+          "data_time": "202609121800",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 19,
+          "model_count": 0,
           "target_model_count": 40,
-          "model_labels": [
-            "CMC",
-            "CMC EPS",
-            "FourCastNet-ECMWF",
-            "FourCastNet-KIM",
-            "GraphCast-ECMWF",
-            "GraphCast-KIM",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "HWRF",
-            "KMA AIFS-ECMWF",
-            "KMA AIFS-KIM",
-            "KIM",
-            "KIM EPS",
-            "Pangu-Weather-ECMWF",
-            "Pangu-Weather-KIM",
-            "UKMO",
-            "WeatherNext2 Cyclones",
-            "WeatherNext3 Cyclones"
-          ],
+          "models": [],
+          "model_labels": [],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2652_NONAME/metadata/source_availability/202609121200.json"
+          "source_availability_path": "data/2026/TD_2652_NONAME/metadata/source_availability/202609121800.json",
+          "no_output": true,
+          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     }
   ],
   "inventory_count": 9362,
