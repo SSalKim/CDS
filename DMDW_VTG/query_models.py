@@ -61,8 +61,6 @@ REQUEST_EXTENT = {
 }
 
 DMDW_MODEL_MAP = {
-    "AIGEFS": "AIGEFS",
-    "AIGFS": "AGFS",
     "CMC": "CMC",
     "CMC_EPS": "CMC_EPS",
     "EC_AIFS": "ECMWF_AIFS",
@@ -71,9 +69,6 @@ DMDW_MODEL_MAP = {
     "ECMWF_AIFS": "ECMWF_AIFS",
     "ECMWF_EPS": "ECMWF_EPS",
     "ECMWF_HRES": "ECMWF",
-    "FNV3": "WNC",
-    "FNV3_LARGE_ENSEMBLE": "WNC",
-    "GALWEM": "AFUM",
     "GEFS": "GFS_EPS",
     "GFS": "GFS",
     "GFS_EPS": "GFS_EPS",
@@ -94,6 +89,26 @@ DMDW_MODEL_MAP = {
     "UKMO": "UKM",
     "UKM": "UKM",
 }
+DMDW_ENABLED_MODEL_IDS = frozenset((
+    "CMC",
+    "CMC_EPS",
+    "ECMWF",
+    "ECMWF_AIFS",
+    "ECMWF_AIFS_EPS",
+    "ECMWF_EPS",
+    "FNMOC_EPS",
+    "GFS",
+    "GFS_EPS",
+    "HAFS",
+    "HWRF",
+    "JGSM",
+    "KIM_3h",
+    "KIM_6h",
+    "KIM_EPS",
+    "NAVGEM",
+    "TEPS",
+    "UKM",
+))
 
 NON_MODEL_LAYER_TOKENS = {
     "NOTICE",
@@ -867,6 +882,11 @@ def fetch_one_storm(
     summary: list[dict[str, Any]] = []
     for index, candidate in enumerate(candidates, start=1):
         raw_id = candidate.get("src") or candidate.get("lyrTitle") or ""
+        normalized_raw = normalize_raw_model_id(raw_id)
+        model_id = mapped_model_id(normalized_raw)
+        if model_id not in DMDW_ENABLED_MODEL_IDS:
+            print(f"[{index}/{len(candidates)}] Skipping unsupported DMDW model {normalized_raw}")
+            continue
         print(f"[{index}/{len(candidates)}] DMDW {raw_id} mapLyrIdx={candidate.get('mapLyrIdx') or '-'}")
         try:
             data = post_json(
@@ -893,10 +913,9 @@ def fetch_one_storm(
             status_code = None
             error = type(exc).__name__
 
-        normalized_raw = normalize_raw_model_id(raw_id)
         model = {
             "raw_model_id": normalized_raw,
-            "model_id": mapped_model_id(normalized_raw),
+            "model_id": model_id,
             "member_id": member_id(normalized_raw),
             "candidate": candidate,
             "points": points,

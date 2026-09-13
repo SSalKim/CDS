@@ -114,7 +114,7 @@ class PolarwxTests(unittest.TestCase):
         self.assertEqual([0.0, 6.0, 12.0], frame["TMD"].tolist())
         self.assertEqual([998.83, 997.42, 998.56], frame["PS"].tolist())
 
-    def test_ukmo_eps_backup_priority_is_knackwx_then_polarwx_then_ral(self):
+    def test_ukmo_eps_prefers_pressure_data_then_normal_source_priority(self):
         polarwx = VTG.read_polarwx_json(
             json.dumps({
                 "ukmet_mean": {
@@ -134,16 +134,39 @@ class PolarwxTests(unittest.TestCase):
         ral = polarwx.copy()
         ral[VTG.DATA_SOURCE_COLUMN] = "RAL.UCAR"
         ral["LAT"] += 0.2
+        ral["PS"] = 0.0
+        apihub = polarwx.copy()
+        apihub[VTG.DATA_SOURCE_COLUMN] = "APIHUB"
+        apihub["LAT"] += 0.3
+        apihub["PS"] = 0.0
 
-        all_sources = pd.concat([ral, polarwx, knackwx], ignore_index=True)
+        all_sources = pd.concat([ral, knackwx, polarwx, apihub], ignore_index=True)
         selected = VTG.select_model_sources_by_priority(all_sources, self.settings())
-        self.assertEqual(["KNACKWX"], selected[VTG.DATA_SOURCE_COLUMN].unique().tolist())
-
-        without_knackwx = all_sources[all_sources[VTG.DATA_SOURCE_COLUMN] != "KNACKWX"]
-        selected = VTG.select_model_sources_by_priority(without_knackwx, self.settings())
         self.assertEqual(["POLARWX"], selected[VTG.DATA_SOURCE_COLUMN].unique().tolist())
 
-        selected = VTG.select_model_sources_by_priority(ral, self.settings())
+        polarwx_without_pressure = polarwx.copy()
+        polarwx_without_pressure["PS"] = 0.0
+        selected = VTG.select_model_sources_by_priority(
+            pd.concat([ral, knackwx, polarwx_without_pressure, apihub], ignore_index=True),
+            self.settings(),
+        )
+        self.assertEqual(["KNACKWX"], selected[VTG.DATA_SOURCE_COLUMN].unique().tolist())
+
+        knackwx_without_pressure = knackwx.copy()
+        knackwx_without_pressure["PS"] = 0.0
+        no_pressure = pd.concat(
+            [ral, knackwx_without_pressure, polarwx_without_pressure, apihub],
+            ignore_index=True,
+        )
+        selected = VTG.select_model_sources_by_priority(no_pressure, self.settings())
+        self.assertEqual(["APIHUB"], selected[VTG.DATA_SOURCE_COLUMN].unique().tolist())
+
+        override_settings = VTG.Settings(
+            data_time=self.settings().data_time,
+            fcst_hours=self.settings().fcst_hours,
+            source_overrides=(("UKMO_EPS", "RAL.UCAR"),),
+        )
+        selected = VTG.select_model_sources_by_priority(all_sources, override_settings)
         self.assertEqual(["RAL.UCAR"], selected[VTG.DATA_SOURCE_COLUMN].unique().tolist())
 
 

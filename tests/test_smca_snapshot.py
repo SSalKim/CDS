@@ -16,11 +16,14 @@ def smca_text(
     pressure: int = 990,
     typhoon_id: str = "202618",
     model_id: str = "AICON",
+    ident: str | None = None,
+    tfbh: str | None = None,
 ) -> str:
     return json.dumps({
         "code": 200,
         "data": {
-            "ident": typhoon_id,
+            "ident": ident if ident is not None else typhoon_id,
+            **({"tfbh": tfbh} if tfbh is not None else {}),
             "points": [{
                 "forecast": [{
                     "sets": model_id,
@@ -89,7 +92,7 @@ class SmcaSnapshotTests(unittest.TestCase):
             restored = restored_frame[restored_frame["SRC"].eq("ECMWF_AIFS_EPS")]
             self.assertEqual([0.0, 6.0, 12.0], restored["TMD"].tolist())
 
-    def test_aifsm_priority_is_after_polarwx_and_before_ral_and_knackwx(self):
+    def test_aifsm_priority_is_after_polarwx_and_before_knackwx(self):
         settings = self.settings(Path("."))
         smca = VTG.read_smca_json(
             smca_text(cycle="2026-08-21T00:00:00Z", model_id="AIFSM"),
@@ -98,22 +101,76 @@ class SmcaSnapshotTests(unittest.TestCase):
         )
         polarwx = smca.copy()
         polarwx[VTG.DATA_SOURCE_COLUMN] = "POLARWX"
-        ral = smca.copy()
-        ral[VTG.DATA_SOURCE_COLUMN] = "RAL.UCAR"
         knackwx = smca.copy()
         knackwx[VTG.DATA_SOURCE_COLUMN] = "KNACKWX"
 
         selected = VTG.select_model_sources_by_priority(
-            pd.concat([knackwx, ral, smca, polarwx], ignore_index=True),
+            pd.concat([knackwx, smca, polarwx], ignore_index=True),
             settings,
         )
         self.assertEqual(["POLARWX"], selected[VTG.DATA_SOURCE_COLUMN].unique().tolist())
 
         selected = VTG.select_model_sources_by_priority(
-            pd.concat([knackwx, ral, smca], ignore_index=True),
+            pd.concat([knackwx, smca], ignore_index=True),
             settings,
         )
         self.assertEqual(["SMCA.FUN"], selected[VTG.DATA_SOURCE_COLUMN].unique().tolist())
+
+    def test_aigfs_maps_to_agfs_and_accepts_smca_td_identifier(self):
+        settings = self.settings(Path("."))
+        smca = VTG.read_smca_json(
+            smca_text(
+                cycle="2026-08-21T00:00:00Z",
+                typhoon_id="20262501",
+                model_id="AIGFS",
+                ident="TD",
+                tfbh="20262501",
+            ),
+            settings,
+            typhoon_id="20262501",
+        )
+
+        self.assertEqual(["AGFS"], smca["SRC"].unique().tolist())
+        self.assertEqual(["AIGFS"], smca[VTG.RAW_MODEL_COLUMN].unique().tolist())
+        self.assertEqual(["SMCA.FUN"], smca[VTG.DATA_SOURCE_COLUMN].unique().tolist())
+        self.assertEqual([990.0, 988.0, 986.0], smca["PS"].tolist())
+        self.assertEqual([20.0, 22.0, 24.0], smca["WS"].tolist())
+
+        polarwx = smca.copy()
+        polarwx[VTG.DATA_SOURCE_COLUMN] = "POLARWX"
+        knackwx = smca.copy()
+        knackwx[VTG.DATA_SOURCE_COLUMN] = "KNACKWX"
+
+        selected = VTG.select_model_sources_by_priority(
+            pd.concat([knackwx, smca, polarwx], ignore_index=True),
+            settings,
+        )
+        self.assertEqual(["POLARWX"], selected[VTG.DATA_SOURCE_COLUMN].unique().tolist())
+
+        selected = VTG.select_model_sources_by_priority(
+            pd.concat([knackwx, smca], ignore_index=True),
+            settings,
+        )
+        self.assertEqual(["SMCA.FUN"], selected[VTG.DATA_SOURCE_COLUMN].unique().tolist())
+
+    def test_live_aigfs_is_saved_and_restored_after_live_cycle_advances(self):
+        with tempfile.TemporaryDirectory() as directory:
+            settings = self.settings(Path(directory))
+            live_text = smca_text(cycle="2026-08-21T00:00:00Z", model_id="AIGFS")
+
+            with patch("VTG.fetch_text", return_value=live_text):
+                live_frame = VTG.fetch_smca_data(object(), settings)
+
+            aigfs = live_frame[live_frame[VTG.RAW_MODEL_COLUMN].eq("AIGFS")]
+            self.assertEqual(3, len(aigfs))
+            self.assertTrue(VTG.smca_snapshot_path(settings, "AIGFS").exists())
+
+            advanced_text = smca_text(cycle="2026-08-21T06:00:00Z", model_id="AIGFS")
+            with patch("VTG.fetch_text", return_value=advanced_text):
+                restored_frame = VTG.fetch_smca_data(object(), settings)
+
+            restored = restored_frame[restored_frame[VTG.RAW_MODEL_COLUMN].eq("AIGFS")]
+            self.assertEqual([0.0, 6.0, 12.0], restored["TMD"].tolist())
 
     def test_snapshot_skips_identical_content_and_refreshes_changed_content(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -165,10 +222,13 @@ class SmcaSnapshotTests(unittest.TestCase):
             root = Path(directory)
             aicon_path = root / "AICON" / "202608210000.json"
             aifsm_path = root / "AIFSM" / "202608210000.json"
+            aigfs_path = root / "AIGFS" / "202608210000.json"
             aicon_path.parent.mkdir(parents=True)
             aifsm_path.parent.mkdir(parents=True)
+            aigfs_path.parent.mkdir(parents=True)
             aicon_path.write_text("{}\n", encoding="utf-8")
             aifsm_path.write_text("{}\n", encoding="utf-8")
+            aigfs_path.write_text("{}\n", encoding="utf-8")
 
             paths = vtg_auto.collect_changed_asset_paths(
                 run_entries=[{
@@ -176,6 +236,7 @@ class SmcaSnapshotTests(unittest.TestCase):
                         "metadata": {
                             "smca_aicon_snapshot_path": str(aicon_path),
                             "smca_aifsm_snapshot_path": str(aifsm_path),
+                            "smca_aigfs_snapshot_path": str(aigfs_path),
                         },
                     },
                 }],
@@ -186,12 +247,15 @@ class SmcaSnapshotTests(unittest.TestCase):
 
             self.assertIn(vtg_auto.relative_asset_path(aicon_path), paths)
             self.assertIn(vtg_auto.relative_asset_path(aifsm_path), paths)
+            self.assertIn(vtg_auto.relative_asset_path(aigfs_path), paths)
             compact = vtg_auto.compact_metadata({
                 "smca_aicon_snapshot_path": str(aicon_path),
                 "smca_aifsm_snapshot_path": str(aifsm_path),
+                "smca_aigfs_snapshot_path": str(aigfs_path),
             })
             self.assertEqual(str(aicon_path), compact["smca_aicon_snapshot_path"])
             self.assertEqual(str(aifsm_path), compact["smca_aifsm_snapshot_path"])
+            self.assertEqual(str(aigfs_path), compact["smca_aigfs_snapshot_path"])
 
 
 if __name__ == "__main__":

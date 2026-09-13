@@ -28,7 +28,7 @@ for(const id of ['WNC','WNV3']){
 }
 assert.equal(catalog.labels.FNV3,catalog.labels.WNC);
 assert.equal(catalog.details.find(row=>row.model_id==='WNC')['모델명'],'WeatherNext2 (WeatherNext Cyclones)');
-assert.equal(catalog.details.find(row=>row.model_id==='WNV3')['모델명'],'WeatherNext3 (WeatherNext WNV3)');
+assert.equal(catalog.details.find(row=>row.model_id==='WNV3')['모델명'],'WeatherNext3 (WeatherNext Cyclones)');
 assert.equal(catalog.colors.FNV3,catalog.colors.WNC);
 const index=catalog.rows.findIndex(row=>row.modelId==='GENC');
 assert.deepEqual(catalog.rows.slice(index,index+3).map(row=>row.modelId),['GENC','WNC','WNV3']);

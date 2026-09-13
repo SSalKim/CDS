@@ -93,8 +93,8 @@ MODEL_INFO = [
 ]
 
 MODEL_SOURCES = [
-    {"name": "ECMWF", "apihub": "ECMWF", "noaa": "ECMF", "ral_ucar": "ECMF", "knackwx": "ECMF", "polarwx": "ecm"},
-    {"name": "ECMWF_EPS", "apihub": "ECMWF_EPS", "noaa": "EEMN", "ral_ucar": "EEMN", "knackwx": "EEMN", "polarwx": "eps_mean"},
+    {"name": "ECMWF", "apihub": "ECMWF", "noaa": "ECMF", "knackwx": "ECMF", "polarwx": "ecm", "smca": "ECMWF"},
+    {"name": "ECMWF_EPS", "apihub": "ECMWF_EPS", "noaa": "EEMN", "knackwx": "EEMN", "polarwx": "eps_mean", "smca": "ECMWFM"},
     {"name": "KIM_3h", "apihub": "KIM_3h", "noaa": None},
     {"name": "KIM_6h", "apihub": "KIM_6h", "noaa": None},
     {"name": "KIM_GFDL_6h", "apihub": "KIM_GFDL_6h", "noaa": None},
@@ -104,8 +104,8 @@ MODEL_SOURCES = [
     {"name": "UM_KEPS", "apihub": "UM_KEPS", "noaa": None},
     {"name": "UKM", "apihub": "UKX", "noaa": "UKM", "ral_ucar": "UKM", "knackwx": "UKM", "polarwx": "ukmet"},
     {"name": "UKMO_EPS", "apihub": "EGRR_EPS", "noaa": "UEMN", "ral_ucar": "UEMN", "knackwx": "UEMN", "polarwx": "ukmet_mean"},
-    {"name": "GFS", "apihub": "GFS", "noaa": "AVNO", "ral_ucar": "AVNO", "knackwx": "AVNO", "polarwx": "gfs"},
-    {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "ral_ucar": "AEMN", "knackwx": "AEMN", "polarwx": "gefs_mean"},
+    {"name": "GFS", "apihub": "GFS", "noaa": "AVNO", "ral_ucar": "AVNO", "knackwx": "AVNO", "polarwx": "gfs", "smca": "GFS"},
+    {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "ral_ucar": "AEMN", "knackwx": "AEMN", "polarwx": "gefs_mean", "smca": "GEFSM"},
     {"name": "CMC", "apihub": "CMC", "noaa": "CMC", "ral_ucar": "CMC", "knackwx": "CMC", "polarwx": "cmc"},
     {"name": "CMC_EPS", "apihub": "CMC_EPS", "noaa": "CEMN", "ral_ucar": "CEMN", "knackwx": "CEMN", "polarwx": "cmc_mean"},
     {"name": "JGSM", "apihub": "JGSM", "noaa": "JGSM", "ral_ucar": "JGSM", "knackwx": "JGSM"},
@@ -116,13 +116,13 @@ MODEL_SOURCES = [
     {"name": "ICON_EPS", "apihub": None, "polarwx": "icon_ens_mean"},
     {"name": "CTCX", "apihub": None, "noaa": "CTCX", "ral_ucar": "CTCX", "knackwx": "CTCX"},
     {"name": "COAMPS_EPS", "apihub": None, "noaa": "CTMN", "ral_ucar": "CTMN", "knackwx": "CTMN"},
-    {"name": "AFUM", "apihub": None, "noaa": "AFUM", "ral_ucar": "AFUM"},
+    {"name": "AFUM", "apihub": None, "noaa": "AFUM"},
     {"name": "HWRF", "apihub": "HWRF", "noaa": "HWRF", "ral_ucar": "HWRF", "knackwx": "HWRF", "polarwx": "hwrf"},
     {"name": "HAFS", "apihub": "HAFS", "noaa": "HFSA", "ral_ucar": "HFSA", "knackwx": "HFSA", "polarwx": "hafsa"},
-    {"name": "ECMWF_AIFS", "apihub": "ECMWF_AIFS", "noaa": "AIFS", "ral_ucar": "AIFS", "knackwx": "AIFS", "polarwx": "aifs"},
-    {"name": "ECMWF_AIFS_EPS", "apihub": None, "noaa": "EAIM", "ral_ucar": "EAMN", "knackwx": "EAMN", "polarwx": "aifs_ens_mean", "smca": "AIFSM"},
-    {"name": "AGFS", "apihub": None, "noaa": "AGFS", "ral_ucar": "AGFS", "knackwx": "AGFS", "polarwx": "aigfs"},
-    {"name": "AIGEFS", "apihub": None, "noaa": "AIMN", "ral_ucar": "AIMN", "knackwx": "AIMN", "smca": "AIGEFSM"},
+    {"name": "ECMWF_AIFS", "apihub": "ECMWF_AIFS", "noaa": "AIFS", "knackwx": "AIFS", "polarwx": "aifs", "smca": "AIFS"},
+    {"name": "ECMWF_AIFS_EPS", "apihub": None, "noaa": "EAIM", "knackwx": "EAMN", "polarwx": "aifs_ens_mean", "smca": "AIFSM"},
+    {"name": "AGFS", "apihub": None, "noaa": "AGFS", "knackwx": "AGFS", "polarwx": "aigfs", "smca": "AIGFS"},
+    {"name": "AIGEFS", "apihub": None, "noaa": "AIMN", "knackwx": "AIMN", "smca": "AIGEFSM"},
     {"name": "AICON", "apihub": None, "smca": "AICON"},
     {"name": "IFEC_AI", "apihub": "IFEC_AI", "noaa": None},
     {"name": "IFKM_AI", "apihub": "IFKM_AI", "noaa": None},
@@ -136,8 +136,8 @@ MODEL_SOURCES = [
     {"name": "GCKM_AI", "apihub": "GCKM_AI", "noaa": None},
     {"name": "GCUM_AI", "apihub": "GCUM_AI", "noaa": None},
     {"name": "GENC", "apihub": None, "noaa": None, "knackwx": "GENC", "raw_github": "GENC", "polarwx": "gencast"},
-    {"name": "WNC", "apihub": None, "noaa": "FGNE", "ral_ucar": "FGNE", "knackwx": "FNV3", "raw_github": "FNV3", "polarwx": "deepmind"},
-    {"name": "WNV3", "apihub": None, "raw_github": "WNV3"},
+    {"name": "WNC", "apihub": None, "noaa": "FGNE", "knackwx": "FNV3", "raw_github": "FNV3", "polarwx": "deepmind", "smca": "WN2C"},
+    {"name": "WNV3", "apihub": None, "knackwx": "WNV3", "raw_github": "WNV3", "smca": "WN3C"},
     {"name": "HKO_AREC", "apihub": "HKO_AREC", "noaa": None},
     {"name": "HKO_FXEC", "apihub": "HKO_FXEC", "noaa": None},
     {"name": "HKO_FWEC", "apihub": "HKO_FWEC", "noaa": None},
@@ -270,10 +270,28 @@ KNACKWX_MAX_LEAD_GAP_HOURS = float(os.getenv("VTG_KNACKWX_MAX_LEAD_GAP_HOURS", "
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
 SOURCE_ORDER = ("APIHUB", "DMDW", "RAW.GITHUB", "POLARWX", "SMCA.FUN", "RAL.UCAR", "KNACKWX")
-MODEL_SOURCE_PRIORITY_OVERRIDES: dict[str, tuple[str, ...]] = {
-    # Among backup feeds, prefer complete pressure/wind tracks before RAL's track-only UEMN.
-    "UKMO_EPS": ("APIHUB", "DMDW", "KNACKWX", "POLARWX", "RAL.UCAR", "RAW.GITHUB", "SMCA.FUN"),
-}
+MODEL_SOURCE_PRIORITY_OVERRIDES: dict[str, tuple[str, ...]] = {}
+PRESSURE_PREFERRED_MODELS = frozenset(("UKMO_EPS",))
+DMDW_ENABLED_MODEL_IDS = frozenset((
+    "CMC",
+    "CMC_EPS",
+    "ECMWF",
+    "ECMWF_AIFS",
+    "ECMWF_AIFS_EPS",
+    "ECMWF_EPS",
+    "FNMOC_EPS",
+    "GFS",
+    "GFS_EPS",
+    "HAFS",
+    "HWRF",
+    "JGSM",
+    "KIM_3h",
+    "KIM_6h",
+    "KIM_EPS",
+    "NAVGEM",
+    "TEPS",
+    "UKM",
+))
 SOURCE_DISPLAY_NAMES = {
     "APIHUB": "KMA APIHUB",
     "DMDW": "KMA DMDW",
@@ -389,7 +407,7 @@ MS_PER_KT = 0.514444
 KMA_URL_BASE = (os.getenv("KMA_APIHUB_BASE_URL") or "https://apihub-pub.kma.go.kr/api/typ01/url").rstrip("/")
 KMA_FALLBACK_URL_BASE = (os.getenv("KMA_APIHUB_FALLBACK_BASE_URL") or "https://apihub.kma.go.kr/api/typ01/url").rstrip("/")
 SMCA_TYPHOON_API_BASE = (os.getenv("SMCA_TYPHOON_API_BASE_URL") or "https://smca.fun/api/typhoon_msg/").rstrip("/")
-SMCA_PERSISTED_MODEL_IDS = ("AICON", "AIFSM")
+SMCA_PERSISTED_MODEL_IDS = ("AICON", "AIFSM", "AIGFS")
 KMA_BASE_URL = f"{KMA_URL_BASE}/typ_gts_now.php"
 KMA_TYP_NOW_URL = f"{KMA_URL_BASE}/typ_now.php"
 KMA_TD_NOW_URL = f"{KMA_URL_BASE}/td_now.php"
@@ -1355,7 +1373,7 @@ def read_dmdw_json(path: Path, settings: Settings) -> pd.DataFrame:
 
         raw_model_id = str(model.get("model_id") or "").strip()
         model_id = MODEL_SOURCE_ALIASES.get(raw_model_id, raw_model_id)
-        if model_id not in MODEL_NAMES:
+        if model_id not in DMDW_ENABLED_MODEL_IDS:
             continue
         lead_hour = dmdw_value(point, column_index, "lead_hour")
         if not isinstance(lead_hour, int) or lead_hour < 0 or lead_hour > settings.fcst_hours:
@@ -1652,6 +1670,14 @@ def smca_payload(text: str | None) -> dict | None:
     return payload
 
 
+def smca_response_ids(data: dict) -> set[str]:
+    return {
+        str(data.get(key) or "").strip()
+        for key in ("tfbh", "ident")
+        if str(data.get(key) or "").strip()
+    }
+
+
 def smca_cycle_snapshot_payload(
     text: str | None,
     settings: Settings,
@@ -1665,8 +1691,7 @@ def smca_cycle_snapshot_payload(
     data = payload.get("data")
     if not isinstance(data, dict):
         return None
-    response_id = str(data.get("ident") or data.get("tfbh") or "").strip()
-    if response_id != typhoon_id:
+    if typhoon_id not in smca_response_ids(data):
         return None
 
     target_cycle = normalize_utc_stamp(settings.data_time)
@@ -1782,9 +1807,10 @@ def read_smca_json(text: str | None, settings: Settings, *, typhoon_id: str = ""
     data = payload.get("data")
     if not isinstance(data, dict):
         return empty_smca_frame()
-    response_id = str(data.get("ident") or data.get("tfbh") or "").strip()
-    if typhoon_id and response_id != typhoon_id:
-        print(f"Warning: SMCA.FUN storm mismatch: requested {typhoon_id}, received {response_id or 'unknown'}")
+    response_ids = smca_response_ids(data)
+    if typhoon_id and typhoon_id not in response_ids:
+        received = ", ".join(sorted(response_ids)) or "unknown"
+        print(f"Warning: SMCA.FUN storm mismatch: requested {typhoon_id}, received {received}")
         return empty_smca_frame()
 
     target_cycle = normalize_utc_stamp(settings.data_time)
@@ -2839,6 +2865,12 @@ def source_priority_for_model(model_name: str, settings: Settings) -> tuple[str,
     return tuple(priority)
 
 
+def source_has_pressure_data(frame: pd.DataFrame) -> bool:
+    if frame.empty or "PS" not in frame:
+        return False
+    return bool(pd.to_numeric(frame["PS"], errors="coerce").gt(0).any())
+
+
 
 def row_inside_120_domain(row: pd.Series) -> bool:
     try:
@@ -2962,10 +2994,23 @@ def select_model_sources_by_priority(df: pd.DataFrame, settings: Settings) -> pd
         priority = source_priority_for_model(model_name, settings)
         ordered_sources = [source for source in priority if source in source_frames]
         ordered_sources.extend(sorted(source for source in source_frames if source not in priority))
+        requested_source = dict(settings.source_overrides).get(model_name)
+        requested_source_available = bool(requested_source and requested_source in source_frames)
+        selection_reason = "source priority"
+        if model_name in PRESSURE_PREFERRED_MODELS and not requested_source_available:
+            pressure_sources = [
+                source for source in ordered_sources
+                if source_has_pressure_data(source_frames[source])
+            ]
+            if pressure_sources and len(pressure_sources) < len(ordered_sources):
+                ordered_sources = [
+                    *pressure_sources,
+                    *[source for source in ordered_sources if source not in pressure_sources],
+                ]
+                selection_reason = "pressure availability, then source priority"
         best_source = ordered_sources[0]
         best_df = source_frames[best_source]
         skipped = ordered_sources[1:]
-        requested_source = dict(settings.source_overrides).get(model_name)
         if requested_source and requested_source not in source_frames:
             print(
                 f"{model_name}: requested {source_display_name(requested_source)} unavailable; "
@@ -2973,7 +3018,7 @@ def select_model_sources_by_priority(df: pd.DataFrame, settings: Settings) -> pd
             )
         if skipped:
             print(
-                f"{model_name}: selected {source_display_name(best_source)} by source priority; "
+                f"{model_name}: selected {source_display_name(best_source)} by {selection_reason}; "
                 f"skipped {', '.join(source_display_name(source) for source in skipped)}"
             )
         selected_frames.append(best_df)

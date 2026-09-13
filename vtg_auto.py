@@ -81,6 +81,7 @@ MANIFEST_METADATA_KEYS = (
     "source_availability_path",
     "smca_aicon_snapshot_path",
     "smca_aifsm_snapshot_path",
+    "smca_aigfs_snapshot_path",
     "no_output",
     "no_output_reason",
 )
@@ -4691,6 +4692,7 @@ def collect_changed_asset_paths(
                     "source_availability_path",
                     "smca_aicon_snapshot_path",
                     "smca_aifsm_snapshot_path",
+                    "smca_aigfs_snapshot_path",
                 ):
                     availability_path = str(metadata.get(availability_key) or "").strip()
                     if availability_path and (PROJECT_ROOT / availability_path).exists():
