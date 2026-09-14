@@ -402,6 +402,7 @@ for row in MODEL_SOURCES:
 
 DATA_SOURCE_COLUMN = "_DATA_SOURCE"
 RAW_MODEL_COLUMN = "_RAW_MODEL"
+KIM_6H_FALLBACK_START_COLUMN = "_KIM_6H_FALLBACK_START"
 MODEL_ALIAS_PRIORITY_COLUMN = "_MODEL_ALIAS_PRIORITY"
 MS_PER_KT = 0.514444
 KMA_URL_BASE = (os.getenv("KMA_APIHUB_BASE_URL") or "https://apihub-pub.kma.go.kr/api/typ01/url").rstrip("/")
@@ -3215,10 +3216,90 @@ def excessive_motion_cutoff(track: pd.DataFrame, *, max_speed_kmh: float = MODEL
     return None
 
 
+def replace_kim_3h_motion_segments(df: pd.DataFrame) -> pd.DataFrame:
+    """Try one native 6h interval per KIM_3h speed failure, never a wider bridge."""
+    identity_columns = ["YY", "TYP", "TYP_TM(UTC)", DATA_SOURCE_COLUMN]
+    if not set(identity_columns).issubset(df.columns):
+        return df
+    fine_mask = df["SRC"].eq("KIM_3h")
+    coarse_mask = df["SRC"].eq("KIM_6h")
+    if not fine_mask.any() or not coarse_mask.any():
+        return df
+
+    coarse_groups = df.loc[coarse_mask].groupby(identity_columns, dropna=False)
+    frames = [df.loc[~fine_mask]]
+    for identity, original in df.loc[fine_mask].groupby(identity_columns, dropna=False):
+        if any(pd.isna(value) for value in identity) or identity not in coarse_groups.groups:
+            frames.append(original)
+            continue
+        fine = original.copy()
+        coarse = coarse_groups.get_group(identity).copy()
+        for track in (fine, coarse):
+            track["TMD"] = pd.to_numeric(track["TMD"], errors="coerce")
+            track.sort_values(["TMD", "FT_TM(UTC)", "SEQ"], kind="stable", inplace=True)
+        coarse_cutoff = excessive_motion_cutoff(coarse)
+        if coarse_cutoff is not None:
+            coarse = coarse[coarse["TMD"].lt(coarse_cutoff[0])]
+
+        while (cutoff := excessive_motion_cutoff(fine)) is not None:
+            end = math.ceil(cutoff[0] / 6) * 6
+            start = end - 6
+            interval = fine[fine["TMD"].between(start, end)]
+            # Missing endpoints or an already-6h step must not widen the fallback.
+            if start < 0 or interval["TMD"].tolist() != [start, start + 3, end]:
+                break
+            previous = fine[fine["TMD"].lt(cutoff[0])].tail(1)
+            if previous.empty or float(previous.iloc[0]["TMD"]) < start:
+                break
+            replacement = coarse[coarse["TMD"].isin([start, end])].copy()
+            if replacement["TMD"].tolist() != [start, end]:
+                break
+            valid_coordinates = (
+                pd.to_numeric(replacement["LAT"], errors="coerce").between(-90, 90)
+                & pd.to_numeric(replacement["LON"], errors="coerce").between(-180, 180)
+            )
+            if not valid_coordinates.all():
+                break
+            if not all(
+                normalize_utc_stamp(row["FT_TM(UTC)"])
+                == normalize_utc_stamp(interval[interval["TMD"].eq(row["TMD"])].iloc[0]["FT_TM(UTC)"])
+                for _, row in replacement.iterrows()
+            ):
+                break
+
+            boundary = pd.concat([
+                fine[fine["TMD"].lt(start)].tail(1),
+                replacement,
+                fine[fine["TMD"].gt(end)].head(1),
+            ], ignore_index=True)
+            if excessive_motion_cutoff(boundary) is not None or signed_dateline_crossing_cutoff(boundary) is not None:
+                break
+
+            replacement["SRC"] = "KIM_3h"
+            replacement[RAW_MODEL_COLUMN] = "KIM_6h"
+            # Preserve the preceding interval's audit marker at a shared endpoint.
+            if KIM_6H_FALLBACK_START_COLUMN in fine:
+                replacement[KIM_6H_FALLBACK_START_COLUMN] = replacement["TMD"].map(
+                    fine.set_index("TMD")[KIM_6H_FALLBACK_START_COLUMN]
+                )
+            replacement.loc[replacement["TMD"].eq(end), KIM_6H_FALLBACK_START_COLUMN] = start
+            fine = pd.concat([
+                fine[~fine["TMD"].between(start, end)], replacement,
+            ], ignore_index=True).sort_values("TMD", kind="stable")
+            print(
+                f"KIM_3h {source_display_name(str(identity[-1]))}: replaced {start:g}-{end:g}h "
+                f"with KIM_6h after excessive forecast motion ({cutoff[1]:.0f} km/h); "
+                "6h interval and both boundaries passed motion QC."
+            )
+        frames.append(fine)
+    return pd.concat(frames, ignore_index=True)
+
+
 def trim_excessive_motion_tracks(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty or DATA_SOURCE_COLUMN not in df.columns:
         return df
 
+    df = replace_kim_3h_motion_segments(df)
     frames: list[pd.DataFrame] = []
     for (model_name, source_name), track in df.groupby(["SRC", DATA_SOURCE_COLUMN], dropna=False):
         if str(model_name) == "KMA":
@@ -4228,6 +4309,18 @@ def write_run_metadata(
         "target_model_count": active_model_target_count(settings),
         "models": model_names,
         "model_labels": model_labels,
+        "motion_qc_fallbacks": [
+            {
+                "model": "KIM_3h",
+                "fallback_model": "KIM_6h",
+                "source": row[DATA_SOURCE_COLUMN],
+                "start_lead_hour": float(row[KIM_6H_FALLBACK_START_COLUMN]),
+                "end_lead_hour": float(row["TMD"]),
+            }
+            for _, row in df.loc[df.get(
+                KIM_6H_FALLBACK_START_COLUMN, pd.Series(index=df.index, dtype=float),
+            ).notna()].iterrows()
+        ],
         "skip_atcf": settings.skip_atcf,
         **source_availability_metadata_paths(settings),
         **smca_snapshot_metadata_paths(settings),
