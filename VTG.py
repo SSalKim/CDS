@@ -120,7 +120,7 @@ MODEL_SOURCES = [
     {"name": "HWRF", "apihub": "HWRF", "noaa": "HWRF", "ral_ucar": "HWRF", "knackwx": "HWRF", "polarwx": "hwrf"},
     {"name": "HAFS", "apihub": "HAFS", "noaa": "HFSA", "ral_ucar": "HFSA", "knackwx": "HFSA", "polarwx": "hafsa"},
     {"name": "ECMWF_AIFS", "apihub": "ECMWF_AIFS", "noaa": "AIFS", "knackwx": "AIFS", "polarwx": "aifs", "smca": "AIFS"},
-    {"name": "ECMWF_AIFS_EPS", "apihub": None, "noaa": "EAIM", "knackwx": "EAMN", "polarwx": "aifs_ens_mean", "smca": "AIFSM"},
+    {"name": "ECMWF_AIFS_EPS", "apihub": None, "noaa": "EAIM", "knackwx": "EAIM", "polarwx": "aifs_ens_mean", "smca": "AIFSM"},
     {"name": "AGFS", "apihub": None, "noaa": "AGFS", "knackwx": "AGFS", "polarwx": "aigfs", "smca": "AIGFS"},
     {"name": "AIGEFS", "apihub": None, "noaa": "AIMN", "knackwx": "AIMN", "smca": "AIGEFSM"},
     {"name": "AICON", "apihub": None, "smca": "AICON"},
