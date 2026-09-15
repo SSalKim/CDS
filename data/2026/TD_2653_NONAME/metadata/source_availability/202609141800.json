@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260915014015",
-  "generated_at_kst": "2026-09-15 10:40 KST",
+  "generated_at_utc": "20260915015015",
+  "generated_at_kst": "2026-09-15 10:50 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_53",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 24,
-  "selected_model_count": 15,
+  "model_source_count": 30,
+  "selected_model_count": 17,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -40,7 +40,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": true,
-      "point_count": 21,
+      "point_count": 31,
       "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
@@ -66,6 +66,23 @@
       "first_seen_kst": "2026-09-15 09:50 KST"
     },
     {
+      "model_id": "CTCX",
+      "model_label": "COAMPS-TC",
+      "raw_model_ids": [
+        "CTCX"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 5,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260915015015",
+      "first_seen_kst": "2026-09-15 10:50 KST"
+    },
+    {
       "model_id": "ECMWF",
       "model_label": "ECMWF",
       "raw_model_ids": [
@@ -81,6 +98,23 @@
       "is_official": false,
       "first_seen_utc": "20260915003014",
       "first_seen_kst": "2026-09-15 09:30 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMF"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 6,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260915015015",
+      "first_seen_kst": "2026-09-15 10:50 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -108,7 +142,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 29,
+      "point_count": 31,
       "max_lead_hour": 222,
       "has_pressure": true,
       "has_wind": true,
@@ -287,6 +321,23 @@
       "first_seen_kst": "2026-09-15 09:10 KST"
     },
     {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HFSA"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 22,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260915015015",
+      "first_seen_kst": "2026-09-15 10:50 KST"
+    },
+    {
       "model_id": "HWRF",
       "model_label": "HWRF",
       "raw_model_ids": [
@@ -302,6 +353,23 @@
       "is_official": false,
       "first_seen_utc": "20260915004015",
       "first_seen_kst": "2026-09-15 09:40 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "HWRF"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 22,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260915015015",
+      "first_seen_kst": "2026-09-15 10:50 KST"
     },
     {
       "model_id": "JGSM",
@@ -389,6 +457,23 @@
       "first_seen_kst": "2026-09-15 07:00 KST"
     },
     {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260915015015",
+      "first_seen_kst": "2026-09-15 10:50 KST"
+    },
+    {
       "model_id": "WNC",
       "model_label": "WeatherNext2 Cyclones",
       "raw_model_ids": [
@@ -438,6 +523,23 @@
       "is_official": false,
       "first_seen_utc": "20260915011014",
       "first_seen_kst": "2026-09-15 10:10 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260915015015",
+      "first_seen_kst": "2026-09-15 10:50 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2653_NONAME/metadata/source_availability/202609141800.json"
