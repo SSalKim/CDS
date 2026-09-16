@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260916171017",
-  "generated_at_kst": "2026-09-17 02:10 KST",
+  "generated_at_utc": "20260916172020",
+  "generated_at_kst": "2026-09-17 02:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_25",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 5,
-  "selected_model_count": 4,
+  "model_source_count": 7,
+  "selected_model_count": 5,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -49,6 +49,23 @@
       "first_seen_kst": "2026-09-17 01:00 KST"
     },
     {
+      "model_id": "AGFS",
+      "model_label": "AIGFS",
+      "raw_model_ids": [
+        "AIGFS"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260916172020",
+      "first_seen_kst": "2026-09-17 02:20 KST"
+    },
+    {
       "model_id": "GFS",
       "model_label": "GFS",
       "raw_model_ids": [
@@ -64,6 +81,23 @@
       "is_official": false,
       "first_seen_utc": "20260916171017",
       "first_seen_kst": "2026-09-17 02:10 KST"
+    },
+    {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "GFS"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 27,
+      "max_lead_hour": 156,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260916172020",
+      "first_seen_kst": "2026-09-17 02:20 KST"
     },
     {
       "model_id": "JGSM",
@@ -118,5 +152,6 @@
     }
   ],
   "source_availability_path": "data/2026/TYP_2625_DUJUAN/metadata/source_availability/202609161200.json",
-  "smca_aicon_snapshot_path": "data/2026/TYP_2625_DUJUAN/metadata/smca/AICON/202609161200.json"
+  "smca_aicon_snapshot_path": "data/2026/TYP_2625_DUJUAN/metadata/smca/AICON/202609161200.json",
+  "smca_aigfs_snapshot_path": "data/2026/TYP_2625_DUJUAN/metadata/smca/AIGFS/202609161200.json"
 }
