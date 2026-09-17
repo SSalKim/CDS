@@ -31,6 +31,27 @@ import matplotlib.ticker as mticker
 import pandas as pd
 import requests
 
+from vtg_sources import (
+    DMDW_ENABLED_MODEL_IDS,
+    MODEL_ALIAS_PRIORITIES,
+    MODEL_SOURCE_ALIASES,
+    MODEL_SOURCE_PRIORITY_OVERRIDES,
+    MODEL_SOURCES,
+    PRESSURE_PREFERRED_MODELS,
+    RAW_GITHUB_MODELS,
+    SMCA_PERSISTED_MODEL_IDS,
+    SMCA_SNAPSHOT_KEYS,
+    SOURCE_ALIASES,
+    SOURCE_DISPLAY_NAMES,
+    SOURCE_IDENTIFIER_COLUMNS,
+    SOURCE_MODEL_IDS,
+    SOURCE_ORDER,
+    expected_raw_model_id,
+    polarwx_keys,
+    render_code_signature,
+    smca_keys,
+)
+
 
 KMA_COLUMNS = [
     "FT", "YY", "TYP", "SEQ", "TMD", "TYP_TM(UTC)", "FT_TM(UTC)",
@@ -90,57 +111,6 @@ MODEL_INFO = [
     {"name": "HKO_AREC", "color": "#1E90FF", "style": "--", "label": "Aurora-ECMWF", "zorder": 56},
     {"name": "HKO_FXEC", "color": "#20B2AA", "style": "--", "label": "FuXi-ECMWF", "zorder": 55},
     {"name": "HKO_FWEC", "color": "#A6C875", "style": "--", "label": "FengWu-ECMWF", "zorder": 54},
-]
-
-MODEL_SOURCES = [
-    {"name": "ECMWF", "apihub": "ECMWF", "noaa": "ECMF", "knackwx": "ECMF", "polarwx": "ecm", "smca": "ECMWF"},
-    {"name": "ECMWF_EPS", "apihub": "ECMWF_EPS", "noaa": "EEMN", "knackwx": "EEMN", "polarwx": "eps_mean", "smca": "ECMWFM"},
-    {"name": "KIM_3h", "apihub": "KIM_3h", "noaa": None},
-    {"name": "KIM_6h", "apihub": "KIM_6h", "noaa": None},
-    {"name": "KIM_GFDL_6h", "apihub": "KIM_GFDL_6h", "noaa": None},
-    {"name": "KIM_EPS", "apihub": "KIM_EPS", "noaa": None},
-    {"name": "UM", "apihub": "UM", "noaa": None},
-    {"name": "UM_GFDL_6h", "apihub": "UM_GFDL_6h", "noaa": None},
-    {"name": "UM_KEPS", "apihub": "UM_KEPS", "noaa": None},
-    {"name": "UKM", "apihub": "UKX", "noaa": "UKM", "ral_ucar": "UKM", "knackwx": "UKM", "polarwx": "ukmet"},
-    {"name": "UKMO_EPS", "apihub": "EGRR_EPS", "noaa": "UEMN", "ral_ucar": "UEMN", "knackwx": "UEMN", "polarwx": "ukmet_mean"},
-    {"name": "GFS", "apihub": "GFS", "noaa": "AVNO", "ral_ucar": "AVNO", "knackwx": "AVNO", "polarwx": "gfs", "smca": "GFS"},
-    {"name": "GFS_EPS", "apihub": "GFS_EPS", "noaa": "AEMN", "ral_ucar": "AEMN", "knackwx": "AEMN", "polarwx": "gefs_mean", "smca": "GEFSM"},
-    {"name": "CMC", "apihub": "CMC", "noaa": "CMC", "ral_ucar": "CMC", "knackwx": "CMC", "polarwx": "cmc"},
-    {"name": "CMC_EPS", "apihub": "CMC_EPS", "noaa": "CEMN", "ral_ucar": "CEMN", "knackwx": "CEMN", "polarwx": "cmc_mean"},
-    {"name": "JGSM", "apihub": "JGSM", "noaa": "JGSM", "ral_ucar": "JGSM", "knackwx": "JGSM"},
-    {"name": "TEPS", "apihub": "TEPS", "noaa": "JENS", "ral_ucar": "JENS", "knackwx": "JENS"},
-    {"name": "NAVGEM", "apihub": "NAVGEM", "noaa": "NVGM", "ral_ucar": "NVGM", "knackwx": "NVGM"},
-    {"name": "FNMOC_EPS", "apihub": "FNMOC_EPS", "noaa": "NEMN", "ral_ucar": "NEMN", "knackwx": "NEMN"},
-    {"name": "ICON", "apihub": None, "polarwx": "icon"},
-    {"name": "ICON_EPS", "apihub": None, "polarwx": "icon_ens_mean"},
-    {"name": "CTCX", "apihub": None, "noaa": "CTCX", "ral_ucar": "CTCX", "knackwx": "CTCX"},
-    {"name": "COAMPS_EPS", "apihub": None, "noaa": "CTMN", "ral_ucar": "CTMN", "knackwx": "CTMN"},
-    {"name": "AFUM", "apihub": None, "noaa": "AFUM"},
-    {"name": "HWRF", "apihub": "HWRF", "noaa": "HWRF", "ral_ucar": "HWRF", "knackwx": "HWRF", "polarwx": "hwrf"},
-    {"name": "HAFS", "apihub": "HAFS", "noaa": "HFSA", "ral_ucar": "HFSA", "knackwx": "HFSA", "polarwx": "hafsa"},
-    {"name": "ECMWF_AIFS", "apihub": "ECMWF_AIFS", "noaa": "AIFS", "knackwx": "AIFS", "polarwx": "aifs", "smca": "AIFS"},
-    {"name": "ECMWF_AIFS_EPS", "apihub": None, "noaa": "EAIM", "knackwx": "EAIM", "polarwx": "aifs_ens_mean", "smca": "AIFSM"},
-    {"name": "AGFS", "apihub": None, "noaa": "AGFS", "knackwx": "AGFS", "polarwx": "aigfs", "smca": "AIGFS"},
-    {"name": "AIGEFS", "apihub": None, "noaa": "AIMN", "knackwx": "AIMN", "smca": "AIGEFSM"},
-    {"name": "AICON", "apihub": None, "smca": "AICON"},
-    {"name": "IFEC_AI", "apihub": "IFEC_AI", "noaa": None},
-    {"name": "IFKM_AI", "apihub": "IFKM_AI", "noaa": None},
-    {"name": "FNEC_AI", "apihub": "FNEC_AI", "noaa": None},
-    {"name": "FNKM_AI", "apihub": "FNKM_AI", "noaa": None},
-    {"name": "FNUM_AI", "apihub": "FNUM_AI", "noaa": None},
-    {"name": "PGEC_AI", "apihub": "PGEC_AI", "noaa": None},
-    {"name": "PGKM_AI", "apihub": "PGKM_AI", "noaa": None},
-    {"name": "PGUM_AI", "apihub": "PGUM_AI", "noaa": None},
-    {"name": "GCEC_AI", "apihub": "GCEC_AI", "noaa": None},
-    {"name": "GCKM_AI", "apihub": "GCKM_AI", "noaa": None},
-    {"name": "GCUM_AI", "apihub": "GCUM_AI", "noaa": None},
-    {"name": "GENC", "apihub": None, "noaa": None, "knackwx": "GENC", "raw_github": "GENC", "polarwx": "gencast"},
-    {"name": "WNC", "apihub": None, "noaa": "FGNE", "knackwx": "FNV3", "raw_github": "FNV3", "polarwx": "deepmind", "smca": "WN2C"},
-    {"name": "WNV3", "apihub": None, "knackwx": "WNV3", "raw_github": "WNV3", "smca": "WN3C"},
-    {"name": "HKO_AREC", "apihub": "HKO_AREC", "noaa": None},
-    {"name": "HKO_FXEC", "apihub": "HKO_FXEC", "noaa": None},
-    {"name": "HKO_FWEC", "apihub": "HKO_FWEC", "noaa": None},
 ]
 
 MODEL_CATEGORIES = {
@@ -269,137 +239,6 @@ KNACKWX_MAX_LEAD_GAP_HOURS = float(os.getenv("VTG_KNACKWX_MAX_LEAD_GAP_HOURS", "
 
 MODEL_NAMES = {model["name"] for model in MODEL_INFO}
 
-SOURCE_ORDER = ("APIHUB", "DMDW", "RAW.GITHUB", "POLARWX", "SMCA.FUN", "RAL.UCAR", "KNACKWX")
-MODEL_SOURCE_PRIORITY_OVERRIDES: dict[str, tuple[str, ...]] = {}
-PRESSURE_PREFERRED_MODELS = frozenset(("UKMO_EPS",))
-DMDW_ENABLED_MODEL_IDS = frozenset((
-    "CMC",
-    "CMC_EPS",
-    "ECMWF",
-    "ECMWF_AIFS",
-    "ECMWF_AIFS_EPS",
-    "ECMWF_EPS",
-    "FNMOC_EPS",
-    "GFS",
-    "GFS_EPS",
-    "HAFS",
-    "HWRF",
-    "JGSM",
-    "KIM_3h",
-    "KIM_6h",
-    "KIM_EPS",
-    "NAVGEM",
-    "TEPS",
-    "UKM",
-))
-SOURCE_DISPLAY_NAMES = {
-    "APIHUB": "KMA APIHUB",
-    "DMDW": "KMA DMDW",
-    "NOAA": "NOAA ATCF",
-    "POLARWX": "POLARWX",
-    "SMCA.FUN": "SMCA.FUN",
-    "RAL.UCAR": "RAL UCAR ATCF",
-    "KNACKWX": "KNACKWX ATCF",
-    "RAW.GITHUB": "GITHUB",
-}
-SOURCE_ALIASES = {
-    "APIHUB": "APIHUB",
-    "KMAAPIHUB": "APIHUB",
-    "DMDW": "DMDW",
-    "KMADMDW": "DMDW",
-    "NOAA": "NOAA",
-    "ATCF": "NOAA",
-    "NCEP": "NOAA",
-    "NOAAATCF": "NOAA",
-    "POLARWX": "POLARWX",
-    "POLAR": "POLARWX",
-    "SMCAFUN": "SMCA.FUN",
-    "SMCA": "SMCA.FUN",
-    "RALUCAR": "RAL.UCAR",
-    "UCAR": "RAL.UCAR",
-    "RAL": "RAL.UCAR",
-    "KNACKWX": "KNACKWX",
-    "KNACK": "KNACKWX",
-    "APIKNACKWX": "KNACKWX",
-    "EMCNCEP": "NOAA",
-    "NCEPATCF": "NOAA",
-    "EMCNCEPATCF": "NOAA",
-    "RAWGITHUB": "RAW.GITHUB",
-    "GITHUB": "RAW.GITHUB",
-    "GDM": "RAW.GITHUB",
-}
-SOURCE_IDENTIFIER_COLUMNS = {
-    "APIHUB": "apihub",
-    "DMDW": "dmdw",
-    "NOAA": "noaa",
-    "POLARWX": "polarwx",
-    "SMCA.FUN": "smca",
-    "RAL.UCAR": "ral_ucar",
-    "KNACKWX": "knackwx",
-    "RAW.GITHUB": "raw_github",
-}
-SOURCE_MODEL_IDS = {
-    source: {
-        row[column]
-        for row in MODEL_SOURCES
-        if (column := SOURCE_IDENTIFIER_COLUMNS[source]) and row.get(column)
-    }
-    for source in SOURCE_ORDER
-}
-MODEL_SOURCE_ALIASES = {
-    row[column]: row["name"]
-    for row in MODEL_SOURCES
-    for column in SOURCE_IDENTIFIER_COLUMNS.values()
-    if row.get(column)
-}
-MODEL_ALIAS_PRIORITIES: dict[str, int] = {}
-for row in MODEL_SOURCES:
-    for source, column in SOURCE_IDENTIFIER_COLUMNS.items():
-        model_id = row.get(column)
-        if not model_id:
-            continue
-
-        MODEL_ALIAS_PRIORITIES.setdefault(model_id, 0)
-
-        alias_ids = []
-        if source == "APIHUB" and model_id == "ECMWF":
-            alias_ids.extend(["ECMWF_TIGGE", "ECM_SPR_D"])
-        if source == "NOAA" and model_id == "ECMWF":
-            alias_ids.extend(["ECMO", "EMX"])
-        if source == "APIHUB" and model_id == "ECMWF_EPS":
-            alias_ids.extend(["ECM_SPR_E"])
-        if source == "APIHUB" and model_id == "UM_KEPS":
-            alias_ids.extend(["KEPS"])
-        if source == "NOAA" and model_id == "UKM":
-            alias_ids.extend(["EGRR"])
-        if source == "APIHUB" and model_id == "GFS":
-            alias_ids.extend(["GFS_TIGGE", "NCEP_TIGGE"])
-        if source == "APIHUB" and model_id == "CMC":
-            alias_ids.extend(["CMSC"])
-        if source == "APIHUB" and model_id == "CMC_EPS":
-            alias_ids.extend(["CMSC_EPS"])
-        if source == "APIHUB" and model_id == "NAVGEM":
-            alias_ids.extend(["NOGAPS"])
-
-        if model_id.endswith("_AI"):
-            alias_ids.append(model_id[:-3])
-        if source == "APIHUB" and model_id == "GCEC_AI":
-            alias_ids.extend(["GPEC"])
-        if source == "APIHUB" and model_id == "GCKM_AI":
-            alias_ids.extend(["GPKM"])
-        if source == "APIHUB" and model_id == "GCUM_AI":
-            alias_ids.extend(["GPUM"])
-
-        if source == "APIHUB" and model_id == "ECMWF_AIFS":
-            alias_ids.extend(["ECMF_AIFS"])
-
-
-        for alias_priority, alias_id in enumerate(alias_ids, start=1):
-            MODEL_SOURCE_ALIASES.setdefault(alias_id, row["name"])
-            if source in SOURCE_MODEL_IDS:
-                SOURCE_MODEL_IDS[source].add(alias_id)
-            MODEL_ALIAS_PRIORITIES.setdefault(alias_id, alias_priority)
-
 DATA_SOURCE_COLUMN = "_DATA_SOURCE"
 RAW_MODEL_COLUMN = "_RAW_MODEL"
 KIM_6H_FALLBACK_START_COLUMN = "_KIM_6H_FALLBACK_START"
@@ -408,7 +247,6 @@ MS_PER_KT = 0.514444
 KMA_URL_BASE = (os.getenv("KMA_APIHUB_BASE_URL") or "https://apihub-pub.kma.go.kr/api/typ01/url").rstrip("/")
 KMA_FALLBACK_URL_BASE = (os.getenv("KMA_APIHUB_FALLBACK_BASE_URL") or "https://apihub.kma.go.kr/api/typ01/url").rstrip("/")
 SMCA_TYPHOON_API_BASE = (os.getenv("SMCA_TYPHOON_API_BASE_URL") or "https://smca.fun/api/typhoon_msg/").rstrip("/")
-SMCA_PERSISTED_MODEL_IDS = ("AICON", "AIFSM", "AIGFS")
 KMA_BASE_URL = f"{KMA_URL_BASE}/typ_gts_now.php"
 KMA_TYP_NOW_URL = f"{KMA_URL_BASE}/typ_now.php"
 KMA_TD_NOW_URL = f"{KMA_URL_BASE}/td_now.php"
@@ -1434,9 +1272,6 @@ def storm_numbers(settings: Settings) -> set[int]:
     return {int(atcf_id[2:4]) for atcf_id in ids}
 
 
-RAW_GITHUB_MODELS = ("GENC", "FNV3", "WNV3")
-
-
 def raw_github_url(settings: Settings, model: str) -> str:
     data_dt = datetime.strptime(settings.data_time, "%Y%m%d%H%M")
     date_path = data_dt.strftime("%Y/%m/%d")
@@ -1481,14 +1316,6 @@ def polarwx_url(atcf_id: str, data_time: str) -> str:
     atcf_id = str(atcf_id or "").strip().lower()
     cycle = normalize_utc_stamp(data_time)[:10]
     return f"https://polarwx.com/data/tropical/storms/{atcf_id}/ensembles/{cycle}.json"
-
-
-def polarwx_keys() -> dict[str, str]:
-    return {
-        str(row.get("polarwx") or "").strip().lower(): row["name"]
-        for row in MODEL_SOURCES
-        if str(row.get("polarwx") or "").strip()
-    }
 
 
 def empty_polarwx_frame() -> pd.DataFrame:
@@ -1613,14 +1440,6 @@ def smca_url(settings: Settings) -> str:
     return f"{SMCA_TYPHOON_API_BASE}/?{urlencode({'typhoonId': typhoon_id})}" if typhoon_id else ""
 
 
-def smca_keys() -> dict[str, str]:
-    return {
-        str(row.get("smca") or "").strip().upper(): row["name"]
-        for row in MODEL_SOURCES
-        if str(row.get("smca") or "").strip()
-    }
-
-
 def empty_smca_frame() -> pd.DataFrame:
     return pd.DataFrame(columns=[*KMA_COLUMNS, RAW_MODEL_COLUMN, DATA_SOURCE_COLUMN, MODEL_ALIAS_PRIORITY_COLUMN])
 
@@ -1652,10 +1471,10 @@ def smca_snapshot_path(settings: Settings, raw_model: str) -> Path:
 
 def smca_snapshot_metadata_paths(settings: Settings) -> dict[str, str]:
     paths: dict[str, str] = {}
-    for raw_model in SMCA_PERSISTED_MODEL_IDS:
+    for raw_model, metadata_key in SMCA_SNAPSHOT_KEYS.items():
         path = smca_snapshot_path(settings, raw_model)
         if path.exists():
-            paths[f"smca_{raw_model.lower()}_snapshot_path"] = relative_project_path(path)
+            paths[metadata_key] = relative_project_path(path)
     return paths
 
 
@@ -2814,18 +2633,6 @@ def trim_discontinuous_forecast(group: pd.DataFrame, *, gap_factor: float = 2.5)
 
 def source_display_name(source: str) -> str:
     return SOURCE_DISPLAY_NAMES.get(source, source)
-
-
-def expected_raw_model_id(model_name: str, source_name: str) -> str:
-    if source_name == "DMDW":
-        return ""
-    source_column = SOURCE_IDENTIFIER_COLUMNS.get(source_name)
-    if not source_column:
-        return ""
-    for row in MODEL_SOURCES:
-        if row.get("name") == model_name:
-            return str(row.get(source_column) or "").strip()
-    return ""
 
 
 def normalized_raw_model_ids(model_name: str, source_name: str, observed_ids: Iterable[str]) -> list[str]:
@@ -4255,10 +4062,7 @@ def metadata_path_for_settings(settings: Settings) -> Path | None:
 
 
 def render_signature() -> str:
-    try:
-        return hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
-    except OSError:
-        return ""
+    return render_code_signature(PROJECT_ROOT)
 
 
 def next_available_path(path: Path) -> Path:

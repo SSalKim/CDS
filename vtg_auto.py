@@ -20,6 +20,8 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+from vtg_sources import SMCA_SNAPSHOT_KEYS, render_code_signature
+
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 KMA_LIST_BASE_URL = (os.getenv("KMA_APIHUB_BASE_URL") or "https://apihub-pub.kma.go.kr/api/typ01/url").rstrip("/")
@@ -79,9 +81,7 @@ MANIFEST_METADATA_KEYS = (
     "model_labels",
     "skip_atcf",
     "source_availability_path",
-    "smca_aicon_snapshot_path",
-    "smca_aifsm_snapshot_path",
-    "smca_aigfs_snapshot_path",
+    *SMCA_SNAPSHOT_KEYS.values(),
     "no_output",
     "no_output_reason",
 )
@@ -4227,10 +4227,7 @@ def prune_status_for_persistence(
 
 
 def current_render_signature() -> str:
-    try:
-        return hashlib.sha256((PROJECT_ROOT / "VTG.py").read_bytes()).hexdigest()
-    except OSError:
-        return ""
+    return render_code_signature(PROJECT_ROOT)
 
 
 def previous_render_signature_matches(previous: dict, render_signature: str) -> bool:
@@ -4690,9 +4687,7 @@ def collect_changed_asset_paths(
                     paths.add(relative_asset_path(PROJECT_ROOT / image_path))
                 for availability_key in (
                     "source_availability_path",
-                    "smca_aicon_snapshot_path",
-                    "smca_aifsm_snapshot_path",
-                    "smca_aigfs_snapshot_path",
+                    *SMCA_SNAPSHOT_KEYS.values(),
                 ):
                     availability_path = str(metadata.get(availability_key) or "").strip()
                     if availability_path and (PROJECT_ROOT / availability_path).exists():

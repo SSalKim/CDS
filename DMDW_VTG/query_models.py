@@ -21,6 +21,13 @@ PROJECT_ROOT = BASE_DIR.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from vtg_sources import (
+    DMDW_ENABLED_MODEL_IDS,
+    DMDW_ENSEMBLE_MODELS,
+    DMDW_MODEL_MAP,
+    ENSEMBLE_MEAN_MODEL_IDS,
+)
+
 LAYER_URL = "https://dmdw.kma.go.kr/uwa/rest/iwa/Typhoon/retLayerInfoTyphoon.json"
 DATA_URL = "https://dmdw.kma.go.kr/uwa/rest/iwa/ObservationSite/retTyphoonDataImg.json"
 
@@ -40,15 +47,6 @@ DMDW_POINT_COLUMNS = [
     "radius_15",
     "member_count",
 ]
-ENSEMBLE_MEAN_MODEL_IDS = {
-    "CMC_EPS",
-    "GFS_EPS",
-    "ECMWF_EPS",
-    "ECMWF_AIFS_EPS",
-    "KIM_EPS",
-    "FNMOC_EPS",
-}
-
 REQUEST_EXTENT = {
     "PROJ": "LCC",
     "STARTX": "-3672626.727296781",
@@ -59,56 +57,6 @@ REQUEST_EXTENT = {
     "chgProjectionLevel": "7",
     "nCntrLonLat": "126.966,37.570999999999756",
 }
-
-DMDW_MODEL_MAP = {
-    "CMC": "CMC",
-    "CMC_EPS": "CMC_EPS",
-    "EC_AIFS": "ECMWF_AIFS",
-    "EC_AIFS_SINGLE": "ECMWF_AIFS",
-    "ECMWF": "ECMWF",
-    "ECMWF_AIFS": "ECMWF_AIFS",
-    "ECMWF_EPS": "ECMWF_EPS",
-    "ECMWF_HRES": "ECMWF",
-    "GEFS": "GFS_EPS",
-    "GFS": "GFS",
-    "GFS_EPS": "GFS_EPS",
-    "HAFS": "HAFS",
-    "HAFS_A": "HAFS",
-    "HAFS-A": "HAFS",
-    "HAFS_B": "HAFS",
-    "HAFS-B": "HAFS",
-    "HWRF": "HWRF",
-    "JENS": "TEPS",
-    "JGSM": "JGSM",
-    "KIM": "KIM_6h",
-    "KIM_3H": "KIM_3h",
-    "KIM_6H": "KIM_6h",
-    "KIM_EPS": "KIM_EPS",
-    "NAVGEM": "NAVGEM",
-    "TEPS": "TEPS",
-    "UKMO": "UKM",
-    "UKM": "UKM",
-}
-DMDW_ENABLED_MODEL_IDS = frozenset((
-    "CMC",
-    "CMC_EPS",
-    "ECMWF",
-    "ECMWF_AIFS",
-    "ECMWF_AIFS_EPS",
-    "ECMWF_EPS",
-    "FNMOC_EPS",
-    "GFS",
-    "GFS_EPS",
-    "HAFS",
-    "HWRF",
-    "JGSM",
-    "KIM_3h",
-    "KIM_6h",
-    "KIM_EPS",
-    "NAVGEM",
-    "TEPS",
-    "UKM",
-))
 
 NON_MODEL_LAYER_TOKENS = {
     "NOTICE",
@@ -507,18 +455,9 @@ def normalize_raw_model_id(value: str) -> str:
 
 def mapped_model_id(raw_model_id: str) -> str:
     raw = normalize_raw_model_id(raw_model_id)
-    if re.match(r"^EC_AIFS_MEM_?\d+$", raw):
-        return "ECMWF_AIFS_EPS"
-    if re.match(r"^ECMWF_MEM_?\d+$", raw):
-        return "ECMWF_EPS"
-    if re.match(r"^CMC_MEM_?\d+$", raw):
-        return "CMC_EPS"
-    if re.match(r"^GFS_MEM_?\d+$", raw):
-        return "GFS_EPS"
-    if re.match(r"^KIM_MEM_?\d+$", raw):
-        return "KIM_EPS"
-    if re.match(r"^FNMOC_MEM_?\d+$", raw):
-        return "FNMOC_EPS"
+    member = re.match(r"^(.+)_MEM_?\d+$", raw)
+    if member and member.group(1) in DMDW_ENSEMBLE_MODELS:
+        return DMDW_ENSEMBLE_MODELS[member.group(1)]
     return DMDW_MODEL_MAP.get(raw, raw)
 
 
