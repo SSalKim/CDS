@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260917181151",
-  "generated_at_kst": "2026-09-18 03:11 KST",
+  "generated_at_utc": "20260917182027",
+  "generated_at_kst": "2026-09-18 03:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_25",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 21,
-  "selected_model_count": 11,
+  "model_source_count": 24,
+  "selected_model_count": 13,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -115,6 +115,40 @@
       "is_official": false,
       "first_seen_utc": "20260917181151",
       "first_seen_kst": "2026-09-18 03:11 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 29,
+      "max_lead_hour": 168,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260917182027",
+      "first_seen_kst": "2026-09-18 03:20 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 19,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260917182027",
+      "first_seen_kst": "2026-09-18 03:20 KST"
     },
     {
       "model_id": "GFS",
@@ -235,6 +269,23 @@
       "is_official": false,
       "first_seen_utc": "20260917181151",
       "first_seen_kst": "2026-09-18 03:11 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GEFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260917182027",
+      "first_seen_kst": "2026-09-18 03:20 KST"
     },
     {
       "model_id": "HAFS",
@@ -392,5 +443,6 @@
   ],
   "source_availability_path": "data/2026/TYP_2625_DUJUAN/metadata/source_availability/202609171200.json",
   "smca_aicon_snapshot_path": "data/2026/TYP_2625_DUJUAN/metadata/smca/AICON/202609171200.json",
+  "smca_aifsm_snapshot_path": "data/2026/TYP_2625_DUJUAN/metadata/smca/AIFSM/202609171200.json",
   "smca_aigfs_snapshot_path": "data/2026/TYP_2625_DUJUAN/metadata/smca/AIGFS/202609171200.json"
 }
