@@ -234,6 +234,10 @@ DISPLAY_120_LON_MIN = 100.0
 DISPLAY_120_LON_MAX = 179.9
 DISPLAY_120_LAT_MIN = 0.0
 DISPLAY_120_LAT_MAX = 50.0
+CAMERA_120_SAFE_X = (0.08, 0.92)
+CAMERA_120_SAFE_Y = (0.08, 0.84)
+CAMERA_120_ACCELERATED_TAIL_WEIGHT = 0.25
+CAMERA_120_ACCELERATED_TAIL_SCALE = 1.40
 APIHUB_MODEL_START_MAX_DISTANCE_KM = float(os.getenv("VTG_APIHUB_START_MAX_DISTANCE_KM", "850"))
 MODEL_TRACK_MAX_SPEED_KMH = float(os.getenv("VTG_MODEL_TRACK_MAX_SPEED_KMH", "100"))
 KNACKWX_MAX_LEAD_GAP_HOURS = float(os.getenv("VTG_KNACKWX_MAX_LEAD_GAP_HOURS", "12"))
@@ -4286,12 +4290,14 @@ def numeric_track_points(df: pd.DataFrame) -> pd.DataFrame:
     return points.dropna(subset=["LAT", "LON"])
 
 
-def robust_series_bounds(series: pd.Series) -> tuple[float, float]:
+def robust_series_bounds(
+    series: pd.Series, *, quantiles: tuple[float, float] = (0.05, 0.95),
+) -> tuple[float, float]:
     clean = pd.to_numeric(series, errors="coerce").dropna()
     if clean.empty:
         return 0.0, 0.0
     if len(clean) >= 10:
-        return float(clean.quantile(0.05)), float(clean.quantile(0.95))
+        return float(clean.quantile(quantiles[0])), float(clean.quantile(quantiles[1]))
     return float(clean.min()), float(clean.max())
 
 
@@ -4442,49 +4448,171 @@ def robust_bounds(points: pd.DataFrame, column: str, settings: Settings) -> tupl
     return robust_series_bounds(clean)
 
 
-def auto_120_map_extent(df: pd.DataFrame, settings: Settings) -> list[float] | None:
-    points = extent_points_for_auto_map(df, settings)
+def current_camera_anchor(df: pd.DataFrame, settings: Settings) -> tuple[float, float] | None:
+    """Current position, not the median position over the first forecast day."""
+    points = numeric_track_points(df)
+    points = points[points["LON"].between(-180, 180) & points["LAT"].between(-90, 90)]
+    starts = points[points["TMD"].eq(0)]
+    kma = starts[starts["SRC"].eq("KMA")] if "SRC" in starts else starts.iloc[:0]
+    if not kma.empty:
+        return float(kma.iloc[0]["LON"]), float(kma.iloc[0]["LAT"])
+    analysis = cli_analysis_point(settings)
+    if analysis is not None and all(math.isfinite(value) for value in (analysis.lon, analysis.lat)):
+        return analysis.lon, analysis.lat
+    if "SRC" in starts:
+        starts = starts[starts["SRC"].isin(plotted_model_names(points, settings))]
+    if not starts.empty:
+        return float(starts["LON"].median()), float(starts["LAT"].median())
+    return None
+
+
+def visible_120_camera_tracks(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    points = numeric_track_points(df)
     if points.empty:
-        return None
-
-    # For 120h, the old KMA past track no longer needs to drive the camera.
-    # Use the forecast spread plus the current KMA position only.
-    lead_hours = pd.to_numeric(points["TMD"], errors="coerce")
-    forecast_points = points[lead_hours.between(0, settings.fcst_hours)].copy()
-    if forecast_points.empty:
-        forecast_points = points.copy()
-
-    current_kma = points[points["SRC"].eq("KMA") & lead_hours.eq(0)].copy()
-    non_kma_forecast = forecast_points[forecast_points["SRC"].ne("KMA")].copy()
-    primary = pd.concat([non_kma_forecast, current_kma], ignore_index=True)
-    if primary.empty:
-        primary = forecast_points.copy()
-
-    lat_min, lat_max = robust_bounds(primary, "LAT", settings)
-    lon_min, lon_max = robust_bounds(primary, "LON", settings)
-    lat_span = max(lat_max - lat_min, 7.0)
-    lon_span = max(lon_max - lon_min, 9.0)
-
-    focus_lat = (lat_min + lat_max) / 2
-    focus_lon = (lon_min + lon_max) / 2
-    lon_total = max(21.0, lon_span * 1.18 + 4.2)
-    lat_total = max(9.2, lat_span * 1.28 + 3.0)
-
-    # Mild westward framing bias so the forecast fan appears closer to center.
-    focus_x = 0.57
-    focus_y = 0.40
-
-    lon_min = focus_lon - lon_total * focus_x
-    lon_max = lon_min + lon_total
-    lat_min = focus_lat - lat_total * focus_y
-    lat_max = lat_min + lat_total
-
-    return [
-        lon_min,
-        lon_max,
-        lat_min,
-        lat_max,
+        return pd.DataFrame(columns=["SRC", "LAT", "LON", "TMD"])
+    points = points[
+        points["TMD"].between(0, settings.fcst_hours)
+        & points["LAT"].between(-90, 90)
+        & points["LON"].between(-180, 180)
     ]
+    names = plotted_model_names(points, settings)
+    return points[points["SRC"].isin(names)].copy()
+
+
+def camera_120_points(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    """Sample only visible tracks at equal lead intervals; never alter plotted data."""
+    points = visible_120_camera_tracks(df, settings)
+    frames = []
+    for model, track in points.groupby("SRC"):
+        track = track.drop_duplicates("TMD").sort_values("TMD").set_index("TMD")
+        start, end = float(track.index.min()), float(track.index.max())
+        hours = sorted({start, end, *range(math.ceil(start / 6) * 6, math.floor(end / 6) * 6 + 1, 6)})
+        # Interpolate inside each model's native coverage only. Dense 1h/3h
+        # models must not outweigh 6h models in the camera's spatial quantiles.
+        sampled = track[["LAT", "LON"]].reindex(track.index.union(hours)).sort_index()
+        sampled = sampled.interpolate(method="index", limit_area="inside").loc[hours]
+        sampled["TMD"] = hours
+        sampled["SRC"] = model
+        frames.append(sampled)
+    anchor = current_camera_anchor(df, settings)
+    if anchor is not None:
+        frames.append(pd.DataFrame([{"LON": anchor[0], "LAT": anchor[1], "TMD": 0, "SRC": "KMA"}]))
+    return pd.concat(frames, ignore_index=True) if frames else points.iloc[:0]
+
+
+def camera_120_acceleration_start(track: pd.DataFrame) -> float | None:
+    """Detect a sustained speed step in 6h camera samples, not gradual acceleration."""
+    ordered = track.sort_values("TMD").drop_duplicates("TMD")
+    rows = list(ordered.itertuples())
+    if len(rows) < 8:
+        return None
+    speeds = pd.Series([
+        haversine_km(a.LAT, a.LON, b.LAT, b.LON) / (b.TMD - a.TMD)
+        for a, b in zip(rows, rows[1:])
+    ], dtype=float)
+    early_speed = max(10.0, float(speeds.iloc[:4].median()))
+    for index in range(4, len(speeds) - 2):
+        recent_speed = max(10.0, float(speeds.iloc[index - 3:index].median()))
+        threshold = max(50.0, early_speed * 3.0, recent_speed * 2.0, recent_speed + 30.0)
+        # Require a sharp local jump, three fast intervals, and a still-fast
+        # terminal segment. A brief surge followed by normal motion is not a tail.
+        if (speeds.iloc[index] >= 1.8 * max(10.0, float(speeds.iloc[index - 1]))
+                and speeds.iloc[index:index + 3].min() >= threshold
+                and speeds.iloc[-3:].median() >= threshold):
+            return float(rows[index].TMD)
+    return None
+
+
+def camera_120_weights(points: pd.DataFrame) -> pd.Series:
+    """Reduce only an abruptly accelerating tail; latitude and lead alone do not count."""
+    weights = pd.Series(1.0, index=points.index)
+    for model, track in points.groupby("SRC"):
+        if model == "KMA":
+            continue
+        cutoff = camera_120_acceleration_start(track)
+        if cutoff is not None:
+            weights.loc[track.index[track["TMD"].gt(cutoff)]] = CAMERA_120_ACCELERATED_TAIL_WEIGHT
+    return weights
+
+
+def weighted_camera_bounds(points: pd.DataFrame, column: str) -> tuple[float, float]:
+    clean = points.loc[points["CAMERA_WEIGHT"].gt(0), [column, "CAMERA_WEIGHT"]].dropna().sort_values(column)
+    if clean.empty:
+        return 0.0, 0.0
+    weights = clean["CAMERA_WEIGHT"]
+    # Invert the weighted empirical CDF. Interpolating across a large spatial
+    # gap could give a nearly zero-weight poleward point substantial influence.
+    positions = weights.cumsum() / weights.sum()
+    indices = positions.searchsorted([0.05, 0.95])
+    low, high = clean[column].iloc[indices]
+    return float(low), float(high)
+
+
+def auto_120_map_extent(df: pd.DataFrame, settings: Settings) -> list[float] | None:
+    primary = camera_120_points(df, settings)
+    if primary.empty:
+        return None
+    anchor = current_camera_anchor(df, settings)
+    primary["CAMERA_WEIGHT"] = camera_120_weights(primary)
+    regular = primary[primary["CAMERA_WEIGHT"].eq(1)]
+    has_accelerated_tail = len(regular) < len(primary)
+    core = {column: robust_series_bounds(regular[column]) for column in ("LON", "LAT")}
+
+    # Keep the previous full-forecast framing unless a speed step was detected.
+    # Regular models retain their real terminal points, including high latitudes.
+    tracks = visible_120_camera_tracks(df, settings)
+    early = tracks[tracks["TMD"].le(24)].groupby("SRC")[["LAT", "LON"]]
+    early_min, early_max = early.min(), early.max()
+    terminals = regular[regular["SRC"].ne("KMA")].sort_values("TMD").groupby("SRC").tail(1)
+    for column in ("LON", "LAT"):
+        low, high = core[column]
+        if not early_min.empty:
+            low = min(low, robust_series_bounds(early_min[column])[0])
+            high = max(high, robust_series_bounds(early_max[column])[1])
+        if not terminals.empty:
+            terminal_low, terminal_high = robust_series_bounds(terminals[column], quantiles=(0.10, 0.90))
+            low, high = min(low, terminal_low), max(high, terminal_high)
+        core[column] = low, high
+    if anchor is not None:
+        for column, value in zip(("LON", "LAT"), anchor):
+            core[column] = (min(core[column][0], value), max(core[column][1], value))
+    context = {column: weighted_camera_bounds(primary, column) for column in core} if has_accelerated_tail else dict(core)
+    for column in core:
+        context[column] = (min(context[column][0], core[column][0]), max(context[column][1], core[column][1]))
+
+    projection, data_crs = ccrs.Mercator(), ccrs.PlateCarree()
+    metres_per_degree, _ = projection.transform_point(1, 0, data_crs)
+    aspect = settings.figure_width / settings.figure_height
+    safe_x, safe_y = CAMERA_120_SAFE_X, CAMERA_120_SAFE_Y
+
+    def project_bounds(bounds):
+        west, east = [min(DISPLAY_120_LON_MAX, max(DISPLAY_120_LON_MIN, v)) for v in bounds["LON"]]
+        south, north = [min(DISPLAY_120_LAT_MAX, max(DISPLAY_120_LAT_MIN, v)) for v in bounds["LAT"]]
+        x0, y0 = projection.transform_point(west, south, data_crs)
+        x1, y1 = projection.transform_point(east, north, data_crs)
+        return x0, x1, y0, y1
+
+    def required_width(bounds):
+        x0, x1, y0, y1 = bounds
+        return max(21.0 * metres_per_degree,
+                   (x1 - x0) / (safe_x[1] - safe_x[0]),
+                   (y1 - y0) / (safe_y[1] - safe_y[0]) * aspect)
+
+    core_box, context_box = project_bounds(core), project_bounds(context)
+    core_width = required_width(core_box)
+    width = min(required_width(context_box), core_width * CAMERA_120_ACCELERATED_TAIL_SCALE) if has_accelerated_tail else core_width
+    height = width / aspect
+    x0, x1, y0, y1 = core_box
+    cx0, cx1, cy0, cy1 = context_box
+    preferred_x0 = (cx0 + cx1) / 2 - width * 0.52
+    preferred_y0 = (cy0 + cy1) / 2 - height * sum(safe_y) / 2
+    left = min(max(preferred_x0, x1 - safe_x[1] * width), x0 - safe_x[0] * width)
+    bottom = min(max(preferred_y0, y1 - safe_y[1] * height), y0 - safe_y[0] * height)
+    _, south = data_crs.transform_point(0, bottom, projection)
+    _, north = data_crs.transform_point(0, bottom + height, projection)
+    # Mercator x is linear in longitude. Avoid inverse-projection wrapping
+    # across 180E before the final hard-domain fit can shift the viewport.
+    return [left / metres_per_degree, (left + width) / metres_per_degree, south, north]
 
 
 def clamp_west_pacific_extent(
@@ -4624,34 +4752,18 @@ def aspect_match_and_clamp_extent(
     return clamp_west_pacific_extent(extent)
 
 
-def extent_exceeds_120_display_bounds(extent: list[float]) -> bool:
-    lon_min, lon_max, lat_min, lat_max = [float(value) for value in extent]
-    return (
-        lon_min < DISPLAY_120_LON_MIN
-        or lon_max > DISPLAY_120_LON_MAX
-        or lat_min < DISPLAY_120_LAT_MIN
-        or lat_max > DISPLAY_120_LAT_MAX
-    )
-
-
-def crop_legacy_120_extent_to_hard_domain(
+def fit_120_extent_to_hard_domain(
     legacy_extent: list[float],
     *,
     fig_width: float,
     fig_height: float,
     start_point: tuple[float, float] | None = None,
 ) -> list[float]:
-    """Crop the original 120h camera without redesigning its composition.
+    """Keep the current point visible, with exact Mercator aspect and hard bounds.
 
-    The pre-hard-domain camera is treated as the source viewport.  Intersect it
-    with the 100E-179.9E / 0N-50N display domain, then choose the largest exact
-    Mercator-aspect rectangle inside that intersection.  No opposite-side fill,
-    terminal-anchor expansion, or secondary camera fit is applied.
-
-    When one dimension must be trimmed, preserve the current 0h point's
-    relative position from the original viewport as far as the hard boundary
-    allows.  This retains the legacy left/bottom breathing room and keeps a
-    short section of the past track visible.
+    Expand before panning so rescuing the start does not crop the forecast fan.
+    The geographic domain has priority when full padding is impossible. The
+    top safe margin also keeps the current marker below the overlaid header.
     """
     if fig_width <= 0 or fig_height <= 0:
         return legacy_extent
@@ -4659,82 +4771,56 @@ def crop_legacy_120_extent_to_hard_domain(
     projection = ccrs.Mercator()
     data_crs = ccrs.PlateCarree()
     lon_min, lon_max, lat_min, lat_max = [float(value) for value in legacy_extent]
-    center_lon = (lon_min + lon_max) / 2.0
-    center_lat = (lat_min + lat_max) / 2.0
+    hard_x0, hard_y0 = projection.transform_point(DISPLAY_120_LON_MIN, DISPLAY_120_LAT_MIN, data_crs)
+    hard_x1, hard_y1 = projection.transform_point(DISPLAY_120_LON_MAX, DISPLAY_120_LAT_MAX, data_crs)
+    metres_per_degree, _ = projection.transform_point(1, 0, data_crs)
+    x0, x1 = lon_min * metres_per_degree, lon_max * metres_per_degree
+    _, y0 = projection.transform_point(0, max(-80.0, min(84.0, lat_min)), data_crs)
+    _, y1 = projection.transform_point(0, max(-80.0, min(84.0, lat_max)), data_crs)
+    if not all(math.isfinite(v) for v in (x0, x1, y0, y1)) or x1 <= x0 or y1 <= y0:
+        x0, x1, y0, y1 = hard_x0, hard_x1, hard_y0, hard_y1
 
-    legacy_x0, _ = projection.transform_point(lon_min, center_lat, data_crs)
-    legacy_x1, _ = projection.transform_point(lon_max, center_lat, data_crs)
-    _, legacy_y0 = projection.transform_point(center_lon, lat_min, data_crs)
-    _, legacy_y1 = projection.transform_point(center_lon, lat_max, data_crs)
-
-    hard_x0, _ = projection.transform_point(DISPLAY_120_LON_MIN, center_lat, data_crs)
-    hard_x1, _ = projection.transform_point(DISPLAY_120_LON_MAX, center_lat, data_crs)
-    _, hard_y0 = projection.transform_point(center_lon, DISPLAY_120_LAT_MIN, data_crs)
-    _, hard_y1 = projection.transform_point(center_lon, DISPLAY_120_LAT_MAX, data_crs)
-
-    crop_x0 = max(legacy_x0, hard_x0)
-    crop_x1 = min(legacy_x1, hard_x1)
-    crop_y0 = max(legacy_y0, hard_y0)
-    crop_y1 = min(legacy_y1, hard_y1)
-    if crop_x1 <= crop_x0 or crop_y1 <= crop_y0:
-        return [
-            max(DISPLAY_120_LON_MIN, min(DISPLAY_120_LON_MAX, lon_min)),
-            max(DISPLAY_120_LON_MIN, min(DISPLAY_120_LON_MAX, lon_max)),
-            max(DISPLAY_120_LAT_MIN, min(DISPLAY_120_LAT_MAX, lat_min)),
-            max(DISPLAY_120_LAT_MIN, min(DISPLAY_120_LAT_MAX, lat_max)),
-        ]
-
-    target_aspect = fig_width / fig_height
-    crop_width = crop_x1 - crop_x0
-    crop_height = crop_y1 - crop_y0
-    crop_aspect = crop_width / crop_height
-
-    # Preserve where the 0h point sat in the legacy camera.  The ratios are
-    # bounded only to guarantee a small visible margin if hard clipping pushes
-    # the point close to an edge.
-    anchor_x = (legacy_x0 + legacy_x1) / 2.0
-    anchor_y = (legacy_y0 + legacy_y1) / 2.0
-    ratio_x = 0.5
-    ratio_y = 0.5
+    anchor = None
     if start_point is not None:
         start_lon, start_lat = [float(value) for value in start_point]
-        if all(math.isfinite(value) for value in (start_lon, start_lat)):
-            anchor_x, anchor_y = projection.transform_point(start_lon, start_lat, data_crs)
-            legacy_width = legacy_x1 - legacy_x0
-            legacy_height = legacy_y1 - legacy_y0
-            if legacy_width > 0:
-                ratio_x = (anchor_x - legacy_x0) / legacy_width
-            if legacy_height > 0:
-                ratio_y = (anchor_y - legacy_y0) / legacy_height
-    ratio_x = min(0.92, max(0.08, ratio_x))
-    ratio_y = min(0.92, max(0.08, ratio_y))
+        if (DISPLAY_120_LON_MIN <= start_lon <= DISPLAY_120_LON_MAX
+                and DISPLAY_120_LAT_MIN <= start_lat <= DISPLAY_120_LAT_MAX):
+            anchor = projection.transform_point(start_lon, start_lat, data_crs)
 
-    if crop_aspect > target_aspect:
-        # Hard clipping made the viewport too wide: trim only longitude.
-        final_height = crop_height
-        final_width = final_height * target_aspect
-        preferred_x0 = anchor_x - ratio_x * final_width
-        final_x0 = min(max(preferred_x0, crop_x0), crop_x1 - final_width)
-        final_x1 = final_x0 + final_width
-        final_y0, final_y1 = crop_y0, crop_y1
-    elif crop_aspect < target_aspect:
-        # Hard clipping made the viewport too tall: trim only latitude.
-        final_width = crop_width
-        final_height = final_width / target_aspect
-        preferred_y0 = anchor_y - ratio_y * final_height
-        final_y0 = min(max(preferred_y0, crop_y0), crop_y1 - final_height)
-        final_y1 = final_y0 + final_height
-        final_x0, final_x1 = crop_x0, crop_x1
-    else:
-        final_x0, final_x1 = crop_x0, crop_x1
-        final_y0, final_y1 = crop_y0, crop_y1
+    safe_x, safe_y = CAMERA_120_SAFE_X, CAMERA_120_SAFE_Y
 
-    projected_y = (final_y0 + final_y1) / 2.0
-    projected_x = (final_x0 + final_x1) / 2.0
-    final_lon_min, _ = data_crs.transform_point(final_x0, projected_y, projection)
-    final_lon_max, _ = data_crs.transform_point(final_x1, projected_y, projection)
-    _, final_lat_min = data_crs.transform_point(projected_x, final_y0, projection)
-    _, final_lat_max = data_crs.transform_point(projected_x, final_y1, projection)
+    def expand_for_anchor(low, high, value, safe):
+        low = min(low, (value - safe[0] * high) / (1.0 - safe[0]))
+        high = max(high, low + (value - low) / safe[1])
+        return low, high
+
+    if anchor is not None:
+        x0, x1 = expand_for_anchor(x0, x1, anchor[0], safe_x)
+        y0, y1 = expand_for_anchor(y0, y1, anchor[1], safe_y)
+
+    aspect = fig_width / fig_height
+    width = min(max(x1 - x0, (y1 - y0) * aspect), hard_x1 - hard_x0, (hard_y1 - hard_y0) * aspect)
+    height = width / aspect
+
+    def place_axis(low, high, span, hard_low, hard_high, value, safe):
+        allowed_low, allowed_high = hard_low, hard_high - span
+        if value is not None:
+            safe_low = max(allowed_low, value - safe[1] * span)
+            safe_high = min(allowed_high, value - safe[0] * span)
+            if safe_low <= safe_high:
+                allowed_low, allowed_high = safe_low, safe_high
+            else:
+                # At a hard edge full padding may be impossible, but the
+                # current point must still belong to the final viewport.
+                allowed_low = max(allowed_low, value - span)
+                allowed_high = min(allowed_high, value)
+        preferred = (low + high - span) / 2.0
+        return min(max(preferred, allowed_low), allowed_high)
+
+    final_x0 = place_axis(x0, x1, width, hard_x0, hard_x1, anchor[0] if anchor else None, safe_x)
+    final_y0 = place_axis(y0, y1, height, hard_y0, hard_y1, anchor[1] if anchor else None, safe_y)
+    final_lon_min, final_lat_min = data_crs.transform_point(final_x0, final_y0, projection)
+    final_lon_max, final_lat_max = data_crs.transform_point(final_x0 + width, final_y0 + height, projection)
 
     return [
         max(DISPLAY_120_LON_MIN, float(final_lon_min)),
@@ -4752,35 +4838,22 @@ def finalize_map_extent(
     fig_height: float,
     start_point: tuple[float, float] | None = None,
 ) -> list[float]:
-    """Finalize the viewport with one explicit camera priority.
-
-    240h and longer forecasts keep their fixed domain. Every other case first uses the original
-    pre-hard-domain camera.  Only an automatic 120h viewport that crosses the
-    hard domain receives one final crop-and-zoom pass.
-    """
+    """Keep 240h fixed; protect the current point in every automatic 120h view."""
     if settings.fcst_hours >= 240:
         return fixed_240_map_extent(settings)
 
-    legacy_extent = aspect_match_and_clamp_extent(
-        [float(value) for value in extent],
-        settings,
-        fig_width=fig_width,
-        fig_height=fig_height,
-    )
-
-    if (
-        settings.fcst_hours == 120
-        and settings.auto_extent
-        and extent_exceeds_120_display_bounds(legacy_extent)
-    ):
-        return crop_legacy_120_extent_to_hard_domain(
-            legacy_extent,
+    if settings.fcst_hours == 120 and settings.auto_extent:
+        return fit_120_extent_to_hard_domain(
+            [float(value) for value in extent],
             fig_width=fig_width,
             fig_height=fig_height,
             start_point=start_point,
         )
 
-    return legacy_extent
+    return aspect_match_and_clamp_extent(
+        [float(value) for value in extent], settings,
+        fig_width=fig_width, fig_height=fig_height,
+    )
 
 
 def bounds_intersect(left: tuple[float, float, float, float], right: tuple[float, float, float, float]) -> bool:
@@ -4840,17 +4913,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     fig_width = settings.figure_width
     fig_height = settings.figure_height
 
-    start_point = None
-    if settings.fcst_hours == 120:
-        kma_start_for_extent = df[
-            df["SRC"].eq("KMA")
-            & pd.to_numeric(df["TMD"], errors="coerce").eq(0)
-        ].dropna(subset=["LON", "LAT"]).head(1)
-        if not kma_start_for_extent.empty:
-            start_point = (
-                float(kma_start_for_extent.iloc[0]["LON"]),
-                float(kma_start_for_extent.iloc[0]["LAT"]),
-            )
+    start_point = current_camera_anchor(df, settings) if settings.fcst_hours == 120 else None
 
     extent = finalize_map_extent(
         settings,
