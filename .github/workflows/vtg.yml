@@ -136,7 +136,6 @@ jobs:
       KMA_APIHUB_FALLBACK_AUTH_KEY: ${{ secrets.KMA_APIHUB_FALLBACK_AUTH_KEY }}
       MPLBACKEND: Agg
       PYTHONUNBUFFERED: "1"
-      VTG_POLARWX_REQUEST_DIR: ${{ runner.temp }}/polarwx_requests
       NOW_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.now || '' }}
       FORCE_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
       MANUAL_VTG_ARGS: ${{ github.event_name == 'workflow_dispatch' && inputs.manual_args || '' }}
@@ -273,6 +272,8 @@ jobs:
 
       - name: Run VTG automation
         if: ${{ steps.vtg_precheck.outputs.run_step_needed == 'true' }}
+        env:
+          VTG_POLARWX_REQUEST_DIR: ${{ runner.temp }}/polarwx_requests
         run: |
           run_with_retry() {
             local attempt=1
