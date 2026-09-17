@@ -163,9 +163,11 @@ def main() -> None:
         frame.to_csv(args.artifacts_dir / "tracks.csv", index=False)
         report.update(models=int(frame["SRC"].nunique()), points=len(frame),
                       pressure_points=int(frame["PS"].gt(0).sum()))
-        VTG.write_cached_text(VTG.http_cache_path(settings.http_cache_dir, VTG.polarwx_url(args.atcf_id, settings.data_time)), text)
+        from polarwx_cache import save_snapshot
+        cache_root = args.artifacts_dir / "cache"
+        save_snapshot(cache_root, args.atcf_id, settings.data_time, text)
         started = time.monotonic()
-        cached_frame = VTG.fetch_polarwx_data(requests.Session(), settings)
+        cached_frame = VTG.fetch_polarwx_data(requests.Session(), settings, cache_root=cache_root)
         report["timings"]["warm_cache_seconds"] = round(time.monotonic() - started, 3)
         if not frame.equals(cached_frame):
             raise PolarwxBrowserError("Cached source differs from browser response")

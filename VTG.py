@@ -31,7 +31,7 @@ import matplotlib.ticker as mticker
 import pandas as pd
 import requests
 
-from polarwx_browser import capture_cycle as capture_polarwx_cycle
+from polarwx_cache import DEFAULT_ROOT as POLARWX_CACHE_ROOT, load_snapshot, queue_request
 
 from vtg_sources import (
     DMDW_ENABLED_MODEL_IDS,
@@ -1408,27 +1408,27 @@ def read_polarwx_json(text: str | None, settings: Settings, *, atcf_id: str = ""
     return df.reset_index(drop=True)
 
 
-def fetch_polarwx_data(session: requests.Session, settings: Settings) -> pd.DataFrame:
+def fetch_polarwx_data(
+    session: requests.Session, settings: Settings, *, cache_root: Path | None = None,
+) -> pd.DataFrame:
+    cache_root = cache_root or POLARWX_CACHE_ROOT
     frames: list[pd.DataFrame] = []
     for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
         if not atcf_id:
             continue
-        url = polarwx_url(atcf_id, settings.data_time)
-        cache_path = http_cache_path(settings.http_cache_dir, url)
-        text = read_cached_text(cache_path, ttl_seconds=settings.http_cache_ttl_seconds)
+        try:
+            snapshot = load_snapshot(cache_root, atcf_id, settings.data_time)
+        except ValueError as exc:
+            print(f"Warning: invalid POLARWX snapshot identity: {exc}")
+            continue
+        text = json.dumps(snapshot["models"]) if snapshot else None
         frame = read_polarwx_json(text, settings, atcf_id=atcf_id)
+        try:
+            queue_request(cache_root, atcf_id, settings.data_time)
+        except OSError as exc:
+            print(f"Warning: could not queue POLARWX prefetch: {exc}")
         if frame.empty:
-            started = time.monotonic()
-            try:
-                text = capture_polarwx_cycle(atcf_id, settings.data_time)
-                frame = read_polarwx_json(text, settings, atcf_id=atcf_id)
-                if not frame.empty:
-                    write_cached_text(cache_path, text)
-            except Exception as exc:
-                print(f"Warning: POLARWX browser collection unavailable for {atcf_id}: {type(exc).__name__}: {exc}")
-            log_timing("POLARWX browser", started, atcf_id=atcf_id, rows=len(frame))
-        else:
-            print(f"Using cached POLARWX browser response: {atcf_id} {settings.data_time[:10]}")
+            print(f"No saved POLARWX response for {atcf_id} {settings.data_time[:10]}; continuing without a browser request.")
         if not frame.empty:
             print(f"Loaded POLARWX source data: {atcf_id} rows={len(frame)}")
             frames.append(frame)
@@ -3333,6 +3333,36 @@ def has_forecast_points(track: pd.DataFrame, min_hour: float = 3) -> bool:
         return False
     leads = pd.to_numeric(track["TMD"], errors="coerce")
     return leads.ge(min_hour).any()
+
+
+def missing_polarwx_models(available_df: pd.DataFrame, settings: Settings) -> set[str]:
+    """Check already validated tracks before opening the optional browser source."""
+    required = (
+        set(polarwx_keys().values()) & active_model_names(settings)
+    ) - excluded_models_for(available_df)
+    available = plotted_model_names(available_df, settings)
+    missing = required - available
+    overrides = dict(settings.source_overrides)
+    for model in required:
+        track = available_df[available_df["SRC"].eq(model)]
+        if overrides.get(model) == "POLARWX":
+            missing.add(model)
+        elif model in PRESSURE_PREFERRED_MODELS and not overrides.get(model) and not source_has_pressure_data(track):
+            missing.add(model)
+    return missing
+
+
+def fetch_needed_polarwx_data(
+    session: requests.Session, settings: Settings, available_df: pd.DataFrame,
+) -> pd.DataFrame:
+    if settings.skip_atcf:
+        return empty_polarwx_frame()
+    missing = missing_polarwx_models(available_df, settings)
+    if not missing:
+        print("Skipping POLARWX: other sources already provide every required usable model.")
+        return empty_polarwx_frame()
+    print("POLARWX needed for: " + ", ".join(sorted(missing)))
+    return fetch_polarwx_data(session, settings)
 
 
 def plotted_model_names(df: pd.DataFrame, settings: Settings) -> set[str]:
@@ -5280,10 +5310,6 @@ def main() -> None:
         log_timing("load DMDW guidance", stage_started_at, rows=len(dmdw_df))
 
         stage_started_at = time.monotonic()
-        polarwx_df = empty_polarwx_frame() if fetch_settings.skip_atcf else fetch_polarwx_data(session, fetch_settings)
-        log_timing("load POLARWX guidance", stage_started_at, rows=len(polarwx_df))
-
-        stage_started_at = time.monotonic()
         smca_df = empty_smca_frame() if fetch_settings.skip_atcf else fetch_smca_data(session, fetch_settings)
         log_timing("load SMCA.FUN guidance", stage_started_at, rows=len(smca_df))
 
@@ -5292,8 +5318,14 @@ def main() -> None:
         log_timing("load ATCF guidance", stage_started_at, rows=len(atcf_df))
 
         stage_started_at = time.monotonic()
+        available_df = normalize_track_data(kma_df, dmdw_df, empty_polarwx_frame(), smca_df, atcf_df, fetch_settings)
+        polarwx_df = fetch_needed_polarwx_data(session, fetch_settings, available_df)
+        log_timing("load POLARWX guidance", stage_started_at, rows=len(polarwx_df))
+
+        stage_started_at = time.monotonic()
         source_availability_raw_df = source_availability_frame(kma_df, dmdw_df, polarwx_df, smca_df, atcf_df, fetch_settings)
-        df = normalize_track_data(kma_df, dmdw_df, polarwx_df, smca_df, atcf_df, fetch_settings)
+        df = (normalize_track_data(kma_df, dmdw_df, polarwx_df, smca_df, atcf_df, fetch_settings)
+              if not polarwx_df.empty else available_df)
         log_timing("normalize guidance", stage_started_at, rows=len(df))
 
         stage_started_at = time.monotonic()

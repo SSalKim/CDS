@@ -1,0 +1,122 @@
+name: Prefetch Polarwx VTG source data
+run-name: Prefetch Polarwx ${{ inputs.atcf_id || github.event.workflow_run.id }} ${{ inputs.cycle }}
+
+on:
+  workflow_run:
+    workflows: ["Generate VTG images", "Backfill VTG images"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      atcf_id:
+        description: "Active storm ATCF ID"
+        required: true
+        type: string
+      cycle:
+        description: "Exact UTC cycle YYYYmmddHH"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: polarwx-source-prefetch
+  cancel-in-progress: false
+
+jobs:
+  prefetch:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      MPLBACKEND: Agg
+      PYTHONUNBUFFERED: "1"
+      ATCF_ID: ${{ inputs.atcf_id }}
+      CYCLE: ${{ inputs.cycle }}
+    steps:
+      - name: Check for collection requests
+        id: plan
+        uses: actions/github-script@v7
+        with:
+          script: |
+            if (context.eventName === 'workflow_dispatch') {
+              core.setOutput('needed', 'true');
+              return;
+            }
+            const artifacts = await github.paginate(github.rest.actions.listWorkflowRunArtifacts, {
+              ...context.repo, run_id: context.payload.workflow_run.id,
+            });
+            core.setOutput('needed', artifacts.some(a => a.name === 'polarwx-requests' && !a.expired) ? 'true' : 'false');
+
+      - uses: actions/checkout@v4
+        if: steps.plan.outputs.needed == 'true'
+        with:
+          ref: main
+
+      - name: Download exact-cycle requests
+        if: steps.plan.outputs.needed == 'true' && github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v4
+        with:
+          name: polarwx-requests
+          path: ${{ runner.temp }}/polarwx_requests
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - uses: actions/setup-python@v5
+        if: steps.plan.outputs.needed == 'true'
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            requirements-vtg.txt
+            requirements-polarwx.txt
+
+      - name: Install collector dependencies
+        if: steps.plan.outputs.needed == 'true'
+        run: |
+          python -m pip install --only-binary=:all: -r requirements-polarwx.txt
+          python -m playwright install --with-deps --only-shell chromium
+
+      - name: Collect requested Raw cycles
+        id: collect
+        if: steps.plan.outputs.needed == 'true'
+        run: |
+          args=(--output-root data/polarwx --report "$RUNNER_TEMP/polarwx-report.json")
+          if [ -n "$ATCF_ID" ]; then
+            args+=(--atcf-id "$ATCF_ID" --cycle "$CYCLE")
+          else
+            args+=(--requests-dir "$RUNNER_TEMP/polarwx_requests")
+          fi
+          python polarwx_prefetch.py "${args[@]}"
+
+      - name: Commit collected snapshots
+        if: always() && steps.collect.outcome != 'skipped' && steps.plan.outputs.needed == 'true'
+        run: |
+          set -euo pipefail
+          if [ ! -d data/polarwx ]; then exit 0; fi
+          git add -- data/polarwx
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update Polarwx VTG source snapshots"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git rebase origin/main
+            if git push origin HEAD:main; then exit 0; fi
+            sleep $((attempt * 5))
+          done
+          exit 1
+
+      - name: Publish collection report
+        if: always() && steps.plan.outputs.needed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: polarwx-prefetch-report
+          path: ${{ runner.temp }}/polarwx-report.json
+          if-no-files-found: ignore
+          retention-days: 3

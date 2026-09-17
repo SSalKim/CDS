@@ -217,6 +217,7 @@ jobs:
       KMA_APIHUB_FALLBACK_AUTH_KEY: ${{ secrets.KMA_APIHUB_FALLBACK_AUTH_KEY }}
       MPLBACKEND: Agg
       PYTHONUNBUFFERED: "1"
+      VTG_POLARWX_REQUEST_DIR: ${{ runner.temp }}/polarwx_requests
       DIAGNOSTICS_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.diagnostics || false }}
 
     steps:
@@ -314,22 +315,6 @@ jobs:
             echo "$req_hash" > "$hash_file"
           else
             python -m pip install --only-binary=:all: -r requirements-vtg.txt
-          fi
-
-      - name: Restore Polarwx browser cache
-        if: ${{ env.RUNNER_KIND != 'self-hosted' }}
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: vtg-chromium-${{ runner.os }}-${{ hashFiles('requirements-vtg.txt') }}
-
-      - name: Prepare Polarwx browser
-        continue-on-error: true
-        run: |
-          if [ "$RUNNER_KIND" = "self-hosted" ]; then
-            python -m playwright install --only-shell chromium
-          else
-            python -m playwright install --with-deps --only-shell chromium
           fi
 
       - name: Generate cycle list
@@ -573,3 +558,12 @@ jobs:
             echo "No manifest index changes after backfill."
           fi
           echo "::endgroup::"
+
+      - name: Queue missing Polarwx source snapshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: polarwx-requests
+          path: ${{ runner.temp }}/polarwx_requests/*.json
+          if-no-files-found: ignore
+          retention-days: 1

@@ -234,7 +234,7 @@ def render_code_signature(project_root: Path) -> str:
     # Source-only edits must invalidate completed renders as they did in VTG.py.
     digest = hashlib.sha256()
     try:
-        for filename in ("VTG.py", "vtg_sources.py", "polarwx_browser.py"):
+        for filename in ("VTG.py", "vtg_sources.py", "polarwx_browser.py", "polarwx_cache.py"):
             digest.update(filename.encode("utf-8") + b"\0")
             digest.update((project_root / filename).read_bytes())
         return digest.hexdigest()

@@ -144,11 +144,13 @@ class VtgSourceMatrixTests(unittest.TestCase):
             registry.write_text("sources-v1", encoding="utf-8")
             browser_source = root / "polarwx_browser.py"
             browser_source.write_text("browser-v1", encoding="utf-8")
+            cache_source = root / "polarwx_cache.py"
+            cache_source.write_text("cache-v1", encoding="utf-8")
             with patch.object(VTG, "PROJECT_ROOT", root), patch.object(vtg_auto, "PROJECT_ROOT", root):
                 previous = {"metadata": {"render_signature": VTG.render_signature()}}
                 initial = vtg_auto.current_render_signature()
                 self.assertTrue(vtg_auto.previous_render_signature_matches(previous, initial))
-                for file in (registry, renderer, browser_source):
+                for file in (registry, renderer, browser_source, cache_source):
                     with self.subTest(file=file.name):
                         before = VTG.render_signature()
                         file.write_text("changed-v2", encoding="utf-8")

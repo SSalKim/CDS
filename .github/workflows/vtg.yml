@@ -136,6 +136,7 @@ jobs:
       KMA_APIHUB_FALLBACK_AUTH_KEY: ${{ secrets.KMA_APIHUB_FALLBACK_AUTH_KEY }}
       MPLBACKEND: Agg
       PYTHONUNBUFFERED: "1"
+      VTG_POLARWX_REQUEST_DIR: ${{ runner.temp }}/polarwx_requests
       NOW_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.now || '' }}
       FORCE_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.force }}
       MANUAL_VTG_ARGS: ${{ github.event_name == 'workflow_dispatch' && inputs.manual_args || '' }}
@@ -270,23 +271,6 @@ jobs:
             python -m pip install --only-binary=:all: -r requirements-vtg.txt
           fi
 
-      - name: Restore Polarwx browser cache
-        if: ${{ steps.vtg_precheck.outputs.deps_needed == 'true' && env.RUNNER_KIND != 'self-hosted' }}
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: vtg-chromium-${{ runner.os }}-${{ hashFiles('requirements-vtg.txt') }}
-
-      - name: Prepare Polarwx browser
-        if: ${{ steps.vtg_precheck.outputs.deps_needed == 'true' }}
-        continue-on-error: true
-        run: |
-          if [ "$RUNNER_KIND" = "self-hosted" ]; then
-            python -m playwright install --only-shell chromium
-          else
-            python -m playwright install --with-deps --only-shell chromium
-          fi
-
       - name: Run VTG automation
         if: ${{ steps.vtg_precheck.outputs.run_step_needed == 'true' }}
         run: |
@@ -328,6 +312,15 @@ jobs:
             args+=(--fcst-hours "120,240" --no-auto-fcst-hours --min-run-interval-minutes 8 --changed-paths-file "$CHANGED_PATHS_FILE" --http-cache-dir "$RUNNER_TEMP/vtg_http_cache" --parallel-jobs 2)
             run_with_retry python vtg_auto.py "${args[@]}"
           fi
+
+      - name: Queue missing Polarwx source snapshots
+        if: always() && env.DRY_RUN_INPUT != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: polarwx-requests
+          path: ${{ runner.temp }}/polarwx_requests/*.json
+          if-no-files-found: ignore
+          retention-days: 1
 
       - name: Detect newly ended systems for Drive archive
         if: ${{ env.DRY_RUN_INPUT != 'true' }}
