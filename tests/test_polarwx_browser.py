@@ -168,6 +168,76 @@ class PolarwxBrowserTests(unittest.TestCase):
             self.assertEqual({"icon"}, set(snapshot["models"]))
             self.assertNotIn("interp", snapshot["models"]["icon"])
 
+    def test_partial_response_retains_missing_empty_or_wrong_cycle_model(self):
+        old_time = datetime(2020, 1, 1, tzinfo=timezone.utc)
+        for incoming in (None, {"fhr": [], "lat": [], "lon": []},
+                         {**json.loads(payload())["icon"], "time": ["2026091618", "2026091700"]}):
+            with self.subTest(incoming=incoming), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                old = json.loads(payload())["icon"]
+                save_snapshot(root, "wp242026", "2026091700", payload(), now=old_time)
+                raw = {"gfs": old}
+                if incoming is not None:
+                    raw["icon"] = incoming
+                with patch("polarwx_prefetch.capture_cycle", return_value=json.dumps(raw)):
+                    result = collect_requests([("wp242026", "2026091700")], root)
+                self.assertEqual([], result["failed"])
+                saved = load_snapshot(root, "wp242026", "2026091700")
+                self.assertEqual(old, saved["models"]["icon"])
+                self.assertEqual(["icon"], saved["retained_models"])
+                self.assertEqual(old_time.isoformat(), saved["model_fetched_at"]["icon"])
+                self.assertIn("gfs", saved["models"])
+
+    def test_valid_model_refresh_replaces_old_track_without_cross_cycle_merge(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            save_snapshot(root, "wp242026", "2026091700", payload(),
+                          now=datetime(2020, 1, 1, tzinfo=timezone.utc))
+            new = json.loads(payload())
+            new["icon"]["mslp"] = [990, 987]
+            with patch("polarwx_prefetch.capture_cycle", return_value=json.dumps(new)):
+                collect_requests([("wp242026", "2026091700")], root)
+            saved = load_snapshot(root, "wp242026", "2026091700")
+            self.assertEqual([990, 987], saved["models"]["icon"]["mslp"])
+            self.assertEqual([], saved["retained_models"])
+            save_snapshot(root, "wp242026", "2026091706", json.dumps({"gfs": new["icon"]}))
+            self.assertNotIn("icon", load_snapshot(root, "wp242026", "2026091706")["models"])
+
+    def previous_render(self, root):
+        settings = replace(self.settings(), output_root=Path(root), overwrite_output=True)
+        target = VTG.output_path(settings)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(b"previous image")
+        metadata = {"data_time": settings.data_time, "atcf_id": settings.atcf_id,
+                    "fcst_hours": 240, "image_path": str(target), "models": ["ICON"]}
+        write_json(VTG.metadata_path_for_settings(settings), metadata)
+        write_json(VTG.source_availability_latest_path(settings), {
+            "data_time": settings.data_time, "atcf_id": settings.atcf_id,
+            "model_sources": [{"source": "POLARWX", "model_id": "ICON", "selected": True}],
+        })
+        return settings
+
+    def test_missing_snapshot_holds_previous_render(self):
+        with tempfile.TemporaryDirectory() as directory:
+            settings = self.previous_render(directory)
+            empty = VTG.empty_polarwx_frame()
+            self.assertEqual({240: ["ICON"]}, VTG.pending_polarwx_render_loss(empty, empty, settings, (240,)))
+            self.assertEqual(b"previous image", VTG.output_path(settings).read_bytes())
+            self.assertEqual({}, VTG.pending_polarwx_render_loss(empty, empty, replace(settings, skip_atcf=True), (240,)))
+            VTG.output_path(settings).unlink()
+            self.assertEqual({}, VTG.pending_polarwx_render_loss(empty, empty, settings, (240,)))
+
+    def test_existing_snapshot_or_other_source_does_not_hold_render(self):
+        with tempfile.TemporaryDirectory() as directory:
+            settings = self.previous_render(directory)
+            empty = VTG.empty_polarwx_frame()
+            frame = VTG.read_polarwx_json(payload(), settings)
+            # A present Raw track rejected by later QC must not resurrect an old image.
+            self.assertEqual({}, VTG.pending_polarwx_render_loss(empty, frame, settings, (240,)))
+            self.assertEqual({}, VTG.pending_polarwx_render_loss(frame, empty, settings, (240,)))
+            other_cycle = replace(settings, data_time="202609170600")
+            self.assertEqual({}, VTG.pending_polarwx_render_loss(empty, empty, other_cycle, (240,)))
+
 
 if __name__ == "__main__":
     unittest.main()

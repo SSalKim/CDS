@@ -23,7 +23,12 @@ members or interpolated prior-cycle tracks.
 - Successful snapshots are refreshed at most once per 15 minutes.
 - Automatic requests cover the latest 48 hours only. The public active-storm UI
   is not an archive endpoint; older stored snapshots remain readable.
-- Failed collections leave the previous successful snapshot untouched.
+- Failed collections leave the previous successful snapshot untouched. Partial
+  responses update usable models individually and retain absent/empty models
+  from the same ATCF ID and cycle, with their original collection timestamps.
+- Normal image updates retain the previous image and metadata while an absent
+  snapshot would remove a previously selected Polarwx model. A first image with
+  no previous output still renders from other sources without waiting.
 - Missing snapshots do not stop other sources or image generation.
 
 For a manual collection, dispatch `polarwx_prefetch.yml` with an active ATCF ID

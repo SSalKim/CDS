@@ -40,16 +40,30 @@ def write_json(path: Path, payload: dict) -> None:
     temporary.replace(path)
 
 
-def save_snapshot(root: Path, atcf_id: str, cycle: str, text: str, *, now: datetime | None = None) -> Path:
+def save_snapshot(
+    root: Path, atcf_id: str, cycle: str, text: str, *, now: datetime | None = None,
+    valid_model_keys: set[str] | None = None,
+) -> Path:
     storm, cycle = request_identity(atcf_id, cycle)
     raw = json.loads(text)
     models = {
         key: {field: raw[key][field] for field in RAW_FIELDS if isinstance(raw[key].get(field), list)}
         for key in polarwx_keys() if isinstance(raw.get(key), dict)
+        and (valid_model_keys is None or key in valid_model_keys)
     }
+    previous = load_snapshot(root, storm, cycle) or {}
+    previous_models = previous.get("models", {})
+    fetched_at = (now or datetime.now(timezone.utc)).isoformat()
+    model_fetched_at = {
+        key: previous.get("model_fetched_at", {}).get(key, previous.get("fetched_at"))
+        for key in previous_models
+    }
+    model_fetched_at.update({key: fetched_at for key in models})
     path = snapshot_path(root, storm, cycle)
     write_json(path, {"schema": 1, "atcf_id": storm, "cycle": cycle,
-                      "fetched_at": (now or datetime.now(timezone.utc)).isoformat(), "models": models})
+                      "fetched_at": fetched_at, "model_fetched_at": model_fetched_at,
+                      "retained_models": sorted(previous_models.keys() - models.keys()),
+                      "models": {**previous_models, **models}})
     return path
 
 

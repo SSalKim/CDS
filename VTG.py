@@ -4102,6 +4102,41 @@ def metadata_path_for_settings(settings: Settings) -> Path | None:
     return system_metadata_dir(settings) / "runs" / f"{settings.data_time}_{settings.fcst_hours}h.json"
 
 
+def pending_polarwx_render_loss(
+    df: pd.DataFrame, polarwx_df: pd.DataFrame, settings: Settings, requested_hours: Iterable[int],
+) -> dict[int, list[str]]:
+    """Hold existing images only when their previous Polarwx tracks have no snapshot yet."""
+    if settings.skip_atcf or not settings.overwrite_output:
+        return {}
+    previous_sources = availability_load_json(source_availability_latest_path(settings), {})
+    if (not isinstance(previous_sources, dict) or previous_sources.get("data_time") != settings.data_time
+            or previous_sources.get("atcf_id") != settings.atcf_id):
+        return {}
+    previous_models = {
+        item.get("model_id") for item in previous_sources.get("model_sources", [])
+        if isinstance(item, dict) and item.get("source") == "POLARWX" and item.get("selected")
+    } & set(polarwx_keys().values()) & active_model_names(settings)
+    losses = {}
+    for hours in requested_hours:
+        hour_settings = replace(settings, fcst_hours=hours, fcst_hours_options=(hours,))
+        path = metadata_path_for_settings(hour_settings)
+        previous = availability_load_json(path, {}) if path else {}
+        if (not isinstance(previous, dict) or previous.get("data_time") != settings.data_time
+                or previous.get("atcf_id") != settings.atcf_id or previous.get("fcst_hours") != hours):
+            continue
+        image_path = Path(previous.get("image_path") or "")
+        if not image_path.is_absolute():
+            image_path = PROJECT_ROOT / image_path
+        if not image_path.is_file():
+            continue
+        current = plotted_model_names(limit_forecast_hours(df, hour_settings), hour_settings)
+        cached = plotted_model_names(limit_forecast_hours(polarwx_df, hour_settings), hour_settings)
+        missing = (previous_models & set(previous.get("models", []))) - current - cached
+        if missing:
+            losses[hours] = sorted(missing)
+    return losses
+
+
 def render_signature() -> str:
     return render_code_signature(PROJECT_ROOT)
 
@@ -5327,6 +5362,12 @@ def main() -> None:
         df = (normalize_track_data(kma_df, dmdw_df, polarwx_df, smca_df, atcf_df, fetch_settings)
               if not polarwx_df.empty else available_df)
         log_timing("normalize guidance", stage_started_at, rows=len(df))
+
+        pending_losses = pending_polarwx_render_loss(df, polarwx_df, fetch_settings, requested_hours)
+        if pending_losses:
+            print(f"Keeping previous images while POLARWX prefetch is pending: {pending_losses}")
+            log_timing("VTG.py total (preserved previous images)", main_started_at)
+            return
 
         stage_started_at = time.monotonic()
         try:

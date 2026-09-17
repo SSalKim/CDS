@@ -25,9 +25,12 @@ def collect_requests(requests: list[tuple[str, str]], root: Path) -> dict:
             frame = VTG.read_polarwx_json(text, settings, atcf_id=storm)
             if not VTG.has_forecast_points(frame):
                 raise ValueError("No usable exact-cycle Raw forecast in the page response")
-            path = save_snapshot(root, storm, cycle, text)
+            valid_models = {name for name, track in frame.groupby("SRC") if VTG.has_forecast_points(track)}
+            valid_keys = {key for key, name in VTG.polarwx_keys().items() if name in valid_models}
+            path = save_snapshot(root, storm, cycle, text, valid_model_keys=valid_keys)
+            saved = load_snapshot(root, storm, cycle)
             report.update(path=str(path), models=int(frame["SRC"].nunique()), points=len(frame),
-                          pressure_points=int(frame["PS"].gt(0).sum()))
+                          pressure_points=int(frame["PS"].gt(0).sum()), retained_models=saved["retained_models"])
             result["collected"].append(report)
         except Exception as exc:
             result["failed"].append({"atcf_id": storm, "cycle": cycle, "error": str(exc)})
