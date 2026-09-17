@@ -316,6 +316,22 @@ jobs:
             python -m pip install --only-binary=:all: -r requirements-vtg.txt
           fi
 
+      - name: Restore Polarwx browser cache
+        if: ${{ env.RUNNER_KIND != 'self-hosted' }}
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: vtg-chromium-${{ runner.os }}-${{ hashFiles('requirements-vtg.txt') }}
+
+      - name: Prepare Polarwx browser
+        continue-on-error: true
+        run: |
+          if [ "$RUNNER_KIND" = "self-hosted" ]; then
+            python -m playwright install --only-shell chromium
+          else
+            python -m playwright install --with-deps --only-shell chromium
+          fi
+
       - name: Generate cycle list
         shell: python
         run: |

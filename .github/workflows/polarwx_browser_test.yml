@@ -1,0 +1,57 @@
+name: Test Polarwx browser collection
+run-name: Polarwx browser ${{ inputs.atcf_id }} ${{ inputs.cycle }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      atcf_id:
+        description: "Active storm ATCF ID"
+        required: true
+        default: "wp242026"
+        type: string
+      cycle:
+        description: "Exact UTC cycle YYYYmmddHH"
+        required: true
+        default: "2026091700"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      MPLBACKEND: Agg
+      PYTHONUNBUFFERED: "1"
+      ATCF_ID: ${{ inputs.atcf_id }}
+      CYCLE: ${{ inputs.cycle }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-vtg.txt
+      - name: Install Python dependencies
+        run: python -m pip install --only-binary=:all: -r requirements-vtg.txt
+      - name: Restore browser cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: vtg-chromium-${{ runner.os }}-${{ hashFiles('requirements-vtg.txt') }}
+      - name: Install Chromium
+        run: python -m playwright install --with-deps --only-shell chromium
+      - name: Regression tests
+        run: python -m unittest discover -s tests -p 'test_*.py'
+      - name: Collect exact Raw cycle and benchmark cache reuse
+        run: python polarwx_browser.py --atcf-id "$ATCF_ID" --cycle "$CYCLE" --artifacts-dir "$RUNNER_TEMP/polarwx-browser"
+      - name: Publish test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: polarwx-browser-test
+          path: ${{ runner.temp }}/polarwx-browser/
+          if-no-files-found: ignore
+          retention-days: 3

@@ -31,6 +31,8 @@ import matplotlib.ticker as mticker
 import pandas as pd
 import requests
 
+from polarwx_browser import capture_cycle as capture_polarwx_cycle
+
 from vtg_sources import (
     DMDW_ENABLED_MODEL_IDS,
     MODEL_ALIAS_PRIORITIES,
@@ -1362,9 +1364,12 @@ def read_polarwx_json(text: str | None, settings: Settings, *, atcf_id: str = ""
             if lead_hour < 0 or lead_hour > settings.fcst_hours:
                 continue
             valid_time = normalize_utc_stamp(str(polarwx_value(model.get("time"), index) or ""))
-            if not valid_time and cycle_utc:
+            if cycle_utc:
                 valid_dt = datetime.strptime(cycle_utc, "%Y%m%d%H%M") + timedelta(hours=lead_hour)
-                valid_time = valid_dt.strftime("%Y%m%d%H%M")
+                expected_time = valid_dt.strftime("%Y%m%d%H%M")
+                if valid_time and valid_time != expected_time:
+                    continue
+                valid_time = expected_time
             pressure = pd.to_numeric(polarwx_value(model.get("mslp"), index), errors="coerce")
             wind_kt = pd.to_numeric(polarwx_value(model.get("vmax"), index), errors="coerce")
             rows.append({
@@ -1409,15 +1414,21 @@ def fetch_polarwx_data(session: requests.Session, settings: Settings) -> pd.Data
         if not atcf_id:
             continue
         url = polarwx_url(atcf_id, settings.data_time)
-        text = fetch_text(
-            session,
-            url,
-            retries=1,
-            timeout=10,
-            cache_dir=settings.http_cache_dir,
-            cache_ttl_seconds=settings.http_cache_ttl_seconds,
-        )
+        cache_path = http_cache_path(settings.http_cache_dir, url)
+        text = read_cached_text(cache_path, ttl_seconds=settings.http_cache_ttl_seconds)
         frame = read_polarwx_json(text, settings, atcf_id=atcf_id)
+        if frame.empty:
+            started = time.monotonic()
+            try:
+                text = capture_polarwx_cycle(atcf_id, settings.data_time)
+                frame = read_polarwx_json(text, settings, atcf_id=atcf_id)
+                if not frame.empty:
+                    write_cached_text(cache_path, text)
+            except Exception as exc:
+                print(f"Warning: POLARWX browser collection unavailable for {atcf_id}: {type(exc).__name__}: {exc}")
+            log_timing("POLARWX browser", started, atcf_id=atcf_id, rows=len(frame))
+        else:
+            print(f"Using cached POLARWX browser response: {atcf_id} {settings.data_time[:10]}")
         if not frame.empty:
             print(f"Loaded POLARWX source data: {atcf_id} rows={len(frame)}")
             frames.append(frame)
