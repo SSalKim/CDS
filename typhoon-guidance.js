@@ -116,9 +116,9 @@ const TYPHOON_MODEL_INFO=[
 {name:'Pangu-Weather-KIM',description:'[AI] 기상청 수행 Pangu-Weather (KIM 초기장)'},
 {name:'GraphCast-ECMWF',description:'[AI] 기상청 수행 GraphCast (ECMWF 초기장)'},
 {name:'GraphCast-KIM',description:'[AI] 기상청 수행 GraphCast (KIM 초기장)'},
-{modelId:'GENC',name:'GenCast',description:'[AI] 구글 딥마인드 앙상블모델(GenCast) 평균'},
-{modelId:'WNC',name:'WeatherNext2 Cyclones',description:'[AI] 구글 딥마인드 WeatherNext2 기반 태풍예측 앙상블 평균'},
-{modelId:'WNV3',name:'WeatherNext3 Cyclones',description:'[AI] 구글 딥마인드 WeatherNext3 기반 태풍예측 앙상블 평균'},
+{modelId:'GENC',name:'GenCast',description:'[AI] 구글 딥마인드 WeatherNext1 앙상블모델(GenCast) 평균'},
+{modelId:'WNC',name:'WeatherNext2 Cyclones',description:'[AI] 구글 딥마인드 WeatherNext2 태풍예측모델(FNV3) 앙상블 평균'},
+{modelId:'WNV3',name:'WeatherNext3 Cyclones',description:'[AI] 구글 딥마인드 WeatherNext3 태풍예측모델(WNV3) 앙상블 평균'},
 {name:'Aurora-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 Aurora (ECMWF 초기장)'},
 {name:'FuXi-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FuXi (ECMWF 초기장)'},
 {name:'FengWu-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FengWu (ECMWF 초기장)'},
@@ -630,7 +630,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "Google DeepMind 차세대 AI모델 WeatherNext3 기반 태풍예측모델(시험운영)"
+    "참고사항": "Google DeepMind 차세대 AI모델 WeatherNext3 기반 태풍예측모델(WNV3) (시험운영)"
   },
   {
     "표출명칭": "Aurora-ECMWF",

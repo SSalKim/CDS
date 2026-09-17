@@ -27,8 +27,14 @@ for(const id of ['WNC','WNV3']){
   assert.equal(catalog.colors[brief.name],model.color);
 }
 assert.equal(catalog.labels.FNV3,catalog.labels.WNC);
+assert.equal(catalog.rows.find(row=>row.modelId==='GENC').description,'[AI] 구글 딥마인드 WeatherNext1 앙상블모델(GenCast) 평균');
+assert.equal(catalog.details.find(row=>row['표출명칭']==='GenCast')['참고사항'],'Google DeepMind AI모델 WeatherNext1 기반 앙상블모델(GenCast)');
 assert.equal(catalog.details.find(row=>row.model_id==='WNC')['모델명'],'WeatherNext2 (WeatherNext Cyclones)');
 assert.equal(catalog.details.find(row=>row.model_id==='WNV3')['모델명'],'WeatherNext3 (WeatherNext Cyclones)');
+assert.equal(catalog.rows.find(row=>row.modelId==='WNC').description,'[AI] 구글 딥마인드 WeatherNext2 태풍예측모델(FNV3) 앙상블 평균');
+assert.equal(catalog.rows.find(row=>row.modelId==='WNV3').description,'[AI] 구글 딥마인드 WeatherNext3 태풍예측모델(WNV3) 앙상블 평균');
+assert.equal(catalog.details.find(row=>row.model_id==='WNC')['참고사항'],'Google DeepMind AI모델 WeatherNext2 기반 태풍예측모델(FNV3)');
+assert.equal(catalog.details.find(row=>row.model_id==='WNV3')['참고사항'],'Google DeepMind 차세대 AI모델 WeatherNext3 기반 태풍예측모델(WNV3) (시험운영)');
 assert.equal(catalog.colors.FNV3,catalog.colors.WNC);
 const index=catalog.rows.findIndex(row=>row.modelId==='GENC');
 assert.deepEqual(catalog.rows.slice(index,index+3).map(row=>row.modelId),['GENC','WNC','WNV3']);
