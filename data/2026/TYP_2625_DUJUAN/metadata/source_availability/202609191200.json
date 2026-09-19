@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260919203021",
-  "generated_at_kst": "2026-09-20 05:30 KST",
+  "generated_at_utc": "20260919204022",
+  "generated_at_kst": "2026-09-20 05:40 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_25",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 79,
-  "selected_model_count": 33,
+  "model_source_count": 84,
+  "selected_model_count": 36,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -98,6 +98,23 @@
       "is_official": false,
       "first_seen_utc": "20260919175040",
       "first_seen_kst": "2026-09-20 02:50 KST"
+    },
+    {
+      "model_id": "HKO_AREC",
+      "model_label": "Aurora-ECMWF",
+      "raw_model_ids": [
+        "HKO_AREC"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 18,
+      "max_lead_hour": 102,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260919204022",
+      "first_seen_kst": "2026-09-20 05:40 KST"
     },
     {
       "model_id": "CMC",
@@ -544,6 +561,23 @@
       "first_seen_kst": "2026-09-20 05:30 KST"
     },
     {
+      "model_id": "HKO_FWEC",
+      "model_label": "FengWu-ECMWF",
+      "raw_model_ids": [
+        "HKO_FWEC"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260919204022",
+      "first_seen_kst": "2026-09-20 05:40 KST"
+    },
+    {
       "model_id": "FNEC_AI",
       "model_label": "FourCastNet-ECMWF",
       "raw_model_ids": [
@@ -576,6 +610,23 @@
       "is_official": false,
       "first_seen_utc": "20260919194022",
       "first_seen_kst": "2026-09-20 04:40 KST"
+    },
+    {
+      "model_id": "HKO_FXEC",
+      "model_label": "FuXi-ECMWF",
+      "raw_model_ids": [
+        "HKO_FXEC"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 18,
+      "max_lead_hour": 102,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260919204022",
+      "first_seen_kst": "2026-09-20 05:40 KST"
     },
     {
       "model_id": "GFS",
@@ -1131,9 +1182,43 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 19,
       "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260919195019",
+      "first_seen_kst": "2026-09-20 04:50 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 18,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260919204022",
+      "first_seen_kst": "2026-09-20 05:40 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "NEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 20,
+      "max_lead_hour": 114,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -1144,18 +1229,18 @@
       "model_id": "FNMOC_EPS",
       "model_label": "NAVGEM EPS",
       "raw_model_ids": [
-        "NEMN"
+        "FNMOC_EPS"
       ],
-      "source": "KNACKWX",
-      "source_label": "KNACKWX ATCF",
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 20,
-      "max_lead_hour": 114,
+      "point_count": 27,
+      "max_lead_hour": 156,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20260919195019",
-      "first_seen_kst": "2026-09-20 04:50 KST"
+      "first_seen_utc": "20260919204022",
+      "first_seen_kst": "2026-09-20 05:40 KST"
     },
     {
       "model_id": "PGEC_AI",
