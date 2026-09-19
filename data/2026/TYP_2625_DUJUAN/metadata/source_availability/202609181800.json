@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260919012016",
-  "generated_at_kst": "2026-09-19 10:20 KST",
+  "generated_at_utc": "20260919013024",
+  "generated_at_kst": "2026-09-19 10:30 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_25",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 48,
+  "model_source_count": 50,
   "selected_model_count": 17,
   "active_target_model_count": 40,
   "model_sources": [
@@ -465,8 +465,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 24,
-      "max_lead_hour": 138,
+      "point_count": 33,
+      "max_lead_hour": 192,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -558,6 +558,23 @@
       "is_official": false,
       "first_seen_utc": "20260919011027",
       "first_seen_kst": "2026-09-19 10:10 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 21,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260919013024",
+      "first_seen_kst": "2026-09-19 10:30 KST"
     },
     {
       "model_id": "HAFS",
@@ -847,6 +864,23 @@
       "is_official": false,
       "first_seen_utc": "20260919011027",
       "first_seen_kst": "2026-09-19 10:10 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WN3C"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 23,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260919013024",
+      "first_seen_kst": "2026-09-19 10:30 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2625_DUJUAN/metadata/source_availability/202609181800.json",
