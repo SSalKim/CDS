@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "20260920063049",
+  "generated_at_utc": "20260920064048",
   "render_signature": "ee2a93328e104f523b5742c51322bd5f70e738e779881e67fe1c132cfb948d75",
   "image_path": "data/2026/TYP_2625_DUJUAN/images/TYP_2625_DUJUAN_202609200000_120h.png",
   "storm_stage": "TYP",
@@ -20,7 +20,7 @@
   "data_time": "202609200000",
   "fcst_hours": 120,
   "intensity": "TYP",
-  "model_count": 15,
+  "model_count": 17,
   "target_model_count": 40,
   "models": [
     "AGFS",
@@ -36,6 +36,8 @@
     "ICON",
     "ICON_EPS",
     "JGSM",
+    "KIM_3h",
+    "KIM_EPS",
     "TEPS",
     "WNC"
   ],
@@ -53,10 +55,20 @@
     "ICON",
     "ICON EPS",
     "JGSM",
+    "KIM",
+    "KIM EPS",
     "JGSM EPS",
     "WeatherNext2 Cyclones"
   ],
-  "motion_qc_fallbacks": [],
+  "motion_qc_fallbacks": [
+    {
+      "model": "KIM_3h",
+      "fallback_model": "KIM_6h",
+      "source": "APIHUB",
+      "start_lead_hour": 78.0,
+      "end_lead_hour": 84.0
+    }
+  ],
   "skip_atcf": false,
   "source_availability_path": "data/2026/TYP_2625_DUJUAN/metadata/source_availability/202609200000.json",
   "smca_aicon_snapshot_path": "data/2026/TYP_2625_DUJUAN/metadata/smca/AICON/202609200000.json",
