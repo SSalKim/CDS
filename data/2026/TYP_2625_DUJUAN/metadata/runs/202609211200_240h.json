@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "20260921182052",
+  "generated_at_utc": "20260921183053",
   "render_signature": "ed6eb6567de39d5293044d1541606e6f68ea397b6673d46020fbe7c8dd863381",
   "image_path": "data/2026/TYP_2625_DUJUAN/images/TYP_2625_DUJUAN_202609211200_240h.png",
   "storm_stage": "TYP",
@@ -20,7 +20,7 @@
   "data_time": "202609211200",
   "fcst_hours": 240,
   "intensity": "TYP",
-  "model_count": 10,
+  "model_count": 12,
   "target_model_count": 40,
   "models": [
     "AGFS",
@@ -32,6 +32,8 @@
     "ICON",
     "ICON_EPS",
     "JGSM",
+    "KIM_3h",
+    "KIM_EPS",
     "TEPS"
   ],
   "model_labels": [
@@ -44,9 +46,19 @@
     "ICON",
     "ICON EPS",
     "JGSM",
+    "KIM",
+    "KIM EPS",
     "JGSM EPS"
   ],
-  "motion_qc_fallbacks": [],
+  "motion_qc_fallbacks": [
+    {
+      "model": "KIM_3h",
+      "fallback_model": "KIM_6h",
+      "source": "APIHUB",
+      "start_lead_hour": 36.0,
+      "end_lead_hour": 42.0
+    }
+  ],
   "skip_atcf": false,
   "source_availability_path": "data/2026/TYP_2625_DUJUAN/metadata/source_availability/202609211200.json",
   "smca_aifsm_snapshot_path": "data/2026/TYP_2625_DUJUAN/metadata/smca/AIFSM/202609211200.json",
