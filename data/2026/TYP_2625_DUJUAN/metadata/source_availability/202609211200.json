@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260921200020",
-  "generated_at_kst": "2026-09-22 05:00 KST",
+  "generated_at_utc": "20260921201023",
+  "generated_at_kst": "2026-09-22 05:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_25",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 72,
-  "selected_model_count": 29,
+  "model_source_count": 74,
+  "selected_model_count": 31,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -1090,6 +1090,23 @@
       "first_seen_kst": "2026-09-22 01:00 KST"
     },
     {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 16,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260921201023",
+      "first_seen_kst": "2026-09-22 05:10 KST"
+    },
+    {
       "model_id": "FNMOC_EPS",
       "model_label": "NAVGEM EPS",
       "raw_model_ids": [
@@ -1258,6 +1275,23 @@
       "is_official": false,
       "first_seen_utc": "20260921195021",
       "first_seen_kst": "2026-09-22 04:50 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 10,
+      "max_lead_hour": 54,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260921201023",
+      "first_seen_kst": "2026-09-22 05:10 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2625_DUJUAN/metadata/source_availability/202609211200.json",
