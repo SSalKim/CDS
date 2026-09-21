@@ -4592,11 +4592,29 @@ def auto_120_map_extent(df: pd.DataFrame, settings: Settings) -> list[float] | N
         x1, y1 = projection.transform_point(east, north, data_crs)
         return x0, x1, y0, y1
 
+    hard_x0, hard_x1, hard_y0, hard_y1 = project_bounds({
+        "LON": (DISPLAY_120_LON_MIN, DISPLAY_120_LON_MAX),
+        "LAT": (DISPLAY_120_LAT_MIN, DISPLAY_120_LAT_MAX),
+    })
+
+    def padded_span(low, high, hard_low, hard_high, safe):
+        # Cap padding at the domain edge, not after choosing the zoom level.
+        # These are the four cases: neither, lower, upper, or both pads capped.
+        return min((high - low) / (safe[1] - safe[0]),
+                   (high - hard_low) / safe[1],
+                   (hard_high - low) / (1.0 - safe[0]),
+                   hard_high - hard_low)
+
     def required_width(bounds):
         x0, x1, y0, y1 = bounds
         return max(21.0 * metres_per_degree,
-                   (x1 - x0) / (safe_x[1] - safe_x[0]),
-                   (y1 - y0) / (safe_y[1] - safe_y[0]) * aspect)
+                   padded_span(x0, x1, hard_x0, hard_x1, safe_x),
+                   padded_span(y0, y1, hard_y0, hard_y1, safe_y) * aspect)
+
+    def place_axis(preferred, low, high, span, hard_low, hard_high, safe):
+        low_pad = min(safe[0] * span, low - hard_low)
+        high_pad = min((1.0 - safe[1]) * span, hard_high - high)
+        return min(max(preferred, high + high_pad - span), low - low_pad)
 
     core_box, context_box = project_bounds(core), project_bounds(context)
     core_width = required_width(core_box)
@@ -4606,8 +4624,8 @@ def auto_120_map_extent(df: pd.DataFrame, settings: Settings) -> list[float] | N
     cx0, cx1, cy0, cy1 = context_box
     preferred_x0 = (cx0 + cx1) / 2 - width * 0.52
     preferred_y0 = (cy0 + cy1) / 2 - height * sum(safe_y) / 2
-    left = min(max(preferred_x0, x1 - safe_x[1] * width), x0 - safe_x[0] * width)
-    bottom = min(max(preferred_y0, y1 - safe_y[1] * height), y0 - safe_y[0] * height)
+    left = place_axis(preferred_x0, x0, x1, width, hard_x0, hard_x1, safe_x)
+    bottom = place_axis(preferred_y0, y0, y1, height, hard_y0, hard_y1, safe_y)
     _, south = data_crs.transform_point(0, bottom, projection)
     _, north = data_crs.transform_point(0, bottom + height, projection)
     # Mercator x is linear in longitude. Avoid inverse-projection wrapping

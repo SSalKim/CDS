@@ -330,6 +330,41 @@ class CameraTests(unittest.TestCase):
         self.assert_domain_aspect(extent)
         self.assertAlmostEqual(extent[1] - extent[0], initial[1] - initial[0], places=7)
 
+    def test_poleward_exit_does_not_reserve_padding_beyond_north_boundary(self):
+        data = track(lat=28.5, lon=140, dx=0, dy=0.25)
+        extent = self.finalize(VTG.auto_120_map_extent(data, self.settings), (140, 28.5))
+        self.assert_domain_aspect(extent)
+        _, start_y = self.projection.transform_point(140, 28.5, self.data_crs)
+        _, north_y = self.projection.transform_point(140, 50, self.data_crs)
+        x0, x1, _, _ = self.projected(extent)
+        expected = (north_y - start_y) / (1 - VTG.CAMERA_120_SAFE_Y[0]) * 4 / 3
+        self.assertAlmostEqual(x1 - x0, expected, places=6)
+        self.assertGreaterEqual(self.anchor_fraction(extent, (140, 28.5))[1], 0.08 - 1e-8)
+
+    def test_near_east_boundary_caps_padding_without_dropping_terminal(self):
+        data = track(lat=28.5, lon=130, dx=0.41, dy=0.05)
+        extent = self.finalize(VTG.auto_120_map_extent(data, self.settings), (130, 28.5))
+        self.assert_domain_aspect(extent)
+        old_width = (data.LON.max() - data.LON.min()) / 0.84
+        self.assertLess(extent[1] - extent[0], old_width * 0.95)
+        self.assertLessEqual(extent[0], data.LON.min())
+        self.assertGreaterEqual(extent[1], data.LON.max())
+        self.assertGreaterEqual(self.anchor_fraction(extent, (130, 28.5))[0], 0.08 - 1e-8)
+
+    def test_boundary_padding_change_keeps_first_day_and_current_in_frame(self):
+        for lon, lat, dx, dy in [(138, 28.5, 0.34, 0.23), (150, 20, -0.45, 0),
+                                  (140, 28, 0, -0.3)]:
+            with self.subTest(lon=lon, lat=lat):
+                data = track(lon=lon, lat=lat, dx=dx, dy=dy)
+                extent = self.finalize(VTG.auto_120_map_extent(data, self.settings), (lon, lat))
+                self.assert_domain_aspect(extent)
+                for row in data[data.TMD.le(24)].itertuples():
+                    x, y = self.anchor_fraction(extent, (row.LON, row.LAT))
+                    self.assertGreaterEqual(x, 0.08 - 1e-8)
+                    self.assertLessEqual(x, 0.92 + 1e-8)
+                    self.assertGreaterEqual(y, 0.08 - 1e-8)
+                    self.assertLessEqual(y, 0.84 + 1e-8)
+
     def test_negligible_weight_cannot_bridge_a_large_gap(self):
         points = pd.DataFrame({"LAT": [20, 20, 46], "CAMERA_WEIGHT": [1, 1, 0.0001]})
         self.assertEqual(VTG.weighted_camera_bounds(points, "LAT"), (20, 20))
