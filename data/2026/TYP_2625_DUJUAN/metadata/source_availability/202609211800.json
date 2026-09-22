@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260922005024",
-  "generated_at_kst": "2026-09-22 09:50 KST",
+  "generated_at_utc": "20260922010024",
+  "generated_at_kst": "2026-09-22 10:00 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_25",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 38,
+  "model_source_count": 44,
   "selected_model_count": 14,
   "active_target_model_count": 40,
   "model_sources": [
@@ -151,6 +151,23 @@
       "first_seen_kst": "2026-09-22 09:30 KST"
     },
     {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECM"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 6,
+      "max_lead_hour": 30,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260922010024",
+      "first_seen_kst": "2026-09-22 10:00 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
       "raw_model_ids": [
@@ -202,6 +219,23 @@
       "first_seen_kst": "2026-09-22 09:50 KST"
     },
     {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 10,
+      "max_lead_hour": 54,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260922010024",
+      "first_seen_kst": "2026-09-22 10:00 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS_EPS",
       "model_label": "ECMWF AIFS EPS",
       "raw_model_ids": [
@@ -251,6 +285,23 @@
       "is_official": false,
       "first_seen_utc": "20260922005024",
       "first_seen_kst": "2026-09-22 09:50 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260922010024",
+      "first_seen_kst": "2026-09-22 10:00 KST"
     },
     {
       "model_id": "ECMWF_EPS",
@@ -441,6 +492,23 @@
       "first_seen_kst": "2026-09-22 09:50 KST"
     },
     {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260922010024",
+      "first_seen_kst": "2026-09-22 10:00 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -473,6 +541,23 @@
       "is_official": false,
       "first_seen_utc": "20260922001022",
       "first_seen_kst": "2026-09-22 09:10 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFSA"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 23,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260922010024",
+      "first_seen_kst": "2026-09-22 10:00 KST"
     },
     {
       "model_id": "ICON",
@@ -677,6 +762,23 @@
       "is_official": false,
       "first_seen_utc": "20260922005024",
       "first_seen_kst": "2026-09-22 09:50 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "DEEPMIND"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 8,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260922010024",
+      "first_seen_kst": "2026-09-22 10:00 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2625_DUJUAN/metadata/source_availability/202609211800.json",
