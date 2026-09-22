@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260922193024",
-  "generated_at_kst": "2026-09-23 04:30 KST",
+  "generated_at_utc": "20260922194024",
+  "generated_at_kst": "2026-09-23 04:40 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_54",
   "storm_stage": "TD",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 46,
+  "model_source_count": 50,
   "selected_model_count": 30,
   "active_target_model_count": 40,
   "model_sources": [
@@ -253,6 +253,23 @@
       "first_seen_kst": "2026-09-23 04:10 KST"
     },
     {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260922194024",
+      "first_seen_kst": "2026-09-23 04:40 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS_EPS",
       "model_label": "ECMWF AIFS EPS",
       "raw_model_ids": [
@@ -260,7 +277,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 39,
       "max_lead_hour": 240,
       "has_pressure": true,
@@ -268,6 +285,23 @@
       "is_official": false,
       "first_seen_utc": "20260922191023",
       "first_seen_kst": "2026-09-23 04:10 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260922194024",
+      "first_seen_kst": "2026-09-23 04:40 KST"
     },
     {
       "model_id": "FNEC_AI",
@@ -329,8 +363,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 29,
-      "max_lead_hour": 168,
+      "point_count": 41,
+      "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -363,8 +397,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 36,
-      "max_lead_hour": 210,
+      "point_count": 41,
+      "max_lead_hour": 240,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -421,6 +455,23 @@
       "is_official": false,
       "first_seen_utc": "20260922192026",
       "first_seen_kst": "2026-09-23 04:20 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 37,
+      "max_lead_hour": 216,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260922194024",
+      "first_seen_kst": "2026-09-23 04:40 KST"
     },
     {
       "model_id": "GCEC_AI",
@@ -702,7 +753,7 @@
       ],
       "source": "RAL.UCAR",
       "source_label": "RAL UCAR ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 29,
       "max_lead_hour": 168,
       "has_pressure": true,
@@ -727,6 +778,23 @@
       "is_official": false,
       "first_seen_utc": "20260922191023",
       "first_seen_kst": "2026-09-23 04:10 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKMET"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 29,
+      "max_lead_hour": 168,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260922194024",
+      "first_seen_kst": "2026-09-23 04:40 KST"
     },
     {
       "model_id": "WNC",
