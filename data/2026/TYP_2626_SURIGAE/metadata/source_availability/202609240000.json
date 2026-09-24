@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260924070018",
-  "generated_at_kst": "2026-09-24 16:00 KST",
+  "generated_at_utc": "20260924071024",
+  "generated_at_kst": "2026-09-24 16:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_26",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 57,
-  "selected_model_count": 20,
+  "model_source_count": 60,
+  "selected_model_count": 22,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -303,6 +303,40 @@
       "is_official": false,
       "first_seen_utc": "20260924070018",
       "first_seen_kst": "2026-09-24 16:00 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 30,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260924071024",
+      "first_seen_kst": "2026-09-24 16:10 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 30,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260924071024",
+      "first_seen_kst": "2026-09-24 16:10 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -1002,6 +1036,23 @@
       "is_official": false,
       "first_seen_utc": "20260924070018",
       "first_seen_kst": "2026-09-24 16:00 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 34,
+      "max_lead_hour": 198,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260924071024",
+      "first_seen_kst": "2026-09-24 16:10 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2626_SURIGAE/metadata/source_availability/202609240000.json",
