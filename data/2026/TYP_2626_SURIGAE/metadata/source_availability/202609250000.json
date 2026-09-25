@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260925055055",
-  "generated_at_kst": "2026-09-25 14:50 KST",
+  "generated_at_utc": "20260925060018",
+  "generated_at_kst": "2026-09-25 15:00 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_26",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 18,
+  "model_source_count": 20,
   "selected_model_count": 9,
   "active_target_model_count": 40,
   "model_sources": [
@@ -168,6 +168,23 @@
       "first_seen_kst": "2026-09-25 14:20 KST"
     },
     {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "gfs"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260925060018",
+      "first_seen_kst": "2026-09-25 15:00 KST"
+    },
+    {
       "model_id": "GFS_EPS",
       "model_label": "GFS EPS",
       "raw_model_ids": [
@@ -218,6 +235,23 @@
       "is_official": false,
       "first_seen_utc": "20260925055055",
       "first_seen_kst": "2026-09-25 14:50 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GEFS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 39,
+      "max_lead_hour": 228,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260925060018",
+      "first_seen_kst": "2026-09-25 15:00 KST"
     },
     {
       "model_id": "ICON",
