@@ -52,7 +52,7 @@ EXPECTED_SOURCE_MODELS = {
         "ECMWF", "ECMWF_EPS", "UKM", "UKMO_EPS", "GFS", "GFS_EPS", "CMC",
         "CMC_EPS", "JGSM", "TEPS", "NAVGEM", "FNMOC_EPS", "CTCX", "COAMPS_EPS",
         "HWRF", "HAFS", "ECMWF_AIFS", "ECMWF_AIFS_EPS", "AGFS", "AIGEFS",
-        "GENC", "WNC", "WNV3",
+        "GENC", "WNC", "WNV3", "ICON", "ICON_EPS",
     },
 }
 

@@ -1827,7 +1827,7 @@ def knackwx_url(atcf_id: str, data_time: str) -> str:
         "cycle": "late",
         "initTime": f"{data_time[8:10]}z",
     })
-    return f"https://api.knackwx.com/atcf/v2/aid/archive?{query}"
+    return f"https://api.knackwx.com/atcf/v2/aid/history/text?{query}"
 
 
 def bdeck_url(atcf_id: str) -> str:
@@ -1991,8 +1991,8 @@ def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFra
             url,
             retries=1 if is_knackwx else 2,
             timeout=15,
-            # This endpoint has no date in its URL and replaces same-hour data
-            # daily, so a persistent cache could replay yesterday's cycle.
+            # This endpoint has no date in its URL and updates as forecasts
+            # arrive, so a persistent cache could replay an older snapshot.
             cache_dir=None if is_knackwx else settings.http_cache_dir,
             cache_ttl_seconds=settings.http_cache_ttl_seconds,
         )
