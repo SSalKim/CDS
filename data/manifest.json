@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at_utc": "202609280649",
+  "updated_at_utc": "202609280700",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 39,
@@ -17,7 +17,7 @@
     {
       "job": {
         "storm_key": "td_2026_55",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202609280000",
         "td_number": 55,
@@ -26,8 +26,8 @@
         "typ_name_ko": "",
         "typ_name": "NONAME",
         "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true
+        "atcf_id": "wp932026",
+        "skip_atcf": false
       },
       "window": {
         "data_time": "202609280000",
@@ -36,9 +36,9 @@
         "end_utc": "202609281000"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260928064949",
+          "generated_at_utc": "20260928070059",
           "image_path": "data/2026/TD_2655_NONAME/images/TD_2655_NONAME_202609280000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -53,19 +53,24 @@
           "canonical_typ_number": 55,
           "canonical_typ_name": "NONAME",
           "canonical_typ_name_ko": "",
-          "atcf_id": "",
+          "atcf_id": "wp932026",
           "extra_atcf_ids": [],
           "data_time": "202609280000",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 7,
           "target_model_count": 40,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": true,
-          "source_availability_path": "data/2026/TD_2655_NONAME/metadata/source_availability/202609280000.json",
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+          "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "GFS EPS",
+            "KIM",
+            "KIM EPS",
+            "WeatherNext2 Cyclones",
+            "WeatherNext3 Cyclones"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TD_2655_NONAME/metadata/source_availability/202609280000.json"
         }
       },
       "completed": false,
@@ -74,7 +79,7 @@
     {
       "job": {
         "storm_key": "td_2026_55",
-        "stage": "TD_UNLINKED",
+        "stage": "TD_POSITION_ATCF",
         "year": 2026,
         "data_time": "202609280000",
         "td_number": 55,
@@ -83,8 +88,8 @@
         "typ_name_ko": "",
         "typ_name": "NONAME",
         "typ_en": "",
-        "atcf_id": null,
-        "skip_atcf": true
+        "atcf_id": "wp932026",
+        "skip_atcf": false
       },
       "window": {
         "data_time": "202609280000",
@@ -93,9 +98,9 @@
         "end_utc": "202609281000"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260928064949",
+          "generated_at_utc": "20260928070109",
           "image_path": "data/2026/TD_2655_NONAME/images/TD_2655_NONAME_202609280000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -110,19 +115,24 @@
           "canonical_typ_number": 55,
           "canonical_typ_name": "NONAME",
           "canonical_typ_name_ko": "",
-          "atcf_id": "",
+          "atcf_id": "wp932026",
           "extra_atcf_ids": [],
           "data_time": "202609280000",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 7,
           "target_model_count": 40,
-          "models": [],
-          "model_labels": [],
-          "skip_atcf": true,
-          "source_availability_path": "data/2026/TD_2655_NONAME/metadata/source_availability/202609280000.json",
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+          "model_labels": [
+            "CMC",
+            "CMC EPS",
+            "GFS EPS",
+            "KIM",
+            "KIM EPS",
+            "WeatherNext2 Cyclones",
+            "WeatherNext3 Cyclones"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TD_2655_NONAME/metadata/source_availability/202609280000.json"
         }
       },
       "completed": false,
@@ -152,7 +162,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260928065020",
+          "generated_at_utc": "20260928070111",
           "image_path": "data/2026/TYP_2626_SURIGAE/images/TYP_2626_SURIGAE_202609280000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -172,7 +182,7 @@
           "data_time": "202609280000",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 15,
+          "model_count": 19,
           "target_model_count": 40,
           "model_labels": [
             "AIGFS",
@@ -188,8 +198,12 @@
             "ICON",
             "ICON EPS",
             "JGSM",
+            "KIM",
+            "KIM EPS",
             "JGSM EPS",
-            "WeatherNext2 Cyclones"
+            "UKMO",
+            "WeatherNext2 Cyclones",
+            "WeatherNext3 Cyclones"
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2626_SURIGAE/metadata/source_availability/202609280000.json",
@@ -225,7 +239,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20260928065022",
+          "generated_at_utc": "20260928070112",
           "image_path": "data/2026/TYP_2626_SURIGAE/images/TYP_2626_SURIGAE_202609280000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -245,7 +259,7 @@
           "data_time": "202609280000",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 15,
+          "model_count": 19,
           "target_model_count": 40,
           "model_labels": [
             "AIGFS",
@@ -261,8 +275,12 @@
             "ICON",
             "ICON EPS",
             "JGSM",
+            "KIM",
+            "KIM EPS",
             "JGSM EPS",
-            "WeatherNext2 Cyclones"
+            "UKMO",
+            "WeatherNext2 Cyclones",
+            "WeatherNext3 Cyclones"
           ],
           "skip_atcf": false,
           "source_availability_path": "data/2026/TYP_2626_SURIGAE/metadata/source_availability/202609280000.json",
@@ -275,7 +293,7 @@
       "final_check": false
     }
   ],
-  "inventory_count": 9488,
+  "inventory_count": 9490,
   "manifest_indexes": [
     {
       "year": 2020,
