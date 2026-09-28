@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260928013950",
-  "generated_at_kst": "2026-09-28 10:39 KST",
+  "generated_at_utc": "20260928014949",
+  "generated_at_kst": "2026-09-28 10:49 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_26",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 47,
+  "model_source_count": 50,
   "selected_model_count": 17,
   "active_target_model_count": 40,
   "model_sources": [
@@ -253,6 +253,23 @@
       "first_seen_kst": "2026-09-28 10:39 KST"
     },
     {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 4,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260928014949",
+      "first_seen_kst": "2026-09-28 10:49 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS_EPS",
       "model_label": "ECMWF AIFS EPS",
       "raw_model_ids": [
@@ -285,6 +302,23 @@
       "is_official": false,
       "first_seen_utc": "20260928013950",
       "first_seen_kst": "2026-09-28 10:39 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "EAIM"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 14,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260928014949",
+      "first_seen_kst": "2026-09-28 10:49 KST"
     },
     {
       "model_id": "ECMWF_EPS",
@@ -831,6 +865,23 @@
       "is_official": false,
       "first_seen_utc": "20260928013950",
       "first_seen_kst": "2026-09-28 10:39 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 21,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260928014949",
+      "first_seen_kst": "2026-09-28 10:49 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2626_SURIGAE/metadata/source_availability/202609271800.json",
