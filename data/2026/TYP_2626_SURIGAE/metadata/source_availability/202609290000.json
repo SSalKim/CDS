@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260929072954",
-  "generated_at_kst": "2026-09-29 16:29 KST",
+  "generated_at_utc": "20260929073959",
+  "generated_at_kst": "2026-09-29 16:39 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_26",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 58,
+  "model_source_count": 64,
   "selected_model_count": 22,
   "active_target_model_count": 40,
   "model_sources": [
@@ -356,6 +356,23 @@
       "first_seen_kst": "2026-09-29 16:19 KST"
     },
     {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECM"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260929073959",
+      "first_seen_kst": "2026-09-29 16:39 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
       "raw_model_ids": [
@@ -390,6 +407,23 @@
       "first_seen_kst": "2026-09-29 15:09 KST"
     },
     {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260929073959",
+      "first_seen_kst": "2026-09-29 16:39 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS_EPS",
       "model_label": "ECMWF AIFS EPS",
       "raw_model_ids": [
@@ -397,7 +431,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 10,
       "max_lead_hour": 72,
       "has_pressure": true,
@@ -405,6 +439,23 @@
       "is_official": false,
       "first_seen_utc": "20260929065005",
       "first_seen_kst": "2026-09-29 15:50 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260929073959",
+      "first_seen_kst": "2026-09-29 16:39 KST"
     },
     {
       "model_id": "GFS",
@@ -535,8 +586,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 16,
-      "max_lead_hour": 90,
+      "point_count": 18,
+      "max_lead_hour": 102,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -593,6 +644,23 @@
       "is_official": false,
       "first_seen_utc": "20260929071004",
       "first_seen_kst": "2026-09-29 16:10 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260929073959",
+      "first_seen_kst": "2026-09-29 16:39 KST"
     },
     {
       "model_id": "HAFS",
@@ -926,7 +994,7 @@
       ],
       "source": "RAL.UCAR",
       "source_label": "RAL UCAR ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 19,
       "max_lead_hour": 108,
       "has_pressure": true,
@@ -934,6 +1002,23 @@
       "is_official": false,
       "first_seen_utc": "20260929070002",
       "first_seen_kst": "2026-09-29 16:00 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKMET"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 19,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260929073959",
+      "first_seen_kst": "2026-09-29 16:39 KST"
     },
     {
       "model_id": "WNC",
@@ -1019,6 +1104,23 @@
       "is_official": false,
       "first_seen_utc": "20260929070002",
       "first_seen_kst": "2026-09-29 16:00 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WN3C"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 13,
+      "max_lead_hour": 72,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260929073959",
+      "first_seen_kst": "2026-09-29 16:39 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2626_SURIGAE/metadata/source_availability/202609290000.json",
