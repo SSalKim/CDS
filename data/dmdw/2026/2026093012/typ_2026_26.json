@@ -1,0 +1,25 @@
+{
+  "cycle": "2026093012",
+  "cycle_utc": "202609301200",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":36,"member_id":null,"model_id":"JGSM","point_count":7,"raw_model_id":"JGSM","row_count":7,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 7,
+  "points": [
+    [0,0,"202609301200",31.9,138.9,996,20,14,45,130,null],
+    [0,6,"202609301800",32.5,139.7,1000,15.9,-9,null,0,null],
+    [0,12,"202610010000",33.4,140.6,1002,15.9,-9,null,0,null],
+    [0,18,"202610010600",34.6,142,1000,16.5,-9,null,0,null],
+    [0,24,"202610011200",36.4,144.6,1001,18.5,-9,null,0,null],
+    [0,30,"202610011800",38,148.2,995,27.3,-9,null,0,null],
+    [0,36,"202610020000",39.9,152.8,995,24.7,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"29","storm_kind":"typ","typ_seq":26,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"SURIGAE","canonical_typ_name_ko":"수리개","canonical_typ_number":26,"data_typ_number":26,"dmdw_o_tm_seq":"29","dmdw_start_time":"202609231200","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_26"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
