@@ -118,6 +118,13 @@ conf_rain_intensity:{
   defaultValue:'no1'
 },
 
+conf_rain_12h_intensity:{
+  title:'12H강수',
+  widthClass:'wide',
+  optionSet:'conf_rain_intensities',
+  defaultValue:'no1'
+},
+
 sstRegion:{
   title:'지역',
   widthClass:'narrow',
@@ -420,6 +427,7 @@ ensemble:{
     selector:'stationWide',
     excludeByModel:{
       kim_epsg:['47175','47251'],
+      ukmo_epsg:['47175','47251'],
       um_epsg:['47175','47172'],
       ecmwf_eps:['47175','47172']
     },
@@ -428,6 +436,7 @@ ensemble:{
     selector:'stationWide',
     excludeByModel:{
       kim_epsg:['47175','47251'],
+      ukmo_epsg:['47175','47251'],
       um_epsg:['47175','47172'],
       ecmwf_eps:['47175','47172']
     },
@@ -443,6 +452,7 @@ ensemble:{
     selector:'stationWide',
     excludeByModel:{
       kim_epsg:['47175','47251'],
+      ukmo_epsg:['47175','47251'],
       um_epsg:['47175','47172'],
       ecmwf_eps:['47175','47172']
     },
@@ -483,7 +493,10 @@ ensemble:{
     selector:'conf_rain_intensity'
   },
   "cnf2:ar12":{
-    selector:'conf_rain_intensity'
+    selector:'conf_rain_12h_intensity',
+    excludeByModel:{
+      ecmwf_eps:['no6','no7']
+    }
   },
   metg:{
     selector:'stationWide',

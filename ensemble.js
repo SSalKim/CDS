@@ -45,6 +45,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"srf3",id:"srf3",label:"EPSgram(단기:5.5일)",
     patternByModel:{
         kim_epsg:"kim_epsg_srf3_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_srf3_{detail}_{run}.png",
         um_epsg:"epsg_srf3_{detail}_{run}.gif",
         ecmwf_eps:"ecmw_epss_{detail}_{run}.gif",
     }
@@ -52,6 +53,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"mrf6",id:"mrf6",label:"EPSgram(중기:12일)",
     patternByModel:{
         kim_epsg:"kim_epsg_mrf6_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_mrf6_{detail}_{run}.png",
         um_epsg:"epsg_mrf6_{detail}_{run}.gif",
         ecmwf_eps:"ecmw_epsg_{detail}_{run}.gif",
     }
@@ -65,6 +67,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"trd3",id:"prcp",label:"강수",
     patternByModel:{
         kim_epsg:"kim_epsg_trnd_srf3_prcp_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_trnd_srf3_prcp_{detail}_{run}.png",
         um_epsg:"epsg_trnd_srf3_prcp_{detail}_{run}.gif",
         ecmwf_eps:"ecmw_epss_prcp_{detail}_{run}.gif",
     }
@@ -72,6 +75,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"trd3",id:"tsfc",label:"기온",
     patternByModel:{
         kim_epsg:"kim_epsg_trnd_srf3_tsfc_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_trnd_srf3_tsfc_{detail}_{run}.png",
         um_epsg:"epsg_trnd_srf3_tsfc_{detail}_{run}.gif",
         ecmwf_eps:"ecmw_epss_tsfc_{detail}_{run}.gif",
     }
@@ -79,6 +83,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"trd3",id:"tcld",label:"운량",
     patternByModel:{
         kim_epsg:"kim_epsg_trnd_srf3_tcld_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_trnd_srf3_tcld_{detail}_{run}.png",
         um_epsg:"epsg_trnd_srf3_tcld_{detail}_{run}.gif",
         ecmwf_eps:"ecmw_epss_tcld_{detail}_{run}.gif",
     }
@@ -86,6 +91,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"trd3",id:"wsfc",label:"풍속",
     patternByModel:{
         kim_epsg:"kim_epsg_trnd_srf3_wsfc_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_trnd_srf3_wsfc_{detail}_{run}.png",
         um_epsg:"epsg_trnd_srf3_wsfc_{detail}_{run}.gif",
         ecmwf_eps:"ecmw_epss_wsfc_{detail}_{run}.gif",
     }
@@ -93,6 +99,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"trd6",id:"prcp",label:"강수",
     patternByModel:{
         kim_epsg:"kim_epsg_trnd_mrf6_prcp_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_trnd_mrf6_prcp_{detail}_{run}.png",
         um_epsg:"epsg_trnd_mrf6_prcp_{detail}_{run}.gif",
         ecmwf_eps:"ecmw_epsg_prcp_{detail}_{run}.gif",
     }
@@ -100,6 +107,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"trd6",id:"tsfc",label:"기온",
     patternByModel:{
         kim_epsg:"kim_epsg_trnd_mrf6_tsfc_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_trnd_mrf6_tsfc_{detail}_{run}.png",
         um_epsg:"epsg_trnd_mrf6_tsfc_{detail}_{run}.gif",
         ecmwf_eps:"ecmw_epsg_tsfc_{detail}_{run}.gif",
     }
@@ -107,6 +115,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"trd6",id:"tcld",label:"운량",
     patternByModel:{
         kim_epsg:"kim_epsg_trnd_mrf6_tcld_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_trnd_mrf6_tcld_{detail}_{run}.png",
         um_epsg:"epsg_trnd_mrf6_tcld_{detail}_{run}.gif",
         ecmwf_eps:"ecmw_epsg_tcld_{detail}_{run}.gif",
     }
@@ -114,6 +123,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"trd6",id:"wsfc",label:"풍속",
     patternByModel:{
         kim_epsg:"kim_epsg_trnd_mrf6_wsfc_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_trnd_mrf6_wsfc_{detail}_{run}.png",
         um_epsg:"epsg_trnd_mrf6_wsfc_{detail}_{run}.gif",
         ecmwf_eps:"ecmw_epsg_wsfc_{detail}_{run}.gif",
     }
@@ -129,6 +139,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"mp03",id:"mp03",label:"강수량(단기 3.5일)",
     patternByModel:{
         kim_epsg:"kim_epsg_mp03_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_mp03_{detail}_{run}.png",
         um_epsg:"epsg_mp03_{detail}_{run}.gif",
         ecmwf_eps:"ecmw_epsg_mp03_{detail}_{run}.gif",
     }
@@ -136,6 +147,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"mp06",id:"mp06",label:"강수량(단기 5.5일)",
     patternByModel:{
         kim_epsg:"kim_epsg_mp06_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_mp06_{detail}_{run}.png",
         um_epsg:"epsg_mp06_{detail}_{run}.gif",
         ecmwf_eps:"ecmw_epsg_mp06_{detail}_{run}.gif",
     }
@@ -143,6 +155,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"days",id:"days",label:"강수량(단기예보용)",
     patternByModel:{
         kim_epsg:"kim_epsg_rain_days_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_rain_days_{detail}_{run}.png",
         um_epsg:"epsg_rain_days_{detail}_{run}.png",
         ecmwf_eps:"ecmw_epsg_rain_days_{detail}_{run}.png",
     }
@@ -150,6 +163,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"mpda",id:"mpda",label:"강수량(중기)",
     patternByModel:{
         kim_epsg:"kim_epsg_mpda_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_mpda_{detail}_{run}.png",
         um_epsg:"epsg_mpda_{detail}_{run}.gif",
         ecmwf_eps:"ecmw_epsg_mpda_{detail}_{run}.gif",
     }
@@ -157,17 +171,23 @@ const ENSEMBLE_PRODUCTS=[
 {category:"prep",id:"prep",label:"강수확률",
     patternByModel:{
         kim_epsg:"kim_epsg_prob_rain_{detail}_s{fh}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_prob_rain_{detail}_s{fh}_{run}.png",
         um_epsg:"epsg_prob_prec_{detail}_s{fh}_{run}.gif"
     }
 },
+
 {category:"snwp",id:"snwp",label:"강설확률",
     patternByModel:{
         kim_epsg:"kim_epsg_prob_snow_s{fh}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_prob_snow_s{fh}_{run}.png",
         um_epsg:"epsg_prob_snow_s{fh}_{run}.png"
     },
     forecastStepByModel:{
         kim_epsg:[
             {start:15,end:255,step:24},
+        ],
+        ukmo_epsg:[
+            {start:15,end:231,step:24},
         ],
         um_epsg:[
             {start:15,end:255,step:24},
@@ -187,6 +207,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"stdv",id:"mslp",label:"동아시아 해면기압",
     patternByModel:{
         kim_epsg:"kim_epsg_stdv_mslp_s{fh}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_stdv_mslp_s{fh}_{run}.png",
         um_epsg:"epsg_stdv_mslp_s{fh}_{run}.gif",
         ecmwf_eps:"ecmw_epsg_sprd_mslp_s{fh}_{run}.gif"
     },
@@ -199,6 +220,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"stdv",id:"h500",label:"500hPa 고도",
     patternByModel:{
         kim_epsg:"kim_epsg_stdv_h500_s{fh}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_stdv_h500_s{fh}_{run}.png",
         um_epsg:"epsg_stdv_h500_s{fh}_{run}.gif",
         ecmwf_eps:"ecmw_epsg_sprd_h500_s{fh}_{run}.gif"
     },
@@ -211,6 +233,7 @@ const ENSEMBLE_PRODUCTS=[
 {category:"stdv",id:"t850",label:"850hPa 기온",
     patternByModel:{
         kim_epsg:"kim_epsg_stdv_t850_s{fh}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_stdv_t850_s{fh}_{run}.png",
         um_epsg:"epsg_stdv_t850_s{fh}_{run}.gif",
         ecmwf_eps:"ecmw_epsg_sprd_t850_s{fh}_{run}.gif"
     },
@@ -223,18 +246,21 @@ const ENSEMBLE_PRODUCTS=[
 {category:"stdv",id:"et85",label:"850hPa 상당온위",
     patternByModel:{
         kim_epsg:"kim_epsg_stdv_et85_s{fh}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_stdv_et85_s{fh}_{run}.png",
         um_epsg:"epsg_stdv_et85_s{fh}_{run}.gif"
     }
 },
 {category:"stdv",id:"tpwa",label:"가강수량",
     patternByModel:{
         kim_epsg:"kim_epsg_stdv_tpwa_s{fh}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_stdv_tpwa_s{fh}_{run}.png",
         um_epsg:"epsg_stdv_tpwa_s{fh}_{run}.gif"
     }
 },
 {category:"spgt",id:"spgt",label:"스파게티",
     patternByModel:{
         kim_epsg:"kim_epsg_stdv_spgt_{detail}_s{fh}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_stdv_spgt_{detail}_s{fh}_{run}.png",
         um_epsg:"epsg_stdv_spgt_{detail}_s{fh}_{run}.gif",
         ecmwf_eps:"ecmw_stdv_spgt_{detail}_s{fh}_{run}.gif"
     },
@@ -247,29 +273,34 @@ const ENSEMBLE_PRODUCTS=[
 {category:"stmp",id:"mslp",label:"해면기압, 6시간 누적강수량",
     patternByModel:{
         kim_epsg:"kim_epsg_stamp_mslp_no1_s{fh}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_stamp_mslp_no1_s{fh}_{run}.png",
         um_epsg:"epsg_stamp_mslp_no1_s{fh}_{run}.gif"
     }
 },
 {category:"stmp",id:"h500",label:"500hPa 고도",
     patternByModel:{
         kim_epsg:"kim_epsg_stamp_h500_no1_s{fh}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_stamp_h500_no1_s{fh}_{run}.png",
         um_epsg:"epsg_stamp_h500_no1_s{fh}_{run}.gif"
     }
 },
 {category:"nhem",id:"stdv",label:"500hPa 고도: 평균/편차",
     patternByModel:{
         kim_epsg:"kim_epsg_nhem_spgt_mean_s{fh}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_nhem_spgt_mean_s{fh}_{run}.png",
         um_epsg:"epsg_nhem_spgt_mean_s{fh}_{run}.gif"
     }
 },
 {category:"nhem",id:"spgt",label:"500hPa 고도: 스파게티/편차",
     patternByModel:{
         kim_epsg:"kim_epsg_nhem_spgt_{detail}_s{fh}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_nhem_spgt_{detail}_s{fh}_{run}.png",
         um_epsg:"epsg_nhem_spgt_{detail}_s{fh}_{run}.gif"
     }
 },
 {category:"week",id:"week",label:"앙상블-주간예보",
     patternByModel:{
+        kim_epsg:"kim_cmpr_week_epsg_{run}.png",
         um_epsg:"cmpr_week_epsg_{run}.gif"
     },
     folderByModel:{
@@ -283,6 +314,8 @@ const ENSEMBLE_PRODUCTS=[
 },
 {category:"cnf1",id:"area",label:"공간-일일 강수확률",
     patternByModel:{
+        kim_epsg:"kim_epsg_rain_conf_area_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_rain_conf_area_{detail}_{run}.png",
         um_epsg:"epsg_rain_conf_area_{detail}_{run}.gif"
     }
 },
@@ -293,7 +326,10 @@ const ENSEMBLE_PRODUCTS=[
 },
 {category:"cnf2",id:"ar12",label:"공간-오전/오후 강수확률",
     patternByModel:{
-        um_epsg:"epsg_rain_conf_12hr_{detail}_{run}.gif"
+        kim_epsg:"kim_epsg_rain_conf_12hr_{detail}_{run}.png",
+        ukmo_epsg:"ukmo_epsg_rain_conf_12hr_{detail}_{run}.png",
+        um_epsg:"epsg_rain_conf_12hr_{detail}_{run}.gif",
+        ecmwf_eps:"ecmw_epsg_pp12_{detail}_{run}.gif"
     }
 },
 
@@ -496,10 +532,25 @@ const ENSEMBLE_PRODUCTS=[
 
 ];
 
+// Explicit thresholds also prevent unsupported ECMWF requests in model comparison.
+ENSEMBLE_PRODUCTS.filter(p=>p.category==='cnf2' && p.id==='ar12').forEach(product=>{
+    product.detailPatternByModel=Object.fromEntries(
+        Object.entries(product.patternByModel).map(([model,pattern])=>[
+            model,
+            Object.fromEntries(Array.from({length:model==='ecmwf_eps'?5:7},(_,index)=>{
+                let detail=`no${index+1}`;
+                return [detail,pattern.replace('{detail}',detail)];
+            }))
+        ])
+    );
+});
+
 
 const ENSEMBLE_DEFAULT_PRODUCT_BY_CATEGORY={
 
-srf3:'srf3'
+srf3:'srf3',
+cnf1:'area',
+cnf2:'ar12'
 
 };
 

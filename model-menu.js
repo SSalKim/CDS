@@ -41,6 +41,7 @@ id:'gens',
 label:'전지구확률',
 models:[
 ['kim_epsg','KIM_EPSG'],
+['ukmo_epsg','UKUM_EPSG'],
 ['ecmwf_eps','ECMWF_EPS']
 ]
 },

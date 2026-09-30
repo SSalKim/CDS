@@ -249,6 +249,25 @@ stepSchemeByCycleGroup:{
 
 
 
+ukmo_epsg:{
+name:"EPSG_UKUM",
+folder:"EPSG",
+archiveStart:"2026-07-30",
+cycles:[0,12],
+cycleAvailability:[
+{from:"2026-07-30",until:"2026-07-30",cycles:[12]},
+{from:"2026-07-31",cycles:[0,12]}
+],
+forecastRules:[
+{from:"2026-07-30",cycles:[0,12],max:240}
+],
+stepSchemeByCycleGroup:{
+"0,12":[
+{start:0,end:240,step:6}
+]
+}
+},
+
 um_epsg:{
 name:"EPSG_UM",
 folder:"EPSG",
