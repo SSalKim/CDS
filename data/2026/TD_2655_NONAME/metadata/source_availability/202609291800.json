@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260930001947",
-  "generated_at_kst": "2026-09-30 09:19 KST",
+  "generated_at_utc": "20260930002956",
+  "generated_at_kst": "2026-09-30 09:29 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_55",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 10,
-  "selected_model_count": 7,
+  "model_source_count": 11,
+  "selected_model_count": 8,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -200,6 +200,23 @@
       "is_official": false,
       "first_seen_utc": "20260929223026",
       "first_seen_kst": "2026-09-30 07:30 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 38,
+      "max_lead_hour": 222,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260930002956",
+      "first_seen_kst": "2026-09-30 09:29 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2655_NONAME/metadata/source_availability/202609291800.json"
