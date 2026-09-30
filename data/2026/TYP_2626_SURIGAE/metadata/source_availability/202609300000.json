@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20260930081055",
-  "generated_at_kst": "2026-09-30 17:10 KST",
+  "generated_at_utc": "20260930082037",
+  "generated_at_kst": "2026-09-30 17:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_26",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 70,
-  "selected_model_count": 32,
+  "model_source_count": 73,
+  "selected_model_count": 34,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -397,7 +397,7 @@
       ],
       "source": "POLARWX",
       "source_label": "POLARWX",
-      "selected": true,
+      "selected": false,
       "point_count": 11,
       "max_lead_hour": 60,
       "has_pressure": true,
@@ -405,6 +405,23 @@
       "is_official": false,
       "first_seen_utc": "20260930075047",
       "first_seen_kst": "2026-09-30 16:50 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "ECMWF_AIFS_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260930082037",
+      "first_seen_kst": "2026-09-30 17:20 KST"
     },
     {
       "model_id": "ECMWF_EPS",
@@ -986,6 +1003,40 @@
       "is_official": false,
       "first_seen_utc": "20260930070041",
       "first_seen_kst": "2026-09-30 16:00 KST"
+    },
+    {
+      "model_id": "IFEC_AI",
+      "model_label": "KMA AIFS-ECMWF",
+      "raw_model_ids": [
+        "IFEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 21,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260930082037",
+      "first_seen_kst": "2026-09-30 17:20 KST"
+    },
+    {
+      "model_id": "IFKM_AI",
+      "model_label": "KMA AIFS-KIM",
+      "raw_model_ids": [
+        "IFKM_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 34,
+      "max_lead_hour": 198,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20260930082037",
+      "first_seen_kst": "2026-09-30 17:20 KST"
     },
     {
       "model_id": "KMA",
