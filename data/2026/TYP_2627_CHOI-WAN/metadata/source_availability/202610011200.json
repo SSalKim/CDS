@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261001200953",
-  "generated_at_kst": "2026-10-02 05:09 KST",
+  "generated_at_utc": "20261001202146",
+  "generated_at_kst": "2026-10-02 05:21 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_27",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 76,
-  "selected_model_count": 30,
+  "model_source_count": 78,
+  "selected_model_count": 31,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -1073,6 +1073,23 @@
       "first_seen_kst": "2026-10-02 03:50 KST"
     },
     {
+      "model_id": "IFEC_AI",
+      "model_label": "KMA AIFS-ECMWF",
+      "raw_model_ids": [
+        "IFEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261001202146",
+      "first_seen_kst": "2026-10-02 05:21 KST"
+    },
+    {
       "model_id": "IFKM_AI",
       "model_label": "KMA AIFS-KIM",
       "raw_model_ids": [
@@ -1122,6 +1139,23 @@
       "is_official": false,
       "first_seen_utc": "20261001200953",
       "first_seen_kst": "2026-10-02 05:09 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 17,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261001202146",
+      "first_seen_kst": "2026-10-02 05:21 KST"
     },
     {
       "model_id": "PGEC_AI",
