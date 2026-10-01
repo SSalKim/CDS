@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261001062954",
-  "generated_at_kst": "2026-10-01 15:29 KST",
+  "generated_at_utc": "20261001063953",
+  "generated_at_kst": "2026-10-01 15:39 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_27",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 31,
+  "model_source_count": 33,
   "selected_model_count": 15,
   "active_target_model_count": 40,
   "model_sources": [
@@ -175,7 +175,7 @@
       ],
       "source": "POLARWX",
       "source_label": "POLARWX",
-      "selected": true,
+      "selected": false,
       "point_count": 28,
       "max_lead_hour": 162,
       "has_pressure": true,
@@ -183,6 +183,23 @@
       "is_official": false,
       "first_seen_utc": "20261001061949",
       "first_seen_kst": "2026-10-01 15:19 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 40,
+      "max_lead_hour": 234,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261001063953",
+      "first_seen_kst": "2026-10-01 15:39 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -558,6 +575,23 @@
       "is_official": false,
       "first_seen_utc": "20261001062954",
       "first_seen_kst": "2026-10-01 15:29 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "WN2C"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261001063953",
+      "first_seen_kst": "2026-10-01 15:39 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2627_CHOI-WAN/metadata/source_availability/202610010000.json",
