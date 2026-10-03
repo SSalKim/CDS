@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261003154003",
-  "generated_at_kst": "2026-10-04 00:40 KST",
+  "generated_at_utc": "20261003154956",
+  "generated_at_kst": "2026-10-04 00:49 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_27",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 68,
-  "selected_model_count": 24,
+  "model_source_count": 69,
+  "selected_model_count": 25,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -159,13 +159,30 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": true,
-      "point_count": 9,
+      "point_count": 14,
       "max_lead_hour": 102,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
       "first_seen_utc": "20261003134958",
       "first_seen_kst": "2026-10-03 22:49 KST"
+    },
+    {
+      "model_id": "COAMPS_EPS",
+      "model_label": "COAMPS-TC EPS",
+      "raw_model_ids": [
+        "CTMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261003154956",
+      "first_seen_kst": "2026-10-04 00:49 KST"
     },
     {
       "model_id": "ECMWF",
@@ -380,7 +397,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 17,
+      "point_count": 18,
       "max_lead_hour": 102,
       "has_pressure": true,
       "has_wind": true,
@@ -466,7 +483,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 19,
+      "point_count": 20,
       "max_lead_hour": 114,
       "has_pressure": true,
       "has_wind": true,
