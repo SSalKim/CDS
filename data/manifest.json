@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at_utc": "202610032219",
+  "updated_at_utc": "202610032229",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 39,
@@ -36,9 +36,9 @@
         "end_utc": "202610040400"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20261003222001",
+          "generated_at_utc": "20261003223024",
           "image_path": "data/2026/TD_2656_NONAME/images/TD_2656_NONAME_202610031800_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -58,14 +58,15 @@
           "data_time": "202610031800",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 3,
           "target_model_count": 40,
-          "models": [],
-          "model_labels": [],
+          "model_labels": [
+            "AIGFS",
+            "ICON",
+            "ICON EPS"
+          ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2656_NONAME/metadata/source_availability/202610031800.json",
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+          "source_availability_path": "data/2026/TD_2656_NONAME/metadata/source_availability/202610031800.json"
         }
       },
       "completed": false,
@@ -93,9 +94,9 @@
         "end_utc": "202610040400"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20261003222001",
+          "generated_at_utc": "20261003223033",
           "image_path": "data/2026/TD_2656_NONAME/images/TD_2656_NONAME_202610031800_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -115,14 +116,15 @@
           "data_time": "202610031800",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 3,
           "target_model_count": 40,
-          "models": [],
-          "model_labels": [],
+          "model_labels": [
+            "AIGFS",
+            "ICON",
+            "ICON EPS"
+          ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2656_NONAME/metadata/source_availability/202610031800.json",
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+          "source_availability_path": "data/2026/TD_2656_NONAME/metadata/source_availability/202610031800.json"
         }
       },
       "completed": false,
@@ -152,7 +154,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20261003222030",
+          "generated_at_utc": "20261003223033",
           "image_path": "data/2026/TYP_2627_CHOI-WAN/images/TYP_2627_CHOI-WAN_202610031800_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -172,10 +174,13 @@
           "data_time": "202610031800",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 3,
+          "model_count": 6,
           "target_model_count": 40,
           "model_labels": [
+            "AIGFS",
             "AICON",
+            "ICON",
+            "ICON EPS",
             "JGSM",
             "JGSM EPS"
           ],
@@ -211,7 +216,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20261003222031",
+          "generated_at_utc": "20261003223034",
           "image_path": "data/2026/TYP_2627_CHOI-WAN/images/TYP_2627_CHOI-WAN_202610031800_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -231,10 +236,13 @@
           "data_time": "202610031800",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 3,
+          "model_count": 6,
           "target_model_count": 40,
           "model_labels": [
+            "AIGFS",
             "AICON",
+            "ICON",
+            "ICON EPS",
             "JGSM",
             "JGSM EPS"
           ],
@@ -247,7 +255,7 @@
       "final_check": false
     }
   ],
-  "inventory_count": 9560,
+  "inventory_count": 9562,
   "manifest_indexes": [
     {
       "year": 2020,
