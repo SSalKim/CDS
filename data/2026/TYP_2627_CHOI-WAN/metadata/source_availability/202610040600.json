@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261004144003",
-  "generated_at_kst": "2026-10-04 23:40 KST",
+  "generated_at_utc": "20261004145009",
+  "generated_at_kst": "2026-10-04 23:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_27",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 65,
-  "selected_model_count": 22,
+  "model_source_count": 68,
+  "selected_model_count": 24,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -142,13 +142,30 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": true,
-      "point_count": 8,
+      "point_count": 12,
       "max_lead_hour": 72,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
       "first_seen_utc": "20261004135021",
       "first_seen_kst": "2026-10-04 22:50 KST"
+    },
+    {
+      "model_id": "COAMPS_EPS",
+      "model_label": "COAMPS-TC EPS",
+      "raw_model_ids": [
+        "CTMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 17,
+      "max_lead_hour": 96,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261004145009",
+      "first_seen_kst": "2026-10-04 23:50 KST"
     },
     {
       "model_id": "ECMWF",
@@ -219,6 +236,23 @@
       "first_seen_kst": "2026-10-04 22:00 KST"
     },
     {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMF"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 14,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261004145009",
+      "first_seen_kst": "2026-10-04 23:50 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
       "raw_model_ids": [
@@ -278,7 +312,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 12,
+      "point_count": 13,
       "max_lead_hour": 72,
       "has_pressure": true,
       "has_wind": true,
@@ -380,7 +414,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 15,
+      "point_count": 16,
       "max_lead_hour": 90,
       "has_pressure": true,
       "has_wind": true,
@@ -773,7 +807,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 13,
+      "point_count": 16,
       "max_lead_hour": 90,
       "has_pressure": true,
       "has_wind": true,
@@ -841,7 +875,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 12,
+      "point_count": 17,
       "max_lead_hour": 96,
       "has_pressure": true,
       "has_wind": true,
@@ -1003,6 +1037,23 @@
       "first_seen_kst": "2026-10-04 19:10 KST"
     },
     {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NVGM"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 7,
+      "max_lead_hour": 72,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261004145009",
+      "first_seen_kst": "2026-10-04 23:50 KST"
+    },
+    {
       "model_id": "UKMO_EPS",
       "model_label": "UKMO EPS",
       "raw_model_ids": [
@@ -1011,10 +1062,10 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": true,
-      "point_count": 8,
-      "max_lead_hour": 90,
-      "has_pressure": false,
-      "has_wind": false,
+      "point_count": 17,
+      "max_lead_hour": 96,
+      "has_pressure": true,
+      "has_wind": true,
       "is_official": false,
       "first_seen_utc": "20261004135021",
       "first_seen_kst": "2026-10-04 22:50 KST"
