@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261004094015",
-  "generated_at_kst": "2026-10-04 18:40 KST",
+  "generated_at_utc": "20261004095218",
+  "generated_at_kst": "2026-10-04 18:52 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_27",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 97,
+  "model_source_count": 99,
   "selected_model_count": 38,
   "active_target_model_count": 40,
   "model_sources": [
@@ -500,8 +500,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 3,
-      "max_lead_hour": 66,
+      "point_count": 13,
+      "max_lead_hour": 78,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -558,6 +558,23 @@
       "is_official": false,
       "first_seen_utc": "20261004074009",
       "first_seen_kst": "2026-10-04 16:40 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "EAIM"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 15,
+      "max_lead_hour": 90,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261004095218",
+      "first_seen_kst": "2026-10-04 18:52 KST"
     },
     {
       "model_id": "ECMWF_EPS",
@@ -1683,6 +1700,23 @@
       "is_official": false,
       "first_seen_utc": "20261004092002",
       "first_seen_kst": "2026-10-04 18:20 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 24,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261004095218",
+      "first_seen_kst": "2026-10-04 18:52 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2627_CHOI-WAN/metadata/source_availability/202610040000.json",
