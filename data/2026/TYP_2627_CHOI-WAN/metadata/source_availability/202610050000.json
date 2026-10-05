@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261005061009",
-  "generated_at_kst": "2026-10-05 15:10 KST",
+  "generated_at_utc": "20261005062048",
+  "generated_at_kst": "2026-10-05 15:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_27",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 24,
-  "selected_model_count": 12,
+  "model_source_count": 30,
+  "selected_model_count": 14,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -151,6 +151,23 @@
       "first_seen_kst": "2026-10-05 15:10 KST"
     },
     {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261005062048",
+      "first_seen_kst": "2026-10-05 15:20 KST"
+    },
+    {
       "model_id": "CMC_EPS",
       "model_label": "CMC EPS",
       "raw_model_ids": [
@@ -166,6 +183,74 @@
       "is_official": false,
       "first_seen_utc": "20261005060011",
       "first_seen_kst": "2026-10-05 15:00 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "ECMWF_AIFS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261005062048",
+      "first_seen_kst": "2026-10-05 15:20 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "ECMWF_AIFS"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261005062048",
+      "first_seen_kst": "2026-10-05 15:20 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261005062048",
+      "first_seen_kst": "2026-10-05 15:20 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 10,
+      "max_lead_hour": 54,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261005062048",
+      "first_seen_kst": "2026-10-05 15:20 KST"
     },
     {
       "model_id": "GFS",
@@ -286,6 +371,23 @@
       "is_official": false,
       "first_seen_utc": "20261005060011",
       "first_seen_kst": "2026-10-05 15:00 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GEFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 30,
+      "max_lead_hour": 174,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261005062048",
+      "first_seen_kst": "2026-10-05 15:20 KST"
     },
     {
       "model_id": "HAFS",
@@ -443,5 +545,6 @@
   ],
   "source_availability_path": "data/2026/TYP_2627_CHOI-WAN/metadata/source_availability/202610050000.json",
   "smca_aicon_snapshot_path": "data/2026/TYP_2627_CHOI-WAN/metadata/smca/AICON/202610050000.json",
+  "smca_aifsm_snapshot_path": "data/2026/TYP_2627_CHOI-WAN/metadata/smca/AIFSM/202610050000.json",
   "smca_aigfs_snapshot_path": "data/2026/TYP_2627_CHOI-WAN/metadata/smca/AIGFS/202610050000.json"
 }
