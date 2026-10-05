@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261005062118",
-  "generated_at_kst": "2026-10-05 15:21 KST",
+  "generated_at_utc": "20261005063113",
+  "generated_at_kst": "2026-10-05 15:31 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_29",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 31,
-  "selected_model_count": 14,
+  "model_source_count": 33,
+  "selected_model_count": 15,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -558,6 +558,40 @@
       "is_official": true,
       "first_seen_utc": "20261005041054",
       "first_seen_kst": "2026-10-05 13:10 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261005063113",
+      "first_seen_kst": "2026-10-05 15:31 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "WN2C"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261005063113",
+      "first_seen_kst": "2026-10-05 15:31 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2629_KOGUMA/metadata/source_availability/202610050000.json",
