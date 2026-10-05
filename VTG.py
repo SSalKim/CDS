@@ -341,6 +341,7 @@ class Settings:
     analysis_atcf_id: str = ""
     analysis_match_method: str = ""
     analysis_distance_km: float | None = None
+    require_exact_analysis: bool = False
     auto_extent: bool = True
     overwrite_output: bool = False
     show_plot: bool = True
@@ -526,6 +527,7 @@ def parse_args() -> Settings:
     parser.add_argument("--analysis-atcf-id", default=Settings.analysis_atcf_id)
     parser.add_argument("--analysis-match-method", default=Settings.analysis_match_method)
     parser.add_argument("--analysis-distance-km", type=float, default=Settings.analysis_distance_km)
+    parser.add_argument("--require-exact-analysis", action="store_true", help="Use only same-cycle analysis values after an identity-only ATCF match.")
     parser.add_argument("--no-auto-extent", action="store_true", help="Use fixed margin/padding map extent.")
     parser.add_argument("--overwrite", action="store_true", help="Overwrite the deterministic output PNG.")
     parser.add_argument("--no-show", action="store_true", help="Save the PNG without opening a GUI window.")
@@ -588,6 +590,7 @@ def parse_args() -> Settings:
         analysis_atcf_id=args.analysis_atcf_id.strip().lower(),
         analysis_match_method=args.analysis_match_method.strip(),
         analysis_distance_km=args.analysis_distance_km,
+        require_exact_analysis=args.require_exact_analysis,
         auto_extent=not args.no_auto_extent,
         overwrite_output=args.overwrite,
         show_plot=not args.no_show,
@@ -2178,7 +2181,9 @@ def settings_with_bdeck_analysis_if_needed(session: requests.Session, settings: 
             analysis_match_method=kma_now_point.match_method,
             analysis_distance_km=kma_now_point.distance_km,
         )
-    analysis = fetch_bdeck_analysis_point(session, settings)
+    analysis = fetch_bdeck_analysis_point(
+        session, settings, max_offset_hours=0 if settings.require_exact_analysis else 12,
+    )
     if analysis is None:
         return settings
     return replace(

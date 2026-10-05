@@ -43,6 +43,7 @@ DEFAULT_ATCF_SEARCH_NEGATIVE_RADIUS = 5
 DEFAULT_ATCF_POSITION_MAX_DISTANCE_KM = 600.0
 DEFAULT_ATCF_POSITION_MIN_DISTANCE_GAP_KM = 100.0
 DEFAULT_DATELINE_CANDIDATE_LONGITUDE_DEGREES = float(os.getenv("VTG_DATELINE_CANDIDATE_LONGITUDE_DEGREES", "170"))
+ATCF_SECTOR_NAME_MAX_AGE_HOURS = 6
 # Rare cross-basin systems or known KMA/JTWC mapping exceptions.
 # User manual map values still override these defaults.
 BUILTIN_MANUAL_ATCF_MAP = {
@@ -148,6 +149,7 @@ class StormJob:
     analysis_source: str = ""
     analysis_match_method: str = ""
     analysis_distance_km: float | None = None
+    require_exact_analysis: bool = False
 
 
 @dataclass(frozen=True)
@@ -975,27 +977,43 @@ def is_near_dateline(point: TrackPoint | None) -> bool:
     return abs(normalized_longitude(point.lon)) >= DEFAULT_DATELINE_CANDIDATE_LONGITUDE_DEGREES
 
 
-def central_pacific_dateline_candidate_ids(year: int) -> list[str]:
+def pacific_dateline_candidate_ids(year: int) -> list[str]:
     return [
         *(f"cp{candidate_number:02d}{year}" for candidate_number in range(90, 100)),
         *(f"cp{candidate_number:02d}{year}" for candidate_number in range(1, 10)),
+        *(f"ep{candidate_number:02d}{year}" for candidate_number in range(90, 100)),
+        *(f"ep{candidate_number:02d}{year}" for candidate_number in range(1, 90)),
     ]
 
 
-def extend_td_atcf_ids_for_dateline(atcf_ids: list[str], *, year: int, kma_point: TrackPoint | None) -> list[str]:
+def extend_atcf_ids_for_dateline(
+    atcf_ids: list[str],
+    *,
+    year: int,
+    kma_point: TrackPoint | None,
+    sector_entries: list[AtcfSectorEntry],
+    regular_only: bool = False,
+) -> list[str]:
     if not is_near_dateline(kma_point):
         return atcf_ids
 
+    sector_ids = [
+        atcf_sector_id_for_year(entry, year)
+        for entry in atcf_sector_entries_for_year(sector_entries, year, include_dateline_basins=True)
+        if entry.atcf_id.startswith(("cp", "ep"))
+    ]
     ids: list[str] = []
     seen: set[str] = set()
-    for atcf_id in [*atcf_ids, *central_pacific_dateline_candidate_ids(year)]:
+    for atcf_id in [*sector_ids, *atcf_ids, *pacific_dateline_candidate_ids(year)]:
         normalized = str(atcf_id or "").strip().lower()
+        if regular_only and is_invest_atcf_id(normalized):
+            continue
         if normalized and normalized not in seen:
             seen.add(normalized)
             ids.append(normalized)
     print(
-        "KMA reference point is near the date line; adding Central Pacific ATCF "
-        f"candidates cp90-cp99 and cp01-cp09 for {year}."
+        "KMA reference point is near the date line; adding Central/Eastern Pacific "
+        f"ATCF candidates for {year}."
     )
     return ids
 
@@ -1004,12 +1022,11 @@ def atcf_sector_entries_for_year(
     entries: list[AtcfSectorEntry],
     year: int,
     *,
-    include_central_pacific: bool = False,
+    include_dateline_basins: bool = False,
 ) -> list[AtcfSectorEntry]:
     # KMA TD/TYP products handled here are western North Pacific systems.
-    # Date-line TD exceptions may keep Central Pacific ATCF IDs after entering
-    # the western Pacific.
-    prefixes = ("wp", "cp") if include_central_pacific else ("wp",)
+    # Cross-date-line systems retain their Central/Eastern Pacific ATCF IDs.
+    prefixes = ("wp", "cp", "ep") if include_dateline_basins else ("wp",)
     return [
         entry
         for entry in entries
@@ -1024,7 +1041,7 @@ def atcf_sector_entries_for_cycle(
     year: int,
     data_time: str,
     *,
-    include_central_pacific: bool = False,
+    include_dateline_basins: bool = False,
 ) -> list[AtcfSectorEntry]:
     target_dt = parse_utc_stamp(data_time)
     if target_dt is None:
@@ -1035,7 +1052,7 @@ def atcf_sector_entries_for_cycle(
         for entry in atcf_sector_entries_for_year(
             entries,
             year,
-            include_central_pacific=include_central_pacific,
+            include_dateline_basins=include_dateline_basins,
         )
         if entry.point.time_utc == target_time
     ]
@@ -1052,37 +1069,43 @@ def find_atcf_sector_name_match(
     year: int,
     data_time: str,
     preferred_atcf_id: str | None = None,
+    kma_point: TrackPoint | None = None,
 ) -> AtcfMatch | None:
     target_name = normalize_name(typ_en)
-    if not target_name:
+    target_dt = parse_utc_stamp(data_time)
+    if not target_name or target_dt is None:
         return None
     candidates = [
         entry
-        for entry in atcf_sector_entries_for_cycle(entries, year, data_time)
+        for entry in atcf_sector_entries_for_year(
+            entries, year, include_dateline_basins=is_near_dateline(kma_point),
+        )
         if normalize_name(entry.storm_name) == target_name
+        and timedelta(0) <= target_dt - parse_utc_stamp(entry.point.time_utc)
+        <= timedelta(hours=ATCF_SECTOR_NAME_MAX_AGE_HOURS)
     ]
     if not candidates:
         return None
     preferred_id = str(preferred_atcf_id or "").strip().lower()
-    candidates.sort(
-        key=lambda entry: (
-            atcf_sector_id_for_year(entry, year) != preferred_id,
-            entry.point.time_utc,
-        )
-    )
-    selected = candidates[0] if preferred_id and atcf_sector_id_for_year(candidates[0], year) == preferred_id else max(
+    selected = max(
         candidates,
-        key=lambda entry: entry.point.time_utc,
+        key=lambda entry: (
+            entry.point.time_utc == format_utc_stamp(target_dt),
+            atcf_sector_id_for_year(entry, year) == preferred_id,
+            entry.point.time_utc,
+        ),
     )
     selected_atcf_id = atcf_sector_id_for_year(selected, year)
+    exact_cycle = selected.point.time_utc == format_utc_stamp(target_dt)
     print(
         f"Matched {typ_en} to {selected_atcf_id} from NRL ATCF sector file "
-        f"({selected.point.time_utc[:10]})."
+        f"({selected.point.time_utc[:10]})"
+        + ("." if exact_cycle else "; using storm identity only, not earlier analysis values.")
     )
     return AtcfMatch(
         atcf_id=selected_atcf_id,
-        method="sector_name",
-        point=selected.point,
+        method="sector_name" if exact_cycle else "sector_name_recent",
+        point=selected.point if exact_cycle else None,
     )
 
 
@@ -1103,7 +1126,7 @@ def find_atcf_sector_position_match(
         entries,
         year,
         data_time,
-        include_central_pacific=is_near_dateline(kma_point),
+        include_dateline_basins=is_near_dateline(kma_point),
     ):
         distance = haversine_km(kma_point.lat, kma_point.lon, entry.point.lat, entry.point.lon)
         if distance <= max_distance_km:
@@ -1535,14 +1558,14 @@ def bdeck_nearest_track_point(text: str, *, data_time: str, max_offset_hours: in
     return best[1] if best else None
 
 
-def fetch_bdeck_analysis_point(atcf_id: str, *, data_time: str) -> TrackPoint | None:
+def fetch_bdeck_analysis_point(atcf_id: str, *, data_time: str, max_offset_hours: int = 12) -> TrackPoint | None:
     text = fetch_bdeck_text_for_data_time(atcf_id, data_time=data_time, timeout=15)
     if not text:
         return None
     points = bdeck_track_points(text, reference_time=f"{data_time[:10]}00")
     if points:
         return points[0]
-    nearest = bdeck_nearest_track_point(text, data_time=data_time, max_offset_hours=12)
+    nearest = bdeck_nearest_track_point(text, data_time=data_time, max_offset_hours=max_offset_hours)
     if nearest:
         print(
             "BDECK exact 0h analysis point missing; using nearest point "
@@ -2460,17 +2483,40 @@ def build_storm_jobs(
             )
             add_timing_elapsed(timing_stats, "kma_reference", started_at)
             started_at = time.monotonic()
-            atcf_match = find_atcf_sector_position_match(
+            atcf_match = find_atcf_sector_name_match(
                 sector_entries,
+                typ_en=typ_en,
                 year=year,
                 data_time=data_time,
                 kma_point=kma_point,
                 preferred_atcf_id=f"wp{typ_number:02d}{year}",
-                max_distance_km=atcf_position_max_distance_km,
-                min_distance_gap_km=atcf_position_min_distance_gap_km,
             )
+            if atcf_match is None:
+                atcf_match = find_atcf_sector_position_match(
+                    sector_entries,
+                    year=year,
+                    data_time=data_time,
+                    kma_point=kma_point,
+                    preferred_atcf_id=f"wp{typ_number:02d}{year}",
+                    max_distance_km=atcf_position_max_distance_km,
+                    min_distance_gap_km=atcf_position_min_distance_gap_km,
+                )
             add_timing_elapsed(timing_stats, "atcf_position", started_at)
         if resolve_atcf and atcf_match is None:
+            if kma_point is None and not sector_entries and typ_en:
+                started_at = time.monotonic()
+                kma_point = fetch_kma_reference_point(
+                    typ_number=typ_number,
+                    data_time=data_time,
+                    auth_key=auth_key,
+                    gts_text=kma_gts_now_text,
+                    stage="TYP",
+                )
+                add_timing_elapsed(timing_stats, "kma_reference", started_at)
+            typ_atcf_ids = extend_atcf_ids_for_dateline(
+                typ_atcf_ids, year=year, kma_point=kma_point,
+                sector_entries=sector_entries, regular_only=True,
+            )
             started_at = time.monotonic()
             atcf_match = find_atcf_match(
                 typ_en=typ_en,
@@ -2482,16 +2528,6 @@ def build_storm_jobs(
             )
             add_timing_elapsed(timing_stats, "atcf_name", started_at)
         if resolve_atcf and atcf_match is None and typ_en:
-            if kma_point is None:
-                started_at = time.monotonic()
-                kma_point = fetch_kma_reference_point(
-                    typ_number=typ_number,
-                    data_time=data_time,
-                    auth_key=auth_key,
-                    gts_text=kma_gts_now_text,
-                    stage="TYP",
-                )
-                add_timing_elapsed(timing_stats, "kma_reference", started_at)
             started_at = time.monotonic()
             atcf_match = find_atcf_position_match(
                 typ_number=typ_number,
@@ -2512,10 +2548,14 @@ def build_storm_jobs(
             )
         atcf_id = atcf_match.atcf_id if atcf_match else None
         atcf_method = atcf_match.method if atcf_match else ""
+        require_exact_analysis = atcf_method == "sector_name_recent"
         analysis_point = atcf_match.point if atcf_match and atcf_match.method == "position" else None
         if analysis_point is None and atcf_id:
             started_at = time.monotonic()
-            analysis_point = fetch_bdeck_analysis_point(atcf_id, data_time=data_time)
+            analysis_point = fetch_bdeck_analysis_point(
+                atcf_id, data_time=data_time,
+                max_offset_hours=0 if require_exact_analysis else 12,
+            )
             add_timing_elapsed(timing_stats, "bdeck_analysis", started_at)
         analysis_source = "BDECK" if analysis_point else ""
         analysis_match_method = atcf_match.method if analysis_point and atcf_match else ""
@@ -2555,6 +2595,7 @@ def build_storm_jobs(
             analysis_source=analysis_source,
             analysis_match_method=analysis_match_method,
             analysis_distance_km=analysis_distance_km,
+            require_exact_analysis=require_exact_analysis,
         ))
 
     active_typhoon_set = set(active_typhoons)
@@ -2649,16 +2690,40 @@ def build_storm_jobs(
             )
             add_timing_elapsed(timing_stats, "kma_reference", started_at)
             started_at = time.monotonic()
-            atcf_match = find_atcf_sector_position_match(
-                sector_entries,
-                year=year,
-                data_time=data_time,
-                kma_point=kma_point,
-                preferred_atcf_id=(f"wp{typ_number:02d}{year}" if typ_number else None),
-                max_distance_km=atcf_position_max_distance_km,
-                min_distance_gap_km=atcf_position_min_distance_gap_km,
-            )
+            if matching_typ_en:
+                atcf_match = find_atcf_sector_name_match(
+                    sector_entries,
+                    typ_en=matching_typ_en,
+                    year=year,
+                    data_time=data_time,
+                    kma_point=kma_point,
+                    preferred_atcf_id=(f"wp{typ_number:02d}{year}" if typ_number else None),
+                )
+            if atcf_match is None:
+                atcf_match = find_atcf_sector_position_match(
+                    sector_entries,
+                    year=year,
+                    data_time=data_time,
+                    kma_point=kma_point,
+                    preferred_atcf_id=(f"wp{typ_number:02d}{year}" if typ_number else None),
+                    max_distance_km=atcf_position_max_distance_km,
+                    min_distance_gap_km=atcf_position_min_distance_gap_km,
+                )
             add_timing_elapsed(timing_stats, "atcf_position", started_at)
+        if resolve_atcf and atcf_match is None:
+            if kma_point is None and not sector_entries:
+                started_at = time.monotonic()
+                kma_point = fetch_kma_reference_point(
+                    typ_number=reference_typ_number,
+                    data_time=data_time,
+                    auth_key=auth_key,
+                    gts_text=kma_gts_now_text,
+                    stage="TD",
+                )
+                add_timing_elapsed(timing_stats, "kma_reference", started_at)
+            td_atcf_ids = extend_atcf_ids_for_dateline(
+                td_atcf_ids, year=year, kma_point=kma_point, sector_entries=sector_entries,
+            )
         if resolve_atcf and atcf_match is None and matching_typ_en:
             started_at = time.monotonic()
             atcf_match = find_atcf_match(
@@ -2671,17 +2736,6 @@ def build_storm_jobs(
             )
             add_timing_elapsed(timing_stats, "atcf_name", started_at)
         if resolve_atcf and atcf_match is None:
-            if kma_point is None:
-                started_at = time.monotonic()
-                kma_point = fetch_kma_reference_point(
-                    typ_number=reference_typ_number,
-                    data_time=data_time,
-                    auth_key=auth_key,
-                    gts_text=kma_gts_now_text,
-                    stage="TD",
-                )
-                add_timing_elapsed(timing_stats, "kma_reference", started_at)
-            td_atcf_ids = extend_td_atcf_ids_for_dateline(td_atcf_ids, year=year, kma_point=kma_point)
             started_at = time.monotonic()
             atcf_match = find_atcf_position_match(
                 typ_number=reference_typ_number,
@@ -2702,10 +2756,14 @@ def build_storm_jobs(
             )
         atcf_id = atcf_match.atcf_id if atcf_match else None
         atcf_method = atcf_match.method if atcf_match else ""
+        require_exact_analysis = atcf_method == "sector_name_recent"
         analysis_point = atcf_match.point if atcf_match and atcf_match.method == "position" else None
         if analysis_point is None and atcf_id:
             started_at = time.monotonic()
-            analysis_point = fetch_bdeck_analysis_point(atcf_id, data_time=data_time)
+            analysis_point = fetch_bdeck_analysis_point(
+                atcf_id, data_time=data_time,
+                max_offset_hours=0 if require_exact_analysis else 12,
+            )
             add_timing_elapsed(timing_stats, "bdeck_analysis", started_at)
         analysis_source = "BDECK" if analysis_point else ""
         analysis_match_method = atcf_match.method if analysis_point and atcf_match else ""
@@ -2783,6 +2841,7 @@ def build_storm_jobs(
             analysis_source=analysis_source,
             analysis_match_method=analysis_match_method,
             analysis_distance_km=analysis_distance_km,
+            require_exact_analysis=require_exact_analysis,
         ))
 
     total_elapsed = time.monotonic() - total_started_at
@@ -3747,6 +3806,8 @@ def vtg_command(
         command.extend(["--metadata-path", str(metadata_paths[unique_hours[0]])])
     if job.atcf_id:
         command.extend(["--atcf-id", job.atcf_id])
+    if job.require_exact_analysis:
+        command.append("--require-exact-analysis")
     if job.analysis_point:
         command.extend([
             "--analysis-lat",
