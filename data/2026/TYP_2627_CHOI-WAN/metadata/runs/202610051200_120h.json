@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "20261005191244",
+  "generated_at_utc": "20261005192057",
   "render_signature": "3f2a106c3afd0817b2ca1906b140de9c7e0675a9280e986c1ff30470d76afa88",
   "image_path": "data/2026/TYP_2627_CHOI-WAN/images/TYP_2627_CHOI-WAN_202610051200_120h.png",
   "storm_stage": "TYP",
@@ -20,7 +20,7 @@
   "data_time": "202610051200",
   "fcst_hours": 120,
   "intensity": "TYP",
-  "model_count": 18,
+  "model_count": 21,
   "target_model_count": 40,
   "models": [
     "AGFS",
@@ -30,6 +30,7 @@
     "ECMWF",
     "ECMWF_AIFS",
     "ECMWF_AIFS_EPS",
+    "GENC",
     "GFS",
     "GFS_EPS",
     "HAFS",
@@ -37,6 +38,8 @@
     "ICON",
     "ICON_EPS",
     "JGSM",
+    "KIM_3h",
+    "KIM_EPS",
     "TEPS",
     "UKM",
     "WNC",
@@ -50,6 +53,7 @@
     "ECMWF",
     "ECMWF AIFS",
     "ECMWF AIFS EPS",
+    "GenCast",
     "GFS",
     "GFS EPS",
     "HAFS",
@@ -57,12 +61,22 @@
     "ICON",
     "ICON EPS",
     "JGSM",
+    "KIM",
+    "KIM EPS",
     "JGSM EPS",
     "UKMO",
     "WeatherNext2 Cyclones",
     "WeatherNext3 Cyclones"
   ],
-  "motion_qc_fallbacks": [],
+  "motion_qc_fallbacks": [
+    {
+      "model": "KIM_3h",
+      "fallback_model": "KIM_6h",
+      "source": "APIHUB",
+      "start_lead_hour": 48.0,
+      "end_lead_hour": 54.0
+    }
+  ],
   "skip_atcf": false,
   "source_availability_path": "data/2026/TYP_2627_CHOI-WAN/metadata/source_availability/202610051200.json",
   "smca_aifsm_snapshot_path": "data/2026/TYP_2627_CHOI-WAN/metadata/smca/AIFSM/202610051200.json",
