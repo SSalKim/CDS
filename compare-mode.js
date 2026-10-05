@@ -309,7 +309,7 @@ return false;
 
 let month=runUTC.getUTCMonth()+1;
 
-return month>=11 || month<=4;
+return month>=10 || month<=4;
 
 }
 
