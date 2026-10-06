@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261006190012",
-  "generated_at_kst": "2026-10-07 04:00 KST",
+  "generated_at_utc": "20261006191009",
+  "generated_at_kst": "2026-10-07 04:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_28",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 30,
-  "selected_model_count": 16,
+  "model_source_count": 33,
+  "selected_model_count": 18,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -166,6 +166,40 @@
       "is_official": false,
       "first_seen_utc": "20261006190012",
       "first_seen_kst": "2026-10-07 04:00 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 24,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261006191009",
+      "first_seen_kst": "2026-10-07 04:10 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 24,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261006191009",
+      "first_seen_kst": "2026-10-07 04:10 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -319,6 +353,23 @@
       "is_official": false,
       "first_seen_utc": "20261006190012",
       "first_seen_kst": "2026-10-07 04:00 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 37,
+      "max_lead_hour": 216,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261006191009",
+      "first_seen_kst": "2026-10-07 04:10 KST"
     },
     {
       "model_id": "HAFS",
