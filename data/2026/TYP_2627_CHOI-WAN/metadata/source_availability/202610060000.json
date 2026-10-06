@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261006070010",
-  "generated_at_kst": "2026-10-06 16:00 KST",
+  "generated_at_utc": "20261006071003",
+  "generated_at_kst": "2026-10-06 16:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_27",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 46,
-  "selected_model_count": 15,
+  "model_source_count": 48,
+  "selected_model_count": 17,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -561,6 +561,23 @@
       "first_seen_kst": "2026-10-06 16:00 KST"
     },
     {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261006071003",
+      "first_seen_kst": "2026-10-06 16:10 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -814,6 +831,23 @@
       "is_official": false,
       "first_seen_utc": "20261006070010",
       "first_seen_kst": "2026-10-06 16:00 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 10,
+      "max_lead_hour": 54,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261006071003",
+      "first_seen_kst": "2026-10-06 16:10 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2627_CHOI-WAN/metadata/source_availability/202610060000.json",
