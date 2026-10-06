@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261006181058",
-  "generated_at_kst": "2026-10-07 03:10 KST",
+  "generated_at_utc": "20261006182042",
+  "generated_at_kst": "2026-10-07 03:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_29",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 23,
-  "selected_model_count": 11,
+  "model_source_count": 26,
+  "selected_model_count": 12,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -132,6 +132,23 @@
       "is_official": false,
       "first_seen_utc": "20261006180050",
       "first_seen_kst": "2026-10-07 03:00 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 34,
+      "max_lead_hour": 198,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261006182042",
+      "first_seen_kst": "2026-10-07 03:20 KST"
     },
     {
       "model_id": "GFS",
@@ -271,6 +288,23 @@
       "first_seen_kst": "2026-10-07 03:00 KST"
     },
     {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GEFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261006182042",
+      "first_seen_kst": "2026-10-07 03:20 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -303,6 +337,23 @@
       "is_official": false,
       "first_seen_utc": "20261006181058",
       "first_seen_kst": "2026-10-07 03:10 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFSA"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261006182042",
+      "first_seen_kst": "2026-10-07 03:20 KST"
     },
     {
       "model_id": "ICON",
@@ -425,5 +476,6 @@
     }
   ],
   "source_availability_path": "data/2026/TYP_2629_KOGUMA/metadata/source_availability/202610061200.json",
+  "smca_aifsm_snapshot_path": "data/2026/TYP_2629_KOGUMA/metadata/smca/AIFSM/202610061200.json",
   "smca_aigfs_snapshot_path": "data/2026/TYP_2629_KOGUMA/metadata/smca/AIGFS/202610061200.json"
 }
