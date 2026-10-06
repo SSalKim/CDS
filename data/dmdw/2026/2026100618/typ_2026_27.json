@@ -1,13 +1,14 @@
 {
   "cycle": "2026100618",
   "cycle_utc": "202610061800",
-  "layer_candidate_count": 1,
-  "model_count": 1,
+  "layer_candidate_count": 2,
+  "model_count": 2,
   "models": [
-    {"index":0,"is_ensemble_mean":false,"max_lead_hour":36,"member_id":null,"model_id":"JGSM","point_count":7,"raw_model_id":"JGSM","row_count":7,"source_member_count":null}
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":36,"member_id":null,"model_id":"JGSM","point_count":7,"raw_model_id":"JGSM","row_count":7,"source_member_count":null},
+    {"index":1,"is_ensemble_mean":false,"max_lead_hour":36,"member_id":null,"model_id":"TEPS","point_count":7,"raw_model_id":"TEPS","row_count":7,"source_member_count":null}
   ],
   "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
-  "point_count": 7,
+  "point_count": 14,
   "points": [
     [0,0,"202610061800",36.3,149.7,965,37,53,45,500,null],
     [0,6,"202610070000",39.6,152.3,971,34,-9,null,0,null],
@@ -15,7 +16,14 @@
     [0,18,"202610071200",46.5,161.9,974,30.3,-9,null,0,null],
     [0,24,"202610071800",50.5,167.7,967,28.8,-9,null,0,null],
     [0,30,"202610080000",54,173.4,958,28.8,-9,null,0,null],
-    [0,36,"202610080600",57.7,177.4,953,30.9,-9,null,0,null]
+    [0,36,"202610080600",57.7,177.4,953,30.9,-9,null,0,null],
+    [1,0,"202610061800",36.3,149.7,965,37,53,45,500,null],
+    [1,6,"202610070000",39.6,152.3,973,34.5,-9,null,0,null],
+    [1,12,"202610070600",42.8,156.4,974,34.5,-9,null,0,null],
+    [1,18,"202610071200",46.5,161.7,975,31.9,-9,null,0,null],
+    [1,24,"202610071800",50.6,167.4,967,30.9,-9,null,0,null],
+    [1,30,"202610080000",54.1,172.9,959,31.4,-9,null,0,null],
+    [1,36,"202610080600",57.9,175.7,947,32.9,-9,null,0,null]
   ],
   "request": {"o_tm_seq":"25","storm_kind":"typ","typ_seq":27,"year":2026},
   "schema_version": 2,
