@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261007193956",
-  "generated_at_kst": "2026-10-08 04:39 KST",
+  "generated_at_utc": "20261007195006",
+  "generated_at_kst": "2026-10-08 04:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_28",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 58,
+  "model_source_count": 59,
   "selected_model_count": 28,
   "active_target_model_count": 40,
   "model_sources": [
@@ -413,7 +413,7 @@
       ],
       "source": "SMCA.FUN",
       "source_label": "SMCA.FUN",
-      "selected": true,
+      "selected": false,
       "point_count": 16,
       "max_lead_hour": 90,
       "has_pressure": true,
@@ -421,6 +421,23 @@
       "is_official": false,
       "first_seen_utc": "20261007193009",
       "first_seen_kst": "2026-10-08 04:30 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "ECMWF_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 32,
+      "max_lead_hour": 186,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261007195006",
+      "first_seen_kst": "2026-10-08 04:50 KST"
     },
     {
       "model_id": "FNEC_AI",
