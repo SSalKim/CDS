@@ -1,19 +1,26 @@
 {
   "cycle": "2026100700",
   "cycle_utc": "202610070000",
-  "layer_candidate_count": 1,
-  "model_count": 1,
+  "layer_candidate_count": 2,
+  "model_count": 2,
   "models": [
-    {"index":0,"is_ensemble_mean":false,"max_lead_hour":24,"member_id":null,"model_id":"JGSM","point_count":5,"raw_model_id":"JGSM","row_count":5,"source_member_count":null}
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":24,"member_id":null,"model_id":"JGSM","point_count":5,"raw_model_id":"JGSM","row_count":5,"source_member_count":null},
+    {"index":1,"is_ensemble_mean":false,"max_lead_hour":30,"member_id":null,"model_id":"TEPS","point_count":6,"raw_model_id":"TEPS","row_count":6,"source_member_count":null}
   ],
   "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
-  "point_count": 5,
+  "point_count": 11,
   "points": [
     [0,0,"202610070000",39.3,152.6,970,35,67,22.5,500,null],
     [0,6,"202610070600",42.5,156.3,978,30.9,-9,null,0,null],
     [0,12,"202610071200",46.4,161.6,978,28.3,-9,null,0,null],
     [0,18,"202610071800",50.5,167.3,970,26.7,-9,null,0,null],
-    [0,24,"202610080000",53.9,173,963,28.3,-9,null,0,null]
+    [0,24,"202610080000",53.9,173,963,28.3,-9,null,0,null],
+    [1,0,"202610070000",39.3,152.6,970,35,67,22.5,500,null],
+    [1,6,"202610070600",42.5,156.3,978,31.4,-9,null,0,null],
+    [1,12,"202610071200",46.4,161.3,978,29.3,-9,null,0,null],
+    [1,18,"202610071800",50.7,167.2,970,27.8,-9,null,0,null],
+    [1,24,"202610080000",54.1,172.6,963,29.3,-9,null,0,null],
+    [1,30,"202610080600",58,174.6,954,30.3,-9,null,0,null]
   ],
   "request": {"o_tm_seq":"26","storm_kind":"typ","typ_seq":27,"year":2026},
   "schema_version": 2,
