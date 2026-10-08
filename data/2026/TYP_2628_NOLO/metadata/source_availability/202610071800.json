@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261008013004",
-  "generated_at_kst": "2026-10-08 10:30 KST",
+  "generated_at_utc": "20261008014000",
+  "generated_at_kst": "2026-10-08 10:40 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_28",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 41,
+  "model_source_count": 43,
   "selected_model_count": 17,
   "active_target_model_count": 40,
   "model_sources": [
@@ -362,7 +362,7 @@
       ],
       "source": "SMCA.FUN",
       "source_label": "SMCA.FUN",
-      "selected": true,
+      "selected": false,
       "point_count": 17,
       "max_lead_hour": 96,
       "has_pressure": true,
@@ -370,6 +370,41 @@
       "is_official": false,
       "first_seen_utc": "20261008011959",
       "first_seen_kst": "2026-10-08 10:19 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "ECMWF_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261008014000",
+      "first_seen_kst": "2026-10-08 10:40 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "ECMWF_EPS",
+        "ECMWF_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 48,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261008014000",
+      "first_seen_kst": "2026-10-08 10:40 KST"
     },
     {
       "model_id": "GFS",
@@ -397,8 +432,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": true,
-      "point_count": 25,
-      "max_lead_hour": 144,
+      "point_count": 29,
+      "max_lead_hour": 168,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -431,8 +466,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": true,
-      "point_count": 24,
-      "max_lead_hour": 138,
+      "point_count": 31,
+      "max_lead_hour": 180,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
