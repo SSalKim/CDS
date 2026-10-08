@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at_utc": "202610080409",
+  "updated_at_utc": "202610080419",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 39,
@@ -14,118 +14,6 @@
     }
   ],
   "runs": [
-    {
-      "job": {
-        "storm_key": "typ_2026_28",
-        "stage": "TYP_LINKED",
-        "year": 2026,
-        "data_time": "202610080000",
-        "td_number": null,
-        "linked_td_number": null,
-        "typ_number": 28,
-        "typ_name_ko": "놀로",
-        "typ_name": "NOLO",
-        "typ_en": "NOLO",
-        "atcf_id": "ep152026",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202610080000",
-        "cycle_time_utc": "202610080000",
-        "start_utc": "202610080400",
-        "end_utc": "202610081000"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20261008041026",
-          "image_path": "data/2026/TYP_2628_NOLO/images/TYP_2628_NOLO_202610080000_120h.png",
-          "storm_stage": "TYP",
-          "storm_year": "2026",
-          "typ_number": 28,
-          "data_typ_number": 28,
-          "typ_name": "NOLO",
-          "typ_name_ko": "놀로",
-          "linked_td_number": null,
-          "linked_typ_number": null,
-          "canonical_storm_key": "typ_2026_28",
-          "canonical_storm_stage": "TYP",
-          "canonical_typ_number": 28,
-          "canonical_typ_name": "NOLO",
-          "canonical_typ_name_ko": "놀로",
-          "atcf_id": "ep152026",
-          "extra_atcf_ids": [],
-          "data_time": "202610080000",
-          "fcst_hours": 120,
-          "intensity": "TYP",
-          "model_count": 1,
-          "target_model_count": 40,
-          "model_labels": [
-            "JGSM"
-          ],
-          "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2628_NOLO/metadata/source_availability/202610080000.json"
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
-    {
-      "job": {
-        "storm_key": "typ_2026_28",
-        "stage": "TYP_LINKED",
-        "year": 2026,
-        "data_time": "202610080000",
-        "td_number": null,
-        "linked_td_number": null,
-        "typ_number": 28,
-        "typ_name_ko": "놀로",
-        "typ_name": "NOLO",
-        "typ_en": "NOLO",
-        "atcf_id": "ep152026",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202610080000",
-        "cycle_time_utc": "202610080000",
-        "start_utc": "202610080400",
-        "end_utc": "202610081000"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20261008041036",
-          "image_path": "data/2026/TYP_2628_NOLO/images/TYP_2628_NOLO_202610080000_240h.png",
-          "storm_stage": "TYP",
-          "storm_year": "2026",
-          "typ_number": 28,
-          "data_typ_number": 28,
-          "typ_name": "NOLO",
-          "typ_name_ko": "놀로",
-          "linked_td_number": null,
-          "linked_typ_number": null,
-          "canonical_storm_key": "typ_2026_28",
-          "canonical_storm_stage": "TYP",
-          "canonical_typ_number": 28,
-          "canonical_typ_name": "NOLO",
-          "canonical_typ_name_ko": "놀로",
-          "atcf_id": "ep152026",
-          "extra_atcf_ids": [],
-          "data_time": "202610080000",
-          "fcst_hours": 240,
-          "intensity": "TYP",
-          "model_count": 1,
-          "target_model_count": 40,
-          "model_labels": [
-            "JGSM"
-          ],
-          "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2628_NOLO/metadata/source_availability/202610080000.json"
-        }
-      },
-      "completed": false,
-      "final_check": false
-    },
     {
       "job": {
         "storm_key": "typ_2026_29",
@@ -150,7 +38,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20261008041027",
+          "generated_at_utc": "20261008042031",
           "image_path": "data/2026/TYP_2629_KOGUMA/images/TYP_2629_KOGUMA_202610080000_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -170,13 +58,19 @@
           "data_time": "202610080000",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 1,
+          "model_count": 6,
           "target_model_count": 40,
           "model_labels": [
-            "JGSM"
+            "AIGFS",
+            "AICON",
+            "ICON",
+            "ICON EPS",
+            "JGSM",
+            "JGSM EPS"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2629_KOGUMA/metadata/source_availability/202610080000.json"
+          "source_availability_path": "data/2026/TYP_2629_KOGUMA/metadata/source_availability/202610080000.json",
+          "smca_aicon_snapshot_path": "data/2026/TYP_2629_KOGUMA/metadata/smca/AICON/202610080000.json"
         }
       },
       "completed": false,
@@ -206,7 +100,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20261008041037",
+          "generated_at_utc": "20261008042033",
           "image_path": "data/2026/TYP_2629_KOGUMA/images/TYP_2629_KOGUMA_202610080000_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -226,13 +120,143 @@
           "data_time": "202610080000",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 1,
+          "model_count": 6,
           "target_model_count": 40,
           "model_labels": [
-            "JGSM"
+            "AIGFS",
+            "AICON",
+            "ICON",
+            "ICON EPS",
+            "JGSM",
+            "JGSM EPS"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2629_KOGUMA/metadata/source_availability/202610080000.json"
+          "source_availability_path": "data/2026/TYP_2629_KOGUMA/metadata/source_availability/202610080000.json",
+          "smca_aicon_snapshot_path": "data/2026/TYP_2629_KOGUMA/metadata/smca/AICON/202610080000.json"
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2026_28",
+        "stage": "TYP_LINKED",
+        "year": 2026,
+        "data_time": "202610080000",
+        "td_number": null,
+        "linked_td_number": null,
+        "typ_number": 28,
+        "typ_name_ko": "놀로",
+        "typ_name": "NOLO",
+        "typ_en": "NOLO",
+        "atcf_id": "ep152026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202610080000",
+        "cycle_time_utc": "202610080000",
+        "start_utc": "202610080400",
+        "end_utc": "202610081000"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20261008042031",
+          "image_path": "data/2026/TYP_2628_NOLO/images/TYP_2628_NOLO_202610080000_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 28,
+          "data_typ_number": 28,
+          "typ_name": "NOLO",
+          "typ_name_ko": "놀로",
+          "linked_td_number": null,
+          "linked_typ_number": null,
+          "canonical_storm_key": "typ_2026_28",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 28,
+          "canonical_typ_name": "NOLO",
+          "canonical_typ_name_ko": "놀로",
+          "atcf_id": "ep152026",
+          "extra_atcf_ids": [],
+          "data_time": "202610080000",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 6,
+          "target_model_count": 40,
+          "model_labels": [
+            "AIGFS",
+            "AICON",
+            "ICON",
+            "ICON EPS",
+            "JGSM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2628_NOLO/metadata/source_availability/202610080000.json",
+          "smca_aicon_snapshot_path": "data/2026/TYP_2628_NOLO/metadata/smca/AICON/202610080000.json"
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2026_28",
+        "stage": "TYP_LINKED",
+        "year": 2026,
+        "data_time": "202610080000",
+        "td_number": null,
+        "linked_td_number": null,
+        "typ_number": 28,
+        "typ_name_ko": "놀로",
+        "typ_name": "NOLO",
+        "typ_en": "NOLO",
+        "atcf_id": "ep152026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202610080000",
+        "cycle_time_utc": "202610080000",
+        "start_utc": "202610080400",
+        "end_utc": "202610081000"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20261008042034",
+          "image_path": "data/2026/TYP_2628_NOLO/images/TYP_2628_NOLO_202610080000_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 28,
+          "data_typ_number": 28,
+          "typ_name": "NOLO",
+          "typ_name_ko": "놀로",
+          "linked_td_number": null,
+          "linked_typ_number": null,
+          "canonical_storm_key": "typ_2026_28",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 28,
+          "canonical_typ_name": "NOLO",
+          "canonical_typ_name_ko": "놀로",
+          "atcf_id": "ep152026",
+          "extra_atcf_ids": [],
+          "data_time": "202610080000",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 6,
+          "target_model_count": 40,
+          "model_labels": [
+            "AIGFS",
+            "AICON",
+            "ICON",
+            "ICON EPS",
+            "JGSM",
+            "JGSM EPS"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2628_NOLO/metadata/source_availability/202610080000.json",
+          "smca_aicon_snapshot_path": "data/2026/TYP_2628_NOLO/metadata/smca/AICON/202610080000.json"
         }
       },
       "completed": false,
@@ -262,7 +286,7 @@
       "result": {
         "status": "no_output",
         "metadata": {
-          "generated_at_utc": "20261008041043",
+          "generated_at_utc": "20261008042037",
           "image_path": "data/2026/TD_2656_NONAME/images/TD_2656_NONAME_202610080000_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -319,7 +343,7 @@
       "result": {
         "status": "no_output",
         "metadata": {
-          "generated_at_utc": "20261008041043",
+          "generated_at_utc": "20261008042037",
           "image_path": "data/2026/TD_2656_NONAME/images/TD_2656_NONAME_202610080000_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
