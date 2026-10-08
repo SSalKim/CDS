@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261008204024",
-  "generated_at_kst": "2026-10-09 05:40 KST",
+  "generated_at_utc": "20261008205001",
+  "generated_at_kst": "2026-10-09 05:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_28",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 76,
+  "model_source_count": 78,
   "selected_model_count": 36,
   "active_target_model_count": 40,
   "model_sources": [
@@ -372,6 +372,23 @@
       "first_seen_kst": "2026-10-09 04:40 KST"
     },
     {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 7,
+      "max_lead_hour": 42,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261008205001",
+      "first_seen_kst": "2026-10-09 05:50 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS_EPS",
       "model_label": "ECMWF AIFS EPS",
       "raw_model_ids": [
@@ -421,6 +438,23 @@
       "is_official": false,
       "first_seen_utc": "20261008194002",
       "first_seen_kst": "2026-10-09 04:40 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "EAIM"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 15,
+      "max_lead_hour": 90,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261008205001",
+      "first_seen_kst": "2026-10-09 05:50 KST"
     },
     {
       "model_id": "ECMWF_EPS",
@@ -1096,8 +1130,8 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": true,
-      "point_count": 13,
-      "max_lead_hour": 150,
+      "point_count": 27,
+      "max_lead_hour": 156,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
