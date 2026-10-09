@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261009080209",
-  "generated_at_kst": "2026-10-09 17:02 KST",
+  "generated_at_utc": "20261009081012",
+  "generated_at_kst": "2026-10-09 17:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_29",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 78,
+  "model_source_count": 80,
   "selected_model_count": 30,
   "active_target_model_count": 40,
   "model_sources": [
@@ -1216,7 +1216,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 16,
       "max_lead_hour": 180,
       "has_pressure": true,
@@ -1224,6 +1224,23 @@
       "is_official": false,
       "first_seen_utc": "20261009075021",
       "first_seen_kst": "2026-10-09 16:50 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "FNMOC_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009081012",
+      "first_seen_kst": "2026-10-09 17:10 KST"
     },
     {
       "model_id": "PGEC_AI",
@@ -1343,6 +1360,23 @@
       "is_official": false,
       "first_seen_utc": "20261009075021",
       "first_seen_kst": "2026-10-09 16:50 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "DEEPMIND"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009081012",
+      "first_seen_kst": "2026-10-09 17:10 KST"
     },
     {
       "model_id": "WNV3",
