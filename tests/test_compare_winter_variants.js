@@ -42,7 +42,30 @@ assert.equal(usesVariant('2026-10-01T00:00:00Z','gph500'),false);
 assert.equal(usesVariant('2020-10-01T00:00:00Z'),false);
 assert.equal(usesVariant('2020-12-28T18:00:00Z'),false);
 assert.equal(usesVariant('2020-12-29T00:00:00Z'),true);
+
+context.compareModels=['kim_gdps','ukmo','ecmwf'];
+context.getCompareProductForModel=()=>context.product;
+function topAligned(date,modelId='ukmo',productId='acptot',category='hkor'){
+  context.product={category,id:productId};
+  return evaluate(`shouldTopAlignCompareImage(${JSON.stringify(modelId)},new Date(${JSON.stringify(date)}))`);
+}
+for(const productId of ['acptot','acrain','tmerge']){
+  assert.equal(topAligned('2026-10-09T00:00:00Z','ukmo',productId),true);
+}
+assert.equal(topAligned('2026-10-09T00:00:00Z','kim_gdps'),false);
+assert.equal(topAligned('2026-10-09T00:00:00Z','ecmwf'),false);
+assert.equal(topAligned('2026-09-30T23:59:59Z'),false);
+assert.equal(topAligned('2026-05-01T00:00:00Z'),false);
+assert.equal(topAligned('2020-12-28T18:00:00Z'),false);
+assert.equal(topAligned('2026-10-09T00:00:00Z','ukmo','gph500'),false);
+assert.equal(topAligned('2026-10-09T00:00:00Z','ukmo','acptot','asia'),false);
+context.compareModels=['ukmo'];
+assert.equal(topAligned('2026-10-09T00:00:00Z'),false);
+context.compareModels=['ukmo','um_ldps'];
+assert.equal(topAligned('2026-10-09T00:00:00Z'),false);
+context.compareModels=['ukmo','ecmwf'];
 mobile=true;
 assert.equal(usesVariant('2026-10-01T00:00:00Z'),false);
+assert.equal(topAligned('2026-10-09T00:00:00Z'),false);
 
-console.log('Comparison winter variants: October-April, UTC boundaries and existing exclusions passed');
+console.log('Comparison winter variants and UKUM top alignment conditions passed');

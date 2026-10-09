@@ -343,6 +343,19 @@ hasWinterVariantCompareArchiveStarted(runUTC);
 
 }
 
+function shouldTopAlignCompareImage(modelId,runUTC){
+
+if(modelId!=='ukmo'){
+return false;
+}
+
+return compareModels.some(otherModelId=>
+otherModelId!==modelId &&
+shouldUseWinterCompareVariant(otherModelId,getCompareProductForModel(otherModelId),runUTC)
+);
+
+}
+
 function getWinterCompareVariantPattern(pattern,productId){
 
 if(typeof pattern!=='string'){
@@ -1780,6 +1793,7 @@ let itemPromises=compareModels.map(async modelId=>{
 
 let item=document.createElement('div');
 item.className='compare-image-item';
+item.classList.toggle('compare-top-aligned',shouldTopAlignCompareImage(modelId,getSelectedUTCDate()));
 
 let blockedMessage=getCompareBlockedMessage(modelId,fh);
 
