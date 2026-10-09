@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261009002955",
-  "generated_at_kst": "2026-10-09 09:29 KST",
+  "generated_at_utc": "20261009004009",
+  "generated_at_kst": "2026-10-09 09:40 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_28",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 25,
-  "selected_model_count": 13,
+  "model_source_count": 28,
+  "selected_model_count": 14,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -200,6 +200,40 @@
       "is_official": false,
       "first_seen_utc": "20261009001959",
       "first_seen_kst": "2026-10-09 09:19 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "ECMWF_AIFS_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": true,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009004009",
+      "first_seen_kst": "2026-10-09 09:40 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009004009",
+      "first_seen_kst": "2026-10-09 09:40 KST"
     },
     {
       "model_id": "GFS",
@@ -455,9 +489,27 @@
       "is_official": false,
       "first_seen_utc": "20261009002955",
       "first_seen_kst": "2026-10-09 09:29 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "WN2C"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 13,
+      "max_lead_hour": 72,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009004009",
+      "first_seen_kst": "2026-10-09 09:40 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2628_NOLO/metadata/source_availability/202610081800.json",
   "smca_aicon_snapshot_path": "data/2026/TYP_2628_NOLO/metadata/smca/AICON/202610081800.json",
+  "smca_aifsm_snapshot_path": "data/2026/TYP_2628_NOLO/metadata/smca/AIFSM/202610081800.json",
   "smca_aigfs_snapshot_path": "data/2026/TYP_2628_NOLO/metadata/smca/AIGFS/202610081800.json"
 }
