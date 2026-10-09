@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261009081012",
-  "generated_at_kst": "2026-10-09 17:10 KST",
+  "generated_at_utc": "20261009082004",
+  "generated_at_kst": "2026-10-09 17:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_29",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 80,
-  "selected_model_count": 30,
+  "model_source_count": 83,
+  "selected_model_count": 31,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -1192,6 +1192,23 @@
       "first_seen_kst": "2026-10-09 15:50 KST"
     },
     {
+      "model_id": "IFEC_AI",
+      "model_label": "KMA AIFS-ECMWF",
+      "raw_model_ids": [
+        "IFEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009082004",
+      "first_seen_kst": "2026-10-09 17:20 KST"
+    },
+    {
       "model_id": "KMA",
       "model_label": "KMA OFCL",
       "raw_model_ids": [
@@ -1241,6 +1258,23 @@
       "is_official": false,
       "first_seen_utc": "20261009081012",
       "first_seen_kst": "2026-10-09 17:10 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "FNMOC_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009082004",
+      "first_seen_kst": "2026-10-09 17:20 KST"
     },
     {
       "model_id": "PGEC_AI",
@@ -1394,6 +1428,23 @@
       "is_official": false,
       "first_seen_utc": "20261009080209",
       "first_seen_kst": "2026-10-09 17:02 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WN3C"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 27,
+      "max_lead_hour": 156,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009082004",
+      "first_seen_kst": "2026-10-09 17:20 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2629_KOGUMA/metadata/source_availability/202610090000.json",

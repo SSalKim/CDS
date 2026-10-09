@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261009081018",
-  "generated_at_kst": "2026-10-09 17:10 KST",
+  "generated_at_utc": "20261009082000",
+  "generated_at_kst": "2026-10-09 17:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_28",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 68,
-  "selected_model_count": 29,
+  "model_source_count": 70,
+  "selected_model_count": 30,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -1003,6 +1003,23 @@
       "first_seen_kst": "2026-10-09 15:59 KST"
     },
     {
+      "model_id": "IFEC_AI",
+      "model_label": "KMA AIFS-ECMWF",
+      "raw_model_ids": [
+        "IFEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009082000",
+      "first_seen_kst": "2026-10-09 17:20 KST"
+    },
+    {
       "model_id": "KMA",
       "model_label": "KMA OFCL",
       "raw_model_ids": [
@@ -1188,6 +1205,23 @@
       "is_official": false,
       "first_seen_utc": "20261009080208",
       "first_seen_kst": "2026-10-09 17:02 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WN3C"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 13,
+      "max_lead_hour": 72,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009082000",
+      "first_seen_kst": "2026-10-09 17:20 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2628_NOLO/metadata/source_availability/202610090000.json",
