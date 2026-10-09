@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261009071002",
-  "generated_at_kst": "2026-10-09 16:10 KST",
+  "generated_at_utc": "20261009072055",
+  "generated_at_kst": "2026-10-09 16:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_29",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 51,
-  "selected_model_count": 19,
+  "model_source_count": 59,
+  "selected_model_count": 26,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -305,6 +305,23 @@
       "first_seen_kst": "2026-10-09 16:10 KST"
     },
     {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 27,
+      "max_lead_hour": 156,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009072055",
+      "first_seen_kst": "2026-10-09 16:20 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
       "raw_model_ids": [
@@ -422,6 +439,40 @@
       "is_official": false,
       "first_seen_utc": "20261009065003",
       "first_seen_kst": "2026-10-09 15:50 KST"
+    },
+    {
+      "model_id": "FNEC_AI",
+      "model_label": "FourCastNet-ECMWF",
+      "raw_model_ids": [
+        "FNEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009072055",
+      "first_seen_kst": "2026-10-09 16:20 KST"
+    },
+    {
+      "model_id": "FNKM_AI",
+      "model_label": "FourCastNet-KIM",
+      "raw_model_ids": [
+        "FNKM_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 32,
+      "max_lead_hour": 186,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009072055",
+      "first_seen_kst": "2026-10-09 16:20 KST"
     },
     {
       "model_id": "GFS",
@@ -610,6 +661,40 @@
       "is_official": false,
       "first_seen_utc": "20261009071002",
       "first_seen_kst": "2026-10-09 16:10 KST"
+    },
+    {
+      "model_id": "GCEC_AI",
+      "model_label": "GraphCast-ECMWF",
+      "raw_model_ids": [
+        "GCEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009072055",
+      "first_seen_kst": "2026-10-09 16:20 KST"
+    },
+    {
+      "model_id": "GCKM_AI",
+      "model_label": "GraphCast-KIM",
+      "raw_model_ids": [
+        "GCKM_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 35,
+      "max_lead_hour": 204,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009072055",
+      "first_seen_kst": "2026-10-09 16:20 KST"
     },
     {
       "model_id": "HAFS",
@@ -885,6 +970,40 @@
       "first_seen_kst": "2026-10-09 13:09 KST"
     },
     {
+      "model_id": "PGEC_AI",
+      "model_label": "Pangu-Weather-ECMWF",
+      "raw_model_ids": [
+        "PGEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 32,
+      "max_lead_hour": 186,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009072055",
+      "first_seen_kst": "2026-10-09 16:20 KST"
+    },
+    {
+      "model_id": "PGKM_AI",
+      "model_label": "Pangu-Weather-KIM",
+      "raw_model_ids": [
+        "PGKM_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 34,
+      "max_lead_hour": 198,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009072055",
+      "first_seen_kst": "2026-10-09 16:20 KST"
+    },
+    {
       "model_id": "UKM",
       "model_label": "UKMO",
       "raw_model_ids": [
@@ -900,6 +1019,23 @@
       "is_official": false,
       "first_seen_utc": "20261009065959",
       "first_seen_kst": "2026-10-09 15:59 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 26,
+      "max_lead_hour": 150,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261009072055",
+      "first_seen_kst": "2026-10-09 16:20 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2629_KOGUMA/metadata/source_availability/202610090000.json",
