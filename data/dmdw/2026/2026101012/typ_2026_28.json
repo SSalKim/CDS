@@ -1,13 +1,14 @@
 {
   "cycle": "2026101012",
   "cycle_utc": "202610101200",
-  "layer_candidate_count": 1,
-  "model_count": 1,
+  "layer_candidate_count": 2,
+  "model_count": 2,
   "models": [
-    {"index":0,"is_ensemble_mean":false,"max_lead_hour":36,"member_id":null,"model_id":"JGSM","point_count":7,"raw_model_id":"JGSM","row_count":7,"source_member_count":null}
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":36,"member_id":null,"model_id":"JGSM","point_count":7,"raw_model_id":"JGSM","row_count":7,"source_member_count":null},
+    {"index":1,"is_ensemble_mean":false,"max_lead_hour":54,"member_id":null,"model_id":"TEPS","point_count":10,"raw_model_id":"TEPS","row_count":10,"source_member_count":null}
   ],
   "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
-  "point_count": 7,
+  "point_count": 17,
   "points": [
     [0,0,"202610101200",31.2,145.8,994,21,16,292.5,210,null],
     [0,6,"202610101800",31.6,145.6,999,16.5,-9,null,0,null],
@@ -15,7 +16,17 @@
     [0,18,"202610110600",32.9,145.9,1002,16.5,-9,null,0,null],
     [0,24,"202610111200",33.7,146.2,1003,19,-9,null,0,null],
     [0,30,"202610111800",34.3,146.3,1002,20.1,-9,null,0,null],
-    [0,36,"202610120000",34.7,146.4,1002,22.6,-9,null,0,null]
+    [0,36,"202610120000",34.7,146.4,1002,22.6,-9,null,0,null],
+    [1,0,"202610101200",31.2,145.8,994,21,16,292.5,210,null],
+    [1,6,"202610101800",31.6,145.6,999,17.5,-9,null,0,null],
+    [1,12,"202610110000",32.2,145.7,1002,16.5,-9,null,0,null],
+    [1,18,"202610110600",32.9,145.7,1002,15.9,-9,null,0,null],
+    [1,24,"202610111200",33.5,145.6,1004,15.9,-9,null,0,null],
+    [1,30,"202610111800",34.3,146.1,1003,18,-9,null,0,null],
+    [1,36,"202610120000",35.2,147.2,1005,19,-9,null,0,null],
+    [1,42,"202610120600",35.8,148.4,1003,19,-9,null,0,null],
+    [1,48,"202610121200",36.6,150.7,1004,17.5,-9,null,0,null],
+    [1,54,"202610121800",37.4,152.4,1003,18,-9,null,0,null]
   ],
   "request": {"o_tm_seq":"23","storm_kind":"typ","typ_seq":28,"year":2026},
   "schema_version": 2,
