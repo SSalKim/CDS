@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261010051000",
-  "generated_at_kst": "2026-10-10 14:10 KST",
+  "generated_at_utc": "20261010052000",
+  "generated_at_kst": "2026-10-10 14:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_28",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 8,
-  "selected_model_count": 5,
+  "model_source_count": 11,
+  "selected_model_count": 7,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -47,6 +47,57 @@
       "is_official": false,
       "first_seen_utc": "20261010043002",
       "first_seen_kst": "2026-10-10 13:30 KST"
+    },
+    {
+      "model_id": "AGFS",
+      "model_label": "AIGFS",
+      "raw_model_ids": [
+        "AIGFS"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 22,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261010052000",
+      "first_seen_kst": "2026-10-10 14:20 KST"
+    },
+    {
+      "model_id": "AIGEFS",
+      "model_label": "AIGFS EPS",
+      "raw_model_ids": [
+        "AIGEFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 26,
+      "max_lead_hour": 150,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261010052000",
+      "first_seen_kst": "2026-10-10 14:20 KST"
+    },
+    {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "GFS"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 7,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261010052000",
+      "first_seen_kst": "2026-10-10 14:20 KST"
     },
     {
       "model_id": "ICON",
@@ -168,5 +219,6 @@
       "first_seen_kst": "2026-10-10 13:14 KST"
     }
   ],
-  "source_availability_path": "data/2026/TYP_2628_NOLO/metadata/source_availability/202610100000.json"
+  "source_availability_path": "data/2026/TYP_2628_NOLO/metadata/source_availability/202610100000.json",
+  "smca_aigfs_snapshot_path": "data/2026/TYP_2628_NOLO/metadata/smca/AIGFS/202610100000.json"
 }
