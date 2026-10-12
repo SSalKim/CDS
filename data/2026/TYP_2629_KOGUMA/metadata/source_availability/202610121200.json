@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261012183003",
-  "generated_at_kst": "2026-10-13 03:30 KST",
+  "generated_at_utc": "20261012184001",
+  "generated_at_kst": "2026-10-13 03:40 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_29",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 28,
+  "model_source_count": 31,
   "selected_model_count": 14,
   "active_target_model_count": 40,
   "model_sources": [
@@ -124,7 +124,7 @@
       ],
       "source": "POLARWX",
       "source_label": "POLARWX",
-      "selected": true,
+      "selected": false,
       "point_count": 14,
       "max_lead_hour": 78,
       "has_pressure": true,
@@ -132,6 +132,23 @@
       "is_official": false,
       "first_seen_utc": "20261012175952",
       "first_seen_kst": "2026-10-13 02:59 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261012184001",
+      "first_seen_kst": "2026-10-13 03:40 KST"
     },
     {
       "model_id": "ECMWF_AIFS_EPS",
@@ -363,7 +380,7 @@
       ],
       "source": "POLARWX",
       "source_label": "POLARWX",
-      "selected": true,
+      "selected": false,
       "point_count": 40,
       "max_lead_hour": 117,
       "has_pressure": true,
@@ -371,6 +388,40 @@
       "is_official": false,
       "first_seen_utc": "20261012181959",
       "first_seen_kst": "2026-10-13 03:19 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "HWRF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 38,
+      "max_lead_hour": 111,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261012184001",
+      "first_seen_kst": "2026-10-13 03:40 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "HWRF"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 38,
+      "max_lead_hour": 111,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261012184001",
+      "first_seen_kst": "2026-10-13 03:40 KST"
     },
     {
       "model_id": "ICON",
