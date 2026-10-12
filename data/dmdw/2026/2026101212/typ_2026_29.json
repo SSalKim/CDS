@@ -1,0 +1,33 @@
+{
+  "cycle": "2026101212",
+  "cycle_utc": "202610121200",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":84,"member_id":null,"model_id":"JGSM","point_count":15,"raw_model_id":"JGSM","row_count":15,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 15,
+  "points": [
+    [0,0,"202610121200",31.3,148.5,960,39,24,22.5,220,null],
+    [0,6,"202610121800",32.8,149.5,962,39.1,-9,null,0,null],
+    [0,12,"202610130000",34.1,150.9,962,39.6,-9,null,0,null],
+    [0,18,"202610130600",35.4,152.4,959,40.1,-9,null,0,null],
+    [0,24,"202610131200",36.6,154.1,960,39.1,-9,null,0,null],
+    [0,30,"202610131800",37.9,155.6,959,37.6,-9,null,0,null],
+    [0,36,"202610140000",39.3,157.4,959,36.5,-9,null,0,null],
+    [0,42,"202610140600",40.6,159.4,958,36.5,-9,null,0,null],
+    [0,48,"202610141200",41.9,161.5,962,35.5,-9,null,0,null],
+    [0,54,"202610141800",42.9,163.9,965,32.4,-9,null,0,null],
+    [0,60,"202610150000",43.8,166.5,969,29.8,-9,null,0,null],
+    [0,66,"202610150600",44.4,169.5,973,28.3,-9,null,0,null],
+    [0,72,"202610151200",44.9,172.5,976,29.3,-9,null,0,null],
+    [0,78,"202610151800",45.3,176,977,28.3,-9,null,0,null],
+    [0,84,"202610160000",45.3,179.8,978,27.3,-9,null,0,null]
+  ],
+  "request": {"o_tm_seq":"31","storm_kind":"typ","typ_seq":29,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"KOGUMA","canonical_typ_name_ko":"고구마","canonical_typ_number":29,"data_typ_number":29,"dmdw_o_tm_seq":"31","dmdw_start_time":"202610050000","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_29"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
