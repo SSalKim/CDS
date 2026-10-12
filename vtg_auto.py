@@ -20,7 +20,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from vtg_sources import SMCA_SNAPSHOT_KEYS, render_code_signature
+from vtg_sources import SMCA_SNAPSHOT_KEYS, SOURCE_MODEL_IDS, render_code_signature
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -1986,11 +1986,12 @@ def ensure_kma_gts_now_cache(
     auth_key: str,
     cache_dir: Path | None,
     mode: str,
+    refresh: bool = False,
 ) -> Path | None:
     if cache_dir is None:
         return None
     path = kma_gts_now_cache_path(cache_dir, data_time, mode)
-    if path.exists():
+    if path.exists() and not refresh:
         return path
     started_at = time.monotonic()
     try:
@@ -2002,6 +2003,7 @@ def ensure_kma_gts_now_cache(
             timeout=20,
             retries=1,
             retry_delay=3.0,
+            use_cache=not refresh,
         )
     except (HTTPError, URLError, TimeoutError, OSError) as exc:
         print(f"Warning: failed to prefetch KMA typ_gts_now mode={mode} {data_time}: {exc}")
@@ -2358,6 +2360,70 @@ def remove_obsolete_typ_artifacts_for_td_phases(
     return suppression_entries
 
 
+def discover_unlisted_td_rows(
+    *,
+    data_time: str,
+    td_rows: list[dict],
+    typ_rows: list[dict],
+    kma_gts_now_text: str | None,
+) -> list[dict]:
+    cycle = parse_utc_stamp(data_time)
+    if cycle is None or not kma_gts_now_text:
+        return []
+    known_td_keys = {(safe_int(row.get("YY")), safe_int(row.get("TD"))) for row in td_rows}
+    known_typ_keys = {(safe_int(row.get("YY")), safe_int(row.get("SEQ"))) for row in typ_rows}
+    latest_td_by_year: dict[int, int] = {}
+    for year, number in known_td_keys:
+        if year and number:
+            latest_td_by_year[year] = max(number, latest_td_by_year.get(year, 0))
+    latest_typ_by_year: dict[int, int] = {}
+    typ_numbers = [*known_typ_keys, *((safe_int(row.get("YY")), safe_int(row.get("TYP"))) for row in td_rows)]
+    for year, number in typ_numbers:
+        if year and number:
+            latest_typ_by_year[year] = max(number, latest_typ_by_year.get(year, 0))
+    allowed_years = kma_list_years_for_windows([], cycle)
+    allowed_sources = {source.upper() for source in SOURCE_MODEL_IDS["APIHUB"]}
+    leads_by_model: dict[tuple[int, int, str], set[int]] = {}
+    for row in parse_kma_csv_lines(kma_gts_now_text, fixed_columns=19):
+        year, number, lead = safe_int(row[1]), safe_int(row[2]), safe_int(row[4])
+        if year not in allowed_years or number is None or not 1 <= number <= 99:
+            continue
+        key = (year, number)
+        # Never resurrect ended/promoted TDs, or reinterpret a named TYP number.
+        if key in known_td_keys or key in known_typ_keys or number <= latest_td_by_year.get(year, 0):
+            continue
+        # The next TYP number is ambiguous until its identity list catches up.
+        if year not in latest_td_by_year or number <= latest_typ_by_year.get(year, 0) + 1:
+            continue
+        source = kma_gts_row_source(row)
+        if lead is None or lead < 0 or lead > 360 or source not in allowed_sources:
+            continue
+        if parse_utc_stamp(row[5]) != cycle or parse_utc_stamp(row[6]) != cycle + timedelta(hours=lead):
+            continue
+        lat, lon = safe_float(row[7]), safe_float(row[8])
+        if lat is None or lon is None or not math.isfinite(lat) or not math.isfinite(lon):
+            continue
+        if not -90 <= lat <= 90 or not -180 <= lon <= 360:
+            continue
+        if lat == 0 and lon == 0:
+            continue
+        leads_by_model.setdefault((year, number, source), set()).add(lead)
+    candidates = {
+        (year, number) for (year, number, _), leads in leads_by_model.items()
+        if 0 in leads and any(lead > 0 for lead in leads)
+    }
+    discovered = []
+    for year, number in sorted(candidates):
+        # These rows belong only to this cycle; never write them into the official list cache.
+        discovered.append({
+            "YY": str(year), "TD": str(number), "TYP": "0",
+            "TM_ST": format_utc_stamp(cycle), "TM_ED": "",
+            "REM": "Provisional TD discovered from same-cycle model guidance.",
+        })
+        print(f"Discovered provisional TD{number:02d} at {data_time} from typ_gts_now; missing from td_lst.")
+    return discovered
+
+
 def build_storm_jobs(
     *,
     now: datetime,
@@ -2393,6 +2459,11 @@ def build_storm_jobs(
     data_dt = parse_utc_stamp(data_time)
     if not data_dt:
         return jobs
+
+    td_rows = [*td_rows, *discover_unlisted_td_rows(
+        data_time=data_time, td_rows=td_rows, typ_rows=typ_rows,
+        kma_gts_now_text=kma_gts_now_text,
+    )]
 
     # KMA can list one named typhoon period broadly in typ_lst.php while td_lst.php
     # contains intermittent weakening/redevelopment TD episodes linked to the same
@@ -4983,17 +5054,15 @@ def main() -> int:
             args.final_check_before_window_end_minutes,
         )
 
-        kma_forecast_text_path = None
+        kma_forecast_text_path = ensure_kma_gts_now_cache(
+            data_time=window.data_time,
+            auth_key=args.auth_key,
+            cache_dir=http_cache_dir,
+            mode="2",
+            refresh=True,
+        )
         kma_past_text_path = None
-        kma_forecast_text = None
-        if not args.check_run_needed:
-            kma_forecast_text_path = ensure_kma_gts_now_cache(
-                data_time=window.data_time,
-                auth_key=args.auth_key,
-                cache_dir=http_cache_dir,
-                mode="2",
-            )
-            kma_forecast_text = read_optional_text(kma_forecast_text_path)
+        kma_forecast_text = read_optional_text(kma_forecast_text_path)
 
         job_started_at = time.monotonic()
         jobs = build_storm_jobs(

@@ -47,11 +47,14 @@ class PrecheckChangedPathsTests(unittest.TestCase):
         with (
             patch("sys.argv", argv),
             patch.object(vtg_auto, "fetch_kma_list_text", side_effect=self.list_text),
-            patch.object(vtg_auto, "ensure_kma_gts_now_cache") as forecast_fetch,
+            patch.object(vtg_auto, "ensure_kma_gts_now_cache", return_value=None) as forecast_fetch,
             redirect_stdout(io.StringIO()),
         ):
             self.assertEqual(vtg_auto.main(), 0)
-            forecast_fetch.assert_not_called()
+            forecast_fetch.assert_called_once_with(
+                data_time="202609080000", auth_key="test-key",
+                cache_dir=self.root / "http", mode="2", refresh=True,
+            )
         self.assertFalse((self.output_root / "status.json").exists())
         self.assertFalse((self.output_root / "manifest.json").exists())
 
