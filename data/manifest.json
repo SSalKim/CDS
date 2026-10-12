@@ -1,16 +1,16 @@
 {
   "version": 3,
-  "updated_at_utc": "202610121559",
+  "updated_at_utc": "202610121601",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 39,
   "final_check_before_window_end_minutes": 10,
   "active_windows": [
     {
-      "data_time": "202610120600",
-      "cycle_time_utc": "202610120600",
-      "start_utc": "202610121000",
-      "end_utc": "202610121600"
+      "data_time": "202610121200",
+      "cycle_time_utc": "202610121200",
+      "start_utc": "202610121600",
+      "end_utc": "202610122200"
     }
   ],
   "runs": [
@@ -19,7 +19,7 @@
         "storm_key": "td_2026_57",
         "stage": "TD_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202610120600",
+        "data_time": "202610121200",
         "td_number": 57,
         "linked_td_number": null,
         "typ_number": 57,
@@ -30,16 +30,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202610120600",
-        "cycle_time_utc": "202610120600",
-        "start_utc": "202610121000",
-        "end_utc": "202610121600"
+        "data_time": "202610121200",
+        "cycle_time_utc": "202610121200",
+        "start_utc": "202610121600",
+        "end_utc": "202610122200"
       },
       "result": {
-        "status": "ok",
+        "status": "no_output",
         "metadata": {
-          "generated_at_utc": "20261012160033",
-          "image_path": "data/2026/TD_2657_NONAME/images/TD_2657_NONAME_202610120600_120h.png",
+          "generated_at_utc": "20261012160152",
+          "image_path": "data/2026/TD_2657_NONAME/images/TD_2657_NONAME_202610121200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 57,
@@ -55,38 +55,28 @@
           "canonical_typ_name_ko": "",
           "atcf_id": "wp282026",
           "extra_atcf_ids": [],
-          "data_time": "202610120600",
+          "data_time": "202610121200",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 12,
+          "model_count": 0,
           "target_model_count": 40,
-          "model_labels": [
-            "AIGFS",
-            "AIGFS EPS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "ICON",
-            "ICON EPS",
-            "UKMO EPS",
-            "WeatherNext2 Cyclones",
-            "WeatherNext3 Cyclones"
-          ],
+          "models": [],
+          "model_labels": [],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2657_NONAME/metadata/source_availability/202610120600.json"
+          "source_availability_path": "data/2026/TD_2657_NONAME/metadata/source_availability/202610121200.json",
+          "no_output": true,
+          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2026_57",
         "stage": "TD_POSITION_ATCF",
         "year": 2026,
-        "data_time": "202610120600",
+        "data_time": "202610121200",
         "td_number": 57,
         "linked_td_number": null,
         "typ_number": 57,
@@ -97,16 +87,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202610120600",
-        "cycle_time_utc": "202610120600",
-        "start_utc": "202610121000",
-        "end_utc": "202610121600"
+        "data_time": "202610121200",
+        "cycle_time_utc": "202610121200",
+        "start_utc": "202610121600",
+        "end_utc": "202610122200"
       },
       "result": {
-        "status": "ok",
+        "status": "no_output",
         "metadata": {
-          "generated_at_utc": "20261012160041",
-          "image_path": "data/2026/TD_2657_NONAME/images/TD_2657_NONAME_202610120600_240h.png",
+          "generated_at_utc": "20261012160152",
+          "image_path": "data/2026/TD_2657_NONAME/images/TD_2657_NONAME_202610121200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 57,
@@ -122,194 +112,28 @@
           "canonical_typ_name_ko": "",
           "atcf_id": "wp282026",
           "extra_atcf_ids": [],
-          "data_time": "202610120600",
+          "data_time": "202610121200",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 12,
+          "model_count": 0,
           "target_model_count": 40,
-          "model_labels": [
-            "AIGFS",
-            "AIGFS EPS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "ICON",
-            "ICON EPS",
-            "UKMO EPS",
-            "WeatherNext2 Cyclones",
-            "WeatherNext3 Cyclones"
-          ],
+          "models": [],
+          "model_labels": [],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2657_NONAME/metadata/source_availability/202610120600.json"
+          "source_availability_path": "data/2026/TD_2657_NONAME/metadata/source_availability/202610121200.json",
+          "no_output": true,
+          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
         }
       },
       "completed": false,
-      "final_check": true
-    },
-    {
-      "job": {
-        "storm_key": "typ_2026_29",
-        "stage": "TYP_LINKED",
-        "year": 2026,
-        "data_time": "202610120600",
-        "td_number": null,
-        "linked_td_number": 56,
-        "typ_number": 29,
-        "typ_name_ko": "고구마",
-        "typ_name": "KOGUMA",
-        "typ_en": "KOGUMA",
-        "atcf_id": "wp272026",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202610120600",
-        "cycle_time_utc": "202610120600",
-        "start_utc": "202610121000",
-        "end_utc": "202610121600"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20261012160041",
-          "image_path": "data/2026/TYP_2629_KOGUMA/images/TYP_2629_KOGUMA_202610120600_120h.png",
-          "storm_stage": "TYP",
-          "storm_year": "2026",
-          "typ_number": 29,
-          "data_typ_number": 29,
-          "typ_name": "KOGUMA",
-          "typ_name_ko": "고구마",
-          "linked_td_number": 56,
-          "linked_typ_number": null,
-          "canonical_storm_key": "typ_2026_29",
-          "canonical_storm_stage": "TYP",
-          "canonical_typ_number": 29,
-          "canonical_typ_name": "KOGUMA",
-          "canonical_typ_name_ko": "고구마",
-          "atcf_id": "wp272026",
-          "extra_atcf_ids": [],
-          "data_time": "202610120600",
-          "fcst_hours": 120,
-          "intensity": "TYP",
-          "model_count": 21,
-          "target_model_count": 40,
-          "model_labels": [
-            "AIGFS",
-            "AIGFS EPS",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "Aurora-ECMWF",
-            "FengWu-ECMWF",
-            "FuXi-ECMWF",
-            "HWRF",
-            "ICON",
-            "ICON EPS",
-            "JGSM",
-            "JGSM EPS",
-            "UKMO EPS",
-            "WeatherNext2 Cyclones",
-            "WeatherNext3 Cyclones"
-          ],
-          "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2629_KOGUMA/metadata/source_availability/202610120600.json",
-          "smca_aifsm_snapshot_path": "data/2026/TYP_2629_KOGUMA/metadata/smca/AIFSM/202610120600.json",
-          "smca_aigfs_snapshot_path": "data/2026/TYP_2629_KOGUMA/metadata/smca/AIGFS/202610120600.json"
-        }
-      },
-      "completed": false,
-      "final_check": true
-    },
-    {
-      "job": {
-        "storm_key": "typ_2026_29",
-        "stage": "TYP_LINKED",
-        "year": 2026,
-        "data_time": "202610120600",
-        "td_number": null,
-        "linked_td_number": 56,
-        "typ_number": 29,
-        "typ_name_ko": "고구마",
-        "typ_name": "KOGUMA",
-        "typ_en": "KOGUMA",
-        "atcf_id": "wp272026",
-        "skip_atcf": false
-      },
-      "window": {
-        "data_time": "202610120600",
-        "cycle_time_utc": "202610120600",
-        "start_utc": "202610121000",
-        "end_utc": "202610121600"
-      },
-      "result": {
-        "status": "ok",
-        "metadata": {
-          "generated_at_utc": "20261012160044",
-          "image_path": "data/2026/TYP_2629_KOGUMA/images/TYP_2629_KOGUMA_202610120600_240h.png",
-          "storm_stage": "TYP",
-          "storm_year": "2026",
-          "typ_number": 29,
-          "data_typ_number": 29,
-          "typ_name": "KOGUMA",
-          "typ_name_ko": "고구마",
-          "linked_td_number": 56,
-          "linked_typ_number": null,
-          "canonical_storm_key": "typ_2026_29",
-          "canonical_storm_stage": "TYP",
-          "canonical_typ_number": 29,
-          "canonical_typ_name": "KOGUMA",
-          "canonical_typ_name_ko": "고구마",
-          "atcf_id": "wp272026",
-          "extra_atcf_ids": [],
-          "data_time": "202610120600",
-          "fcst_hours": 240,
-          "intensity": "TYP",
-          "model_count": 21,
-          "target_model_count": 40,
-          "model_labels": [
-            "AIGFS",
-            "AIGFS EPS",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
-            "HAFS",
-            "Aurora-ECMWF",
-            "FengWu-ECMWF",
-            "FuXi-ECMWF",
-            "HWRF",
-            "ICON",
-            "ICON EPS",
-            "JGSM",
-            "JGSM EPS",
-            "UKMO EPS",
-            "WeatherNext2 Cyclones",
-            "WeatherNext3 Cyclones"
-          ],
-          "skip_atcf": false,
-          "source_availability_path": "data/2026/TYP_2629_KOGUMA/metadata/source_availability/202610120600.json",
-          "smca_aifsm_snapshot_path": "data/2026/TYP_2629_KOGUMA/metadata/smca/AIFSM/202610120600.json",
-          "smca_aigfs_snapshot_path": "data/2026/TYP_2629_KOGUMA/metadata/smca/AIGFS/202610120600.json"
-        }
-      },
-      "completed": false,
-      "final_check": true
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2026_58",
         "stage": "TD_UNLINKED",
         "year": 2026,
-        "data_time": "202610120600",
+        "data_time": "202610121200",
         "td_number": 58,
         "linked_td_number": null,
         "typ_number": 58,
@@ -320,16 +144,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202610120600",
-        "cycle_time_utc": "202610120600",
-        "start_utc": "202610121000",
-        "end_utc": "202610121600"
+        "data_time": "202610121200",
+        "cycle_time_utc": "202610121200",
+        "start_utc": "202610121600",
+        "end_utc": "202610122200"
       },
       "result": {
-        "status": "ok",
+        "status": "no_output",
         "metadata": {
-          "generated_at_utc": "20261012160106",
-          "image_path": "data/2026/TD_2658_NONAME/images/TD_2658_NONAME_202610120600_120h.png",
+          "generated_at_utc": "20261012160217",
+          "image_path": "data/2026/TD_2658_NONAME/images/TD_2658_NONAME_202610121200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 58,
@@ -345,38 +169,28 @@
           "canonical_typ_name_ko": "",
           "atcf_id": "wp962026",
           "extra_atcf_ids": [],
-          "data_time": "202610120600",
+          "data_time": "202610121200",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 12,
+          "model_count": 0,
           "target_model_count": 40,
-          "model_labels": [
-            "AIGFS",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
-            "ICON",
-            "ICON EPS",
-            "WeatherNext2 Cyclones",
-            "WeatherNext3 Cyclones"
-          ],
+          "models": [],
+          "model_labels": [],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2658_NONAME/metadata/source_availability/202610120600.json"
+          "source_availability_path": "data/2026/TD_2658_NONAME/metadata/source_availability/202610121200.json",
+          "no_output": true,
+          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
     },
     {
       "job": {
         "storm_key": "td_2026_58",
         "stage": "TD_UNLINKED",
         "year": 2026,
-        "data_time": "202610120600",
+        "data_time": "202610121200",
         "td_number": 58,
         "linked_td_number": null,
         "typ_number": 58,
@@ -387,16 +201,16 @@
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202610120600",
-        "cycle_time_utc": "202610120600",
-        "start_utc": "202610121000",
-        "end_utc": "202610121600"
+        "data_time": "202610121200",
+        "cycle_time_utc": "202610121200",
+        "start_utc": "202610121600",
+        "end_utc": "202610122200"
       },
       "result": {
-        "status": "ok",
+        "status": "no_output",
         "metadata": {
-          "generated_at_utc": "20261012160115",
-          "image_path": "data/2026/TD_2658_NONAME/images/TD_2658_NONAME_202610120600_240h.png",
+          "generated_at_utc": "20261012160217",
+          "image_path": "data/2026/TD_2658_NONAME/images/TD_2658_NONAME_202610121200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
           "typ_number": 58,
@@ -412,34 +226,136 @@
           "canonical_typ_name_ko": "",
           "atcf_id": "wp962026",
           "extra_atcf_ids": [],
-          "data_time": "202610120600",
+          "data_time": "202610121200",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 12,
+          "model_count": 0,
           "target_model_count": 40,
-          "model_labels": [
-            "AIGFS",
-            "ECMWF",
-            "ECMWF AIFS",
-            "ECMWF AIFS EPS",
-            "ECMWF EPS",
-            "GenCast",
-            "GFS",
-            "GFS EPS",
-            "ICON",
-            "ICON EPS",
-            "WeatherNext2 Cyclones",
-            "WeatherNext3 Cyclones"
-          ],
+          "models": [],
+          "model_labels": [],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2658_NONAME/metadata/source_availability/202610120600.json"
+          "source_availability_path": "data/2026/TD_2658_NONAME/metadata/source_availability/202610121200.json",
+          "no_output": true,
+          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2026_29",
+        "stage": "TYP_LINKED",
+        "year": 2026,
+        "data_time": "202610121200",
+        "td_number": null,
+        "linked_td_number": 56,
+        "typ_number": 29,
+        "typ_name_ko": "고구마",
+        "typ_name": "KOGUMA",
+        "typ_en": "KOGUMA",
+        "atcf_id": "wp272026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202610121200",
+        "cycle_time_utc": "202610121200",
+        "start_utc": "202610121600",
+        "end_utc": "202610122200"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20261012160220",
+          "image_path": "data/2026/TYP_2629_KOGUMA/images/TYP_2629_KOGUMA_202610121200_120h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 29,
+          "data_typ_number": 29,
+          "typ_name": "KOGUMA",
+          "typ_name_ko": "고구마",
+          "linked_td_number": 56,
+          "linked_typ_number": null,
+          "canonical_storm_key": "typ_2026_29",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 29,
+          "canonical_typ_name": "KOGUMA",
+          "canonical_typ_name_ko": "고구마",
+          "atcf_id": "wp272026",
+          "extra_atcf_ids": [],
+          "data_time": "202610121200",
+          "fcst_hours": 120,
+          "intensity": "TYP",
+          "model_count": 1,
+          "target_model_count": 40,
+          "model_labels": [
+            "JGSM"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2629_KOGUMA/metadata/source_availability/202610121200.json"
+        }
+      },
+      "completed": false,
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "typ_2026_29",
+        "stage": "TYP_LINKED",
+        "year": 2026,
+        "data_time": "202610121200",
+        "td_number": null,
+        "linked_td_number": 56,
+        "typ_number": 29,
+        "typ_name_ko": "고구마",
+        "typ_name": "KOGUMA",
+        "typ_en": "KOGUMA",
+        "atcf_id": "wp272026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202610121200",
+        "cycle_time_utc": "202610121200",
+        "start_utc": "202610121600",
+        "end_utc": "202610122200"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20261012160224",
+          "image_path": "data/2026/TYP_2629_KOGUMA/images/TYP_2629_KOGUMA_202610121200_240h.png",
+          "storm_stage": "TYP",
+          "storm_year": "2026",
+          "typ_number": 29,
+          "data_typ_number": 29,
+          "typ_name": "KOGUMA",
+          "typ_name_ko": "고구마",
+          "linked_td_number": 56,
+          "linked_typ_number": null,
+          "canonical_storm_key": "typ_2026_29",
+          "canonical_storm_stage": "TYP",
+          "canonical_typ_number": 29,
+          "canonical_typ_name": "KOGUMA",
+          "canonical_typ_name_ko": "고구마",
+          "atcf_id": "wp272026",
+          "extra_atcf_ids": [],
+          "data_time": "202610121200",
+          "fcst_hours": 240,
+          "intensity": "TYP",
+          "model_count": 1,
+          "target_model_count": 40,
+          "model_labels": [
+            "JGSM"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TYP_2629_KOGUMA/metadata/source_availability/202610121200.json"
+        }
+      },
+      "completed": false,
+      "final_check": false
     }
   ],
-  "inventory_count": 9714,
+  "inventory_count": 9716,
   "manifest_indexes": [
     {
       "year": 2020,
