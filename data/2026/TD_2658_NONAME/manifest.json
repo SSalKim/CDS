@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "updated_at_utc": "202610120959",
+  "updated_at_utc": "202610121339",
   "storm_key": "td_2026_58",
   "stage": "TD",
   "year": 2026,
@@ -9,32 +9,36 @@
   "linked_typ_number": null,
   "typ_name": "NONAME",
   "typ_name_ko": "",
-  "latest_data_time": "202610120000",
-  "item_count": 2,
+  "latest_data_time": "202610120600",
+  "item_count": 4,
   "inventory": [
     {
       "job": {
         "storm_key": "td_2026_58",
-        "stage": "TD_POSITION_ATCF",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202610120000",
         "td_number": 58,
         "linked_td_number": null,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TD",
+        "canonical_typ_number": 58,
+        "canonical_typ_name": "NONAME",
+        "canonical_typ_name_ko": "",
         "typ_number": 58,
+        "data_typ_number": 58,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp962026",
+        "fcst_hours": 120,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202610120000",
-        "cycle_time_utc": "202610120000",
-        "start_utc": "202610120400",
-        "end_utc": "202610121000"
+        "data_time": "202610120000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20261012100106",
           "image_path": "data/2026/TD_2658_NONAME/images/TD_2658_NONAME_202610120000_120h.png",
@@ -81,35 +85,39 @@
             "WeatherNext3 Cyclones"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2658_NONAME/metadata/source_availability/202610120000.json"
+          "source_availability_path": "data/2026/TD_2658_NONAME/metadata/source_availability/202610120000.json",
+          "models": []
         }
       },
-      "completed": false,
-      "final_check": true
+      "metadata_path": "data/2026/TD_2658_NONAME/metadata/runs/202610120000_120h.json"
     },
     {
       "job": {
         "storm_key": "td_2026_58",
-        "stage": "TD_POSITION_ATCF",
+        "stage": "TD",
         "year": 2026,
         "data_time": "202610120000",
         "td_number": 58,
         "linked_td_number": null,
+        "linked_typ_number": null,
+        "canonical_storm_stage": "TD",
+        "canonical_typ_number": 58,
+        "canonical_typ_name": "NONAME",
+        "canonical_typ_name_ko": "",
         "typ_number": 58,
+        "data_typ_number": 58,
         "typ_name_ko": "",
         "typ_name": "NONAME",
-        "typ_en": "",
+        "typ_en": "NONAME",
         "atcf_id": "wp962026",
+        "fcst_hours": 240,
         "skip_atcf": false
       },
       "window": {
-        "data_time": "202610120000",
-        "cycle_time_utc": "202610120000",
-        "start_utc": "202610120400",
-        "end_utc": "202610121000"
+        "data_time": "202610120000"
       },
       "result": {
-        "status": "ok",
+        "status": "inventory",
         "metadata": {
           "generated_at_utc": "20261012100115",
           "image_path": "data/2026/TD_2658_NONAME/images/TD_2658_NONAME_202610120000_240h.png",
@@ -156,11 +164,125 @@
             "WeatherNext3 Cyclones"
           ],
           "skip_atcf": false,
-          "source_availability_path": "data/2026/TD_2658_NONAME/metadata/source_availability/202610120000.json"
+          "source_availability_path": "data/2026/TD_2658_NONAME/metadata/source_availability/202610120000.json",
+          "models": []
+        }
+      },
+      "metadata_path": "data/2026/TD_2658_NONAME/metadata/runs/202610120000_240h.json"
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_58",
+        "stage": "TD_UNLINKED",
+        "year": 2026,
+        "data_time": "202610120600",
+        "td_number": 58,
+        "linked_td_number": null,
+        "typ_number": 58,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp962026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202610120600",
+        "cycle_time_utc": "202610120600",
+        "start_utc": "202610121000",
+        "end_utc": "202610121600"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20261012134126",
+          "image_path": "data/2026/TD_2658_NONAME/images/TD_2658_NONAME_202610120600_120h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 58,
+          "data_typ_number": 58,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": null,
+          "canonical_storm_key": "td_2026_58",
+          "canonical_storm_stage": "TD",
+          "canonical_typ_number": 58,
+          "canonical_typ_name": "NONAME",
+          "canonical_typ_name_ko": "",
+          "atcf_id": "wp962026",
+          "extra_atcf_ids": [],
+          "data_time": "202610120600",
+          "fcst_hours": 120,
+          "intensity": "TD",
+          "model_count": 2,
+          "target_model_count": 40,
+          "model_labels": [
+            "GFS EPS",
+            "WeatherNext2 Cyclones"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TD_2658_NONAME/metadata/source_availability/202610120600.json"
         }
       },
       "completed": false,
-      "final_check": true
+      "final_check": false
+    },
+    {
+      "job": {
+        "storm_key": "td_2026_58",
+        "stage": "TD_UNLINKED",
+        "year": 2026,
+        "data_time": "202610120600",
+        "td_number": 58,
+        "linked_td_number": null,
+        "typ_number": 58,
+        "typ_name_ko": "",
+        "typ_name": "NONAME",
+        "typ_en": "",
+        "atcf_id": "wp962026",
+        "skip_atcf": false
+      },
+      "window": {
+        "data_time": "202610120600",
+        "cycle_time_utc": "202610120600",
+        "start_utc": "202610121000",
+        "end_utc": "202610121600"
+      },
+      "result": {
+        "status": "ok",
+        "metadata": {
+          "generated_at_utc": "20261012134135",
+          "image_path": "data/2026/TD_2658_NONAME/images/TD_2658_NONAME_202610120600_240h.png",
+          "storm_stage": "TD",
+          "storm_year": "2026",
+          "typ_number": 58,
+          "data_typ_number": 58,
+          "typ_name": "NONAME",
+          "typ_name_ko": "",
+          "linked_td_number": null,
+          "linked_typ_number": null,
+          "canonical_storm_key": "td_2026_58",
+          "canonical_storm_stage": "TD",
+          "canonical_typ_number": 58,
+          "canonical_typ_name": "NONAME",
+          "canonical_typ_name_ko": "",
+          "atcf_id": "wp962026",
+          "extra_atcf_ids": [],
+          "data_time": "202610120600",
+          "fcst_hours": 240,
+          "intensity": "TD",
+          "model_count": 2,
+          "target_model_count": 40,
+          "model_labels": [
+            "GFS EPS",
+            "WeatherNext2 Cyclones"
+          ],
+          "skip_atcf": false,
+          "source_availability_path": "data/2026/TD_2658_NONAME/metadata/source_availability/202610120600.json"
+        }
+      },
+      "completed": false,
+      "final_check": false
     }
   ]
 }
