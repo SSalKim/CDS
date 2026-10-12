@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261012185147",
-  "generated_at_kst": "2026-10-13 03:51 KST",
+  "generated_at_utc": "20261012190050",
+  "generated_at_kst": "2026-10-13 04:00 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_58",
   "storm_stage": "TD",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 13,
+  "model_source_count": 14,
   "selected_model_count": 8,
   "active_target_model_count": 40,
   "model_sources": [
@@ -243,7 +243,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 40,
       "max_lead_hour": 240,
       "has_pressure": true,
@@ -251,6 +251,23 @@
       "is_official": false,
       "first_seen_utc": "20261012185147",
       "first_seen_kst": "2026-10-13 03:51 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "DEEPMIND"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 40,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261012190050",
+      "first_seen_kst": "2026-10-13 04:00 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2658_NONAME/metadata/source_availability/202610121200.json"
