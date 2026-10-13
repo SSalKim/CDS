@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261013181002",
-  "generated_at_kst": "2026-10-14 03:10 KST",
+  "generated_at_utc": "20261013182454",
+  "generated_at_kst": "2026-10-14 03:24 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_29",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 19,
-  "selected_model_count": 11,
+  "model_source_count": 21,
+  "selected_model_count": 12,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -237,6 +237,23 @@
       "first_seen_kst": "2026-10-14 03:10 KST"
     },
     {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HAFSA"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 35,
+      "max_lead_hour": 102,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261013182454",
+      "first_seen_kst": "2026-10-14 03:24 KST"
+    },
+    {
       "model_id": "ICON",
       "model_label": "ICON",
       "raw_model_ids": [
@@ -354,6 +371,23 @@
       "is_official": true,
       "first_seen_utc": "20261013160222",
       "first_seen_kst": "2026-10-14 01:02 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 10,
+      "max_lead_hour": 54,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261013182454",
+      "first_seen_kst": "2026-10-14 03:24 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2629_KOGUMA/metadata/source_availability/202610131200.json"
