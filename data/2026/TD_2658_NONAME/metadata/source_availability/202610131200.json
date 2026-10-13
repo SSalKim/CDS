@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261013203030",
-  "generated_at_kst": "2026-10-14 05:30 KST",
+  "generated_at_utc": "20261013204030",
+  "generated_at_kst": "2026-10-14 05:40 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_58",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 47,
-  "selected_model_count": 27,
+  "model_source_count": 49,
+  "selected_model_count": 28,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -685,7 +685,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 26,
       "max_lead_hour": 180,
       "has_pressure": true,
@@ -693,6 +693,23 @@
       "is_official": false,
       "first_seen_utc": "20261013194112",
       "first_seen_kst": "2026-10-14 04:41 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "FNMOC_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261013204030",
+      "first_seen_kst": "2026-10-14 05:40 KST"
     },
     {
       "model_id": "PGEC_AI",
@@ -829,6 +846,23 @@
       "is_official": false,
       "first_seen_utc": "20261013185242",
       "first_seen_kst": "2026-10-14 03:52 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261013204030",
+      "first_seen_kst": "2026-10-14 05:40 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2658_NONAME/metadata/source_availability/202610131200.json"
