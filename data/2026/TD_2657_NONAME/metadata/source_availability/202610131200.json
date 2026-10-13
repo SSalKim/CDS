@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261013182918",
-  "generated_at_kst": "2026-10-14 03:29 KST",
+  "generated_at_utc": "20261013184355",
+  "generated_at_kst": "2026-10-14 03:43 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_57",
   "storm_stage": "TD",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 13,
+  "model_source_count": 16,
   "selected_model_count": 10,
   "active_target_model_count": 40,
   "model_sources": [
@@ -56,9 +56,43 @@
       ],
       "source": "POLARWX",
       "source_label": "POLARWX",
-      "selected": true,
+      "selected": false,
       "point_count": 19,
       "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261013175956",
+      "first_seen_kst": "2026-10-14 02:59 KST"
+    },
+    {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 13,
+      "max_lead_hour": 72,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261013184355",
+      "first_seen_kst": "2026-10-14 03:43 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 17,
+      "max_lead_hour": 96,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -69,18 +103,18 @@
       "model_id": "CMC_EPS",
       "model_label": "CMC EPS",
       "raw_model_ids": [
-        "CMC_MEAN"
+        "CMC_EPS"
       ],
-      "source": "POLARWX",
-      "source_label": "POLARWX",
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 17,
-      "max_lead_hour": 96,
+      "point_count": 13,
+      "max_lead_hour": 72,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20261013175956",
-      "first_seen_kst": "2026-10-14 02:59 KST"
+      "first_seen_utc": "20261013184355",
+      "first_seen_kst": "2026-10-14 03:43 KST"
     },
     {
       "model_id": "GFS",
@@ -192,7 +226,7 @@
       ],
       "source": "POLARWX",
       "source_label": "POLARWX",
-      "selected": true,
+      "selected": false,
       "point_count": 39,
       "max_lead_hour": 114,
       "has_pressure": true,
@@ -200,6 +234,23 @@
       "is_official": false,
       "first_seen_utc": "20261013182508",
       "first_seen_kst": "2026-10-14 03:25 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "HWRF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 39,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261013184355",
+      "first_seen_kst": "2026-10-14 03:43 KST"
     },
     {
       "model_id": "ICON",
