@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261014211952",
-  "generated_at_kst": "2026-10-15 06:19 KST",
+  "generated_at_utc": "20261014212938",
+  "generated_at_kst": "2026-10-15 06:29 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_57",
   "storm_stage": "TD",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 33,
+  "model_source_count": 34,
   "selected_model_count": 19,
   "active_target_model_count": 40,
   "model_sources": [
@@ -447,7 +447,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 19,
       "max_lead_hour": 108,
       "has_pressure": true,
@@ -455,6 +455,23 @@
       "is_official": false,
       "first_seen_utc": "20261014195136",
       "first_seen_kst": "2026-10-15 04:51 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "NEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": true,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261014212938",
+      "first_seen_kst": "2026-10-15 06:29 KST"
     },
     {
       "model_id": "UKM",
