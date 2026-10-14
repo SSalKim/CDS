@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261014172936",
-  "generated_at_kst": "2026-10-15 02:29 KST",
+  "generated_at_utc": "20261014174125",
+  "generated_at_kst": "2026-10-15 02:41 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_58",
   "storm_stage": "TD",
@@ -29,8 +29,8 @@
     120,
     240
   ],
-  "model_source_count": 8,
-  "selected_model_count": 7,
+  "model_source_count": 11,
+  "selected_model_count": 8,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -85,6 +85,40 @@
       "first_seen_kst": "2026-10-15 02:09 KST"
     },
     {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GFS_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261014174125",
+      "first_seen_kst": "2026-10-15 02:41 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261014174125",
+      "first_seen_kst": "2026-10-15 02:41 KST"
+    },
+    {
       "model_id": "ICON",
       "model_label": "ICON",
       "raw_model_ids": [
@@ -134,6 +168,23 @@
       "is_official": false,
       "first_seen_utc": "20261014160059",
       "first_seen_kst": "2026-10-15 01:00 KST"
+    },
+    {
+      "model_id": "JGSM",
+      "model_label": "JGSM",
+      "raw_model_ids": [
+        "JGSM"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 23,
+      "max_lead_hour": 132,
+      "has_pressure": false,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261014174125",
+      "first_seen_kst": "2026-10-15 02:41 KST"
     },
     {
       "model_id": "TEPS",
