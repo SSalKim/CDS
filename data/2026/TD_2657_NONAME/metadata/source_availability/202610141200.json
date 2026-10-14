@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261014191937",
-  "generated_at_kst": "2026-10-15 04:19 KST",
+  "generated_at_utc": "20261014192941",
+  "generated_at_kst": "2026-10-15 04:29 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_57",
   "storm_stage": "TD",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 20,
+  "model_source_count": 21,
   "selected_model_count": 12,
   "active_target_model_count": 40,
   "model_sources": [
@@ -294,7 +294,7 @@
       ],
       "source": "RAL.UCAR",
       "source_label": "RAL UCAR ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 5,
       "max_lead_hour": 24,
       "has_pressure": true,
@@ -302,6 +302,23 @@
       "is_official": false,
       "first_seen_utc": "20261014185935",
       "first_seen_kst": "2026-10-15 03:59 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKMET"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 5,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261014192941",
+      "first_seen_kst": "2026-10-15 04:29 KST"
     },
     {
       "model_id": "WNC",
