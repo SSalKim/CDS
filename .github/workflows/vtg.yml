@@ -223,6 +223,14 @@ jobs:
             echo "KMA_APIHUB_FALLBACK_AUTH_KEY is not configured; skipping fallback probes."
           fi
 
+      - name: Restore short-lived source backup
+        id: source_backup_restore
+        if: ${{ env.DRY_RUN_INPUT != 'true' && env.MANUAL_VTG_ARGS == '' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python vtg_source_backup.py restore --root "$RUNNER_TEMP/vtg_source_backup"
+
       - name: Precheck VTG run
         id: vtg_precheck
         run: |
@@ -274,6 +282,7 @@ jobs:
         if: ${{ steps.vtg_precheck.outputs.run_step_needed == 'true' }}
         env:
           VTG_POLARWX_REQUEST_DIR: ${{ runner.temp }}/polarwx_requests
+          VTG_SOURCE_BACKUP_DIR: ${{ steps.source_backup_restore.outcome == 'success' && format('{0}/vtg_source_backup', runner.temp) || '' }}
         run: |
           run_with_retry() {
             local attempt=1
@@ -335,6 +344,31 @@ jobs:
             --kma-cache-dir data/cache/kma_apihub \
             --changed-paths-file "$changed_file" \
             --targets-file "$targets_file"
+
+      - name: Remove ended and expired source backups
+        id: source_backup_prune
+        if: ${{ always() && steps.source_backup_restore.outcome == 'success' }}
+        continue-on-error: true
+        run: python vtg_source_backup.py prune --root "$RUNNER_TEMP/vtg_source_backup" --kma-cache-dir data/cache/kma_apihub
+
+      - name: Save short-lived source backup outside Git
+        id: source_backup_upload
+        if: ${{ always() && steps.source_backup_prune.outcome == 'success' }}
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: vtg-source-backup-v1
+          path: ${{ runner.temp }}/vtg_source_backup/
+          if-no-files-found: error
+          retention-days: 2
+
+      - name: Delete superseded source backup artifacts
+        if: ${{ always() && steps.source_backup_upload.outcome == 'success' && steps.source_backup_upload.outputs.artifact-id != '' }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BACKUP_ARTIFACT_ID: ${{ steps.source_backup_upload.outputs.artifact-id }}
+        run: python vtg_source_backup.py cleanup --root "$RUNNER_TEMP/vtg_source_backup" --keep-id "$BACKUP_ARTIFACT_ID"
 
       - name: Commit generated VTG assets
         if: ${{ env.DRY_RUN_INPUT != 'true' }}

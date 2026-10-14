@@ -32,6 +32,7 @@ import pandas as pd
 import requests
 
 from polarwx_cache import DEFAULT_ROOT as POLARWX_CACHE_ROOT, load_snapshot, queue_request
+from vtg_source_backup import cycle_time as backup_cycle_time, read_snapshot as read_source_backup, recent_cycle, write_snapshot as write_source_backup
 
 from vtg_sources import (
     DMDW_ENABLED_MODEL_IDS,
@@ -332,6 +333,7 @@ class Settings:
     kma_past_text_path: Path | None = None
     http_cache_dir: Path | None = None
     http_cache_ttl_seconds: int = 6 * 3600
+    source_backup_dir: Path | None = None
     source_overrides: tuple[tuple[str, str], ...] = ()
     skip_atcf: bool = False
     analysis_lat: float | None = None
@@ -519,6 +521,11 @@ def parse_args() -> Settings:
         metavar="MODEL=SOURCE",
         help="Prefer a source for this run, e.g. ECMWF_EPS=NOAA. Repeat or comma-separate.",
     )
+    parser.add_argument(
+        "--source-backup-dir", type=Path,
+        default=Path(os.environ["VTG_SOURCE_BACKUP_DIR"]) if os.environ.get("VTG_SOURCE_BACKUP_DIR") else None,
+        help="Optional short-lived same-storm/cycle backup directory, outside the Git checkout.",
+    )
     parser.add_argument("--skip-atcf", action="store_true", help="Skip ATCF fallback sources.")
     parser.add_argument("--analysis-lat", type=float, default=Settings.analysis_lat)
     parser.add_argument("--analysis-lon", type=float, default=Settings.analysis_lon)
@@ -581,6 +588,7 @@ def parse_args() -> Settings:
         kma_past_text_path=args.kma_past_text_path,
         http_cache_dir=args.http_cache_dir,
         http_cache_ttl_seconds=max(0, int(args.http_cache_ttl_seconds)),
+        source_backup_dir=args.source_backup_dir,
         source_overrides=source_overrides,
         skip_atcf=args.skip_atcf,
         analysis_lat=args.analysis_lat,
@@ -1438,10 +1446,15 @@ def fetch_polarwx_data(
             print(f"No saved POLARWX response for {atcf_id} {settings.data_time[:10]}; continuing without a browser request.")
         if not frame.empty:
             print(f"Loaded POLARWX source data: {atcf_id} rows={len(frame)}")
+            frame["_ATCF_ID"] = atcf_id
             frames.append(frame)
     if not frames:
         return empty_polarwx_frame()
-    return pd.concat(frames, ignore_index=True, sort=False).drop_duplicates(
+    combined = select_atcf_identity_tracks(
+        pd.concat(frames, ignore_index=True, sort=False), settings,
+        model_column="SRC", lead_column="TMD",
+    )
+    return combined.drop_duplicates(
         subset=["SRC", "TMD", "FT_TM(UTC)", "LAT", "LON"],
         keep="first",
     )
@@ -1968,6 +1981,41 @@ def read_atcf_csv(text: str | None, *, source: str, skiprows: int = 0) -> pd.Dat
     )
 
 
+def select_atcf_identity_tracks(
+    frame: pd.DataFrame,
+    settings: Settings,
+    *,
+    model_column: str,
+    lead_column: str,
+) -> pd.DataFrame:
+    """Choose one whole same-source model track, never splice two ATCF identities."""
+    identities = list(dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)))
+    if frame.empty or len(identities) < 2 or "_ATCF_ID" not in frame:
+        return frame
+    work = frame.assign(_IDENTITY_MODEL=frame[model_column].replace(MODEL_SOURCE_ALIASES))
+    selected = []
+    for (_, model), group in work.groupby([DATA_SOURCE_COLUMN, "_IDENTITY_MODEL"], sort=True, dropna=False):
+        tracks = {}
+        for identity, track in group.groupby("_ATCF_ID", sort=False):
+            checked = trim_discontinuous_forecast(track.rename(columns={model_column: "SRC", lead_column: "TMD"}))
+            if not checked.empty:
+                tracks[identity] = track.loc[checked.index]
+        forecast_ids = {
+            identity for identity, track in tracks.items()
+            if pd.to_numeric(track[lead_column], errors="coerce").gt(0).any()
+        }
+        available_ids = forecast_ids or set(tracks)
+        chosen = next((identity for identity in identities if identity in available_ids), None)
+        if chosen is None:
+            continue
+        selected.append(tracks[chosen])
+        if len(set(group["_ATCF_ID"])) > 1 or chosen != settings.atcf_id:
+            print(f"{model}: selected whole ATCF track {chosen} for cycle {settings.data_time[:10]}.")
+    if not selected:
+        return frame.iloc[0:0].copy()
+    return pd.concat(selected, ignore_index=True).drop(columns="_IDENTITY_MODEL")
+
+
 def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
     url_specs = atcf_urls(settings)
@@ -2043,7 +2091,16 @@ def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFra
         & raw["TM10"].eq(data_time_10)
         & storm_mask
     )
-    return raw.loc[mask].copy()
+    filtered = raw.loc[mask].copy()
+    identity_by_storm = {
+        (atcf_id[:2].upper(), int(atcf_id[2:4])): atcf_id
+        for atcf_id in (settings.atcf_id, *settings.extra_atcf_ids)
+    }
+    filtered["_ATCF_ID"] = [
+        identity_by_storm[(basin, number)]
+        for basin, number in zip(filtered["ATCF_BASIN"], filtered["ATCF_NUMBER"])
+    ]
+    return select_atcf_identity_tracks(filtered, settings, model_column="MODEL", lead_column="FTM")
 
 
 def kma_has_current_track_point(kma_df: pd.DataFrame) -> bool:
@@ -2202,7 +2259,14 @@ def atcf_to_kma_schema(raw: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     if raw.empty:
         return pd.DataFrame(columns=KMA_COLUMNS)
 
-    raw = raw.copy()
+    target_storms = {(atcf_id[:2].upper(), int(atcf_id[2:4])) for atcf_id in (settings.atcf_id, *settings.extra_atcf_ids)}
+    mask = raw["TM10"].eq(int(settings.data_time[:10])) & pd.Series(
+        [(basin, number) in target_storms for basin, number in zip(raw["ATCF_BASIN"], raw["ATCF_NUMBER"])],
+        index=raw.index,
+    )
+    raw = raw.loc[mask].copy()
+    if raw.empty:
+        return pd.DataFrame(columns=KMA_COLUMNS)
     for col in ["ATCF_NUMBER", "TM10", "FTM", "WS(KT)", "SLP", "LATI", "LONG"]:
         raw[col] = pd.to_numeric(raw[col], errors="coerce")
 
@@ -2865,6 +2929,10 @@ def normalize_track_data(
     settings: Settings,
 ) -> pd.DataFrame:
     df = pd.concat([kma_df, dmdw_df, polarwx_df, smca_df, atcf_to_kma_schema(atcf_df, settings)], ignore_index=True)
+    return normalize_guidance_frame(df, settings)
+
+
+def normalize_guidance_frame(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     if df.empty:
         return df
 
@@ -2893,6 +2961,94 @@ def normalize_track_data(
     df = trim_dateline_reflected_tracks(df)
     df = trim_excessive_motion_tracks(df)
     return clip_120_domain_tracks(df, settings)
+
+
+def source_backup_tracks(raw: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    required = {"SRC", DATA_SOURCE_COLUMN, "TMD", "LAT", "LON", "TYP_TM(UTC)", "FT_TM(UTC)", "SEQ"}
+    if raw.empty or not required.issubset(raw):
+        return pd.DataFrame()
+    work = raw.copy()
+    for column in ("TMD", "LAT", "LON", "WS", "PS", "SEQ"):
+        if column in work:
+            work[column] = pd.to_numeric(work[column], errors="coerce")
+    cycle = normalize_utc_stamp(settings.data_time)
+    initialization = work["TYP_TM(UTC)"].astype(str).map(normalize_utc_stamp)
+    valid_time = parse_ft_time(work["FT_TM(UTC)"])
+    expected_time = pd.Timestamp(backup_cycle_time(cycle)).tz_localize(None) + pd.to_timedelta(work["TMD"], unit="h")
+    work = work[
+        initialization.eq(cycle) & valid_time.eq(expected_time)
+        & work["TMD"].between(0, max(CLI_FCST_HOURS))
+        & work["LAT"].between(-90, 90) & work["LON"].between(-180, 180)
+        & work["SRC"].isin(set(MODEL_NAMES) - {"KMA"})
+        & work[DATA_SOURCE_COLUMN].isin(SOURCE_ORDER)
+    ].copy()
+    work = filter_suspicious_apihub_model_starts(work, settings)
+    order = ["TMD", "SEQ"]
+    if MODEL_ALIAS_PRIORITY_COLUMN in work:
+        work[MODEL_ALIAS_PRIORITY_COLUMN] = pd.to_numeric(work[MODEL_ALIAS_PRIORITY_COLUMN], errors="coerce").fillna(0)
+        order.append(MODEL_ALIAS_PRIORITY_COLUMN)
+    tracks = [trim_discontinuous_forecast(track.sort_values(order, kind="stable").drop_duplicates("TMD"))
+              for _, track in work.groupby(["SRC", DATA_SOURCE_COLUMN], sort=True)]
+    if not tracks:
+        return work
+    work = trim_excessive_motion_tracks(trim_dateline_reflected_tracks(pd.concat(tracks, ignore_index=True)))
+    return work.groupby(["SRC", DATA_SOURCE_COLUMN], group_keys=False).filter(
+        lambda track: track["TMD"].gt(0).any()
+    )
+
+
+def merge_source_backups(raw: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    """Restore whole missing source/model tracks; never append cached tails to live data."""
+    if settings.source_backup_dir is None or settings.skip_atcf:
+        return raw
+    cycle = normalize_utc_stamp(settings.data_time)
+    if not recent_cycle(cycle):
+        return raw
+    try:
+        keys = storm_history_keys(settings)
+        previous_frames = []
+        previous_pairs = set()
+        for key in keys:
+            payload = read_source_backup(settings.source_backup_dir, key, cycle)
+            if payload:
+                frame = pd.DataFrame(payload["rows"])
+                frame["TYP"] = settings.typ_number
+                checked = source_backup_tracks(frame, settings)
+                for pair, track in checked.groupby(["SRC", DATA_SOURCE_COLUMN], sort=True) if not checked.empty else []:
+                    if pair not in previous_pairs:
+                        previous_frames.append(track)
+                        previous_pairs.add(pair)
+        previous = pd.concat(previous_frames, ignore_index=True) if previous_frames else pd.DataFrame()
+        fresh = source_backup_tracks(raw, settings)
+        pairs = ["SRC", DATA_SOURCE_COLUMN]
+        fresh_pairs = set(map(tuple, fresh[pairs].drop_duplicates().to_numpy())) if not fresh.empty else set()
+        restored = []
+        for pair, track in previous.groupby(pairs, sort=True) if not previous.empty else []:
+            if pair not in fresh_pairs:
+                restored.append(track)
+                fresh_pairs.add(pair)
+        saved_frames = [frame for frame in [fresh, *restored] if not frame.empty]
+        if saved_frames:
+            saved = pd.concat(saved_frames, ignore_index=True)
+            columns = [column for column in [*KMA_COLUMNS, DATA_SOURCE_COLUMN, RAW_MODEL_COLUMN,
+                       MODEL_ALIAS_PRIORITY_COLUMN, KIM_6H_FALLBACK_START_COLUMN] if column in saved]
+            write_source_backup(settings.source_backup_dir, {
+                "version": 1, "storm_key": keys[0], "storm_keys": keys, "cycle": cycle,
+                "atcf_ids": [settings.atcf_id, *settings.extra_atcf_ids],
+                "rows": json.loads(saved[columns].to_json(orient="records")),
+            })
+        if not restored:
+            return raw
+        restored_frame = pd.concat(restored, ignore_index=True)
+        # Remove analysis-only/invalid live fragments for each restored pair, too.
+        replaced_pairs = set(map(tuple, restored_frame[pairs].drop_duplicates().to_numpy()))
+        keep = [tuple(pair) not in replaced_pairs for pair in raw[pairs].to_numpy()] if not raw.empty else []
+        restored_frame["_SOURCE_BACKUP"] = True
+        print(f"Restored {len(replaced_pairs)} whole same-cycle model/source track(s) from source backup ({cycle}).")
+        return pd.concat([raw.loc[keep], restored_frame], ignore_index=True)
+    except (OSError, ValueError, TypeError, KeyError) as exc:
+        print(f"Warning: source backup unavailable ({type(exc).__name__}); using freshly fetched guidance.")
+        return raw
 
 
 def suspected_dateline_reflection_cutoff(track: pd.DataFrame) -> float | None:
@@ -5445,8 +5601,12 @@ def main() -> None:
 
         stage_started_at = time.monotonic()
         source_availability_raw_df = source_availability_frame(kma_df, dmdw_df, polarwx_df, smca_df, atcf_df, fetch_settings)
-        df = (normalize_track_data(kma_df, dmdw_df, polarwx_df, smca_df, atcf_df, fetch_settings)
-              if not polarwx_df.empty else available_df)
+        if fetch_settings.source_backup_dir is not None:
+            source_availability_raw_df = merge_source_backups(source_availability_raw_df, fetch_settings)
+            df = normalize_guidance_frame(source_availability_raw_df, fetch_settings)
+        else:
+            df = (normalize_track_data(kma_df, dmdw_df, polarwx_df, smca_df, atcf_df, fetch_settings)
+                  if not polarwx_df.empty else available_df)
         log_timing("normalize guidance", stage_started_at, rows=len(df))
 
         pending_losses = pending_polarwx_render_loss(df, polarwx_df, fetch_settings, requested_hours)

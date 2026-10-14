@@ -73,6 +73,7 @@ MANIFEST_METADATA_KEYS = (
     "canonical_typ_name_ko",
     "atcf_id",
     "extra_atcf_ids",
+    "atcf_transition",
     "data_time",
     "fcst_hours",
     "intensity",
@@ -150,6 +151,8 @@ class StormJob:
     analysis_match_method: str = ""
     analysis_distance_km: float | None = None
     require_exact_analysis: bool = False
+    extra_atcf_ids: tuple[str, ...] = ()
+    atcf_transition: dict | None = None
 
 
 @dataclass(frozen=True)
@@ -176,6 +179,8 @@ class AtcfMatch:
     distance_km: float | None = None
     point: TrackPoint | None = None
     reference_point: TrackPoint | None = None
+    extra_atcf_ids: tuple[str, ...] = ()
+    atcf_transition: dict | None = None
 
 
 def utc_now() -> datetime:
@@ -1516,7 +1521,7 @@ def bdeck_stats_delta(before: dict[str, int]) -> dict[str, int]:
     return {key: BDECK_FETCH_STATS.get(key, 0) - before.get(key, 0) for key in BDECK_FETCH_STATS}
 
 
-def bdeck_all_tau0_points(text: str) -> list[TrackPoint]:
+def bdeck_all_tau0_points(text: str, *, atcf_id: str = "") -> list[TrackPoint]:
     points: list[TrackPoint] = []
     for raw_line in text.splitlines():
         line = raw_line.strip()
@@ -1527,6 +1532,8 @@ def bdeck_all_tau0_points(text: str) -> list[TrackPoint]:
         except csv.Error:
             continue
         if len(row) < 8:
+            continue
+        if atcf_id and (row[0].upper() != atcf_id[:2].upper() or safe_int(row[1]) != safe_int(atcf_id[2:4])):
             continue
         if safe_int(row[5]) != 0:
             continue
@@ -2138,6 +2145,120 @@ def retain_previous_named_regular_atcf_match(
     return AtcfMatch(atcf_id=previous.atcf_id, method="previous_regular_name")
 
 
+def resolve_atcf_promotion_for_cycle(
+    current: AtcfMatch | None,
+    status: dict | None,
+    *,
+    storm_keys: list[str],
+    data_time: str,
+    sector_entries: list[AtcfSectorEntry],
+) -> AtcfMatch | None:
+    if current is not None and current.method == "manual":
+        return current
+    target = parse_utc_stamp(data_time)
+    cycles = status.get("cycles", {}) if isinstance(status, dict) else {}
+    if target is None or not isinstance(cycles, dict):
+        return current
+    records = []
+    for cycle_text, cycle_records in cycles.items():
+        cycle_time = parse_utc_stamp(cycle_text)
+        if cycle_time is None or not isinstance(cycle_records, dict):
+            continue
+        for key in storm_keys:
+            for suffix in ("_240h", "_120h", ""):
+                record = cycle_records.get(key + suffix)
+                if isinstance(record, dict):
+                    records.append((cycle_time, record))
+    records.sort(key=lambda item: item[0], reverse=True)
+
+    transition = None
+    for _, record in records:
+        candidate = record.get("atcf_transition") or (record.get("metadata") or {}).get("atcf_transition")
+        if not isinstance(candidate, dict):
+            continue
+        old_id, new_id = candidate.get("invest_id", ""), candidate.get("regular_id", "")
+        effective = parse_utc_stamp(candidate.get("effective_time_utc", ""))
+        first_invest = parse_utc_stamp(candidate.get("invest_start_time_utc", ""))
+        if (
+            is_invest_atcf_id(old_id) and regular_atcf_storm_number(new_id) is not None
+            and old_id[:2] == new_id[:2] and old_id[-4:] == new_id[-4:]
+            and effective and first_invest and first_invest <= target and first_invest < effective
+            and (current is None or current.atcf_id in {old_id, new_id})
+        ):
+            transition = candidate
+            break
+
+    if transition is None and current is not None and regular_atcf_storm_number(current.atcf_id) is not None:
+        previous = next((
+            (cycle_time, str(record.get("atcf_id") or (record.get("metadata") or {}).get("atcf_id") or "").lower())
+            for cycle_time, record in records
+            if timedelta(0) <= target - cycle_time <= timedelta(hours=12)
+            and is_invest_atcf_id(str(record.get("atcf_id") or (record.get("metadata") or {}).get("atcf_id") or ""))
+        ), None)
+        if previous:
+            old_cycle, old_id = previous
+            new_id = current.atcf_id
+            if any(
+                cycle_time <= old_cycle
+                and str(record.get("atcf_id") or (record.get("metadata") or {}).get("atcf_id") or "").lower() == new_id
+                for cycle_time, record in records
+            ):
+                # A later bad INVEST match must not undo an already established regular identity.
+                return current
+            # Sector timestamps are operational observations, unlike backfilled B-deck rows.
+            effective_times = [
+                stamp for entry in sector_entries
+                if entry.atcf_id == new_id and entry.atcf_id[:2] == old_id[:2]
+                and entry.atcf_id[-4:] == old_id[-4:]
+                and (stamp := parse_utc_stamp(entry.point.time_utc)) is not None
+                and old_cycle < stamp and abs(stamp - target) <= timedelta(hours=6)
+            ]
+            if effective_times:
+                effective = min(effective_times)
+                texts = {
+                    atcf_id: fetch_bdeck_text_for_data_time(atcf_id, data_time=format_utc_stamp(effective))
+                    for atcf_id in (old_id, new_id)
+                }
+                old_points = bdeck_all_tau0_points(texts[old_id] or "", atcf_id=old_id)
+                new_points = bdeck_all_tau0_points(texts[new_id] or "", atcf_id=new_id)
+                continuous = any(
+                    effective - timedelta(hours=6) <= old_time <= new_time <= effective
+                    and new_time - old_time <= timedelta(hours=6)
+                    and haversine_km(old.lat, old.lon, new.lat, new.lon) <= (75 if old_time == new_time else 300)
+                    for old in old_points if (old_time := parse_utc_stamp(old.time_utc)) is not None
+                    for new in new_points if (new_time := parse_utc_stamp(new.time_utc)) is not None
+                )
+                if continuous:
+                    first_invest = min(
+                        cycle_time for cycle_time, record in records
+                        if effective - timedelta(hours=48) <= cycle_time < effective
+                        and str(record.get("atcf_id") or (record.get("metadata") or {}).get("atcf_id") or "").lower() == old_id
+                    )
+                    transition = {
+                        "invest_id": old_id, "regular_id": new_id,
+                        "effective_time_utc": format_utc_stamp(effective),
+                        "invest_start_time_utc": format_utc_stamp(first_invest),
+                    }
+                    print(f"Confirmed ATCF promotion {old_id} -> {new_id} at {format_utc_stamp(effective)}.")
+            if transition is None and old_cycle == target:
+                print(f"Keeping established cycle identity {old_id} at {data_time}; promotion link is unconfirmed.")
+                return AtcfMatch(old_id, "previous_cycle")
+
+    if transition is None:
+        return current
+    effective = parse_utc_stamp(transition["effective_time_utc"])
+    primary = transition["invest_id"] if target < effective else transition["regular_id"]
+    secondary = transition["regular_id"] if target < effective else transition["invest_id"]
+    # The old INVEST number is not a permanent alias: it can belong to another system later.
+    extras = (secondary,) if target <= effective else ()
+    point = current.point if current and current.atcf_id == primary and current.point and current.point.time_utc == data_time else None
+    print(f"ATCF cycle identity {data_time}: {primary}; same-cycle backup={','.join(extras) or '-'}.")
+    return AtcfMatch(
+        primary, "promotion_cycle", point=point,
+        extra_atcf_ids=extras, atcf_transition=transition,
+    )
+
+
 def linked_td_number_for_typ(
     td_rows: list[dict],
     *,
@@ -2517,6 +2638,11 @@ def build_storm_jobs(
         atcf_match = None
         kma_point = None
         typ_status_keys = [f"typ_{year}_{typ_number:02d}"]
+        if linked_td_number:
+            typ_status_keys.extend([
+                f"td_{year}_{linked_td_number:02d}_typ_{typ_number:02d}",
+                f"td_{year}_{linked_td_number:02d}",
+            ])
         if resolve_atcf:
             manual_id = manual_atcf_id(
                 manual_map,
@@ -2617,9 +2743,14 @@ def build_storm_jobs(
                 storm_keys=typ_status_keys,
                 data_time=data_time,
             )
+        if resolve_atcf:
+            atcf_match = resolve_atcf_promotion_for_cycle(
+                atcf_match, status, storm_keys=typ_status_keys,
+                data_time=data_time, sector_entries=sector_entries,
+            )
         atcf_id = atcf_match.atcf_id if atcf_match else None
         atcf_method = atcf_match.method if atcf_match else ""
-        require_exact_analysis = atcf_method == "sector_name_recent"
+        require_exact_analysis = atcf_method in {"sector_name_recent", "promotion_cycle", "previous_cycle"}
         analysis_point = atcf_match.point if atcf_match and atcf_match.method == "position" else None
         if analysis_point is None and atcf_id:
             started_at = time.monotonic()
@@ -2667,6 +2798,8 @@ def build_storm_jobs(
             analysis_match_method=analysis_match_method,
             analysis_distance_km=analysis_distance_km,
             require_exact_analysis=require_exact_analysis,
+            extra_atcf_ids=atcf_match.extra_atcf_ids if atcf_match else (),
+            atcf_transition=atcf_match.atcf_transition if atcf_match else None,
         ))
 
     active_typhoon_set = set(active_typhoons)
@@ -2825,9 +2958,14 @@ def build_storm_jobs(
                 storm_keys=status_keys,
                 data_time=data_time,
             )
+        if resolve_atcf:
+            atcf_match = resolve_atcf_promotion_for_cycle(
+                atcf_match, status, storm_keys=status_keys,
+                data_time=data_time, sector_entries=sector_entries,
+            )
         atcf_id = atcf_match.atcf_id if atcf_match else None
         atcf_method = atcf_match.method if atcf_match else ""
-        require_exact_analysis = atcf_method == "sector_name_recent"
+        require_exact_analysis = atcf_method in {"sector_name_recent", "promotion_cycle", "previous_cycle"}
         analysis_point = atcf_match.point if atcf_match and atcf_match.method == "position" else None
         if analysis_point is None and atcf_id:
             started_at = time.monotonic()
@@ -2913,6 +3051,8 @@ def build_storm_jobs(
             analysis_match_method=analysis_match_method,
             analysis_distance_km=analysis_distance_km,
             require_exact_analysis=require_exact_analysis,
+            extra_atcf_ids=atcf_match.extra_atcf_ids if atcf_match else (),
+            atcf_transition=atcf_match.atcf_transition if atcf_match else None,
         ))
 
     total_elapsed = time.monotonic() - total_started_at
@@ -3877,6 +4017,8 @@ def vtg_command(
         command.extend(["--metadata-path", str(metadata_paths[unique_hours[0]])])
     if job.atcf_id:
         command.extend(["--atcf-id", job.atcf_id])
+    if job.extra_atcf_ids:
+        command.extend(["--extra-atcf-ids", ",".join(job.extra_atcf_ids)])
     if job.require_exact_analysis:
         command.append("--require-exact-analysis")
     if job.analysis_point:
@@ -3991,6 +4133,9 @@ def run_vtg_batch(
             "metadata_path": str(metadata_path),
         }
         metadata = load_json(metadata_path, None)
+        if metadata_is_current and isinstance(metadata, dict) and job.atcf_transition:
+            metadata["atcf_transition"] = job.atcf_transition
+            write_json(metadata_path, metadata)
         if metadata:
             result["metadata"] = metadata
             if metadata_is_current:
@@ -4067,6 +4212,8 @@ def record_batch_results(
             "atcf_match_method": job.atcf_match_method,
             "reason": job.reason,
         }
+        if job.atcf_transition:
+            status_record["atcf_transition"] = job.atcf_transition
         if final_check_window:
             status_record["final_checked_at_utc"] = format_utc_stamp(now)
             status_record["final_check_window_end_utc"] = window.end_utc
@@ -4315,6 +4462,7 @@ def compact_status_record(record: dict) -> dict:
         "last_status",
         "atcf_id",
         "atcf_match_method",
+        "atcf_transition",
         "reason",
         "final_checked_at_utc",
         "final_check_window_end_utc",
