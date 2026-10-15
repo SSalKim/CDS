@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261015065939",
-  "generated_at_kst": "2026-10-15 15:59 KST",
+  "generated_at_utc": "20261015070939",
+  "generated_at_kst": "2026-10-15 16:09 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_58",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 35,
-  "selected_model_count": 18,
+  "model_source_count": 38,
+  "selected_model_count": 21,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -202,6 +202,23 @@
       "first_seen_kst": "2026-10-15 15:59 KST"
     },
     {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261015070939",
+      "first_seen_kst": "2026-10-15 16:09 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
       "raw_model_ids": [
@@ -319,6 +336,23 @@
       "is_official": false,
       "first_seen_utc": "20261015065939",
       "first_seen_kst": "2026-10-15 15:59 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261015070939",
+      "first_seen_kst": "2026-10-15 16:09 KST"
     },
     {
       "model_id": "HAFS",
@@ -625,6 +659,23 @@
       "is_official": false,
       "first_seen_utc": "20261015064936",
       "first_seen_kst": "2026-10-15 15:49 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261015070939",
+      "first_seen_kst": "2026-10-15 16:09 KST"
     }
   ],
   "source_availability_path": "data/2026/TD_2658_NONAME/metadata/source_availability/202610150000.json"
