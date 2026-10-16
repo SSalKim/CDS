@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261016211943",
-  "generated_at_kst": "2026-10-17 06:19 KST",
+  "generated_at_utc": "20261016212939",
+  "generated_at_kst": "2026-10-17 06:29 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_30",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 81,
-  "selected_model_count": 34,
+  "model_source_count": 83,
+  "selected_model_count": 35,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -1260,6 +1260,23 @@
       "first_seen_kst": "2026-10-17 05:49 KST"
     },
     {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "NEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261016212939",
+      "first_seen_kst": "2026-10-17 06:29 KST"
+    },
+    {
       "model_id": "PGEC_AI",
       "model_label": "Pangu-Weather-ECMWF",
       "raw_model_ids": [
@@ -1411,6 +1428,23 @@
       "is_official": false,
       "first_seen_utc": "20261016190937",
       "first_seen_kst": "2026-10-17 04:09 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 38,
+      "max_lead_hour": 222,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261016212939",
+      "first_seen_kst": "2026-10-17 06:29 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2630_CHAMPI/metadata/source_availability/202610161200.json",
