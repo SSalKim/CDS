@@ -13,7 +13,7 @@ import sys
 import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.error import HTTPError, URLError
@@ -21,6 +21,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from vtg_sources import SMCA_SNAPSHOT_KEYS, SOURCE_MODEL_IDS, render_code_signature
+from vtg_identity_links import LINKS_FILENAME, active_links, effective_td_rows, load_links, reconcile_links
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -74,6 +75,7 @@ MANIFEST_METADATA_KEYS = (
     "atcf_id",
     "extra_atcf_ids",
     "atcf_transition",
+    "td_typ_link",
     "data_time",
     "fcst_hours",
     "intensity",
@@ -153,6 +155,7 @@ class StormJob:
     require_exact_analysis: bool = False
     extra_atcf_ids: tuple[str, ...] = ()
     atcf_transition: dict | None = None
+    td_typ_link: dict | None = None
 
 
 @dataclass(frozen=True)
@@ -510,12 +513,15 @@ def kma_cache_path(cache_dir: Path, endpoint: str, year: int) -> Path:
 
 
 def kma_cache_asset_paths(cache_dir: Path, years: set[int]) -> list[Path]:
-    return [
+    paths = [
         path
         for year in sorted(years)
         for endpoint in (TD_LIST_ENDPOINT, TYP_LIST_ENDPOINT)
         if (path := kma_cache_path(cache_dir, endpoint, year)).exists()
     ]
+    if (cache_dir / LINKS_FILENAME).exists():
+        paths.append(cache_dir / LINKS_FILENAME)
+    return paths
 
 
 def load_cached_kma_rows(cache_dir: Path | None, endpoint: str, year: int) -> list[dict] | None:
@@ -2545,6 +2551,125 @@ def discover_unlisted_td_rows(
     return discovered
 
 
+def official_link_analysis(job: StormJob, time_utc: str, output_root: Path, gts_text: str | None) -> TrackPoint | None:
+    """Identity evidence must be official KMA analysis, not a model mean or ATCF alias."""
+    points = []
+    for row in parse_kma_csv_lines(gts_text or "", fixed_columns=19):
+        if (
+            safe_int(row[0]) == 0 and safe_int(row[1]) == job.year and safe_int(row[2]) == job.data_typ_number
+            and safe_int(row[4]) == 0 and row[5].strip() == time_utc and row[6].strip() == time_utc
+            and kma_gts_row_source(row) == "KMA"
+        ):
+            points.append((safe_float(row[7]), safe_float(row[8])))
+    if not points:
+        history = load_json(system_dir_from_job(output_root, job) / "metadata" / "track_history.json", {})
+        for point in history.get("points", []) if isinstance(history, dict) else []:
+            if isinstance(point, dict) and point.get("source") == "KMA_OFFICIAL" and point.get("time_utc") == time_utc:
+                points.append((safe_float(point.get("lat")), safe_float(point.get("lon"))))
+    valid = {(lat, lon) for lat, lon in points if lat is not None and lon is not None
+             and -90 <= lat <= 90 and -180 <= lon <= 180 and (lat, lon) != (0, 0)}
+    if len(valid) != 1:
+        return None
+    lat, lon = next(iter(valid))
+    return TrackPoint(time_utc, lat, lon)
+
+
+def infer_provisional_td_links(
+    jobs: list[StormJob], *, td_rows: list[dict], typ_rows: list[dict], status: dict,
+    identity_links: dict, output_root: Path, gts_text: str | None,
+) -> list[StormJob]:
+    identity_links.update(reconcile_links(identity_links, td_rows, typ_rows))
+    proposals = []
+    previous_records = status.get("cycles") or {}
+    if not isinstance(previous_records, dict):
+        return jobs
+    named_methods = {"name", "sector_name", "sector_name_recent", "previous_regular_name"}
+    for typ_job in jobs:
+        if not typ_job.stage.startswith("TYP_") or typ_job.linked_td_number or not typ_job.atcf_id:
+            continue
+        if regular_atcf_storm_number(typ_job.atcf_id) is None:
+            continue
+        typ_row = typ_row_for_number(typ_rows, year=typ_job.year, typ_number=typ_job.typ_number)
+        start_text = str((typ_row or {}).get("TM_ST") or "")
+        start = parse_utc_stamp(start_text)
+        if not start or typ_job.data_time < start_text:
+            continue
+        named_evidence = typ_job.atcf_match_method in named_methods or any(
+            start <= (stamp := parse_utc_stamp(cycle)) <= start + timedelta(hours=6)
+            and any(isinstance(record, dict) and record.get("atcf_id") == typ_job.atcf_id
+                    and record.get("atcf_match_method") in named_methods
+                    for key, record in records.items() if key.startswith(typ_job.storm_key + "_"))
+            for cycle, records in previous_records.items() if isinstance(records, dict) and parse_utc_stamp(cycle)
+        )
+        if not named_evidence:
+            continue
+        typ_point = official_link_analysis(typ_job, start_text, output_root, gts_text)
+        if typ_point is None:
+            continue
+        for td_job in jobs:
+            if not td_job.stage.startswith("TD_") or td_job.year != typ_job.year or td_job.linked_typ_number:
+                continue
+            if td_job.atcf_match_method == "manual" or (td_job.atcf_id and td_job.atcf_id != typ_job.atcf_id):
+                continue
+            row = next((row for row in td_rows if safe_int(row.get("YY")) == td_job.year
+                        and safe_int(row.get("TD")) == td_job.td_number), None)
+            td_start = parse_utc_stamp((row or {}).get("TM_ST", ""))
+            if not td_start or td_start >= start or (safe_int((row or {}).get("TYP")) or 0) > 0:
+                continue
+            previous_times = []
+            for cycle, records in previous_records.items():
+                stamp = parse_utc_stamp(cycle)
+                if not stamp or not timedelta(0) < start - stamp <= timedelta(hours=6) or not isinstance(records, dict):
+                    continue
+                for suffix in ("_240h", "_120h"):
+                    record = records.get(td_job.storm_key + suffix, {})
+                    if not isinstance(record, dict):
+                        continue
+                    metadata = record.get("metadata") or {}
+                    if (record.get("atcf_id") == typ_job.atcf_id and (safe_int(metadata.get("model_count")) or 0) > 0
+                            and not metadata.get("no_output")):
+                        previous_times.append(cycle)
+            if not previous_times:
+                continue
+            previous_cycle = max(previous_times)
+            td_point = official_link_analysis(td_job, previous_cycle, output_root, gts_text)
+            if td_point is None:
+                continue
+            hours = (start - parse_utc_stamp(previous_cycle)).total_seconds() / 3600
+            distance = haversine_km(td_point.lat, td_point.lon, typ_point.lat, typ_point.lon)
+            if distance > 300 or distance / hours >= 75:
+                continue
+            proposals.append({
+                "year": typ_job.year, "td_number": td_job.td_number, "typ_number": typ_job.typ_number,
+                "typ_name": typ_job.typ_en, "typ_name_ko": typ_job.typ_name_ko, "effective_time_utc": start_text,
+                "atcf_id": typ_job.atcf_id, "state": "provisional",
+                "evidence": {"td_analysis": asdict(td_point), "typ_analysis": asdict(typ_point),
+                             "distance_km": round(distance, 1), "interval_hours": hours},
+            })
+    accepted = [proposal for proposal in proposals if sum(
+        other["year"] == proposal["year"] and (other["td_number"] == proposal["td_number"]
+                                              or other["typ_number"] == proposal["typ_number"])
+        for other in proposals
+    ) == 1]
+    for link in accepted:
+        if any(int(item["year"]) == link["year"] and (int(item["td_number"]) == link["td_number"]
+                or int(item["typ_number"]) == link["typ_number"]) for item in identity_links.get("links", [])):
+            continue
+        identity_links.setdefault("links", []).append(link)
+        print(f"Provisional KMA identity: TD{link['td_number']:02d} -> TYP{link['typ_number']:02d} at {link['effective_time_utc']} ({link['atcf_id']}).")
+    linked = active_links(identity_links)
+    result = []
+    for job in jobs:
+        link = next((item for item in linked if int(item["year"]) == job.year
+                     and job.data_time >= item["effective_time_utc"]
+                     and ((job.stage.startswith("TD_") and int(item["td_number"]) == job.td_number)
+                          or (job.stage.startswith("TYP_") and int(item["typ_number"]) == job.typ_number))), None)
+        if link and job.stage.startswith("TD_"):
+            continue
+        result.append(replace(job, linked_td_number=int(link["td_number"]), td_typ_link=link) if link else job)
+    return result
+
+
 def build_storm_jobs(
     *,
     now: datetime,
@@ -2561,6 +2686,8 @@ def build_storm_jobs(
     kma_gts_now_text: str | None = None,
     activity_cycle_time: datetime | None = None,
     status: dict | None = None,
+    identity_links: dict | None = None,
+    output_root: Path | None = None,
 ) -> list[StormJob]:
     total_started_at = time.monotonic()
     timing_stats: dict[str, float] = {
@@ -2581,10 +2708,18 @@ def build_storm_jobs(
     if not data_dt:
         return jobs
 
+    if identity_links is not None:
+        identity_links.update(reconcile_links(identity_links, td_rows, typ_rows))
+    known_links = active_links(identity_links or {})
+    suppressed_tds = {(int(link["year"]), int(link["td_number"])) for link in known_links
+                      if data_time >= link["effective_time_utc"]}
+    td_rows = effective_td_rows(td_rows, typ_rows, {})
+
     td_rows = [*td_rows, *discover_unlisted_td_rows(
         data_time=data_time, td_rows=td_rows, typ_rows=typ_rows,
         kma_gts_now_text=kma_gts_now_text,
     )]
+    td_rows = [row for row in td_rows if (safe_int(row.get("YY")), safe_int(row.get("TD"))) not in suppressed_tds]
 
     # KMA can list one named typhoon period broadly in typ_lst.php while td_lst.php
     # contains intermittent weakening/redevelopment TD episodes linked to the same
@@ -2628,6 +2763,10 @@ def build_storm_jobs(
         typ_en = row.get("TYP_EN", "").strip().upper()
         typ_name_ko = row.get("TYP_NAME", "").strip()
         linked_td_number = linked_td_number_for_typ(td_rows, year=year, typ_number=typ_number, data_time=data_time)
+        temporary_link = next((link for link in known_links if int(link["year"]) == year
+                               and int(link["typ_number"]) == typ_number and data_time >= link["effective_time_utc"]), None)
+        if linked_td_number is None and temporary_link:
+            linked_td_number = int(temporary_link["td_number"])
         typ_atcf_ids = candidate_atcf_ids(
             typ_number=typ_number,
             year=year,
@@ -2800,6 +2939,7 @@ def build_storm_jobs(
             require_exact_analysis=require_exact_analysis,
             extra_atcf_ids=atcf_match.extra_atcf_ids if atcf_match else (),
             atcf_transition=atcf_match.atcf_transition if atcf_match else None,
+            td_typ_link=temporary_link,
         ))
 
     active_typhoon_set = set(active_typhoons)
@@ -3055,6 +3195,11 @@ def build_storm_jobs(
             atcf_transition=atcf_match.atcf_transition if atcf_match else None,
         ))
 
+    if resolve_atcf and identity_links is not None and output_root is not None:
+        jobs = infer_provisional_td_links(
+            jobs, td_rows=td_rows, typ_rows=typ_rows, status=status or {},
+            identity_links=identity_links, output_root=output_root, gts_text=kma_gts_now_text,
+        )
     total_elapsed = time.monotonic() - total_started_at
     measured_elapsed = sum(timing_stats.values())
     bdeck_delta = bdeck_stats_delta(bdeck_before)
@@ -4133,9 +4278,13 @@ def run_vtg_batch(
             "metadata_path": str(metadata_path),
         }
         metadata = load_json(metadata_path, None)
-        if metadata_is_current and isinstance(metadata, dict) and job.atcf_transition:
-            metadata["atcf_transition"] = job.atcf_transition
-            write_json(metadata_path, metadata)
+        if metadata_is_current and isinstance(metadata, dict):
+            if job.atcf_transition:
+                metadata["atcf_transition"] = job.atcf_transition
+            if job.td_typ_link:
+                metadata["td_typ_link"] = job.td_typ_link
+            if job.atcf_transition or job.td_typ_link:
+                write_json(metadata_path, metadata)
         if metadata:
             result["metadata"] = metadata
             if metadata_is_current:
@@ -4748,6 +4897,7 @@ def storm_summary_from_inventory(storm_key: str, inventory: list[dict]) -> dict:
         "year": job.get("year") or metadata.get("storm_year") or "",
         "typ_number": canonical_typ_number or job.get("typ_number") or metadata.get("typ_number") or 0,
         "linked_td_number": linked_td_number,
+        "td_typ_link": metadata.get("td_typ_link") or job.get("td_typ_link"),
         "linked_typ_number": None if canonical_stage == "TYP" else (job.get("linked_typ_number") or metadata.get("linked_typ_number")),
         "typ_name": canonical_typ_name or job.get("typ_name") or metadata.get("typ_name") or "NONAME",
         "typ_name_ko": canonical_typ_name_ko or job.get("typ_name_ko") or metadata.get("typ_name_ko") or "",
@@ -5087,6 +5237,8 @@ def main() -> int:
     parallel_jobs = max(1, int(args.parallel_jobs or 1))
     windows = active_cycle_windows(now)
     status = load_json(status_path, {"cycles": {}})
+    identity_links = load_links(kma_cache_dir)
+    previous_identity_links = json.loads(json.dumps(identity_links))
     manual_map = load_manual_map(args.manual_map)
 
     if args.index_only:
@@ -5188,6 +5340,7 @@ def main() -> int:
     )
 
     td_typ_links = td_typ_link_lookup(td_rows, typ_rows)
+    identity_links = reconcile_links(identity_links, td_rows, typ_rows)
 
     run_entries = []
     removed_artifact_paths: set[Path] = set()
@@ -5228,6 +5381,8 @@ def main() -> int:
             kma_gts_now_text=kma_forecast_text,
             activity_cycle_time=explicit_cycle_time,
             status=status,
+            identity_links=identity_links,
+            output_root=output_root,
         )
         log_timing(f"build storm jobs {window.data_time} jobs={len(jobs)}", job_started_at)
 
@@ -5398,6 +5553,9 @@ def main() -> int:
 
             log_timing(f"render active storm batches {window.data_time}", render_started_at)
         log_timing(f"cycle total before manifest {window.data_time}", window_started_at)
+
+    if not args.dry_run and identity_links != previous_identity_links:
+        write_json(kma_cache_dir / LINKS_FILENAME, identity_links)
 
     if args.check_run_needed:
         # The live activity-list refresh writes caches even when rendering is skipped.

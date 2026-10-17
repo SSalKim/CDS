@@ -18,6 +18,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from vtg_archive_state import load_kma_rows, official_ended_systems
+from vtg_identity_links import effective_td_rows, load_links
 
 
 ARTIFACT_NAME = "vtg-source-backup-v1"
@@ -102,7 +103,8 @@ def prune(root: Path, kma_cache_dir: Path, *, now: datetime | None = None) -> di
     now = now or datetime.now(timezone.utc)
     ended = set(official_ended_systems(kma_cache_dir, now))
     # A TD promoted to a TYP ends with that TYP, not at the promotion itself.
-    for row in load_kma_rows(kma_cache_dir, "td_lst"):
+    for row in effective_td_rows(load_kma_rows(kma_cache_dir, "td_lst"),
+                                 load_kma_rows(kma_cache_dir, "typ_lst"), load_links(kma_cache_dir)):
         try:
             year, td, typ = int(row["YY"]), int(row["TD"]), int(row.get("TYP") or 0)
         except (KeyError, TypeError, ValueError):

@@ -7,6 +7,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
+from vtg_identity_links import effective_td_rows, load_links
+
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 DEFAULT_OUTPUT_ROOT = PROJECT_ROOT / "data"
@@ -145,7 +147,8 @@ def load_kma_rows(cache_dir: Path, endpoint: str) -> list[dict]:
 
 def official_ended_systems(cache_dir: Path, now: datetime) -> dict[str, dict]:
     ended: dict[str, dict] = {}
-    td_rows = load_kma_rows(cache_dir, "td_lst")
+    typ_rows = load_kma_rows(cache_dir, "typ_lst")
+    td_rows = effective_td_rows(load_kma_rows(cache_dir, "td_lst"), typ_rows, load_links(cache_dir))
     active_linked_typhoons: set[tuple[int, int]] = set()
     for row in td_rows:
         try:
@@ -162,7 +165,7 @@ def official_ended_systems(cache_dir: Path, now: datetime) -> dict[str, dict]:
         ):
             active_linked_typhoons.add((year, linked_typ_number))
 
-    for row in load_kma_rows(cache_dir, "typ_lst"):
+    for row in typ_rows:
         try:
             year = int(row.get("YY"))
             number = int(row.get("SEQ"))

@@ -695,6 +695,7 @@ modelDetailLastFocus:null,
 typImpactByYear:new Map(),
 typNowByYear:new Map(),
 tdNowByYear:new Map(),
+tdTypLinks:new Map(),
 selectionLoadSeq:0,
 slotLoadSeq:0
 };
@@ -1493,6 +1494,7 @@ throw manifestError || new Error('HTTP 404');
 typhoonState.manifest=manifest;
 typhoonState.manifestBaseUrl=manifestResult?.baseUrl || '';
 typhoonState.status=status;
+await loadTyphoonIdentityLinks();
 typhoonState.stormManifestCache=new Map();
 let latestManifestYear=typhoonManifestYears()[0] || '';
 if(latestManifestYear){
@@ -1547,6 +1549,7 @@ typhoonState.stormManifestCache=new Map();
 typhoonState.typImpactByYear=new Map();
 typhoonState.typNowByYear=new Map();
 typhoonState.tdNowByYear=new Map();
+typhoonState.tdTypLinks=new Map();
 typhoonState.driveArchiveImages=new Map();
 typhoonState.driveArchivePathsLoaded=new Set();
 typhoonState.driveArchiveLoadPromises=new Map();
@@ -1739,6 +1742,7 @@ stage,
 typNumber,
 tdNumber:system?.linked_td_number || null,
 linkedTypNumber:system?.linked_typ_number || null,
+tdTypLink:system?.td_typ_link || null,
 typNameKo,
 typName,
 stormKey:[year,stage,typNumber,typName].join('|'),
@@ -1790,27 +1794,30 @@ return false;
 
 function manifestPathsForStormKey(year,stormKey){
 let paths=new Set();
+function remember(entry){
+[entry.manifestPath,...(entry.manifestPaths || [])].filter(Boolean).forEach(path=>paths.add(path));
+}
 let yearText=String(year || '').trim();
 let selectedKey=String(stormKey || '');
 let selected=typhoonStormKeyInfo(selectedKey);
 
 typhoonYearSummaryEntries(year).forEach(entry=>{
 if(entry.stormKey===selectedKey && entry.manifestPath){
-paths.add(entry.manifestPath);
+remember(entry);
 return;
 }
 if(entryMatchesSelectedStormManifest(entry,selected,yearText,selectedKey)){
-paths.add(entry.manifestPath);
+remember(entry);
 }
 });
 if(!paths.size){
 typhoonState.entries.forEach(entry=>{
 if(entry.year===yearText && entry.stormKey===selectedKey && entry.manifestPath){
-paths.add(entry.manifestPath);
+remember(entry);
 return;
 }
 if(entryMatchesSelectedStormManifest(entry,selected,yearText,selectedKey)){
-paths.add(entry.manifestPath);
+remember(entry);
 }
 });
 }
@@ -2053,6 +2060,7 @@ originalStage:rawStage!==stage ? rawStage : undefined,
 typNumber,
 tdNumber,
 linkedTypNumber,
+tdTypLink:metadata.td_typ_link || job.td_typ_link || null,
 typNameKo,
 typName,
 stormKey
@@ -2089,6 +2097,23 @@ return text || 'TYP';
 }
 
 function linkTdEntriesToTyphoons(entries){
+entries=entries.map(entry=>{
+if(entry.stage!=='TD'){
+let evidence=entry.tdTypLink;
+if(evidence && !typhoonState.tdTypLinks.has(`${entry.year}|${Number(evidence.td_number)}`)){
+return {...entry,tdNumber:null};
+}
+return entry;
+}
+let link=typhoonState.tdTypLinks.get(`${entry.year}|${entry.typNumber}`);
+if(!link){
+return entry;
+}
+let typName=normalizeTyphoonName(link.typ_name || 'NONAME');
+return applyTyphoonSortKey({...entry,originalStage:'TD',stage:'TYP',tdNumber:entry.typNumber,
+typNumber:Number(link.typ_number),typName,typNameKo:link.typ_name_ko || koreanTyphoonName(typName),
+stormKey:[entry.year,'TYP',Number(link.typ_number),typName].join('|')});
+});
 let tdLinks=new Map();
 let typLinks=new Map();
 
@@ -2153,13 +2178,16 @@ if(!existing){
 byKey.set(key,entry);
 return;
 }
+let paths=[...new Set([existing.manifestPath,entry.manifestPath,...(existing.manifestPaths || []),...(entry.manifestPaths || [])].filter(Boolean))];
+let keep=existing;
 if(existing.originalStage==='TD' && entry.originalStage!=='TD'){
-byKey.set(key,entry);
-return;
+keep=entry;
 }
-if(String(entry.generatedAt || '')>String(existing.generatedAt || '')){
-byKey.set(key,entry);
+else if(!(existing.originalStage!=='TD' && entry.originalStage==='TD')
+&& String(entry.generatedAt || '')>String(existing.generatedAt || '')){
+keep=entry;
 }
+byKey.set(key,paths.length ? {...keep,manifestPaths:paths} : keep);
 });
 return [...byKey.values()];
 }
@@ -2264,6 +2292,44 @@ typhoonState.typNowByYear=nextNowMap;
 typhoonState.tdNowByYear=nextTdNowMap;
 }
 
+async function loadTyphoonIdentityLinks(){
+let links=new Map();
+try{
+let payload=await fetchTyphoonJson('data/cache/kma_apihub/td_typ_links.json',typhoonState.manifestBaseUrl);
+if(payload?.version===1 && Array.isArray(payload.links)){
+let active=payload.links.filter(link=>['provisional','confirmed'].includes(link?.state)
+&& /^\d{4}$/.test(String(link.year)) && Number(link.td_number)>0 && Number(link.td_number)<=99
+&& Number(link.typ_number)>0 && Number(link.typ_number)<=99 && /^\d{12}$/.test(link.effective_time_utc || '')
+&& /^(wp|cp|ep)(0[1-9]|[1-8]\d)\d{4}$/.test(link.atcf_id || ''));
+active.forEach(link=>{
+if(active.filter(other=>Number(other.year)===Number(link.year)
+&& (Number(other.td_number)===Number(link.td_number) || Number(other.typ_number)===Number(link.typ_number))).length===1){
+links.set(`${link.year}|${Number(link.td_number)}`,link);
+}
+});
+}
+}
+catch(error){
+}
+typhoonState.tdTypLinks=links;
+}
+
+function tdActivityRecord(row,year,typRecords){
+let startTime=String(row?.TM_ST || '').trim();
+let endTime=String(row?.TM_ED || '').trim();
+let officialNumber=Number(row?.TYP || 0);
+let link=typhoonState.tdTypLinks.get(`${year}|${Number(row?.TD)}`);
+if(link && officialNumber && officialNumber!==Number(link.typ_number)){
+typhoonState.tdTypLinks.delete(`${year}|${Number(row?.TD)}`);
+link=null;
+}
+let boundary=officialNumber ? typRecords.get(String(officialNumber))?.startTime : link?.effective_time_utc;
+if(boundary && startTime && startTime<boundary && (!endTime || boundary<endTime)){
+endTime=boundary;
+}
+return {status:'1',startTime,endTime};
+}
+
 async function fetchTyphoonListMapsForYear(year){
 let path=`${TYPHOON_TYP_LIST_CACHE_PREFIX}${year}${TYPHOON_TYP_LIST_CACHE_SUFFIX}`;
 let tdPath=`${TYPHOON_TD_LIST_CACHE_PREFIX}${year}${TYPHOON_TYP_LIST_CACHE_SUFFIX}`;
@@ -2302,11 +2368,7 @@ let td=Number(row?.TD);
 if(!Number.isFinite(td) || td<=0){
 return;
 }
-tdNow.set(String(td),{
-status:'1',
-startTime:String(row?.TM_ST || '').trim(),
-endTime:String(row?.TM_ED || '').trim()
-});
+tdNow.set(String(td),tdActivityRecord(row,year,now));
 });
 }
 catch(error){
