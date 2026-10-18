@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261018082949",
-  "generated_at_kst": "2026-10-18 17:29 KST",
+  "generated_at_utc": "20261018083952",
+  "generated_at_kst": "2026-10-18 17:39 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_30",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 81,
-  "selected_model_count": 30,
+  "model_source_count": 85,
+  "selected_model_count": 34,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -98,6 +98,23 @@
       "is_official": false,
       "first_seen_utc": "20261018053947",
       "first_seen_kst": "2026-10-18 14:39 KST"
+    },
+    {
+      "model_id": "HKO_AREC",
+      "model_label": "Aurora-ECMWF",
+      "raw_model_ids": [
+        "HKO_AREC"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 36,
+      "max_lead_hour": 210,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261018083952",
+      "first_seen_kst": "2026-10-18 17:39 KST"
     },
     {
       "model_id": "CMC",
@@ -510,6 +527,23 @@
       "first_seen_kst": "2026-10-18 17:19 KST"
     },
     {
+      "model_id": "HKO_FWEC",
+      "model_label": "FengWu-ECMWF",
+      "raw_model_ids": [
+        "HKO_FWEC"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261018083952",
+      "first_seen_kst": "2026-10-18 17:39 KST"
+    },
+    {
       "model_id": "FNEC_AI",
       "model_label": "FourCastNet-ECMWF",
       "raw_model_ids": [
@@ -542,6 +576,23 @@
       "is_official": false,
       "first_seen_utc": "20261018070951",
       "first_seen_kst": "2026-10-18 16:09 KST"
+    },
+    {
+      "model_id": "HKO_FXEC",
+      "model_label": "FuXi-ECMWF",
+      "raw_model_ids": [
+        "HKO_FXEC"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261018083952",
+      "first_seen_kst": "2026-10-18 17:39 KST"
     },
     {
       "model_id": "GFS",
@@ -1411,6 +1462,23 @@
       "is_official": false,
       "first_seen_utc": "20261018065947",
       "first_seen_kst": "2026-10-18 15:59 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 35,
+      "max_lead_hour": 204,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261018083952",
+      "first_seen_kst": "2026-10-18 17:39 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2630_CHAMPI/metadata/source_availability/202610180000.json",
