@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261018075948",
-  "generated_at_kst": "2026-10-18 16:59 KST",
+  "generated_at_utc": "20261018080947",
+  "generated_at_kst": "2026-10-18 17:09 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_30",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 76,
+  "model_source_count": 77,
   "selected_model_count": 29,
   "active_target_model_count": 40,
   "model_sources": [
@@ -1165,7 +1165,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 28,
       "max_lead_hour": 180,
       "has_pressure": true,
@@ -1173,6 +1173,23 @@
       "is_official": false,
       "first_seen_utc": "20261018074948",
       "first_seen_kst": "2026-10-18 16:49 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "FNMOC_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 40,
+      "max_lead_hour": 234,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261018080947",
+      "first_seen_kst": "2026-10-18 17:09 KST"
     },
     {
       "model_id": "PGEC_AI",
