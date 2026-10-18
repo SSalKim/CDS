@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261018063945",
-  "generated_at_kst": "2026-10-18 15:39 KST",
+  "generated_at_utc": "20261018064945",
+  "generated_at_kst": "2026-10-18 15:49 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_30",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 44,
+  "model_source_count": 49,
   "selected_model_count": 19,
   "active_target_model_count": 40,
   "model_sources": [
@@ -151,6 +151,23 @@
       "first_seen_kst": "2026-10-18 15:19 KST"
     },
     {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261018064945",
+      "first_seen_kst": "2026-10-18 15:49 KST"
+    },
+    {
       "model_id": "CMC_EPS",
       "model_label": "CMC EPS",
       "raw_model_ids": [
@@ -183,6 +200,41 @@
       "is_official": false,
       "first_seen_utc": "20261018063945",
       "first_seen_kst": "2026-10-18 15:39 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_EPS",
+        "CMC_EPS_MEAN"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 77,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261018064945",
+      "first_seen_kst": "2026-10-18 15:49 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261018064945",
+      "first_seen_kst": "2026-10-18 15:49 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -473,6 +525,23 @@
       "is_official": false,
       "first_seen_utc": "20261018063945",
       "first_seen_kst": "2026-10-18 15:39 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "HWRF"
+      ],
+      "source": "DMDW",
+      "source_label": "KMA DMDW",
+      "selected": false,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261018064945",
+      "first_seen_kst": "2026-10-18 15:49 KST"
     },
     {
       "model_id": "ICON",
@@ -780,6 +849,23 @@
       "is_official": false,
       "first_seen_utc": "20261018063945",
       "first_seen_kst": "2026-10-18 15:39 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261018064945",
+      "first_seen_kst": "2026-10-18 15:49 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2630_CHAMPI/metadata/source_availability/202610180000.json",
