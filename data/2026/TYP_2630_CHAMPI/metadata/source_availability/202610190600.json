@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261019133957",
-  "generated_at_kst": "2026-10-19 22:39 KST",
+  "generated_at_utc": "20261019134957",
+  "generated_at_kst": "2026-10-19 22:49 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_30",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 50,
+  "model_source_count": 52,
   "selected_model_count": 18,
   "active_target_model_count": 40,
   "model_sources": [
@@ -404,6 +404,23 @@
       "is_official": false,
       "first_seen_utc": "20261019115952",
       "first_seen_kst": "2026-10-19 20:59 KST"
+    },
+    {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "AVNO"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 26,
+      "max_lead_hour": 150,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261019134957",
+      "first_seen_kst": "2026-10-19 22:49 KST"
     },
     {
       "model_id": "GFS_EPS",
@@ -881,6 +898,23 @@
       "is_official": false,
       "first_seen_utc": "20261019131957",
       "first_seen_kst": "2026-10-19 22:19 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 35,
+      "max_lead_hour": 204,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261019134957",
+      "first_seen_kst": "2026-10-19 22:49 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2630_CHAMPI/metadata/source_availability/202610190600.json",
