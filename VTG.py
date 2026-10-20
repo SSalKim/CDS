@@ -2768,6 +2768,15 @@ def source_has_pressure_data(frame: pd.DataFrame) -> bool:
     return bool(pd.to_numeric(frame["PS"], errors="coerce").gt(0).any())
 
 
+def forecast_step_hours(frame: pd.DataFrame) -> float | None:
+    leads = pd.to_numeric(frame["TMD"], errors="coerce")
+    # A shared 0h analysis or repeated wind-radius rows do not define cadence.
+    hours = sorted(leads[leads.gt(0)].dropna().unique())
+    if len(hours) < 2:
+        return None
+    return float(min(later - earlier for earlier, later in zip(hours, hours[1:])))
+
+
 
 def row_inside_120_domain(row: pd.Series) -> bool:
     try:
@@ -2875,7 +2884,7 @@ def filter_suspicious_apihub_model_starts(df: pd.DataFrame, settings: Settings) 
     return df.loc[keep_mask].copy()
 
 def select_model_sources_by_priority(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
-    """Keep one source per model using fixed provider priority."""
+    """Keep one source per model, applying model-specific preferences first."""
     if df.empty or DATA_SOURCE_COLUMN not in df.columns:
         return df
 
@@ -2883,7 +2892,9 @@ def select_model_sources_by_priority(df: pd.DataFrame, settings: Settings) -> pd
     for model_name, model_df in df.groupby("SRC", dropna=True):
         source_frames = {}
         for source, source_df in model_df.groupby(DATA_SOURCE_COLUMN, dropna=True):
-            source_frames[source] = trim_discontinuous_forecast(source_df)
+            checked = trim_discontinuous_forecast(source_df)
+            if not checked.empty:
+                source_frames[source] = checked
 
         if not source_frames:
             continue
@@ -2894,6 +2905,15 @@ def select_model_sources_by_priority(df: pd.DataFrame, settings: Settings) -> pd
         requested_source = dict(settings.source_overrides).get(model_name)
         requested_source_available = bool(requested_source and requested_source in source_frames)
         selection_reason = "source priority"
+        if model_name == "UKM":
+            steps = {source: forecast_step_hours(source_frames[source]) for source in ordered_sources}
+            six_hour_sources = [source for source in ordered_sources if steps[source] == 6]
+            if six_hour_sources and 12 in steps.values():
+                ordered_sources = [
+                    *six_hour_sources,
+                    *[source for source in ordered_sources if source not in six_hour_sources],
+                ]
+                selection_reason = "6h forecast interval, then source priority"
         if model_name in PRESSURE_PREFERRED_MODELS and not requested_source_available:
             pressure_sources = [
                 source for source in ordered_sources
