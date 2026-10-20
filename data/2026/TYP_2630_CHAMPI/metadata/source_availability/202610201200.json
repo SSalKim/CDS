@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261020184955",
-  "generated_at_kst": "2026-10-21 03:49 KST",
+  "generated_at_utc": "20261020185954",
+  "generated_at_kst": "2026-10-21 03:59 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_30",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 50,
-  "selected_model_count": 19,
+  "model_source_count": 55,
+  "selected_model_count": 20,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -125,8 +125,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 23,
-      "max_lead_hour": 132,
+      "point_count": 24,
+      "max_lead_hour": 138,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -193,8 +193,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 20,
-      "max_lead_hour": 114,
+      "point_count": 26,
+      "max_lead_hour": 150,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -408,6 +408,23 @@
       "first_seen_kst": "2026-10-21 03:19 KST"
     },
     {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 26,
+      "max_lead_hour": 150,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261020185954",
+      "first_seen_kst": "2026-10-21 03:59 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -491,6 +508,23 @@
       "is_official": false,
       "first_seen_utc": "20261020184002",
       "first_seen_kst": "2026-10-21 03:40 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "hwrf"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 43,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261020185954",
+      "first_seen_kst": "2026-10-21 03:59 KST"
     },
     {
       "model_id": "ICON",
@@ -807,7 +841,7 @@
       ],
       "source": "EMC.NCEP",
       "source_label": "EMC NCEP ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 11,
       "max_lead_hour": 120,
       "has_pressure": true,
@@ -832,6 +866,23 @@
       "is_official": false,
       "first_seen_utc": "20261020184955",
       "first_seen_kst": "2026-10-21 03:49 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKM"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": true,
+      "point_count": 21,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261020185954",
+      "first_seen_kst": "2026-10-21 03:59 KST"
     },
     {
       "model_id": "WNC",
@@ -883,6 +934,40 @@
       "is_official": false,
       "first_seen_utc": "20261020184955",
       "first_seen_kst": "2026-10-21 03:49 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "DEEPMIND"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 23,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261020185954",
+      "first_seen_kst": "2026-10-21 03:59 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 23,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261020185954",
+      "first_seen_kst": "2026-10-21 03:59 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2630_CHAMPI/metadata/source_availability/202610201200.json",
