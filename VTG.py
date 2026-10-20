@@ -36,6 +36,8 @@ from vtg_source_backup import cycle_time as backup_cycle_time, read_snapshot as 
 
 from vtg_sources import (
     DMDW_ENABLED_MODEL_IDS,
+    EMC_ADECK_URL_TEMPLATE,
+    EMC_BDECK_URL_TEMPLATE,
     MODEL_ALIAS_PRIORITIES,
     MODEL_SOURCE_ALIASES,
     MODEL_SOURCE_PRIORITY_OVERRIDES,
@@ -1846,9 +1848,14 @@ def knackwx_url(atcf_id: str, data_time: str) -> str:
     return f"https://api.knackwx.com/atcf/v2/aid/history/text?{query}"
 
 
+def emc_adeck_url(atcf_id: str) -> str:
+    atcf_id = str(atcf_id or "").strip().lower()
+    return EMC_ADECK_URL_TEMPLATE.format(atcf_id=atcf_id)
+
+
 def bdeck_url(atcf_id: str) -> str:
     atcf_id = str(atcf_id or "").strip().lower()
-    return f"https://www.emc.ncep.noaa.gov/gc_wmb/vxt/DECKS/b{atcf_id}.dat"
+    return EMC_BDECK_URL_TEMPLATE.format(atcf_id=atcf_id)
 
 
 def ral_ucar_bdeck_url(atcf_id: str) -> str:
@@ -1860,15 +1867,12 @@ def ral_ucar_bdeck_url(atcf_id: str) -> str:
     )
 
 
-def natyphoon_bdeck_url(atcf_id: str) -> str:
-    atcf_id = str(atcf_id or "").strip().lower()
-    return f"https://www.natyphoon.top/atcf/temp/b{atcf_id}.dat"
-
-
 def atcf_urls(settings: Settings) -> list[tuple[str, str, int]]:
     urls = []
     for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
         urls.append(("RAL.UCAR", ral_ucar_url(atcf_id), 0))
+    for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
+        urls.append(("EMC.NCEP", emc_adeck_url(atcf_id), 0))
     for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
         if url := knackwx_url(atcf_id, settings.data_time):
             urls.append(("KNACKWX", url, 0))
@@ -2037,14 +2041,15 @@ def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFra
             if recent_text is not None:
                 return recent_text
         is_knackwx = source == "KNACKWX"
+        mutable_source = is_knackwx or source == "EMC.NCEP"
         return fetch_text(
             session,
             url,
             retries=1 if is_knackwx else 2,
             timeout=15,
-            # This endpoint has no date in its URL and updates as forecasts
-            # arrive, so a persistent cache could replay an older snapshot.
-            cache_dir=None if is_knackwx else settings.http_cache_dir,
+            # EMC is grouped by model, not cycle: fetch the whole mutable file,
+            # never the recent-byte shortcut or a stale URL-keyed snapshot.
+            cache_dir=None if mutable_source else settings.http_cache_dir,
             cache_ttl_seconds=settings.http_cache_ttl_seconds,
         )
 
@@ -2172,8 +2177,8 @@ def select_bdeck_analysis_row(
 ) -> tuple[pd.Series, str] | None:
     nearest_fallback: tuple[pd.Series, str] | None = None
     for source_name, url in (
+        ("EMC.NCEP", bdeck_url(settings.atcf_id)),
         ("RAL.UCAR", ral_ucar_bdeck_url(settings.atcf_id)),
-        ("NATYPHOON", natyphoon_bdeck_url(settings.atcf_id)),
     ):
         frame = fetch_bdeck_analysis_candidates(
             session,

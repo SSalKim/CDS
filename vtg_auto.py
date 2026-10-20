@@ -20,7 +20,7 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from vtg_sources import SMCA_SNAPSHOT_KEYS, SOURCE_MODEL_IDS, render_code_signature
+from vtg_sources import EMC_BDECK_URL_TEMPLATE, SMCA_SNAPSHOT_KEYS, SOURCE_MODEL_IDS, render_code_signature
 from vtg_identity_links import LINKS_FILENAME, active_links, effective_td_rows, load_links, reconcile_links
 
 
@@ -32,8 +32,8 @@ TD_LIST_ENDPOINT = "td_lst.php"
 TYP_LIST_ENDPOINT = "typ_lst.php"
 NRL_ATCF_SECTOR_URL = "https://science.nrlmry.navy.mil/geoips/tcdat/sectors/atcf_sector_file"
 BDECK_SOURCE_URLS = (
+    ("EMC.NCEP", EMC_BDECK_URL_TEMPLATE),
     ("RAL.UCAR", "https://hurricanes.ral.ucar.edu/realtime/plots/{ral_basin_dir}/{year}/{atcf_id}/b{atcf_id}.dat"),
-    ("NATYPHOON", "https://www.natyphoon.top/atcf/temp/b{atcf_id}.dat"),
 )
 KMA_GTS_NOW_URL = f"{KMA_LIST_BASE_URL}/typ_gts_now.php"
 KMA_TYP_NOW_URL = f"{KMA_LIST_BASE_URL}/typ_now.php"

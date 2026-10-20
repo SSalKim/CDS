@@ -4,15 +4,21 @@ import hashlib
 from pathlib import Path
 
 
-SOURCE_ORDER = ("APIHUB", "DMDW", "RAW.GITHUB", "POLARWX", "SMCA.FUN", "RAL.UCAR", "KNACKWX")
+SOURCE_ORDER = ("APIHUB", "DMDW", "RAW.GITHUB", "POLARWX", "SMCA.FUN", "RAL.UCAR", "EMC.NCEP", "KNACKWX")
 MODEL_SOURCE_PRIORITY_OVERRIDES: dict[str, tuple[str, ...]] = {}
 PRESSURE_PREFERRED_MODELS = frozenset(("UKMO_EPS",))
+EMC_ADECK_URL_TEMPLATE = "https://www.emc.ncep.noaa.gov/hurricane/DECKS_OPEN/a{atcf_id}.dat"
+EMC_BDECK_URL_TEMPLATE = "https://www.emc.ncep.noaa.gov/hurricane/DECKS_OPEN/b{atcf_id}.dat"
+_EMC_MODEL_IDS = {
+    "CMC": "CMC", "GFS": "AVNO", "CTCX": "CTCX", "UKM": "EGRR",
+    "HAFS": "HFSA", "NAVGEM": "NVGM", "HWRF": "HWRF",
+}
 
 # None disables a source. DMDW is a support flag: its layer IDs are mapped below.
-# NOAA IDs are legacy aliases only; NOAA is not an active source in SOURCE_ORDER.
+# NOAA IDs remain legacy aliases; EMC enables only the explicitly approved models.
 _MODEL_SOURCE_COLUMNS = ("name", "apihub", "dmdw", "raw_github", "polarwx", "smca", "ral_ucar", "knackwx", "noaa")
 MODEL_SOURCES = [
-    dict(zip(_MODEL_SOURCE_COLUMNS, row, strict=True))
+    dict(zip(_MODEL_SOURCE_COLUMNS, row, strict=True), emc=_EMC_MODEL_IDS.get(row[0]))
     for row in (
         # name              apihub         dmdw   raw_github  polarwx          smca       ral_ucar  knackwx  noaa
         ("ECMWF",          "ECMWF",       True,  None,       "ecm",           "ECMWF",   None,     "ECMF",  "ECMF"),
@@ -72,6 +78,7 @@ SOURCE_DISPLAY_NAMES = {
     "APIHUB": "KMA APIHUB",
     "DMDW": "KMA DMDW",
     "NOAA": "NOAA ATCF",
+    "EMC.NCEP": "EMC NCEP ATCF",
     "POLARWX": "POLARWX",
     "SMCA.FUN": "SMCA.FUN",
     "RAL.UCAR": "RAL UCAR ATCF",
@@ -83,10 +90,10 @@ SOURCE_ALIASES = {
     "KMAAPIHUB": "APIHUB",
     "DMDW": "DMDW",
     "KMADMDW": "DMDW",
-    "NOAA": "NOAA",
-    "ATCF": "NOAA",
-    "NCEP": "NOAA",
-    "NOAAATCF": "NOAA",
+    "NOAA": "EMC.NCEP",
+    "ATCF": "EMC.NCEP",
+    "NCEP": "EMC.NCEP",
+    "NOAAATCF": "EMC.NCEP",
     "POLARWX": "POLARWX",
     "POLAR": "POLARWX",
     "SMCAFUN": "SMCA.FUN",
@@ -97,9 +104,9 @@ SOURCE_ALIASES = {
     "KNACKWX": "KNACKWX",
     "KNACK": "KNACKWX",
     "APIKNACKWX": "KNACKWX",
-    "EMCNCEP": "NOAA",
-    "NCEPATCF": "NOAA",
-    "EMCNCEPATCF": "NOAA",
+    "EMCNCEP": "EMC.NCEP",
+    "NCEPATCF": "EMC.NCEP",
+    "EMCNCEPATCF": "EMC.NCEP",
     "RAWGITHUB": "RAW.GITHUB",
     "GITHUB": "RAW.GITHUB",
     "GDM": "RAW.GITHUB",
@@ -108,6 +115,7 @@ SOURCE_IDENTIFIER_COLUMNS = {
     "APIHUB": "apihub",
     "DMDW": "dmdw",
     "NOAA": "noaa",
+    "EMC.NCEP": "emc",
     "POLARWX": "polarwx",
     "SMCA.FUN": "smca",
     "RAL.UCAR": "ral_ucar",

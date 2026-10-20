@@ -17,6 +17,7 @@ SOURCE_COLUMNS = {
     "POLARWX": "polarwx",
     "SMCA.FUN": "smca",
     "RAL.UCAR": "ral_ucar",
+    "EMC.NCEP": "emc",
     "KNACKWX": "knackwx",
 }
 
@@ -54,6 +55,7 @@ EXPECTED_SOURCE_MODELS = {
         "HWRF", "HAFS", "ECMWF_AIFS", "ECMWF_AIFS_EPS", "AGFS", "AIGEFS",
         "GENC", "WNC", "WNV3", "ICON", "ICON_EPS",
     },
+    "EMC.NCEP": {"CMC", "GFS", "CTCX", "UKM", "HAFS", "NAVGEM", "HWRF"},
 }
 
 
