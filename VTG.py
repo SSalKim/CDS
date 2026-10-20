@@ -3405,6 +3405,8 @@ def apply_common_kma_start(df: pd.DataFrame, settings: Settings) -> pd.DataFrame
                 .head(1)
                 .copy()
             )
+            # This is only a positional anchor, not a native 0h intensity.
+            model_start["PS"] = float("nan")
         if model_start.empty:
             continue
         model_start.loc[:, "LAT"] = kma_lat
@@ -3998,14 +4000,15 @@ def limit_forecast_hours(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
 
 
 def track_intensity_summary(track: pd.DataFrame, model_name: str) -> str:
-    forecast = track[pd.to_numeric(track["TMD"], errors="coerce").ge(3)].copy()
-    if forecast.empty:
+    leads = pd.to_numeric(track["TMD"], errors="coerce")
+    forecast = track[leads.eq(0) | leads.ge(3)].copy()
+    if forecast.empty or not has_forecast_points(forecast):
         return ""
 
     forecast["WS"] = pd.to_numeric(forecast["WS"], errors="coerce")
     forecast["PS"] = pd.to_numeric(forecast["PS"], errors="coerce")
     forecast["TMD"] = pd.to_numeric(forecast["TMD"], errors="coerce")
-    forecast = forecast.dropna(subset=["TMD"])
+    forecast = forecast.dropna(subset=["TMD"]).sort_values("TMD", kind="stable").reset_index(drop=True)
     if forecast.empty:
         return ""
 
