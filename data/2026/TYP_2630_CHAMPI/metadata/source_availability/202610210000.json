@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261021051956",
-  "generated_at_kst": "2026-10-21 14:19 KST",
+  "generated_at_utc": "20261021052956",
+  "generated_at_kst": "2026-10-21 14:29 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_30",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 10,
+  "model_source_count": 11,
   "selected_model_count": 5,
   "active_target_model_count": 40,
   "model_sources": [
@@ -39,7 +39,7 @@
       ],
       "source": "SMCA.FUN",
       "source_label": "SMCA.FUN",
-      "selected": true,
+      "selected": false,
       "point_count": 27,
       "max_lead_hour": 156,
       "has_pressure": true,
@@ -47,6 +47,23 @@
       "is_official": false,
       "first_seen_utc": "20261021051956",
       "first_seen_kst": "2026-10-21 14:19 KST"
+    },
+    {
+      "model_id": "AGFS",
+      "model_label": "AIGFS",
+      "raw_model_ids": [
+        "AIGFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261021052956",
+      "first_seen_kst": "2026-10-21 14:29 KST"
     },
     {
       "model_id": "ICON",
