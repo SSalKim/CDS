@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261022065024",
-  "generated_at_kst": "2026-10-22 15:50 KST",
+  "generated_at_utc": "20261022070230",
+  "generated_at_kst": "2026-10-22 16:02 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_30",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 50,
-  "selected_model_count": 18,
+  "model_source_count": 56,
+  "selected_model_count": 20,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -185,6 +185,23 @@
       "first_seen_kst": "2026-10-22 15:50 KST"
     },
     {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 24,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261022070230",
+      "first_seen_kst": "2026-10-22 16:02 KST"
+    },
+    {
       "model_id": "CMC_EPS",
       "model_label": "CMC EPS",
       "raw_model_ids": [
@@ -252,6 +269,40 @@
       "is_official": false,
       "first_seen_utc": "20261022065024",
       "first_seen_kst": "2026-10-22 15:50 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 21,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261022070230",
+      "first_seen_kst": "2026-10-22 16:02 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 18,
+      "max_lead_hour": 102,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261022070230",
+      "first_seen_kst": "2026-10-22 16:02 KST"
     },
     {
       "model_id": "GFS",
@@ -406,6 +457,23 @@
       "is_official": false,
       "first_seen_utc": "20261022062025",
       "first_seen_kst": "2026-10-22 15:20 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "AEMN"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": false,
+      "point_count": 22,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261022070230",
+      "first_seen_kst": "2026-10-22 16:02 KST"
     },
     {
       "model_id": "HAFS",
@@ -807,7 +875,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 12,
       "max_lead_hour": 120,
       "has_pressure": true,
@@ -815,6 +883,23 @@
       "is_official": false,
       "first_seen_utc": "20261022055022",
       "first_seen_kst": "2026-10-22 14:50 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKM"
+      ],
+      "source": "RAL.UCAR",
+      "source_label": "RAL UCAR ATCF",
+      "selected": true,
+      "point_count": 22,
+      "max_lead_hour": 126,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261022070230",
+      "first_seen_kst": "2026-10-22 16:02 KST"
     },
     {
       "model_id": "WNC",
@@ -883,6 +968,23 @@
       "is_official": false,
       "first_seen_utc": "20261022065024",
       "first_seen_kst": "2026-10-22 15:50 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 18,
+      "max_lead_hour": 102,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261022070230",
+      "first_seen_kst": "2026-10-22 16:02 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2630_CHAMPI/metadata/source_availability/202610220000.json",
