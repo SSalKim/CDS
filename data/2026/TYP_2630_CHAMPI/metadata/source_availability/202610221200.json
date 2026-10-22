@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261022191023",
-  "generated_at_kst": "2026-10-23 04:10 KST",
+  "generated_at_utc": "20261022192025",
+  "generated_at_kst": "2026-10-23 04:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_30",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 61,
-  "selected_model_count": 25,
+  "model_source_count": 63,
+  "selected_model_count": 26,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -953,6 +953,23 @@
       "first_seen_kst": "2026-10-23 04:10 KST"
     },
     {
+      "model_id": "PGKM_AI",
+      "model_label": "Pangu-Weather-KIM",
+      "raw_model_ids": [
+        "PGKM_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261022192025",
+      "first_seen_kst": "2026-10-23 04:20 KST"
+    },
+    {
       "model_id": "UKM",
       "model_label": "UKMO",
       "raw_model_ids": [
@@ -1070,6 +1087,23 @@
       "is_official": false,
       "first_seen_utc": "20261022191023",
       "first_seen_kst": "2026-10-23 04:10 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WN3C"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 17,
+      "max_lead_hour": 96,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261022192025",
+      "first_seen_kst": "2026-10-23 04:20 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2630_CHAMPI/metadata/source_availability/202610221200.json",
