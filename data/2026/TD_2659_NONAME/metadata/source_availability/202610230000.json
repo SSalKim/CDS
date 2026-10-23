@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261023080028",
-  "generated_at_kst": "2026-10-23 17:00 KST",
+  "generated_at_utc": "20261023081031",
+  "generated_at_kst": "2026-10-23 17:10 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_59",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 49,
-  "selected_model_count": 27,
+  "model_source_count": 52,
+  "selected_model_count": 29,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -200,6 +200,40 @@
       "is_official": false,
       "first_seen_utc": "20261023070031",
       "first_seen_kst": "2026-10-23 16:00 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261023081031",
+      "first_seen_kst": "2026-10-23 17:10 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261023081031",
+      "first_seen_kst": "2026-10-23 17:10 KST"
     },
     {
       "model_id": "ECMWF_EPS",
@@ -685,7 +719,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 21,
       "max_lead_hour": 180,
       "has_pressure": true,
@@ -693,6 +727,23 @@
       "is_official": false,
       "first_seen_utc": "20261023075030",
       "first_seen_kst": "2026-10-23 16:50 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "FNMOC_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261023081031",
+      "first_seen_kst": "2026-10-23 17:10 KST"
     },
     {
       "model_id": "PGEC_AI",
