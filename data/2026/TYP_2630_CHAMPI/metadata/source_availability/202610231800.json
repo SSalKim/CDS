@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261024010033",
-  "generated_at_kst": "2026-10-24 10:00 KST",
+  "generated_at_utc": "20261024011013",
+  "generated_at_kst": "2026-10-24 10:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_30",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 43,
-  "selected_model_count": 14,
+  "model_source_count": 49,
+  "selected_model_count": 17,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -132,6 +132,23 @@
       "is_official": false,
       "first_seen_utc": "20261023232013",
       "first_seen_kst": "2026-10-24 08:20 KST"
+    },
+    {
+      "model_id": "CTCX",
+      "model_label": "COAMPS-TC",
+      "raw_model_ids": [
+        "CTCX"
+      ],
+      "source": "EMC.NCEP",
+      "source_label": "EMC NCEP ATCF",
+      "selected": true,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261024011013",
+      "first_seen_kst": "2026-10-24 10:10 KST"
     },
     {
       "model_id": "ECMWF",
@@ -304,6 +321,23 @@
       "first_seen_kst": "2026-10-24 09:20 KST"
     },
     {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "AVNO"
+      ],
+      "source": "EMC.NCEP",
+      "source_label": "EMC NCEP ATCF",
+      "selected": false,
+      "point_count": 16,
+      "max_lead_hour": 90,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261024011013",
+      "first_seen_kst": "2026-10-24 10:10 KST"
+    },
+    {
       "model_id": "GFS_EPS",
       "model_label": "GFS EPS",
       "raw_model_ids": [
@@ -407,6 +441,23 @@
       "first_seen_kst": "2026-10-24 10:00 KST"
     },
     {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENC"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261024011013",
+      "first_seen_kst": "2026-10-24 10:10 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -458,6 +509,23 @@
       "first_seen_kst": "2026-10-24 09:20 KST"
     },
     {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HFSA"
+      ],
+      "source": "EMC.NCEP",
+      "source_label": "EMC NCEP ATCF",
+      "selected": false,
+      "point_count": 14,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261024011013",
+      "first_seen_kst": "2026-10-24 10:10 KST"
+    },
+    {
       "model_id": "HWRF",
       "model_label": "HWRF",
       "raw_model_ids": [
@@ -507,6 +575,23 @@
       "is_official": false,
       "first_seen_utc": "20261024004010",
       "first_seen_kst": "2026-10-24 09:40 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "HWRF"
+      ],
+      "source": "EMC.NCEP",
+      "source_label": "EMC NCEP ATCF",
+      "selected": false,
+      "point_count": 16,
+      "max_lead_hour": 90,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261024011013",
+      "first_seen_kst": "2026-10-24 10:10 KST"
     },
     {
       "model_id": "ICON",
@@ -762,6 +847,23 @@
       "is_official": false,
       "first_seen_utc": "20261024010033",
       "first_seen_kst": "2026-10-24 10:00 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261024011013",
+      "first_seen_kst": "2026-10-24 10:10 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2630_CHAMPI/metadata/source_availability/202610231800.json",
