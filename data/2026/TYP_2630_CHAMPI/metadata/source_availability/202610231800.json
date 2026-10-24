@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261024011013",
-  "generated_at_kst": "2026-10-24 10:10 KST",
+  "generated_at_utc": "20261024012009",
+  "generated_at_kst": "2026-10-24 10:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_30",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 49,
+  "model_source_count": 51,
   "selected_model_count": 17,
   "active_target_model_count": 40,
   "model_sources": [
@@ -363,8 +363,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 14,
-      "max_lead_hour": 78,
+      "point_count": 17,
+      "max_lead_hour": 96,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -456,6 +456,23 @@
       "is_official": false,
       "first_seen_utc": "20261024011013",
       "first_seen_kst": "2026-10-24 10:10 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261024012009",
+      "first_seen_kst": "2026-10-24 10:20 KST"
     },
     {
       "model_id": "HAFS",
@@ -864,6 +881,23 @@
       "is_official": false,
       "first_seen_utc": "20261024011013",
       "first_seen_kst": "2026-10-24 10:10 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WN3C"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261024012009",
+      "first_seen_kst": "2026-10-24 10:20 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2630_CHAMPI/metadata/source_availability/202610231800.json",
