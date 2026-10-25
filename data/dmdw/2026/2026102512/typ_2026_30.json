@@ -1,0 +1,27 @@
+{
+  "cycle": "2026102512",
+  "cycle_utc": "202610251200",
+  "layer_candidate_count": 1,
+  "model_count": 1,
+  "models": [
+    {"index":0,"is_ensemble_mean":false,"max_lead_hour":48,"member_id":null,"model_id":"GFS","point_count":9,"raw_model_id":"GFS","row_count":9,"source_member_count":null}
+  ],
+  "point_columns": ["model_index","lead_hour","valid_time","lat","lon","pressure_hpa","wind","speed","direction","radius_15","member_count"],
+  "point_count": 9,
+  "points": [
+    [0,0,"202610251200",30.9,126.2,998,22,19,45,250,null],
+    [0,6,"202610251800",31.6,127.4,1002,20.1,-9,null,357,null],
+    [0,12,"202610260000",31.9,128.9,1005,19.5,-9,null,173,null],
+    [0,18,"202610260600",32.2,130.1,1004,17,-9,null,0,null],
+    [0,24,"202610261200",32.1,131.9,1007,16.5,-9,null,0,null],
+    [0,30,"202610261800",32.6,133.9,1005,17.5,-9,null,0,null],
+    [0,36,"202610270000",33.5,136.8,1005,15.9,-9,null,370,null],
+    [0,42,"202610270600",34.7,139.9,1002,17.5,-9,null,0,null],
+    [0,48,"202610271200",36.9,144.7,999,16.5,-9,null,363,null]
+  ],
+  "request": {"o_tm_seq":"42","storm_kind":"typ","typ_seq":30,"year":2026},
+  "schema_version": 2,
+  "source": "DMDW",
+  "storm": {"canonical_storm_stage":"TYP","canonical_typ_name":"CHAMPI","canonical_typ_name_ko":"참피","canonical_typ_number":30,"data_typ_number":30,"dmdw_o_tm_seq":"42","dmdw_start_time":"202610150600","stage":"TYP_LINKED_ATCF_PENDING","storm_key":"typ_2026_30"},
+  "time_basis": "DMDW typTm stored as received; lead_hour is computed as typTm minus comparetime. Only forecast points with lead_hour >= 0 are stored."
+}
