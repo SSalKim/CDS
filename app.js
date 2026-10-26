@@ -108,7 +108,7 @@ const PRELOAD_IMAGE_TIMEOUT_MS=15000;
 const DISPLAY_IMAGE_RETRY_DELAY_MS=500;
 const DISPLAY_IMAGE_MAX_RETRIES=2;
 const AUTO_CHECK_DEBOUNCE_MS=250;
-const QUIET_IMAGE_PROBE_HOSTS=new Set(['dmdw.kma.go.kr','data.kma.go.kr','afso.kma.go.kr']);
+const QUIET_IMAGE_PROBE_HOSTS=new Set(['dmdw.kma.go.kr','data.kma.go.kr']);
 
 let latestSearchSeq=0;
 let latestSearchInProgress=false;
@@ -1716,7 +1716,7 @@ return false;
 async function quietImageExists(url,timeoutMs=PRELOAD_IMAGE_TIMEOUT_MS){
 
 // Do not use fetch(HEAD) for KMA CHT images.
-// data.kma.go.kr and afso.kma.go.kr frequently reject HEAD with 405 and/or
+// KMA image servers may reject HEAD with 405 and/or
 // CORS errors even when normal <img> loading works.  Those rejected probes are
 // harmless functionally, but they flood DevTools with red errors.
 // Returning null lets the regular image loader try the candidate URL directly.

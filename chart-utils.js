@@ -2,8 +2,7 @@
 
 const DEFAULT_CHART_BASE_URL='https://data.kma.go.kr/CHT';
 const DEFAULT_CHART_BACKUP_BASE_URLS=[
-'https://dmdw.kma.go.kr/map/data/CHT',
-'https://afso.kma.go.kr/data/CHT'
+'https://dmdw.kma.go.kr/map/data/CHT'
 ];
 const DEFAULT_CHART_BASE_URLS=[
 DEFAULT_CHART_BASE_URL,
@@ -25,6 +24,7 @@ let parsed=new URL(url,typeof window!=='undefined'?window.location.href:undefine
 let roots=[
 {host:'dmdw.kma.go.kr',path:'/map/data/CHT/'},
 {host:'data.kma.go.kr',path:'/CHT/'},
+// Rewrite legacy AFSO URLs to the active sources without requesting AFSO.
 {host:'afso.kma.go.kr',path:'/data/CHT/'}
 ];
 let matched=roots.find(root=>
