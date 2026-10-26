@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261026180027",
-  "generated_at_kst": "2026-10-27 03:00 KST",
+  "generated_at_utc": "20261026181106",
+  "generated_at_kst": "2026-10-27 03:11 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 21,
-  "selected_model_count": 8,
+  "model_source_count": 23,
+  "selected_model_count": 10,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -98,6 +98,40 @@
       "is_official": false,
       "first_seen_utc": "20261026172031",
       "first_seen_kst": "2026-10-27 02:20 KST"
+    },
+    {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "cmc"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261026181106",
+      "first_seen_kst": "2026-10-27 03:11 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261026181106",
+      "first_seen_kst": "2026-10-27 03:11 KST"
     },
     {
       "model_id": "GFS",
