@@ -1,0 +1,43 @@
+name: Collect historical track verification data
+run-name: Track verification BAVI and CHAMPI 2026
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        storm: [BAVI, CHAMPI]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check collector
+        run: python -B -m unittest discover -s tests -p test_track_verification.py
+      - name: Collect exact historical cycles (no production output)
+        env:
+          KMA_APIHUB_AUTH_KEY: ${{ secrets.KMA_APIHUB_AUTH_KEY }}
+          KMA_APIHUB_FALLBACK_AUTH_KEY: ${{ secrets.KMA_APIHUB_FALLBACK_AUTH_KEY }}
+          WB_API_KEY: ${{ secrets.WB_API_KEY }}
+          STORM: ${{ matrix.storm }}
+          PYTHONUNBUFFERED: '1'
+        run: python -B analysis/collect_track_verification.py --storm "$STORM" --output "$RUNNER_TEMP/verification/$STORM"
+      - name: Publish analysis data only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: track-verification-${{ matrix.storm }}
+          path: ${{ runner.temp }}/verification/${{ matrix.storm }}/
+          retention-days: 3
+          if-no-files-found: error
