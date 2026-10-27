@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261027121107",
-  "generated_at_kst": "2026-10-27 21:11 KST",
+  "generated_at_utc": "20261027122027",
+  "generated_at_kst": "2026-10-27 21:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 24,
-  "selected_model_count": 11,
+  "model_source_count": 26,
+  "selected_model_count": 12,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -254,6 +254,23 @@
       "first_seen_kst": "2026-10-27 21:01 KST"
     },
     {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GEFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 33,
+      "max_lead_hour": 192,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261027122027",
+      "first_seen_kst": "2026-10-27 21:20 KST"
+    },
+    {
       "model_id": "HAFS",
       "model_label": "HAFS",
       "raw_model_ids": [
@@ -422,6 +439,23 @@
       "is_official": true,
       "first_seen_utc": "20261027100023",
       "first_seen_kst": "2026-10-27 19:00 KST"
+    },
+    {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "FNV3"
+      ],
+      "source": "RAW.GITHUB",
+      "source_label": "GITHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261027122027",
+      "first_seen_kst": "2026-10-27 21:20 KST"
     },
     {
       "model_id": "WMSH",
