@@ -47,7 +47,7 @@ class ZeroHourPressureTests(unittest.TestCase):
             )
 
     def test_every_source_keeps_native_zero_hour_pressure_but_uses_official_position(self):
-        for source in VTG.SOURCE_ORDER:
+        for source in VTG.source_priority_for_model("GFS", self.settings):
             column = VTG.SOURCE_IDENTIFIER_COLUMNS[source]
             model = next(row["name"] for row in VTG.MODEL_SOURCES if row.get(column))
             with self.subTest(source=source, model=model):
@@ -83,7 +83,7 @@ class ZeroHourPressureTests(unittest.TestCase):
         self.assertEqual("----hPa +----/012h", VTG.track_intensity_summary(frame, "GFS"))
 
     def test_synthetic_anchor_does_not_relabel_future_pressure_as_zero_hour(self):
-        for source in VTG.SOURCE_ORDER:
+        for source in VTG.source_priority_for_model("GFS", self.settings):
             with self.subTest(source=source):
                 normalized = self.normalize(track(source, hours=(6, 12), pressures=(970, 980)))
                 model_track = normalized[normalized["SRC"].eq("GFS")]

@@ -34,7 +34,7 @@ class UkmoSourceIntervalTests(unittest.TestCase):
         return selected, log.getvalue()
 
     def test_six_hour_source_beats_every_higher_priority_twelve_hour_source(self):
-        priorities = VTG.SOURCE_ORDER
+        priorities = VTG.source_priority_for_model("UKM", self.settings)
         for fine_index in range(1, len(priorities)):
             for coarse_source in priorities[:fine_index]:
                 with self.subTest(fine=priorities[fine_index], coarse=coarse_source):

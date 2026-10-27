@@ -48,6 +48,7 @@ from vtg_sources import (
     MODEL_SOURCE_ALIASES,
     MODEL_SOURCE_PRIORITY_OVERRIDES,
     MODEL_SOURCES,
+    PAUSED_SOURCE_IDS,
     PRESSURE_PREFERRED_MODELS,
     RAW_GITHUB_MODELS,
     SMCA_PERSISTED_MODEL_IDS,
@@ -1304,6 +1305,8 @@ def read_dmdw_json(path: Path, settings: Settings) -> pd.DataFrame:
 
 
 def read_dmdw_data(settings: Settings) -> pd.DataFrame:
+    if "DMDW" in PAUSED_SOURCE_IDS:
+        return pd.DataFrame(columns=[*KMA_COLUMNS, RAW_MODEL_COLUMN, DATA_SOURCE_COLUMN, MODEL_ALIAS_PRIORITY_COLUMN])
     frames = []
     for path in dmdw_candidate_paths(settings):
         frame = read_dmdw_json(path, settings)
@@ -1345,6 +1348,8 @@ def raw_github_candidate_urls(settings: Settings, model: str) -> list[str]:
 
 
 def fetch_raw_github_text(session: requests.Session, settings: Settings, model: str) -> str | None:
+    if "RAW.GITHUB" in PAUSED_SOURCE_IDS:
+        return None
     for url in raw_github_candidate_urls(settings, model):
         text = fetch_text(
             session, url, retries=2, timeout=15,
@@ -1911,7 +1916,7 @@ def atcf_urls(settings: Settings) -> list[tuple[str, str, int]]:
         query = urlencode({"initialization_time": settings.data_time[:10], "format": "deck"})
         for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
             urls.append(("WINDBORNE", f"{WINDBORNE_BASE_URL}/{atcf_id.upper()}?{query}", 0))
-    return urls
+    return [spec for spec in urls if spec[0] not in PAUSED_SOURCE_IDS]
 
 
 def parse_atcf_coord(series: pd.Series, *, signed: bool = False) -> pd.Series:
@@ -2801,7 +2806,7 @@ def source_priority_for_model(model_name: str, settings: Settings) -> tuple[str,
     if preferred_source:
         priority = [preferred_source, *[source for source in priority if source != preferred_source]]
         priority.extend(source for source in SOURCE_ORDER if source not in priority)
-    return tuple(priority)
+    return tuple(source for source in priority if source not in PAUSED_SOURCE_IDS)
 
 
 def source_has_pressure_data(frame: pd.DataFrame) -> bool:
@@ -2925,8 +2930,16 @@ def filter_suspicious_apihub_model_starts(df: pd.DataFrame, settings: Settings) 
         )
     return df.loc[keep_mask].copy()
 
+def exclude_paused_sources(df: pd.DataFrame) -> pd.DataFrame:
+    if df.empty or DATA_SOURCE_COLUMN not in df.columns:
+        return df
+    sources = df[DATA_SOURCE_COLUMN].astype(str).str.strip().str.upper()
+    return df.loc[~sources.isin(PAUSED_SOURCE_IDS)].copy()
+
+
 def select_model_sources_by_priority(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     """Keep one source per model, applying model-specific preferences first."""
+    df = exclude_paused_sources(df)
     if df.empty or DATA_SOURCE_COLUMN not in df.columns:
         return df
 
@@ -3000,6 +3013,7 @@ def normalize_track_data(
 
 
 def normalize_guidance_frame(df: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    df = exclude_paused_sources(df)
     if df.empty:
         return df
 
@@ -3031,6 +3045,7 @@ def normalize_guidance_frame(df: pd.DataFrame, settings: Settings) -> pd.DataFra
 
 
 def source_backup_tracks(raw: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    raw = exclude_paused_sources(raw)
     required = {"SRC", DATA_SOURCE_COLUMN, "TMD", "LAT", "LON", "TYP_TM(UTC)", "FT_TM(UTC)", "SEQ"}
     if raw.empty or not required.issubset(raw):
         return pd.DataFrame()
@@ -3066,6 +3081,7 @@ def source_backup_tracks(raw: pd.DataFrame, settings: Settings) -> pd.DataFrame:
 
 def merge_source_backups(raw: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     """Restore whole missing source/model tracks; never append cached tails to live data."""
+    raw = exclude_paused_sources(raw)
     if settings.source_backup_dir is None or settings.skip_atcf:
         return raw
     cycle = normalize_utc_stamp(settings.data_time)
@@ -3780,7 +3796,7 @@ def source_availability_frame(
             raw[column] = pd.to_numeric(raw[column], errors="coerce")
     raw = raw[raw["SRC"].isin(MODEL_NAMES)].copy()
     raw = raw.dropna(subset=["TMD"])
-    return raw
+    return exclude_paused_sources(raw)
 
 
 def source_availability_entries(
@@ -5788,6 +5804,8 @@ def main() -> None:
     settings = parse_args()
     if not settings.auth_key:
         raise SystemExit("KMA_APIHUB_AUTH_KEY or --auth-key is required.")
+    if PAUSED_SOURCE_IDS:
+        print("Paused guidance sources (collection and backup replay disabled): " + ", ".join(sorted(PAUSED_SOURCE_IDS)))
 
     stage_started_at = time.monotonic()
     configure_plot_fonts()
@@ -5822,7 +5840,7 @@ def main() -> None:
         if kma_df.empty and not fetch_settings.skip_atcf:
             print(
                 "KMA APIHUB has no forecast model rows for this storm/time; "
-                "trying DMDW/ATCF guidance sources."
+                "trying enabled guidance sources."
             )
         stage_started_at = time.monotonic()
         dmdw_df = read_dmdw_data(fetch_settings)

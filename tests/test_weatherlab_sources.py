@@ -17,6 +17,10 @@ def atcf(aid="WNV3", cycle="2026090412", basin="WP", number=22):
 class WeatherLabSourceTests(unittest.TestCase):
     def setUp(self):
         self.settings = VTG.Settings(data_time="202609041200", atcf_id="wp222026", fcst_hours=240)
+        # Keep testing the preserved collector in its explicitly re-enabled state.
+        paused = patch.object(VTG, "PAUSED_SOURCE_IDS", frozenset())
+        paused.start()
+        self.addCleanup(paused.stop)
 
     def test_new_paths_and_historical_fallback(self):
         for model in VTG.RAW_GITHUB_MODELS:

@@ -5,6 +5,8 @@ from pathlib import Path
 
 
 SOURCE_ORDER = ("APIHUB", "DMDW", "RAW.GITHUB", "POLARWX", "SMCA.FUN", "RAL.UCAR", "EMC.NCEP", "KNACKWX", "WINDBORNE")
+# Retain mappings and parsers for reactivation; paused providers must not be fetched or replayed.
+PAUSED_SOURCE_IDS = frozenset(("DMDW", "RAW.GITHUB"))
 INACTIVE_MODEL_IDS = frozenset(("COAMPS_EPS", "AFUM"))
 MODEL_SOURCE_PRIORITY_OVERRIDES: dict[str, tuple[str, ...]] = {}
 PRESSURE_PREFERRED_MODELS = frozenset(("UKMO_EPS",))
