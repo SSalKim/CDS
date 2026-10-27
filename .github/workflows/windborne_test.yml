@@ -1,0 +1,52 @@
+name: Test WindBorne exact-cycle ATCF
+run-name: WindBorne ${{ inputs.atcf_id }} ${{ inputs.cycles }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      atcf_id:
+        description: "Operational ATCF ID"
+        required: true
+        default: "WP302026"
+        type: string
+      cycles:
+        description: "Comma-separated exact UTC cycles YYYYmmddHH (up to 8)"
+        required: true
+        default: "2026102612,2026102618,2026102700"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test probe validation
+        run: python -B -m unittest discover -s tests -p 'test_windborne_probe.py'
+      - name: Query exact cycles and verify returned ATCF
+        env:
+          WB_API_KEY: ${{ secrets.WB_API_KEY }}
+          ATCF_ID: ${{ inputs.atcf_id }}
+          CYCLES: ${{ inputs.cycles }}
+          PYTHONUNBUFFERED: "1"
+        run: >-
+          python -B windborne_probe.py
+          --storm-id "$ATCF_ID"
+          --cycles "$CYCLES"
+          --output-dir "$RUNNER_TEMP/windborne-test"
+      - name: Publish forecast test files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windborne-atcf-test
+          path: ${{ runner.temp }}/windborne-test/
+          if-no-files-found: ignore
+          retention-days: 3
