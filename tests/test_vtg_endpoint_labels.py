@@ -59,8 +59,8 @@ class EndpointLabelTests(unittest.TestCase):
         self.assertGreater(label.get_position()[1], 0)
         self.assertEqual("#F7F7F7", label.get_color())
         self.assertEqual(to_rgba(self.models["WNC"]["color"]), label.get_bbox_patch().get_edgecolor())
-        self.assertLess(label.get_zorder(), 100)
-        self.assertGreater(label.get_zorder(), 99)
+        self.assertLess(label.get_zorder(), 101)
+        self.assertGreater(label.get_zorder(), 100)
         self.assertEqual(to_rgba("#171717", 0.5), label.get_bbox_patch().get_facecolor())
         self.assertFalse(label.get_path_effects())
         pd.testing.assert_frame_equal(forecast, original)
@@ -121,6 +121,28 @@ class EndpointLabelTests(unittest.TestCase):
             text.remove()
         VTG.draw_model_endpoint_labels(self.ax, endpoints)
         self.assertEqual(first, [(label.get_text(), label.get_position()) for label in self.labels()])
+
+    def test_label_and_leader_stacking_follow_model_priority(self):
+        point = pd.DataFrame([{"LON": 150, "LAT": 25, "TMD": 240}])
+        names = [name for name in VTG.MODEL_ENDPOINT_LABELS if name in self.models]
+        VTG.draw_model_endpoint_labels(self.ax, [(self.models[name], point) for name in reversed(names)])
+        labels = {label.get_gid().removeprefix("model-endpoint-"): label for label in self.labels()}
+        leaders = {text.get_gid().removeprefix("model-endpoint-leader-"): text for text in self.ax.texts
+                   if (text.get_gid() or "").startswith("model-endpoint-leader-")}
+        self.assertEqual(set(names), set(labels))
+        self.assertTrue(leaders)
+        for name, label in labels.items():
+            self.assertGreater(label.get_zorder(), 100)
+            self.assertLess(label.get_zorder(), 101)
+            self.assertEqual(to_rgba("#171717", 0.5), label.get_bbox_patch().get_facecolor())
+            for other_name, other in labels.items():
+                difference = self.models[name]["zorder"] - self.models[other_name]["zorder"]
+                expected = (difference > 0) - (difference < 0)
+                actual = label.get_zorder() - other.get_zorder()
+                self.assertEqual(expected, (actual > 0) - (actual < 0))
+        for name, leader in leaders.items():
+            self.assertAlmostEqual(99 + self.models[name]["zorder"] / 1000, leader.get_zorder())
+            self.assertLess(leader.get_zorder(), min(label.get_zorder() for label in labels.values()))
 
     def test_off_map_endpoint_labels_the_exit_line_not_the_previous_point(self):
         forecast = track(hours=(0, 6, 12))

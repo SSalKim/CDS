@@ -18,15 +18,15 @@ class ModelZorderTests(unittest.TestCase):
             "KIM_3h": 67, "KIM_6h": 67, "KIM_GFDL_6h": 67, "KIM_EPS": 66,
             "UM": 65, "UM_GFDL_6h": 65, "UM_KEPS": 64, "UKM": 65, "UKMO_EPS": 64,
             "GFS": 63, "GFS_EPS": 62, "CMC": 61, "CMC_EPS": 60,
-            "NAVGEM": 59, "FNMOC_EPS": 58, "ICON": 57, "ICON_EPS": 56,
-            "JGSM": 55, "TEPS": 54, "CTCX": 53, "COAMPS_EPS": 52, "AFUM": 51,
-            "HAFS": 50, "HWRF": 49, "ECMWF_AIFS": 94, "ECMWF_AIFS_EPS": 93,
-            "IFEC_AI": 92, "IFKM_AI": 91, "AGFS": 90, "AIGEFS": 89,
-            "GEML": 88, "AICON": 87, "FNEC_AI": 86, "FNKM_AI": 83, "FNUM_AI": 80,
-            "PGEC_AI": 85, "PGKM_AI": 82, "PGUM_AI": 79,
-            "GCEC_AI": 84, "GCKM_AI": 81, "GCUM_AI": 78,
-            "GENC": 97, "WNC": 98, "WNV3": 99, "WMSH": 95,
-            "HKO_AREC": 77, "HKO_FXEC": 76, "HKO_FWEC": 75,
+            "NAVGEM": 55, "FNMOC_EPS": 54, "ICON": 59, "ICON_EPS": 58,
+            "JGSM": 57, "TEPS": 56, "CTCX": 53, "COAMPS_EPS": 52, "AFUM": 51,
+            "HAFS": 50, "HWRF": 49, "ECMWF_AIFS": 95, "ECMWF_AIFS_EPS": 94,
+            "IFEC_AI": 93, "IFKM_AI": 92, "AGFS": 85, "AIGEFS": 84,
+            "GEML": 83, "AICON": 82, "FNEC_AI": 90, "FNKM_AI": 81, "FNUM_AI": 78,
+            "PGEC_AI": 89, "PGKM_AI": 80, "PGUM_AI": 77,
+            "GCEC_AI": 88, "GCKM_AI": 79, "GCUM_AI": 76,
+            "GENC": 96, "WNC": 97, "WNV3": 98, "WMSH": 99,
+            "HKO_AREC": 91, "HKO_FXEC": 87, "HKO_FWEC": 86,
         }
         actual = {m["name"]: m["zorder"] for m in VTG.MODEL_INFO if "zorder" in m}
         self.assertEqual(expected, actual)
@@ -60,8 +60,10 @@ class ModelZorderTests(unittest.TestCase):
                 official_marker = ax.lines[-1]
                 self.assertEqual("white", official_marker.get_color())
                 self.assertEqual(100, official_marker.get_zorder())
-                self.assertEqual([95, 95], [line.get_zorder() for line in ax.lines[:-1]])
+                self.assertEqual([99, 99], [line.get_zorder() for line in ax.lines[:-1]])
                 self.assertTrue(all(m.get("zorder", 2) < official_marker.get_zorder() for m in VTG.MODEL_INFO))
+                label, = [text for text in ax.texts if text.get_gid() == "model-endpoint-WMSH"]
+                self.assertGreater(label.get_zorder(), official_marker.get_zorder())
                 figure.canvas.draw()
                 x, y = official_marker.get_transform().transform((150.0, 16.0))
                 pixels = np.asarray(figure.canvas.buffer_rgba())
