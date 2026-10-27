@@ -21,7 +21,7 @@ from urllib.request import Request, build_opener
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from windborne import NoRedirects, WindborneError, fetch_mean_deck, parse_coord
+from windborne import NoRedirects, WindborneError, parse_coord
 
 STORMS = {
     "BAVI": dict(number=9, atcf="WP092026", start="2026070200", end="2026071306"),
@@ -160,7 +160,6 @@ def collect(storm, output):
     observations = [p for p in history["points"] if spec["start"] <= p["time_utc"][:10] <= spec["end"]]
     (output / "observations.json").write_text(json.dumps(observations, indent=2), encoding="utf-8")
     keys = [os.getenv("KMA_APIHUB_AUTH_KEY", "").strip(), os.getenv("KMA_APIHUB_FALLBACK_AUTH_KEY", "").strip()]
-    wb_key = os.getenv("WB_API_KEY", "").strip()
     hosts = ["apihub-pub.kma.go.kr", "apihub.kma.go.kr"]
     audit, points = [], []
     for cycle in cycles(spec):
@@ -246,15 +245,6 @@ def collect(storm, output):
                     break
                 time.sleep(0.1)
 
-        try:
-            text = fetch_mean_deck(spec["atcf"], cycle, wb_key)
-            ref = f"raw/wmsh_{cycle}.atcf"
-            rows, conflicts = parse_deck(text, storm, cycle, "WMSH", spec["atcf"], "WINDBORNE", ref, digest_text(text))
-            points.extend(rows)
-            (output / ref).write_text(text, encoding="utf-8")
-            audit.append(dict(storm=storm, cycle=cycle, source="WINDBORNE", status="ok", points=len(rows), conflicts=conflicts))
-        except WindborneError as error:
-            audit.append(dict(storm=storm, cycle=cycle, source="WINDBORNE", status=str(error)))
         (output / "audit.json").write_text(json.dumps(audit, indent=2), encoding="utf-8")
         with (output / "forecasts.csv").open("w", encoding="utf-8", newline="") as stream:
             writer = csv.DictWriter(stream, fieldnames=FIELDS)

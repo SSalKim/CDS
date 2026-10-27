@@ -3,12 +3,18 @@ run-name: Track verification BAVI and CHAMPI 2026
 
 on:
   workflow_dispatch:
+    inputs:
+      windborne_only:
+        description: Recover WindBorne history only, without re-fetching other providers
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 jobs:
   collect:
+    if: ${{ !inputs.windborne_only }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     strategy:
@@ -29,7 +35,6 @@ jobs:
         env:
           KMA_APIHUB_AUTH_KEY: ${{ secrets.KMA_APIHUB_AUTH_KEY }}
           KMA_APIHUB_FALLBACK_AUTH_KEY: ${{ secrets.KMA_APIHUB_FALLBACK_AUTH_KEY }}
-          WB_API_KEY: ${{ secrets.WB_API_KEY }}
           STORM: ${{ matrix.storm }}
           PYTHONUNBUFFERED: '1'
         run: python -B analysis/collect_track_verification.py --storm "$STORM" --output "$RUNNER_TEMP/verification/$STORM"
@@ -39,5 +44,31 @@ jobs:
         with:
           name: track-verification-${{ matrix.storm }}
           path: ${{ runner.temp }}/verification/${{ matrix.storm }}/
+          retention-days: 3
+          if-no-files-found: error
+  windborne:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            analysis
+            windborne.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Collect WMSH with provider rate-limit pacing
+        env:
+          WB_API_KEY: ${{ secrets.WB_API_KEY }}
+          PYTHONUNBUFFERED: '1'
+        run: python -B analysis/collect_windborne_verification.py --output "$RUNNER_TEMP/windborne-verification"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: track-verification-WINDBORNE
+          path: ${{ runner.temp }}/windborne-verification/
           retention-days: 3
           if-no-files-found: error
