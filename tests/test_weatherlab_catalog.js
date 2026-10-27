@@ -37,6 +37,12 @@ assert.equal(catalog.rows.find(row=>row.modelId==='WNV3').description,'[AI] 구�
 assert.equal(catalog.details.find(row=>row.model_id==='WNC')['참고사항'],'Google DeepMind AI모델 WeatherNext2 기반 태풍예측모델(FNV3)');
 assert.equal(catalog.details.find(row=>row.model_id==='WNV3')['참고사항'],'Google DeepMind 차세대 AI모델 WeatherNext3 기반 태풍예측모델(WNV3) (시험운영)');
 assert.equal(catalog.colors.FNV3,catalog.colors.WNC);
+assert.equal(catalog.rows.find(row=>row.modelId==='GEML').description,'[AI] 캐나다기상센터(CMC) AI 전구모델');
+assert.equal(catalog.rows.find(row=>row.modelId==='WMSH').description,'[AI] 윈드본 시스템즈 WeatherMesh-6 태풍예측 앙상블 평균');
+assert.equal(catalog.details.find(row=>row.model_id==='GEML')['운영기관'],'캐나다기상센터(CMC)');
+assert.equal(catalog.details.find(row=>row.model_id==='GEML')['참고사항'],'');
+assert.equal(catalog.details.find(row=>row.model_id==='WMSH')['운영기관'],'윈드본 시스템즈(WindBorne Systems)');
+assert.equal(catalog.details.find(row=>row.model_id==='WMSH')['연직층수'],'26층');
 const index=catalog.rows.findIndex(row=>row.modelId==='GENC');
 assert.deepEqual(catalog.rows.slice(index,index+3).map(row=>row.modelId),['GENC','WNC','WNV3']);
 assert(catalog.groups.includes('WNV3'));
@@ -52,4 +58,11 @@ for(const rows of [catalog.rows,catalog.details]){
   }
 }
 for(const name of ['COAMPS-TC','AIGFS EPS','GEML','AICON','WMSH']) assert(catalog.groups.includes(name));
+context.document.createElement=tagName=>({tagName,className:'',textContent:''});
+for(const id of ['WMSH','WNV3','GEML','AICON']){
+  const label=vm.runInContext(`createTyphoonModelNameLabel(TYPHOON_MODEL_LABELS['${id}'],'${id}')`,context);
+  assert.equal(label.tagName,'span');
+  assert.equal(label.textContent,catalog.labels[id]);
+  assert.equal(label.className,id==='WMSH'?'typhoon-model-name-condensed':'');
+}
 console.log('Weather Lab catalog, colors, labels and group separator tests passed');

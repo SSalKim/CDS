@@ -111,7 +111,7 @@ const TYPHOON_MODEL_INFO=[
 {name:'KMA AIFS-KIM',description:'[AI] 기상청 수행 AIFS (KIM 초기장)'},
 {name:'AIGFS',description:'[AI] 미해양대기청(NOAA NCEP) AI 전구모델'},
 {name:'AIGFS EPS',description:'[AI] 미해양대기청(NOAA NCEP) AI 앙상블모델 평균'},
-{modelId:'GEML',name:'CMC GEML',description:'[AI] 캐나다 환경기후변화부(ECCC) GEML 전구모델'},
+{modelId:'GEML',name:'CMC GEML',description:'[AI] 캐나다기상센터(CMC) AI 전구모델'},
 {name:'AICON',description:'[AI] 독일기상청(DWD) AI 전구모델'},
 {name:'FourCastNet-ECMWF',description:'[AI] 기상청 수행 FourCastNet (ECMWF 초기장)'},
 {name:'FourCastNet-KIM',description:'[AI] 기상청 수행 FourCastNet (KIM 초기장)'},
@@ -122,7 +122,7 @@ const TYPHOON_MODEL_INFO=[
 {modelId:'GENC',name:'GenCast',description:'[AI] 구글 딥마인드 WeatherNext1 앙상블모델(GenCast) 평균'},
 {modelId:'WNC',name:'WeatherNext2 Cyclones',description:'[AI] 구글 딥마인드 WeatherNext2 태풍예측모델(FNV3) 앙상블 평균'},
 {modelId:'WNV3',name:'WeatherNext3 Cyclones',description:'[AI] 구글 딥마인드 WeatherNext3 태풍예측모델(WNV3) 앙상블 평균'},
-{modelId:'WMSH',name:'WindBorne WeatherMesh',description:'[AI] WindBorne WeatherMesh-6 태풍예측 앙상블 평균'},
+{modelId:'WMSH',name:'WindBorne WeatherMesh',description:'[AI] 윈드본 시스템즈 WeatherMesh-6 태풍예측 앙상블 평균'},
 {name:'Aurora-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 Aurora (ECMWF 초기장)'},
 {name:'FuXi-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FuXi (ECMWF 초기장)'},
 {name:'FengWu-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FengWu (ECMWF 초기장)'},
@@ -535,14 +535,14 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
   {
     "model_id": "GEML",
     "표출명칭": "CMC GEML",
-    "운영기관": "캐나다 환경기후변화부(ECCC)",
-    "모델명": "GEML (Global Environmental eMuLator)",
+    "운영기관": "캐나다기상센터(CMC)",
+    "모델명": "GEML",
     "도메인": "전지구",
     "구분": "결정론적 모델",
     "격자체계 (분해능)": "0.25° (~28km)",
     "연직층수": "13층",
     "기반": "AI",
-    "참고사항": "GraphCast 호환 구조의 ECCC AI모델. 공개 GEML 1.0 사양 기준이며 제공 예측의 세부 버전은 미확인. 기존 CMC 역학모델과 별도 표출."
+    "참고사항": ""
   },
   {
     "표출명칭": "AICON",
@@ -660,14 +660,14 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
   {
     "model_id": "WMSH",
     "표출명칭": "WindBorne WeatherMesh",
-    "운영기관": "WindBorne Systems",
+    "운영기관": "윈드본 시스템즈(WindBorne Systems)",
     "모델명": "WeatherMesh-6",
     "도메인": "전지구",
-    "구분": "앙상블 모델 평균 (최대 M128)",
+    "구분": "앙상블 모델 평균 (M128)",
     "격자체계 (분해능)": "0.25° (~28km)",
-    "연직층수": "지상 + 25개 기압면",
+    "연직층수": "26층",
     "기반": "AI",
-    "참고사항": "시험운영 태풍예측 WMSH 평균 트랙, 3시간 간격. 리드타임별 평균 참여 멤버 수는 변동하며 격자 최대풍속은 기관 발표 1분 평균풍속과 다를 수 있음."
+    "참고사항": "미국 스타트업 WindBorne Systems AI모델 WeatherMesh-6 기반 태풍예측모델 (시험운영)"
   },
   {
     "표출명칭": "Aurora-ECMWF",
@@ -894,6 +894,15 @@ page.appendChild(content);
 root.replaceChildren(page);
 }
 
+function createTyphoonModelNameLabel(text,modelKey){
+let label=document.createElement('span');
+label.textContent=text;
+if(modelKey==='WMSH'){
+label.className='typhoon-model-name-condensed';
+}
+return label;
+}
+
 function createTyphoonModelInfoPanel(){
 let panel=document.createElement('aside');
 panel.className='typhoon-model-info-panel';
@@ -917,7 +926,7 @@ row.style.setProperty('--typhoon-model-color',TYPHOON_MODEL_INFO_COLORS[modelKey
 
 let name=document.createElement('div');
 name.className='typhoon-model-info-name';
-name.textContent=item.name;
+name.appendChild(createTyphoonModelNameLabel(item.name,modelKey));
 
 let description=document.createElement('div');
 description.className='typhoon-model-info-description';
@@ -975,6 +984,12 @@ min-height:0;
 }
 .typhoon-model-info-list{
 min-height:0;
+}
+.typhoon-model-name-condensed{
+display:inline-block;
+max-width:100%;
+transform:scaleX(.94);
+transform-origin:left center;
 }
 .typhoon-model-info-actions{
 display:flex;
@@ -1393,7 +1408,7 @@ let value=row[column] || '';
 if(column==='표출명칭'){
 td.className='typhoon-model-detail-name';
 td.style.setProperty('--typhoon-model-detail-color',TYPHOON_MODEL_INFO_COLORS[row.model_id || value] || '#0f172a');
-td.textContent=value;
+td.appendChild(createTyphoonModelNameLabel(value,modelKey));
 }
 else if(column==='기반'){
 let chip=document.createElement('span');
