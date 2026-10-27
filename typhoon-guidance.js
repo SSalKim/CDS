@@ -63,6 +63,7 @@ IFKM_AI:'KMA AIFS-KIM',
 AGFS:'AIGFS',
 AIGEFS:'AIGFS EPS',
 AICON:'AICON',
+GEML:'CMC GEML',
 FNEC_AI:'FourCastNet-ECMWF',
 FNKM_AI:'FourCastNet-KIM',
 FNUM_AI:'FourCastNet-UM',
@@ -76,6 +77,7 @@ GENC:'GenCast',
 WNC:'WeatherNext2 Cyclones',
 FNV3:'WeatherNext2 Cyclones',
 WNV3:'WeatherNext3 Cyclones',
+WMSH:'WindBorne WeatherMesh',
 HKO_AREC: 'Aurora-ECMWF',
 HKO_FXEC: 'FuXi-ECMWF',
 HKO_FWEC: 'FengWu-ECMWF',
@@ -99,8 +101,8 @@ const TYPHOON_MODEL_INFO=[
 {name:'JGSM',description:'일본기상청(JMA) 전구모델'},
 {name:'JGSM EPS',description:'일본기상청(JMA) 앙상블모델 평균'},
 {name:'COAMPS-TC',description:'미해군연구소(NRL) 태풍모델'},
-{name:'COAMPS-TC EPS',description:'미해군연구소(NRL) 앙상블모델 평균'},
-{name:'GALWEM',description:'미공군(USAF) 전구모델'},
+{modelId:'COAMPS_EPS',name:'COAMPS-TC EPS',description:'미해군연구소(NRL) 앙상블모델 평균'},
+{modelId:'AFUM',name:'GALWEM',description:'미공군(USAF) 전구모델'},
 {name:'HAFS',description:'미해양대기청(NOAA EMC) 태풍모델(신)'},
 {name:'HWRF',description:'미해양대기청(NOAA EMC) 태풍모델(구)'},
 {name:'ECMWF AIFS',description:'[AI] 유럽중기예보센터(ECMWF) AI 전구모델'},
@@ -110,6 +112,7 @@ const TYPHOON_MODEL_INFO=[
 {name:'AIGFS',description:'[AI] 미해양대기청(NOAA NCEP) AI 전구모델'},
 {name:'AIGFS EPS',description:'[AI] 미해양대기청(NOAA NCEP) AI 앙상블모델 평균'},
 {name:'AICON',description:'[AI] 독일기상청(DWD) AI 전구모델'},
+{modelId:'GEML',name:'CMC GEML',description:'[AI] 캐나다 환경기후변화부(ECCC) GEML 전구모델'},
 {name:'FourCastNet-ECMWF',description:'[AI] 기상청 수행 FourCastNet (ECMWF 초기장)'},
 {name:'FourCastNet-KIM',description:'[AI] 기상청 수행 FourCastNet (KIM 초기장)'},
 {name:'Pangu-Weather-ECMWF',description:'[AI] 기상청 수행 Pangu-Weather (ECMWF 초기장)'},
@@ -119,13 +122,14 @@ const TYPHOON_MODEL_INFO=[
 {modelId:'GENC',name:'GenCast',description:'[AI] 구글 딥마인드 WeatherNext1 앙상블모델(GenCast) 평균'},
 {modelId:'WNC',name:'WeatherNext2 Cyclones',description:'[AI] 구글 딥마인드 WeatherNext2 태풍예측모델(FNV3) 앙상블 평균'},
 {modelId:'WNV3',name:'WeatherNext3 Cyclones',description:'[AI] 구글 딥마인드 WeatherNext3 태풍예측모델(WNV3) 앙상블 평균'},
+{modelId:'WMSH',name:'WindBorne WeatherMesh',description:'[AI] WindBorne WeatherMesh-6 태풍예측 앙상블 평균'},
 {name:'Aurora-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 Aurora (ECMWF 초기장)'},
 {name:'FuXi-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FuXi (ECMWF 초기장)'},
 {name:'FengWu-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FengWu (ECMWF 초기장)'},
 ];
 
 // Keep temporary model visibility changes reversible without removing catalog metadata.
-const TYPHOON_INACTIVE_MODEL_IDS=new Set();
+const TYPHOON_INACTIVE_MODEL_IDS=new Set(['COAMPS_EPS','AFUM']);
 
 const TYPHOON_DEFAULT_MODEL_TARGET=TYPHOON_MODEL_INFO.filter(item=>{
 let modelKey=item.modelId || item.name;
@@ -141,6 +145,7 @@ const TYPHOON_MODEL_INFO_GROUP_ENDS=new Set([
 'NAVGEM EPS',
 'ICON EPS',
 'JGSM EPS',
+'COAMPS-TC',
 'COAMPS-TC EPS',
 'GALWEM',
 'HWRF',
@@ -148,10 +153,12 @@ const TYPHOON_MODEL_INFO_GROUP_ENDS=new Set([
 'KMA AIFS-KIM',
 'AIGFS EPS',
 'AICON',
+'GEML',
 'FourCastNet-KIM',
 'Pangu-Weather-KIM',
 'GraphCast-KIM',
 'WNV3',
+'WMSH',
 'Aurora-ECMWF',
 'FuXi-ECMWF',
 'FengWu-ECMWF'
@@ -187,6 +194,8 @@ const TYPHOON_MODEL_INFO_COLORS={
 'AIGFS':'#E0FF78',
 'AIGFS EPS':'#78FF8F',
 'AICON':'#C8A3D3FF',
+'GEML':'#00E8B0',
+'CMC GEML':'#00E8B0',
 'FourCastNet-ECMWF':'#004B1C',
 'FourCastNet-KIM':'#388E3C',
 'Pangu-Weather-ECMWF':'#3944BC',
@@ -203,6 +212,8 @@ const TYPHOON_MODEL_INFO_COLORS={
 'WeatherNext2 Cyclones':'#DA70D6',
 'WNV3':'#FF9F80',
 'WeatherNext3 Cyclones':'#FF9F80',
+'WMSH':'#FF4D17',
+'WindBorne WeatherMesh':'#FF4D17',
 'Aurora-ECMWF':'#1E90FF',
 'FuXi-ECMWF':'#20B2AA',
 'FengWu-ECMWF':'#A6C875'
@@ -410,6 +421,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "참고사항": "COAMPS-TC 실험모델(CTCX), GFS 초기장 활용"
   },
   {
+    "model_id": "COAMPS_EPS",
     "표출명칭": "COAMPS-TC EPS",
     "운영기관": "미해군연구소(NRL)",
     "모델명": "COAMPS-TC",
@@ -421,6 +433,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "참고사항": ""
   },
   {
+    "model_id": "AFUM",
     "표출명칭": "GALWEM",
     "운영기관": "미공군(USAF)",
     "모델명": "UM (GALWEM)",
@@ -531,6 +544,18 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "참고사항": ""
   },
   {
+    "model_id": "GEML",
+    "표출명칭": "CMC GEML",
+    "운영기관": "캐나다 환경기후변화부(ECCC)",
+    "모델명": "GEML (Global Environmental eMuLator)",
+    "도메인": "전지구",
+    "구분": "결정론적 모델",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "13층",
+    "기반": "AI",
+    "참고사항": "GraphCast 호환 구조의 ECCC AI모델. 공개 GEML 1.0 사양 기준이며 제공 예측의 세부 버전은 미확인. 기존 CMC 역학모델과 별도 표출."
+  },
+  {
     "표출명칭": "FourCastNet-ECMWF",
     "운영기관": "기상청(KMA)",
     "모델명": "FourCastNet",
@@ -631,6 +656,18 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "연직층수": "13층",
     "기반": "AI",
     "참고사항": "Google DeepMind 차세대 AI모델 WeatherNext3 기반 태풍예측모델(WNV3) (시험운영)"
+  },
+  {
+    "model_id": "WMSH",
+    "표출명칭": "WindBorne WeatherMesh",
+    "운영기관": "WindBorne Systems",
+    "모델명": "WeatherMesh-6",
+    "도메인": "전지구",
+    "구분": "앙상블 모델 평균 (최대 M128)",
+    "격자체계 (분해능)": "0.25° (~28km)",
+    "연직층수": "지상 + 25개 기압면",
+    "기반": "AI",
+    "참고사항": "시험운영 태풍예측 WMSH 평균 트랙, 3시간 간격. 리드타임별 평균 참여 멤버 수는 변동하며 격자 최대풍속은 기관 발표 1분 평균풍속과 다를 수 있음."
   },
   {
     "표출명칭": "Aurora-ECMWF",
@@ -1259,7 +1296,7 @@ title.textContent='모델 상세정보';
 
 let subtitle=document.createElement('p');
 subtitle.className='typhoon-model-detail-subtitle';
-subtitle.textContent='2026년 9월 기준 표출 모델';
+subtitle.textContent='2026년 10월 기준 표출 모델';
 
 titleWrap.appendChild(title);
 titleWrap.appendChild(subtitle);

@@ -19,6 +19,7 @@ SOURCE_COLUMNS = {
     "RAL.UCAR": "ral_ucar",
     "EMC.NCEP": "emc",
     "KNACKWX": "knackwx",
+    "WINDBORNE": "windborne",
 }
 
 EXPECTED_SOURCE_MODELS = {
@@ -43,7 +44,7 @@ EXPECTED_SOURCE_MODELS = {
     },
     "SMCA.FUN": {
         "ECMWF", "ECMWF_EPS", "GFS", "GFS_EPS", "ECMWF_AIFS",
-        "ECMWF_AIFS_EPS", "AGFS", "AIGEFS", "AICON", "WNC", "WNV3",
+        "ECMWF_AIFS_EPS", "AGFS", "AIGEFS", "AICON", "WNC", "WNV3", "GEML",
     },
     "RAL.UCAR": {
         "UKM", "UKMO_EPS", "GFS", "GFS_EPS", "CMC", "CMC_EPS", "JGSM", "TEPS",
@@ -56,6 +57,7 @@ EXPECTED_SOURCE_MODELS = {
         "GENC", "WNC", "WNV3", "ICON", "ICON_EPS",
     },
     "EMC.NCEP": {"CMC", "GFS", "CTCX", "UKM", "HAFS", "NAVGEM", "HWRF"},
+    "WINDBORNE": {"WMSH"},
 }
 
 
@@ -81,7 +83,7 @@ class VtgSourceMatrixTests(unittest.TestCase):
                     self.assertTrue(row[column] is None or isinstance(row[column], str))
         self.assertTrue(set(VTG.SMCA_PERSISTED_MODEL_IDS) <= VTG.smca_keys().keys())
         self.assertEqual(
-            ("smca_aicon_snapshot_path", "smca_aifsm_snapshot_path", "smca_aigfs_snapshot_path"),
+            ("smca_aicon_snapshot_path", "smca_aifsm_snapshot_path", "smca_aigfs_snapshot_path", "smca_geml_snapshot_path"),
             tuple(vtg_sources.SMCA_SNAPSHOT_KEYS.values()),
         )
         self.assertTrue(set(vtg_sources.SMCA_SNAPSHOT_KEYS.values()) <= set(vtg_auto.MANIFEST_METADATA_KEYS))
@@ -152,11 +154,13 @@ class VtgSourceMatrixTests(unittest.TestCase):
             backup_source.write_text("backup-v1", encoding="utf-8")
             identity_source = root / "vtg_identity_links.py"
             identity_source.write_text("identity-v1", encoding="utf-8")
+            windborne_source = root / "windborne.py"
+            windborne_source.write_text("windborne-v1", encoding="utf-8")
             with patch.object(VTG, "PROJECT_ROOT", root), patch.object(vtg_auto, "PROJECT_ROOT", root):
                 previous = {"metadata": {"render_signature": VTG.render_signature()}}
                 initial = vtg_auto.current_render_signature()
                 self.assertTrue(vtg_auto.previous_render_signature_matches(previous, initial))
-                for file in (registry, renderer, browser_source, cache_source, backup_source, identity_source):
+                for file in (registry, renderer, browser_source, cache_source, backup_source, identity_source, windborne_source):
                     with self.subTest(file=file.name):
                         before = VTG.render_signature()
                         file.write_text("changed-v2", encoding="utf-8")
@@ -176,6 +180,7 @@ class VtgSourceMatrixTests(unittest.TestCase):
             "AIGFS": "AGFS",
             "AIGEFSM": "AIGEFS",
             "AICON": "AICON",
+            "GEML": "GEML",
             "WN2C": "WNC",
             "WN3C": "WNV3",
         }

@@ -76,8 +76,8 @@ class WeatherLabSourceTests(unittest.TestCase):
 
     def test_catalog_order_categories_and_distinct_colors(self):
         names = [model["name"] for model in VTG.MODEL_INFO]
-        self.assertEqual(["GENC", "WNC", "WNV3", "HKO_AREC"],
-                         names[names.index("GENC"):names.index("GENC") + 4])
+        self.assertEqual(["GENC", "WNC", "WNV3", "WMSH", "HKO_AREC"],
+                         names[names.index("GENC"):names.index("GENC") + 5])
         models = {model["name"]: model for model in VTG.MODEL_INFO}
         self.assertEqual("WeatherNext2 Cyclones", models["WNC"]["label"])
         self.assertEqual("WeatherNext3 Cyclones", models["WNV3"]["label"])

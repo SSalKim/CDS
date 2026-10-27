@@ -12,10 +12,11 @@ vm.runInContext(fs.readFileSync(path.join(__dirname,'..','typhoon-guidance.js'),
 const catalog=JSON.parse(vm.runInContext(`JSON.stringify({
   labels:TYPHOON_MODEL_LABELS, colors:TYPHOON_MODEL_INFO_COLORS,
   rows:TYPHOON_MODEL_INFO, details:TYPHOON_MODEL_DETAIL_ROWS,
-  groups:[...TYPHOON_MODEL_INFO_GROUP_ENDS], count:TYPHOON_DEFAULT_MODEL_TARGET
+  groups:[...TYPHOON_MODEL_INFO_GROUP_ENDS], count:TYPHOON_DEFAULT_MODEL_TARGET,
+  inactive:[...TYPHOON_INACTIVE_MODEL_IDS]
 })`,context));
 const backend=fs.readFileSync(path.join(__dirname,'..','VTG.py'),'utf8');
-for(const id of ['WNC','WNV3']){
+for(const id of ['WNC','WNV3','GEML','WMSH']){
   const match=backend.match(new RegExp('\\{"name": "'+id+'", "color": "[^"]+"[^\\n]+'));
   const model=JSON.parse(match[0].trim().replace(/,$/,''));
   const brief=catalog.rows.find(row=>row.modelId===id);
@@ -40,4 +41,15 @@ const index=catalog.rows.findIndex(row=>row.modelId==='GENC');
 assert.deepEqual(catalog.rows.slice(index,index+3).map(row=>row.modelId),['GENC','WNC','WNV3']);
 assert(catalog.groups.includes('WNV3'));
 assert.equal(catalog.count,40);
+assert.deepEqual(catalog.inactive,['COAMPS_EPS','AFUM']);
+for(const rows of [catalog.rows,catalog.details]){
+  const names=rows.filter(row=>!catalog.inactive.includes(row.modelId || row.model_id)).map(row=>row.name || row['표출명칭']);
+  assert.equal(names.length,40);
+  assert(!names.includes('COAMPS-TC EPS'));
+  assert(!names.includes('GALWEM'));
+  for(const [before,added,after] of [['AICON','CMC GEML','FourCastNet-ECMWF'],['WeatherNext3 Cyclones','WindBorne WeatherMesh','Aurora-ECMWF']]){
+    assert.deepEqual(names.slice(names.indexOf(before),names.indexOf(before)+3),[before,added,after]);
+  }
+}
+for(const name of ['COAMPS-TC','GEML','WMSH']) assert(catalog.groups.includes(name));
 console.log('Weather Lab catalog, colors, labels and group separator tests passed');

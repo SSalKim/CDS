@@ -4,7 +4,8 @@ import hashlib
 from pathlib import Path
 
 
-SOURCE_ORDER = ("APIHUB", "DMDW", "RAW.GITHUB", "POLARWX", "SMCA.FUN", "RAL.UCAR", "EMC.NCEP", "KNACKWX")
+SOURCE_ORDER = ("APIHUB", "DMDW", "RAW.GITHUB", "POLARWX", "SMCA.FUN", "RAL.UCAR", "EMC.NCEP", "KNACKWX", "WINDBORNE")
+INACTIVE_MODEL_IDS = frozenset(("COAMPS_EPS", "AFUM"))
 MODEL_SOURCE_PRIORITY_OVERRIDES: dict[str, tuple[str, ...]] = {}
 PRESSURE_PREFERRED_MODELS = frozenset(("UKMO_EPS",))
 EMC_ADECK_URL_TEMPLATE = "https://www.emc.ncep.noaa.gov/hurricane/DECKS_OPEN/a{atcf_id}.dat"
@@ -18,7 +19,8 @@ _EMC_MODEL_IDS = {
 # NOAA IDs remain legacy aliases; EMC enables only the explicitly approved models.
 _MODEL_SOURCE_COLUMNS = ("name", "apihub", "dmdw", "raw_github", "polarwx", "smca", "ral_ucar", "knackwx", "noaa")
 MODEL_SOURCES = [
-    dict(zip(_MODEL_SOURCE_COLUMNS, row, strict=True), emc=_EMC_MODEL_IDS.get(row[0]))
+    dict(zip(_MODEL_SOURCE_COLUMNS, row, strict=True), emc=_EMC_MODEL_IDS.get(row[0]),
+         windborne="WMSH" if row[0] == "WMSH" else None)
     for row in (
         # name              apihub         dmdw   raw_github  polarwx          smca       ral_ucar  knackwx  noaa
         ("ECMWF",          "ECMWF",       True,  None,       "ecm",           "ECMWF",   None,     "ECMF",  "ECMF"),
@@ -52,6 +54,7 @@ MODEL_SOURCES = [
         ("AGFS",           None,          False, None,       "aigfs",         "AIGFS",   None,     "AGFS",  "AGFS"),
         ("AIGEFS",         None,          False, None,       None,            "AIGEFSM", None,     "AIMN",  "AIMN"),
         ("AICON",          None,          False, None,       None,            "AICON",   None,     None,    None),
+        ("GEML",           None,          False, None,       None,            "GEML",    None,     None,    None),
         ("IFEC_AI",        "IFEC_AI",     False, None,       None,            None,      None,     None,    None),
         ("IFKM_AI",        "IFKM_AI",     False, None,       None,            None,      None,     None,    None),
         ("FNEC_AI",        "FNEC_AI",     False, None,       None,            None,      None,     None,    None),
@@ -66,6 +69,7 @@ MODEL_SOURCES = [
         ("GENC",           None,          False, "GENC",     "gencast",       None,      None,     "GENC",  None),
         ("WNC",            None,          False, "FNV3",     "deepmind",      "WN2C",    None,     "FNV3",  "FGNE"),
         ("WNV3",           None,          False, "WNV3",     None,            "WN3C",    None,     "WNV3",  None),
+        ("WMSH",           None,          False, None,       None,            None,      None,     None,    None),
         ("HKO_AREC",       "HKO_AREC",    False, None,       None,            None,      None,     None,    None),
         ("HKO_FXEC",       "HKO_FXEC",    False, None,       None,            None,      None,     None,    None),
         ("HKO_FWEC",       "HKO_FWEC",    False, None,       None,            None,      None,     None,    None),
@@ -75,6 +79,7 @@ _MODEL_SOURCES_BY_NAME = {row["name"]: row for row in MODEL_SOURCES}
 DMDW_ENABLED_MODEL_IDS = frozenset(row["name"] for row in MODEL_SOURCES if row["dmdw"])
 
 SOURCE_DISPLAY_NAMES = {
+    "WINDBORNE": "WindBorne WeatherMesh",
     "APIHUB": "KMA APIHUB",
     "DMDW": "KMA DMDW",
     "NOAA": "NOAA ATCF",
@@ -86,6 +91,8 @@ SOURCE_DISPLAY_NAMES = {
     "RAW.GITHUB": "GITHUB",
 }
 SOURCE_ALIASES = {
+    "WINDBORNE": "WINDBORNE",
+    "WEATHERMESH": "WINDBORNE",
     "APIHUB": "APIHUB",
     "KMAAPIHUB": "APIHUB",
     "DMDW": "DMDW",
@@ -112,6 +119,7 @@ SOURCE_ALIASES = {
     "GDM": "RAW.GITHUB",
 }
 SOURCE_IDENTIFIER_COLUMNS = {
+    "WINDBORNE": "windborne",
     "APIHUB": "apihub",
     "DMDW": "dmdw",
     "NOAA": "noaa",
@@ -146,6 +154,7 @@ SOURCE_MODEL_IDS = {
     source: {
         row[column] for row in MODEL_SOURCES
         if (column := _RAW_SOURCE_COLUMNS.get(source)) and row.get(column)
+        and row["name"] not in INACTIVE_MODEL_IDS
     }
     for source in SOURCE_ORDER
 }
@@ -166,7 +175,7 @@ for row in MODEL_SOURCES:
         alias_ids.extend(_SOURCE_MODEL_EXTRA_ALIASES.get((source, model_id), ()))
         for priority, alias_id in enumerate(alias_ids, start=1):
             MODEL_SOURCE_ALIASES.setdefault(alias_id, row["name"])
-            if source in SOURCE_MODEL_IDS:
+            if source in SOURCE_MODEL_IDS and row["name"] not in INACTIVE_MODEL_IDS:
                 SOURCE_MODEL_IDS[source].add(alias_id)
             MODEL_ALIAS_PRIORITIES.setdefault(alias_id, priority)
 
@@ -177,7 +186,7 @@ _POLARWX_KEYS = {
 _SMCA_KEYS = {
     row["smca"].strip().upper(): row["name"] for row in MODEL_SOURCES if row["smca"]
 }
-SMCA_PERSISTED_MODEL_IDS = ("AICON", "AIFSM", "AIGFS")
+SMCA_PERSISTED_MODEL_IDS = ("AICON", "AIFSM", "AIGFS", "GEML")
 SMCA_SNAPSHOT_KEYS = {
     raw_model: f"smca_{raw_model.lower()}_snapshot_path"
     for raw_model in SMCA_PERSISTED_MODEL_IDS
@@ -242,7 +251,7 @@ def render_code_signature(project_root: Path) -> str:
     # Source-only edits must invalidate completed renders as they did in VTG.py.
     digest = hashlib.sha256()
     try:
-        for filename in ("VTG.py", "vtg_sources.py", "polarwx_browser.py", "polarwx_cache.py", "vtg_source_backup.py", "vtg_identity_links.py"):
+        for filename in ("VTG.py", "vtg_sources.py", "polarwx_browser.py", "polarwx_cache.py", "vtg_source_backup.py", "vtg_identity_links.py", "windborne.py"):
             digest.update(filename.encode("utf-8") + b"\0")
             digest.update((project_root / filename).read_bytes())
         return digest.hexdigest()

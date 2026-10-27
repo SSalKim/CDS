@@ -18,7 +18,7 @@ from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 from pathlib import Path
 from typing import Iterable
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
@@ -28,16 +28,20 @@ import matplotlib.lines as mlines
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+from matplotlib.textpath import TextPath, TextToPath
+from matplotlib.transforms import Affine2D
 import pandas as pd
 import requests
 
 from polarwx_cache import DEFAULT_ROOT as POLARWX_CACHE_ROOT, load_snapshot, queue_request
 from vtg_source_backup import cycle_time as backup_cycle_time, read_snapshot as read_source_backup, recent_cycle, write_snapshot as write_source_backup
+from windborne import BASE_URL as WINDBORNE_BASE_URL, fetch_mean_deck as fetch_windborne_mean_deck
 
 from vtg_sources import (
     DMDW_ENABLED_MODEL_IDS,
     EMC_ADECK_URL_TEMPLATE,
     EMC_BDECK_URL_TEMPLATE,
+    INACTIVE_MODEL_IDS,
     MODEL_ALIAS_PRIORITIES,
     MODEL_SOURCE_ALIASES,
     MODEL_SOURCE_PRIORITY_OVERRIDES,
@@ -101,6 +105,7 @@ MODEL_INFO = [
     {"name": "AGFS", "color": "#E0FF78", "style": "--", "label": "AIGFS", "zorder": 59},
     {"name": "AIGEFS", "color": "#78FF8F", "style": "--", "label": "AIGFS EPS", "zorder": 58},
     {"name": "AICON", "color": "#C8A3D3", "style": "--", "label": "AICON", "zorder": 57.5},
+    {"name": "GEML", "color": "#00E8B0", "style": "--", "label": "CMC GEML", "zorder": 57.4},
     {"name": "FNEC_AI", "color": "#004B1C", "style": "--", "label": "FourCastNet-ECMWF", "zorder": 62},
     {"name": "FNKM_AI", "color": "#388E3C", "style": "--", "label": "FourCastNet-KIM", "zorder": 61},
     {"name": "FNUM_AI", "color": "#4BB200", "style": "--", "label": "FourCastNet-UM", "zorder": 60},
@@ -113,6 +118,7 @@ MODEL_INFO = [
     {"name": "GENC", "color": "#9866C7", "style": "--", "label": "GenCast", "zorder": 57},
     {"name": "WNC", "color": "#DA70D6", "style": "--", "label": "WeatherNext2 Cyclones", "zorder": 99},
     {"name": "WNV3", "color": "#FF9F80", "style": "--", "label": "WeatherNext3 Cyclones", "zorder": 100},
+    {"name": "WMSH", "color": "#FF4D17", "style": "--", "label": "WindBorne WeatherMesh", "legend_width_scale": 0.94, "zorder": 101},
     {"name": "HKO_AREC", "color": "#1E90FF", "style": "--", "label": "Aurora-ECMWF", "zorder": 56},
     {"name": "HKO_FXEC", "color": "#20B2AA", "style": "--", "label": "FuXi-ECMWF", "zorder": 55},
     {"name": "HKO_FWEC", "color": "#A6C875", "style": "--", "label": "FengWu-ECMWF", "zorder": 54},
@@ -150,6 +156,7 @@ MODEL_CATEGORIES = {
     "AGFS": ("AI", "DETERMINISTIC"),
     "AIGEFS": ("AI", "ENSEMBLE"),
     "AICON": ("AI", "DETERMINISTIC"),
+    "GEML": ("AI", "DETERMINISTIC"),
     "IFEC_AI": ("AI", "DETERMINISTIC"),
     "IFKM_AI": ("AI", "DETERMINISTIC"),
     "FNEC_AI": ("AI", "DETERMINISTIC"),
@@ -167,6 +174,7 @@ MODEL_CATEGORIES = {
     "GENC": ("AI", "ENSEMBLE"),
     "WNC": ("AI", "ENSEMBLE"),
     "WNV3": ("AI", "ENSEMBLE"),
+    "WMSH": ("AI", "ENSEMBLE"),
 }
 
 MODEL_ACTIVE_WINDOWS = {
@@ -1878,13 +1886,19 @@ def atcf_urls(settings: Settings) -> list[tuple[str, str, int]]:
             urls.append(("KNACKWX", url, 0))
     urls.extend(("RAW.GITHUB", raw_github_url(settings, model), 0)
                 for model in RAW_GITHUB_MODELS)
+    if os.getenv("WB_API_KEY", "").strip():
+        query = urlencode({"initialization_time": settings.data_time[:10], "format": "deck"})
+        for atcf_id in dict.fromkeys((settings.atcf_id, *settings.extra_atcf_ids)):
+            urls.append(("WINDBORNE", f"{WINDBORNE_BASE_URL}/{atcf_id.upper()}?{query}", 0))
     return urls
 
 
-def parse_atcf_coord(series: pd.Series) -> pd.Series:
+def parse_atcf_coord(series: pd.Series, *, signed: bool = False) -> pd.Series:
     text = series.astype("string").str.strip()
     direction = text.str[-1].str.upper()
     value = pd.to_numeric(text.str[:-1], errors="coerce") / 10
+    if signed:
+        return value.where(direction.isin(["N", "S", "E", "W"])) * direction.map({"N": 1, "E": 1, "S": -1, "W": -1})
     return value.where(direction.isin(["N", "E"]))
 
 
@@ -1964,8 +1978,8 @@ def read_atcf_csv(text: str | None, *, source: str, skiprows: int = 0) -> pd.Dat
     df["SLP"] = pd.to_numeric(df["SLP"], errors="coerce")
     if source == "KNACKWX":
         df = trim_knackwx_dateline_crossings(df)
-    df["LATI"] = parse_atcf_coord(df["LATI"])
-    df["LONG"] = parse_atcf_coord(df["LONG"])
+    df["LATI"] = parse_atcf_coord(df["LATI"], signed=source == "WINDBORNE")
+    df["LONG"] = parse_atcf_coord(df["LONG"], signed=source == "WINDBORNE")
     df[DATA_SOURCE_COLUMN] = source
     valid = (
         df["ATCF_NUMBER"].between(1, 99)
@@ -2024,8 +2038,15 @@ def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFra
     frames: list[pd.DataFrame] = []
     url_specs = atcf_urls(settings)
     target_cycle = settings.data_time[:10]
+    windborne_key = os.getenv("WB_API_KEY", "").strip()
+    if not windborne_key:
+        print("WINDBORNE: WB_API_KEY is not configured; skipping WeatherMesh.")
 
     def fetch_source(source: str, url: str) -> str | None:
+        if source == "WINDBORNE":
+            # Use isolated authenticated requests; never attach this key to the shared session.
+            storm_id = urlparse(url).path.rsplit("/", 1)[-1]
+            return fetch_windborne_mean_deck(storm_id, target_cycle, windborne_key)
         if source == "RAW.GITHUB":
             model = next(model for model in RAW_GITHUB_MODELS
                          if raw_github_url(settings, model) == url)
@@ -2977,7 +2998,7 @@ def normalize_guidance_frame(df: pd.DataFrame, settings: Settings) -> pd.DataFra
         kind="stable",
     )
     df = df.drop_duplicates(subset=["TYP", "SRC", "FT_TM(UTC)"], keep="first")
-    df = df[df["SRC"].isin(MODEL_NAMES)].copy()
+    df = df[df["SRC"].isin(MODEL_NAMES - INACTIVE_MODEL_IDS)].copy()
     for col in ["LAT", "LON", "WS", "TMD", "SEQ"]:
         if col in df:
             df[col] = pd.to_numeric(df[col], errors="coerce")
@@ -3004,7 +3025,7 @@ def source_backup_tracks(raw: pd.DataFrame, settings: Settings) -> pd.DataFrame:
         initialization.eq(cycle) & valid_time.eq(expected_time)
         & work["TMD"].between(0, max(CLI_FCST_HOURS))
         & work["LAT"].between(-90, 90) & work["LON"].between(-180, 180)
-        & work["SRC"].isin(set(MODEL_NAMES) - {"KMA"})
+        & work["SRC"].isin(set(MODEL_NAMES) - {"KMA"} - INACTIVE_MODEL_IDS)
         & work[DATA_SOURCE_COLUMN].isin(SOURCE_ORDER)
     ].copy()
     work = filter_suspicious_apihub_model_starts(work, settings)
@@ -3481,7 +3502,7 @@ def active_model_names(settings: Settings) -> set[str]:
     active = set()
     for model in MODEL_INFO:
         name = model["name"]
-        if name == "KMA":
+        if name == "KMA" or name in INACTIVE_MODEL_IDS:
             continue
 
         start_str, end_str = MODEL_ACTIVE_WINDOWS.get(name, (None, None))
@@ -5360,6 +5381,7 @@ def draw_model_tracks(ax, df: pd.DataFrame, settings: Settings, *, legend_side: 
         text_color = "black" if has_plot_data else "#A6A6A6"
         legend_rows.append({
             "label": label,
+            "label_width_scale": model.get("legend_width_scale", 1.0),
             "metric": metric,
             "color": legend_color,
             "text_color": text_color,
@@ -5383,6 +5405,30 @@ def snap_axes_point_to_pixel(ax, x: float, y: float) -> tuple[float, float]:
     px = round(px) + 0.5
     py = round(py) + 0.5
     return tuple(ax.transAxes.inverted().transform((px, py)))
+
+
+def compress_legend_label(ax, label, renderer, width_scale: float, available_width: float | None):
+    """Compress glyph widths only, retaining the text's font size and baseline."""
+    bounds = label.get_window_extent(renderer=renderer)
+    prop = label.get_fontproperties()
+    pixels_per_point = ax.figure.dpi / 72
+    metrics = renderer if renderer is not None else TextToPath()
+    descent = max(metrics.get_text_width_height_descent(text, prop, ismath=False)[2]
+                  for text in ("lp", label.get_text()))
+    if renderer is None:
+        descent *= pixels_per_point
+    path = TextPath((0, 0), label.get_text(), prop=prop, usetex=False)
+    if available_width is not None and available_width > 0:
+        width_scale = min(width_scale, available_width / (path.get_extents().x1 * pixels_per_point))
+    transform = (Affine2D().scale(pixels_per_point * width_scale, pixels_per_point)
+                 .translate(bounds.x0, bounds.y0 + descent))
+    patch = mpatches.PathPatch(
+        path, transform=transform, facecolor=label.get_color(), edgecolor="none",
+        zorder=label.get_zorder(), clip_on=False, gid="compressed-legend-label",
+    )
+    ax.add_patch(patch)
+    label.set_visible(False)
+    return patch
 
 
 def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> None:
@@ -5523,7 +5569,7 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
         )
         ax.add_line(marker)
         label_text_x, label_text_y = snap_axes_point_to_pixel(ax, label_x, y)
-        ax.text(
+        label_artist = ax.text(
             label_text_x,
             label_text_y,
             row["label"],
@@ -5541,7 +5587,7 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
 
         pressure_text_x, pressure_text_y = snap_axes_point_to_pixel(ax, pressure_x, y)
         lead_text_x, lead_text_y = snap_axes_point_to_pixel(ax, lead_x, y)
-        ax.text(
+        pressure_artist = ax.text(
             pressure_text_x,
             pressure_text_y,
             pressure_text,
@@ -5554,6 +5600,21 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
             va="center",
             zorder=102,
         )
+        label_width_scale = row.get("label_width_scale", 1.0)
+        if pressure_text or label_width_scale < 1:
+            # Long model names must also leave room for four-digit TD pressures.
+            get_renderer = getattr(ax.figure.canvas, "get_renderer", None)
+            if get_renderer is None:
+                ax.figure.canvas.draw()
+            renderer = get_renderer() if get_renderer is not None else None
+            label_bounds = label_artist.get_window_extent(renderer=renderer)
+            pressure_bounds = pressure_artist.get_window_extent(renderer=renderer)
+            available_width = pressure_bounds.x0 - label_bounds.x0 - ax.figure.dpi * 0.06
+            if label_width_scale < 1:
+                compress_legend_label(ax, label_artist, renderer, label_width_scale,
+                                      available_width if pressure_text else None)
+            elif 0 < available_width < label_bounds.width:
+                label_artist.set_fontsize(font_size * available_width / label_bounds.width * 0.99)
         ax.text(
             lead_text_x,
             lead_text_y,

@@ -215,6 +215,7 @@ jobs:
       RUNNER_KIND: ${{ needs.decide-runner.outputs.runner_kind }}
       KMA_APIHUB_AUTH_KEY: ${{ secrets.KMA_APIHUB_AUTH_KEY }}
       KMA_APIHUB_FALLBACK_AUTH_KEY: ${{ secrets.KMA_APIHUB_FALLBACK_AUTH_KEY }}
+      WB_API_KEY: ${{ secrets.WB_API_KEY }}
       MPLBACKEND: Agg
       PYTHONUNBUFFERED: "1"
       DIAGNOSTICS_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.diagnostics || false }}
