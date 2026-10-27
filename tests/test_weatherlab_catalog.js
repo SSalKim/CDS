@@ -40,6 +40,7 @@ assert.equal(catalog.colors.FNV3,catalog.colors.WNC);
 assert.equal(catalog.rows.find(row=>row.modelId==='GEML').description,'[AI] 캐나다기상센터(CMC) AI 전구모델');
 assert.equal(catalog.rows.find(row=>row.modelId==='WMSH').description,'[AI] 윈드본 시스템즈 WeatherMesh-6 태풍예측 앙상블 평균');
 assert.equal(catalog.details.find(row=>row.model_id==='GEML')['운영기관'],'캐나다기상센터(CMC)');
+assert.equal(catalog.details.find(row=>row.model_id==='GEML')['모델명'],'GEML (GDPS)');
 assert.equal(catalog.details.find(row=>row.model_id==='GEML')['참고사항'],'');
 assert.equal(catalog.details.find(row=>row.model_id==='WMSH')['운영기관'],'윈드본 시스템즈(WindBorne Systems)');
 assert.equal(catalog.details.find(row=>row.model_id==='WMSH')['연직층수'],'26층');

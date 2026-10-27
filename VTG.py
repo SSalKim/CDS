@@ -28,10 +28,12 @@ import matplotlib.lines as mlines
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+from matplotlib.colors import to_rgba
 from matplotlib.textpath import TextPath, TextToPath
-from matplotlib.transforms import Affine2D
+from matplotlib.transforms import Affine2D, Bbox
 import pandas as pd
 import requests
+from shapely.geometry import LineString, box as geometry_box
 
 from polarwx_cache import DEFAULT_ROOT as POLARWX_CACHE_ROOT, load_snapshot, queue_request
 from vtg_source_backup import cycle_time as backup_cycle_time, read_snapshot as read_source_backup, recent_cycle, write_snapshot as write_source_backup
@@ -123,6 +125,25 @@ MODEL_INFO = [
     {"name": "HKO_FXEC", "color": "#20B2AA", "style": "--", "label": "FuXi-ECMWF", "zorder": 76},
     {"name": "HKO_FWEC", "color": "#A6C875", "style": "--", "label": "FengWu-ECMWF", "zorder": 75},
 ]
+
+MODEL_ENDPOINT_LABELS = {
+    "ECMWF": "ECMWF", "ECMWF_EPS": "ECME",
+    "KIM_3h": "KIM", "KIM_6h": "KIM", "KIM_GFDL_6h": "KIM", "KIM_EPS": "KIME",
+    "UM": "UKMO", "UM_GFDL_6h": "UKMO", "UM_KEPS": "UKME",
+    "UKM": "UKMO", "UKMO_EPS": "UKME",
+    "GFS": "GFS", "GFS_EPS": "GFSE", "CMC": "CMC", "CMC_EPS": "CMCE",
+    "NAVGEM": "NVGM", "FNMOC_EPS": "NVGME",
+    "ICON": "ICON", "ICON_EPS": "ICONE", "JGSM": "JGSM", "TEPS": "JGSME",
+    "CTCX": "CTCX", "HAFS": "HAFS", "HWRF": "HWRF",
+    "ECMWF_AIFS": "AIFS", "ECMWF_AIFS_EPS": "AIFSE",
+    "IFEC_AI": "IFEC", "IFKM_AI": "IFKM",
+    "AGFS": "AGFS", "AIGEFS": "AGFSE", "GEML": "GEML", "AICON": "AICON",
+    "FNEC_AI": "FNEC", "FNKM_AI": "FNKM", "FNUM_AI": "FNUM",
+    "PGEC_AI": "PGEC", "PGKM_AI": "PGKM", "PGUM_AI": "PGUM",
+    "GCEC_AI": "GCEC", "GCKM_AI": "GCKM", "GCUM_AI": "GCUM",
+    "GENC": "GENC", "WNC": "FNV3", "WNV3": "WNV3", "WMSH": "WMSH",
+    "HKO_AREC": "AREC", "HKO_FXEC": "FXEC", "HKO_FWEC": "FWEC",
+}
 
 MODEL_CATEGORIES = {
     "ECMWF": ("DYNAMICAL", "DETERMINISTIC"),
@@ -5331,6 +5352,7 @@ def draw_model_tracks(ax, df: pd.DataFrame, settings: Settings, *, legend_side: 
     excluded = excluded_models_for(df)
     active = active_model_names(settings)
     legend_rows = []
+    endpoints = []
     grouped = {name: group for name, group in df.dropna(subset=["FT_TIME", "LAT", "LON"]).groupby("SRC")}
     active_legend_models = [model for model in MODEL_INFO if model["name"] in active and model["name"] not in excluded]
 
@@ -5349,6 +5371,8 @@ def draw_model_tracks(ax, df: pd.DataFrame, settings: Settings, *, legend_side: 
                 metric = track_intensity_summary(track, name)
 
         if has_plot_data:
+            if name in MODEL_ENDPOINT_LABELS:
+                endpoints.append((model, track))
             for segment in split_knackwx_track_segments(track):
                 ax.plot(
                     segment["LON"],
@@ -5391,7 +5415,134 @@ def draw_model_tracks(ax, df: pd.DataFrame, settings: Settings, *, legend_side: 
             "markersize": style["markersize"],
         })
 
+    draw_model_endpoint_labels(ax, endpoints)
     draw_model_legend_table(legend_ax if legend_ax is not None else ax, legend_rows, side=legend_side)
+
+
+def endpoint_screen_direction(points):
+    """Return the last non-stationary direction along a projected segment."""
+    for start, end in reversed(list(zip(points[:-1], points[1:]))):
+        dx, dy = end[0] - start[0], end[1] - start[1]
+        length = math.hypot(dx, dy)
+        if length > 1e-6:
+            return dx / length, dy / length
+    return None
+
+
+def model_endpoint_label_anchor(ax, track: pd.DataFrame, bounds: Bbox):
+    """Return the last visible anchor and its local screen-space heading."""
+    transform = ccrs.PlateCarree()._as_mpl_transform(ax)
+    window = geometry_box(*bounds.extents)
+
+    def projected_parts(start, end):
+        if not all(math.isfinite(float(v)) for v in (*start, *end)) or start == end:
+            return []
+        # Unwrap before projection so a dateline exit cannot anchor on the opposite edge.
+        end_lon = start[0] + longitude_delta(end[0], start[0])
+        projected = ax.projection.project_geometry(LineString([start, (end_lon, end[1])]), ccrs.PlateCarree())
+        return [ax.transData.transform(part.coords) for part in projected.geoms]
+
+    for segment in reversed(split_knackwx_track_segments(track)):
+        points = list(segment[["LON", "LAT", "TMD"]].itertuples(index=False, name=None))
+        for index in range(len(points) - 1, -1, -1):
+            lon, lat, lead = points[index]
+            if lead <= 0 or not all(math.isfinite(float(v)) for v in (lon, lat)):
+                continue
+            if bounds.contains(*transform.transform((lon, lat))):
+                for previous in range(index - 1, -1, -1):
+                    for coords in reversed(projected_parts(points[previous][:2], (lon, lat))):
+                        direction = endpoint_screen_direction(coords)
+                        if direction is not None:
+                            return (float(lon), float(lat)), direction
+                return (float(lon), float(lat)), (0.0, 1.0)
+            if index == 0:
+                continue
+            start = points[index - 1][:2]
+            for coords in reversed(projected_parts(start, (lon, lat))):
+                clipped = LineString(coords).intersection(window)
+                pieces = list(clipped.geoms) if hasattr(clipped, "geoms") else [clipped]
+                for piece in reversed(pieces):
+                    if not piece.is_empty:
+                        direction = endpoint_screen_direction(list(piece.coords)) or endpoint_screen_direction(coords)
+                        return tuple(transform.inverted().transform(piece.coords[-1])), direction or (0.0, 1.0)
+    return None
+
+
+def draw_model_endpoint_labels(ax, endpoints) -> None:
+    """Label forecast ends with bounded, display-space overlap relief."""
+    if not endpoints:
+        return
+    ax.apply_aspect()
+    renderer = ax.figure.canvas.get_renderer()
+    pixels_per_point = ax.figure.dpi / 72
+    # draw_header's padded banner starts at figure y=0.885.
+    bounds = Bbox.from_extents(
+        ax.bbox.x0 + 4, ax.bbox.y0 + 4, ax.bbox.x1 - 4,
+        min(ax.bbox.y1, ax.figure.bbox.y0 + ax.figure.bbox.height * 0.885) - 4,
+    )
+    transform = ccrs.PlateCarree()._as_mpl_transform(ax)
+    occupied = []
+    for model, track in sorted(endpoints, key=lambda item: -item[0].get("zorder", 2)):
+        anchor = model_endpoint_label_anchor(ax, track, bounds)
+        if anchor is None:
+            continue
+        xy, direction = anchor
+        color = model["color"]
+        label = ax.annotate(
+            MODEL_ENDPOINT_LABELS[model["name"]], xy=xy, xycoords=transform,
+            xytext=(0, 0), textcoords="offset points", ha="center", va="center",
+            fontsize=11, fontweight="bold", fontfamily=PLOT_FONT_FAMILY,
+            color="#F7F7F7", zorder=99.5, annotation_clip=False, clip_on=True,
+            bbox=dict(boxstyle="round,pad=0.16,rounding_size=0.12", facecolor=to_rgba("#171717", 0.5),
+                      edgecolor=color, linewidth=0.9),
+            gid="model-endpoint-" + model["name"],
+        )
+        label.set_clip_path(ax.patch)
+        label.get_bbox_patch().set_clip_path(ax.patch)
+        padding = 3 * pixels_per_point
+        text_box = label.get_window_extent(renderer).padded(padding)
+        half_width, half_height = text_box.width / (2 * pixels_per_point), text_box.height / (2 * pixels_per_point)
+        offsets = []
+        heading = math.atan2(direction[1], direction[0])
+        # Stay in the forward sector; only the map-boundary clamp may put a label behind its anchor.
+        for extra in (0, 18, 36):
+            for turn in (0, -20, 20, -40, 40):
+                angle = heading + math.radians(turn)
+                ux, uy = math.cos(angle), math.sin(angle)
+                radius = min(half_width / max(abs(ux), 1e-6), half_height / max(abs(uy), 1e-6))
+                offsets.append(((radius + 6 + extra) * ux, (radius + 6 + extra) * uy))
+        base_dx, base_dy = offsets[0]
+        choices = []
+        for dx, dy in offsets:
+            label.set_position((dx, dy))
+            box = label.get_window_extent(renderer).padded(padding)
+            dx += (max(0, bounds.x0 - box.x0) - max(0, box.x1 - bounds.x1)) / pixels_per_point
+            dy += (max(0, bounds.y0 - box.y0) - max(0, box.y1 - bounds.y1)) / pixels_per_point
+            label.set_position((dx, dy))
+            box = label.get_window_extent(renderer).padded(padding)
+            overlap = sum(
+                max(0, min(box.x1, other.x1) - max(box.x0, other.x0))
+                * max(0, min(box.y1, other.y1) - max(box.y0, other.y0))
+                for other in occupied
+            )
+            choices.append((overlap, (dx - base_dx) ** 2 + (dy - base_dy) ** 2, dx, dy, box))
+            if overlap == 0 and (dx, dy) == offsets[0]:
+                break
+        _, _, dx, dy, box = min(choices, key=lambda choice: choice[:2])
+        label.set_position((dx, dy))
+        occupied.append(box)
+        if (dx - base_dx) ** 2 + (dy - base_dy) ** 2 > 100:
+            px, py = transform.transform(xy)
+            start_x, start_y = min(max(px, box.x0), box.x1), min(max(py, box.y0), box.y1)
+            ax.annotate(
+                "", xy=xy, xycoords=transform,
+                xytext=((start_x - px) / pixels_per_point, (start_y - py) / pixels_per_point),
+                textcoords="offset points",
+                arrowprops=dict(arrowstyle="-", color=color, linewidth=0.6, alpha=0.7,
+                                shrinkA=0, shrinkB=3),
+                zorder=99.4, annotation_clip=False, clip_on=True,
+                gid="model-endpoint-leader-" + model["name"],
+            )
 
 
 def snap_axes_point_to_pixel(ax, x: float, y: float) -> tuple[float, float]:

@@ -536,7 +536,7 @@ const TYPHOON_MODEL_DETAIL_ROWS=[
     "model_id": "GEML",
     "표출명칭": "CMC GEML",
     "운영기관": "캐나다기상센터(CMC)",
-    "모델명": "GEML",
+    "모델명": "GEML (GDPS)",
     "도메인": "전지구",
     "구분": "결정론적 모델",
     "격자체계 (분해능)": "0.25° (~28km)",

@@ -127,7 +127,8 @@ class ZeroHourPressureTests(unittest.TestCase):
         normalized = self.normalize(track())
         normalized["FT_TIME"] = VTG.parse_ft_time(normalized["FT_TM(UTC)"])
         ax = Mock()
-        with patch.object(VTG, "draw_model_legend_table") as legend:
+        with patch.object(VTG, "draw_model_legend_table") as legend, \
+                patch.object(VTG, "draw_model_endpoint_labels"):
             VTG.draw_model_tracks(ax, normalized, self.settings)
         gfs = next(row for row in legend.call_args.args[1] if row["label"] == "GFS")
         self.assertEqual(" 970hPa +000/012h", gfs["metric"])
