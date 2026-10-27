@@ -148,7 +148,7 @@ class WindborneIntegrationTests(unittest.TestCase):
 
     def test_new_models_are_in_requested_legend_order(self):
         names = [m["name"] for m in VTG.MODEL_INFO if m["name"] in VTG.active_model_names(self.settings)]
-        for before, added, after in (("AICON", "GEML", "FNEC_AI"), ("WNV3", "WMSH", "HKO_AREC")):
+        for before, added, after in (("AIGEFS", "GEML", "AICON"), ("WNV3", "WMSH", "HKO_AREC")):
             self.assertEqual([before, added, after], names[names.index(before):names.index(before) + 3])
         self.assertEqual(("AI", "DETERMINISTIC"), VTG.MODEL_CATEGORIES["GEML"])
         self.assertEqual(("AI", "ENSEMBLE"), VTG.MODEL_CATEGORIES["WMSH"])

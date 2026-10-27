@@ -47,9 +47,9 @@ for(const rows of [catalog.rows,catalog.details]){
   assert.equal(names.length,40);
   assert(!names.includes('COAMPS-TC EPS'));
   assert(!names.includes('GALWEM'));
-  for(const [before,added,after] of [['AICON','CMC GEML','FourCastNet-ECMWF'],['WeatherNext3 Cyclones','WindBorne WeatherMesh','Aurora-ECMWF']]){
+  for(const [before,added,after] of [['AIGFS EPS','CMC GEML','AICON'],['WeatherNext3 Cyclones','WindBorne WeatherMesh','Aurora-ECMWF']]){
     assert.deepEqual(names.slice(names.indexOf(before),names.indexOf(before)+3),[before,added,after]);
   }
 }
-for(const name of ['COAMPS-TC','GEML','WMSH']) assert(catalog.groups.includes(name));
+for(const name of ['COAMPS-TC','AIGFS EPS','GEML','AICON','WMSH']) assert(catalog.groups.includes(name));
 console.log('Weather Lab catalog, colors, labels and group separator tests passed');
