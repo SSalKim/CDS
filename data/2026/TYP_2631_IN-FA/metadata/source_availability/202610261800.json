@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261027025024",
-  "generated_at_kst": "2026-10-27 11:50 KST",
+  "generated_at_utc": "20261027030025",
+  "generated_at_kst": "2026-10-27 12:00 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -115,23 +115,6 @@
       "is_official": false,
       "first_seen_utc": "20261027024024",
       "first_seen_kst": "2026-10-27 11:40 KST"
-    },
-    {
-      "model_id": "COAMPS_EPS",
-      "model_label": "COAMPS-TC EPS",
-      "raw_model_ids": [
-        "CTMN"
-      ],
-      "source": "KNACKWX",
-      "source_label": "KNACKWX ATCF",
-      "selected": true,
-      "point_count": 8,
-      "max_lead_hour": 126,
-      "has_pressure": true,
-      "has_wind": true,
-      "is_official": false,
-      "first_seen_utc": "20261027025024",
-      "first_seen_kst": "2026-10-27 11:50 KST"
     },
     {
       "model_id": "ECMWF",
@@ -1051,6 +1034,23 @@
       "is_official": false,
       "first_seen_utc": "20261027015024",
       "first_seen_kst": "2026-10-27 10:50 KST"
+    },
+    {
+      "model_id": "WMSH",
+      "model_label": "WindBorne WeatherMesh",
+      "raw_model_ids": [
+        "WMSH"
+      ],
+      "source": "WINDBORNE",
+      "source_label": "WindBorne WeatherMesh",
+      "selected": true,
+      "point_count": 81,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261027030025",
+      "first_seen_kst": "2026-10-27 12:00 KST"
     }
   ],
   "source_availability_path": "data/2026/TYP_2631_IN-FA/metadata/source_availability/202610261800.json",
