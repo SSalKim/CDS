@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261027080025",
-  "generated_at_kst": "2026-10-27 17:00 KST",
+  "generated_at_utc": "20261027081025",
+  "generated_at_kst": "2026-10-27 17:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 86,
+  "model_source_count": 89,
   "selected_model_count": 33,
   "active_target_model_count": 40,
   "model_sources": [
@@ -458,6 +458,23 @@
       "first_seen_kst": "2026-10-27 16:50 KST"
     },
     {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261027081025",
+      "first_seen_kst": "2026-10-27 17:10 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS_EPS",
       "model_label": "ECMWF AIFS EPS",
       "raw_model_ids": [
@@ -465,7 +482,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 40,
       "max_lead_hour": 240,
       "has_pressure": true,
@@ -473,6 +490,23 @@
       "is_official": false,
       "first_seen_utc": "20261027075023",
       "first_seen_kst": "2026-10-27 16:50 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261027081025",
+      "first_seen_kst": "2026-10-27 17:10 KST"
     },
     {
       "model_id": "ECMWF_EPS",
@@ -1250,7 +1284,7 @@
       ],
       "source": "EMC.NCEP",
       "source_label": "EMC NCEP ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 31,
       "max_lead_hour": 180,
       "has_pressure": true,
@@ -1275,6 +1309,23 @@
       "is_official": false,
       "first_seen_utc": "20261027075023",
       "first_seen_kst": "2026-10-27 16:50 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 22,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261027081025",
+      "first_seen_kst": "2026-10-27 17:10 KST"
     },
     {
       "model_id": "PGEC_AI",
