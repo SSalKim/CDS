@@ -122,7 +122,7 @@ const TYPHOON_MODEL_INFO=[
 {modelId:'GENC',name:'GenCast',description:'[AI] 구글 딥마인드 WeatherNext1 앙상블모델(GenCast) 평균'},
 {modelId:'WNC',name:'WeatherNext2 Cyclones',description:'[AI] 구글 딥마인드 WeatherNext2 태풍예측모델(FNV3) 앙상블 평균'},
 {modelId:'WNV3',name:'WeatherNext3 Cyclones',description:'[AI] 구글 딥마인드 WeatherNext3 태풍예측모델(WNV3) 앙상블 평균'},
-{modelId:'WMSH',name:'WindBorne WeatherMesh',description:'[AI] 윈드본 시스템즈 WeatherMesh-6 태풍예측 앙상블 평균'},
+{modelId:'WMSH',name:'WindBorne WeatherMesh',description:'[AI] 윈드본 시스템즈 WeatherMesh-6 태풍예측모델 앙상블 평균'},
 {name:'Aurora-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 Aurora (ECMWF 초기장)'},
 {name:'FuXi-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FuXi (ECMWF 초기장)'},
 {name:'FengWu-ECMWF',description:'[AI] 홍콩기상청(HKO) 수행 FengWu (ECMWF 초기장)'},
