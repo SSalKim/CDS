@@ -5570,23 +5570,15 @@ def draw_model_endpoint_labels(ax, endpoints) -> None:
         _, displacement, dx, dy, box, text_box = min(choices, key=lambda choice: choice[:2])
         label.set_position((dx, dy))
         occupied.append(text_box)
-        last = track.dropna(subset=["LON", "LAT", "TMD"]).sort_values("TMD").iloc[-1]
-        # A clipped map exit is not a forecast endpoint and must not receive an end marker.
-        if abs(longitude_delta(last.LON, xy[0])) < 1e-6 and abs(last.LAT - xy[1]) < 1e-6:
-            ax.plot(
-                [xy[0]], [xy[1]], transform=ccrs.PlateCarree(), linestyle="None",
-                marker="o", markersize=5, markerfacecolor=color, markeredgecolor=color,
-                markeredgewidth=1, zorder=99 + priority, gid="model-endpoint-marker-" + model["name"],
-            )
         if displacement > 2:
-            px, py = transform.transform(xy)
-            start_x, start_y = min(max(px, box.x0), box.x1), min(max(py, box.y0), box.y1)
+            # Leaders render before labels; resolve the actual rounded backing now.
+            label.update_bbox_position_size(renderer)
             ax.annotate(
                 "", xy=xy, xycoords=transform,
-                xytext=((start_x - px) / pixels_per_point, (start_y - py) / pixels_per_point),
+                xytext=(dx, dy),
                 textcoords="offset points",
                 arrowprops=dict(arrowstyle="-", color=color, linewidth=0.6, alpha=0.7,
-                                shrinkA=0, shrinkB=3),
+                                patchA=label.get_bbox_patch(), shrinkA=0, shrinkB=0),
                 zorder=99 + priority, annotation_clip=False, clip_on=True,
                 gid="model-endpoint-leader-" + model["name"],
             )

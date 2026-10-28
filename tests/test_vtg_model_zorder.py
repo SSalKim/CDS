@@ -60,10 +60,7 @@ class ModelZorderTests(unittest.TestCase):
                 official_marker = ax.lines[-1]
                 self.assertEqual("white", official_marker.get_color())
                 self.assertEqual(100, official_marker.get_zorder())
-                forecast_lines = [line for line in ax.lines[:-1] if not (line.get_gid() or "").startswith("model-endpoint-marker-")]
-                self.assertEqual([99, 99], [line.get_zorder() for line in forecast_lines])
-                end_marker, = [line for line in ax.lines if line.get_gid() == "model-endpoint-marker-WMSH"]
-                self.assertAlmostEqual(99.099, end_marker.get_zorder())
+                self.assertEqual([99, 99], [line.get_zorder() for line in ax.lines[:-1]])
                 self.assertTrue(all(line.get_zorder() < official_marker.get_zorder() for line in ax.lines[:-1]))
                 self.assertTrue(all(m.get("zorder", 2) < official_marker.get_zorder() for m in VTG.MODEL_INFO))
                 label, = [text for text in ax.texts if text.get_gid() == "model-endpoint-WMSH"]

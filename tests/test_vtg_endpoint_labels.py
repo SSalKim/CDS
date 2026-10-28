@@ -168,17 +168,48 @@ class EndpointLabelTests(unittest.TestCase):
         )
         self.assertAlmostEqual(score, scaled)
 
-    def test_filled_marker_marks_actual_endpoint_without_changing_track_data(self):
+    def test_endpoint_label_does_not_add_marker_between_24_hour_points(self):
         forecast = track(model="WMSH", hours=(0, 24, 30))
         original = forecast.copy(deep=True)
         self.draw([forecast])
-        marker, = [line for line in self.ax.lines if (line.get_gid() or "").startswith("model-endpoint-marker-")]
+        marker, = [line for line in self.ax.lines if line.get_linestyle() == "None"]
         label, = self.labels()
-        self.assertEqual(tuple(label.xy), (marker.get_xdata()[0], marker.get_ydata()[0]))
+        self.assertEqual(forecast.loc[forecast.TMD.isin([0, 24]), "LAT"].tolist(), list(marker.get_ydata()))
+        self.assertEqual(tuple(label.xy), (forecast.iloc[-1].LON, forecast.iloc[-1].LAT))
+        self.assertNotIn(label.xy[1], marker.get_ydata())
         self.assertEqual(self.models["WMSH"]["color"], marker.get_markerfacecolor())
-        self.assertEqual(self.models["WMSH"]["color"], marker.get_markeredgecolor())
         self.assertLess(marker.get_zorder(), 100)
+        self.assertFalse(any((line.get_gid() or "").startswith("model-endpoint-marker-") for line in self.ax.lines))
         pd.testing.assert_frame_equal(original, forecast)
+
+    def test_endpoint_at_24_hour_step_keeps_only_the_existing_marker(self):
+        forecast = track(model="WMSH", hours=(0, 24, 48))
+        self.draw([forecast])
+        marker, = [line for line in self.ax.lines if line.get_linestyle() == "None"]
+        self.assertEqual(forecast.LAT.tolist(), list(marker.get_ydata()))
+        self.assertFalse(any((line.get_gid() or "").startswith("model-endpoint-marker-") for line in self.ax.lines))
+
+    def test_leaders_touch_label_border_and_exact_track_anchor(self):
+        point = pd.DataFrame([{"LON": 150, "LAT": 25, "TMD": 240}])
+        VTG.draw_model_endpoint_labels(self.ax, [(self.models[name], point) for name in ("WMSH", "WNC", "GFS")])
+        self.figure.canvas.draw()
+        labels = {label.get_gid(): label for label in self.labels()}
+        leaders = [text for text in self.ax.texts if (text.get_gid() or "").startswith("model-endpoint-leader-")]
+        self.assertTrue(leaders)
+        for leader in leaders:
+            label = labels[leader.get_gid().replace("model-endpoint-leader-", "model-endpoint-")]
+            arrow = leader.arrow_patch
+            self.assertIs(label.get_bbox_patch(), arrow.patchA)
+            self.assertEqual(0, arrow.shrinkA)
+            self.assertEqual(0, arrow.shrinkB)
+            path = arrow.get_path().transformed(arrow.get_transform())
+            start, end = path.vertices[0], path.vertices[-1]
+            anchor = ccrs.PlateCarree()._as_mpl_transform(self.ax).transform(label.xy)
+            self.assertAlmostEqual(anchor[0], end[0], places=5)
+            self.assertAlmostEqual(anchor[1], end[1], places=5)
+            border = label.get_bbox_patch().get_path().transformed(label.get_bbox_patch().get_transform())
+            self.assertTrue(border.contains_point(start, radius=1))
+            self.assertFalse(border.contains_point(start, radius=-1))
 
     def test_labels_stay_inside_map_and_below_header_at_edges(self):
         self.ax.apply_aspect()
