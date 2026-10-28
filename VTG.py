@@ -5521,8 +5521,9 @@ def endpoint_label_boxstyle(label, renderer):
     rounded = mpatches.BoxStyle.Round(pad=0.16, rounding_size=0.12)
 
     def glyph_box(x0, y0, width, height, mutation_size):
-        return rounded(x0, y0 + bottom * mutation_size, width,
-                       ink_height * mutation_size, mutation_size)
+        # Add half a display pixel below the glyphs for optical balance.
+        return rounded(x0, y0 + bottom * mutation_size - 0.5, width,
+                       ink_height * mutation_size + 0.5, mutation_size)
 
     return glyph_box
 

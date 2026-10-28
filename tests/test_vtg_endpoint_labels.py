@@ -49,7 +49,7 @@ class EndpointLabelTests(unittest.TestCase):
         for name in ("KIM_6h", "KIM_GFDL_6h"):
             self.assertEqual("KIM", VTG.MODEL_ENDPOINT_LABELS[name])
 
-    def test_backing_has_equal_padding_around_rendered_capitals(self):
+    def test_backing_has_optically_balanced_padding_around_rendered_capitals(self):
         fonts = ["DejaVu Sans"]
         if VTG.PREFERRED_PLOT_FONT_FILE.exists():
             VTG.fm.fontManager.addfont(str(VTG.PREFERRED_PLOT_FONT_FILE))
@@ -79,8 +79,15 @@ class EndpointLabelTests(unittest.TestCase):
                             top_gap = box.y1 - ink_top
                             bottom_gap = ink_bottom - box.y0
                             self.assertGreater(min(top_gap, bottom_gap), 0)
+                            font_properties = label.get_fontproperties()
+                            _, height, descent = renderer.get_text_width_height_descent(name, font_properties, False)
+                            _, _, font_descent = renderer.get_text_width_height_descent("lp", font_properties, False)
+                            padding = 0.16 * renderer.points_to_pixels(label.get_fontsize())
+                            glyph_bottom = label.get_window_extent(renderer).y0 + max(descent, font_descent) - descent
+                            self.assertAlmostEqual(glyph_bottom - padding - 0.5, box.y0)
+                            self.assertAlmostEqual(glyph_bottom + height + padding, box.y1)
                             # Raster antialiasing can move the visible edge by one pixel.
-                            self.assertAlmostEqual(top_gap, bottom_gap, delta=1.1)
+                            self.assertAlmostEqual(top_gap, bottom_gap - 0.5, delta=1.1)
                         finally:
                             VTG.plt.close(figure)
 
