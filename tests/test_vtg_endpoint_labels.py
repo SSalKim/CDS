@@ -82,10 +82,12 @@ class EndpointLabelTests(unittest.TestCase):
                             font_properties = label.get_fontproperties()
                             _, height, descent = renderer.get_text_width_height_descent(name, font_properties, False)
                             _, _, font_descent = renderer.get_text_width_height_descent("lp", font_properties, False)
-                            padding = 0.16 * renderer.points_to_pixels(label.get_fontsize())
+                            padding = 0.20 * renderer.points_to_pixels(label.get_fontsize())
                             glyph_bottom = label.get_window_extent(renderer).y0 + max(descent, font_descent) - descent
                             self.assertAlmostEqual(glyph_bottom - padding - 0.5, box.y0)
                             self.assertAlmostEqual(glyph_bottom + height + padding, box.y1)
+                            original_height = label.get_window_extent(renderer).height + 0.32 * renderer.points_to_pixels(label.get_fontsize())
+                            self.assertLess(box.height, original_height)
                             # Raster antialiasing can move the visible edge by one pixel.
                             self.assertAlmostEqual(top_gap, bottom_gap - 0.5, delta=1.1)
                         finally:

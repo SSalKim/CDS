@@ -5518,7 +5518,7 @@ def endpoint_label_boxstyle(label, renderer):
     em_pixels = renderer.points_to_pixels(font.get_size_in_points())
     bottom = (max(descent, font_descent) - descent) / em_pixels
     ink_height /= em_pixels
-    rounded = mpatches.BoxStyle.Round(pad=0.16, rounding_size=0.12)
+    rounded = mpatches.BoxStyle.Round(pad=0.20, rounding_size=0.12)
 
     def glyph_box(x0, y0, width, height, mutation_size):
         # Add half a display pixel below the glyphs for optical balance.
