@@ -5,6 +5,7 @@ from unittest.mock import patch
 import cartopy.crs as ccrs
 import pandas as pd
 from matplotlib.colors import to_rgba
+from matplotlib.transforms import Bbox
 
 import VTG
 from test_vtg_zero_hour_pressure import official_point, track
@@ -82,18 +83,102 @@ class EndpointLabelTests(unittest.TestCase):
                 ])
         self.assertEqual([], self.labels())
 
-    def test_small_overlaps_are_separated_with_short_leaders(self):
+    def test_coincident_ends_allow_overlap_instead_of_long_leaders(self):
         point = pd.DataFrame([{"LON": 150, "LAT": 25, "TMD": 240}])
         VTG.draw_model_endpoint_labels(self.ax, [(self.models[name], point) for name in ("GFS", "WMSH", "WNC")])
         renderer = self.figure.canvas.get_renderer()
         boxes = [label.get_window_extent(renderer).padded(2) for label in self.labels()]
-        for index, box in enumerate(boxes):
-            self.assertFalse(any(box.overlaps(other) for other in boxes[index + 1:]))
+        self.assertTrue(any(box.overlaps(other) for index, box in enumerate(boxes) for other in boxes[index + 1:]))
         self.assertTrue(any(text.get_gid().startswith("model-endpoint-leader-") for text in self.ax.texts))
         for label in self.labels():
             dx, dy = label.get_position()
-            self.assertLess(math.hypot(dx, dy), 65)
+            height = label.get_window_extent(renderer).height / (self.figure.dpi / 72)
+            base_dy = height / 2 + 3 + 6
+            self.assertLessEqual(math.hypot(dx, dy - base_dy), height + 1e-6)
+            self.assertLessEqual(abs(math.degrees(math.atan2(dx, dy))), 25 + 1e-6)
             self.assertGreater(dy, 0)
+
+    def test_candidates_stay_close_and_forward_for_all_headings(self):
+        for width in (15, 25):
+            for degrees in range(0, 360, 45):
+                heading = math.radians(degrees)
+                direction = (math.cos(heading), math.sin(heading))
+                offsets = VTG.endpoint_label_offsets(width, 8, direction, max_shift=10)
+                base_dx, base_dy, _ = offsets[0]
+                for dx, dy, turn in offsets:
+                    with self.subTest(width=width, heading=degrees, turn=turn):
+                        delta = math.atan2(dy, dx) - heading
+                        delta = math.atan2(math.sin(delta), math.cos(delta))
+                        self.assertLessEqual(abs(math.degrees(delta)), 25 + 1e-6)
+                        self.assertLessEqual(math.hypot(dx - base_dx, dy - base_dy), 10 + 1e-6)
+
+    def test_tiny_text_overlap_is_preferred_to_distant_clear_placement(self):
+        box = Bbox.from_bounds(0, 0, 40, 10)
+        occupied = [Bbox.from_bounds(39.8, 0, 40, 10)]
+        near = VTG.endpoint_label_placement_score(box, occupied, 0, 10, 0)
+        far = VTG.endpoint_label_placement_score(box.translated(0, 10), occupied, 10, 10, 0)
+        self.assertGreater(near, 0)
+        self.assertLess(near, far)
+        substantial_overlap = [Bbox.from_bounds(30, 0, 40, 10)]
+        self.assertGreater(VTG.endpoint_label_placement_score(box, substantial_overlap, 0, 10, 0), far)
+
+    def test_backing_only_overlap_does_not_move_labels(self):
+        self.ax.apply_aspect()
+        transform = ccrs.PlateCarree()._as_mpl_transform(self.ax)
+        first = pd.DataFrame([{"LON": 150, "LAT": 25, "TMD": 240}])
+        VTG.draw_model_endpoint_labels(self.ax, [(self.models["WMSH"], first)])
+        expected = self.labels()[0].get_position()
+        height = self.labels()[0].get_window_extent(self.figure.canvas.get_renderer()).height
+        px, py = transform.transform((150, 25))
+        lon, lat = transform.inverted().transform((px, py + height + 1))
+        second = pd.DataFrame([{"LON": lon, "LAT": lat, "TMD": 240}])
+        for label in list(self.ax.texts):
+            label.remove()
+        VTG.draw_model_endpoint_labels(self.ax, [(self.models["WMSH"], first), (self.models["WNC"], second)])
+        for label in self.labels():
+            for wanted, actual in zip(expected, label.get_position()):
+                self.assertAlmostEqual(wanted, actual)
+        a, b = [label.get_window_extent(self.figure.canvas.get_renderer()) for label in self.labels()]
+        self.assertFalse(a.overlaps(b))
+        self.assertTrue(a.padded(3).overlaps(b.padded(3)))
+
+    def test_small_text_collision_is_relieved_without_a_long_move(self):
+        self.ax.apply_aspect()
+        transform = ccrs.PlateCarree()._as_mpl_transform(self.ax)
+        point = pd.DataFrame([{"LON": 150, "LAT": 25, "TMD": 240}])
+        endpoints = [(self.models[name], point) for name in ("WMSH", "WNC")]
+        VTG.draw_model_endpoint_labels(self.ax, endpoints)
+        renderer = self.figure.canvas.get_renderer()
+        boxes = [label.get_window_extent(renderer) for label in self.labels()]
+        px, py = transform.transform((150, 25))
+        lon, lat = transform.inverted().transform((px + sum(box.width for box in boxes) / 2 - 2, py))
+        second = pd.DataFrame([{"LON": lon, "LAT": lat, "TMD": 240}])
+        for label in list(self.ax.texts):
+            label.remove()
+        VTG.draw_model_endpoint_labels(self.ax, [(self.models["WMSH"], point), (self.models["WNC"], second)])
+        a, b = [label.get_window_extent(renderer) for label in self.labels()]
+        self.assertFalse(a.overlaps(b))
+
+    def test_placement_scoring_is_dpi_independent(self):
+        box = Bbox.from_bounds(0, 0, 40, 10)
+        other = Bbox.from_bounds(38, 0, 40, 10)
+        score = VTG.endpoint_label_placement_score(box, [other], 3, 10, 12.5)
+        scaled = VTG.endpoint_label_placement_score(
+            Bbox.from_extents(*(box.extents * 2)), [Bbox.from_extents(*(other.extents * 2))], 3, 10, 12.5,
+        )
+        self.assertAlmostEqual(score, scaled)
+
+    def test_filled_marker_marks_actual_endpoint_without_changing_track_data(self):
+        forecast = track(model="WMSH", hours=(0, 24, 30))
+        original = forecast.copy(deep=True)
+        self.draw([forecast])
+        marker, = [line for line in self.ax.lines if (line.get_gid() or "").startswith("model-endpoint-marker-")]
+        label, = self.labels()
+        self.assertEqual(tuple(label.xy), (marker.get_xdata()[0], marker.get_ydata()[0]))
+        self.assertEqual(self.models["WMSH"]["color"], marker.get_markerfacecolor())
+        self.assertEqual(self.models["WMSH"]["color"], marker.get_markeredgecolor())
+        self.assertLess(marker.get_zorder(), 100)
+        pd.testing.assert_frame_equal(original, forecast)
 
     def test_labels_stay_inside_map_and_below_header_at_edges(self):
         self.ax.apply_aspect()
@@ -114,8 +199,13 @@ class EndpointLabelTests(unittest.TestCase):
         VTG.draw_model_endpoint_labels(self.ax, endpoints)
         first = [(label.get_text(), label.get_position()) for label in self.labels()]
         self.assertEqual(len(names), len(first))
-        for _, (dx, dy) in first:
-            self.assertLess(math.hypot(dx, dy), 65)
+        renderer = self.figure.canvas.get_renderer()
+        for label in self.labels():
+            dx, dy = label.get_position()
+            height = label.get_window_extent(renderer).height / (self.figure.dpi / 72)
+            base_dy = height / 2 + 3 + 6
+            self.assertLessEqual(math.hypot(dx, dy - base_dy), height + 1e-6)
+            self.assertLessEqual(abs(math.degrees(math.atan2(dx, dy))), 25 + 1e-6)
             self.assertGreater(dy, 0)
         for text in list(self.ax.texts):
             text.remove()
@@ -153,6 +243,7 @@ class EndpointLabelTests(unittest.TestCase):
         self.assertGreater(label.xy[0], 179.0)
         self.assertLess(label.xy[0], 179.9)
         self.assertAlmostEqual(20.0, label.xy[1])
+        self.assertFalse(any((line.get_gid() or "").startswith("model-endpoint-marker-") for line in self.ax.lines))
 
     def test_dateline_crossing_label_stays_at_eastern_exit(self):
         forecast = track(hours=(0, 6, 12))

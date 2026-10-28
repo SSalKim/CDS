@@ -5484,8 +5484,34 @@ def model_endpoint_label_anchor(ax, track: pd.DataFrame, bounds: Bbox):
     return None
 
 
+def endpoint_label_offsets(half_width, half_height, direction, max_shift):
+    """Keep collision relief within 25 degrees and one text-line displacement."""
+    heading = math.atan2(direction[1], direction[0])
+    offsets = []
+    for extra in (0, max_shift / 2, max_shift):
+        for turn in (0, -12.5, 12.5, -25, 25):
+            angle = heading + math.radians(turn)
+            ux, uy = math.cos(angle), math.sin(angle)
+            radius = min(half_width / max(abs(ux), 1e-6), half_height / max(abs(uy), 1e-6))
+            dx, dy = (radius + 6 + extra) * ux, (radius + 6 + extra) * uy
+            base_dx, base_dy = offsets[0][:2] if offsets else (dx, dy)
+            if math.hypot(dx - base_dx, dy - base_dy) <= max_shift + 1e-6:
+                offsets.append((dx, dy, turn))
+    return offsets
+
+
+def endpoint_label_placement_score(text_box, occupied, displacement, max_shift, turn):
+    # Ignore backing-only overlap; balance glyph overlap against distance and heading.
+    overlap = sum(
+        max(0, min(text_box.x1, other.x1) - max(text_box.x0, other.x0))
+        * max(0, min(text_box.y1, other.y1) - max(text_box.y0, other.y0))
+        for other in occupied
+    ) / max(text_box.width * text_box.height, 1e-6)
+    return 6 * overlap + 0.45 * (displacement / max_shift) ** 2 + 0.15 * (turn / 25) ** 2
+
+
 def draw_model_endpoint_labels(ax, endpoints) -> None:
-    """Label forecast ends with bounded, display-space overlap relief."""
+    """Keep labels near forecast ends, allowing limited overlap in dense clusters."""
     if not endpoints:
         return
     ax.apply_aspect()
@@ -5518,38 +5544,41 @@ def draw_model_endpoint_labels(ax, endpoints) -> None:
         label.set_clip_path(ax.patch)
         label.get_bbox_patch().set_clip_path(ax.patch)
         padding = 3 * pixels_per_point
-        text_box = label.get_window_extent(renderer).padded(padding)
-        half_width, half_height = text_box.width / (2 * pixels_per_point), text_box.height / (2 * pixels_per_point)
-        offsets = []
-        heading = math.atan2(direction[1], direction[0])
-        # Stay in the forward sector; only the map-boundary clamp may put a label behind its anchor.
-        for extra in (0, 18, 36):
-            for turn in (0, -20, 20, -40, 40):
-                angle = heading + math.radians(turn)
-                ux, uy = math.cos(angle), math.sin(angle)
-                radius = min(half_width / max(abs(ux), 1e-6), half_height / max(abs(uy), 1e-6))
-                offsets.append(((radius + 6 + extra) * ux, (radius + 6 + extra) * uy))
-        base_dx, base_dy = offsets[0]
+        text_box = label.get_window_extent(renderer)
+        max_shift = text_box.height / pixels_per_point
+        box = text_box.padded(padding)
+        offsets = endpoint_label_offsets(
+            box.width / (2 * pixels_per_point), box.height / (2 * pixels_per_point), direction, max_shift,
+        )
+        base_dx, base_dy, _ = offsets[0]
         choices = []
-        for dx, dy in offsets:
-            label.set_position((dx, dy))
-            box = label.get_window_extent(renderer).padded(padding)
-            dx += (max(0, bounds.x0 - box.x0) - max(0, box.x1 - bounds.x1)) / pixels_per_point
-            dy += (max(0, bounds.y0 - box.y0) - max(0, box.y1 - bounds.y1)) / pixels_per_point
-            label.set_position((dx, dy))
-            box = label.get_window_extent(renderer).padded(padding)
-            overlap = sum(
-                max(0, min(box.x1, other.x1) - max(box.x0, other.x0))
-                * max(0, min(box.y1, other.y1) - max(box.y0, other.y0))
-                for other in occupied
-            )
-            choices.append((overlap, (dx - base_dx) ** 2 + (dy - base_dy) ** 2, dx, dy, box))
-            if overlap == 0 and (dx, dy) == offsets[0]:
+        for dx, dy, turn in offsets:
+            candidate = text_box.translated(dx * pixels_per_point, dy * pixels_per_point)
+            box = candidate.padded(padding)
+            shift_x = max(0, bounds.x0 - box.x0) - max(0, box.x1 - bounds.x1)
+            shift_y = max(0, bounds.y0 - box.y0) - max(0, box.y1 - bounds.y1)
+            # Boundary clamping is the only exception to the forward-sector/distance limits.
+            dx += shift_x / pixels_per_point
+            dy += shift_y / pixels_per_point
+            candidate = candidate.translated(shift_x, shift_y)
+            box = candidate.padded(padding)
+            displacement = math.hypot(dx - base_dx, dy - base_dy)
+            score = endpoint_label_placement_score(candidate, occupied, displacement, max_shift, turn)
+            choices.append((score, displacement, dx, dy, box, candidate))
+            if score == 0:
                 break
-        _, _, dx, dy, box = min(choices, key=lambda choice: choice[:2])
+        _, displacement, dx, dy, box, text_box = min(choices, key=lambda choice: choice[:2])
         label.set_position((dx, dy))
-        occupied.append(box)
-        if (dx - base_dx) ** 2 + (dy - base_dy) ** 2 > 100:
+        occupied.append(text_box)
+        last = track.dropna(subset=["LON", "LAT", "TMD"]).sort_values("TMD").iloc[-1]
+        # A clipped map exit is not a forecast endpoint and must not receive an end marker.
+        if abs(longitude_delta(last.LON, xy[0])) < 1e-6 and abs(last.LAT - xy[1]) < 1e-6:
+            ax.plot(
+                [xy[0]], [xy[1]], transform=ccrs.PlateCarree(), linestyle="None",
+                marker="o", markersize=5, markerfacecolor=color, markeredgecolor=color,
+                markeredgewidth=1, zorder=99 + priority, gid="model-endpoint-marker-" + model["name"],
+            )
+        if displacement > 2:
             px, py = transform.transform(xy)
             start_x, start_y = min(max(px, box.x0), box.x1), min(max(py, box.y0), box.y1)
             ax.annotate(
