@@ -5510,6 +5510,23 @@ def endpoint_label_placement_score(text_box, occupied, displacement, max_shift, 
     return 6 * overlap + 0.45 * (displacement / max_shift) ** 2 + 0.15 * (turn / 25) ** 2
 
 
+def endpoint_label_boxstyle(label, renderer):
+    """Pad the visible glyph height, excluding unused font descender space."""
+    font = label.get_fontproperties()
+    _, ink_height, descent = renderer.get_text_width_height_descent(label.get_text(), font, False)
+    _, _, font_descent = renderer.get_text_width_height_descent("lp", font, False)
+    em_pixels = renderer.points_to_pixels(font.get_size_in_points())
+    bottom = (max(descent, font_descent) - descent) / em_pixels
+    ink_height /= em_pixels
+    rounded = mpatches.BoxStyle.Round(pad=0.16, rounding_size=0.12)
+
+    def glyph_box(x0, y0, width, height, mutation_size):
+        return rounded(x0, y0 + bottom * mutation_size, width,
+                       ink_height * mutation_size, mutation_size)
+
+    return glyph_box
+
+
 def draw_model_endpoint_labels(ax, endpoints) -> None:
     """Keep labels near forecast ends, allowing limited overlap in dense clusters."""
     if not endpoints:
@@ -5541,6 +5558,7 @@ def draw_model_endpoint_labels(ax, endpoints) -> None:
                       edgecolor=color, linewidth=0.9),
             gid="model-endpoint-" + model["name"],
         )
+        label.get_bbox_patch().set_boxstyle(endpoint_label_boxstyle(label, renderer))
         label.set_clip_path(ax.patch)
         label.get_bbox_patch().set_clip_path(ax.patch)
         padding = 3 * pixels_per_point

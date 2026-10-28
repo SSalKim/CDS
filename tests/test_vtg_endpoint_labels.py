@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 import cartopy.crs as ccrs
 import pandas as pd
+import numpy as np
 from matplotlib.colors import to_rgba
 from matplotlib.transforms import Bbox
 
@@ -47,6 +48,41 @@ class EndpointLabelTests(unittest.TestCase):
         self.assertEqual(expected, {name: VTG.MODEL_ENDPOINT_LABELS[name] for name in expected})
         for name in ("KIM_6h", "KIM_GFDL_6h"):
             self.assertEqual("KIM", VTG.MODEL_ENDPOINT_LABELS[name])
+
+    def test_backing_has_equal_padding_around_rendered_capitals(self):
+        fonts = ["DejaVu Sans"]
+        if VTG.PREFERRED_PLOT_FONT_FILE.exists():
+            VTG.fm.fontManager.addfont(str(VTG.PREFERRED_PLOT_FONT_FILE))
+            fonts.append(VTG.fm.FontProperties(fname=str(VTG.PREFERRED_PLOT_FONT_FILE)).get_name())
+        for font in fonts:
+            for dpi in (100, 200):
+                for name in ("GFS", "ICONE", "AIFS", "FNV3"):
+                    with self.subTest(font=font, dpi=dpi, label=name):
+                        figure = VTG.plt.figure(figsize=(2, 1), dpi=dpi, facecolor="#262626")
+                        try:
+                            ax = figure.add_axes([0, 0, 1, 1])
+                            ax.set_axis_off()
+                            label = ax.annotate(
+                                name, (0.5, 0.5), ha="center", va="center",
+                                fontsize=11, fontweight="bold", fontfamily=font, color="#F7F7F7",
+                                bbox=dict(facecolor="#171717", edgecolor="#03C04A"),
+                            )
+                            renderer = figure.canvas.get_renderer()
+                            label.get_bbox_patch().set_boxstyle(VTG.endpoint_label_boxstyle(label, renderer))
+                            figure.canvas.draw()
+                            pixels = np.asarray(figure.canvas.buffer_rgba())[:, :, :3]
+                            rows = np.where((pixels.min(axis=2) > 200).any(axis=1))[0]
+                            self.assertGreater(len(rows), 0)
+                            ink_bottom = pixels.shape[0] - rows[-1] - 1
+                            ink_top = pixels.shape[0] - rows[0]
+                            box = label.get_bbox_patch().get_window_extent(renderer)
+                            top_gap = box.y1 - ink_top
+                            bottom_gap = ink_bottom - box.y0
+                            self.assertGreater(min(top_gap, bottom_gap), 0)
+                            # Raster antialiasing can move the visible edge by one pixel.
+                            self.assertAlmostEqual(top_gap, bottom_gap, delta=1.1)
+                        finally:
+                            VTG.plt.close(figure)
 
     def test_last_actual_point_not_last_24_hour_marker(self):
         forecast = track(model="WNC", hours=(0, 24, 30))
