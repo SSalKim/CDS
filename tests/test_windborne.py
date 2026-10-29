@@ -3,6 +3,8 @@ import io
 import os
 import tempfile
 import unittest
+from concurrent.futures import ThreadPoolExecutor
+from datetime import timedelta
 from dataclasses import replace
 from pathlib import Path
 from unittest.mock import Mock, patch
@@ -13,8 +15,141 @@ from matplotlib.figure import Figure
 
 import VTG
 import windborne as wb
+import vtg_source_backup as backup
+from test_vtg_source_backup import artifact_zip
 from test_windborne_probe import deck_row, metadata
 from test_smca_snapshot import smca_text
+
+
+class WindborneCacheTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.settings = VTG.Settings(
+            atcf_id="wp302026", storm_year="2026", typ_number=31, typ_name="IN-FA",
+            data_time="202610270000", source_backup_dir=Path(self.temp.name),
+        )
+        recent = patch.object(VTG, "recent_cycle", return_value=True)
+        recent.start()
+        self.addCleanup(recent.stop)
+        self.deck = deck_row() + deck_row(hour=3) + deck_row(hour=6)
+
+    def fetch(self, settings=None, identity="WP302026"):
+        with contextlib.redirect_stdout(io.StringIO()):
+            return VTG.fetch_windborne_data(settings or self.settings, identity, "test-key")
+
+    def test_first_download_then_skip_both_api_requests_across_image_horizons(self):
+        with patch.object(wb, "request_json", return_value=metadata()) as info, \
+                patch.object(wb, "request_text", return_value=self.deck) as deck:
+            first = self.fetch(replace(self.settings, fcst_hours=120))
+            second = self.fetch(replace(self.settings, fcst_hours=240))
+        self.assertEqual(first, second)
+        self.assertEqual(1, info.call_count)
+        self.assertEqual(1, deck.call_count)
+
+    def test_explicit_refresh_replaces_cache_but_failed_refresh_preserves_it(self):
+        updated = self.deck.replace("994", "980")
+        with patch.object(VTG, "fetch_windborne_mean_deck", side_effect=[self.deck, updated, wb.WindborneError("HTTP 503")]) as fetch:
+            self.fetch()
+            self.assertEqual(updated, self.fetch(replace(self.settings, windborne_refresh=True)))
+            with self.assertRaises(wb.WindborneError):
+                self.fetch(replace(self.settings, windborne_refresh=True))
+            self.assertEqual(updated, self.fetch())
+        self.assertEqual(3, fetch.call_count)
+
+    def test_analysis_only_missing_analysis_or_gapped_decks_are_not_frozen(self):
+        for deck in (deck_row(), deck_row(hour=3), deck_row() + deck_row(hour=6), "<html>error</html>"):
+            with self.subTest(deck=deck), patch.object(VTG, "fetch_windborne_mean_deck", return_value=deck) as fetch:
+                self.fetch()
+                self.fetch()
+                self.assertEqual(2, fetch.call_count)
+        self.assertFalse(list(Path(self.temp.name).glob("*/*.json.gz")))
+
+    def test_naturally_short_forecast_is_reusable(self):
+        with patch.object(VTG, "fetch_windborne_mean_deck", return_value=self.deck) as fetch:
+            self.fetch()
+            self.fetch()
+        fetch.assert_called_once()
+
+    def test_identity_and_cycle_never_share_a_deck(self):
+        other_id = self.deck.replace("WP, 30", "WP, 31")
+        other_cycle = self.deck.replace("2026102700", "2026102706")
+        with patch.object(VTG, "fetch_windborne_mean_deck", side_effect=[self.deck, other_id, other_cycle]) as fetch:
+            self.fetch()
+            self.assertEqual(other_id, self.fetch(identity="WP312026"))
+            self.assertEqual(other_cycle, self.fetch(replace(self.settings, data_time="202610270600")))
+            self.assertEqual(self.deck, self.fetch())
+        self.assertEqual(3, fetch.call_count)
+
+    def test_corrupt_cached_deck_is_refetched(self):
+        with patch.object(VTG, "fetch_windborne_mean_deck", return_value=self.deck) as fetch:
+            self.fetch()
+            root, cycle = self.settings.source_backup_dir, self.settings.data_time
+            name = VTG.storm_history_keys(self.settings)[0]
+            payload = VTG.read_source_backup(root, name, cycle)
+            payload["windborne_decks"]["WP302026"]["deck"] = self.deck.replace("2026102700", "2026102618")
+            VTG.write_source_backup(root, payload)
+            self.assertEqual(self.deck, self.fetch())
+        self.assertEqual(2, fetch.call_count)
+
+    def test_snapshot_merge_preserves_untrimmed_deck_for_reuse(self):
+        # A later QC pass must not replace the transport cache with its trimmed track.
+        with patch.object(VTG, "fetch_windborne_mean_deck", return_value=self.deck) as fetch:
+            self.fetch()
+            raw = VTG.atcf_to_kma_schema(VTG.read_atcf_csv(self.deck, source="WINDBORNE"), self.settings)
+            VTG.merge_source_backups(raw, self.settings)
+            self.assertEqual(self.deck, self.fetch())
+        fetch.assert_called_once()
+
+    def test_parallel_same_identity_downloads_only_once(self):
+        with patch.object(VTG, "fetch_windborne_mean_deck", return_value=self.deck) as fetch:
+            with ThreadPoolExecutor(max_workers=2) as executor:
+                results = list(executor.map(lambda _: self.fetch(), range(2)))
+        self.assertEqual([self.deck, self.deck], results)
+        fetch.assert_called_once()
+
+    def test_failed_or_unavailable_storage_never_discards_live_guidance(self):
+        with patch.object(VTG, "fetch_windborne_mean_deck", return_value=self.deck), \
+                patch.object(VTG, "write_source_backup", side_effect=OSError("unavailable")):
+            self.assertEqual(self.deck, self.fetch())
+        self.assertFalse(list(Path(self.temp.name).glob("*/*.json.gz")))
+
+    def test_not_yet_available_is_retried_until_first_success(self):
+        with patch.object(VTG, "fetch_windborne_mean_deck", side_effect=[wb.WindborneError("HTTP 404"), self.deck]) as fetch:
+            with self.assertRaises(wb.WindborneError):
+                self.fetch()
+            self.assertFalse(list(Path(self.temp.name).glob("*/*.json.gz")))
+            self.fetch()
+            self.fetch()
+        self.assertEqual(2, fetch.call_count)
+
+    def test_artifact_roundtrip_reuses_deck_and_expiry_removes_it(self):
+        now = backup.cycle_time(self.settings.data_time) + timedelta(hours=12)
+        root = self.settings.source_backup_dir
+        with patch.object(VTG, "fetch_windborne_mean_deck", return_value=self.deck) as fetch, \
+                patch.object(backup, "official_ended_systems", return_value=set()):
+            self.fetch()
+            backup.prune(root, root / "kma", now=now)
+            target = root / "restored"
+            backup.restore_archive(target, artifact_zip(root))
+            self.assertEqual(self.deck, self.fetch(replace(self.settings, source_backup_dir=target)))
+            backup.prune(target, root / "kma", now=now + timedelta(days=3))
+            self.assertFalse(list(target.glob("*/*.json.gz")))
+        fetch.assert_called_once()
+
+    def test_cli_refresh_is_independent_and_defaults_off(self):
+        with patch.dict(os.environ, {"VTG_WINDBORNE_REFRESH": "false"}), patch("sys.argv", ["VTG.py"]):
+            self.assertFalse(VTG.parse_args().windborne_refresh)
+        with patch.dict(os.environ, {"VTG_WINDBORNE_REFRESH": "false"}), patch("sys.argv", ["VTG.py", "--windborne-refresh"]):
+            self.assertTrue(VTG.parse_args().windborne_refresh)
+        with patch.dict(os.environ, {"VTG_WINDBORNE_REFRESH": "true"}), patch("sys.argv", ["VTG.py"]):
+            self.assertTrue(VTG.parse_args().windborne_refresh)
+
+    def test_no_cache_directory_keeps_existing_transport(self):
+        with patch.object(VTG, "fetch_windborne_mean_deck", return_value=self.deck) as fetch:
+            self.fetch(replace(self.settings, source_backup_dir=None))
+            self.fetch(replace(self.settings, source_backup_dir=None))
+        self.assertEqual(2, fetch.call_count)
 
 
 class WindborneIntegrationTests(unittest.TestCase):

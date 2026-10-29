@@ -13,6 +13,11 @@ on:
         required: false
         default: false
         type: boolean
+      refresh_windborne:
+        description: "Refetch WeatherMesh instead of reusing validated data (use force to rerender completed runs)"
+        required: false
+        default: false
+        type: boolean
       manual_args:
         description: "Optional raw VTG.py args for one manual image run"
         required: false
@@ -135,6 +140,7 @@ jobs:
       KMA_APIHUB_AUTH_KEY: ${{ secrets.KMA_APIHUB_AUTH_KEY }}
       KMA_APIHUB_FALLBACK_AUTH_KEY: ${{ secrets.KMA_APIHUB_FALLBACK_AUTH_KEY }}
       WB_API_KEY: ${{ secrets.WB_API_KEY }}
+      VTG_WINDBORNE_REFRESH: ${{ github.event_name == 'workflow_dispatch' && inputs.refresh_windborne && 'true' || 'false' }}
       MPLBACKEND: Agg
       PYTHONUNBUFFERED: "1"
       NOW_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.now || '' }}

@@ -146,6 +146,22 @@ def summarize_deck(text, storm_id, cycle):
     }
 
 
+def reusable_mean_deck(text, storm_id, cycle):
+    """Freeze only mean-only decks with analysis and uninterrupted 3-hour forecasts.
+
+    A naturally short forecast is valid; this is local validation, not a claim
+    that the provider exposes a final-publication flag.
+    """
+    if not isinstance(text, str):
+        return False
+    try:
+        summary = summarize_deck(text, storm_id, cycle)
+    except WindborneError:
+        return False
+    return (summary["member_count"] == 0 and summary["mean_first_hour"] == 0
+            and summary["mean_points"] >= 2 and summary["mean_step_hours"] == [3])
+
+
 def fetch_mean_deck(storm_id, cycle, key):
     """Return only WMSH for this identity/cycle, without latest-cycle fallback."""
     storm_id = storm_id.strip().upper()

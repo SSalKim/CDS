@@ -17,6 +17,7 @@ from dataclasses import dataclass, replace
 from datetime import datetime, timedelta, timezone
 from functools import lru_cache
 from pathlib import Path
+from threading import Lock
 from typing import Iterable
 from urllib.parse import urlencode, urlparse
 
@@ -37,7 +38,8 @@ from shapely.geometry import LineString, box as geometry_box
 
 from polarwx_cache import DEFAULT_ROOT as POLARWX_CACHE_ROOT, load_snapshot, queue_request
 from vtg_source_backup import cycle_time as backup_cycle_time, read_snapshot as read_source_backup, recent_cycle, write_snapshot as write_source_backup
-from windborne import BASE_URL as WINDBORNE_BASE_URL, fetch_mean_deck as fetch_windborne_mean_deck
+from windborne import (BASE_URL as WINDBORNE_BASE_URL, fetch_mean_deck as fetch_windborne_mean_deck,
+                      reusable_mean_deck as reusable_windborne_mean_deck)
 
 from vtg_sources import (
     DMDW_ENABLED_MODEL_IDS,
@@ -366,6 +368,7 @@ class Settings:
     http_cache_dir: Path | None = None
     http_cache_ttl_seconds: int = 6 * 3600
     source_backup_dir: Path | None = None
+    windborne_refresh: bool = False
     source_overrides: tuple[tuple[str, str], ...] = ()
     skip_atcf: bool = False
     analysis_lat: float | None = None
@@ -558,6 +561,11 @@ def parse_args() -> Settings:
         default=Path(os.environ["VTG_SOURCE_BACKUP_DIR"]) if os.environ.get("VTG_SOURCE_BACKUP_DIR") else None,
         help="Optional short-lived same-storm/cycle backup directory, outside the Git checkout.",
     )
+    parser.add_argument(
+        "--windborne-refresh", action="store_true",
+        default=os.getenv("VTG_WINDBORNE_REFRESH", "").lower() in {"1", "true"},
+        help="Refetch WeatherMesh even when a validated same-identity/cycle deck is stored.",
+    )
     parser.add_argument("--skip-atcf", action="store_true", help="Skip ATCF fallback sources.")
     parser.add_argument("--analysis-lat", type=float, default=Settings.analysis_lat)
     parser.add_argument("--analysis-lon", type=float, default=Settings.analysis_lon)
@@ -621,6 +629,7 @@ def parse_args() -> Settings:
         http_cache_dir=args.http_cache_dir,
         http_cache_ttl_seconds=max(0, int(args.http_cache_ttl_seconds)),
         source_backup_dir=args.source_backup_dir,
+        windborne_refresh=args.windborne_refresh,
         source_overrides=source_overrides,
         skip_atcf=args.skip_atcf,
         analysis_lat=args.analysis_lat,
@@ -2060,6 +2069,51 @@ def select_atcf_identity_tracks(
     return pd.concat(selected, ignore_index=True).drop(columns="_IDENTITY_MODEL")
 
 
+WINDBORNE_CACHE_LOCK = Lock()
+
+
+def fetch_windborne_data(settings: Settings, storm_id: str, key: str) -> str:
+    cycle = normalize_utc_stamp(settings.data_time)
+    root = settings.source_backup_dir
+    if root is None or not recent_cycle(cycle):
+        return fetch_windborne_mean_deck(storm_id, cycle[:10], key)
+    identity = storm_id.upper()
+    keys = storm_history_keys(settings)
+    # Multiple identity requests share a storm snapshot; serialize read/modify/write.
+    with WINDBORNE_CACHE_LOCK:
+        snapshots = [read_source_backup(root, name, cycle) for name in keys]
+        if not settings.windborne_refresh:
+            for payload in snapshots:
+                entries = (payload or {}).get("windborne_decks", {})
+                entry = entries.get(identity) if isinstance(entries, dict) else None
+                if not isinstance(entry, dict) or entry.get("status") != "validated":
+                    continue
+                deck = entry.get("deck")
+                if reusable_windborne_mean_deck(deck, identity, cycle[:10]):
+                    print(f"WINDBORNE: reusing validated {identity} {cycle[:10]}; API request skipped.")
+                    return deck
+        deck = fetch_windborne_mean_deck(identity, cycle[:10], key)
+        if not reusable_windborne_mean_deck(deck, identity, cycle[:10]):
+            print(f"WINDBORNE: {identity} {cycle[:10]} is not reusable yet; will retry on the next run.")
+            return deck
+        payload = dict(snapshots[0] or {
+            "version": 1, "storm_key": keys[0], "cycle": cycle, "rows": [],
+        })
+        entries = {}
+        for snapshot in reversed(snapshots):
+            stored = (snapshot or {}).get("windborne_decks", {})
+            if isinstance(stored, dict):
+                entries.update(stored)
+        entries[identity] = {"status": "validated", "deck": deck}
+        payload.update(storm_keys=keys, windborne_decks=entries)
+        try:
+            write_source_backup(root, payload)
+            print(f"WINDBORNE: saved validated {identity} {cycle[:10]} for subsequent runs.")
+        except (OSError, ValueError, TypeError) as exc:
+            print(f"Warning: WeatherMesh cache could not be saved ({type(exc).__name__}); using fresh data.")
+        return deck
+
+
 def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
     url_specs = atcf_urls(settings)
@@ -2072,7 +2126,7 @@ def fetch_atcf_data(session: requests.Session, settings: Settings) -> pd.DataFra
         if source == "WINDBORNE":
             # Use isolated authenticated requests; never attach this key to the shared session.
             storm_id = urlparse(url).path.rsplit("/", 1)[-1]
-            return fetch_windborne_mean_deck(storm_id, target_cycle, windborne_key)
+            return fetch_windborne_data(settings, storm_id, windborne_key)
         if source == "RAW.GITHUB":
             model = next(model for model in RAW_GITHUB_MODELS
                          if raw_github_url(settings, model) == url)
@@ -3115,7 +3169,9 @@ def merge_source_backups(raw: pd.DataFrame, settings: Settings) -> pd.DataFrame:
             saved = pd.concat(saved_frames, ignore_index=True)
             columns = [column for column in [*KMA_COLUMNS, DATA_SOURCE_COLUMN, RAW_MODEL_COLUMN,
                        MODEL_ALIAS_PRIORITY_COLUMN, KIM_6H_FALLBACK_START_COLUMN] if column in saved]
+            existing = read_source_backup(settings.source_backup_dir, keys[0], cycle) or {}
             write_source_backup(settings.source_backup_dir, {
+                **existing,
                 "version": 1, "storm_key": keys[0], "storm_keys": keys, "cycle": cycle,
                 "atcf_ids": [settings.atcf_id, *settings.extra_atcf_ids],
                 "rows": json.loads(saved[columns].to_json(orient="records")),
