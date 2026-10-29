@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261029132935",
-  "generated_at_kst": "2026-10-29 22:29 KST",
+  "generated_at_utc": "20261029133936",
+  "generated_at_kst": "2026-10-29 22:39 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 28,
-  "selected_model_count": 15,
+  "model_source_count": 30,
+  "selected_model_count": 16,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -243,7 +243,7 @@
       ],
       "source": "SMCA.FUN",
       "source_label": "SMCA.FUN",
-      "selected": true,
+      "selected": false,
       "point_count": 25,
       "max_lead_hour": 144,
       "has_pressure": true,
@@ -251,6 +251,23 @@
       "is_official": false,
       "first_seen_utc": "20261029131940",
       "first_seen_kst": "2026-10-29 22:19 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "ECMWF_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261029133936",
+      "first_seen_kst": "2026-10-29 22:39 KST"
     },
     {
       "model_id": "GFS",
@@ -489,6 +506,23 @@
       "is_official": false,
       "first_seen_utc": "20261029124938",
       "first_seen_kst": "2026-10-29 21:49 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WN3C"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 40,
+      "max_lead_hour": 234,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261029133936",
+      "first_seen_kst": "2026-10-29 22:39 KST"
     },
     {
       "model_id": "WMSH",
