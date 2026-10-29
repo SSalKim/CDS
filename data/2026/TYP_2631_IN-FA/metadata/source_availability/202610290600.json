@@ -1,0 +1,105 @@
+{
+  "version": 2,
+  "schema": "cycle_model_source_first_seen",
+  "generated_at_utc": "20261029100934",
+  "generated_at_kst": "2026-10-29 19:09 KST",
+  "storm_year": "2026",
+  "storm_key": "typ_2026_31",
+  "storm_stage": "TYP",
+  "typ_number": 31,
+  "data_typ_number": 31,
+  "typ_name": "IN-FA",
+  "typ_name_ko": "인파",
+  "canonical_storm_key": "typ_2026_31",
+  "canonical_storm_stage": "TYP",
+  "canonical_typ_number": 31,
+  "canonical_typ_name": "IN-FA",
+  "canonical_typ_name_ko": "인파",
+  "linked_td_number": 59,
+  "linked_typ_number": null,
+  "atcf_id": "wp302026",
+  "extra_atcf_ids": [],
+  "data_time": "202610290600",
+  "cycle_time_utc": "202610290600",
+  "cycle_label_utc": "2026-10-29 06UTC",
+  "fetch_hours": 240,
+  "requested_hours": [
+    120,
+    240
+  ],
+  "model_source_count": 4,
+  "selected_model_count": 3,
+  "active_target_model_count": 40,
+  "model_sources": [
+    {
+      "model_id": "AICON",
+      "model_label": "AICON",
+      "raw_model_ids": [
+        "AICON"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 21,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261029100934",
+      "first_seen_kst": "2026-10-29 19:09 KST"
+    },
+    {
+      "model_id": "JGSM",
+      "model_label": "JGSM",
+      "raw_model_ids": [
+        "JGSM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 23,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261029100934",
+      "first_seen_kst": "2026-10-29 19:09 KST"
+    },
+    {
+      "model_id": "KMA",
+      "model_label": "KMA OFCL",
+      "raw_model_ids": [
+        "KMA"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 8,
+      "max_lead_hour": 120,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": true,
+      "first_seen_utc": "20261029100934",
+      "first_seen_kst": "2026-10-29 19:09 KST"
+    },
+    {
+      "model_id": "WMSH",
+      "model_label": "WindBorne WeatherMesh",
+      "raw_model_ids": [
+        "WMSH"
+      ],
+      "source": "WINDBORNE",
+      "source_label": "WindBorne WeatherMesh",
+      "selected": true,
+      "point_count": 68,
+      "max_lead_hour": 201,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261029100934",
+      "first_seen_kst": "2026-10-29 19:09 KST"
+    }
+  ],
+  "source_availability_path": "data/2026/TYP_2631_IN-FA/metadata/source_availability/202610290600.json",
+  "smca_aicon_snapshot_path": "data/2026/TYP_2631_IN-FA/metadata/smca/AICON/202610290600.json"
+}
