@@ -13,6 +13,14 @@ on:
         required: false
         default: false
         type: boolean
+      runner_mode:
+        description: "Runner routing (github-hosted bypasses unavailable laptop runners)"
+        required: false
+        default: auto
+        type: choice
+        options:
+          - auto
+          - github-hosted
       refresh_windborne:
         description: "Refetch WeatherMesh instead of reusing validated data (use force to rerender completed runs)"
         required: false
@@ -44,6 +52,7 @@ concurrency:
 jobs:
   decide-runner:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     outputs:
       runner_kind: ${{ steps.choose.outputs.runner_kind }}
       runner_labels: ${{ steps.choose.outputs.runner_labels }}
@@ -52,10 +61,17 @@ jobs:
         id: choose
         env:
           GH_TOKEN: ${{ secrets.RUNNER_STATUS_TOKEN || github.token }}
+          RUNNER_MODE: ${{ inputs.runner_mode || 'auto' }}
         run: |
           set +e
+          if [ "$RUNNER_MODE" = "github-hosted" ]; then
+            echo "GitHub-hosted runner explicitly requested; bypassing self-hosted routing."
+            echo "runner_kind=github-hosted" >> "$GITHUB_OUTPUT"
+            echo 'runner_labels="ubuntu-latest"' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           api_url="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners"
-          http_code="$(curl -sS \
+          http_code="$(curl -sS --connect-timeout 10 --max-time 20 \
             -o runners.json \
             -w '%{http_code}' \
             -H "Authorization: Bearer ${GH_TOKEN}" \
