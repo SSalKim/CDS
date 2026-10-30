@@ -5198,6 +5198,20 @@ def filtered_country_borders(scale: str) -> cfeature.ShapelyFeature:
     return cfeature.ShapelyFeature(geometries, ccrs.PlateCarree(), facecolor="none")
 
 
+def fit_fixed_map_panel(ax, *, fig_width: float, fig_height: float) -> None:
+    """Fill the fixed panel without stretching or moving its longitude edges.
+
+    A rounded geographic north edge is not an exact Mercator canvas aspect.
+    GeoAxes otherwise shrinks the axes and exposes a strip before the legend.
+    Derive the north edge in projected metres instead; keep west/east/south
+    fixed, including the deliberate limit just short of the date line.
+    """
+    x0, x1 = ax.get_xlim()
+    y0, _ = ax.get_ylim()
+    ax.set_ylim(y0, y0 + (x1 - x0) * fig_height / fig_width)
+    ax.spines["geo"].set_visible(False)
+
+
 def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, intensity: str) -> Path:
     df = df.copy()
     df["FT_TIME"] = parse_ft_time(df["FT_TM(UTC)"])
@@ -5248,6 +5262,8 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     ax = fig.add_axes([0, 0, map_panel_frac, 1], projection=map_crs)
     ax.set_facecolor("#262626")
     ax.set_extent(extent, crs=data_crs)
+    if settings.fcst_hours >= 240:
+        fit_fixed_map_panel(ax, fig_width=fig_width, fig_height=fig_height)
     ax.set_position([0, 0, map_panel_frac, 1])
     ax.set_anchor("W")
 
