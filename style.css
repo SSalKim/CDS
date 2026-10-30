@@ -72,6 +72,24 @@ select{
   flex-direction:column;
   gap:10px;
   flex-shrink:0;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior-y:contain;
+  scrollbar-width:thin;
+}
+
+.sidebar > *{
+  flex-shrink:0;
+}
+
+.sidebar::-webkit-scrollbar{
+  width:6px;
+}
+
+.sidebar::-webkit-scrollbar-thumb{
+  background:var(--line-soft);
+  border-radius:3px;
 }
 
 .main-panel{
