@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import importlib.metadata
 import json
+import os
 import platform
 from functools import lru_cache
 from pathlib import Path
@@ -30,7 +31,10 @@ def runtime_report():
             packages[name] = None
     result = {"python": platform.python_version(), "packages": packages,
               "lock_sha256": hashlib.sha256(LOCK.read_bytes()).hexdigest(),
-              "font_sha256": hashlib.sha256(FONT.read_bytes()).hexdigest()}
+              "font_sha256": hashlib.sha256(FONT.read_bytes()).hexdigest(),
+              "arithmetic": {name: os.getenv(name) for name in (
+                  "OPENBLAS_CORETYPE", "OPENBLAS_NUM_THREADS", "OMP_NUM_THREADS",
+                  "NPY_DISABLE_CPU_FEATURES")}}
     if packages.get("matplotlib"):
         import matplotlib
         from matplotlib import ft2font

@@ -16,6 +16,11 @@ runs:
         set -euo pipefail
         echo "MPLCONFIGDIR=$RUNNER_TEMP/vtg-mpl" >> "$GITHUB_ENV"
         echo "VTG_MAP_DATA_DIR=$RUNNER_TOOL_CACHE/cds-vtg/maps-10m-v2" >> "$GITHUB_ENV"
+        # Use a shared, non-FMA arithmetic path even when runner CPUs differ.
+        echo "OPENBLAS_CORETYPE=Nehalem" >> "$GITHUB_ENV"
+        echo "OPENBLAS_NUM_THREADS=1" >> "$GITHUB_ENV"
+        echo "OMP_NUM_THREADS=1" >> "$GITHUB_ENV"
+        echo "NPY_DISABLE_CPU_FEATURES=AVX512F,AVX2,FMA3" >> "$GITHUB_ENV"
         lock_hash="$(sha256sum requirements-vtg.lock.txt | cut -d ' ' -f 1)"
         venv_path="$RUNNER_TOOL_CACHE/cds-vtg/python-3.12.15-$lock_hash"
         if [ ! -x "$venv_path/bin/python" ]; then
