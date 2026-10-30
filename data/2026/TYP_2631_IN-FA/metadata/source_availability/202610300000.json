@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261030070936",
-  "generated_at_kst": "2026-10-30 16:09 KST",
+  "generated_at_utc": "20261030071936",
+  "generated_at_kst": "2026-10-30 16:19 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 53,
-  "selected_model_count": 22,
+  "model_source_count": 65,
+  "selected_model_count": 30,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -210,8 +210,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 34,
-      "max_lead_hour": 198,
+      "point_count": 35,
+      "max_lead_hour": 204,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -270,6 +270,23 @@
       "first_seen_kst": "2026-10-30 15:59 KST"
     },
     {
+      "model_id": "GEML",
+      "model_label": "CMC GEML",
+      "raw_model_ids": [
+        "GEML"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261030071936",
+      "first_seen_kst": "2026-10-30 16:19 KST"
+    },
+    {
       "model_id": "ECMWF",
       "model_label": "ECMWF",
       "raw_model_ids": [
@@ -285,6 +302,40 @@
       "is_official": false,
       "first_seen_utc": "20261030070936",
       "first_seen_kst": "2026-10-30 16:09 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECM"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261030071936",
+      "first_seen_kst": "2026-10-30 16:19 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261030071936",
+      "first_seen_kst": "2026-10-30 16:19 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -404,6 +455,40 @@
       "is_official": false,
       "first_seen_utc": "20261030065936",
       "first_seen_kst": "2026-10-30 15:59 KST"
+    },
+    {
+      "model_id": "FNEC_AI",
+      "model_label": "FourCastNet-ECMWF",
+      "raw_model_ids": [
+        "FNEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261030071936",
+      "first_seen_kst": "2026-10-30 16:19 KST"
+    },
+    {
+      "model_id": "FNKM_AI",
+      "model_label": "FourCastNet-KIM",
+      "raw_model_ids": [
+        "FNKM_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 36,
+      "max_lead_hour": 210,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261030071936",
+      "first_seen_kst": "2026-10-30 16:19 KST"
     },
     {
       "model_id": "GFS",
@@ -574,6 +659,57 @@
       "is_official": false,
       "first_seen_utc": "20261030065936",
       "first_seen_kst": "2026-10-30 15:59 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261030071936",
+      "first_seen_kst": "2026-10-30 16:19 KST"
+    },
+    {
+      "model_id": "GCEC_AI",
+      "model_label": "GraphCast-ECMWF",
+      "raw_model_ids": [
+        "GCEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 30,
+      "max_lead_hour": 174,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261030071936",
+      "first_seen_kst": "2026-10-30 16:19 KST"
+    },
+    {
+      "model_id": "GCKM_AI",
+      "model_label": "GraphCast-KIM",
+      "raw_model_ids": [
+        "GCKM_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261030071936",
+      "first_seen_kst": "2026-10-30 16:19 KST"
     },
     {
       "model_id": "HAFS",
@@ -831,6 +967,40 @@
       "first_seen_kst": "2026-10-30 13:09 KST"
     },
     {
+      "model_id": "PGEC_AI",
+      "model_label": "Pangu-Weather-ECMWF",
+      "raw_model_ids": [
+        "PGEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261030071936",
+      "first_seen_kst": "2026-10-30 16:19 KST"
+    },
+    {
+      "model_id": "PGKM_AI",
+      "model_label": "Pangu-Weather-KIM",
+      "raw_model_ids": [
+        "PGKM_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 41,
+      "max_lead_hour": 240,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261030071936",
+      "first_seen_kst": "2026-10-30 16:19 KST"
+    },
+    {
       "model_id": "UKM",
       "model_label": "UKMO",
       "raw_model_ids": [
@@ -872,7 +1042,7 @@
       ],
       "source": "RAL.UCAR",
       "source_label": "RAL UCAR ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 29,
       "max_lead_hour": 168,
       "has_pressure": true,
@@ -880,6 +1050,23 @@
       "is_official": false,
       "first_seen_utc": "20261030065936",
       "first_seen_kst": "2026-10-30 15:59 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKMET"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 29,
+      "max_lead_hour": 168,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261030071936",
+      "first_seen_kst": "2026-10-30 16:19 KST"
     },
     {
       "model_id": "WNC",
@@ -916,6 +1103,23 @@
       "first_seen_kst": "2026-10-30 15:59 KST"
     },
     {
+      "model_id": "WNC",
+      "model_label": "WeatherNext2 Cyclones",
+      "raw_model_ids": [
+        "WN2C"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261030071936",
+      "first_seen_kst": "2026-10-30 16:19 KST"
+    },
+    {
       "model_id": "WMSH",
       "model_label": "WindBorne WeatherMesh",
       "raw_model_ids": [
@@ -936,5 +1140,6 @@
   "source_availability_path": "data/2026/TYP_2631_IN-FA/metadata/source_availability/202610300000.json",
   "smca_aicon_snapshot_path": "data/2026/TYP_2631_IN-FA/metadata/smca/AICON/202610300000.json",
   "smca_aifsm_snapshot_path": "data/2026/TYP_2631_IN-FA/metadata/smca/AIFSM/202610300000.json",
-  "smca_aigfs_snapshot_path": "data/2026/TYP_2631_IN-FA/metadata/smca/AIGFS/202610300000.json"
+  "smca_aigfs_snapshot_path": "data/2026/TYP_2631_IN-FA/metadata/smca/AIGFS/202610300000.json",
+  "smca_geml_snapshot_path": "data/2026/TYP_2631_IN-FA/metadata/smca/GEML/202610300000.json"
 }
