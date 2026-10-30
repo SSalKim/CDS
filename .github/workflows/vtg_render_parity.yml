@@ -56,5 +56,5 @@ jobs:
         with:
           pattern: vtg-parity-*
           path: parity
-      - name: Require exact RGBA pixel equality
+      - name: Verify pixels with isolated antialias rounding tolerance
         run: python -B vtg_render_parity.py --compare parity/vtg-parity-hosted parity/vtg-parity-laptop

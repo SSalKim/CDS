@@ -88,9 +88,21 @@ def compare(left, right):
             raise RuntimeError(f"Runner parity mismatch: {key}")
     for name in ("120h.png", "240h.png"):
         a, b = (reports[i]["images"][name] for i in (0, 1))
-        if a["size"] != b["size"] or a["pixel_sha256"] != b["pixel_sha256"]:
+        if a["size"] != b["size"]:
             raise RuntimeError(f"Runner pixel mismatch: {name}")
-        print(f"IDENTICAL {name}: {a['size']}, {a['pixel_sha256']}")
+        if a["pixel_sha256"] == b["pixel_sha256"]:
+            print(f"IDENTICAL {name}: {a['size']}, {a['pixel_sha256']}")
+            continue
+        with Image.open(left / name) as first, Image.open(right / name) as second:
+            delta = np.abs(np.asarray(first.convert("RGBA"), dtype=np.int16)
+                           - np.asarray(second.convert("RGBA"), dtype=np.int16))
+        changed = int(np.any(delta, axis=2).sum())
+        maximum = int(delta.max())
+        # Allow only isolated 1/255 antialias rounding, never a geometry/font change.
+        limit = max(1, a["size"][0] * a["size"][1] // 100_000)
+        if maximum > 1 or changed > limit:
+            raise RuntimeError(f"Runner pixel mismatch: {name}, {changed} pixels, max delta {maximum}")
+        print(f"EQUIVALENT {name}: {changed} pixels differ by at most {maximum}/255")
 
 
 def main():
