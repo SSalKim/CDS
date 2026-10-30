@@ -1,0 +1,23 @@
+name: Set up deterministic VTG runtime
+description: Use the same isolated Python and wheel versions on hosted and laptop runners.
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: "3.12.15"
+        cache: pip
+        cache-dependency-path: |
+          requirements-vtg.txt
+          requirements-vtg.lock.txt
+    - name: Prepare isolated VTG interpreter
+      shell: bash
+      run: |
+        set -euo pipefail
+        lock_hash="$(sha256sum requirements-vtg.lock.txt | cut -d ' ' -f 1)"
+        venv_path="$RUNNER_TOOL_CACHE/cds-vtg/python-3.12.15-$lock_hash"
+        if [ ! -x "$venv_path/bin/python" ]; then
+          python -m venv "$venv_path"
+        fi
+        echo "$venv_path/bin" >> "$GITHUB_PATH"
+        "$venv_path/bin/python" --version

@@ -256,6 +256,10 @@ def render_code_signature(project_root: Path) -> str:
         for filename in ("VTG.py", "vtg_sources.py", "polarwx_browser.py", "polarwx_cache.py", "vtg_source_backup.py", "vtg_identity_links.py", "windborne.py"):
             digest.update(filename.encode("utf-8") + b"\0")
             digest.update((project_root / filename).read_bytes())
+        for filename in ("vtg_render_runtime.py", "requirements-vtg.lock.txt", "fonts/NanumSquareB.ttf"):
+            path = project_root / filename
+            if path.is_file():
+                digest.update(filename.encode("utf-8") + b"\0" + path.read_bytes())
         return digest.hexdigest()
     except OSError:
         return ""

@@ -22,6 +22,7 @@ from typing import Iterable
 from urllib.parse import urlencode, urlparse
 
 import cartopy.crs as ccrs
+from cartopy import config as cartopy_config
 import cartopy.feature as cfeature
 from cartopy.io import shapereader
 import matplotlib.font_manager as fm
@@ -40,6 +41,7 @@ from polarwx_cache import DEFAULT_ROOT as POLARWX_CACHE_ROOT, load_snapshot, que
 from vtg_source_backup import cycle_time as backup_cycle_time, read_snapshot as read_source_backup, recent_cycle, write_snapshot as write_source_backup
 from windborne import (BASE_URL as WINDBORNE_BASE_URL, fetch_mean_deck as fetch_windborne_mean_deck,
                       reusable_mean_deck as reusable_windborne_mean_deck)
+from vtg_render_runtime import runtime_report
 
 from vtg_sources import (
     DMDW_ENABLED_MODEL_IDS,
@@ -299,6 +301,8 @@ TRACK_HISTORY_MAX_LOOKBACK_DAYS = 45
 PROJECT_ROOT = Path(__file__).resolve().parent
 PLOT_FONT_FAMILY = "DejaVu Sans"
 PREFERRED_PLOT_FONT_FILE = PROJECT_ROOT / "fonts" / "NanumSquareB.ttf"
+if os.getenv("VTG_MAP_DATA_DIR"):
+    cartopy_config["data_dir"] = Path(os.environ["VTG_MAP_DATA_DIR"])
 MAP_FEATURE_SCALE = os.getenv("VTG_MAP_FEATURE_SCALE", "10m").strip().lower()
 if MAP_FEATURE_SCALE not in {"10m", "50m", "110m"}:
     MAP_FEATURE_SCALE = "10m"
@@ -646,41 +650,21 @@ def parse_args() -> Settings:
     )
 
 
+def plot_font_properties(**kwargs):
+    """Use the bundled file, never a host's same-family regular/bold variant."""
+    return fm.FontProperties(fname=str(PREFERRED_PLOT_FONT_FILE), **kwargs)
+
+
 def configure_plot_fonts() -> None:
     global PLOT_FONT_FAMILY
-    font_dirs = [
-        str(PROJECT_ROOT / "fonts"),
-        "/usr/share/fonts/truetype/nanum",
-        str(Path.home() / "AppData/Local/Microsoft/Windows/Fonts"),
-        "C:/Windows/Fonts",
-    ]
-
     preferred_font = PREFERRED_PLOT_FONT_FILE
-    if preferred_font.exists():
-        try:
-            fm.fontManager.addfont(str(preferred_font))
-            PLOT_FONT_FAMILY = fm.FontProperties(fname=str(preferred_font)).get_name()
-            plt.rcParams["font.family"] = [PLOT_FONT_FAMILY]
-            plt.rcParams["font.sans-serif"] = [PLOT_FONT_FAMILY]
-            plt.rcParams["axes.unicode_minus"] = False
-            print(f"Using plot font: {PLOT_FONT_FAMILY} ({preferred_font})")
-            return
-        except RuntimeError as exc:
-            print(f"Preferred font could not be loaded: {preferred_font} ({exc})")
-
-    for font_file in fm.findSystemFonts(fontpaths=[p for p in font_dirs if Path(p).exists()]):
-        try:
-            fm.fontManager.addfont(font_file)
-        except RuntimeError:
-            pass
-    available = {font.name for font in fm.fontManager.ttflist}
-    for candidate in ("NanumSquare", "NanumGothic", "NanumBarunGothic", "Malgun Gothic", "DejaVu Sans"):
-        if candidate in available:
-            PLOT_FONT_FAMILY = candidate
-            break
-    print(f"Using plot font: {PLOT_FONT_FAMILY}")
-    plt.rcParams["font.family"] = [PLOT_FONT_FAMILY, "DejaVu Sans"]
-    plt.rcParams["font.sans-serif"] = [PLOT_FONT_FAMILY, "DejaVu Sans"]
+    if not preferred_font.is_file():
+        raise RuntimeError("Bundled VTG font fonts/NanumSquareB.ttf is missing")
+    fm.fontManager.addfont(str(preferred_font))
+    PLOT_FONT_FAMILY = plot_font_properties().get_name()
+    print(f"Using bundled plot font: {PLOT_FONT_FAMILY}")
+    plt.rcParams["font.family"] = [PLOT_FONT_FAMILY]
+    plt.rcParams["font.sans-serif"] = [PLOT_FONT_FAMILY]
     plt.rcParams["axes.unicode_minus"] = False
 
 
@@ -4477,6 +4461,7 @@ def write_run_metadata(
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"),
         "render_signature": render_signature(),
+        "render_environment": runtime_report(),
         "image_path": image_path.as_posix(),
         "storm_stage": settings.storm_stage,
         "storm_year": storm_year(settings),
@@ -5256,7 +5241,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     legend_extra_width_ratio = 0.325
     total_fig_width = fig_width * (1.0 + legend_extra_width_ratio)
     map_panel_frac = fig_width / total_fig_width
-    fig = plt.figure(figsize=(total_fig_width, fig_height), dpi=settings.figure_dpi, frameon=False)
+    fig = plt.figure(figsize=(total_fig_width, fig_height), dpi=settings.figure_dpi, frameon=True)
     fig.patch.set_facecolor("#262626")
     fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
 
@@ -5264,6 +5249,7 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     ax.set_facecolor("#262626")
     ax.set_extent(extent, crs=data_crs)
     ax.set_position([0, 0, map_panel_frac, 1])
+    ax.set_anchor("W")
 
     legend_ax = fig.add_axes([map_panel_frac, 0, 1 - map_panel_frac, 1], frameon=False)
     legend_ax.set_axis_off()
@@ -5280,8 +5266,8 @@ def plot_guidance(df: pd.DataFrame, past_kma: pd.DataFrame, settings: Settings, 
     gl = ax.gridlines(draw_labels=True, color="gray", alpha=0.3)
     gl.top_labels = False
     gl.right_labels = False
-    gl.xlabel_style = {"size": 10, "color": "gray", "va": "top"}
-    gl.ylabel_style = {"size": 10, "color": "gray", "ha": "right"}
+    gl.xlabel_style = {"fontproperties": plot_font_properties(size=10), "color": "gray", "va": "top"}
+    gl.ylabel_style = {"fontproperties": plot_font_properties(size=10), "color": "gray", "ha": "right"}
     gl.xpadding = -5
     gl.ypadding = -5
     gl.xlocator = mticker.MultipleLocator(5)
@@ -5352,7 +5338,7 @@ def draw_header(
         fontsize=38,
         color="#AAF7F4",
         fontweight="1000",
-        fontfamily=PLOT_FONT_FAMILY,
+        fontproperties=plot_font_properties(),
         verticalalignment="top",
         zorder=100,
     )
@@ -5373,7 +5359,7 @@ def draw_header(
         right_header_ha = "center"
 
     ax.text(right_header_x, 0.978, f"{start_date} {start_hour}UTC", transform=ax.transAxes,
-            fontsize=34, color="white", fontweight="1000", fontfamily=PLOT_FONT_FAMILY,
+            fontsize=34, color="white", fontweight="1000", fontproperties=plot_font_properties(),
             verticalalignment="top", horizontalalignment=right_header_ha, zorder=100,
             bbox=dict(boxstyle="square,pad=0.5", facecolor="none", linewidth=0))
     guidance_text = ax.text(
@@ -5384,7 +5370,7 @@ def draw_header(
         fontsize=22.5,
         color="white",
         fontweight="800",
-        fontfamily=PLOT_FONT_FAMILY,
+        fontproperties=plot_font_properties(),
         verticalalignment="top",
         zorder=100,
         bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0),
@@ -5403,19 +5389,19 @@ def draw_header(
     if storm_number:
         ax.text(title_bbox.x1 + 0.004, 0.966, storm_number, transform=ax.transAxes,
                 fontsize=17.5 if not display_name else 16.5, color="#AAF7F4", fontweight="700",
-                fontfamily=PLOT_FONT_FAMILY, verticalalignment="top", horizontalalignment="left", zorder=100)
+                fontproperties=plot_font_properties(), verticalalignment="top", horizontalalignment="left", zorder=100)
     ax.text(guidance_bbox.x1 + 0.006, 0.932, "+", transform=ax.transAxes,
-            fontsize=22.5, color="white", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
+            fontsize=22.5, color="white", fontweight="800", fontproperties=plot_font_properties(),
             verticalalignment="top", zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
     ax.text(right_header_x, 0.932, model_count_text, transform=ax.transAxes,
-            fontsize=22.5, color="#DCB0E1", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
+            fontsize=22.5, color="#DCB0E1", fontweight="800", fontproperties=plot_font_properties(),
             verticalalignment="top", horizontalalignment=right_header_ha, zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
     credit_x = 0.995 if legend_side == "left" else 0.005
     credit_ha = "right" if legend_side == "left" else "left"
     ax.text(credit_x, 0.006, "Plotted by WooJin Kim\nData sourced from KMA APIHUB & NRL ATCF", transform=ax.transAxes,
-            fontsize=12, color="aliceblue", fontweight="800", fontfamily=PLOT_FONT_FAMILY,
+            fontsize=12, color="aliceblue", fontweight="800", fontproperties=plot_font_properties(),
             verticalalignment="bottom", horizontalalignment=credit_ha, zorder=100,
             bbox=dict(boxstyle="square,pad=0.3", facecolor="none", alpha=0.8, linewidth=0))
 
@@ -5609,7 +5595,7 @@ def draw_model_endpoint_labels(ax, endpoints) -> None:
         label = ax.annotate(
             MODEL_ENDPOINT_LABELS[model["name"]], xy=xy, xycoords=transform,
             xytext=(0, 0), textcoords="offset points", ha="center", va="center",
-            fontsize=11, fontweight="bold", fontfamily=PLOT_FONT_FAMILY,
+            fontsize=11, fontweight="bold", fontproperties=plot_font_properties(),
             color="#F7F7F7", zorder=100 + priority, annotation_clip=False, clip_on=True,
             bbox=dict(boxstyle="round,pad=0.16,rounding_size=0.12", facecolor=to_rgba("#171717", 0.5),
                       edgecolor=color, linewidth=0.9),
@@ -5772,7 +5758,6 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
     handle_x1 = x0 + pad_x + handle_len
     handle_mid = (handle_x0 + handle_x1) / 2
     label_x = x0 + pad_x + label_gap
-    label_font_family = PLOT_FONT_FAMILY
     label_font_weight = "semibold"
 
     for idx, row in enumerate(rows):
@@ -5839,7 +5824,7 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
             label_text_y,
             row["label"],
             transform=ax.transAxes,
-            fontfamily=label_font_family,
+            fontproperties=plot_font_properties(),
             fontsize=font_size,
             fontweight=label_font_weight,
             color=row["text_color"],
@@ -5857,7 +5842,7 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
             pressure_text_y,
             pressure_text,
             transform=ax.transAxes,
-            fontfamily=PLOT_FONT_FAMILY,
+            fontproperties=plot_font_properties(),
             fontsize=font_size,
             fontweight="700",
             color=metric_text_color,
@@ -5885,7 +5870,7 @@ def draw_model_legend_table(ax, rows: list[dict], *, side: str = "right") -> Non
             lead_text_y,
             lead_text,
             transform=ax.transAxes,
-            fontfamily=PLOT_FONT_FAMILY,
+            fontproperties=plot_font_properties(),
             fontsize=font_size,
             fontweight="700",
             color=metric_text_color,

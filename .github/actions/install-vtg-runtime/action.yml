@@ -1,0 +1,13 @@
+name: Install locked VTG rendering packages
+description: Check every pinned dependency before reusing a cached virtual environment.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        set -euo pipefail
+        if ! python -B vtg_render_runtime.py --check; then
+          python -m pip install --only-binary=:all: -r requirements-vtg.txt
+        fi
+        python -m pip check
+        python -B vtg_render_runtime.py --check

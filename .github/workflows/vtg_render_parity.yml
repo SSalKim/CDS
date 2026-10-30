@@ -1,0 +1,62 @@
+name: Verify VTG runner pixel parity
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: vtg-render-parity
+  cancel-in-progress: false
+
+jobs:
+  render:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: hosted
+            labels: '"ubuntu-24.04"'
+          - name: laptop
+            labels: '["self-hosted","cds-vtg"]'
+    runs-on: ${{ fromJson(matrix.labels) }}
+    timeout-minutes: 15
+    env:
+      MPLBACKEND: Agg
+      MPLCONFIGDIR: ${{ runner.temp }}/vtg-parity-mpl
+      VTG_MAP_DATA_DIR: ${{ runner.tool_cache }}/cds-vtg/maps-10m-v2
+      PYTHONHASHSEED: "0"
+      PYTHONNOUSERSITE: "1"
+      PROJ_NETWORK: "OFF"
+      TZ: UTC
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-vtg-runtime
+      - uses: ./.github/actions/install-vtg-runtime
+      - uses: actions/cache@v4
+        with:
+          path: ${{ env.VTG_MAP_DATA_DIR }}
+          key: cartopy-natural-earth-10m-v2
+      - name: Render identical offline inputs
+        run: python -B vtg_render_parity.py --output "${{ runner.temp }}/parity-${{ matrix.name }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vtg-parity-${{ matrix.name }}
+          path: ${{ runner.temp }}/parity-${{ matrix.name }}/
+          retention-days: 3
+
+  compare:
+    needs: render
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-vtg-runtime
+      - uses: ./.github/actions/install-vtg-runtime
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: vtg-parity-*
+          path: parity
+      - name: Require exact RGBA pixel equality
+        run: python -B vtg_render_parity.py --compare parity/vtg-parity-hosted parity/vtg-parity-laptop
