@@ -19,6 +19,9 @@ jobs:
     timeout-minutes: 3
     steps:
       - uses: actions/checkout@v4
+        with:
+          sparse-checkout: /vtg_runner_watchdog.py
+          sparse-checkout-cone-mode: false
       - name: Recover automatic self-hosted jobs queued for over three minutes
         env:
           GH_TOKEN: ${{ github.token }}
