@@ -1,5 +1,5 @@
 name: Generate VTG images
-run-name: Generate VTG images ${{ github.event.inputs.now || github.run_number }}
+run-name: Generate VTG images ${{ github.event.inputs.now || github.run_number }}${{ (inputs.manual_args || inputs.force) && ' (manual)' || '' }}
 
 on:
   workflow_dispatch:

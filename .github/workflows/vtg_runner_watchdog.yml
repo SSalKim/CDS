@@ -1,0 +1,25 @@
+name: Recover stalled VTG runner queues
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: vtg-runner-watchdog
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - name: Recover automatic self-hosted jobs queued for over three minutes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B vtg_runner_watchdog.py
