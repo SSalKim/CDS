@@ -76,7 +76,8 @@ select{
   overflow-y:auto;
   overflow-x:hidden;
   overscroll-behavior-y:contain;
-  scrollbar-width:thin;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
 }
 
 .sidebar > *{
@@ -84,12 +85,7 @@ select{
 }
 
 .sidebar::-webkit-scrollbar{
-  width:6px;
-}
-
-.sidebar::-webkit-scrollbar-thumb{
-  background:var(--line-soft);
-  border-radius:3px;
+  display:none;
 }
 
 .main-panel{
