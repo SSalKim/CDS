@@ -24,8 +24,6 @@ jobs:
     timeout-minutes: 15
     env:
       MPLBACKEND: Agg
-      MPLCONFIGDIR: ${{ runner.temp }}/vtg-parity-mpl
-      VTG_MAP_DATA_DIR: ${{ runner.tool_cache }}/cds-vtg/maps-10m-v2
       PYTHONHASHSEED: "0"
       PYTHONNOUSERSITE: "1"
       PROJ_NETWORK: "OFF"

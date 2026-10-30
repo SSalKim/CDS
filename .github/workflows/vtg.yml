@@ -161,8 +161,6 @@ jobs:
       PYTHONUNBUFFERED: "1"
       PYTHONHASHSEED: "0"
       PYTHONNOUSERSITE: "1"
-      MPLCONFIGDIR: ${{ runner.temp }}/vtg-mpl
-      VTG_MAP_DATA_DIR: ${{ runner.tool_cache }}/cds-vtg/maps-10m-v2
       PROJ_NETWORK: "OFF"
       TZ: UTC
       NOW_INPUT: ${{ github.event_name == 'workflow_dispatch' && inputs.now || '' }}
