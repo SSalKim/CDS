@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261031193034",
-  "generated_at_kst": "2026-11-01 04:30 KST",
+  "generated_at_utc": "20261031194034",
+  "generated_at_kst": "2026-11-01 04:40 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 60,
-  "selected_model_count": 31,
+  "model_source_count": 62,
+  "selected_model_count": 32,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -278,8 +278,8 @@
       "source": "APIHUB",
       "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 30,
-      "max_lead_hour": 174,
+      "point_count": 31,
+      "max_lead_hour": 180,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -754,7 +754,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 15,
+      "point_count": 30,
       "max_lead_hour": 174,
       "has_pressure": true,
       "has_wind": true,
@@ -882,6 +882,23 @@
       "first_seen_kst": "2026-11-01 01:00 KST"
     },
     {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "NEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261031194034",
+      "first_seen_kst": "2026-11-01 04:40 KST"
+    },
+    {
       "model_id": "PGEC_AI",
       "model_label": "Pangu-Weather-ECMWF",
       "raw_model_ids": [
@@ -948,6 +965,23 @@
       "is_official": false,
       "first_seen_utc": "20261031193034",
       "first_seen_kst": "2026-11-01 04:30 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKM"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 29,
+      "max_lead_hour": 168,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261031194034",
+      "first_seen_kst": "2026-11-01 04:40 KST"
     },
     {
       "model_id": "WNC",
