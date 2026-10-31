@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261031010103",
-  "generated_at_kst": "2026-10-31 10:01 KST",
+  "generated_at_utc": "20261031011055",
+  "generated_at_kst": "2026-10-31 10:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 36,
+  "model_source_count": 38,
   "selected_model_count": 16,
   "active_target_model_count": 40,
   "model_sources": [
@@ -202,6 +202,23 @@
       "first_seen_kst": "2026-10-31 09:50 KST"
     },
     {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 26,
+      "max_lead_hour": 150,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261031011055",
+      "first_seen_kst": "2026-10-31 10:10 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS_EPS",
       "model_label": "ECMWF AIFS EPS",
       "raw_model_ids": [
@@ -209,7 +226,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 35,
       "max_lead_hour": 216,
       "has_pressure": true,
@@ -217,6 +234,23 @@
       "is_official": false,
       "first_seen_utc": "20261031005058",
       "first_seen_kst": "2026-10-31 09:50 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261031011055",
+      "first_seen_kst": "2026-10-31 10:10 KST"
     },
     {
       "model_id": "GFS",
