@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261031191037",
-  "generated_at_kst": "2026-11-01 04:10 KST",
+  "generated_at_utc": "20261031192047",
+  "generated_at_kst": "2026-11-01 04:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 54,
-  "selected_model_count": 29,
+  "model_source_count": 57,
+  "selected_model_count": 30,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -253,6 +253,23 @@
       "first_seen_kst": "2026-11-01 04:00 KST"
     },
     {
+      "model_id": "GEML",
+      "model_label": "CMC GEML",
+      "raw_model_ids": [
+        "GEML"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 16,
+      "max_lead_hour": 90,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261031192047",
+      "first_seen_kst": "2026-11-01 04:20 KST"
+    },
+    {
       "model_id": "ECMWF",
       "model_label": "ECMWF",
       "raw_model_ids": [
@@ -268,6 +285,23 @@
       "is_official": false,
       "first_seen_utc": "20261031191037",
       "first_seen_kst": "2026-11-01 04:10 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261031192047",
+      "first_seen_kst": "2026-11-01 04:20 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -923,7 +957,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 29,
       "max_lead_hour": 168,
       "has_pressure": true,
@@ -931,6 +965,23 @@
       "is_official": false,
       "first_seen_utc": "20261031185036",
       "first_seen_kst": "2026-11-01 03:50 KST"
+    },
+    {
+      "model_id": "WNV3",
+      "model_label": "WeatherNext3 Cyclones",
+      "raw_model_ids": [
+        "WN3C"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 26,
+      "max_lead_hour": 150,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261031192047",
+      "first_seen_kst": "2026-11-01 04:20 KST"
     },
     {
       "model_id": "WMSH",
@@ -953,5 +1004,6 @@
   "source_availability_path": "data/2026/TYP_2631_IN-FA/metadata/source_availability/202610311200.json",
   "smca_aicon_snapshot_path": "data/2026/TYP_2631_IN-FA/metadata/smca/AICON/202610311200.json",
   "smca_aifsm_snapshot_path": "data/2026/TYP_2631_IN-FA/metadata/smca/AIFSM/202610311200.json",
-  "smca_aigfs_snapshot_path": "data/2026/TYP_2631_IN-FA/metadata/smca/AIGFS/202610311200.json"
+  "smca_aigfs_snapshot_path": "data/2026/TYP_2631_IN-FA/metadata/smca/AIGFS/202610311200.json",
+  "smca_geml_snapshot_path": "data/2026/TYP_2631_IN-FA/metadata/smca/GEML/202610311200.json"
 }
