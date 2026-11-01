@@ -1,0 +1,159 @@
+name: Deploy CDS Pages
+run-name: Deploy CDS Pages ${{ github.run_number }}
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      force:
+        description: Republish even when public files are unchanged
+        type: boolean
+        default: false
+  workflow_run:
+    workflows:
+      - Generate VTG images
+      - Backfill VTG images
+      - Archive VTG images to Google Drive
+      - Prefetch Polarwx VTG source data
+      - Sync DMDW VTG source data
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+  deployments: read
+
+# Finish an active deployment; collapse waiting requests to the latest snapshot.
+concurrency:
+  group: cds-pages-production
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name != 'workflow_run' ||
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      needed: ${{ steps.site.outputs.needed }}
+      commit: ${{ steps.site.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /pages_deploy.py
+            /.github/workflows/pages.yml
+          persist-credentials: false
+      - name: Find last successful publication
+        id: published
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              const { data } = await github.rest.repos.listDeployments({
+                ...context.repo, environment: 'github-pages', per_page: 30,
+              });
+              for (const deployment of data) {
+                const statuses = await github.rest.repos.listDeploymentStatuses({
+                  ...context.repo, deployment_id: deployment.id, per_page: 1,
+                });
+                if (statuses.data[0]?.state === 'success' && /^[a-f0-9]{40}$/.test(deployment.sha)) {
+                  core.setOutput('commit', deployment.sha);
+                  return;
+                }
+              }
+            } catch (error) {
+              core.warning(`Cannot read prior publication (HTTP ${error.status || 'unknown'}); publishing conservatively.`);
+            }
+      - name: Compare tracked public files
+        id: site
+        env:
+          PREVIOUS_COMMIT: ${{ steps.published.outputs.commit }}
+          FORCE_PUBLISH: ${{ inputs.force || false }}
+        run: |
+          set -euo pipefail
+          args=()
+          if [[ "$PREVIOUS_COMMIT" =~ ^[a-f0-9]{40}$ ]]; then
+            if git fetch --no-tags --depth=1 origin "$PREVIOUS_COMMIT"; then
+              args+=(--compare-ref "$PREVIOUS_COMMIT")
+            fi
+          fi
+          if [ "$FORCE_PUBLISH" = true ]; then args+=(--force); fi
+          python -B pages_deploy.py "${args[@]}"
+
+  build:
+    needs: plan
+    if: needs.plan.outputs.needed == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.plan.outputs.commit }}
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /pages_deploy.py
+            /.github/workflows/pages.yml
+          persist-credentials: false
+      - name: Stage tracked static site without Jekyll
+        run: python -B pages_deploy.py --prepare "$RUNNER_TEMP/cds-pages" --materialize
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ runner.temp }}/cds-pages
+          retention-days: 1
+
+  deploy:
+    needs: [plan, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+      contents: read
+    environment:
+      name: github-pages
+      url: ${{ steps.publish.outputs.page_url || steps.retry.outputs.page_url }}
+    steps:
+      - name: Publish GitHub Pages
+        id: publish
+        continue-on-error: true
+        uses: actions/deploy-pages@v5
+        with:
+          timeout: 300000
+      - name: Release this failed request before one retry
+        if: steps.publish.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.request('POST /repos/{owner}/{repo}/pages/deployments/{deployment_id}/cancel', {
+                ...context.repo, deployment_id: context.sha,
+              });
+            } catch (error) {
+              if (![400, 404, 409].includes(error.status)) throw error;
+              core.info(`No unfinished request for this commit (HTTP ${error.status}).`);
+            }
+            await new Promise(resolve => setTimeout(resolve, 15000));
+      - name: Retry publication once
+        if: steps.publish.outcome == 'failure'
+        id: retry
+        uses: actions/deploy-pages@v5
+        with:
+          timeout: 300000
+      - name: Release own deployment on failure or cancellation
+        if: failure() || cancelled()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.request('POST /repos/{owner}/{repo}/pages/deployments/{deployment_id}/cancel', {
+                ...context.repo, deployment_id: context.sha,
+              });
+            } catch (error) {
+              core.warning(`Own deployment cleanup returned HTTP ${error.status || 'unknown'}.`);
+            }
