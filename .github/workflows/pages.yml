@@ -79,7 +79,7 @@ jobs:
           set -euo pipefail
           args=()
           if [[ "$PREVIOUS_COMMIT" =~ ^[a-f0-9]{40}$ ]]; then
-            if git fetch --no-tags --depth=1 origin "$PREVIOUS_COMMIT"; then
+            if git fetch --filter=blob:none --no-tags --depth=1 origin "$PREVIOUS_COMMIT"; then
               args+=(--compare-ref "$PREVIOUS_COMMIT")
             fi
           fi

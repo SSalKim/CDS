@@ -4,6 +4,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import pages_deploy as pages
 
@@ -97,6 +98,20 @@ class PagesDeploymentTests(unittest.TestCase):
         pages.prepare(self.root, destination, report, public, materialize=True)
         self.assertTrue((destination / "index.html").is_file())
         self.assertFalse((self.root / "VTG.py").exists())
+
+    def test_comparison_never_requests_blob_sizes_in_a_partial_clone(self):
+        original = pages.git
+        calls = []
+
+        def observed(root, *args, **kwargs):
+            calls.append(args)
+            return original(root, *args, **kwargs)
+
+        with patch.object(pages, "git", side_effect=observed):
+            pages.plan(self.root, self.git("rev-parse", "HEAD"))
+        for args in calls:
+            if args[0] == "ls-tree":
+                self.assertNotIn("-l", args)
 
 
 if __name__ == "__main__":

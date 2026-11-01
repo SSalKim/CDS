@@ -34,21 +34,22 @@ def is_public(path):
 
 def tracked_tree(root, ref="HEAD"):
     entries = []
-    for record in git(root, "ls-tree", "-r", "-l", "-z", ref).split(b"\0"):
+    # Asking for blob sizes (-l) would lazily download data in a partial clone.
+    for record in git(root, "ls-tree", "-r", "-z", ref).split(b"\0"):
         if not record:
             continue
         metadata, raw_path = record.split(b"\t", 1)
-        mode, kind, oid, size = metadata.decode("ascii").split()
+        mode, kind, oid = metadata.decode("ascii").split()
         path = raw_path.decode("utf-8")
         if is_public(path) or path in CONTROL_PATHS:
             if mode not in {"100644", "100755"} or kind != "blob":
                 raise ValueError(f"Public file must be a regular tracked file: {path}")
-            entries.append((path, mode, oid, int(size)))
+            entries.append((path, mode, oid))
     return sorted(entries)
 
 
 def fingerprint(entries):
-    content = json.dumps([(p, m, oid) for p, m, oid, _ in entries], separators=(",", ":"))
+    content = json.dumps(entries, separators=(",", ":"))
     return hashlib.sha256(content.encode("utf-8")).hexdigest()
 
 
@@ -58,14 +59,11 @@ def plan(root, compare_ref=None, force=False):
     missing = REQUIRED_PATHS - {entry[0] for entry in public}
     if missing:
         raise ValueError("Missing public entrypoints: " + ", ".join(sorted(missing)))
-    size = sum(entry[3] for entry in public)
-    if size > MAX_SITE_BYTES:
-        raise ValueError(f"Public site exceeds the 1 GB deployment budget: {size}")
     revision = fingerprint(entries)
     previous = fingerprint(tracked_tree(root, compare_ref)) if compare_ref else None
     return {"needed": force or revision != previous, "revision": revision,
             "commit": git(root, "rev-parse", "HEAD").decode().strip(),
-            "file_count": len(public), "bytes": size}, public
+            "file_count": len(public)}, public
 
 
 def prepare(root, destination, report, public, materialize=False):
@@ -77,15 +75,19 @@ def prepare(root, destination, report, public, materialize=False):
     if materialize:
         # Request only static roots, root-level assets, and the packaging controls.
         patterns = [f"/{p}/" for p in sorted(PUBLIC_DIRS)]
-        patterns.extend("/" + p for p, _, _, _ in public if "/" not in p)
+        patterns.extend("/" + p for p, _, _ in public if "/" not in p)
         patterns.extend("/" + p for p in sorted(CONTROL_PATHS))
         git(root, "sparse-checkout", "set", "--no-cone", "--stdin",
             input=("\n".join(patterns) + "\n").encode())
     destination.mkdir(parents=True, exist_ok=True)
-    for path, _, _, _ in public:
+    total = 0
+    for path, _, _ in public:
         source = root / path
         if source.is_symlink() or not source.is_file() or root not in source.resolve().parents:
             raise ValueError(f"Unsafe or missing public file: {path}")
+        total += source.stat().st_size
+        if total > MAX_SITE_BYTES:
+            raise ValueError(f"Public site exceeds the 1 GB deployment budget: {total}")
         target = destination / path
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, target)
@@ -93,6 +95,7 @@ def prepare(root, destination, report, public, materialize=False):
     (destination / "deployment.json").write_text(json.dumps({
         "commit": report["commit"], "site_revision": report["revision"],
     }, indent=2) + "\n", encoding="utf-8")
+    return total
 
 
 def main():
@@ -108,7 +111,7 @@ def main():
         parser.error("--compare-ref must be a complete commit SHA")
     report, public = plan(root, args.compare_ref, args.force)
     if args.prepare:
-        prepare(root, args.prepare, report, public, args.materialize)
+        report["bytes"] = prepare(root, args.prepare, report, public, args.materialize)
     print(json.dumps(report, sort_keys=True))
     if os.getenv("GITHUB_OUTPUT"):
         with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
