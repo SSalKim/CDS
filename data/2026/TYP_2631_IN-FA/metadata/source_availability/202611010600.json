@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261101130034",
-  "generated_at_kst": "2026-11-01 22:00 KST",
+  "generated_at_utc": "20261101131034",
+  "generated_at_kst": "2026-11-01 22:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 37,
+  "model_source_count": 39,
   "selected_model_count": 18,
   "active_target_model_count": 40,
   "model_sources": [
@@ -219,6 +219,23 @@
       "first_seen_kst": "2026-11-01 21:50 KST"
     },
     {
+      "model_id": "ECMWF_AIFS",
+      "model_label": "ECMWF AIFS",
+      "raw_model_ids": [
+        "AIFS"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 20,
+      "max_lead_hour": 114,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261101131034",
+      "first_seen_kst": "2026-11-01 22:10 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS_EPS",
       "model_label": "ECMWF AIFS EPS",
       "raw_model_ids": [
@@ -226,7 +243,7 @@
       ],
       "source": "SMCA.FUN",
       "source_label": "SMCA.FUN",
-      "selected": true,
+      "selected": false,
       "point_count": 20,
       "max_lead_hour": 114,
       "has_pressure": true,
@@ -251,6 +268,23 @@
       "is_official": false,
       "first_seen_utc": "20261101124042",
       "first_seen_kst": "2026-11-01 21:40 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFS_ENS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 23,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261101131034",
+      "first_seen_kst": "2026-11-01 22:10 KST"
     },
     {
       "model_id": "ECMWF_EPS",
