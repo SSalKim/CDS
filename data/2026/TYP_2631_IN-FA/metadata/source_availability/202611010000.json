@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261101081039",
-  "generated_at_kst": "2026-11-01 17:10 KST",
+  "generated_at_utc": "20261101082037",
+  "generated_at_kst": "2026-11-01 17:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 80,
-  "selected_model_count": 35,
+  "model_source_count": 82,
+  "selected_model_count": 36,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -559,6 +559,23 @@
       "first_seen_kst": "2026-11-01 16:50 KST"
     },
     {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EPS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 27,
+      "max_lead_hour": 156,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261101082037",
+      "first_seen_kst": "2026-11-01 17:20 KST"
+    },
+    {
       "model_id": "FNEC_AI",
       "model_label": "FourCastNet-ECMWF",
       "raw_model_ids": [
@@ -1084,6 +1101,23 @@
       "is_official": false,
       "first_seen_utc": "20261101063036",
       "first_seen_kst": "2026-11-01 15:30 KST"
+    },
+    {
+      "model_id": "IFEC_AI",
+      "model_label": "KMA AIFS-ECMWF",
+      "raw_model_ids": [
+        "IFEC_AI"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 38,
+      "max_lead_hour": 222,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261101082037",
+      "first_seen_kst": "2026-11-01 17:20 KST"
     },
     {
       "model_id": "KMA",
