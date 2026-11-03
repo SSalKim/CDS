@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261103144016",
-  "generated_at_kst": "2026-11-03 23:40 KST",
+  "generated_at_utc": "20261103145010",
+  "generated_at_kst": "2026-11-03 23:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 59,
-  "selected_model_count": 24,
+  "model_source_count": 62,
+  "selected_model_count": 25,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -81,6 +81,23 @@
       "is_official": false,
       "first_seen_utc": "20261103112009",
       "first_seen_kst": "2026-11-03 20:20 KST"
+    },
+    {
+      "model_id": "AGFS",
+      "model_label": "AIGFS",
+      "raw_model_ids": [
+        "AGFS"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261103145010",
+      "first_seen_kst": "2026-11-03 23:50 KST"
     },
     {
       "model_id": "AIGEFS",
@@ -219,6 +236,23 @@
       "first_seen_kst": "2026-11-03 21:50 KST"
     },
     {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMF"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 17,
+      "max_lead_hour": 96,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261103145010",
+      "first_seen_kst": "2026-11-03 23:50 KST"
+    },
+    {
       "model_id": "ECMWF_AIFS",
       "model_label": "ECMWF AIFS",
       "raw_model_ids": [
@@ -278,7 +312,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 12,
+      "point_count": 13,
       "max_lead_hour": 72,
       "has_pressure": true,
       "has_wind": true,
@@ -931,6 +965,23 @@
       "is_official": false,
       "first_seen_utc": "20261103135007",
       "first_seen_kst": "2026-11-03 22:50 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 18,
+      "max_lead_hour": 102,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20261103145010",
+      "first_seen_kst": "2026-11-03 23:50 KST"
     },
     {
       "model_id": "WNC",
