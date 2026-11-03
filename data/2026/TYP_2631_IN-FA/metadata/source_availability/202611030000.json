@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261103080012",
-  "generated_at_kst": "2026-11-03 17:00 KST",
+  "generated_at_utc": "20261103081006",
+  "generated_at_kst": "2026-11-03 17:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 78,
-  "selected_model_count": 34,
+  "model_source_count": 80,
+  "selected_model_count": 35,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -1127,7 +1127,7 @@
       ],
       "source": "EMC.NCEP",
       "source_label": "EMC NCEP ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 21,
       "max_lead_hour": 120,
       "has_pressure": true,
@@ -1154,6 +1154,23 @@
       "first_seen_kst": "2026-11-03 16:50 KST"
     },
     {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 19,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261103081006",
+      "first_seen_kst": "2026-11-03 17:10 KST"
+    },
+    {
       "model_id": "FNMOC_EPS",
       "model_label": "NAVGEM EPS",
       "raw_model_ids": [
@@ -1169,6 +1186,23 @@
       "is_official": false,
       "first_seen_utc": "20261103075018",
       "first_seen_kst": "2026-11-03 16:50 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "FNMOC_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 26,
+      "max_lead_hour": 150,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261103081006",
+      "first_seen_kst": "2026-11-03 17:10 KST"
     },
     {
       "model_id": "PGEC_AI",
