@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261103132007",
-  "generated_at_kst": "2026-11-03 22:20 KST",
+  "generated_at_utc": "20261103134006",
+  "generated_at_kst": "2026-11-03 22:40 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 42,
-  "selected_model_count": 20,
+  "model_source_count": 44,
+  "selected_model_count": 21,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -277,7 +277,7 @@
       ],
       "source": "SMCA.FUN",
       "source_label": "SMCA.FUN",
-      "selected": true,
+      "selected": false,
       "point_count": 12,
       "max_lead_hour": 66,
       "has_pressure": true,
@@ -285,6 +285,23 @@
       "is_official": false,
       "first_seen_utc": "20261103132007",
       "first_seen_kst": "2026-11-03 22:20 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "ECMWF_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 18,
+      "max_lead_hour": 102,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261103134006",
+      "first_seen_kst": "2026-11-03 22:40 KST"
     },
     {
       "model_id": "GFS",
@@ -397,8 +414,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 18,
-      "max_lead_hour": 102,
+      "point_count": 22,
+      "max_lead_hour": 126,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -438,6 +455,23 @@
       "is_official": false,
       "first_seen_utc": "20261103130004",
       "first_seen_kst": "2026-11-03 22:00 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 15,
+      "max_lead_hour": 84,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261103134006",
+      "first_seen_kst": "2026-11-03 22:40 KST"
     },
     {
       "model_id": "HAFS",
