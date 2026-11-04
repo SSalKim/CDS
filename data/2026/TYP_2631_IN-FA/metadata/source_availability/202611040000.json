@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261104093007",
-  "generated_at_kst": "2026-11-04 18:30 KST",
+  "generated_at_utc": "20261104094007",
+  "generated_at_kst": "2026-11-04 18:40 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_31",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 79,
-  "selected_model_count": 38,
+  "model_source_count": 87,
+  "selected_model_count": 39,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -219,6 +219,23 @@
       "first_seen_kst": "2026-11-04 16:00 KST"
     },
     {
+      "model_id": "CMC",
+      "model_label": "CMC",
+      "raw_model_ids": [
+        "CMC"
+      ],
+      "source": "EMC.NCEP",
+      "source_label": "EMC NCEP ATCF",
+      "selected": false,
+      "point_count": 16,
+      "max_lead_hour": 90,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261104094007",
+      "first_seen_kst": "2026-11-04 18:40 KST"
+    },
+    {
       "model_id": "CMC_EPS",
       "model_label": "CMC EPS",
       "raw_model_ids": [
@@ -311,7 +328,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 11,
       "max_lead_hour": 60,
       "has_pressure": true,
@@ -319,6 +336,23 @@
       "is_official": false,
       "first_seen_utc": "20261104074019",
       "first_seen_kst": "2026-11-04 16:40 KST"
+    },
+    {
+      "model_id": "CTCX",
+      "model_label": "COAMPS-TC",
+      "raw_model_ids": [
+        "CTCX"
+      ],
+      "source": "EMC.NCEP",
+      "source_label": "EMC NCEP ATCF",
+      "selected": true,
+      "point_count": 11,
+      "max_lead_hour": 60,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261104094007",
+      "first_seen_kst": "2026-11-04 18:40 KST"
     },
     {
       "model_id": "ECMWF",
@@ -482,7 +516,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 17,
+      "point_count": 18,
       "max_lead_hour": 114,
       "has_pressure": true,
       "has_wind": true,
@@ -712,6 +746,23 @@
       "first_seen_kst": "2026-11-04 16:40 KST"
     },
     {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "AVNO"
+      ],
+      "source": "EMC.NCEP",
+      "source_label": "EMC NCEP ATCF",
+      "selected": false,
+      "point_count": 10,
+      "max_lead_hour": 54,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261104094007",
+      "first_seen_kst": "2026-11-04 18:40 KST"
+    },
+    {
       "model_id": "GFS_EPS",
       "model_label": "GFS EPS",
       "raw_model_ids": [
@@ -890,13 +941,30 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 3,
+      "point_count": 7,
       "max_lead_hour": 54,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
       "first_seen_utc": "20261104074019",
       "first_seen_kst": "2026-11-04 16:40 KST"
+    },
+    {
+      "model_id": "HAFS",
+      "model_label": "HAFS",
+      "raw_model_ids": [
+        "HFSA"
+      ],
+      "source": "EMC.NCEP",
+      "source_label": "EMC NCEP ATCF",
+      "selected": false,
+      "point_count": 10,
+      "max_lead_hour": 54,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261104094007",
+      "first_seen_kst": "2026-11-04 18:40 KST"
     },
     {
       "model_id": "HWRF",
@@ -948,6 +1016,23 @@
       "is_official": false,
       "first_seen_utc": "20261104074019",
       "first_seen_kst": "2026-11-04 16:40 KST"
+    },
+    {
+      "model_id": "HWRF",
+      "model_label": "HWRF",
+      "raw_model_ids": [
+        "HWRF"
+      ],
+      "source": "EMC.NCEP",
+      "source_label": "EMC NCEP ATCF",
+      "selected": false,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261104094007",
+      "first_seen_kst": "2026-11-04 18:40 KST"
     },
     {
       "model_id": "ICON",
@@ -1171,6 +1256,40 @@
       "first_seen_kst": "2026-11-04 17:50 KST"
     },
     {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NVGM"
+      ],
+      "source": "EMC.NCEP",
+      "source_label": "EMC NCEP ATCF",
+      "selected": false,
+      "point_count": 10,
+      "max_lead_hour": 54,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261104094007",
+      "first_seen_kst": "2026-11-04 18:40 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "NEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 6,
+      "max_lead_hour": 78,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261104094007",
+      "first_seen_kst": "2026-11-04 18:40 KST"
+    },
+    {
       "model_id": "PGEC_AI",
       "model_label": "Pangu-Weather-ECMWF",
       "raw_model_ids": [
@@ -1254,6 +1373,23 @@
       "is_official": false,
       "first_seen_utc": "20261104074019",
       "first_seen_kst": "2026-11-04 16:40 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "EGRR"
+      ],
+      "source": "EMC.NCEP",
+      "source_label": "EMC NCEP ATCF",
+      "selected": false,
+      "point_count": 10,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261104094007",
+      "first_seen_kst": "2026-11-04 18:40 KST"
     },
     {
       "model_id": "UKMO_EPS",
