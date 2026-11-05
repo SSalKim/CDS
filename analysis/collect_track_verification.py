@@ -26,6 +26,7 @@ from windborne import NoRedirects, WindborneError, parse_coord
 STORMS = {
     "BAVI": dict(number=9, atcf="WP092026", start="2026070200", end="2026071306"),
     "CHAMPI": dict(number=30, atcf="WP292026", start="2026101506", end="2026102518"),
+    "IN-FA": dict(number=31, atcf="WP302026", start="2026102318", end="2026110500"),
 }
 LEADS = (24, 48, 72, 120, 240)
 MODELS = {
@@ -72,10 +73,10 @@ def record(storm, model, source, cycle, lead, lat, lon, raw_model, storm_id, ref
         stamp(dt(cycle) + timedelta(hours=lead)), lat, lon, raw_model, storm_id, reference, digest)))
 
 
-def parse_kma(text, storm, cycle, numbers, reference="", digest=""):
+def parse_kma(text, storm, cycle, numbers, reference="", digest="", models=None):
     selected = {}
     conflicts = set()
-    aliases = {alias: (model, rank) for model, names in MODELS.items() for rank, alias in enumerate(names)}
+    aliases = {alias: (model, rank) for model, names in (models or MODELS).items() for rank, alias in enumerate(names)}
     for line in text.splitlines():
         if not line.strip() or line.lstrip().startswith("#"):
             continue

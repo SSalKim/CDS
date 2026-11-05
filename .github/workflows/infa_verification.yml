@@ -1,0 +1,56 @@
+name: Collect IN-FA track verification data
+run-name: IN-FA 2026 interim track verification
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  historical:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test collectors
+        run: python -B -m unittest discover -s tests -p 'test_*track_verification.py'
+      - name: Collect exact-cycle sources without production changes
+        env:
+          KMA_APIHUB_AUTH_KEY: ${{ secrets.KMA_APIHUB_AUTH_KEY }}
+          KMA_APIHUB_FALLBACK_AUTH_KEY: ${{ secrets.KMA_APIHUB_FALLBACK_AUTH_KEY }}
+          PYTHONUNBUFFERED: '1'
+        run: python -B analysis/collect_infa_verification.py --output "$RUNNER_TEMP/infa-historical"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: infa-historical
+          path: ${{ runner.temp }}/infa-historical/
+          retention-days: 7
+  windborne:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /analysis/
+            /windborne.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Collect paced WMSH history
+        env:
+          WB_API_KEY: ${{ secrets.WB_API_KEY }}
+          PYTHONUNBUFFERED: '1'
+        run: python -B analysis/collect_windborne_verification.py --storm IN-FA --output "$RUNNER_TEMP/infa-windborne"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: infa-windborne
+          path: ${{ runner.temp }}/infa-windborne/
+          retention-days: 7

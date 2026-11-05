@@ -15,7 +15,7 @@ from analysis.collect_track_verification import STORMS, FIELDS, cycles, parse_de
 from windborne import NoRedirects, WindborneError, request_text, parse_time, summarize_deck
 
 
-def main(output):
+def main(output, storm_names=None):
     output.mkdir(parents=True, exist_ok=True)
     key = os.environ.get('WB_API_KEY', '').strip()
     if not key:
@@ -45,6 +45,8 @@ def main(output):
             writer.writerows(points)
 
     for storm, spec in STORMS.items():
+        if storm_names and storm not in storm_names:
+            continue
         try:
             listing = request('/' + spec['atcf'] + '/init_times')
             payload = json.loads(listing)
@@ -85,4 +87,6 @@ def main(output):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--output', required=True, type=Path)
-    main(parser.parse_args().output)
+    parser.add_argument('--storm', choices=STORMS, action='append')
+    args = parser.parse_args()
+    main(args.output, args.storm or ['BAVI', 'CHAMPI'])
