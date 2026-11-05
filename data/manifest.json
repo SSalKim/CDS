@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "updated_at_utc": "202611051910",
+  "updated_at_utc": "202611051920",
   "window_start_offset_hours": 4,
   "window_end_offset_hours": 10,
   "complete_model_count": 39,
@@ -36,9 +36,9 @@
         "end_utc": "202611052200"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20261105191048",
+          "generated_at_utc": "20261105192110",
           "image_path": "data/2026/TD_2660_NONAME/images/TD_2660_NONAME_202611051200_120h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -58,14 +58,18 @@
           "data_time": "202611051200",
           "fcst_hours": 120,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 6,
           "target_model_count": 40,
-          "models": [],
-          "model_labels": [],
+          "model_labels": [
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM"
+          ],
           "skip_atcf": true,
-          "source_availability_path": "data/2026/TD_2660_NONAME/metadata/source_availability/202611051200.json",
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+          "source_availability_path": "data/2026/TD_2660_NONAME/metadata/source_availability/202611051200.json"
         }
       },
       "completed": false,
@@ -93,9 +97,9 @@
         "end_utc": "202611052200"
       },
       "result": {
-        "status": "no_output",
+        "status": "ok",
         "metadata": {
-          "generated_at_utc": "20261105191048",
+          "generated_at_utc": "20261105192111",
           "image_path": "data/2026/TD_2660_NONAME/images/TD_2660_NONAME_202611051200_240h.png",
           "storm_stage": "TD",
           "storm_year": "2026",
@@ -115,14 +119,18 @@
           "data_time": "202611051200",
           "fcst_hours": 240,
           "intensity": "TD",
-          "model_count": 0,
+          "model_count": 6,
           "target_model_count": 40,
-          "models": [],
-          "model_labels": [],
+          "model_labels": [
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "Pangu-Weather-ECMWF",
+            "Pangu-Weather-KIM"
+          ],
           "skip_atcf": true,
-          "source_availability_path": "data/2026/TD_2660_NONAME/metadata/source_availability/202611051200.json",
-          "no_output": true,
-          "no_output_reason": "No forecast data matched the requested storm/time/model configuration."
+          "source_availability_path": "data/2026/TD_2660_NONAME/metadata/source_availability/202611051200.json"
         }
       },
       "completed": false,
@@ -152,7 +160,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20261105191120",
+          "generated_at_utc": "20261105192115",
           "image_path": "data/2026/TYP_2631_IN-FA/images/TYP_2631_IN-FA_202611051200_120h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -196,7 +204,7 @@
           "data_time": "202611051200",
           "fcst_hours": 120,
           "intensity": "TYP",
-          "model_count": 16,
+          "model_count": 22,
           "target_model_count": 40,
           "model_labels": [
             "AIGFS",
@@ -206,6 +214,11 @@
             "ECMWF",
             "ECMWF AIFS",
             "ECMWF AIFS EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "GenCast",
             "GFS",
             "GFS EPS",
             "ICON",
@@ -213,6 +226,7 @@
             "JGSM",
             "KIM",
             "KIM EPS",
+            "Pangu-Weather-ECMWF",
             "JGSM EPS",
             "UKMO"
           ],
@@ -247,7 +261,7 @@
       "result": {
         "status": "ok",
         "metadata": {
-          "generated_at_utc": "20261105191123",
+          "generated_at_utc": "20261105192117",
           "image_path": "data/2026/TYP_2631_IN-FA/images/TYP_2631_IN-FA_202611051200_240h.png",
           "storm_stage": "TYP",
           "storm_year": "2026",
@@ -291,7 +305,7 @@
           "data_time": "202611051200",
           "fcst_hours": 240,
           "intensity": "TYP",
-          "model_count": 16,
+          "model_count": 22,
           "target_model_count": 40,
           "model_labels": [
             "AIGFS",
@@ -301,6 +315,11 @@
             "ECMWF",
             "ECMWF AIFS",
             "ECMWF AIFS EPS",
+            "FourCastNet-ECMWF",
+            "FourCastNet-KIM",
+            "GraphCast-ECMWF",
+            "GraphCast-KIM",
+            "GenCast",
             "GFS",
             "GFS EPS",
             "ICON",
@@ -308,6 +327,7 @@
             "JGSM",
             "KIM",
             "KIM EPS",
+            "Pangu-Weather-ECMWF",
             "JGSM EPS",
             "UKMO"
           ],
@@ -319,7 +339,7 @@
       "final_check": false
     }
   ],
-  "inventory_count": 9974,
+  "inventory_count": 9976,
   "manifest_indexes": [
     {
       "year": 2020,
