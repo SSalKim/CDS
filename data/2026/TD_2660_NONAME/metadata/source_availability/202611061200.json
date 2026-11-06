@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261106201048",
-  "generated_at_kst": "2026-11-07 05:10 KST",
+  "generated_at_utc": "20261106202043",
+  "generated_at_kst": "2026-11-07 05:20 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_60",
   "storm_stage": "TD",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 31,
+  "model_source_count": 34,
   "selected_model_count": 23,
   "active_target_model_count": 40,
   "model_sources": [
@@ -124,7 +124,7 @@
       ],
       "source": "RAL.UCAR",
       "source_label": "RAL UCAR ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 31,
       "max_lead_hour": 180,
       "has_pressure": true,
@@ -132,6 +132,23 @@
       "is_official": false,
       "first_seen_utc": "20261106200044",
       "first_seen_kst": "2026-11-07 05:00 KST"
+    },
+    {
+      "model_id": "CMC_EPS",
+      "model_label": "CMC EPS",
+      "raw_model_ids": [
+        "CMC_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261106202043",
+      "first_seen_kst": "2026-11-07 05:20 KST"
     },
     {
       "model_id": "ECMWF",
@@ -149,6 +166,23 @@
       "is_official": false,
       "first_seen_utc": "20261106194039",
       "first_seen_kst": "2026-11-07 04:40 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECM"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 24,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261106202043",
+      "first_seen_kst": "2026-11-07 05:20 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -200,6 +234,23 @@
       "is_official": false,
       "first_seen_utc": "20261106195045",
       "first_seen_kst": "2026-11-07 04:50 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EPS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 24,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261106202043",
+      "first_seen_kst": "2026-11-07 05:20 KST"
     },
     {
       "model_id": "GFS",
