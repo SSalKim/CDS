@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261106140043",
-  "generated_at_kst": "2026-11-06 23:00 KST",
+  "generated_at_utc": "20261106141042",
+  "generated_at_kst": "2026-11-06 23:10 KST",
   "storm_year": "2026",
   "storm_key": "td_2026_60",
   "storm_stage": "TD",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 26,
-  "selected_model_count": 16,
+  "model_source_count": 28,
+  "selected_model_count": 17,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -98,6 +98,23 @@
       "is_official": false,
       "first_seen_utc": "20261106135047",
       "first_seen_kst": "2026-11-06 22:50 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECM"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 24,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261106141042",
+      "first_seen_kst": "2026-11-06 23:10 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -175,7 +192,7 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 24,
       "max_lead_hour": 144,
       "has_pressure": true,
@@ -183,6 +200,23 @@
       "is_official": false,
       "first_seen_utc": "20261106125218",
       "first_seen_kst": "2026-11-06 21:52 KST"
+    },
+    {
+      "model_id": "ECMWF_EPS",
+      "model_label": "ECMWF EPS",
+      "raw_model_ids": [
+        "EPS_MEAN"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 24,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261106141042",
+      "first_seen_kst": "2026-11-06 23:10 KST"
     },
     {
       "model_id": "GFS",
