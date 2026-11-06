@@ -1,5 +1,6 @@
 """Read-only, bounded WeatherMesh gridded sample; never publishes CDS products."""
 import argparse
+import base64
 from datetime import datetime, timedelta, timezone
 import json
 import os
@@ -7,6 +8,8 @@ from pathlib import Path
 import resource
 import sys
 import time
+import re
+import zipfile
 from urllib.error import HTTPError
 from urllib.parse import urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, Request, build_opener, urlopen
@@ -48,6 +51,39 @@ def download(key, cycle, hour, target, metrics):
     link = metadata.get("url")
     if not isinstance(link, str) or urlsplit(link).scheme != "https":
         raise RuntimeError("No HTTPS download URL returned")
+    parts = metadata.get("parts")
+    if isinstance(parts, list) and parts:
+        safe_metadata = {k: v for k, v in metadata.items() if k not in {"url", "url_expires_at"}}
+        (target.parent / "selection_manifest.json").write_text(json.dumps(safe_metadata, indent=2), encoding="utf-8")
+        selected = [part for part in parts if needed_part(part["path"])]
+        metrics["archive_entries"] = len(parts)
+        metrics["selected_entries"] = len(selected)
+        metrics["provider_subset_bytes"] = metadata.get("subset_bytes")
+        with zipfile.ZipFile(target, "w", compression=zipfile.ZIP_STORED) as output:
+            for part in selected:
+                path = part["path"]
+                if path.startswith("/") or ".." in path.split("/") or "\\" in path:
+                    raise RuntimeError("Unsafe Zarr entry path")
+                if "inline" in part:
+                    raw = base64.b64decode(part["inline"], validate=True)
+                else:
+                    start, end = part["range"]
+                    expected = end - start + 1
+                    if expected < 0 or metrics["download_bytes"] + expected > MAX_DOWNLOAD:
+                        raise RuntimeError("Selected fields exceed 768 MiB sample budget")
+                    metrics["storage_download_requests"] += 1
+                    request = Request(link, headers={"Range": f"bytes={start}-{end}",
+                                                    "User-Agent": "CDS-WM6-Grid-Sample/1.0"})
+                    with urlopen(request, timeout=120) as response:
+                        if response.status != 206:
+                            raise RuntimeError("Storage did not honor byte-range selection")
+                        raw = response.read(expected + 1)
+                    metrics["download_bytes"] += len(raw)
+                    if len(raw) != expected:
+                        raise RuntimeError("Incorrect storage range length")
+                output.writestr(path, raw)
+        metrics["archive_bytes"] = target.stat().st_size
+        return
     # Use a new, unauthenticated request; do not forward the API key to storage.
     metrics["storage_download_requests"] += 1
     with urlopen(Request(link, headers={"User-Agent": "CDS-WM6-Grid-Sample/1.0"}), timeout=180) as response:
@@ -62,6 +98,18 @@ def download(key, cycle, hour, target, metrics):
                     raise RuntimeError("Download exceeds 768 MiB sample budget")
                 output.write(chunk)
     metrics["archive_bytes"] = target.stat().st_size
+
+
+def needed_part(path):
+    """Keep shared metadata/coordinates and requested fields, not other variables."""
+    lower = path.lower()
+    if lower.split("/")[-1].startswith(".") or lower.endswith("zarr.json"):
+        return True
+    if any(name in lower for name in FIELDS):
+        return True
+    return any(token in lower.split("/") for token in (
+        "latitude", "longitude", "lat", "lon", "level", "levels", "pressure",
+        "pressure_level", "time", "initialization_time", "forecast_hour"))
 
 
 def find_coord(dataset, names):

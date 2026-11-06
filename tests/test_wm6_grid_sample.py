@@ -16,6 +16,12 @@ spec.loader.exec_module(sample)
 
 
 class GridSelectionTest(unittest.TestCase):
+    def test_selection_excludes_unrequested_chunks(self):
+        self.assertTrue(sample.needed_part("mean/temperature/0.0.0"))
+        self.assertTrue(sample.needed_part("mean/temperature/.zarray"))
+        self.assertTrue(sample.needed_part(".zattrs"))
+        self.assertFalse(sample.needed_part("mean/specific_humidity/0.0.0"))
+
     def dataset(self, level_name="level", levels=(500, 700), member=False):
         dims = ["time", level_name, "latitude", "longitude"]
         values = np.arange(8).reshape(1, 2, 2, 2)

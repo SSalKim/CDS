@@ -52,5 +52,7 @@ jobs:
             ${{ runner.temp }}/wm6-grid-sample/asia_fields.npz
             ${{ runner.temp }}/wm6-grid-sample/schema.json
             ${{ runner.temp }}/wm6-grid-sample/resource_usage.json
+            ${{ runner.temp }}/wm6-grid-sample/forecast.zarr.zip
+            ${{ runner.temp }}/wm6-grid-sample/selection_manifest.json
           if-no-files-found: ignore
           retention-days: 3
