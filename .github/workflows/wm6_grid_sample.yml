@@ -1,0 +1,56 @@
+name: WeatherMesh Asia grid sample (read only)
+run-name: WM6 Asia ${{ inputs.cycle }} +${{ inputs.forecast_hour }}h sample
+
+on:
+  workflow_dispatch:
+    inputs:
+      cycle:
+        description: "Exact UTC initialization YYYYmmddHH"
+        required: true
+        default: "2026110600"
+        type: string
+      forecast_hour:
+        description: "One forecast hour, multiple of 3"
+        required: true
+        default: "24"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  sample:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install sample data readers
+        run: python -m pip install 'numpy>=2,<3' 'xarray>=2025.1' 'zarr>=3,<4' 'numcodecs>=0.15'
+      - name: Check extraction logic
+        run: python -B -m unittest discover -s tests -p 'test_wm6_grid_sample.py'
+      - name: Fetch one mean forecast with a bounded download
+        env:
+          WB_API_KEY: ${{ secrets.WB_API_KEY }}
+          CYCLE: ${{ inputs.cycle }}
+          FORECAST_HOUR: ${{ inputs.forecast_hour }}
+          PYTHONUNBUFFERED: "1"
+        run: >-
+          python -B analysis/wm6_grid_sample.py
+          --cycle "$CYCLE" --forecast-hour "$FORECAST_HOUR"
+          --output-dir "$RUNNER_TEMP/wm6-grid-sample"
+      - name: Publish only regional data and resource measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wm6-asia-grid-sample
+          path: |
+            ${{ runner.temp }}/wm6-grid-sample/asia_fields.npz
+            ${{ runner.temp }}/wm6-grid-sample/schema.json
+            ${{ runner.temp }}/wm6-grid-sample/resource_usage.json
+          if-no-files-found: ignore
+          retention-days: 3
