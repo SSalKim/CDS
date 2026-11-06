@@ -5,10 +5,12 @@ from datetime import datetime, timedelta, timezone
 import json
 import os
 from pathlib import Path
-import resource
+try:
+    import resource
+except ImportError:
+    resource = None
 import sys
 import time
-import re
 import zipfile
 from urllib.error import HTTPError
 from urllib.parse import urlencode, urlsplit
@@ -102,14 +104,14 @@ def download(key, cycle, hour, target, metrics):
 
 def needed_part(path):
     """Keep shared metadata/coordinates and requested fields, not other variables."""
-    lower = path.lower()
-    if lower.split("/")[-1].startswith(".") or lower.endswith("zarr.json"):
+    parts = path.lower().split("/")
+    if path in {"zarr.json", ".zgroup", ".zattrs", "ensemble_mean/zarr.json", "ensemble_mean/.zgroup", "ensemble_mean/.zattrs"}:
         return True
-    if any(name in lower for name in FIELDS):
+    if parts[0] in {"latitude", "longitude", "lat", "lon"}:
         return True
-    return any(token in lower.split("/") for token in (
-        "latitude", "longitude", "lat", "lon", "level", "levels", "pressure",
-        "pressure_level", "time", "initialization_time", "forecast_hour"))
+    wanted = {"total_precipitation_3h", "pressure_msl", "geopotential_500",
+              "temperature_500", "wind_u_500", "wind_v_500"}
+    return len(parts) >= 3 and parts[0] == "ensemble_mean" and parts[1] in wanted
 
 
 def find_coord(dataset, names):
@@ -120,7 +122,7 @@ def find_coord(dataset, names):
 
 
 def select_field(dataset, name, lat_name, lon_name):
-    candidates = [name, name + "_mean", "mean_" + name]
+    candidates = [name, name + "_500", name + "_mean", "mean_" + name]
     variable = next((n for n in candidates if n in dataset.data_vars), None)
     if variable is None:
         raise ValueError("Missing ensemble-mean variable: " + name)
@@ -146,7 +148,17 @@ def select_field(dataset, name, lat_name, lon_name):
 def extract(archive, output, cycle, hour, metrics):
     store = ZipStore(archive, mode="r")
     try:
-        dataset = xr.open_zarr(store, consolidated=None, chunks=None)
+        root = xr.open_zarr(store, consolidated=False, chunks=None)
+        attributes = dict(root.attrs)
+        if datetime.fromisoformat(attributes["initialization_time"].replace("Z", "+00:00")) != cycle:
+            raise ValueError("Returned initialization differs from request")
+        if int(attributes["forecast_hour"]) != hour:
+            raise ValueError("Returned forecast hour differs from request")
+        if datetime.fromisoformat(attributes["valid_time"].replace("Z", "+00:00")) != cycle + timedelta(hours=hour):
+            raise ValueError("Returned valid time differs from request")
+        dataset = xr.open_zarr(store, group="ensemble_mean", consolidated=False, chunks=None)
+        dataset = dataset.assign_coords({name: field for name, field in root.coords.items()})
+        dataset.attrs.update(attributes)
         schema = {"dimensions": dict(dataset.sizes),
                   "coordinates": {n: {"shape": list(v.shape), "attrs": dict(v.attrs)}
                                   for n, v in dataset.coords.items()},
@@ -186,6 +198,7 @@ def extract(archive, output, cycle, hour, metrics):
         metrics["regional_arrays_bytes"] = sum(a.nbytes for a in arrays.values())
         metrics["regional_npz_bytes"] = (output / "asia_fields.npz").stat().st_size
         dataset.close()
+        root.close()
     finally:
         store.close()
 
@@ -195,12 +208,13 @@ def main():
     parser.add_argument("--cycle", required=True)
     parser.add_argument("--forecast-hour", type=int, default=24)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--archive", type=Path, help="Reuse an existing sample without API requests")
     args = parser.parse_args()
     cycle = datetime.strptime(args.cycle, "%Y%m%d%H").replace(tzinfo=timezone.utc)
     if not 3 <= args.forecast_hour <= 360 or args.forecast_hour % 3:
         parser.error("Use a 3-hour forecast step between +3 and +360")
     key = os.environ.get("WB_API_KEY", "").strip()
-    if not key:
+    if not key and not args.archive:
         parser.error("WB_API_KEY is not configured")
     output = args.output_dir.resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -211,10 +225,14 @@ def main():
                "authenticated_api_requests": 0, "storage_download_requests": 0,
                "download_bytes": 0, "status": "started",
                "billing_note": "HTTP counts are measured; provider quota debits and remaining quota are not exposed or inferred."}
-    archive = output / "forecast.zarr.zip"
+    archive = args.archive.resolve() if args.archive else output / "forecast.zarr.zip"
     try:
         before = time.perf_counter()
-        download(key, cycle, args.forecast_hour, archive, metrics)
+        if args.archive:
+            metrics["reused_archive"] = True
+            metrics["archive_bytes"] = archive.stat().st_size
+        else:
+            download(key, cycle, args.forecast_hour, archive, metrics)
         metrics["fetch_seconds"] = round(time.perf_counter() - before, 3)
         print("Downloaded bytes:", metrics["download_bytes"], flush=True)
         before = time.perf_counter()
@@ -231,7 +249,7 @@ def main():
     finally:
         metrics["elapsed_seconds"] = round(time.perf_counter() - started, 3)
         metrics["cpu_seconds"] = round(time.process_time() - cpu, 3)
-        metrics["peak_rss_bytes"] = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024)
+        metrics["peak_rss_bytes"] = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024) if resource else None
         (output / "resource_usage.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")
         print(json.dumps(metrics, indent=2), flush=True)
     return 0 if metrics["status"] == "ok" else 1
