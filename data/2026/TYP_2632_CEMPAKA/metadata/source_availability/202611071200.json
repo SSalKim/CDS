@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261107192012",
-  "generated_at_kst": "2026-11-08 04:20 KST",
+  "generated_at_utc": "20261107193002",
+  "generated_at_kst": "2026-11-08 04:30 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_32",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 39,
+  "model_source_count": 41,
   "selected_model_count": 22,
   "active_target_model_count": 40,
   "model_sources": [
@@ -159,8 +159,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": true,
-      "point_count": 25,
-      "max_lead_hour": 144,
+      "point_count": 27,
+      "max_lead_hour": 156,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -209,7 +209,7 @@
       ],
       "source": "SMCA.FUN",
       "source_label": "SMCA.FUN",
-      "selected": true,
+      "selected": false,
       "point_count": 18,
       "max_lead_hour": 102,
       "has_pressure": true,
@@ -217,6 +217,23 @@
       "is_official": false,
       "first_seen_utc": "20261107192012",
       "first_seen_kst": "2026-11-08 04:20 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECM"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 18,
+      "max_lead_hour": 102,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261107193002",
+      "first_seen_kst": "2026-11-08 04:30 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -583,7 +600,7 @@
       ],
       "source": "RAL.UCAR",
       "source_label": "RAL UCAR ATCF",
-      "selected": true,
+      "selected": false,
       "point_count": 27,
       "max_lead_hour": 156,
       "has_pressure": true,
@@ -591,6 +608,23 @@
       "is_official": false,
       "first_seen_utc": "20261107190001",
       "first_seen_kst": "2026-11-08 04:00 KST"
+    },
+    {
+      "model_id": "UKM",
+      "model_label": "UKMO",
+      "raw_model_ids": [
+        "UKMET"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 27,
+      "max_lead_hour": 156,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261107193002",
+      "first_seen_kst": "2026-11-08 04:30 KST"
     },
     {
       "model_id": "WNC",
