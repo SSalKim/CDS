@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261108080002",
-  "generated_at_kst": "2026-11-08 17:00 KST",
+  "generated_at_utc": "20261108081003",
+  "generated_at_kst": "2026-11-08 17:10 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_32",
   "storm_stage": "TYP",
@@ -27,7 +27,7 @@
     120,
     240
   ],
-  "model_source_count": 71,
+  "model_source_count": 73,
   "selected_model_count": 33,
   "active_target_model_count": 40,
   "model_sources": [
@@ -1025,7 +1025,41 @@
       ],
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
+      "selected": false,
+      "point_count": 31,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261108075001",
+      "first_seen_kst": "2026-11-08 16:50 KST"
+    },
+    {
+      "model_id": "NAVGEM",
+      "model_label": "NAVGEM",
+      "raw_model_ids": [
+        "NAVGEM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
       "selected": true,
+      "point_count": 22,
+      "max_lead_hour": 180,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261108081003",
+      "first_seen_kst": "2026-11-08 17:10 KST"
+    },
+    {
+      "model_id": "FNMOC_EPS",
+      "model_label": "NAVGEM EPS",
+      "raw_model_ids": [
+        "NEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": false,
       "point_count": 31,
       "max_lead_hour": 180,
       "has_pressure": true,
@@ -1038,18 +1072,18 @@
       "model_id": "FNMOC_EPS",
       "model_label": "NAVGEM EPS",
       "raw_model_ids": [
-        "NEMN"
+        "FNMOC_EPS"
       ],
-      "source": "KNACKWX",
-      "source_label": "KNACKWX ATCF",
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
       "selected": true,
-      "point_count": 31,
-      "max_lead_hour": 180,
+      "point_count": 25,
+      "max_lead_hour": 144,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
-      "first_seen_utc": "20261108075001",
-      "first_seen_kst": "2026-11-08 16:50 KST"
+      "first_seen_utc": "20261108081003",
+      "first_seen_kst": "2026-11-08 17:10 KST"
     },
     {
       "model_id": "PGEC_AI",
