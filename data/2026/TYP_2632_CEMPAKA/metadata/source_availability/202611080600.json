@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261108154002",
-  "generated_at_kst": "2026-11-09 00:40 KST",
+  "generated_at_utc": "20261108155005",
+  "generated_at_kst": "2026-11-09 00:50 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_32",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 53,
-  "selected_model_count": 23,
+  "model_source_count": 55,
+  "selected_model_count": 25,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -149,6 +149,23 @@
       "is_official": false,
       "first_seen_utc": "20261108144007",
       "first_seen_kst": "2026-11-08 23:40 KST"
+    },
+    {
+      "model_id": "CTCX",
+      "model_label": "COAMPS-TC",
+      "raw_model_ids": [
+        "CTCX"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 3,
+      "max_lead_hour": 108,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261108155005",
+      "first_seen_kst": "2026-11-09 00:50 KST"
     },
     {
       "model_id": "ECMWF",
@@ -312,7 +329,7 @@
       "source": "KNACKWX",
       "source_label": "KNACKWX ATCF",
       "selected": false,
-      "point_count": 16,
+      "point_count": 17,
       "max_lead_hour": 96,
       "has_pressure": true,
       "has_wind": true,
@@ -829,6 +846,23 @@
       "is_official": false,
       "first_seen_utc": "20261108134003",
       "first_seen_kst": "2026-11-08 22:40 KST"
+    },
+    {
+      "model_id": "UKMO_EPS",
+      "model_label": "UKMO EPS",
+      "raw_model_ids": [
+        "UEMN"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 10,
+      "max_lead_hour": 144,
+      "has_pressure": false,
+      "has_wind": false,
+      "is_official": false,
+      "first_seen_utc": "20261108155005",
+      "first_seen_kst": "2026-11-09 00:50 KST"
     },
     {
       "model_id": "WNC",
