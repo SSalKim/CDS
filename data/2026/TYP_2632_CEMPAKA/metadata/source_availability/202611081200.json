@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261108161002",
-  "generated_at_kst": "2026-11-09 01:10 KST",
+  "generated_at_utc": "20261108162008",
+  "generated_at_kst": "2026-11-09 01:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_32",
   "storm_stage": "TYP",
@@ -27,10 +27,27 @@
     120,
     240
   ],
-  "model_source_count": 3,
-  "selected_model_count": 2,
+  "model_source_count": 4,
+  "selected_model_count": 3,
   "active_target_model_count": 40,
   "model_sources": [
+    {
+      "model_id": "AICON",
+      "model_label": "AICON",
+      "raw_model_ids": [
+        "AICON"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261108162008",
+      "first_seen_kst": "2026-11-09 01:20 KST"
+    },
     {
       "model_id": "JGSM",
       "model_label": "JGSM",
@@ -83,5 +100,6 @@
       "first_seen_kst": "2026-11-09 01:10 KST"
     }
   ],
-  "source_availability_path": "data/2026/TYP_2632_CEMPAKA/metadata/source_availability/202611081200.json"
+  "source_availability_path": "data/2026/TYP_2632_CEMPAKA/metadata/source_availability/202611081200.json",
+  "smca_aicon_snapshot_path": "data/2026/TYP_2632_CEMPAKA/metadata/smca/AICON/202611081200.json"
 }
