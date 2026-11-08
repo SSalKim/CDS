@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261108113001",
-  "generated_at_kst": "2026-11-08 20:30 KST",
+  "generated_at_utc": "20261108113959",
+  "generated_at_kst": "2026-11-08 20:39 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_32",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 12,
-  "selected_model_count": 9,
+  "model_source_count": 14,
+  "selected_model_count": 10,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -115,6 +115,40 @@
       "is_official": false,
       "first_seen_utc": "20261108111000",
       "first_seen_kst": "2026-11-08 20:10 KST"
+    },
+    {
+      "model_id": "GFS",
+      "model_label": "GFS",
+      "raw_model_ids": [
+        "GFS"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 24,
+      "max_lead_hour": 138,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261108113959",
+      "first_seen_kst": "2026-11-08 20:39 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GFS_EPS"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 25,
+      "max_lead_hour": 144,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261108113959",
+      "first_seen_kst": "2026-11-08 20:39 KST"
     },
     {
       "model_id": "ICON",
