@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261110121032",
-  "generated_at_kst": "2026-11-10 21:10 KST",
+  "generated_at_utc": "20261110122033",
+  "generated_at_kst": "2026-11-10 21:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_32",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 18,
-  "selected_model_count": 10,
+  "model_source_count": 20,
+  "selected_model_count": 11,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -115,6 +115,23 @@
       "is_official": false,
       "first_seen_utc": "20261110115151",
       "first_seen_kst": "2026-11-10 20:51 KST"
+    },
+    {
+      "model_id": "ECMWF_AIFS_EPS",
+      "model_label": "ECMWF AIFS EPS",
+      "raw_model_ids": [
+        "AIFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 7,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261110122033",
+      "first_seen_kst": "2026-11-10 21:20 KST"
     },
     {
       "model_id": "GFS",
@@ -217,6 +234,23 @@
       "is_official": false,
       "first_seen_utc": "20261110115151",
       "first_seen_kst": "2026-11-10 20:51 KST"
+    },
+    {
+      "model_id": "GFS_EPS",
+      "model_label": "GFS EPS",
+      "raw_model_ids": [
+        "GEFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 12,
+      "max_lead_hour": 66,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261110122033",
+      "first_seen_kst": "2026-11-10 21:20 KST"
     },
     {
       "model_id": "HAFS",
@@ -340,5 +374,6 @@
   ],
   "source_availability_path": "data/2026/TYP_2632_CEMPAKA/metadata/source_availability/202611100600.json",
   "smca_aicon_snapshot_path": "data/2026/TYP_2632_CEMPAKA/metadata/smca/AICON/202611100600.json",
+  "smca_aifsm_snapshot_path": "data/2026/TYP_2632_CEMPAKA/metadata/smca/AIFSM/202611100600.json",
   "smca_aigfs_snapshot_path": "data/2026/TYP_2632_CEMPAKA/metadata/smca/AIGFS/202611100600.json"
 }
