@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261110191027",
-  "generated_at_kst": "2026-11-11 04:10 KST",
+  "generated_at_utc": "20261110192033",
+  "generated_at_kst": "2026-11-11 04:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_32",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 49,
-  "selected_model_count": 26,
+  "model_source_count": 53,
+  "selected_model_count": 28,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -125,8 +125,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 6,
-      "max_lead_hour": 30,
+      "point_count": 10,
+      "max_lead_hour": 54,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -193,8 +193,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 8,
-      "max_lead_hour": 42,
+      "point_count": 10,
+      "max_lead_hour": 54,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -253,6 +253,23 @@
       "first_seen_kst": "2026-11-11 04:00 KST"
     },
     {
+      "model_id": "GEML",
+      "model_label": "CMC GEML",
+      "raw_model_ids": [
+        "GEML"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 6,
+      "max_lead_hour": 30,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261110192033",
+      "first_seen_kst": "2026-11-11 04:20 KST"
+    },
+    {
       "model_id": "ECMWF",
       "model_label": "ECMWF",
       "raw_model_ids": [
@@ -268,6 +285,40 @@
       "is_official": false,
       "first_seen_utc": "20261110191027",
       "first_seen_kst": "2026-11-11 04:10 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECM"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": false,
+      "point_count": 7,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261110192033",
+      "first_seen_kst": "2026-11-11 04:20 KST"
+    },
+    {
+      "model_id": "ECMWF",
+      "model_label": "ECMWF",
+      "raw_model_ids": [
+        "ECMWF"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 7,
+      "max_lead_hour": 36,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261110192033",
+      "first_seen_kst": "2026-11-11 04:20 KST"
     },
     {
       "model_id": "ECMWF_AIFS",
@@ -482,8 +533,8 @@
       "source": "POLARWX",
       "source_label": "POLARWX",
       "selected": false,
-      "point_count": 7,
-      "max_lead_hour": 36,
+      "point_count": 10,
+      "max_lead_hour": 54,
       "has_pressure": true,
       "has_wind": true,
       "is_official": false,
@@ -523,6 +574,23 @@
       "is_official": false,
       "first_seen_utc": "20261110190034",
       "first_seen_kst": "2026-11-11 04:00 KST"
+    },
+    {
+      "model_id": "GENC",
+      "model_label": "GenCast",
+      "raw_model_ids": [
+        "GENCAST"
+      ],
+      "source": "POLARWX",
+      "source_label": "POLARWX",
+      "selected": true,
+      "point_count": 5,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261110192033",
+      "first_seen_kst": "2026-11-11 04:20 KST"
     },
     {
       "model_id": "GCEC_AI",
@@ -868,5 +936,6 @@
   "source_availability_path": "data/2026/TYP_2632_CEMPAKA/metadata/source_availability/202611101200.json",
   "smca_aicon_snapshot_path": "data/2026/TYP_2632_CEMPAKA/metadata/smca/AICON/202611101200.json",
   "smca_aifsm_snapshot_path": "data/2026/TYP_2632_CEMPAKA/metadata/smca/AIFSM/202611101200.json",
-  "smca_aigfs_snapshot_path": "data/2026/TYP_2632_CEMPAKA/metadata/smca/AIGFS/202611101200.json"
+  "smca_aigfs_snapshot_path": "data/2026/TYP_2632_CEMPAKA/metadata/smca/AIGFS/202611101200.json",
+  "smca_geml_snapshot_path": "data/2026/TYP_2632_CEMPAKA/metadata/smca/GEML/202611101200.json"
 }
