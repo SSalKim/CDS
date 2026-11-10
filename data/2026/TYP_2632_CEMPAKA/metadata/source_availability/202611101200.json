@@ -1,8 +1,8 @@
 {
   "version": 2,
   "schema": "cycle_model_source_first_seen",
-  "generated_at_utc": "20261110171031",
-  "generated_at_kst": "2026-11-11 02:10 KST",
+  "generated_at_utc": "20261110172035",
+  "generated_at_kst": "2026-11-11 02:20 KST",
   "storm_year": "2026",
   "storm_key": "typ_2026_32",
   "storm_stage": "TYP",
@@ -27,8 +27,8 @@
     120,
     240
   ],
-  "model_source_count": 8,
-  "selected_model_count": 7,
+  "model_source_count": 10,
+  "selected_model_count": 8,
   "active_target_model_count": 40,
   "model_sources": [
     {
@@ -64,6 +64,40 @@
       "is_official": false,
       "first_seen_utc": "20261110162027",
       "first_seen_kst": "2026-11-11 01:20 KST"
+    },
+    {
+      "model_id": "AGFS",
+      "model_label": "AIGFS",
+      "raw_model_ids": [
+        "AIGFS"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": false,
+      "point_count": 10,
+      "max_lead_hour": 54,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261110172035",
+      "first_seen_kst": "2026-11-11 02:20 KST"
+    },
+    {
+      "model_id": "AIGEFS",
+      "model_label": "AIGFS EPS",
+      "raw_model_ids": [
+        "AIGEFSM"
+      ],
+      "source": "SMCA.FUN",
+      "source_label": "SMCA.FUN",
+      "selected": true,
+      "point_count": 9,
+      "max_lead_hour": 48,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261110172035",
+      "first_seen_kst": "2026-11-11 02:20 KST"
     },
     {
       "model_id": "GFS",
@@ -169,5 +203,6 @@
     }
   ],
   "source_availability_path": "data/2026/TYP_2632_CEMPAKA/metadata/source_availability/202611101200.json",
-  "smca_aicon_snapshot_path": "data/2026/TYP_2632_CEMPAKA/metadata/smca/AICON/202611101200.json"
+  "smca_aicon_snapshot_path": "data/2026/TYP_2632_CEMPAKA/metadata/smca/AICON/202611101200.json",
+  "smca_aigfs_snapshot_path": "data/2026/TYP_2632_CEMPAKA/metadata/smca/AIGFS/202611101200.json"
 }
