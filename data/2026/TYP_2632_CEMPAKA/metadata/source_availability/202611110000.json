@@ -1,0 +1,87 @@
+{
+  "version": 2,
+  "schema": "cycle_model_source_first_seen",
+  "generated_at_utc": "20261111040025",
+  "generated_at_kst": "2026-11-11 13:00 KST",
+  "storm_year": "2026",
+  "storm_key": "typ_2026_32",
+  "storm_stage": "TYP",
+  "typ_number": 32,
+  "data_typ_number": 32,
+  "typ_name": "CEMPAKA",
+  "typ_name_ko": "츰파카",
+  "canonical_storm_key": "typ_2026_32",
+  "canonical_storm_stage": "TYP",
+  "canonical_typ_number": 32,
+  "canonical_typ_name": "CEMPAKA",
+  "canonical_typ_name_ko": "츰파카",
+  "linked_td_number": 60,
+  "linked_typ_number": null,
+  "atcf_id": "wp312026",
+  "extra_atcf_ids": [],
+  "data_time": "202611110000",
+  "cycle_time_utc": "202611110000",
+  "cycle_label_utc": "2026-11-11 00UTC",
+  "fetch_hours": 240,
+  "requested_hours": [
+    120,
+    240
+  ],
+  "model_source_count": 3,
+  "selected_model_count": 2,
+  "active_target_model_count": 40,
+  "model_sources": [
+    {
+      "model_id": "JGSM",
+      "model_label": "JGSM",
+      "raw_model_ids": [
+        "JGSM"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 23,
+      "max_lead_hour": 132,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261111040025",
+      "first_seen_kst": "2026-11-11 13:00 KST"
+    },
+    {
+      "model_id": "TEPS",
+      "model_label": "JGSM EPS",
+      "raw_model_ids": [
+        "JENS"
+      ],
+      "source": "KNACKWX",
+      "source_label": "KNACKWX ATCF",
+      "selected": true,
+      "point_count": 1,
+      "max_lead_hour": 12,
+      "has_pressure": false,
+      "has_wind": true,
+      "is_official": false,
+      "first_seen_utc": "20261111040025",
+      "first_seen_kst": "2026-11-11 13:00 KST"
+    },
+    {
+      "model_id": "KMA",
+      "model_label": "KMA OFCL",
+      "raw_model_ids": [
+        "KMA"
+      ],
+      "source": "APIHUB",
+      "source_label": "KMA APIHUB",
+      "selected": true,
+      "point_count": 3,
+      "max_lead_hour": 24,
+      "has_pressure": true,
+      "has_wind": true,
+      "is_official": true,
+      "first_seen_utc": "20261111040025",
+      "first_seen_kst": "2026-11-11 13:00 KST"
+    }
+  ],
+  "source_availability_path": "data/2026/TYP_2632_CEMPAKA/metadata/source_availability/202611110000.json"
+}
