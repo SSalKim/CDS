@@ -311,6 +311,26 @@ updateForecastSegmentState(index);
 const AUTO_NOW_ON_STARTUP=true;
 
 
+function isPublicChartModel(modelId=currentModel){
+return typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId);
+}
+
+function refreshPublicChartManifestView(){
+let affected=isPublicChartModel() || (modelCompareMode && compareModels.some(isPublicChartModel));
+if(!affected){
+renderModels();
+return;
+}
+let preserveForecastHour=getSelectedTimelineHourForPreserve();
+let previousModel=currentModel;
+invalidateSelectionAsyncWork({latest:false});
+resetForecastImageCache();
+ensureCurrentModelVisibleForMenu();
+if(currentModel!==previousModel) invalidateLatestSearch();
+return refreshView({updateCategories:false,updateProducts:true,updateHours:true,
+resetSlider:false,preserveForecastHour});
+}
+
 function init(){
 
 if(isCatalogValidationEnabled()){
@@ -329,6 +349,10 @@ updateChartAfter:false
 });
 
 bindEvents();
+
+if(typeof CDSPublicCharts!=='undefined'){
+CDSPublicCharts.startPolling(refreshPublicChartManifestView);
+}
 
 if(AUTO_NOW_ON_STARTUP){
 
@@ -533,8 +557,13 @@ patterns,
 forecastHour=0,
 detailToken=null,
 requireDetailToken=true,
-checkAvailability=false
+checkAvailability=false,
+variant='normal'
 }={}){
+
+if(isPublicChartModel(modelId)){
+return CDSPublicCharts.resolveUrls({modelId,product,runUTC,forecastHour,variant});
+}
 
 let resolvedPatterns=patterns ?? CDSChartUtils.getProductPatternsForDetail(
 product,
@@ -681,6 +710,16 @@ setCurrentForecastList(getForecastHoursForCurrentSelection());
 
 if(!currentForecastList.length){
 setCurrentForecastList([0]);
+if(isPublicChartModel()){
+slider.min=0;
+slider.max=0;
+slider.value=0;
+slider.disabled=true;
+forecastLabel.textContent='자료 없음';
+setForecastLoadStates(['missing']);
+renderForecastTimeline();
+return;
+}
 }
 
 slider.min=0;
@@ -1411,7 +1450,8 @@ row.className='compare-timeline-row single-timeline-row';
 
 let info=document.createElement('div');
 info.className='compare-row-info';
-info.innerHTML=`<div class="compare-row-model">${getModelDisplayLabel(currentModel)}</div>`;
+info.innerHTML=`<div class="compare-row-model">${getModelTimelineLabel(currentModel)}</div>`;
+info.title=getModelDisplayLabel(currentModel);
 
 let track=document.createElement('div');
 track.className='compare-track single-forecast-track';
@@ -1628,7 +1668,9 @@ return;
 성공 캐시만 신뢰한다.
 실패 캐시는 네트워크 지연/timeout일 수 있으므로 현재 선택 이미지는 다시 직접 시도한다.
 */
-if(cached?.ok===true && cached?.urls?.length){
+let cachedUrlsAreCurrent=!isPublicChartModel() ||
+JSON.stringify(cached?.baseUrls || cached?.urls)===JSON.stringify(buildImageUrlsForForecastIndex(index));
+if(cached?.ok===true && cached?.urls?.length && cachedUrlsAreCurrent){
 let urls=await resolveAnalysisResolutionUrls(
 cached.baseUrls || cached.urls,
 {updateControls:true}
@@ -1826,6 +1868,8 @@ return true;
 }
 
 function shouldJumpOlderAvailableRunForMissingSelection(){
+
+if(isPublicChartModel()) return false;
 
 let selectedRunUTC=getSelectedUTCDate();
 
@@ -2098,6 +2142,18 @@ showViewerMessage(cycleStatus.message);
 return false;
 }
 
+if(isPublicChartModel()){
+if(!CDSPublicCharts.supportsProduct(currentModel,p)){
+showViewerMessage(`${MODELS[currentModel].name}\n현재 선택한 산출자료를 지원하지 않습니다.`);
+return false;
+}
+if(!CDSPublicCharts.readyHours({modelId:currentModel,product:p,runUTC:getSelectedUTCDate()}).length){
+showViewerMessage('선택한 초기시각의 공개 이미지가 없습니다. 아직 생산 중이거나 보관기간이 지난 자료입니다.');
+return false;
+}
+return true;
+}
+
 if(!p.patternByModel?.[currentModel]){
 showViewerMessage(
 `${MODELS[currentModel]?.name || currentModel}은(는)
@@ -2167,6 +2223,10 @@ preloadAllForecastImages({imageRefreshToken});
 
 
 function getForecastHoursForProductAtRun(product,modelId,runUTC){
+
+if(isPublicChartModel(modelId)){
+return CDSPublicCharts.readyHours({modelId,product,runUTC});
+}
 
 let pattern=product?.patternByModel?.[modelId];
 
@@ -2368,6 +2428,13 @@ lookbackHours=NOW_LOOKBACK_HOURS,
 maxCandidates=NOW_MAX_CANDIDATES
 ){
 
+if(isPublicChartModel(modelId)){
+return CDSPublicCharts.readyCycles(modelId,getCurrentProduct()).map(cycle=>
+new Date(Date.UTC(Number(cycle.slice(0,4)),Number(cycle.slice(4,6))-1,
+Number(cycle.slice(6,8)),Number(cycle.slice(8,10))))
+).filter(date=>date<=baseDate).slice(0,maxCandidates);
+}
+
 let candidates=[];
 
 let base=new Date(baseDate.getTime());
@@ -2437,6 +2504,11 @@ let skipRunStamp=skipRunUTC ? formatUTCStampFromDate(skipRunUTC) : null;
 setViewerLoading(true,'최신 자료 검색 중');
 
 try{
+
+if(isPublicChartModel()){
+await CDSPublicCharts.load();
+if(searchId!==latestSearchSeq) return false;
+}
 
 let candidates=getRecentRunCandidates(
 currentModel,

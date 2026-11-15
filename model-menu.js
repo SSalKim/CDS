@@ -8,7 +8,11 @@ label:'전지구',
 models:[
 ['kim_gdps','KIM_GDAPS'],
 ['ukmo','UKUM'],
-['ecmwf','ECMWF']
+['ecmwf','ECMWF'],
+['aifs','ECMWF AIFS-Single (N320)'],
+['gfs','NCEP GFS (C768 L127)'],
+['aigfs','NCEP AIGFS (0.25\u00b0)'],
+['cmc','CMC GDPS (GEM 0.135\u02da L84)']
 ]
 },
 
@@ -204,13 +208,14 @@ function getVisibleModelGroups(){
 
 let ids=MODEL_GROUP_VISIBILITY_BY_MENU[currentMainMenu];
 
-if(!ids){
-return modelGroups;
-}
-
-return modelGroups.filter(group=>
-ids.includes(group.id)
-);
+return modelGroups.filter(group=>!ids || ids.includes(group.id)).map(group=>({
+...group,
+models:group.models.filter(([modelId])=>{
+if(MODELS[modelId]?.source!=='public_charts') return true;
+return currentMainMenu==='forecast' && typeof CDSPublicCharts!=='undefined' &&
+CDSPublicCharts.hasPublishedCharts(modelId);
+})
+})).filter(group=>group.models.length>0);
 
 }
 

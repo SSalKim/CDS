@@ -36,6 +36,10 @@ if(!product || product.type==="header"){
 return false;
 }
 
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId)){
+return CDSPublicCharts.supportsProduct(modelId,product);
+}
+
 return !!(
 product.patternByModel &&
 product.patternByModel[modelId]

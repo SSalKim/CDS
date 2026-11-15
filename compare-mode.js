@@ -4,7 +4,7 @@ const COMPARE_WINTER_VARIANT_ARCHIVE_START='2020-12-29';
 const COMPARE_WINTER_VARIANT_CATEGORY='hkor';
 const COMPARE_WINTER_VARIANT_PRODUCTS=new Set(['acptot','acrain','tmerge']);
 const COMPARE_HKOR_ACPTOT_REGIONAL_MODELS=new Set(['kim_rdps','kim_ldps']);
-const COMPARE_WINTER_VARIANT_UNSUPPORTED_MODELS=new Set(['ukmo','um_ldps']);
+const COMPARE_WINTER_VARIANT_UNSUPPORTED_MODELS=new Set(['ukmo','um_ldps','aigfs']);
 
 let compareImageAvailabilitySeq=0;
 let compareImageAvailabilityMap=new Map();
@@ -236,6 +236,10 @@ return MODELS[modelId]?.name || modelId;
 
 }
 
+function getModelTimelineLabel(modelId){
+return MODELS[modelId]?.timelineName || getModelDisplayLabel(modelId);
+}
+
 function getCompareProductForModel(modelId){
 
 let categoryId=getCategoryIdForModelFiltering(modelId);
@@ -345,7 +349,7 @@ hasWinterVariantCompareArchiveStarted(runUTC);
 
 function shouldTopAlignCompareImage(modelId,runUTC){
 
-if(modelId!=='ukmo'){
+if(!['ukmo','aigfs'].includes(modelId)){
 return false;
 }
 
@@ -554,6 +558,10 @@ return section;
 
 function productUsesForecastHourForModel(product,modelId){
 
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId)){
+return CDSPublicCharts.supportsProduct(modelId,product);
+}
+
 let pattern=product?.patternByModel?.[modelId];
 let patterns=Array.isArray(pattern)
 ?pattern
@@ -601,6 +609,11 @@ getSelectedUTCDate()
 
 if(!cycleStatus.supported){
 return [];
+}
+
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId)){
+return CDSPublicCharts.readyHours({modelId,product,runUTC:getSelectedUTCDate(),
+variant:shouldUseWinterCompareVariant(modelId,getCompareProductForModel(modelId),getSelectedUTCDate())?'compare':'normal'});
 }
 
 if(!productUsesForecastHourForModel(product,modelId)){
@@ -684,7 +697,9 @@ currentMainMenu,
 categoryId,
 currentProduct,
 runStamp,
-detailToken || ''
+detailToken || '',
+...(typeof CDSPublicCharts!=='undefined' && compareModels.some(modelId=>CDSPublicCharts.isModel(modelId))
+?[CDSPublicCharts.getRevision()]:[])
 ].join('|');
 
 }
@@ -1119,7 +1134,8 @@ return [];
 
 let runUTC=getSelectedUTCDate();
 let detailToken=getCurrentAuxToken();
-let patterns=shouldUseWinterCompareVariant(modelId,baseProduct,runUTC)
+let useWinterVariant=shouldUseWinterCompareVariant(modelId,baseProduct,runUTC);
+let patterns=useWinterVariant && !(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId))
 ?getWinterCompareVariantPatterns(product,modelId)
 :null;
 
@@ -1130,6 +1146,7 @@ runUTC,
 forecastHour,
 detailToken,
 patterns,
+variant:useWinterVariant?'compare':'normal',
 checkAvailability:true
 });
 
@@ -1583,7 +1600,8 @@ row.dataset.modelId=modelId;
 
 let info=document.createElement('div');
 info.className='compare-row-info';
-info.innerHTML=`<div class="compare-row-model">${getModelDisplayLabel(modelId)}</div>`;
+info.innerHTML=`<div class="compare-row-model">${getModelTimelineLabel(modelId)}</div>`;
+info.title=getModelDisplayLabel(modelId);
 
 let track=document.createElement('div');
 track.className='compare-track';

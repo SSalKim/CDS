@@ -36,6 +36,8 @@ for(const [productId,token] of [['acptot','acptot'],['acrain','acrain'],['tmerge
   );
 }
 assert.equal(usesVariant('2026-10-01T00:00:00Z','acptot','ukmo'),false);
+assert.equal(usesVariant('2026-10-01T00:00:00Z','acptot','aigfs'),false);
+assert.equal(usesVariant('2026-10-01T00:00:00Z','acrain','aigfs'),false);
 assert.equal(usesVariant('2026-10-01T00:00:00Z','acptot','um_ldps'),false);
 assert.equal(usesVariant('2026-10-01T00:00:00Z','acptot','kim_gdps','asia'),false);
 assert.equal(usesVariant('2026-10-01T00:00:00Z','gph500'),false);
@@ -54,6 +56,11 @@ for(const productId of ['acptot','acrain','tmerge']){
 }
 assert.equal(topAligned('2026-10-09T00:00:00Z','kim_gdps'),false);
 assert.equal(topAligned('2026-10-09T00:00:00Z','ecmwf'),false);
+context.compareModels=['aigfs','ecmwf'];
+assert.equal(topAligned('2026-10-09T00:00:00Z','aigfs'),true);
+context.compareModels=['aigfs','ukmo'];
+assert.equal(topAligned('2026-10-09T00:00:00Z','aigfs'),false);
+context.compareModels=['kim_gdps','ukmo','ecmwf'];
 assert.equal(topAligned('2026-09-30T23:59:59Z'),false);
 assert.equal(topAligned('2026-05-01T00:00:00Z'),false);
 assert.equal(topAligned('2020-12-28T18:00:00Z'),false);

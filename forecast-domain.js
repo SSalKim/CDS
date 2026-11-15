@@ -155,6 +155,10 @@ message:''
 
 function productUsesForecastHour(){
 
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(currentModel)){
+return CDSPublicCharts.supportsProduct(currentModel,getCurrentProduct());
+}
+
 let patterns=getCurrentPatterns();
 
 return patterns.some(
@@ -273,6 +277,9 @@ return [...new Set(out)].sort((a,b)=>a-b);
 function getForecastHoursForCurrentSelection(){
 
 let p=getCurrentProduct();
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(currentModel)){
+return CDSPublicCharts.readyHours({modelId:currentModel,product:p,runUTC:getSelectedUTCDate()});
+}
 let utcHour=parseInt(getUTCStamp().slice(8,10),10);
 let productScheme=p?.forecastStepByModel?.[currentModel];
 

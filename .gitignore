@@ -15,3 +15,16 @@ DMDW_VTG/dmdw_all_model_tracks.json
 
 # Local preview server logs
 localhost-*.log
+
+# Private local chart tool: code, credentials, cache and generated charts stay local.
+/local_tools/weathermesh/
+
+# Public-model chart experiments and native grids remain local until reviewed.
+/local_tools/open_models/
+/outputs/open-models-*/
+/outputs/CDS_Public_Models_*.zip
+
+# Public charts keep raw grids and OAuth downloads out of Git.
+/public_charts/__pycache__/
+/outputs/public-charts-*/
+/public-charts-oauth*.json

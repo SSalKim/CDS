@@ -12,6 +12,50 @@ const HALF_HOURLY_MODEL_CYCLES=[
 
 const MODELS={
 
+aifs:{
+name:"ECMWF AIFS-Single (N320)",
+timelineName:"AIFS",
+source:"public_charts",
+cycles:[0,6,12,18],
+forecastRules:[{cycles:[0,6,12,18],max:240}],
+stepSchemeByCycleGroup:{"0,6,12,18":[
+{start:0,end:96,step:6},{start:108,end:240,step:12}
+]}
+},
+
+gfs:{
+name:"NCEP GFS (C768 L127)",
+timelineName:"GFS",
+source:"public_charts",
+cycles:[0,6,12,18],
+forecastRules:[{cycles:[0,6,12,18],max:240}],
+stepSchemeByCycleGroup:{"0,6,12,18":[
+{start:0,end:84,step:3},{start:90,end:96,step:6},{start:108,end:240,step:12}
+]}
+},
+
+aigfs:{
+name:"NCEP AIGFS (0.25\u00b0)",
+timelineName:"AIGFS",
+source:"public_charts",
+cycles:[0,6,12,18],
+forecastRules:[{cycles:[0,6,12,18],max:240}],
+stepSchemeByCycleGroup:{"0,6,12,18":[
+{start:0,end:96,step:6},{start:108,end:240,step:12}
+]}
+},
+
+cmc:{
+name:"CMC GDPS (GEM 0.135\u02da L84)",
+timelineName:"CMC",
+source:"public_charts",
+cycles:[0,12],
+forecastRules:[{cycles:[0,12],max:240}],
+stepSchemeByCycleGroup:{"0,12":[
+{start:0,end:84,step:3},{start:90,end:96,step:6},{start:108,end:240,step:12}
+]}
+},
+
 kim_gdps:{
 name:"GDAPS_KIM",
 folder:"KIMG",

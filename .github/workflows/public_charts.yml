@@ -1,0 +1,179 @@
+name: Generate public model charts
+run-name: Public model charts ${{ inputs.cycle || github.run_number }}
+
+on:
+  schedule:
+    - cron: '3,13,23,33,43,53 * * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Plan only; no Drive authentication, uploads, or deletion
+        type: boolean
+        default: true
+      runner_mode:
+        description: Prefer an idle laptop or force GitHub-hosted
+        type: choice
+        options: [auto, github-hosted]
+        default: auto
+      model:
+        type: choice
+        options: [all, aifs, gfs, aigfs, cmc]
+        default: all
+      cycle:
+        description: Optional UTC YYYYMMDDHH; blank checks recent cycles
+        type: string
+      hours:
+        description: Optional forecast hours separated by spaces or commas
+        type: string
+      max_leads:
+        description: Maximum processed leads per model in this batch
+        type: number
+        default: 2
+      force:
+        description: Explicitly rerender published charts
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: cds-public-model-charts
+  cancel-in-progress: false
+
+jobs:
+  route:
+    if: github.event_name == 'workflow_dispatch' || vars.PUBLIC_CHARTS_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    outputs:
+      labels: ${{ steps.runner.outputs.labels }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: public_charts_runner.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
+      - id: runner
+        env:
+          GH_TOKEN: ${{ secrets.RUNNER_STATUS_TOKEN || github.token }}
+          RUNNER_MODE: ${{ inputs.runner_mode || 'auto' }}
+        run: python public_charts_runner.py --mode "$RUNNER_MODE"
+
+  produce:
+    needs: route
+    runs-on: ${{ fromJson(needs.route.outputs.labels) }}
+    timeout-minutes: 45
+    env:
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true' || 'false' }}
+      PUBLIC_CHARTS_DRIVE_CLIENT_ID: ${{ secrets.PUBLIC_CHARTS_DRIVE_CLIENT_ID }}
+      PUBLIC_CHARTS_DRIVE_CLIENT_SECRET: ${{ secrets.PUBLIC_CHARTS_DRIVE_CLIENT_SECRET }}
+      PUBLIC_CHARTS_DRIVE_REFRESH_TOKEN: ${{ secrets.PUBLIC_CHARTS_DRIVE_REFRESH_TOKEN }}
+      PUBLIC_CHARTS_DRIVE_FOLDER_ID: ${{ secrets.PUBLIC_CHARTS_DRIVE_FOLDER_ID }}
+      PUBLIC_CHARTS_DRIVE_ACCOUNT_EMAIL: ${{ secrets.PUBLIC_CHARTS_DRIVE_ACCOUNT_EMAIL }}
+      CHART_WORK: ${{ runner.temp }}/cds-public-charts
+      PUBLIC_CHARTS_MAP_DIR: ${{ runner.tool_cache }}/cds-public-charts/maps-v1
+      MPLCONFIGDIR: ${{ runner.temp }}/public-charts-mpl
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      PYTHONUTF8: '1'
+      MODEL_INPUT: ${{ inputs.model || 'all' }}
+      CYCLE_INPUT: ${{ inputs.cycle }}
+      HOURS_INPUT: ${{ inputs.hours }}
+      LIMIT_INPUT: ${{ inputs.max_leads || 2 }}
+      FORCE_INPUT: ${{ inputs.force }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /public_charts/
+            /public_charts_run.py
+            /public_charts_runner.py
+            /public_charts_runtime.py
+            /public_charts_drive.py
+            /vtg_drive_archive.py
+            /requirements-public-charts.txt
+            /data/public_charts_manifest.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.15'
+          cache: pip
+          cache-dependency-path: requirements-public-charts.txt
+      - name: Install isolated rendering runtime
+        if: env.DRY_RUN != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          hash="$(sha256sum requirements-public-charts.txt | cut -d ' ' -f 1)"
+          venv="$RUNNER_TOOL_CACHE/cds-public-charts/python-$hash"
+          if [ ! -x "$venv/bin/python" ]; then python -m venv "$venv"; fi
+          "$venv/bin/python" -m pip install -r requirements-public-charts.txt
+          echo "$venv/bin" >> "$GITHUB_PATH"
+      - name: Verify separate Drive account before downloads
+        if: env.DRY_RUN != 'true'
+        run: python public_charts_run.py --check-drive
+      - uses: actions/cache@v4
+        if: env.DRY_RUN != 'true'
+        with:
+          path: ${{ env.PUBLIC_CHARTS_MAP_DIR }}
+          key: public-charts-maps-v1
+      - uses: actions/cache@v4
+        if: env.DRY_RUN != 'true'
+        with:
+          path: ${{ env.CHART_WORK }}/raw-cache/checkpoints
+          key: public-charts-prefix-v1-${{ hashFiles('public_charts/diagnostics.py', 'public_charts/extended_sources.py') }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            public-charts-prefix-v1-${{ hashFiles('public_charts/diagnostics.py', 'public_charts/extended_sources.py') }}-
+      - name: Prepare map data
+        if: env.DRY_RUN != 'true'
+        run: python public_charts_runtime.py --prepare-maps
+      - name: Produce available forecast leads
+        id: generate
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--workdir "$CHART_WORK" --max-leads "$LIMIT_INPUT")
+          if [ "$DRY_RUN" = 'true' ]; then args+=(--dry-run); fi
+          if [ "$MODEL_INPUT" != 'all' ]; then args+=(--models "$MODEL_INPUT"); fi
+          if [ -n "$CYCLE_INPUT" ]; then args+=(--cycle "$CYCLE_INPUT"); fi
+          if [ -n "$HOURS_INPUT" ]; then
+            read -ra hours <<< "${HOURS_INPUT//,/ }"
+            args+=(--hours "${hours[@]}")
+          fi
+          if [ "$FORCE_INPUT" = 'true' ]; then args+=(--force); fi
+          python public_charts_run.py "${args[@]}"
+      - name: Publish verified URL manifest only
+        id: publish
+        if: always() && env.DRY_RUN != 'true' && steps.generate.outcome != 'skipped'
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$CHART_WORK/cleanup-plan.json"
+          git add -- data/public_charts_manifest.json
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'Update public chart availability'
+            for attempt in 1 2 3; do
+              git pull --rebase origin main
+              if git push origin HEAD:main; then break; fi
+              if [ "$attempt" = 3 ]; then exit 1; fi
+              sleep 3
+            done
+          fi
+          git fetch origin main --depth=1
+      - name: Remove expired chart files only after publication
+        if: steps.publish.outcome == 'success' && env.DRY_RUN != 'true'
+        run: python public_charts_run.py --finalize-cleanup --workdir "$CHART_WORK"
+      - name: Limit derived checkpoint cache
+        if: always() && env.DRY_RUN != 'true'
+        run: python public_charts_runtime.py --prune-checkpoints "$CHART_WORK/raw-cache/checkpoints"
+      - name: Report production failure
+        if: always() && steps.generate.outcome == 'failure'
+        run: exit 1
