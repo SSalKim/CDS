@@ -32,6 +32,8 @@ const context={
   timeMode:'UTC',modelCompareMode:false,compareModels:[],COMPARE_MAX_MODELS:6,
   currentForecastList:[24],slider:{value:'0'},
   chartResolvedUrlCache:new Map(),
+  publicChartNoticeDismissed:false,
+  sessionStorage:{values:new Map(),getItem(key){return this.values.get(key) || null;},setItem(key,value){this.values.set(key,value);}},
   getCurrentAuxToken:()=>null,
   getCurrentCategory:()=>context.productCategory.value
 };
@@ -59,7 +61,7 @@ function includeAppFunction(name){
   }
   throw new Error('Incomplete app function: '+name);
 }
-for(const name of ['getOrderedChartUrlCandidates','isPublicChartModel','updatePublicChartNotice','refreshPublicChartManifestView','makeChartImageUrls',
+for(const name of ['getOrderedChartUrlCandidates','isPublicChartModel','updatePublicChartNotice','dismissPublicChartNotice','refreshPublicChartManifestView','makeChartImageUrls',
   'getCycleSupportStatus','getForecastHoursForProductAtRun','buildImageUrlsForCurrentSelectionAtRun',
   'getRecentRunCandidates','selectionIsDisplayable','shouldJumpOlderAvailableRunForMissingSelection',
   'displayCurrentForecastImage','rebuildForecastAxis','jumpLatestAvailableForCurrentSelection']) includeAppFunction(name);
@@ -98,14 +100,22 @@ async function main(){
     context.currentModel=model;
     context.modelCompareMode=false;
     context.updatePublicChartNotice();
-    assert.equal(notice.hidden,!api.isModel(model));
+    assert.equal(notice.hidden,false);
   }
   context.modelCompareMode=true;
   for(const models of [['kim_gdps','aifs'],['gfs','cmc'],['kim_gdps','ukmo'],[]]){
     context.compareModels=models;
     context.updatePublicChartNotice();
-    assert.equal(notice.hidden,!models.some(api.isModel));
+    assert.equal(notice.hidden,false);
   }
+  context.dismissPublicChartNotice();
+  assert.equal(notice.hidden,true);
+  context.publicChartNoticeDismissed=false;
+  context.updatePublicChartNotice();
+  assert.equal(notice.hidden,true,'Dismissal survives model changes and reloads in this tab');
+  context.sessionStorage.values.clear();
+  context.updatePublicChartNotice();
+  assert.equal(notice.hidden,false);
   context.modelCompareMode=false;
   context.compareModels=[];
   context.currentModel='kim_gdps';
@@ -155,6 +165,9 @@ async function main(){
   assert.deepEqual(visible().filter(api.isModel).sort(),['aifs','aigfs','cmc','gfs']);
   assert.equal(evaluate('MODELS.aifs.name'),'ECMWF AIFS-Single (N320)');
   assert.equal(evaluate("modelGroups.find(group=>group.id==='global').models.find(model=>model[0]==='aifs')[1]"),'AIFS');
+  for(const [id,label] of [['gfs','GFS'],['aigfs','AIGFS'],['cmc','CMC']]){
+    assert.equal(evaluate(`modelGroups.find(group=>group.id==='global').models.find(model=>model[0]==='${id}')[1]`),label);
+  }
   assert.equal(evaluate('MODELS.cmc.name'),'CMC GDPS (GEM 0.135\u02da L84)');
   assert.equal(evaluate('MODELS.gfs.name'),'NCEP GFS (C768 L127)');
   assert.equal(evaluate('MODELS.aigfs.name'),'NCEP AIGFS (0.25\u00b0)');

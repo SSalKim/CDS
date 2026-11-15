@@ -308,7 +308,7 @@ def render(arrays, cycle, hour, product, domain, target, accumulation=None, *,
         grid.xpadding = grid.ypadding = -3
         figure.canvas.draw()
         pos = ax.get_position()
-        cax = figure.add_axes([pos.x1 + .012, pos.y0, .013, pos.height])
+        cax = figure.add_axes([pos.x1 + (.004 if public and korea else .012), pos.y0, .013, pos.height])
         sigma = .7 if korea else 1.1
         border = .04 if public and korea else .006
         def map_grid(latitude,longitude):
@@ -806,7 +806,7 @@ def render(arrays, cycle, hour, product, domain, target, accumulation=None, *,
         title_y = pos.y1 + .005
         heading=figure.text(pos.x0,title_y,title,size=fs(8.6 if korea else 10.1),weight="bold",family="DejaVu Serif",va="bottom")
         model_text=figure.text(pos.x0 if korea else pos.x1,title_y+(.024 if korea and public else .020 if korea else 0),model_name,size=fs(9),
-                               color="#0000cc",ha="left" if korea else "right",weight="bold",family="DejaVu Serif",va="bottom")
+                               color="#0000ff",ha="left" if korea else "right",weight="bold",family="DejaVu Serif",va="bottom")
         heading.set_gid("product-title")
         title_scale=1.
         if public:
@@ -835,6 +835,8 @@ def render(arrays, cycle, hour, product, domain, target, accumulation=None, *,
         frame=Image.fromarray(np.asarray(figure.canvas.buffer_rgba())).convert("RGB")
         if profile==PUBLIC_PROFILE:
             frame=frame.resize(PUBLIC_IMAGE_SIZES[domain],Image.Resampling.LANCZOS)
+            if korea:
+                frame=frame.crop((0,2,frame.width-6,frame.height-3))
         if return_frame:
             return frame
         target = Path(target)

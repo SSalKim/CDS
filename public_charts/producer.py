@@ -12,6 +12,8 @@ from .plotter import render
 from .quality import closed_contour_predicate
 from .sources import MODELS, collect, accumulation_hours, NotReady
 
+WINTER_COMPOSITE_SIZES = {False: (1750, 660), True: (600, 2000)}
+
 
 def crop(arrays, domain):
     if domain == "asia":
@@ -40,7 +42,7 @@ def compose(frames, vertical):
     result = Image.new("RGB", (width, height * len(frames)) if vertical else (width * len(frames), height), "white")
     for index, frame in enumerate(frames):
         result.paste(frame, (0, index * height) if vertical else (index * width, 0))
-    return result
+    return result.resize(WINTER_COMPOSITE_SIZES[vertical], Image.Resampling.LANCZOS) if len(frames) == 3 else result
 
 
 def encode(frame, path):

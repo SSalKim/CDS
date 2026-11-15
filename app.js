@@ -117,6 +117,7 @@ let latestSearchSeq=0;
 let latestSearchInProgress=false;
 let autoCheckTimer=null;
 let selectionToastTimer=null;
+let publicChartNoticeDismissed=false;
 
 function showSelectionToast(message){
 
@@ -321,8 +322,15 @@ return typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId);
 function updatePublicChartNotice(){
 let notice=document.getElementById('publicChartNotice');
 if(!notice) return;
-notice.hidden=typeof CDSPublicCharts==='undefined' ||
-!CDSPublicCharts.needsRetentionNotice(modelCompareMode?compareModels:[currentModel]);
+let dismissed=publicChartNoticeDismissed;
+try{dismissed=dismissed || window.sessionStorage.getItem('cds-public-chart-notice-dismissed')==='1';}catch(error){}
+notice.hidden=dismissed;
+}
+
+function dismissPublicChartNotice(){
+publicChartNoticeDismissed=true;
+try{window.sessionStorage.setItem('cds-public-chart-notice-dismissed','1');}catch(error){}
+updatePublicChartNotice();
 }
 
 function refreshPublicChartManifestView(){
@@ -2715,6 +2723,7 @@ updateChartAfter:true
 
 
 function bindEvents(){
+document.getElementById('publicChartNoticeDismiss')?.addEventListener('click',dismissPublicChartNotice);
 
 rememberSelectedRunUTC();
 

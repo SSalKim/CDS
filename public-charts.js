@@ -11,10 +11,6 @@ function isModel(modelId){
 return MODEL_IDS.has(modelId);
 }
 
-function needsRetentionNotice(modelIds){
-return Array.isArray(modelIds) && modelIds.some(isModel);
-}
-
 function supportsProduct(modelId,product){
 if(!isModel(modelId) || !['asia','hkor'].includes(product?.category)) return false;
 return COMMON_PRODUCTS.has(product.id) ||
@@ -210,5 +206,5 @@ return {isModel,supportsProduct,hasPublishedCharts,resolveUrls,readyHours,readyC
 load,startPolling,stopPolling,getRevision:()=>revision};
 }
 
-global.CDSPublicCharts=Object.assign(createStore(),{createStore,manifestUrl,needsRetentionNotice,browserImageCandidates});
+global.CDSPublicCharts=Object.assign(createStore(),{createStore,manifestUrl,browserImageCandidates});
 })(typeof window!=='undefined'?window:globalThis);

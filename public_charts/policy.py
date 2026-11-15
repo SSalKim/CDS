@@ -9,7 +9,7 @@ CYCLE_STEP = {"aifs": 6, "gfs": 6, "aigfs": 6, "cmc": 12}
 TITLES = {"aifs": "ECMWF AIFS-Single (N320)", "gfs": "NCEP GFS (C768 L127)",
           "aigfs": "NCEP AIGFS (0.25\u00b0)", "cmc": "CMC GDPS (GEM 0.135\u02da L84)"}
 MAX_IMAGE_BYTES = 12_000_000_000
-PIPELINE_VERSION = 1
+PIPELINE_VERSION = 2
 KEY_PATTERN = re.compile(r"(aifs|gfs|aigfs|cmc)/(\d{10})/(\d{3})/([a-z0-9_]+)/(asia|hkor)")
 
 
@@ -102,8 +102,11 @@ def retain(rows, max_bytes=MAX_IMAGE_BYTES):
 
 
 def public_manifest(rows):
+    rows = list(rows)
     public = [{k: row[k] for k in ("model", "cycle", "hour", "product", "domain", "url", "size", "sha256", "file_id")}
               for row in rows]
+    for source, target in zip(rows, public):
+        target["render_version"] = source.get("render_version", 0)
     return {"schema_version": 1, "pipeline_version": PIPELINE_VERSION,
             "generated_at": datetime.now(timezone.utc).isoformat(),
             "models": {model: {"title": TITLES[model], "published": any(r["model"] == model for r in public),

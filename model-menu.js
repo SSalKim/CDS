@@ -10,9 +10,9 @@ models:[
 ['ukmo','UKUM'],
 ['ecmwf','ECMWF'],
 ['aifs','AIFS'],
-['gfs','NCEP GFS (C768 L127)'],
-['aigfs','NCEP AIGFS (0.25\u00b0)'],
-['cmc','CMC GDPS (GEM 0.135\u02da L84)']
+['gfs','GFS'],
+['aigfs','AIGFS'],
+['cmc','CMC']
 ]
 },
 

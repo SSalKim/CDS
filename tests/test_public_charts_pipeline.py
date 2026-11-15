@@ -14,7 +14,7 @@ from public_charts import producer
 from public_charts.extended_sources import ExtraFields, winter_fields
 from public_charts.sources import Decoded, NotReady
 from public_charts_runner import choose
-from public_charts_run import (finalize_cleanup, manifest_bytes, plan_cleanup, recover_rows, resolve_plan)
+from public_charts_run import (current_render_keys, finalize_cleanup, manifest_bytes, plan_cleanup, recover_rows, resolve_plan)
 from public_charts_runtime import prune_checkpoints
 from public_charts.sources import Provider
 
@@ -72,6 +72,14 @@ class PolicyTests(unittest.TestCase):
             resolve_plan(["gfs"], cycle="2026111506", start_cycle="2026111512")
         with self.assertRaises(ValueError):
             resolve_plan(["gfs"], start_cycle="2026111513")
+
+    def test_old_render_versions_are_refreshed_without_losing_published_rows(self):
+        previous=row()
+        rows={policy.row_key(previous):previous}
+        self.assertEqual(current_render_keys(rows),set())
+        previous["render_version"]=policy.PIPELINE_VERSION
+        self.assertEqual(current_render_keys(rows),set(rows))
+        self.assertEqual(policy.public_manifest(list(rows.values()))["charts"][0]["render_version"],policy.PIPELINE_VERSION)
 
     def test_reject_invalid_model_cycle_product_or_hour(self):
         for args in (("cmc", "2026111506", 0, "surfce", "asia"),
@@ -206,6 +214,11 @@ class ProductionTests(unittest.TestCase):
         with Image.open(path) as decoded:
             self.assertEqual(decoded.format, "WEBP")
             np.testing.assert_array_equal(np.asarray(original), np.asarray(decoded.convert("RGB")))
+
+    def test_winter_composites_match_the_operational_comparison_size(self):
+        panels=[self.picture() for _ in range(3)]
+        self.assertEqual(producer.compose(panels,False).size,(1750,660))
+        self.assertEqual(producer.compose(panels,True).size,(600,2000))
 
     def test_rain_prefix_reuses_previous_native_intervals(self):
         extra = ExtraFields(self.root, "gfs", "2026111500")

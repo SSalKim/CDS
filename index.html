@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=3.6.1">
+<link rel="stylesheet" href="style.css?v=3.6.4">
 </head>
 <body>
 <div class="app-shell">
@@ -91,7 +91,10 @@ max="2099-12-31"
   </div>
 </div>
 
-<div id="publicChartNotice" class="public-chart-notice" role="note" hidden>※ 시험운영 외부 예측모델(AIFS, GFS, AIGFS, CMC)은 장기 과거자료를 지원하지 않으며, 최근 48시간 이내 초기시각의 생산자료만 제공합니다.</div>
+<div id="publicChartNotice" class="public-chart-notice" role="note" hidden>
+<span>※ 시험운영 외부 예측모델(AIFS, GFS, AIGFS, CMC)은 장기 과거자료를 지원하지 않으며, 최근 48시간 이내 초기시각의 생산자료만 제공합니다.</span>
+<button id="publicChartNoticeDismiss" class="public-chart-notice-dismiss" type="button" aria-label="시험운영 안내 닫기" title="안내 닫기">&times;</button>
+</div>
 
 <div class="viewer-layout">
 
@@ -151,7 +154,7 @@ max="2099-12-31"
 <script src="image-pipeline.js?v=3.5.0"></script>
 <script src="time-controls.js?v=3.5.0"></script>
 <script src="catalog-core.js?v=3.5.0"></script>
-<script src="model-menu.js?v=3.6.3"></script>
+<script src="model-menu.js?v=3.6.4"></script>
 <script src="product-menu.js?v=3.5.2"></script>
 <script src="main-menu.js?v=3.5.0"></script>
 <script src="aux-panel.js?v=3.5.0"></script>
@@ -160,7 +163,7 @@ max="2099-12-31"
 <script src="compare-mode.js?v=3.5.2"></script>
 <script src="radar-analysis.js?v=3.5.0"></script>
 <script src="typhoon-guidance.js?v=3.5.1"></script>
-<script src="app.js?v=3.6.2"></script>
+<script src="app.js?v=3.6.4"></script>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q3DTERTT0J"></script>

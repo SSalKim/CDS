@@ -2,7 +2,7 @@
 STYLE_VERSION = 12
 PUBLIC_PROFILE = "cds-public-v6"
 PUBLIC_IMAGE_SIZES = {"asia": (910, 660), "hkor": (640, 730)}
-PUBLIC_MAP_AXES = {"hkor": (.004, .058, .910, .874)}
+PUBLIC_MAP_AXES = {"hkor": (.004, .052, .926, .896)}
 
 
 def precipitation_threshold(cycle,hours=3):

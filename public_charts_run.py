@@ -36,6 +36,9 @@ def write_json(path, value):
 def manifest_bytes(payload):
     return (json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
 
+def current_render_keys(rows):
+    return {key for key, row in rows.items() if row.get("render_version") == policy.PIPELINE_VERSION}
+
 
 def resolve_plan(models, cycle=None, requested_hours=None, now=None, start_cycle=None):
     if start_cycle:
@@ -186,6 +189,7 @@ def run(args, store=None):
         rows = {key: row for key, row in rows.items() if row.get("file_id") in valid_ids}
         # Uncommitted uploads are not public state. A retry reuses and verifies
         # them through upload_image rather than trusting their metadata alone.
+    fresh = current_render_keys(rows)
     if not args.cycle:
         planned={(item["model"],item["cycle"]) for item in plan}
         for model in args.models:
@@ -226,7 +230,7 @@ def run(args, store=None):
                 continue
             if (model, cycle) in unavailable_cycles:
                 continue
-            if not args.force and policy.expected_keys(model, cycle, hour) <= rows.keys():
+            if not args.force and policy.expected_keys(model, cycle, hour) <= fresh:
                 continue
             attempts += 1
             if attempts > args.max_leads * len(args.models) * 4:
@@ -256,10 +260,12 @@ def run(args, store=None):
                         image_bytes += int(info["size"])
                         before_ids.add(info["file_id"])
                 rows[entry_key] = {"model": model, "cycle": cycle, "hour": hour, "product": product,
-                                   "domain": domain, **{key: info[key] for key in ("file_id", "url", "size", "sha256")}}
+                                   "domain": domain, "render_version": policy.PIPELINE_VERSION,
+                                   **{key: info[key] for key in ("file_id", "url", "size", "sha256")}}
+                fresh.add(entry_key)
 
             try:
-                result = produce_lead(model, cycle, hour, raw_root, rows.keys(), publish, force=args.force)
+                result = produce_lead(model, cycle, hour, raw_root, fresh, publish, force=args.force)
                 counts[model] += 1
                 print(json.dumps({**target, **result}), flush=True)
                 save_state()

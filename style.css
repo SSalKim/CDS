@@ -97,6 +97,9 @@ select{
 }
 
 .public-chart-notice{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
   flex:0 0 auto;
   padding:6px 12px;
   border-bottom:1px solid #e6dcbe;
@@ -106,6 +109,25 @@ select{
   line-height:1.55;
   overflow-wrap:anywhere;
 }
+
+.public-chart-notice[hidden]{display:none;}
+.public-chart-notice > span{flex:1;min-width:0;}
+.public-chart-notice .public-chart-notice-dismiss{
+  flex:0 0 20px;
+  width:20px;
+  height:20px;
+  min-width:20px;
+  min-height:20px;
+  padding:0;
+  border:0;
+  border-radius:3px;
+  background:transparent;
+  color:inherit;
+  font-size:18px;
+  line-height:1;
+  cursor:pointer;
+}
+.public-chart-notice .public-chart-notice-dismiss:hover{background:#f2e8c6;}
 
 .viewer-layout{
   flex:1;
