@@ -92,7 +92,7 @@ const run=parseCycle(row.cycle);
 if(!run || !(row.model==='cmc'?[0,12]:[0,6,12,18]).includes(run.getUTCHours())) continue;
 if(row.domain==='asia' && ['acptot','acptot1','acrain','acrain1'].includes(row.product)) continue;
 if(row.model==='aigfs' && ['acptot1','acrain1'].includes(row.product)) continue;
-if(row.hour===0 && ['acptot1','acrain','acrain1'].includes(row.product)) continue;
+if(row.hour===0 && ['acrain','acrain1'].includes(row.product)) continue;
 const key=[row.model,row.cycle,row.hour,row.domain,row.product].join('/');
 const entry={model:row.model,cycle:row.cycle,hour:row.hour,domain:row.domain,
 product:row.product,url:row.url,sha256:row.sha256 || '',size:row.size || 0};
@@ -128,7 +128,7 @@ if(product.id==='acrain' && forecastHour===0) return [];
 // Winter precipitation composites start in October, one month before 300 hPa.
 const winter=month>=10 || month<=4;
 if(product.category==='hkor' && ['surfce','acptot'].includes(product.id)){
-return variant==='compare' && winter && modelId!=='aigfs' && forecastHour>0
+return variant==='compare' && winter && modelId!=='aigfs'
 ?['acptot1']:['acptot','surfce'];
 }
 if(product.id==='acrain' && variant==='compare' && winter && modelId!=='aigfs') return ['acrain1'];

@@ -78,6 +78,7 @@ jobs:
       PYTHONUTF8: '1'
       MODEL_INPUT: ${{ inputs.model || 'all' }}
       CYCLE_INPUT: ${{ inputs.cycle }}
+      START_CYCLE_INPUT: ${{ vars.PUBLIC_CHARTS_START_CYCLE }}
       HOURS_INPUT: ${{ inputs.hours }}
       LIMIT_INPUT: ${{ inputs.max_leads || 2 }}
       FORCE_INPUT: ${{ inputs.force }}
@@ -146,6 +147,7 @@ jobs:
           if [ "$DRY_RUN" = 'true' ]; then args+=(--dry-run); fi
           if [ "$MODEL_INPUT" != 'all' ]; then args+=(--models "$MODEL_INPUT"); fi
           if [ -n "$CYCLE_INPUT" ]; then args+=(--cycle "$CYCLE_INPUT"); fi
+          if [ -n "$START_CYCLE_INPUT" ]; then args+=(--start-cycle "$START_CYCLE_INPUT"); fi
           if [ -n "$HOURS_INPUT" ]; then
             read -ra hours <<< "${HOURS_INPUT//,/ }"
             args+=(--hours "${hours[@]}")

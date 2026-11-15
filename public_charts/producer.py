@@ -94,28 +94,27 @@ def produce_lead(model, cycle, hour, root, existing, publish, *, force=False):
             if not done(product, domain):
                 emit(product, domain, draw(selected, product, domain))
     if hour == 0:
-        for domain in ("asia", "hkor"):
-            if not done("surfce", domain):
-                emit("surfce", domain, draw(crop(base, domain), "surfce", domain, pressure_only=True))
-        for alias in ("acptot", "acptot1"):
-            emit(alias, "hkor", alias_of=("surfce", "hkor"))
-        return {"complete": policy.expected_keys(model, cycle, hour) <= completed}
+        base = {**base, "precipitation": np.zeros_like(base["pressure_msl"], dtype=np.float64)}
 
     try:
-        base, _, _ = collect(model, cycle, hour, root)
+        if hour:
+            base, _, _ = collect(model, cycle, hour, root)
         if not done("surfce", "asia"):
             emit("surfce", "asia", draw(base, "surfce", "asia"))
         extra = ExtraFields(root, model, cycle)
         selected = crop(base, "hkor")
-        total = None if done("acrain", "hkor") and done("acrain1", "hkor") else extra.total_rain(hour)
+        total = None if not hour or done("acrain", "hkor") and done("acrain1", "hkor") else extra.total_rain(hour)
         if policy.winter(model, cycle):
-            if all(done(name, "hkor") for name in ("acptot", "acptot1", "acrain", "acrain1")):
+            required = ("acptot", "acptot1", "acrain", "acrain1") if hour else ("acptot", "acptot1")
+            if all(done(name, "hkor") for name in required):
                 emit("surfce", "hkor", alias_of=("acptot", "hkor"))
                 return {"complete": policy.expected_keys(model, cycle, hour) <= completed}
             selected, _ = winter_fields(extra, base, hour, interval)
             amount = interpolate(total, selected["latitude"], selected["longitude"]) if total is not None else None
             for name, components in (("acptot", ("acptot", "acptot_snow", "acptot_snowdepth")),
                                      ("acrain", ("acrain", "acrain_snow", "acrain_snowdepth"))):
+                if name == "acrain" and not hour:
+                    continue
                 if done(name, "hkor") and done(name + "1", "hkor"):
                     continue
                 panels = [draw(selected, product, "hkor", accumulation=amount if product == "acrain" else None)
@@ -129,10 +128,11 @@ def produce_lead(model, cycle, hour, root, existing, publish, *, force=False):
                 emit("surfce", "hkor", draw(selected, "surfce", "hkor"))
             for name in ("acptot", "acptot1"):
                 emit(name, "hkor", alias_of=("surfce", "hkor"))
-            if not done("acrain", "hkor"):
+            if hour and not done("acrain", "hkor"):
                 emit("acrain", "hkor", draw(selected, "acrain", "hkor",
                                             accumulation=interpolate(total, selected["latitude"], selected["longitude"])))
-            emit("acrain1", "hkor", alias_of=("acrain", "hkor"))
+            if hour:
+                emit("acrain1", "hkor", alias_of=("acrain", "hkor"))
     except NotReady as error:
         return {"complete": False, "pending": str(error)}
     return {"complete": policy.expected_keys(model, cycle, hour) <= completed}

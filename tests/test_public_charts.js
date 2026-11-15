@@ -154,6 +154,7 @@ async function main(){
   assert.equal(requests.at(-1).url,'data/public_charts_manifest.json');
   assert.deepEqual(visible().filter(api.isModel).sort(),['aifs','aigfs','cmc','gfs']);
   assert.equal(evaluate('MODELS.aifs.name'),'ECMWF AIFS-Single (N320)');
+  assert.equal(evaluate("modelGroups.find(group=>group.id==='global').models.find(model=>model[0]==='aifs')[1]"),'AIFS');
   assert.equal(evaluate('MODELS.cmc.name'),'CMC GDPS (GEM 0.135\u02da L84)');
   assert.equal(evaluate('MODELS.gfs.name'),'NCEP GFS (C768 L127)');
   assert.equal(evaluate('MODELS.aigfs.name'),'NCEP AIGFS (0.25\u00b0)');
@@ -181,6 +182,7 @@ async function main(){
   assert.deepEqual(urls('acptot','aifs','2026050100'),[row('aifs','2026050100',24,'surfce').url]);
   assert.deepEqual(urls('acptot'),[row('aifs','2026111500',24,'acptot').url]);
   assert.deepEqual(urls('acptot','aifs','2026111500',24,'hkor','compare'),[row('aifs','2026111500',24,'acptot1').url]);
+  assert.deepEqual(urls('acptot','aifs','2026111500',0,'hkor','compare'),[row('aifs','2026111500',0,'acptot1').url]);
   assert.deepEqual(urls('acrain','aifs','2026111500',24,'hkor','compare'),[row('aifs','2026111500',24,'acrain1').url]);
   assert.deepEqual(urls('acptot','aifs','2026111500',120,'hkor','compare'),[],
     'A missing explicit comparison variant must not fall back to a different layout');
@@ -188,7 +190,7 @@ async function main(){
   assert.deepEqual(urls('acrain','aigfs','2026111500',24,'hkor','compare'),[row('aigfs','2026111500',24,'acrain').url]);
   assert.deepEqual(urls('acrain','aifs','2026111500',0),[],'No fabricated zero-hour accumulation');
   assert.deepEqual(urls('acptot','aifs','2026111500',0),[row('aifs','2026111500',0,'surfce').url]);
-  assert.deepEqual(urls('acptot','aifs','2026111500',0,'hkor','compare'),[row('aifs','2026111500',0,'surfce').url]);
+  assert.deepEqual(urls('acptot','aifs','2026111500',0,'hkor','compare'),[row('aifs','2026111500',0,'acptot1').url]);
   assert.deepEqual(urls('gph500','aifs','2026111500',0),[row('aifs','2026111500',0,'gph500').url]);
   assert.deepEqual(urls('wnd850','aifs','2026111500',0),[row('aifs','2026111500',0,'wnd850').url]);
   assert.deepEqual(urls('acptot','aifs','2026111500',24,'asia'),[]);

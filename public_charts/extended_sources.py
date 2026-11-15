@@ -162,7 +162,7 @@ def current_snowfall(extra,base,hour,interval):
     return Decoded(values,current.latitude,current.longitude,{"source":"native snowfall water equivalent","units":"kg/m2"})
 
 
-def snow_step(extra,end,cadence):
+def near_surface_fields(extra,end):
     surface=regional(extra.get(end,"temperature_2m",sflux=extra.model=="gfs"))
     lat,lon=surface.latitude,surface.longitude
     t=surface.values
@@ -177,6 +177,14 @@ def snow_step(extra,end,cadence):
     else:
         rh=regional(extra.get(end,"relative_humidity_2m")).values
         pressure=regional(extra.get(end,"surface_pressure")).values
+    return {"latitude":lat,"longitude":lon,"temperature_2m":t,
+            "relative_humidity_2m":rh,"surface_pressure":pressure}
+
+
+def snow_step(extra,end,cadence):
+    surface=near_surface_fields(extra,end)
+    lat,lon=surface["latitude"],surface["longitude"]
+    t,rh,pressure=surface["temperature_2m"],surface["relative_humidity_2m"],surface["surface_pressure"]
     rain_values,rain_reference,_=collect_rainfall(extra.provider,extra.cycle,end,cadence)
     rain=interpolate(Decoded(rain_values,rain_reference.latitude,rain_reference.longitude,{}),lat,lon)
     t850=interpolate(extra.get(end,"temperature_850"),lat,lon)-273.15
@@ -216,6 +224,12 @@ def winter_fields(extra,base,hour,interval):
             start=previous_end
             break
     last=None
+    if hour==0:
+        last=near_surface_fields(extra,0)
+        empty=np.zeros_like(last["temperature_2m"],dtype=np.float64)
+        last.update({key:empty.copy() for key in ("snow_ratio","snow_expected",
+                    "snowfall_water_equivalent","snowfall_depth_diagnostic",
+                    "total_snowfall_water_equivalent","total_snowfall_depth_diagnostic")})
     for end in range(start+cadence,hour+1,cadence):
         current=extra.checkpoint(f"snow/{end:03}.npz")
         if current is None:
@@ -256,12 +270,15 @@ def winter_fields(extra,base,hour,interval):
     dew=mpcalc.dewpoint_from_relative_humidity(last["temperature_2m"]*units.K,np.clip(last["relative_humidity_2m"],.01,100)/100).to("K").m
     last["wet_bulb_2m"]=wet_bulb_psychrometric(last["temperature_2m"],dew,last["surface_pressure"])
     metadata={"model":extra.model,"cycle":extra.cycle,"hour":hour,"interval":interval,"native_interval":cadence,
-              "snowfall_source":"endpoint GFS CSNOW categorical diagnostic, not native snowfall mass" if extra.model=="gfs" else "native accumulated snowfall water equivalent",
+              "snowfall_source":("zero-length display window; no accumulation queried" if hour==0 else
+                                 "endpoint GFS CSNOW categorical diagnostic, not native snowfall mass" if extra.model=="gfs" else
+                                 "native accumulated snowfall water equivalent"),
               "ratio_convention":"KMA 2024 manual p88; natural logarithm; rain normalized to 3h-equivalent intensity; cm=mm*ratio/10",
               "depth_caveat":"fresh-snow diagnostic; no melting, compaction, blowing snow or existing snowpack",
               "wet_bulb_method":"MetPy WMO psychrometric vapor pressure inversion",
               "cutoff_convention":"display only; light precipitation remains in interval/cumulative physical totals"}
     temporary=target.with_suffix(".tmp")
+    target.parent.mkdir(parents=True,exist_ok=True)
     with temporary.open("wb") as stream:
         np.savez_compressed(stream,**last)
     temporary.replace(target)

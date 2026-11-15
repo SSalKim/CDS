@@ -56,6 +56,23 @@ class PolicyTests(unittest.TestCase):
         self.assertEqual(policy.cycle_candidates("aifs", now), ["2026111606", "2026111600"])
         self.assertEqual(policy.cycle_candidates("cmc", now), ["2026111600", "2026111512"])
 
+    def test_automatic_plan_starts_at_the_configured_cycle_and_recovers_missed_cycles(self):
+        now = datetime(2026, 11, 16, 1, tzinfo=timezone.utc)
+        planned = resolve_plan(["aifs", "cmc"], requested_hours=[0, 24], now=now,
+                               start_cycle="2026111512")
+        self.assertTrue(all(item["cycle"] >= "2026111512" for item in planned))
+        self.assertEqual({item["cycle"] for item in planned if item["model"] == "aifs"},
+                         {"2026111512", "2026111518", "2026111600"})
+        self.assertEqual({item["cycle"] for item in planned if item["model"] == "cmc"},
+                         {"2026111512", "2026111600"})
+        self.assertEqual([item["hour"] for item in planned[:3]], [0, 0, 0])
+
+    def test_explicit_cycle_cannot_bypass_the_start_floor(self):
+        with self.assertRaises(ValueError):
+            resolve_plan(["gfs"], cycle="2026111506", start_cycle="2026111512")
+        with self.assertRaises(ValueError):
+            resolve_plan(["gfs"], start_cycle="2026111513")
+
     def test_reject_invalid_model_cycle_product_or_hour(self):
         for args in (("cmc", "2026111506", 0, "surfce", "asia"),
                      ("aifs", "2026111500", 3, "gph500", "asia"),
@@ -128,16 +145,46 @@ class ProductionTests(unittest.TestCase):
         data = np.tile(np.array([0, 255], dtype=np.uint8), (16, 8))
         return Image.fromarray(data).convert("RGB")
 
-    def test_zero_renders_only_instantaneous_maps_and_pressure(self):
+    def test_zero_keeps_normal_titles_and_all_three_empty_winter_panels(self):
         entries = []
-        with patch.object(producer, "collect", return_value=(self.base, {}, {})), patch.object(producer, "render", side_effect=self.picture) as render:
+        with patch.object(producer, "collect", return_value=(self.base, {}, {})), \
+                patch.object(producer,"winter_fields",side_effect=lambda extra,base,hour,interval:(base,{})), \
+                patch.object(producer, "render", side_effect=self.picture) as render:
             result = producer.produce_lead("aifs", "2026111500", 0, self.root, set(),
                                           lambda product, domain, path, alias_of=None: entries.append((product, domain, path, alias_of)))
         self.assertTrue(result["complete"])
-        self.assertEqual(render.call_count, 16)
+        self.assertEqual(render.call_count, 18)
         self.assertEqual(len(entries), 18)
         self.assertFalse(any(item[0].startswith("acrain") for item in entries))
-        self.assertEqual(sum(bool(call.kwargs["pressure_only"]) for call in render.call_args_list), 2)
+        self.assertFalse(any(call.kwargs["pressure_only"] for call in render.call_args_list))
+        winter_calls=[call for call in render.call_args_list if call.args[3] in ("acptot","acptot_snow","acptot_snowdepth")]
+        self.assertEqual(len(winter_calls),3)
+        self.assertTrue(all(call.kwargs["precipitation_hours"]==0 for call in winter_calls))
+        self.assertTrue(all(not np.any(call.args[0]["precipitation"]) for call in winter_calls))
+
+    def test_zero_winter_fields_use_instantaneous_state_without_accumulation_queries(self):
+        from unittest.mock import Mock
+        base={**self.base,"precipitation":np.zeros((2,2))}
+        for key in ("geopotential_925","geopotential_850","temperature_925","temperature_850","wind_u_925","wind_v_925"):
+            base[key]=np.full((2,2),273.)
+        extra=ExtraFields(self.root,"aifs","2026111500")
+        extra.get=Mock(return_value=Decoded(np.full((2,2),100.),base["latitude"],base["longitude"],{}))
+        surface={"latitude":base["latitude"],"longitude":base["longitude"],
+                 "temperature_2m":np.full((2,2),273.),"relative_humidity_2m":np.full((2,2),80.),
+                 "surface_pressure":np.full((2,2),101000.)}
+        with patch("public_charts.extended_sources.near_surface_fields",return_value=surface), \
+                patch("public_charts.extended_sources.collect_rainfall",side_effect=AssertionError("No accumulation at zero")):
+            fields,metadata=winter_fields(extra,base,0,0)
+        extra.get.assert_called_once_with(0,"geopotential_1000")
+        self.assertTrue(np.isfinite(fields["wet_bulb_2m"]).all())
+        self.assertFalse(np.any(fields["snowfall_water_equivalent"]))
+        self.assertFalse(np.any(fields["snowfall_depth_diagnostic"]))
+        self.assertIn("zero-length",metadata["snowfall_source"])
+
+    def test_zero_precipitation_title_uses_the_standard_empty_window(self):
+        from public_charts.chart_titles import product_title
+        for product in ("surfce","acptot","acptot_snow","acptot_snowdepth"):
+            self.assertTrue(product_title(product,"hkor",0,0).endswith("[000-000]"))
 
     def test_pending_rain_does_not_suppress_upper_and_streamline_charts(self):
         entries = []

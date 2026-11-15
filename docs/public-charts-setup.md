@@ -6,7 +6,7 @@
 - CMC GDPS: 00, 12 UTC, 최근 5 cycle.
 - 산출물: 계절별 gph200 또는 gph300, gph500, gph700, ept850, ept925, surfce/acptot, acrain, wnd850, wnd925.
 - 아시아는 연중 surfce, acrain은 한반도만. 겨울철 한반도는 기존 3패널과 세로 비교본을 유지한다. AIGFS는 강수 첫 패널만 사용한다.
-- +000h: 고도/기온/바람/유선과 MSLP만 제공한다. 누적강수/적설은 만들지 않는다. 한반도 acptot의 +000h도 MSLP 단일 패널이다.
+- +000h: surfce/acptot도 다른 시간대와 같은 제목에 `[000-000]`을 사용하고 누적량 채색은 비운다. 겨울철 한반도 acptot는 순간 고도·기온·바람·습구온도와 함께 3패널/세로 비교본을 모두 제공한다. 누적강수·강설 자료는 조회하지 않으며 acrain은 +000h에 생성하지 않는다.
 - 빠른 무손실 WebP(`lossless=True, quality=80, method=4`). 지도는 한 번만 렌더링하고 최종 프레임에서 저장한다.
 - 노트북이 online/idle이고 `linux`, `cds-vtg` 라벨이 있을 때 우선 사용한다. busy/offline/조회 실패는 ubuntu-24.04로 보낸다. 선택 직후 상태가 바뀌는 경합 가능성까지 완전히 없어지는 것은 아니다.
 - AIGFS는 NOAA 공식 S3의 `aigfs.YYYYMMDD/HH/model/atmos/grib2/` 운영 파일을 우선 사용한다. 같은 버킷의 예전 GraphCastGFS 실험 경로와 혼합하지 않는다. S3 인덱스가 없을 때만 같은 cycle의 NOMADS 인덱스를 조회한다.
@@ -66,6 +66,8 @@ PUBLIC_CHARTS_DRIVE_ACCOUNT_EMAIL
 3. `dry_run=false`, 모델 하나, 원하는 cycle, `hours=0,24`, `max_leads=2`로 업로드·비로그인 이미지 URL·제목·시간대를 확인한다. **실제 모드는 만료 파일 영구 삭제까지 수행할 수 있으므로 전용 폴더만 사용한다.**
 4. 한 모델 전 시간대, 그다음 네 모델로 확장하여 GitHub-hosted에서 실행시간·디스크·메모리·이미지 bytes를 계측한다.
 5. 검증 후 repository variable `PUBLIC_CHARTS_ENABLED`를 `true`로 설정한다. 10분마다 최근 미완성 cycle을 확인한다.
+
+`PUBLIC_CHARTS_START_CYCLE=2026111512`는 운영 시작 초기시각의 하한이다. 이후 자동 실행은 이 시각 이전을 조회하지 않고, 보관 개수 범위 안의 누락 cycle도 다시 확인한다. 예측시간별로 초기시각을 교차 처리해 최신 cycle 하나가 끝날 때까지 이전 미완성 cycle이 완전히 밀리지 않도록 한다. 수동 실행에서 하한보다 오래된 cycle을 지정하면 다운로드 전에 거부한다.
 
 기존 `RUNNER_STATUS_TOKEN`은 GitHub 러너 조회 용도로만 재사용한다. 이것이 없어 조회에 실패해도 GitHub-hosted로 진행한다.
 

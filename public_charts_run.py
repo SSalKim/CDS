@@ -12,6 +12,7 @@ import shutil
 import subprocess
 
 from public_charts import policy
+from public_charts.dates import parse_cycle
 
 ROOT = Path(__file__).resolve().parent
 MANIFEST_PATH = ROOT / "data/public_charts_manifest.json"
@@ -36,17 +37,27 @@ def manifest_bytes(payload):
     return (json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
 
 
-def resolve_plan(models, cycle=None, requested_hours=None, now=None):
+def resolve_plan(models, cycle=None, requested_hours=None, now=None, start_cycle=None):
+    if start_cycle:
+        parsed = parse_cycle(start_cycle)
+        if parsed.strftime("%Y%m%d%H") != start_cycle or parsed.hour % 6:
+            raise ValueError("Start cycle must be a valid six-hour UTC cycle")
+        if cycle and cycle < start_cycle:
+            raise ValueError("Requested cycle precedes the configured production start")
     result = []
     for model in models:
-        cycles = [cycle] if cycle else policy.cycle_candidates(model, now)
+        depth = policy.RETENTION[model] if start_cycle else 2
+        cycles = [cycle] if cycle else policy.cycle_candidates(model, now, depth)
+        cycles = [selected for selected in cycles if not start_cycle or selected >= start_cycle]
         for selected in cycles:
-            from public_charts.dates import parse_cycle
             if parse_cycle(selected).hour % policy.CYCLE_STEP[model] and len(models)>1:
                 continue
             for hour in requested_hours if requested_hours is not None else policy.hours(model):
                 policy.expected_keys(model, selected, hour)
                 result.append({"model": model, "cycle": selected, "hour": hour})
+    if not cycle:
+        order = {model: index for index, model in enumerate(models)}
+        result.sort(key=lambda target: (order[target["model"]], target["hour"], -int(target["cycle"])))
     return result
 
 
@@ -143,7 +154,7 @@ def verify_public_url(url):
 
 
 def run(args, store=None):
-    plan = resolve_plan(args.models, args.cycle, args.hours)
+    plan = resolve_plan(args.models, args.cycle, args.hours, start_cycle=args.start_cycle)
     if args.dry_run:
         print(json.dumps({"dry_run": True, "retention": policy.RETENTION,
                           "products": "nine seasonal products; Asia surfce only; Korea rain/snow layouts",
@@ -180,8 +191,10 @@ def run(args, store=None):
         for model in args.models:
             previous=sorted({row["cycle"] for row in rows.values() if row["model"]==model},reverse=True)[:policy.RETENTION[model]]
             for cycle in previous:
-                if (model,cycle) not in planned:
+                if (model,cycle) not in planned and (not args.start_cycle or cycle >= args.start_cycle):
                     plan.extend({"model":model,"cycle":cycle,"hour":hour} for hour in policy.hours(model))
+        order = {model: index for index, model in enumerate(args.models)}
+        plan.sort(key=lambda target: (order[target["model"]], target["hour"], -int(target["cycle"])))
     image_bytes = policy.unique_bytes(rows.values())
     if not local:
         image_bytes = sum(int(item.get("size", 0)) for item in inventory
@@ -297,6 +310,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--models", nargs="+", choices=policy.RETENTION, default=list(policy.RETENTION))
     parser.add_argument("--cycle")
+    parser.add_argument("--start-cycle", help="Never produce initialization cycles before this UTC YYYYMMDDHH")
     parser.add_argument("--hours", nargs="+", type=int)
     parser.add_argument("--max-leads", type=int, default=2)
     parser.add_argument("--max-bytes", type=int, default=policy.MAX_IMAGE_BYTES)

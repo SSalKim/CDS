@@ -9,7 +9,7 @@ models:[
 ['kim_gdps','KIM_GDAPS'],
 ['ukmo','UKUM'],
 ['ecmwf','ECMWF'],
-['aifs','ECMWF AIFS-Single (N320)'],
+['aifs','AIFS'],
 ['gfs','NCEP GFS (C768 L127)'],
 ['aigfs','NCEP AIGFS (0.25\u00b0)'],
 ['cmc','CMC GDPS (GEM 0.135\u02da L84)']
