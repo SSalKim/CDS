@@ -1,5 +1,18 @@
 # 공개 모델 일기도 자동화 설정
 
+## 운영 저장소 분리
+
+외부 모델 일기도의 운영 저장소는 [SSalKim/CDS-Public-Charts](https://github.com/SSalKim/CDS-Public-Charts)이다.
+생산 workflow, Drive 인증정보, 공개 manifest는 그 저장소에서 관리하며, 이 저장소는 CDS 사이트·VTG를 유지한다.
+CDS는 새 저장소의 raw manifest를 읽으므로 일기도 갱신 때마다 Pages를 재배포하지 않는다.
+이 저장소에 남은 Python 일기도 소스는 로컬 검토용 이전본이며, 이후 운영 코드 수정은 새 저장소에서 한다.
+
+- 새 생산은 Cloudflare에서 `public_charts.yml`을 10분마다 호출한다. GitHub 자체 cron은 사용하지 않는다.
+- Cloudflare URL·권한·요청 본문은 [새 저장소 README](https://github.com/SSalKim/CDS-Public-Charts#cloudflare-setup)에 있다.
+- Drive 계정·폴더·기존 이미지와 2026111512 시작 경계는 그대로 유지한다.
+- 기존 CDS의 생산 workflow는 이전 완료 후 비활성화한다. 두 저장소에서 동시에 같은 Drive 상태를 쓰면 안 된다.
+- 노트북 러너는 새 저장소에 별도로 등록되기 전까지 사용할 수 없으며 GitHub-hosted로 자동 대체된다.
+
 ## 확정 구성
 
 - AIFS / GFS / AIGFS: 00, 06, 12, 18 UTC, 최근 9 cycle.
@@ -41,7 +54,7 @@ gh auth status
   --client-secrets "$env:USERPROFILE\Downloads\<다운로드한 OAuth JSON 파일명>" `
   --folder-id "<전용 폴더 ID>" `
   --account-email "<새 Drive 계정 이메일>" `
-  --register-repo "SSalKim/CDS"
+  --register-repo "SSalKim/CDS-Public-Charts"
 ```
 
 `gh` 명령이 없다면 [GitHub CLI](https://cli.github.com/)를 설치하고 `gh auth login`으로 저장소에 접근 가능한 계정으로 로그인한다. Windows에서는 `winget install --id GitHub.cli` 후 터미널을 다시 여는 방법도 있다.
@@ -60,13 +73,13 @@ PUBLIC_CHARTS_DRIVE_ACCOUNT_EMAIL
 
 ## Actions 시험 순서
 
-코드를 main에 반영한 뒤 Actions의 `Generate public model charts`를 수동 실행한다. 예약 작업은 repository variable `PUBLIC_CHARTS_ENABLED=true`가 없으면 실행하지 않는다.
+새 운영 저장소의 main에 반영한 뒤 Actions의 `Generate public model charts`를 수동 실행한다. 실제 생산은 repository variable `PUBLIC_CHARTS_ENABLED=true`가 있어야 한다. GitHub 자체 예약 작업 대신 Cloudflare 호출을 사용한다.
 
 1. `dry_run=true`, `runner_mode=github-hosted`로 계획만 확인한다. 인증·다운로드·업로드·삭제는 하지 않는다.
 2. 로컬 인증 도구가 계정/폴더 검사를 통과한 뒤 Secrets를 등록했다고 표시되는지 확인한다. Actions Secrets는 로컬 명령에서 자동으로 읽을 수 없으며, 실제 workflow가 자체 계정 검사 단계를 다시 실행한다.
 3. `dry_run=false`, 모델 하나, 원하는 cycle, `hours=0,24`, `max_leads=2`로 업로드·비로그인 이미지 URL·제목·시간대를 확인한다. **실제 모드는 만료 파일 영구 삭제까지 수행할 수 있으므로 전용 폴더만 사용한다.**
 4. 한 모델 전 시간대, 그다음 네 모델로 확장하여 GitHub-hosted에서 실행시간·디스크·메모리·이미지 bytes를 계측한다.
-5. 검증 후 repository variable `PUBLIC_CHARTS_ENABLED`를 `true`로 설정한다. 10분마다 최근 미완성 cycle을 확인한다.
+5. 새 저장소의 읽기 전용 Drive 검사와 dry-run을 통과하고 기존 생산이 종료·비활성화되었는지 확인한 뒤, 새 저장소의 `PUBLIC_CHARTS_ENABLED`를 `true`로 설정한다. Cloudflare가 10분마다 호출하면 최근 미완성 cycle을 확인한다.
 
 `PUBLIC_CHARTS_START_CYCLE=2026111512`는 운영 시작 초기시각의 하한이다. 이후 자동 실행은 이 시각 이전을 조회하지 않고, 보관 개수 범위 안의 누락 cycle도 다시 확인한다. 예측시간별로 초기시각을 교차 처리해 최신 cycle 하나가 끝날 때까지 이전 미완성 cycle이 완전히 밀리지 않도록 한다. 수동 실행에서 하한보다 오래된 cycle을 지정하면 다운로드 전에 거부한다.
 

@@ -123,7 +123,7 @@ async function main(){
   assert.equal(api.manifestUrl({hostname:'127.0.0.1'}),'data/public_charts_manifest.json');
   assert.equal(api.manifestUrl({hostname:'[::1]'}),'data/public_charts_manifest.json');
   assert.equal(api.manifestUrl({hostname:'ssalkim.github.io'}),
-    'https://raw.githubusercontent.com/SSalKim/CDS/main/data/public_charts_manifest.json');
+    'https://raw.githubusercontent.com/SSalKim/CDS-Public-Charts/main/data/public_charts_manifest.json');
   assert(!visible().some(api.isModel));
   let remoteRequest='';
   const remoteStore=api.createStore({location:{hostname:'ssalkim.github.io'},fetchImpl:async url=>{

@@ -5,7 +5,7 @@ const MODEL_IDS=new Set(['aifs','gfs','aigfs','cmc']);
 const COMMON_PRODUCTS=new Set(['gph200','gph500','gph700','ept850','ept925','wnd850','wnd925']);
 const ROW_PRODUCTS=new Set([...COMMON_PRODUCTS,'gph300','surfce','acptot','acptot1','acrain','acrain1']);
 const DRIVE_HOSTS=new Set(['drive.google.com','drive.usercontent.google.com','lh3.googleusercontent.com']);
-const REMOTE_MANIFEST='https://raw.githubusercontent.com/SSalKim/CDS/main/data/public_charts_manifest.json';
+const REMOTE_MANIFEST='https://raw.githubusercontent.com/SSalKim/CDS-Public-Charts/main/data/public_charts_manifest.json';
 
 function isModel(modelId){
 return MODEL_IDS.has(modelId);

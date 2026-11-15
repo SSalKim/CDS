@@ -2,8 +2,7 @@ name: Generate public model charts
 run-name: Public model charts ${{ inputs.cycle || github.run_number }}
 
 on:
-  schedule:
-    - cron: '3,13,23,33,43,53 * * * *'
+  # Production moved to SSalKim/CDS-Public-Charts; retained for rollback only.
   workflow_dispatch:
     inputs:
       dry_run:
@@ -44,7 +43,7 @@ concurrency:
 
 jobs:
   route:
-    if: github.event_name == 'workflow_dispatch' || vars.PUBLIC_CHARTS_ENABLED == 'true'
+    if: vars.PUBLIC_CHARTS_ENABLED == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 3
     outputs:
