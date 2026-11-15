@@ -73,9 +73,6 @@ jobs:
       PUBLIC_CHARTS_DRIVE_REFRESH_TOKEN: ${{ secrets.PUBLIC_CHARTS_DRIVE_REFRESH_TOKEN }}
       PUBLIC_CHARTS_DRIVE_FOLDER_ID: ${{ secrets.PUBLIC_CHARTS_DRIVE_FOLDER_ID }}
       PUBLIC_CHARTS_DRIVE_ACCOUNT_EMAIL: ${{ secrets.PUBLIC_CHARTS_DRIVE_ACCOUNT_EMAIL }}
-      CHART_WORK: ${{ runner.temp }}/cds-public-charts
-      PUBLIC_CHARTS_MAP_DIR: ${{ runner.tool_cache }}/cds-public-charts/maps-v1
-      MPLCONFIGDIR: ${{ runner.temp }}/public-charts-mpl
       OPENBLAS_NUM_THREADS: '1'
       OMP_NUM_THREADS: '1'
       PYTHONUTF8: '1'
@@ -99,6 +96,13 @@ jobs:
             /vtg_drive_archive.py
             /requirements-public-charts.txt
             /data/public_charts_manifest.json
+      - name: Configure isolated runtime paths
+        shell: bash
+        run: |
+          printf '%s\n' \
+            "CHART_WORK=$RUNNER_TEMP/cds-public-charts" \
+            "PUBLIC_CHARTS_MAP_DIR=$RUNNER_TOOL_CACHE/cds-public-charts/maps-v1" \
+            "MPLCONFIGDIR=$RUNNER_TEMP/public-charts-mpl" >> "$GITHUB_ENV"
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12.15'
