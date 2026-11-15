@@ -1,0 +1,52 @@
+name: Migrate chart credentials
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  seal:
+    if: github.repository == 'SSalKim/CDS' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Install sealed-box encryption
+        run: python -m pip install PyNaCl==1.5.0
+      - name: Seal chart-only credentials for the new repository
+        env:
+          PUBLIC_CHARTS_DRIVE_CLIENT_ID: ${{ secrets.PUBLIC_CHARTS_DRIVE_CLIENT_ID }}
+          PUBLIC_CHARTS_DRIVE_CLIENT_SECRET: ${{ secrets.PUBLIC_CHARTS_DRIVE_CLIENT_SECRET }}
+          PUBLIC_CHARTS_DRIVE_REFRESH_TOKEN: ${{ secrets.PUBLIC_CHARTS_DRIVE_REFRESH_TOKEN }}
+          PUBLIC_CHARTS_DRIVE_FOLDER_ID: ${{ secrets.PUBLIC_CHARTS_DRIVE_FOLDER_ID }}
+          PUBLIC_CHARTS_DRIVE_ACCOUNT_EMAIL: ${{ secrets.PUBLIC_CHARTS_DRIVE_ACCOUNT_EMAIL }}
+        run: |
+          python - <<'PY'
+          from base64 import b64encode
+          import json
+          import os
+          from pathlib import Path
+          from nacl import encoding, public
+
+          box = public.SealedBox(public.PublicKey(
+              "IPZ1HfveH/mMwwIZRc4+Dt9TaYt8H3P5eFhRlZVqDyo=",
+              encoder=encoding.Base64Encoder))
+          names = ["CLIENT_ID", "CLIENT_SECRET", "REFRESH_TOKEN", "FOLDER_ID", "ACCOUNT_EMAIL"]
+          sealed = {}
+          for suffix in names:
+              name = "PUBLIC_CHARTS_DRIVE_" + suffix
+              value = os.environ.get(name, "")
+              if not value:
+                  raise SystemExit("Missing required chart credential: " + name)
+              sealed[name] = b64encode(box.encrypt(value.encode("utf-8"))).decode("ascii")
+          payload = {"repository": "SSalKim/CDS-Public-Charts", "key_id": "3380204578043523366",
+                     "encrypted_values": sealed}
+          Path("sealed-chart-credentials.json").write_text(json.dumps(payload), encoding="utf-8")
+          print("Five chart credentials sealed for SSalKim/CDS-Public-Charts. No plaintext was written.")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sealed-chart-credentials
+          path: sealed-chart-credentials.json
+          retention-days: 1
