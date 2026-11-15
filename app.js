@@ -315,6 +315,13 @@ function isPublicChartModel(modelId=currentModel){
 return typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId);
 }
 
+function updatePublicChartNotice(){
+let notice=document.getElementById('publicChartNotice');
+if(!notice) return;
+notice.hidden=typeof CDSPublicCharts==='undefined' ||
+!CDSPublicCharts.needsRetentionNotice(modelCompareMode?compareModels:[currentModel]);
+}
+
 function refreshPublicChartManifestView(){
 let affected=isPublicChartModel() || (modelCompareMode && compareModels.some(isPublicChartModel));
 if(!affected){

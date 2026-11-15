@@ -335,6 +335,7 @@ return true;
 
 function renderModels(){
 
+if(typeof updatePublicChartNotice==='function') updatePublicChartNotice();
 modelGrid.innerHTML='';
 
 let groups=getVisibleModelGroups().filter(

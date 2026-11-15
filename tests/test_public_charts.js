@@ -48,7 +48,7 @@ function includeAppFunction(name){
   const next=app.slice(start+1).search(/\n(?:async )?function \w+\(/);
   vm.runInContext(app.slice(start,next<0?undefined:start+1+next),context,{filename:'app.js:'+name});
 }
-for(const name of ['isPublicChartModel','refreshPublicChartManifestView','makeChartImageUrls',
+for(const name of ['isPublicChartModel','updatePublicChartNotice','refreshPublicChartManifestView','makeChartImageUrls',
   'getCycleSupportStatus','getForecastHoursForProductAtRun','buildImageUrlsForCurrentSelectionAtRun',
   'getRecentRunCandidates','selectionIsDisplayable','shouldJumpOlderAvailableRunForMissingSelection',
   'displayCurrentForecastImage','rebuildForecastAxis','jumpLatestAvailableForCurrentSelection']) includeAppFunction(name);
@@ -72,6 +72,24 @@ const urls=(...args)=>Array.from(api.resolveUrls(selection(...args)));
 const visible=()=>snapshot('getVisibleModelGroups().flatMap(group=>group.models.map(model=>model[0]))');
 
 async function main(){
+  const notice={hidden:true};
+  context.document={getElementById:id=>id==='publicChartNotice'?notice:null};
+  assert(fs.readFileSync(path.join(root,'index.html'),'utf8').includes('System 3.6'));
+  for(const model of ['aifs','gfs','aigfs','cmc','kim_gdps']){
+    context.currentModel=model;
+    context.modelCompareMode=false;
+    context.updatePublicChartNotice();
+    assert.equal(notice.hidden,!api.isModel(model));
+  }
+  context.modelCompareMode=true;
+  for(const models of [['kim_gdps','aifs'],['gfs','cmc'],['kim_gdps','ukmo'],[]]){
+    context.compareModels=models;
+    context.updatePublicChartNotice();
+    assert.equal(notice.hidden,!models.some(api.isModel));
+  }
+  context.modelCompareMode=false;
+  context.compareModels=[];
+  context.currentModel='kim_gdps';
   assert.equal(api.manifestUrl({hostname:'localhost'}),'data/public_charts_manifest.json');
   assert.equal(api.manifestUrl({hostname:'127.0.0.1'}),'data/public_charts_manifest.json');
   assert.equal(api.manifestUrl({hostname:'[::1]'}),'data/public_charts_manifest.json');
