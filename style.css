@@ -4645,7 +4645,7 @@ select option.unsupported-option{
   .app-shell{
     display:grid;
     grid-template-columns:72px minmax(0,1fr);
-    grid-template-rows:auto auto auto minmax(150px,1fr) auto;
+    grid-template-rows:auto auto auto auto minmax(150px,1fr) auto;
     width:100%;
     height:100dvh;
     min-width:0;
@@ -4923,7 +4923,7 @@ select option.unsupported-option{
 
   .app-shell .viewer-layout{
     grid-column:1 / -1;
-    grid-row:4;
+    grid-row:5;
     min-width:0;
     min-height:0;
     display:flex;
@@ -5143,7 +5143,7 @@ select option.unsupported-option{
 
   .app-shell .model-box{
     grid-column:1 / -1;
-    grid-row:5;
+    grid-row:6;
     min-width:0;
     max-height:178px;
     overflow:auto;
@@ -5151,6 +5151,15 @@ select option.unsupported-option{
     border-top:1px solid var(--line);
     border-radius:0;
     background:#ffffff;
+  }
+
+  .app-shell .public-chart-notice{
+    grid-column:1 / -1;
+    grid-row:4;
+    width:100%;
+    min-width:0;
+    padding:5px 8px;
+    font-size:11px;
   }
 
   .app-shell .model-grid{

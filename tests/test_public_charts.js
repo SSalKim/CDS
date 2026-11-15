@@ -96,6 +96,13 @@ async function main(){
   assert.equal(api.manifestUrl({hostname:'ssalkim.github.io'}),
     'https://raw.githubusercontent.com/SSalKim/CDS/main/data/public_charts_manifest.json');
   assert(!visible().some(api.isModel));
+  let remoteRequest='';
+  const remoteStore=api.createStore({location:{hostname:'ssalkim.github.io'},fetchImpl:async url=>{
+    remoteRequest=url;
+    return {ok:true,json:async()=>manifest([])};
+  }});
+  await remoteStore.load();
+  assert.match(remoteRequest,/public_charts_manifest\.json\?t=\d+$/);
   payload=manifest([]);
   await api.load();
   assert(!visible().some(api.isModel),'A published flag alone must not reveal empty models');

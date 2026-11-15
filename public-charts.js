@@ -160,7 +160,9 @@ pending=(async()=>{
 const controller=typeof global.AbortController==='function'?new global.AbortController():null;
 const timeout=controller?global.setTimeout(()=>controller.abort(),12000):null;
 try{
-const response=await fetchImpl(manifestUrl(location),{
+const baseUrl=manifestUrl(location);
+const requestUrl=baseUrl===REMOTE_MANIFEST?`${baseUrl}?t=${Math.floor(Date.now()/60000)}`:baseUrl;
+const response=await fetchImpl(requestUrl,{
 cache:'no-store',credentials:'omit',...(controller?{signal:controller.signal}:{})
 });
 if(!response.ok){
