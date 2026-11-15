@@ -52,6 +52,19 @@ return false;
 }
 }
 
+function browserImageCandidates(value){
+if(!validUrl(value)) return [];
+const url=new URL(value);
+if(!['drive.google.com','drive.usercontent.google.com'].includes(url.hostname)) return [];
+const id=url.searchParams.get('id');
+if(!id || !/^[A-Za-z0-9_-]{1,200}$/.test(id)) return [];
+return [...new Set([
+`https://lh3.googleusercontent.com/d/${encodeURIComponent(id)}=s0`,
+value,
+`https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w2400`
+])];
+}
+
 function manifestUrl(location=global.location){
 const host=location?.hostname || '';
 return ['localhost','127.0.0.1','[::1]','::1'].includes(host) || host.endsWith('.localhost')
@@ -197,5 +210,5 @@ return {isModel,supportsProduct,hasPublishedCharts,resolveUrls,readyHours,readyC
 load,startPolling,stopPolling,getRevision:()=>revision};
 }
 
-global.CDSPublicCharts=Object.assign(createStore(),{createStore,manifestUrl,needsRetentionNotice});
+global.CDSPublicCharts=Object.assign(createStore(),{createStore,manifestUrl,needsRetentionNotice,browserImageCandidates});
 })(typeof window!=='undefined'?window:globalThis);

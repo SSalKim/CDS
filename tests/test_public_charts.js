@@ -31,6 +31,7 @@ const context={
   productCategory:{value:'asia'},runDate:{value:'2026-11-15'},runHour:{value:'00:00'},
   timeMode:'UTC',modelCompareMode:false,compareModels:[],COMPARE_MAX_MODELS:6,
   currentForecastList:[24],slider:{value:'0'},
+  chartResolvedUrlCache:new Map(),
   getCurrentAuxToken:()=>null,
   getCurrentCategory:()=>context.productCategory.value
 };
@@ -48,7 +49,7 @@ function includeAppFunction(name){
   const next=app.slice(start+1).search(/\n(?:async )?function \w+\(/);
   vm.runInContext(app.slice(start,next<0?undefined:start+1+next),context,{filename:'app.js:'+name});
 }
-for(const name of ['isPublicChartModel','updatePublicChartNotice','refreshPublicChartManifestView','makeChartImageUrls',
+for(const name of ['getOrderedChartUrlCandidates','isPublicChartModel','updatePublicChartNotice','refreshPublicChartManifestView','makeChartImageUrls',
   'getCycleSupportStatus','getForecastHoursForProductAtRun','buildImageUrlsForCurrentSelectionAtRun',
   'getRecentRunCandidates','selectionIsDisplayable','shouldJumpOlderAvailableRunForMissingSelection',
   'displayCurrentForecastImage','rebuildForecastAxis','jumpLatestAvailableForCurrentSelection']) includeAppFunction(name);
@@ -72,6 +73,14 @@ const urls=(...args)=>Array.from(api.resolveUrls(selection(...args)));
 const visible=()=>snapshot('getVisibleModelGroups().flatMap(group=>group.models.map(model=>model[0]))');
 
 async function main(){
+  const original=row().url;
+  const id=new URL(original).searchParams.get('id');
+  assert.equal(api.browserImageCandidates(original)[0],`https://lh3.googleusercontent.com/d/${id}=s0`);
+  assert.deepEqual(Array.from(api.browserImageCandidates('https://example.invalid/image.webp')),[]);
+  assert.equal(evaluate(`getOrderedChartUrlCandidates(${JSON.stringify(original)})[0]`),`https://lh3.googleusercontent.com/d/${id}=s0`);
+  assert.equal(evaluate('currentModel'),'kim_gdps','Drive candidates must also work in mixed-model comparison');
+  assert.equal(evaluate("getOrderedChartUrlCandidates('https://data.kma.go.kr/CHT/KIMG/chart.png')[0]"),
+    'https://data.kma.go.kr/CHT/KIMG/chart.png');
   const notice={hidden:true};
   context.document={getElementById:id=>id==='publicChartNotice'?notice:null};
   assert(fs.readFileSync(path.join(root,'index.html'),'utf8').includes('System 3.6'));

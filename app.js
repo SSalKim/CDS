@@ -70,9 +70,12 @@ trimTo:250
 const chartResolvedUrlCache=new Map();
 
 function getOrderedChartUrlCandidates(url){
-let candidates=typeof CDSChartUtils.getChartUrlCandidates==='function'
-?CDSChartUtils.getChartUrlCandidates(url)
-:[url];
+let candidates=typeof CDSPublicCharts!=='undefined' && typeof CDSPublicCharts.browserImageCandidates==='function'
+?CDSPublicCharts.browserImageCandidates(url):[];
+if(!candidates.length){
+candidates=typeof CDSChartUtils.getChartUrlCandidates==='function'
+?CDSChartUtils.getChartUrlCandidates(url):[url];
+}
 let preferred=chartResolvedUrlCache.get(url);
 
 if(preferred && candidates.includes(preferred)){
