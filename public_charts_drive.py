@@ -24,6 +24,8 @@ NAMESPACE = "cds-public-charts-v1"
 FOLDER_MIME = "application/vnd.google-apps.folder"
 JSON_NAMES = frozenset({"state.json", "manifest.json"})
 ENV_PREFIX = "PUBLIC_CHARTS_DRIVE_"
+DRIVE_V2_API = "https://www.googleapis.com/drive/v2"
+DRIVE_V2_UPLOAD_API = "https://www.googleapis.com/upload/drive/v2"
 FILE_FIELDS = (
     "id,name,mimeType,size,md5Checksum,parents,appProperties,trashed,"
     "ownedByMe,owners(emailAddress),driveId"
@@ -121,6 +123,42 @@ class ChartDriveStore:
         if metadata.get("id") != file_id:
             raise ChartDriveError("Google Drive returned an unexpected file ID.")
         return metadata, response.headers.get("ETag")
+
+    def _mutation_metadata(self, file_id: str):
+        metadata, etag = self._metadata(file_id)
+        if etag:
+            return metadata, etag, 3
+        # Drive v3 may omit metadata ETags. The v2 snapshot exposes an ETag
+        # together with fresh ownership, parent, and private-property guards.
+        payload = self._json(self._request(
+            "GET", f"{DRIVE_V2_API}/files/{quote(_file_id(file_id), safe='')}",
+            params={"fields": "id,title,mimeType,fileSize,md5Checksum,parents(id),"
+                    "properties(key,value,visibility),labels(trashed),ownedByMe,"
+                    "owners(emailAddress),driveId,etag"},
+        ))
+        if payload.get("id") != file_id:
+            raise ChartDriveError("Google Drive returned an unexpected file ID.")
+        properties = payload.get("properties", [])
+        parents = payload.get("parents", [])
+        labels = payload.get("labels", {})
+        if (not isinstance(properties, list) or not isinstance(parents, list)
+                or not isinstance(labels, dict)
+                or not all(isinstance(item, dict) for item in properties + parents)):
+            raise ChartDriveError("Google Drive returned invalid conditional metadata.")
+        private = [item for item in properties if item.get("visibility") == "PRIVATE"]
+        keys = [item.get("key") for item in private]
+        if not all(isinstance(key, str) for key in keys) or len(set(keys)) != len(keys):
+            raise ChartDriveError("Google Drive returned invalid private properties.")
+        fresh = {"id": file_id, "name": payload.get("title"), "mimeType": payload.get("mimeType"),
+                 "size": payload.get("fileSize"), "md5Checksum": payload.get("md5Checksum"),
+                 "parents": [item.get("id") for item in parents],
+                 "appProperties": {item["key"]: item.get("value") for item in private},
+                 "trashed": labels.get("trashed"), "ownedByMe": payload.get("ownedByMe"),
+                 "owners": payload.get("owners"), "driveId": payload.get("driveId")}
+        etag = payload.get("etag")
+        if not isinstance(etag, str) or etag.startswith("W/"):
+            etag = None
+        return fresh, etag, 2
 
     def _owned(self, metadata: dict) -> bool:
         owners = metadata.get("owners")
@@ -417,14 +455,18 @@ class ChartDriveStore:
         metadata = {"name": name, "mimeType": "application/json", "parents": [self.folder_id],
                     "appProperties": {"namespace": NAMESPACE, "key": name, "kind": "json"}}
         method, url, headers = "POST", f"{DRIVE_UPLOAD_API}/files", {}
+        params = {"uploadType": "multipart", "fields": "id"}
         if entry is not None:
-            current, etag = self._metadata(_file_id(entry["id"]))
+            current, etag, api_version = self._mutation_metadata(_file_id(entry["id"]))
             self._require_json_entry(current, name)
             if self._matches(current, len(data), md5):
                 return self._json_record(current["id"], name, data, md5)
             if not etag:
                 raise ChartDriveError("Managed JSON update requires an ETag precondition.")
             method, url = "PATCH", f"{DRIVE_UPLOAD_API}/files/{quote(current['id'], safe='')}"
+            if api_version == 2:
+                method, url = "PUT", f"{DRIVE_V2_UPLOAD_API}/files/{quote(current['id'], safe='')}"
+                params["newRevision"] = "false"
             headers["If-Match"] = etag
             metadata = {"mimeType": "application/json"}
         boundary = "chart_" + uuid.uuid4().hex
@@ -436,7 +478,7 @@ class ChartDriveStore:
         )
         headers["Content-Type"] = f"multipart/related; boundary={boundary}"
         result = self._json(self._request(
-            method, url, params={"uploadType": "multipart", "fields": "id"},
+            method, url, params=params,
             headers=headers, data=body,
         ))
         file_id = _file_id(result.get("id"))
@@ -458,11 +500,11 @@ class ChartDriveStore:
         if clean_id == self.folder_id:
             raise ChartDriveError("The chart folder cannot be deleted.")
         self._ensure_verified()
-        current, etag = self._metadata(clean_id)
+        current, etag, api_version = self._mutation_metadata(clean_id)
         self._require_managed(current)
         if not etag:
             raise ChartDriveError("Managed deletion requires an ETag precondition.")
         self._request(
-            "DELETE", f"{DRIVE_API}/files/{quote(clean_id, safe='')}",
+            "DELETE", f"{DRIVE_V2_API if api_version == 2 else DRIVE_API}/files/{quote(clean_id, safe='')}",
             headers={"If-Match": etag},
         )

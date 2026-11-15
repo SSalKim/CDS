@@ -56,6 +56,8 @@ class FakeDriveClient:
         self.upload_location = charts.DRIVE_UPLOAD_API + "/files?upload_id=private-session"
         self.fail_patch = False
         self.metadata_overrides = {}
+        self.omit_v3_etag = False
+        self.v2_metadata_overrides = {}
         self.add(FOLDER, b"", mime=charts.FOLDER_MIME, tagged=False, parents=[self.root_id])
         self.request = Mock(side_effect=self.dispatch)
 
@@ -123,7 +125,7 @@ class FakeDriveClient:
             return Response({"id": file_id})
         file_id = parsed.path.split("/")[-1]
         if params.get("uploadType") == "multipart":
-            if method == "PATCH":
+            if method in ("PATCH", "PUT"):
                 if self.fail_patch or kwargs["headers"].get("If-Match") != self.versions[file_id]:
                     raise RuntimeError("HTTP 412 private-refresh-token")
             message = BytesParser(policy=policy.default).parsebytes(
@@ -149,8 +151,19 @@ class FakeDriveClient:
             return Response(status=204)
         if params.get("alt") == "media":
             return Response(content=self.contents[file_id])
+        if parsed.path.startswith("/drive/v2/files/"):
+            item = self.files[file_id]
+            value = {"id": file_id, "title": item["name"], "mimeType": item["mimeType"],
+                     "fileSize": item["size"], "md5Checksum": item["md5Checksum"],
+                     "parents": [{"id": parent} for parent in item["parents"]],
+                     "properties": [{"key": key, "value": value, "visibility": "PRIVATE"}
+                                    for key, value in item["appProperties"].items()],
+                     "labels": {"trashed": item["trashed"]}, "ownedByMe": item["ownedByMe"],
+                     "owners": item["owners"], "driveId": item.get("driveId"),
+                     "etag": self.versions.get(file_id)}
+            return Response(self.v2_metadata_overrides.get(file_id, value))
         return Response(self.metadata_overrides.get(file_id, self.files[file_id]),
-                        headers={"ETag": self.versions.get(file_id)})
+                        headers={} if self.omit_v3_etag else {"ETag": self.versions.get(file_id)})
 
 
 class PublicChartDriveTests(unittest.TestCase):
@@ -498,6 +511,52 @@ class PublicChartDriveTests(unittest.TestCase):
         self.client.store_content(first["file_id"], b"not-json")
         with self.assertRaisesRegex(charts.ChartDriveError, "invalid"):
             self.store.read_json("manifest.json", {})
+
+    def test_json_updates_use_conditional_v2_when_v3_omits_etag(self):
+        self.client.omit_v3_etag = True
+        self.store.write_json("state.json", {"old": True})
+        self.store.write_json("state.json", {"new": True})
+        self.assertEqual({"new": True}, self.store.read_json("state.json"))
+        update = self.methods("PUT")[-1]
+        self.assertTrue(update.args[1].startswith(charts.DRIVE_V2_UPLOAD_API))
+        self.assertTrue(update.kwargs["headers"]["If-Match"])
+        self.assertEqual("false", update.kwargs["params"]["newRevision"])
+        self.client.fail_patch = True
+        with self.assertRaises(charts.ChartDriveError):
+            self.store.write_json("state.json", {"stale": True})
+
+    def test_v2_snapshot_rechecks_ownership_and_parent_before_mutation(self):
+        first = self.store.write_json("state.json", {"old": True})
+        self.client.omit_v3_etag = True
+        self.client.v2_metadata_overrides[first["file_id"]] = {"id": first["file_id"],
+                                                              "parents": [{"id": "outside"}]}
+        with self.assertRaises(charts.ChartDriveError):
+            self.store.write_json("state.json", {"new": True})
+        self.assertFalse(self.methods("PUT"))
+
+    def test_v2_delete_keeps_etag_guard_when_v3_omits_it(self):
+        self.client.add("remove")
+        self.client.omit_v3_etag = True
+        self.store.delete_managed("remove")
+        call = self.methods("DELETE")[-1]
+        self.assertEqual(charts.DRIVE_V2_API + "/files/remove", call.args[1])
+        self.assertEqual('"version-1"', call.kwargs["headers"]["If-Match"])
+
+    def test_v2_delete_rejects_a_move_after_the_guarded_snapshot(self):
+        self.client.add("moving_v2")
+        self.client.omit_v3_etag = True
+        dispatch = self.client.dispatch
+
+        def move_before_delete(method, url, **kwargs):
+            if method == "DELETE":
+                self.client.files["moving_v2"]["parents"] = ["outside"]
+                self.client.versions["moving_v2"] = '"moved-version"'
+            return dispatch(method, url, **kwargs)
+
+        self.client.request.side_effect = move_before_delete
+        with self.assertRaises(charts.ChartDriveError):
+            self.store.delete_managed("moving_v2")
+        self.assertIn("moving_v2", self.client.files)
 
     def test_json_refetch_rejects_moved_or_untagged_entries(self):
         first = self.store.write_json("state.json", {})
