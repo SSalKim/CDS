@@ -46,8 +46,18 @@ const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
 function includeAppFunction(name){
   const start=app.search(new RegExp(`^(?:async )?function ${name}\\(`,'m'));
   assert(start>=0,name);
-  const next=app.slice(start+1).search(/\n(?:async )?function \w+\(/);
-  vm.runInContext(app.slice(start,next<0?undefined:start+1+next),context,{filename:'app.js:'+name});
+  // Let the JS parser find a complete function without evaluating adjacent globals.
+  let end=start;
+  while((end=app.indexOf('\n}',end+1))>=0){
+    const source=app.slice(start,end+2);
+    try{new vm.Script(source);}catch(error){
+      if(error instanceof SyntaxError) continue;
+      throw error;
+    }
+    vm.runInContext(source,context,{filename:'app.js:'+name});
+    return;
+  }
+  throw new Error('Incomplete app function: '+name);
 }
 for(const name of ['getOrderedChartUrlCandidates','isPublicChartModel','updatePublicChartNotice','refreshPublicChartManifestView','makeChartImageUrls',
   'getCycleSupportStatus','getForecastHoursForProductAtRun','buildImageUrlsForCurrentSelectionAtRun',
