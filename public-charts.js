@@ -198,7 +198,9 @@ timer=null;
 
 function startPolling(onChange){
 if(typeof onChange==='function') listeners.add(onChange);
-if(timer===null) timer=global.setInterval(()=>load(),60000);
+if(timer===null) timer=global.setInterval(()=>{
+if(global.document?.visibilityState!=='hidden') return load();
+},60000);
 return load();
 }
 

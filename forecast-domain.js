@@ -274,11 +274,27 @@ return [...new Set(out)].sort((a,b)=>a-b);
 }
 
 
+function getPublicChartTimelineHours(modelId,product,runUTC){
+
+if(!CDSPublicCharts.supportsProduct(modelId,product) || !Number.isFinite(runUTC?.getTime?.())){
+return [];
+}
+
+let runDateOnly=parseDateOnly(formatDateInputFromUTCParts(runUTC));
+let cycleHour=runUTC.getUTCHours();
+if(!getAvailableCycles(modelId,runDateOnly).includes(cycleHour)) return [];
+
+let hours=getForecastHours(modelId,runDateOnly,cycleHour);
+return product.id==='acrain' ? hours.filter(hour=>hour!==0) : hours;
+
+}
+
+
 function getForecastHoursForCurrentSelection(){
 
 let p=getCurrentProduct();
 if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(currentModel)){
-return CDSPublicCharts.readyHours({modelId:currentModel,product:p,runUTC:getSelectedUTCDate()});
+return getPublicChartTimelineHours(currentModel,p,getSelectedUTCDate());
 }
 let utcHour=parseInt(getUTCStamp().slice(8,10),10);
 let productScheme=p?.forecastStepByModel?.[currentModel];

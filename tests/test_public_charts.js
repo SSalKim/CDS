@@ -64,7 +64,7 @@ function includeAppFunction(name){
 for(const name of ['getOrderedChartUrlCandidates','isPublicChartModel','updatePublicChartNotice','dismissPublicChartNotice','refreshPublicChartManifestView','makeChartImageUrls',
   'getCycleSupportStatus','getForecastHoursForProductAtRun','buildImageUrlsForCurrentSelectionAtRun',
   'getRecentRunCandidates','selectionIsDisplayable','shouldJumpOlderAvailableRunForMissingSelection',
-  'displayCurrentForecastImage','rebuildForecastAxis','jumpLatestAvailableForCurrentSelection']) includeAppFunction(name);
+  'displayCurrentForecastImage','rebuildForecastAxis','updateChart','jumpLatestAvailableForCurrentSelection']) includeAppFunction(name);
 const evaluate=code=>vm.runInContext(code,context);
 const snapshot=code=>JSON.parse(evaluate(`JSON.stringify(${code})`));
 const api=context.CDSPublicCharts;
@@ -236,8 +236,26 @@ async function main(){
   context.currentProduct='acptot';
   assert.equal(evaluate('productUsesForecastHour()'),true);
   assert.equal(evaluate("productUsesForecastHourForModel(getCurrentProduct(),'aifs')"),true);
-  assert.deepEqual(snapshot('getForecastHoursForCurrentSelection()'),[0,24,120]);
-  assert.deepEqual(snapshot("getForecastHoursForCompareModel('aifs')"),[0,24]);
+  const sixHourly=evaluate("getForecastHours('aifs',new Date('2026-11-15T00:00:00Z'),0)");
+  assert.deepEqual(snapshot('getForecastHoursForCurrentSelection()'),Array.from(sixHourly));
+  assert.deepEqual(snapshot("getForecastHoursForCompareModel('aifs')"),Array.from(sixHourly));
+  assert.equal(sixHourly.at(-1),240,'Unpublished leads remain on the slider through +240h');
+  assert.deepEqual(snapshot("buildCompareImageUrlsForModel('aifs',120)"),[],
+    'Unpublished comparison frames remain missing, not replaced by another layout');
+  for(const model of ['aifs','gfs','aigfs','cmc']){
+    const hours=Array.from(evaluate(`getPublicChartTimelineHours('${model}',getCurrentProduct(),new Date('2026-11-15T00:00:00Z'))`));
+    assert.equal(hours.length,['aifs','aigfs'].includes(model)?29:43);
+    assert.equal(hours.at(-1),240);
+    assert(hours.includes(84)&&hours.includes(90)&&hours.includes(96)&&hours.includes(108));
+    assert.equal(hours.includes(3),['gfs','cmc'].includes(model));
+    assert(!hours.includes(87)&&!hours.includes(102));
+    assert.deepEqual(snapshot(`getPublicChartTimelineHours('${model}',{id:'acrain',category:'hkor'},new Date('2026-11-15T00:00:00Z'))`),
+      hours.filter(hour=>hour!==0),'Total precipitation has no unsupported +000h tile');
+  }
+  assert.deepEqual(snapshot("getPublicChartTimelineHours('cmc',getCurrentProduct(),new Date('2026-11-15T06:00:00Z'))"),[]);
+  assert.deepEqual(snapshot("getPublicChartTimelineHours('aifs',{id:'wnd700',category:'hkor'},new Date('2026-11-15T00:00:00Z'))"),[]);
+  assert.deepEqual(urls('acptot','aifs','2026111500',6),[],
+    'A scheduled but unpublished tile must not invent an image URL');
   assert.deepEqual(snapshot("buildCompareImageUrlsForModel('aifs',24)"),[row('aifs','2026111500',24,'acptot1').url]);
   assert.deepEqual(snapshot("buildCompareImageUrlsForModel('aigfs',24)"),[row('aigfs','2026111500',24,'surfce').url]);
   mobile=true;
@@ -263,9 +281,25 @@ async function main(){
   context.setCurrentForecastList=list=>{context.currentForecastList=list;};
   context.setForecastLoadStates=()=>{};
   context.renderForecastTimeline=()=>{};
+  context.getForecastIndexByHour=hour=>context.currentForecastList.indexOf(hour);
+  context.updateForecastLabel=()=>{};
   context.forecastLabel={};
   evaluate('rebuildForecastAxis()');
-  assert.equal(context.slider.disabled,true,'An empty manifest timeline must not expose a fake +000 frame');
+  assert.equal(context.slider.disabled,false,'An unpublished cycle keeps the complete scheduled timeline');
+  assert.deepEqual(Array.from(context.currentForecastList),Array.from(sixHourly));
+  evaluate('rebuildForecastAxis({reset:false,preserveForecastHour:24})');
+  assert.equal(context.currentForecastList[Number(context.slider.value)],24,'Rebuilding preserves the selected lead');
+  let missingStates=[];
+  context.setAllForecastLoadStates=(count,state)=>{missingStates=Array(count).fill(state);};
+  context.invalidateImagePreload=()=>{};
+  context.invalidateForecastDisplay=()=>{};
+  context.resetAnalysisResolutionState=()=>{};
+  context.resetForecastImageCache=()=>{};
+  context.setViewerLoading=()=>{};
+  context.chartImages={classList:{remove(){}}};
+  evaluate('updateChart()');
+  assert.deepEqual(missingStates,Array(sixHourly.length).fill('missing'),
+    'A cycle with no images marks every scheduled tile gray');
   context.runDate.value='2026-11-15';
   context.currentForecastList=[24];
 

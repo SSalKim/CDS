@@ -59,6 +59,10 @@ let auxAvailabilityLoading=false;
 const AUX_AVAILABILITY_CONCURRENCY=6;
 
 const IMAGE_PRELOAD_CONCURRENCY=4;
+const forecastAvailabilityRefresh=CDSForecastRefresh.createRefresher({
+refresh:refreshMissingForecastFrames,
+canRefresh:canRefreshForecastAvailability
+});
 const COMPARE_PLAY_INTERVAL_MS=500;
 const COMPARE_MAX_MODELS=6;
 const IMAGE_DECODE_TIMEOUT_MS=20000;
@@ -371,6 +375,16 @@ bindEvents();
 if(typeof CDSPublicCharts!=='undefined'){
 CDSPublicCharts.startPolling(refreshPublicChartManifestView);
 }
+
+forecastAvailabilityRefresh.start();
+let retryMissing=()=>forecastAvailabilityRefresh.request({manual:true});
+forecastTimeline?.addEventListener('pointerdown',retryMissing);
+forecastTimeline?.addEventListener('keydown',retryMissing);
+slider?.addEventListener('pointerdown',retryMissing);
+slider?.addEventListener('keydown',retryMissing);
+document.addEventListener('visibilitychange',()=>{
+if(document.visibilityState!=='hidden') retryMissing();
+});
 
 if(AUTO_NOW_ON_STARTUP){
 
@@ -2228,7 +2242,8 @@ chartImages.classList.remove('compare-images','fit-screen','fixed-size','layout-
 if(!selectionIsDisplayable()){
 
 resetForecastImageCache();
-setForecastLoadStates(['missing']);
+setAllForecastLoadStates(currentForecastList.length || 1,'missing');
+renderForecastTimeline();
 
 setViewerLoading(false);
 return;
@@ -2240,9 +2255,64 @@ preloadAllForecastImages({imageRefreshToken});
 }
 
 
+function canRefreshForecastAvailability({manual=false}={}){
+if(document.visibilityState==='hidden' || latestSearchInProgress || slider.disabled || currentForecastList.length<2){
+return false;
+}
+if(!modelCompareMode && !productUsesForecastHour()) return false;
+let run=getSelectedUTCDate();
+if(!Number.isFinite(run?.getTime?.())) return false;
+let age=Date.now()-run.getTime();
+return manual || (age>=0 && age<=48*60*60*1000);
+}
+
+function getForecastRefreshContextKey(){
+return [modelCompareMode,currentModel,getCompareAvailabilityContextKey(),
+currentForecastList.join(','),imagePreloadSeq,compareImageAvailabilitySeq].join('|');
+}
+
+async function refreshMissingForecastFrames({manual=false}={}){
+let contextKey=getForecastRefreshContextKey();
+let isCurrent=()=>contextKey===getForecastRefreshContextKey() && document.visibilityState!=='hidden';
+let hasPublic=isPublicChartModel() || (modelCompareMode && compareModels.some(isPublicChartModel));
+if(manual && hasPublic) await CDSPublicCharts.load();
+if(!isCurrent()) return false;
+let imageRefreshToken=String(Date.now());
+if(modelCompareMode){
+return probeCompareImageAvailability({retryMissing:true,imageRefreshToken});
+}
+
+let jobs=currentForecastList.map((hour,index)=>index).filter(index=>
+forecastTimelineState.getLoadState(index)==='missing' && !isRunTimeFrameFuture(index));
+let newlyAvailable=new Set();
+let seq=imagePreloadSeq;
+await CDSImagePipeline.runConcurrentRange({
+count:jobs.length,
+concurrency:2,
+isCancelled:()=>!isCurrent(),
+task:async jobIndex=>{
+let index=jobs[jobIndex];
+if(forecastTimelineState.getLoadState(index)!=='missing') return true;
+let result=await preloadForecastIndex(index,seq,{imageRefreshToken});
+if(!isCurrent() || result.cancelled) return false;
+if(result.ok && forecastTimelineState.getLoadState(index)==='missing'){
+setForecastAvailabilityResult(index,result);
+newlyAvailable.add(index);
+}
+return true;
+}
+});
+if(isCurrent() && newlyAvailable.has(Number(slider.value || 0))){
+await displayCurrentForecastImage();
+}
+return newlyAvailable.size>0;
+}
+
+
 function getForecastHoursForProductAtRun(product,modelId,runUTC){
 
 if(isPublicChartModel(modelId)){
+// NOW searches use published leads; the slider uses the complete model schedule.
 return CDSPublicCharts.readyHours({modelId,product,runUTC});
 }
 

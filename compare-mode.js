@@ -8,6 +8,7 @@ const COMPARE_WINTER_VARIANT_UNSUPPORTED_MODELS=new Set(['ukmo','um_ldps','aigfs
 
 let compareImageAvailabilitySeq=0;
 let compareImageAvailabilityMap=new Map();
+let compareImageRefreshTokens=new Map();
 let compareImageAvailabilityContextKey='';
 let compareImageRenderFrame=null;
 
@@ -612,8 +613,7 @@ return [];
 }
 
 if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId)){
-return CDSPublicCharts.readyHours({modelId,product,runUTC:getSelectedUTCDate(),
-variant:shouldUseWinterCompareVariant(modelId,getCompareProductForModel(modelId),getSelectedUTCDate())?'compare':'normal'});
+return getPublicChartTimelineHours(modelId,product,getSelectedUTCDate());
 }
 
 if(!productUsesForecastHourForModel(product,modelId)){
@@ -741,14 +741,16 @@ segment.classList.add('state-'+getCompareImageAvailability(modelId,forecastHour)
 
 }
 
-async function probeCompareImageAvailability(){
+async function probeCompareImageAvailability({retryMissing=false,imageRefreshToken=''}={}){
 
-let seq=++compareImageAvailabilitySeq;
+let seq=retryMissing?compareImageAvailabilitySeq:++compareImageAvailabilitySeq;
 let contextKey=getCompareAvailabilityContextKey();
 
 if(contextKey!==compareImageAvailabilityContextKey){
+if(retryMissing) return false;
 compareImageAvailabilityContextKey=contextKey;
 compareImageAvailabilityMap=new Map();
+compareImageRefreshTokens=new Map();
 }
 
 let jobs=[];
@@ -759,7 +761,8 @@ let key=getCompareAvailabilityKey(modelId,forecastHour);
 
 if(
 compareModelHasForecastHour(modelId,forecastHour) &&
-!compareImageAvailabilityMap.has(key)
+(retryMissing ? compareImageAvailabilityMap.get(key)==='missing'
+: !compareImageAvailabilityMap.has(key))
 ){
 jobs.push({
 modelId,
@@ -769,16 +772,17 @@ forecastHour:Number(forecastHour)
 });
 });
 
-renderCompareForecastTimeline();
+if(!retryMissing) renderCompareForecastTimeline();
 
 if(!jobs.length){
 return;
 }
 
+let changedCurrent=false;
 await CDSImagePipeline.runConcurrentRange({
 count:jobs.length,
 concurrency:IMAGE_PRELOAD_CONCURRENCY,
-isCancelled:()=>seq!==compareImageAvailabilitySeq,
+isCancelled:()=>seq!==compareImageAvailabilitySeq || (retryMissing && document.visibilityState==='hidden'),
 task:async index=>{
 let job=jobs[index];
 let product=getEffectiveCompareProductForModel(job.modelId);
@@ -787,23 +791,34 @@ let exists=false;
 
 if(urls.length){
 exists=await urlsExist(urls,{
-existenceMode:getProductExistenceMode(product,job.modelId)
+existenceMode:getProductExistenceMode(product,job.modelId),
+imageRefreshToken
 });
 }
 
-if(seq!==compareImageAvailabilitySeq){
+if(seq!==compareImageAvailabilitySeq || (retryMissing && document.visibilityState==='hidden')){
 return false;
 }
 
+let key=getCompareAvailabilityKey(job.modelId,job.forecastHour);
+if(retryMissing && compareImageAvailabilityMap.get(key)==='available') return true;
 compareImageAvailabilityMap.set(
-getCompareAvailabilityKey(job.modelId,job.forecastHour),
+key,
 exists?'available':'missing'
 );
+if(retryMissing && exists){
+compareImageRefreshTokens.set(key,imageRefreshToken);
+if(Number(currentForecastList[Number(slider.value || 0)])===job.forecastHour) changedCurrent=true;
+}
 updateCompareSegmentAvailability(job.modelId,job.forecastHour);
 return true;
 }
 });
 
+if(retryMissing && changedCurrent && seq===compareImageAvailabilitySeq){
+await renderCompareImages();
+}
+return changedCurrent;
 }
 
 function rebuildCompareForecastAxis({
@@ -1822,6 +1837,8 @@ return item;
 
 let product=getCompareProductForModel(modelId);
 let urls=buildCompareImageUrlsForModel(modelId,fh);
+let refreshToken=compareImageRefreshTokens.get(getCompareAvailabilityKey(modelId,fh));
+if(refreshToken) urls=addImageRefreshTokenToUrls(urls,refreshToken);
 
 if(!urls.length){
 item.appendChild(renderComparePlaceholder(`${getModelDisplayLabel(modelId)}\n이미지 URL을 생성하지 못했습니다.`));
