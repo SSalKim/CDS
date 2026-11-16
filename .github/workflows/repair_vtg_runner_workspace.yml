@@ -1,0 +1,30 @@
+name: Repair VTG runner checkout without deleting files
+on:
+  workflow_dispatch:
+permissions: {}
+concurrency:
+  group: vtg-image-generation
+  cancel-in-progress: false
+jobs:
+  repair:
+    runs-on: [self-hosted, linux, cds-vtg]
+    timeout-minutes: 3
+    steps:
+      - name: Preserve old CI checkout and create an empty workspace
+        shell: python
+        run: |
+          import os
+          from pathlib import Path
+          import shutil
+          workspace = Path(os.environ['GITHUB_WORKSPACE']).resolve()
+          owner = Path(os.environ['RUNNER_WORKSPACE']).resolve()
+          if workspace.parent != owner or workspace.name != 'CDS' or owner.name != 'CDS':
+              raise SystemExit('Unexpected workspace; no changes made')
+          backup = owner / ('CDS-before-chart-runner-setup-' + os.environ['GITHUB_RUN_ID'])
+          if backup.exists() or backup.resolve().parent != owner:
+              raise SystemExit('Unsafe backup destination; no changes made')
+          os.chdir(owner)
+          shutil.move(str(workspace), str(backup))
+          backup.chmod(0o700)
+          workspace.mkdir(mode=0o700)
+          print('Old CI checkout was preserved in a private sibling backup. No files were deleted.')
