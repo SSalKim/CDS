@@ -279,6 +279,11 @@ jobs:
           VTG_POLARWX_REQUEST_DIR: ${{ runner.temp }}/polarwx_requests
           VTG_SOURCE_BACKUP_DIR: ${{ steps.source_backup_restore.outcome == 'success' && format('{0}/vtg_source_backup', runner.temp) || '' }}
         run: |
+          if [ "$RUNNER_KIND" = "self-hosted" ]; then
+            mkdir -p "$HOME/.cache/cds-render"
+            exec 9>"$HOME/.cache/cds-render/owner.lock"
+            flock -x 9
+          fi
           run_with_retry() {
             local attempt=1
             local max_attempts=2

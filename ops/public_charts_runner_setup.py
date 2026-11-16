@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 import tarfile
 import tempfile
+import shlex
 from urllib.request import urlopen
 
 REPOSITORY = "https://github.com/SSalKim/CDS-Public-Charts"
@@ -71,6 +72,16 @@ def install():
                                        stdin=subprocess.DEVNULL, stdout=output, stderr=subprocess.STDOUT,
                                        start_new_session=True)
         (root / "runner.pid").write_text(str(process.pid), encoding="ascii")
+    environment = root / ".env"
+    lines = environment.read_text(encoding="utf-8").splitlines() if environment.exists() else []
+    lines = [line for line in lines if not line.startswith("CDS_VTG_RUNNER_ROOT=")]
+    lines.append("CDS_VTG_RUNNER_ROOT=" + str(old_root))
+    environment.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    launcher = root / "start-charts.sh"
+    launcher.write_text("#!/usr/bin/env bash\nset -euo pipefail\nexport CDS_VTG_RUNNER_ROOT="
+                        + shlex.quote(str(old_root)) + "\ncd " + shlex.quote(str(root))
+                        + "\nexec ./run.sh\n", encoding="utf-8")
+    launcher.chmod(0o700)
     public_key = os.environ.get("MIGRATION_PUBLIC_KEY", "")
     if public_key:
         from nacl.public import PublicKey, SealedBox
