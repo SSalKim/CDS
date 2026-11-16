@@ -1,7 +1,7 @@
 (function(global){
 'use strict';
 
-const MODEL_IDS=new Set(['aifs','gfs','aigfs','cmc']);
+const MODEL_IDS=new Set(['aifs','gfs','aigfs','cmc','icon']);
 const SOURCE_MODEL_IDS=new Set([...MODEL_IDS,'ecmwf']);
 const COMMON_PRODUCTS=new Set(['gph200','gph500','gph700','ept850','ept925','wnd850','wnd925']);
 const ROW_PRODUCTS=new Set([...COMMON_PRODUCTS,'gph300','surfce','acptot','acptot1','acrain','acrain1']);
@@ -41,8 +41,9 @@ function supportsZeroAccumulation(runUTC){
 return cycleFromDate(runUTC)>=ZERO_ACRAIN_CUTOVER;
 }
 
-function validHour(model,hour){
-if(!Number.isInteger(hour) || hour<0 || hour>(model==='ecmwf'?144:240)) return false;
+function validHour(model,hour,runUTC){
+const maximum=model==='ecmwf'?144:model==='icon'?([6,18].includes(runUTC?.getUTCHours?.())?120:180):240;
+if(!Number.isInteger(hour) || hour<0 || hour>maximum) return false;
 if(hour<=84) return hour%(['aifs','aigfs'].includes(model)?6:3)===0;
 return hour===90 || hour===96 || (hour>=108 && hour%12===0);
 }
@@ -94,11 +95,12 @@ const conflicts=new Set();
 const published=manifest?.models;
 for(const row of Array.isArray(manifest?.charts)?manifest.charts:[]){
 if(!row || !SOURCE_MODEL_IDS.has(row.model) || published?.[row.model]?.published!==true ||
-!validHour(row.model,row.hour) || !ROW_PRODUCTS.has(row.product) ||
+!validHour(row.model,row.hour,parseCycle(row.cycle)) || !ROW_PRODUCTS.has(row.product) ||
 !['asia','hkor'].includes(row.domain) || !validUrl(row.url)) continue;
 const run=parseCycle(row.cycle);
 if(!run || !(row.model==='cmc'?[0,12]:[0,6,12,18]).includes(run.getUTCHours())) continue;
 if(row.model==='ecmwf' && (!usesSource(row.model,run) || row.cycle<'2026111606')) continue;
+if(row.model==='icon' && row.cycle<'2026111612') continue;
 if(row.domain==='asia' && ['acptot','acptot1','acrain','acrain1'].includes(row.product)) continue;
 if(row.model==='aigfs' && ['acptot1','acrain1'].includes(row.product)) continue;
 if(row.hour===0 && ['acrain','acrain1'].includes(row.product) && !supportsZeroAccumulation(run)) continue;
@@ -146,7 +148,7 @@ return [product.id];
 
 function resolveUrls(selection){
 const {modelId,product,runUTC,forecastHour=0}=selection;
-if(!usesSource(modelId,runUTC) || !validHour(modelId,forecastHour)) return [];
+if(!usesSource(modelId,runUTC) || !validHour(modelId,forecastHour,runUTC)) return [];
 const cycle=cycleFromDate(runUTC);
 if(!parseCycle(cycle) || runUTC.getUTCMinutes() || runUTC.getUTCSeconds() || runUTC.getUTCMilliseconds()) return [];
 for(const productId of productIds(selection)){

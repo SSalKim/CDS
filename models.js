@@ -56,6 +56,18 @@ stepSchemeByCycleGroup:{"0,12":[
 ]}
 },
 
+icon:{
+name:"DWD ICON (R03B07 L120)",
+timelineName:"ICON",
+source:"public_charts",
+cycles:[0,6,12,18],
+forecastRules:[{cycles:[0,12],max:180},{cycles:[6,18],max:120}],
+stepSchemeByCycleGroup:{
+"0,12":[{start:0,end:84,step:3},{start:90,end:96,step:6},{start:108,end:180,step:12}],
+"6,18":[{start:0,end:84,step:3},{start:90,end:96,step:6},{start:108,end:120,step:12}]
+}
+},
+
 kim_gdps:{
 name:"GDAPS_KIM",
 folder:"KIMG",

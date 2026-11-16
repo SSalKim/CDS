@@ -78,7 +78,7 @@ const row=(model='aifs',cycle='2026111500',hour=24,id='gph500',domain='hkor',ext
   size:12345,sha256:'a'.repeat(64),file_id:'public-file',...extra
 });
 const manifest=charts=>({schema_version:1,models:Object.fromEntries(
-  ['aifs','gfs','aigfs','cmc','ecmwf'].map(id=>[id,{published:true}])
+  ['aifs','gfs','aigfs','cmc','ecmwf','icon'].map(id=>[id,{published:true}])
 ),charts});
 const selection=(id='gph500',modelId='aifs',cycle='2026111500',hour=24,category='hkor',variant='normal')=>({
   modelId,product:product(id,category),runUTC:date(cycle),forecastHour:hour,variant
@@ -99,7 +99,7 @@ async function main(){
   context.document={getElementById:id=>id==='publicChartNotice'?notice:null};
   assert(fs.readFileSync(path.join(root,'index.html'),'utf8').includes('System 3.6'));
   assert(fs.readFileSync(path.join(root,'index.html'),'utf8').includes(
-    '※ 시험운영 외부 예측모델(AIFS, GFS, AIGFS, CMC, ECMWF 06/18Z)은 과거 예측자료 조회를 지원하지 않으며, 최근 48시간 이내 생산자료만 제공됩니다.'));
+    '※ 시험운영 외부 예측모델(AIFS, GFS, AIGFS, CMC, ICON, ECMWF 06/18Z)은 과거 예측자료 조회를 지원하지 않으며, 최근 48시간 이내 생산자료만 제공됩니다.'));
   for(const model of ['aifs','gfs','aigfs','cmc','kim_gdps']){
     context.currentModel=model;
     context.modelCompareMode=false;
@@ -187,6 +187,8 @@ async function main(){
   assert.equal(evaluate('MODELS.cmc.name'),'CMC GDPS (GEM 0.135\u02da L84)');
   assert.equal(evaluate('MODELS.gfs.name'),'NCEP GFS (C768 L127)');
   assert.equal(evaluate('MODELS.aigfs.name'),'NCEP AIGFS (0.25\u00b0)');
+  assert.equal(evaluate('MODELS.icon.name'),'DWD ICON (R03B07 L120)');
+  assert.equal(evaluate("getCurrentModelName('icon')"),'ICON');
   context.currentMainMenu='hazard';
   assert(!visible().some(api.isModel),'Public chart models must not leak into other catalogs');
   context.currentMainMenu='forecast';
@@ -279,6 +281,28 @@ async function main(){
       hours,'The new zero-hour total precipitation tile must remain scheduled before publication');
   }
   assert.deepEqual(snapshot("getPublicChartTimelineHours('cmc',getCurrentProduct(),new Date('2026-11-15T06:00:00Z'))"),[]);
+  for(const [cycle,maximum,count] of [['2026111612',180,38],['2026111618',120,33]]){
+    const hours=snapshot(`getPublicChartTimelineHours('icon',getCurrentProduct(),new Date('${date(cycle).toISOString()}'))`);
+    assert.equal(hours.at(-1),maximum);
+    assert.equal(hours.length,count);
+    assert(hours.includes(0)&&hours.includes(3)&&hours.includes(84)&&hours.includes(90)&&hours.includes(108));
+  }
+  const iconStore=api.createStore({fetchImpl:async()=>({ok:true,json:async()=>manifest([
+    row('icon','2026111612',180),row('icon','2026111618',120),row('icon','2026111618',132),
+    row('icon','2026111612',192),row('icon','2026111606',24),
+    row('icon','2026111612',24,'acptot1'),row('icon','2026111612',0,'acrain1')])})});
+  await iconStore.load();
+  assert(iconStore.hasPublishedCharts('icon'));
+  assert.equal(iconStore.resolveUrls(selection('gph500','icon','2026111618',132)).length,0);
+  assert.equal(iconStore.resolveUrls(selection('gph500','icon','2026111612',180)).length,1);
+  assert.equal(iconStore.resolveUrls(selection('gph500','icon','2026111606',24)).length,0);
+  assert.equal(iconStore.resolveUrls(selection('acptot','icon','2026111612',24,'hkor','compare')).length,1);
+  assert.equal(iconStore.resolveUrls(selection('acrain','icon','2026111612',0,'hkor','compare')).length,1);
+  payload=manifest([...rows,row('icon','2026111612',0,'gph500')]);
+  await api.load();
+  assert(visible().includes('icon'),'ICON becomes visible only after a verified published row arrives');
+  payload=manifest(rows);
+  await api.load();
   assert.deepEqual(snapshot("getPublicChartTimelineHours('aifs',{id:'wnd700',category:'hkor'},new Date('2026-11-15T00:00:00Z'))"),[]);
   assert.deepEqual(urls('acptot','aifs','2026111500',6),[],
     'A scheduled but unpublished tile must not invent an image URL');

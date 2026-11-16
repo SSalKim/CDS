@@ -74,3 +74,12 @@ After registration, use CDS-Public-Charts Actions > Verify chart Drive connectio
 with drive_account=secondary. This verifies ownership without uploading or deleting
 files and does not fall back to the primary account if secondary settings are missing.
 Authentication does not by itself enable automatic ICON production.
+
+## Production Allocation
+
+The balanced-v1 producer writes GFS, CMC and ECMWF 06/18Z images to the primary
+account, and AIFS, AIGFS and ICON images to the second account. Each has a separate
+14GB image limit; the two accounts are not treated as one interchangeable quota.
+Existing published image URLs remain unchanged until their normal retention
+expires. The shared private state and public availability manifest have one
+coordinator, avoiding competing writers during active forecast production.

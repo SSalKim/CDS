@@ -12,7 +12,8 @@ models:[
 ['aifs','AIFS'],
 ['gfs','GFS'],
 ['aigfs','AIGFS'],
-['cmc','CMC']
+['cmc','CMC'],
+['icon','ICON']
 ]
 },
 
