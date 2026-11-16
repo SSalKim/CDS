@@ -373,7 +373,9 @@ updateChartAfter:false
 bindEvents();
 
 if(typeof CDSPublicCharts!=='undefined'){
-CDSPublicCharts.startPolling(refreshPublicChartManifestView);
+CDSPublicCharts.startPolling(refreshPublicChartManifestView,{
+isActive:()=>isPublicChartModel() || (modelCompareMode && compareModels.some(modelId=>isPublicChartModel(modelId)))
+});
 }
 
 forecastAvailabilityRefresh.start();

@@ -17,7 +17,7 @@ const context={
   console,Date,URL,URLSearchParams,
   location:{hostname:'localhost'},
   matchMedia:()=>({matches:mobile}),
-  setInterval:callback=>{intervalCallback=callback;intervalCalls++;return 1;},
+  setInterval:(callback,ms)=>{assert.equal(ms,20000);intervalCallback=callback;intervalCalls++;return 1;},
   clearInterval:()=>{clearCalls++;},
   fetch:async(url,options)=>{
     requests.push({url,options});
@@ -455,7 +455,7 @@ async function main(){
   payload=manifest(rows);await api.load();
 
   let changes=0;
-  await api.startPolling(()=>{changes++;});
+  await api.startPolling(()=>{changes++;},{isActive:()=>true});
   await api.startPolling();
   assert.equal(intervalCalls,1);
   assert.equal(changes,0,'Unchanged snapshots must not reset the selected frame');
@@ -527,6 +527,23 @@ async function main(){
   assert(!await nowSearch);
   assert.equal(candidateLookups,0,'Changing selections during manifest fetch must cancel the pending search');
   api.load=originalLoad;
+
+  let now=0,fast=false,polls=0,pollTick;
+  const pollingContext={
+    console,URL,URLSearchParams,location:{hostname:'localhost'},document:{visibilityState:'visible'},
+    Date:class extends Date{static now(){return now;}},
+    setInterval:(callback,ms)=>{assert.equal(ms,20000);pollTick=callback;return 1;},
+    clearInterval:()=>{},
+    fetch:async()=>{polls++;return {ok:true,status:200,json:async()=>manifest([])};}
+  };
+  vm.runInNewContext(fs.readFileSync(path.join(root,'public-charts.js'),'utf8'),pollingContext);
+  await pollingContext.CDSPublicCharts.startPolling(null,{isActive:()=>fast});
+  now=20000;await pollTick();assert.equal(polls,1,'Legacy-only viewing keeps one-minute polling');
+  fast=true;await pollTick();assert.equal(polls,2,'External viewing checks within twenty seconds');
+  now=40000;pollingContext.document.visibilityState='hidden';await pollTick();assert.equal(polls,2);
+  pollingContext.document.visibilityState='visible';await pollTick();assert.equal(polls,3);
+  fast=false;now=80000;await pollTick();assert.equal(polls,3);
+  now=100000;await pollTick();assert.equal(polls,4,'Returning to legacy viewing restores one-minute spacing');
 
   assert(fs.readFileSync(path.join(root,'index.html'),'utf8').indexOf('public-charts.js')<
     fs.readFileSync(path.join(root,'index.html'),'utf8').indexOf('app.js?'));

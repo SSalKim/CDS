@@ -80,6 +80,7 @@ let signature='';
 let revision=0;
 let pending=null;
 let timer=null;
+let lastPollAt=0;
 const listeners=new Set();
 
 function replaceManifest(manifest){
@@ -177,7 +178,7 @@ const controller=typeof global.AbortController==='function'?new global.AbortCont
 const timeout=controller?global.setTimeout(()=>controller.abort(),12000):null;
 try{
 const baseUrl=manifestUrl(location);
-const requestUrl=baseUrl===REMOTE_MANIFEST?`${baseUrl}?t=${Math.floor(Date.now()/60000)}`:baseUrl;
+const requestUrl=baseUrl===REMOTE_MANIFEST?`${baseUrl}?t=${Math.floor(Date.now()/15000)}`:baseUrl;
 const response=await fetchImpl(requestUrl,{
 cache:'no-store',credentials:'omit',...(controller?{signal:controller.signal}:{})
 });
@@ -203,11 +204,17 @@ if(timer!==null) global.clearInterval(timer);
 timer=null;
 }
 
-function startPolling(onChange){
+function startPolling(onChange,{isActive=()=>false}={}){
 if(typeof onChange==='function') listeners.add(onChange);
-if(timer===null) timer=global.setInterval(()=>{
-if(global.document?.visibilityState!=='hidden') return load();
-},60000);
+if(timer===null){
+lastPollAt=Date.now();
+timer=global.setInterval(()=>{
+if(global.document?.visibilityState==='hidden') return;
+if(!isActive() && Date.now()-lastPollAt<60000) return;
+lastPollAt=Date.now();
+return load();
+},20000);
+}
 return load();
 }
 
