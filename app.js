@@ -473,7 +473,7 @@ return;
 }
 
 if(updateChartAfter){
-updateChart({imageRefreshToken});
+updateChart({imageRefreshToken,preserveForecastHour});
 }
 
 }
@@ -1876,7 +1876,9 @@ baseUrls
 }
 
 
-async function jumpOlderAvailableRunForMissingSelection(){
+async function jumpOlderAvailableRunForMissingSelection({
+preserveForecastHour=getSelectedTimelineHourForPreserve()
+}={}){
 
 if(latestSearchInProgress || modelCompareMode){
 return false;
@@ -1890,7 +1892,7 @@ let baseRunUTC=getSelectedUTCDate();
 
 await jumpLatestAvailableForCurrentSelection({
 silent:false,
-preserveForecastHour:getSelectedTimelineHourForPreserve(),
+preserveForecastHour,
 baseDate:baseRunUTC,
 skipRunUTC:baseRunUTC
 });
@@ -1900,8 +1902,6 @@ return true;
 }
 
 function shouldJumpOlderAvailableRunForMissingSelection(){
-
-if(isPublicChartModel()) return false;
 
 let selectedRunUTC=getSelectedUTCDate();
 
@@ -2176,7 +2176,7 @@ return false;
 
 if(isPublicChartModel()){
 if(!CDSPublicCharts.supportsProduct(currentModel,p)){
-showViewerMessage(`${MODELS[currentModel].name}\n현재 선택한 산출자료를 지원하지 않습니다.`);
+showViewerMessage(`${getCurrentModelName()}\n현재 선택한 산출자료를 지원하지 않습니다.`);
 return false;
 }
 if(!CDSPublicCharts.readyHours({modelId:currentModel,product:p,runUTC:getSelectedUTCDate()}).length){
@@ -2188,7 +2188,7 @@ return true;
 
 if(!p.patternByModel?.[currentModel]){
 showViewerMessage(
-`${MODELS[currentModel]?.name || currentModel}은(는)
+`${getCurrentModelName()}은(는)
 현재 선택한 산출자료를 지원하지 않습니다.`
 );
 return false;
@@ -2207,7 +2207,7 @@ return false;
 
 if(!MODELS[currentModel]?.folder){
 showViewerMessage(
-`${MODELS[currentModel]?.name || currentModel}은(는)\n아직 URL 매핑이 등록되지 않았습니다.`
+`${getCurrentModelName()}은(는)\n아직 URL 매핑이 등록되지 않았습니다.`
 );
 return false;
 }
@@ -2224,8 +2224,9 @@ return true;
 }
 
 
-function updateChart({
-imageRefreshToken=''
+async function updateChart({
+imageRefreshToken='',
+preserveForecastHour=getSelectedTimelineHourForPreserve()
 }={}){
 
 invalidateImagePreload();
@@ -2238,6 +2239,15 @@ return;
 }
 
 chartImages.classList.remove('compare-images','fit-screen','fixed-size','layout-auto','layout-manual','compare-single','single-images');
+
+if(isPublicChartModel() &&
+CDSPublicCharts.supportsProduct(currentModel,getCurrentProduct()) &&
+!CDSPublicCharts.readyHours({modelId:currentModel,product:getCurrentProduct(),runUTC:getSelectedUTCDate()}).length &&
+await jumpOlderAvailableRunForMissingSelection({
+preserveForecastHour:preserveForecastHour ?? getSelectedTimelineHourForPreserve()
+})){
+return;
+}
 
 if(!selectionIsDisplayable()){
 
@@ -2464,6 +2474,10 @@ function getLatestSearchLookbackHours(product=getCurrentProduct()){
 
 let baseLookback=Math.max(24,Number(NOW_LOOKBACK_HOURS) || 24);
 
+if(isPublicChartModel()){
+baseLookback=Math.max(baseLookback,48);
+}
+
 if(currentMainMenu==='analysis'){
 baseLookback=Math.max(baseLookback,72);
 }
@@ -2520,7 +2534,7 @@ if(isPublicChartModel(modelId)){
 return CDSPublicCharts.readyCycles(modelId,getCurrentProduct()).map(cycle=>
 new Date(Date.UTC(Number(cycle.slice(0,4)),Number(cycle.slice(4,6))-1,
 Number(cycle.slice(6,8)),Number(cycle.slice(8,10))))
-).filter(date=>date<=baseDate).slice(0,maxCandidates);
+).filter(date=>date<=baseDate && baseDate-date<=lookbackHours*60*60*1000).slice(0,maxCandidates);
 }
 
 let candidates=[];

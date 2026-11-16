@@ -64,7 +64,9 @@ function includeAppFunction(name){
 for(const name of ['getOrderedChartUrlCandidates','isPublicChartModel','updatePublicChartNotice','dismissPublicChartNotice','refreshPublicChartManifestView','makeChartImageUrls',
   'getCycleSupportStatus','getForecastHoursForProductAtRun','buildImageUrlsForCurrentSelectionAtRun',
   'getRecentRunCandidates','selectionIsDisplayable','shouldJumpOlderAvailableRunForMissingSelection',
-  'displayCurrentForecastImage','rebuildForecastAxis','updateChart','jumpLatestAvailableForCurrentSelection']) includeAppFunction(name);
+  'displayCurrentForecastImage','rebuildForecastAxis','updateChart','jumpLatestAvailableForCurrentSelection',
+  'jumpOlderAvailableRunForMissingSelection','getLatestSearchLookbackHours',
+  'getLatestSearchMaxCandidates','getDefaultLatestSearchBaseDate','isSeaSurfaceTemperatureDailySelection']) includeAppFunction(name);
 const evaluate=code=>vm.runInContext(code,context);
 const snapshot=code=>JSON.parse(evaluate(`JSON.stringify(${code})`));
 const api=context.CDSPublicCharts;
@@ -169,7 +171,13 @@ async function main(){
   assert.equal(evaluate("modelGroups.find(group=>group.id==='global').models.find(model=>model[0]==='aifs')[1]"),'AIFS');
   for(const [id,label] of [['gfs','GFS'],['aigfs','AIGFS'],['cmc','CMC']]){
     assert.equal(evaluate(`modelGroups.find(group=>group.id==='global').models.find(model=>model[0]==='${id}')[1]`),label);
+    assert.equal(evaluate(`getCurrentModelName('${id}')`),label);
   }
+  assert.equal(evaluate("getCurrentModelName('aifs')"),'AIFS');
+  assert.equal(evaluate("getCurrentModelName('ecmwf')"),'ECMWF');
+  const unsupportedCycle=evaluate("getCycleSupportStatus('cmc',getCurrentProduct(),new Date('2026-11-15T18:00:00Z'))");
+  assert(unsupportedCycle.message.startsWith('CMC은(는)'));
+  assert(!unsupportedCycle.message.includes('GDPS'));
   assert.equal(evaluate('MODELS.cmc.name'),'CMC GDPS (GEM 0.135\u02da L84)');
   assert.equal(evaluate('MODELS.gfs.name'),'NCEP GFS (C768 L127)');
   assert.equal(evaluate('MODELS.aigfs.name'),'NCEP AIGFS (0.25\u00b0)');
@@ -272,7 +280,11 @@ async function main(){
   context.NOW_MAX_CANDIDATES=32;
   assert.deepEqual(snapshot("getRecentRunCandidates('aifs',new Date('2026-11-15T18:00:00Z')).map(date=>formatUTCStampFromDate(date))"),
     ['2026111512','2026111500']);
-  assert.equal(evaluate('shouldJumpOlderAvailableRunForMissingSelection()'),false);
+  assert.equal(evaluate('getLatestSearchLookbackHours()'),48);
+  const oldNowBase=context.getDefaultLatestSearchBaseDate;
+  context.getDefaultLatestSearchBaseDate=()=>date('2026111600');
+  assert.equal(evaluate('shouldJumpOlderAvailableRunForMissingSelection()'),true);
+  context.getDefaultLatestSearchBaseDate=oldNowBase;
   let message='';
   context.showViewerMessage=value=>{message=value;};
   assert.equal(evaluate('selectionIsDisplayable()'),true,'Manifest sources need no KMA folder/pattern');
@@ -299,10 +311,83 @@ async function main(){
   context.resetForecastImageCache=()=>{};
   context.setViewerLoading=()=>{};
   context.chartImages={classList:{remove(){}}};
-  evaluate('updateChart()');
+  context.getSelectedTimelineHourForPreserve=()=>24;
+  context.latestSearchInProgress=false;
+  await evaluate('updateChart()');
   assert.deepEqual(missingStates,Array(sixHourly.length).fill('missing'),
     'A cycle with no images marks every scheduled tile gray');
+
+  const savedFallbackHooks=Object.fromEntries(['currentSelectionExistsAtRun','setRunControlsToUTC',
+    'refreshView','preloadAllForecastImages','updateCompareChart','getDefaultLatestSearchBaseDate']
+    .map(name=>[name,context[name]]));
+  const fallbackRows=[...['aifs','gfs','aigfs'].map(model=>row(model,'2026111518',24)),
+    row('aifs','2026111512',24),row('cmc','2026111512',24),
+    row('cmc','2026111600',24,'wnd925'),
+    row('aifs','2026111600',24,'gph500','asia'),row('aifs','2026111606',24)];
+  payload=manifest(fallbackRows);
+  await api.load();
+  let fallbackRefresh=null,preloads=0,compareUpdates=0;
+  const probedCycles=[];
+  context.latestSearchSeq=0;
+  context.getDefaultLatestSearchBaseDate=()=>date('2026111600');
+  context.currentSelectionExistsAtRun=async runUTC=>{
+    probedCycles.push(runUTC.toISOString());
+    const chartUrls=context.buildImageUrlsForCurrentSelectionAtRun(runUTC);
+    return {exists:chartUrls.length>0,urls:chartUrls};
+  };
+  context.setRunControlsToUTC=runUTC=>{
+    context.runDate.value=runUTC.toISOString().slice(0,10);
+    context.runHour.value=runUTC.toISOString().slice(11,16);
+  };
+  context.refreshView=options=>{fallbackRefresh=options;};
+  context.preloadAllForecastImages=()=>{preloads++;};
+  context.updateCompareChart=()=>{compareUpdates++;};
+  context.currentProduct='gph500';
+  for(const model of ['aifs','gfs','aigfs','cmc']){
+    context.currentModel=model;
+    context.runDate.value='2026-11-16';
+    context.runHour.value='00:00';
+    fallbackRefresh=null;
+    const before=probedCycles.length;
+    await evaluate('updateChart({preserveForecastHour:24})');
+    assert.equal(evaluate('getUTCStamp()'),model==='cmc'?'2026111512':'2026111518',
+      'A missing public-model cycle selects the closest earlier run for this product and domain');
+    assert.equal(fallbackRefresh.preserveForecastHour,24);
+    assert.equal(probedCycles.length,before+1,'The nearest published cycle is probed first');
+    assert.equal(context.latestSearchInProgress,false);
+  }
+  context.currentModel='cmc';
   context.runDate.value='2026-11-15';
+  context.runHour.value='18:00';
+  await evaluate('updateChart({preserveForecastHour:24})');
+  assert.equal(evaluate('getUTCStamp()'),'2026111512',
+    'CMC switches to 12Z even when the selected 18Z cycle is unsupported');
+
+  context.runDate.value='2026-11-16';
+  context.runHour.value='00:00';
+  context.modelCompareMode=true;
+  const beforeCompare=probedCycles.length;
+  await evaluate('updateChart({preserveForecastHour:24})');
+  assert.equal(compareUpdates,1);
+  assert.equal(probedCycles.length,beforeCompare,'Comparison mode never changes the common run automatically');
+  assert.equal(evaluate('getUTCStamp()'),'2026111600');
+  context.modelCompareMode=false;
+
+  payload=manifest([...fallbackRows,row('aifs','2026111600',12)]);
+  await api.load();
+  context.currentModel='aifs';
+  const beforePartial=probedCycles.length;
+  await evaluate('updateChart({preserveForecastHour:24})');
+  assert.equal(evaluate('getUTCStamp()'),'2026111600');
+  assert.equal(probedCycles.length,beforePartial,'Gray leads in a partly published cycle do not trigger fallback');
+  assert.equal(preloads,1);
+  assert.deepEqual(snapshot("getRecentRunCandidates('aifs',new Date('2026-11-17T18:00:00Z'),6).map(date=>formatUTCStampFromDate(date))"),[],
+    'Automatic fallback does not exceed its lookback window');
+  Object.assign(context,savedFallbackHooks);
+  payload=manifest(rows);
+  await api.load();
+  context.runDate.value='2026-11-15';
+  context.runHour.value='00:00';
   context.currentForecastList=[24];
 
   let shown=[];

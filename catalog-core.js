@@ -79,7 +79,7 @@ return MAIN_MENU_META[currentMainMenu]?.label || currentMainMenu;
 
 function getCurrentModelName(modelId=currentModel){
 
-return MODELS[modelId]?.name || modelId;
+return MODELS[modelId]?.timelineName || MODELS[modelId]?.name || modelId;
 
 }
 
