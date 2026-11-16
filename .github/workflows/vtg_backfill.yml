@@ -126,86 +126,23 @@ concurrency:
 jobs:
   decide-runner:
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     outputs:
       runner_kind: ${{ steps.choose.outputs.runner_kind }}
       runner_labels: ${{ steps.choose.outputs.runner_labels }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: vtg_runner_route.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Choose VTG runner
         id: choose
         env:
           GH_TOKEN: ${{ secrets.RUNNER_STATUS_TOKEN || github.token }}
-        run: |
-          set +e
-          api_url="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners"
-          http_code="$(curl -sS \
-            -o runners.json \
-            -w '%{http_code}' \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "$api_url")"
-          curl_status=$?
-
-          if [ "$curl_status" -ne 0 ] || [ "$http_code" != "200" ]; then
-            echo "Could not read self-hosted runner status (curl_status=${curl_status}, http_code=${http_code}); falling back to GitHub-hosted."
-            echo "runner_kind=github-hosted" >> "$GITHUB_OUTPUT"
-            echo 'runner_labels="ubuntu-24.04"' >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          python - <<'PY'
-          import json
-          import os
-
-          with open("runners.json", "r", encoding="utf-8") as handle:
-              payload = json.load(handle)
-
-          selected = None
-          selected_has_cds_label = False
-          selected_busy = False
-          for runner in payload.get("runners", []):
-              labels = {str(label.get("name", "")).lower() for label in runner.get("labels", [])}
-              name = str(runner.get("name", "")).lower()
-              print(
-                  "runner:",
-                  runner.get("name"),
-                  "status=",
-                  runner.get("status"),
-                  "busy=",
-                  runner.get("busy"),
-                  "labels=",
-                  ",".join(sorted(labels)),
-              )
-              # Choose an ONLINE cds-vtg self-hosted runner even when it is busy.
-              # GitHub Actions will queue this job on the self-hosted label until
-              # that runner becomes idle. Only fall back to GitHub-hosted when no
-              # matching self-hosted runner is online at all.
-              if (
-                  runner.get("status") == "online"
-                  and ("cds-vtg" in labels or name == "cds-vtg-laptop")
-              ):
-                  selected = runner
-                  selected_has_cds_label = "cds-vtg" in labels
-                  selected_busy = bool(runner.get("busy"))
-                  break
-
-          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
-              if selected:
-                  if selected_busy:
-                      print(f"Using self-hosted runner queue: {selected.get('name')} is online but busy; job will wait for it to become idle.")
-                  else:
-                      print(f"Using idle self-hosted runner: {selected.get('name')}")
-                  output.write("runner_kind=self-hosted\n")
-                  if selected_has_cds_label:
-                      output.write('runner_labels=["self-hosted","cds-vtg"]\n')
-                  else:
-                      print("Warning: selected runner is missing the cds-vtg label; using generic self-hosted routing.")
-                      output.write('runner_labels=["self-hosted"]\n')
-              else:
-                  print("No online cds-vtg self-hosted runner found; using GitHub-hosted.")
-                  output.write("runner_kind=github-hosted\n")
-                  output.write('runner_labels="ubuntu-24.04"\n')
-          PY
+          RUNNER_MODE: ${{ inputs.runner_mode || 'auto' }}
+        run: python vtg_runner_route.py --mode "$RUNNER_MODE"
 
   backfill:
     needs: decide-runner
@@ -340,6 +277,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          if [ "$RUNNER_KIND" = "self-hosted" ]; then
+            mkdir -p "$HOME/.cache/cds-render"
+            exec 9>"$HOME/.cache/cds-render/owner.lock"
+            flock -x 9
+          fi
 
           run_with_retry() {
             local attempt=1

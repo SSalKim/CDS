@@ -52,100 +52,23 @@ concurrency:
 jobs:
   decide-runner:
     runs-on: ubuntu-24.04
-    timeout-minutes: 3
+    timeout-minutes: 5
     outputs:
       runner_kind: ${{ steps.choose.outputs.runner_kind }}
       runner_labels: ${{ steps.choose.outputs.runner_labels }}
     steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: vtg_runner_route.py
+          sparse-checkout-cone-mode: false
+          persist-credentials: false
       - name: Choose VTG runner
         id: choose
         env:
           GH_TOKEN: ${{ secrets.RUNNER_STATUS_TOKEN || github.token }}
           RUNNER_MODE: ${{ inputs.runner_mode || 'auto' }}
-        run: |
-          set +e
-          if [ "$RUNNER_MODE" = "github-hosted" ]; then
-            echo "GitHub-hosted runner explicitly requested; bypassing self-hosted routing."
-            echo "runner_kind=github-hosted" >> "$GITHUB_OUTPUT"
-            echo 'runner_labels="ubuntu-24.04"' >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          api_url="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/runners"
-          http_code="$(curl -sS --connect-timeout 10 --max-time 20 \
-            -o runners.json \
-            -w '%{http_code}' \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "$api_url")"
-          curl_status=$?
-
-          if [ "$curl_status" -ne 0 ] || [ "$http_code" != "200" ]; then
-            echo "Could not read self-hosted runner status (curl_status=${curl_status}, http_code=${http_code}); falling back to GitHub-hosted."
-            echo "runner_kind=github-hosted" >> "$GITHUB_OUTPUT"
-            echo 'runner_labels="ubuntu-24.04"' >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          python - <<'PY'
-          import json
-          import os
-
-          with open("runners.json", "r", encoding="utf-8") as handle:
-              payload = json.load(handle)
-
-          selected = None
-          selected_has_cds_label = False
-          busy_matches = []
-          for runner in payload.get("runners", []):
-              labels = {str(label.get("name", "")).lower() for label in runner.get("labels", [])}
-              name = str(runner.get("name", "")).lower()
-              is_match = "cds-vtg" in labels or name == "cds-vtg-laptop"
-              is_online = runner.get("status") == "online"
-              is_busy = bool(runner.get("busy"))
-              print(
-                  "runner:",
-                  runner.get("name"),
-                  "status=",
-                  runner.get("status"),
-                  "busy=",
-                  runner.get("busy"),
-                  "labels=",
-                  ",".join(sorted(labels)),
-              )
-
-              # Generate VTG images should use the laptop only when it is both
-              # online and idle. If the matching laptop is busy, run immediately
-              # on GitHub-hosted instead of waiting in the self-hosted queue.
-              if is_match and is_online and is_busy:
-                  busy_matches.append(str(runner.get("name", "self-hosted runner")))
-                  continue
-              if is_match and is_online and not is_busy:
-                  selected = runner
-                  selected_has_cds_label = "cds-vtg" in labels
-                  break
-
-          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
-              if selected:
-                  print(f"Using idle self-hosted runner: {selected.get('name')}")
-                  output.write("runner_kind=self-hosted\n")
-                  if selected_has_cds_label:
-                      output.write('runner_labels=["self-hosted","cds-vtg"]\n')
-                  else:
-                      print("Warning: selected runner is missing the cds-vtg label; using generic self-hosted routing.")
-                      output.write('runner_labels=["self-hosted"]\n')
-              else:
-                  if busy_matches:
-                      print(
-                          "Matching self-hosted runner is busy ("
-                          + ", ".join(busy_matches)
-                          + "); using GitHub-hosted instead."
-                      )
-                  else:
-                      print("No online idle cds-vtg self-hosted runner found; using GitHub-hosted.")
-                  output.write("runner_kind=github-hosted\n")
-                  output.write('runner_labels="ubuntu-24.04"\n')
-          PY
+        run: python vtg_runner_route.py --mode "$RUNNER_MODE"
 
   generate:
     needs: decide-runner
