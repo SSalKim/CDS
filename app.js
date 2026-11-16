@@ -319,8 +319,8 @@ updateForecastSegmentState(index);
 const AUTO_NOW_ON_STARTUP=true;
 
 
-function isPublicChartModel(modelId=currentModel){
-return typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId);
+function isPublicChartModel(modelId=currentModel,runUTC=getSelectedUTCDate()){
+return typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,runUTC);
 }
 
 function updatePublicChartNotice(){
@@ -338,7 +338,7 @@ updatePublicChartNotice();
 }
 
 function refreshPublicChartManifestView(){
-let affected=isPublicChartModel() || (modelCompareMode && compareModels.some(isPublicChartModel));
+let affected=isPublicChartModel() || (modelCompareMode && compareModels.some(modelId=>isPublicChartModel(modelId)));
 if(!affected){
 renderModels();
 return;
@@ -593,7 +593,7 @@ checkAvailability=false,
 variant='normal'
 }={}){
 
-if(isPublicChartModel(modelId)){
+if(isPublicChartModel(modelId,runUTC)){
 return CDSPublicCharts.resolveUrls({modelId,product,runUTC,forecastHour,variant});
 }
 
@@ -2284,7 +2284,7 @@ currentForecastList.join(','),imagePreloadSeq,compareImageAvailabilitySeq].join(
 async function refreshMissingForecastFrames({manual=false}={}){
 let contextKey=getForecastRefreshContextKey();
 let isCurrent=()=>contextKey===getForecastRefreshContextKey() && document.visibilityState!=='hidden';
-let hasPublic=isPublicChartModel() || (modelCompareMode && compareModels.some(isPublicChartModel));
+let hasPublic=isPublicChartModel() || (modelCompareMode && compareModels.some(modelId=>isPublicChartModel(modelId)));
 if(manual && hasPublic) await CDSPublicCharts.load();
 if(!isCurrent()) return false;
 let imageRefreshToken=String(Date.now());
@@ -2321,7 +2321,7 @@ return newlyAvailable.size>0;
 
 function getForecastHoursForProductAtRun(product,modelId,runUTC){
 
-if(isPublicChartModel(modelId)){
+if(isPublicChartModel(modelId,runUTC)){
 // NOW searches use published leads; the slider uses the complete model schedule.
 return CDSPublicCharts.readyHours({modelId,product,runUTC});
 }
@@ -2474,7 +2474,7 @@ function getLatestSearchLookbackHours(product=getCurrentProduct()){
 
 let baseLookback=Math.max(24,Number(NOW_LOOKBACK_HOURS) || 24);
 
-if(isPublicChartModel()){
+if(isPublicChartModel() || currentModel==='ecmwf'){
 baseLookback=Math.max(baseLookback,48);
 }
 
@@ -2530,7 +2530,7 @@ lookbackHours=NOW_LOOKBACK_HOURS,
 maxCandidates=NOW_MAX_CANDIDATES
 ){
 
-if(isPublicChartModel(modelId)){
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId)){
 return CDSPublicCharts.readyCycles(modelId,getCurrentProduct()).map(cycle=>
 new Date(Date.UTC(Number(cycle.slice(0,4)),Number(cycle.slice(4,6))-1,
 Number(cycle.slice(6,8)),Number(cycle.slice(8,10))))
@@ -2607,7 +2607,7 @@ setViewerLoading(true,'최신 자료 검색 중');
 
 try{
 
-if(isPublicChartModel()){
+if(isPublicChartModel() || currentModel==='ecmwf'){
 await CDSPublicCharts.load();
 if(searchId!==latestSearchSeq) return false;
 }

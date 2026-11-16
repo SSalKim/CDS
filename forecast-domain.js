@@ -155,7 +155,7 @@ message:''
 
 function productUsesForecastHour(){
 
-if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(currentModel)){
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(currentModel,getSelectedUTCDate())){
 return CDSPublicCharts.supportsProduct(currentModel,getCurrentProduct());
 }
 
@@ -293,7 +293,7 @@ return product.id==='acrain' ? hours.filter(hour=>hour!==0) : hours;
 function getForecastHoursForCurrentSelection(){
 
 let p=getCurrentProduct();
-if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(currentModel)){
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(currentModel,getSelectedUTCDate())){
 return getPublicChartTimelineHours(currentModel,p,getSelectedUTCDate());
 }
 let utcHour=parseInt(getUTCStamp().slice(8,10),10);

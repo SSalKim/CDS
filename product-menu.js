@@ -36,7 +36,7 @@ if(!product || product.type==="header"){
 return false;
 }
 
-if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId)){
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,getSelectedUTCDate())){
 return CDSPublicCharts.supportsProduct(modelId,product);
 }
 

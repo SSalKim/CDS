@@ -15,7 +15,7 @@ const viewer=element();
 const context={console,Date,compareModels:publicModels,currentForecastList:[132],slider:{value:'0'},
   forecastDisplayRequest:0,timeMode:'KST',compareFitToScreen:false,compareLayoutMode:'auto',
   chartImages:viewer,modelStatus:element(),document:{createElement:element},
-  CDSPublicCharts:{isModel:id=>publicModels.includes(id)},
+  CDSPublicCharts:{isModel:id=>publicModels.includes(id),usesSource:id=>publicModels.includes(id)},
   normalizeCompareLayout(){},setViewerLoading(){},getActiveCompareLayout:()=>({cols:3}),
   getSelectedUTCDate:()=>new Date('2026-11-16T12:00:00Z'),
   getModelDisplayLabel:id=>labels[id],getCurrentProductLabel:()=> '500 고도,기온,풍속',

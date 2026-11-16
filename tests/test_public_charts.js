@@ -78,7 +78,7 @@ const row=(model='aifs',cycle='2026111500',hour=24,id='gph500',domain='hkor',ext
   size:12345,sha256:'a'.repeat(64),file_id:'public-file',...extra
 });
 const manifest=charts=>({schema_version:1,models:Object.fromEntries(
-  ['aifs','gfs','aigfs','cmc'].map(id=>[id,{published:true}])
+  ['aifs','gfs','aigfs','cmc','ecmwf'].map(id=>[id,{published:true}])
 ),charts});
 const selection=(id='gph500',modelId='aifs',cycle='2026111500',hour=24,category='hkor',variant='normal')=>({
   modelId,product:product(id,category),runUTC:date(cycle),forecastHour:hour,variant
@@ -415,6 +415,43 @@ async function main(){
   assert.equal(evaluate("getForecastHours('aifs',new Date(),0).length"),29);
   assert.equal(evaluate("getForecastHours('gfs',new Date(),0).length"),43);
   assert.equal(evaluate("getAvailableCycles('cmc',new Date()).join(',')"),'0,12');
+
+  const beforeHybrid={model:context.currentModel,product:context.currentProduct,
+    category:context.productCategory.value,date:context.runDate.value,hour:context.runHour.value,time:context.timeMode};
+  payload=manifest([...rows,row('ecmwf','2026111606',24,'gph500','asia'),
+    row('ecmwf','2026111618',0,'gph500','asia'),row('ecmwf','2026111606',24,'acptot1'),
+    row('ecmwf','2026111606',144,'gph500','asia'),
+    row('ecmwf','2026111600',24,'gph500','asia'),row('ecmwf','2026111606',156,'gph500','asia')]);
+  await api.load();
+  context.currentModel='ecmwf';context.currentProduct='gph500';context.productCategory.value='asia';
+  context.runDate.value='2026-11-16';context.runHour.value='06:00';context.timeMode='UTC';
+  assert.equal(api.isModel('ecmwf'),false,'ECMWF must retain its existing button and legacy catalog');
+  assert.equal(api.usesSource('ecmwf',date('2026111606')),true);
+  assert.equal(api.usesSource('ecmwf',date('2026111600')),false);
+  assert.deepEqual(snapshot("getAvailableCycles('ecmwf',new Date('2026-11-15')).map(Number)"),[0,12]);
+  assert.deepEqual(snapshot("getAvailableCycles('ecmwf',new Date('2026-11-16')).map(Number)"),[0,6,12,18]);
+  assert.equal(evaluate('isPublicChartModel()'),true);
+  const hybridHours=snapshot('getForecastHoursForCurrentSelection()');
+  assert.equal(hybridHours.length,35);assert.equal(hybridHours.at(-1),144);
+  assert.deepEqual(snapshot("getForecastHoursForCompareModel('ecmwf')"),hybridHours);
+  assert.deepEqual(snapshot("buildCompareImageUrlsForModel('ecmwf',24)"),[row('ecmwf','2026111606',24,'gph500','asia').url]);
+  assert.deepEqual(urls('gph500','ecmwf','2026111600',24,'asia'),[],'Public manifest cannot replace 00/12Z KMA charts');
+  assert.deepEqual(urls('gph500','ecmwf','2026111606',156,'asia'),[],'Off-cycle forecasts stop at +144h');
+  assert.deepEqual(urls('acptot','ecmwf','2026111606',24,'hkor','compare'),[row('ecmwf','2026111606',24,'acptot1').url]);
+  assert.deepEqual(snapshot("makeChartImageUrls({modelId:'ecmwf',product:getCurrentProduct(),runUTC:new Date('2026-11-16T00:00Z'),forecastHour:24})"),
+    ['https://data.kma.go.kr/CHT/ECMW/202611/16/ecmw_lc40_asia_gph500_s024_2026111600.gif'],
+    'Routing follows the requested run, not the currently selected 06Z widget');
+  assert.deepEqual(snapshot("getForecastHoursForProductAtRun(getCurrentProduct(),'ecmwf',new Date('2026-11-16T06:00Z'))"),[24,144]);
+  assert(evaluate("getRecentRunCandidates('ecmwf',new Date('2026-11-16T18:00Z'),48,20).some(date=>date.getUTCHours()===0)"),
+    'Mixed-source NOW searches must still consider legacy cycles');
+  const unsupportedHybridProduct={id:'thk500',category:'asia',patternByModel:{ecmwf:'legacy'}};
+  assert.equal(context.productSupportsModel(unsupportedHybridProduct,'ecmwf'),false);
+  context.runHour.value='00:00';
+  assert.equal(context.productSupportsModel(unsupportedHybridProduct,'ecmwf'),true);
+  context.currentModel=beforeHybrid.model;context.currentProduct=beforeHybrid.product;
+  context.productCategory.value=beforeHybrid.category;context.runDate.value=beforeHybrid.date;
+  context.runHour.value=beforeHybrid.hour;context.timeMode=beforeHybrid.time;
+  payload=manifest(rows);await api.load();
 
   let changes=0;
   await api.startPolling(()=>{changes++;});

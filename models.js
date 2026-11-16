@@ -115,9 +115,14 @@ ecmwf:{
 name:"ECMWF",
 folder:"ECMW",
 archiveStart:"2013-01-28",
-cycles:[0,12],
+cycles:[0,6,12,18],
+cycleAvailability:[
+{until:"2026-11-15",cycles:[0,12]},
+{from:"2026-11-16",cycles:[0,6,12,18]}
+],
 forecastRules:[
-{cycles:[0,12],max:240}
+{cycles:[0,12],max:240},
+{from:"2026-11-16",cycles:[6,18],max:144}
 ],
 stepSchemeByCycleGroup:{
 "0,12":[
@@ -125,6 +130,11 @@ stepSchemeByCycleGroup:{
 {start:90,end:96,step:6},
 {start:108,end:240,step:12}
 ],
+"6,18":[
+{start:0,end:84,step:3},
+{start:90,end:96,step:6},
+{start:108,end:144,step:12}
+]
 }
 },
 

@@ -2,6 +2,7 @@
 'use strict';
 
 const MODEL_IDS=new Set(['aifs','gfs','aigfs','cmc']);
+const SOURCE_MODEL_IDS=new Set([...MODEL_IDS,'ecmwf']);
 const COMMON_PRODUCTS=new Set(['gph200','gph500','gph700','ept850','ept925','wnd850','wnd925']);
 const ROW_PRODUCTS=new Set([...COMMON_PRODUCTS,'gph300','surfce','acptot','acptot1','acrain','acrain1']);
 const DRIVE_HOSTS=new Set(['drive.google.com','drive.usercontent.google.com','lh3.googleusercontent.com']);
@@ -11,8 +12,13 @@ function isModel(modelId){
 return MODEL_IDS.has(modelId);
 }
 
+function usesSource(modelId,runUTC){
+return isModel(modelId) || (modelId==='ecmwf' &&
+Number.isFinite(runUTC?.getTime?.()) && [6,18].includes(runUTC.getUTCHours()));
+}
+
 function supportsProduct(modelId,product){
-if(!isModel(modelId) || !['asia','hkor'].includes(product?.category)) return false;
+if(!SOURCE_MODEL_IDS.has(modelId) || !['asia','hkor'].includes(product?.category)) return false;
 return COMMON_PRODUCTS.has(product.id) ||
 (product.category==='asia' ? product.id==='surfce' : ['surfce','acptot','acrain'].includes(product.id));
 }
@@ -31,7 +37,7 @@ return [date.getUTCFullYear(),date.getUTCMonth()+1,date.getUTCDate(),date.getUTC
 }
 
 function validHour(model,hour){
-if(!Number.isInteger(hour) || hour<0 || hour>240) return false;
+if(!Number.isInteger(hour) || hour<0 || hour>(model==='ecmwf'?144:240)) return false;
 if(hour<=84) return hour%(['aifs','aigfs'].includes(model)?6:3)===0;
 return hour===90 || hour===96 || (hour>=108 && hour%12===0);
 }
@@ -81,11 +87,12 @@ const next=new Map();
 const conflicts=new Set();
 const published=manifest?.models;
 for(const row of Array.isArray(manifest?.charts)?manifest.charts:[]){
-if(!row || !isModel(row.model) || published?.[row.model]?.published!==true ||
+if(!row || !SOURCE_MODEL_IDS.has(row.model) || published?.[row.model]?.published!==true ||
 !validHour(row.model,row.hour) || !ROW_PRODUCTS.has(row.product) ||
 !['asia','hkor'].includes(row.domain) || !validUrl(row.url)) continue;
 const run=parseCycle(row.cycle);
 if(!run || !(row.model==='cmc'?[0,12]:[0,6,12,18]).includes(run.getUTCHours())) continue;
+if(row.model==='ecmwf' && (!usesSource(row.model,run) || row.cycle<'2026111606')) continue;
 if(row.domain==='asia' && ['acptot','acptot1','acrain','acrain1'].includes(row.product)) continue;
 if(row.model==='aigfs' && ['acptot1','acrain1'].includes(row.product)) continue;
 if(row.hour===0 && ['acrain','acrain1'].includes(row.product)) continue;
@@ -133,7 +140,7 @@ return [product.id];
 
 function resolveUrls(selection){
 const {modelId,product,runUTC,forecastHour=0}=selection;
-if(!validHour(modelId,forecastHour)) return [];
+if(!usesSource(modelId,runUTC) || !validHour(modelId,forecastHour)) return [];
 const cycle=cycleFromDate(runUTC);
 if(!parseCycle(cycle) || runUTC.getUTCMinutes() || runUTC.getUTCSeconds() || runUTC.getUTCMilliseconds()) return [];
 for(const productId of productIds(selection)){
@@ -204,7 +211,7 @@ if(global.document?.visibilityState!=='hidden') return load();
 return load();
 }
 
-return {isModel,supportsProduct,hasPublishedCharts,resolveUrls,readyHours,readyCycles,
+return {isModel,usesSource,supportsProduct,hasPublishedCharts,resolveUrls,readyHours,readyCycles,
 load,startPolling,stopPolling,getRevision:()=>revision};
 }
 

@@ -559,7 +559,7 @@ return section;
 
 function productUsesForecastHourForModel(product,modelId){
 
-if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId)){
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,getSelectedUTCDate())){
 return CDSPublicCharts.supportsProduct(modelId,product);
 }
 
@@ -612,7 +612,7 @@ if(!cycleStatus.supported){
 return [];
 }
 
-if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId)){
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,getSelectedUTCDate())){
 return getPublicChartTimelineHours(modelId,product,getSelectedUTCDate());
 }
 
@@ -698,7 +698,7 @@ categoryId,
 currentProduct,
 runStamp,
 detailToken || '',
-...(typeof CDSPublicCharts!=='undefined' && compareModels.some(modelId=>CDSPublicCharts.isModel(modelId))
+...(typeof CDSPublicCharts!=='undefined' && compareModels.some(modelId=>CDSPublicCharts.usesSource(modelId,getSelectedUTCDate()))
 ?[CDSPublicCharts.getRevision()]:[])
 ].join('|');
 
@@ -1158,7 +1158,7 @@ return [];
 let runUTC=getSelectedUTCDate();
 let detailToken=getCurrentAuxToken();
 let useWinterVariant=shouldUseWinterCompareVariant(modelId,baseProduct,runUTC);
-let patterns=useWinterVariant && !(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId))
+let patterns=useWinterVariant && !(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,runUTC))
 ?getWinterCompareVariantPatterns(product,modelId)
 :null;
 
@@ -1849,7 +1849,7 @@ let refreshToken=compareImageRefreshTokens.get(getCompareAvailabilityKey(modelId
 if(refreshToken) urls=addImageRefreshTokenToUrls(urls,refreshToken);
 
 if(!urls.length){
-let message=typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId)
+let message=typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,getSelectedUTCDate())
 ?makeCompareExpectedButMissingMessage(modelId,product,fh)
 :`${getModelDisplayLabel(modelId)}\n이미지 URL을 생성하지 못했습니다.`;
 item.appendChild(renderComparePlaceholder(message));

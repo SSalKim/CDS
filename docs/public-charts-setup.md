@@ -25,6 +25,7 @@ CDS는 새 저장소의 raw manifest를 읽으므로 일기도 갱신 때마다 
 
 - AIFS / GFS / AIGFS: 00, 06, 12, 18 UTC, 최근 9 cycle.
 - CMC GDPS: 00, 12 UTC, 최근 5 cycle.
+- ECMWF IFS: 2026111606부터 06, 18 UTC만 추가 생산하며 공식 0.25도 자료를 지상·상층 모두 사용한다. +000~084h는 3h, +090/+096h는 6h, +108~144h는 12h 간격이며 최근 5 cycle을 보관한다. 기존 ECMWF 버튼에서 00/12 UTC는 기상청 CDS 이미지·과거자료를 그대로 조회하고, 06/18 UTC만 새 Drive manifest를 사용한다. 06/18 UTC의 생산 산출물 범위·겨울철 합성·WebP·14GB 상한은 다른 외부 모델과 동일하다. Cloudflare의 `model=all` 호출에 자동으로 포함되므로 Worker 수정은 필요 없다.
 - 산출물: 계절별 gph200 또는 gph300, gph500, gph700, ept850, ept925, surfce/acptot, acrain, wnd850, wnd925.
 - 아시아는 연중 surfce, acrain은 한반도만. 겨울철 한반도는 기존 3패널과 세로 비교본을 유지한다. AIGFS는 강수 첫 패널만 사용한다.
 - +000h: surfce/acptot도 다른 시간대와 같은 제목에 `[000-000]`을 사용하고 누적량 채색은 비운다. 겨울철 한반도 acptot는 순간 고도·기온·바람·습구온도와 함께 3패널/세로 비교본을 모두 제공한다. 누적강수·강설 자료는 조회하지 않으며 acrain은 +000h에 생성하지 않는다.
