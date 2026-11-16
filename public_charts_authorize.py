@@ -7,7 +7,7 @@ import shutil
 import subprocess
 
 
-SECRET_PREFIXES = ("PUBLIC_CHARTS_DRIVE_", "PUBLIC_CHARTS_ICON_DRIVE_")
+SECRET_PREFIXES = ("PUBLIC_CHARTS_DRIVE_", "PUBLIC_CHARTS_DRIVE2_", "PUBLIC_CHARTS_ICON_DRIVE_")
 SECRET_SUFFIXES = ("CLIENT_ID", "CLIENT_SECRET", "REFRESH_TOKEN", "FOLDER_ID", "ACCOUNT_EMAIL")
 
 
@@ -34,7 +34,7 @@ def main():
     parser.add_argument("--account-email", required=True)
     parser.add_argument("--register-repo", required=True, help="Explicit OWNER/REPO receiving dedicated chart Drive secrets")
     parser.add_argument("--secret-prefix", choices=SECRET_PREFIXES, default=SECRET_PREFIXES[0],
-                        help="Use PUBLIC_CHARTS_ICON_DRIVE_ for the separate ICON account")
+                        help="Use PUBLIC_CHARTS_DRIVE2_ for the second chart Drive account")
     args = parser.parse_args()
     from google_auth_oauthlib.flow import InstalledAppFlow
     from vtg_drive_archive import DriveClient
@@ -59,7 +59,7 @@ def main():
         subprocess.run([gh, "secret", "set", name, "--repo", args.register_repo],
                        input=value.encode("utf-8"), check=True, capture_output=True)
     print(f"Five dedicated {args.secret_prefix}* secrets registered. VTG settings were not changed.")
-    if args.secret_prefix == "PUBLIC_CHARTS_ICON_DRIVE_":
+    if args.secret_prefix != SECRET_PREFIXES[0]:
         print("Existing PUBLIC_CHARTS_DRIVE_* settings were not changed.")
 
 

@@ -1,13 +1,14 @@
-# ICON Dedicated Drive Setup
+# Second Chart Drive Setup
 
-ICON uses a second personal Google Drive account. Do not replace the existing
-PUBLIC_CHARTS_DRIVE_* or VTG credentials. The new repository secrets have the
-prefix PUBLIC_CHARTS_ICON_DRIVE_.
+The second personal Google Drive account can store ICON and future chart models;
+it is not ICON-exclusive. Do not replace existing PUBLIC_CHARTS_DRIVE_* or VTG
+credentials. The new repository secrets have the prefix PUBLIC_CHARTS_DRIVE2_.
 
 ## Google Console
 
 1. Sign into the new Drive account and create an owned My Drive folder, e.g.
-   CDS-ICON. Copy the folder ID after /folders/ in its URL. Keep it private.
+   CDS_Chart2. Copy the folder ID after /folders/ in its URL. Keep it private.
+   The folder name is arbitrary; authentication and storage use its folder ID.
 2. Create/select a Google Cloud project and enable Google Drive API.
 3. In Google Auth Platform, configure Branding with an app name, support email
    and developer contact email. Select External audience; add the new account
@@ -32,6 +33,15 @@ Official documentation:
 - https://support.google.com/cloud/answer/15549945
 - https://developers.google.com/identity/protocols/oauth2#expiration
 
+The currently published app disclosure pages can be used for CDS-CHART branding:
+
+- Homepage: https://ssalkim.github.io/CDS/oauth.html
+- Privacy policy: https://ssalkim.github.io/CDS/privacy.html
+- Authorized domain: ssalkim.github.io (no scheme or path)
+
+Do not claim domain verification is complete merely because these pages load.
+If Google requests ownership verification, complete that separate check.
+
 ## Local Authorization
 
 Run PowerShell in E:\\제작자료\\CDS3\\CDS_Git. The updated helper can locate an
@@ -43,7 +53,7 @@ installed GitHub CLI even when this terminal has an older PATH.
   --folder-id "<NEW Drive folder ID>" `
   --account-email "<NEW Drive account email>" `
   --register-repo "SSalKim/CDS-Public-Charts" `
-  --secret-prefix "PUBLIC_CHARTS_ICON_DRIVE_"
+  --secret-prefix "PUBLIC_CHARTS_DRIVE2_"
 ```
 
 The helper validates the authenticated account and folder owner before setting
@@ -53,14 +63,14 @@ save refresh tokens. Never send the JSON contents or tokens in chat.
 Five new secrets are registered:
 
 ```text
-PUBLIC_CHARTS_ICON_DRIVE_CLIENT_ID
-PUBLIC_CHARTS_ICON_DRIVE_CLIENT_SECRET
-PUBLIC_CHARTS_ICON_DRIVE_REFRESH_TOKEN
-PUBLIC_CHARTS_ICON_DRIVE_FOLDER_ID
-PUBLIC_CHARTS_ICON_DRIVE_ACCOUNT_EMAIL
+PUBLIC_CHARTS_DRIVE2_CLIENT_ID
+PUBLIC_CHARTS_DRIVE2_CLIENT_SECRET
+PUBLIC_CHARTS_DRIVE2_REFRESH_TOKEN
+PUBLIC_CHARTS_DRIVE2_FOLDER_ID
+PUBLIC_CHARTS_DRIVE2_ACCOUNT_EMAIL
 ```
 
 After registration, use CDS-Public-Charts Actions > Verify chart Drive connection
-with drive_account=icon. This verifies ownership without uploading or deleting
-files and does not fall back to the primary account if ICON settings are missing.
+with drive_account=secondary. This verifies ownership without uploading or deleting
+files and does not fall back to the primary account if secondary settings are missing.
 Authentication does not by itself enable automatic ICON production.
