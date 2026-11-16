@@ -175,6 +175,7 @@ async function main(){
   }
   assert.equal(evaluate("getCurrentModelName('aifs')"),'AIFS');
   assert.equal(evaluate("getCurrentModelName('ecmwf')"),'ECMWF');
+  assert.equal(evaluate('MODELS.ecmwf.name'),'ECMWF IFS (TCo1279 L137)');
   const unsupportedCycle=evaluate("getCycleSupportStatus('cmc',getCurrentProduct(),new Date('2026-11-15T18:00:00Z'))");
   assert(unsupportedCycle.message.startsWith('CMC은(는)'));
   assert(!unsupportedCycle.message.includes('GDPS'));

@@ -112,7 +112,8 @@ stepSchemeByCycleGroup:{
 },
 
 ecmwf:{
-name:"ECMWF",
+name:"ECMWF IFS (TCo1279 L137)",
+timelineName:"ECMWF",
 folder:"ECMW",
 archiveStart:"2013-01-28",
 cycles:[0,6,12,18],
