@@ -1509,7 +1509,7 @@ seg.className=classes.join(' ');
 seg.dataset.index=String(i);
 seg.dataset.time=getValidTimeLabel(i);
 seg.dataset.lead=getForecastLeadLabel(i);
-seg.title=`${seg.dataset.time} / ${seg.dataset.lead}`;
+setTimelineSegmentAvailability(seg,state);
 seg.onclick=()=>{
 focusTimelineForKeyboardControl();
 setForecastIndex(i);
@@ -1549,8 +1549,7 @@ if(!seg){
 return;
 }
 
-seg.classList.remove('state-loading','state-available','state-missing');
-seg.classList.add('state-'+forecastTimelineState.getLoadState(index));
+setTimelineSegmentAvailability(seg,forecastTimelineState.getLoadState(index));
 
 }
 
@@ -1575,9 +1574,10 @@ return;
 forecastTimeline
 .querySelectorAll('.forecast-segment,.compare-segment')
 .forEach((seg,i)=>{
-seg.dataset.time=getValidTimeLabel(i);
-seg.dataset.lead=getForecastLeadLabel(i);
-seg.title=`${seg.dataset.time} / ${seg.dataset.lead}`;
+let index=Number(seg.dataset.index ?? i);
+seg.dataset.time=getValidTimeLabel(index);
+seg.dataset.lead=getForecastLeadLabel(index);
+setTimelineSegmentAvailability(seg,seg.dataset.availability || forecastTimelineState.getLoadState(index));
 });
 
 updateCompareTimelineActiveLabels();

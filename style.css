@@ -23,6 +23,7 @@
   --hover-label-text:#1e1b4b;
   --available:paleturquoise;
   --missing:lightgray;
+  --unsupported:#afb4bb;
   --label-font-size:10px;
   --label-font-weight:700;
   --label-line-height:1;
@@ -879,15 +880,23 @@ option.group-header{
   background:var(--available);
 }
 
+.forecast-segment.state-unsupported,
+.compare-segment.state-unsupported{
+  background-color:var(--unsupported);
+  /* Integer-aligned pixels keep the repeated diagonal mark a uniform width. */
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' shape-rendering='crispEdges'%3E%3Cpath fill='%23757c86' d='M0 5h1v1H0z M1 4h1v1H1z M2 3h1v1H2z M3 2h1v1H3z M4 1h1v1H4z M5 0h1v1H5z'/%3E%3C/svg%3E");
+  background-size:6px 6px;
+}
+
 .forecast-segment.active,
 .compare-segment.active,
 .compare-segment.active.hover-sync{
-  background:var(--active-bg) !important;
+  background-color:var(--active-bg) !important;
 }
 
 .compare-segment:hover:not(.active),
 .compare-segment.hover-sync:not(.active){
-  background:var(--hover-bg) !important;
+  background-color:var(--hover-bg) !important;
   z-index:5;
 }
 
@@ -1012,37 +1021,6 @@ option.group-header{
 .compare-segment.active.hover-sync.hover-time-label::before,
 .compare-segment.active.hover-sync.hover-lead-label::after{
   display:none !important;
-}
-
-.compare-segment:hover:not(.active)::before,
-.compare-segment:hover:not(.active)::after{
-  display:block !important;
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  z-index:30;
-  min-width:max-content;
-  width:max-content;
-  max-width:none;
-  padding:var(--label-padding);
-  border-radius:var(--label-radius);
-  background:var(--hover-label-bg) !important;
-  color:var(--hover-label-text) !important;
-  font-size:var(--label-font-size);
-  font-weight:var(--label-font-weight);
-  line-height:var(--label-line-height);
-  white-space:nowrap;
-  pointer-events:none;
-}
-
-.compare-segment:hover:not(.active)::before{
-  content:attr(data-time);
-  top:-18px !important;
-}
-
-.compare-segment:hover:not(.active)::after{
-  content:attr(data-lead);
-  bottom:-18px !important;
 }
 
 /* =========================================================

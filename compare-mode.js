@@ -707,13 +707,22 @@ detailToken || '',
 function getCompareImageAvailability(modelId,forecastHour){
 
 if(!compareModelHasForecastHour(modelId,forecastHour)){
-return 'missing';
+return 'unsupported';
 }
 
 return compareImageAvailabilityMap.get(
 getCompareAvailabilityKey(modelId,forecastHour)
 ) || 'loading';
 
+}
+
+function setTimelineSegmentAvailability(segment,state){
+let label={loading:'이미지 확인 중',available:'이미지 있음',missing:'이미지 없음',unsupported:'미지원 예측시간'}[state];
+segment.classList.remove('state-loading','state-available','state-missing','state-unsupported');
+segment.classList.add('state-'+state);
+segment.dataset.availability=state;
+segment.title=label;
+segment.setAttribute('aria-label',`${segment.dataset.time} / ${segment.dataset.lead} / ${label}`);
 }
 
 function updateCompareSegmentAvailability(modelId,forecastHour){
@@ -736,8 +745,7 @@ if(!segment){
 return;
 }
 
-segment.classList.remove('state-loading','state-available','state-missing');
-segment.classList.add('state-'+getCompareImageAvailability(modelId,forecastHour));
+setTimelineSegmentAvailability(segment,getCompareImageAvailability(modelId,forecastHour));
 
 }
 
@@ -1647,7 +1655,7 @@ seg.dataset.index=String(i);
 seg.dataset.forecastHour=String(Number(fh));
 seg.dataset.time=getValidTimeLabelForForecastHour(fh);
 seg.dataset.lead=getForecastLeadLabelForHour(fh);
-seg.title=`${seg.dataset.time} / ${seg.dataset.lead}`;
+setTimelineSegmentAvailability(seg,availability);
 seg.onclick=()=>{
 focusTimelineForKeyboardControl();
 setCompareForecastIndex(i);
