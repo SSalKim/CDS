@@ -285,7 +285,8 @@ let cycleHour=runUTC.getUTCHours();
 if(!getAvailableCycles(modelId,runDateOnly).includes(cycleHour)) return [];
 
 let hours=getForecastHours(modelId,runDateOnly,cycleHour);
-return product.id==='acrain' ? hours.filter(hour=>hour!==0) : hours;
+return product.id==='acrain' && !CDSPublicCharts.supportsZeroAccumulation(runUTC)
+? hours.filter(hour=>hour!==0) : hours;
 
 }
 

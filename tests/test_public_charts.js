@@ -161,6 +161,11 @@ async function main(){
     row('aifs','2026100100',24,'gph200'),row('aifs','2026100100',24,'gph300'),
     row('aifs','2026100100',24,'acptot1'),
     row('aifs','2026050100',24,'gph200'),row('aifs','2026050100',24,'surfce')];
+  for(const model of ['aifs','gfs','aigfs','cmc','ecmwf']){
+    const cycle=model==='ecmwf'?'2026111618':'2026111612';
+    rows.push(row(model,cycle,0,'acrain'));
+    if(model!=='aigfs') rows.push(row(model,cycle,0,'acrain1'));
+  }
   payload=manifest(rows);
   await api.load();
   assert.equal(requests.at(-1).options.credentials,'omit');
@@ -222,6 +227,14 @@ async function main(){
   assert.deepEqual(urls('surfce','aifs','2026111500',24,'asia'),[row('aifs','2026111500',24,'surfce','asia').url]);
   assert.deepEqual(Array.from(api.readyHours(selection('acrain'))),[24]);
   assert.deepEqual(Array.from(api.readyHours(selection('acptot'))),[0,24,120]);
+  assert.equal(api.supportsZeroAccumulation(date('2026111606')),false);
+  assert.equal(api.supportsZeroAccumulation(date('2026111612')),true);
+  for(const model of ['aifs','gfs','aigfs','cmc','ecmwf']){
+    const cycle=model==='ecmwf'?'2026111618':'2026111612';
+    assert.deepEqual(urls('acrain',model,cycle,0),[row(model,cycle,0,'acrain').url]);
+    const compare=model==='aigfs'?'acrain':'acrain1';
+    assert.deepEqual(urls('acrain',model,cycle,0,'hkor','compare'),[row(model,cycle,0,compare).url]);
+  }
   assert.deepEqual(Array.from(api.resolveUrls({...selection(),runUTC:new Date('2026-11-15T00:30:00Z')})),[]);
 
   const rejected=[
@@ -262,6 +275,8 @@ async function main(){
     assert(!hours.includes(87)&&!hours.includes(102));
     assert.deepEqual(snapshot(`getPublicChartTimelineHours('${model}',{id:'acrain',category:'hkor'},new Date('2026-11-15T00:00:00Z'))`),
       hours.filter(hour=>hour!==0),'Total precipitation has no unsupported +000h tile');
+    assert.deepEqual(snapshot(`getPublicChartTimelineHours('${model}',{id:'acrain',category:'hkor'},new Date('2026-11-16T12:00:00Z'))`),
+      hours,'The new zero-hour total precipitation tile must remain scheduled before publication');
   }
   assert.deepEqual(snapshot("getPublicChartTimelineHours('cmc',getCurrentProduct(),new Date('2026-11-15T06:00:00Z'))"),[]);
   assert.deepEqual(snapshot("getPublicChartTimelineHours('aifs',{id:'wnd700',category:'hkor'},new Date('2026-11-15T00:00:00Z'))"),[]);

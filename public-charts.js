@@ -7,6 +7,7 @@ const COMMON_PRODUCTS=new Set(['gph200','gph500','gph700','ept850','ept925','wnd
 const ROW_PRODUCTS=new Set([...COMMON_PRODUCTS,'gph300','surfce','acptot','acptot1','acrain','acrain1']);
 const DRIVE_HOSTS=new Set(['drive.google.com','drive.usercontent.google.com','lh3.googleusercontent.com']);
 const REMOTE_MANIFEST='https://raw.githubusercontent.com/SSalKim/CDS-Public-Charts/main/data/public_charts_manifest.json';
+const ZERO_ACRAIN_CUTOVER='2026111612';
 
 function isModel(modelId){
 return MODEL_IDS.has(modelId);
@@ -34,6 +35,10 @@ function cycleFromDate(date){
 if(!date || typeof date.getTime!=='function' || !Number.isFinite(date.getTime())) return '';
 return [date.getUTCFullYear(),date.getUTCMonth()+1,date.getUTCDate(),date.getUTCHours()]
 .map((part,index)=>String(part).padStart(index===0?4:2,'0')).join('');
+}
+
+function supportsZeroAccumulation(runUTC){
+return cycleFromDate(runUTC)>=ZERO_ACRAIN_CUTOVER;
 }
 
 function validHour(model,hour){
@@ -96,7 +101,7 @@ if(!run || !(row.model==='cmc'?[0,12]:[0,6,12,18]).includes(run.getUTCHours())) 
 if(row.model==='ecmwf' && (!usesSource(row.model,run) || row.cycle<'2026111606')) continue;
 if(row.domain==='asia' && ['acptot','acptot1','acrain','acrain1'].includes(row.product)) continue;
 if(row.model==='aigfs' && ['acptot1','acrain1'].includes(row.product)) continue;
-if(row.hour===0 && ['acrain','acrain1'].includes(row.product)) continue;
+if(row.hour===0 && ['acrain','acrain1'].includes(row.product) && !supportsZeroAccumulation(run)) continue;
 const key=[row.model,row.cycle,row.hour,row.domain,row.product].join('/');
 const entry={model:row.model,cycle:row.cycle,hour:row.hour,domain:row.domain,
 product:row.product,url:row.url,sha256:row.sha256 || '',size:row.size || 0};
@@ -128,7 +133,7 @@ function productIds({modelId,product,runUTC,forecastHour=0,variant='normal'}){
 if(!supportsProduct(modelId,product) || !Number.isFinite(runUTC?.getTime?.())) return [];
 const month=runUTC.getUTCMonth()+1;
 if(product.id==='gph200') return [month>=11 || month<=4?'gph300':'gph200'];
-if(product.id==='acrain' && forecastHour===0) return [];
+if(product.id==='acrain' && forecastHour===0 && !supportsZeroAccumulation(runUTC)) return [];
 // Winter precipitation composites start in October, one month before 300 hPa.
 const winter=month>=10 || month<=4;
 if(product.category==='hkor' && ['surfce','acptot'].includes(product.id)){
@@ -218,7 +223,7 @@ return load();
 return load();
 }
 
-return {isModel,usesSource,supportsProduct,hasPublishedCharts,resolveUrls,readyHours,readyCycles,
+return {isModel,usesSource,supportsProduct,supportsZeroAccumulation,hasPublishedCharts,resolveUrls,readyHours,readyCycles,
 load,startPolling,stopPolling,getRevision:()=>revision};
 }
 
