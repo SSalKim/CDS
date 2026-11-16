@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="CDS-CHART의 Google Drive 데이터 접근, 보관, 공유 및 연결 해제 안내">
+<title>CDS-CHART | 개인정보처리방침</title>
+<link rel="stylesheet" href="oauth.css?v=1">
+</head>
+<body>
+<header><nav aria-label="주 메뉴"><strong>CDS-CHART</strong><div><a href="oauth.html">앱 안내</a><a href="./">CDS</a></div></nav></header>
+<main>
+<h1>개인정보처리방침</h1>
+<p class="date">적용 대상: CDS-CHART의 일기도 자동 생산·Google Drive 보관 기능<br>최종 수정일: 2026년 11월 17일</p>
+<h2>1. 운영자와 이용 대상</h2>
+<p>CDS-CHART는 WooJin Kim이 운영합니다. Google 계정 연결은 운영자가 관리하는 일기도 저장 계정에만 사용하며, 일반 CDS 방문자의 Google 계정이나 개인 Drive를 연결하는 서비스는 제공하지 않습니다.</p>
+<h2>2. 접근하거나 처리하는 정보</h2>
+<ul>
+<li>연결 계정의 이메일과 전용 폴더의 ID·소유자·권한 정보: 계정과 저장 위치가 올바른지 확인하는 데 사용합니다.</li>
+<li>전용 폴더에 생성한 일기도 이미지 및 파일 ID·크기·해시·관리 태그: 업로드 검증, 이미지 표출과 보관 기간 관리에 사용합니다.</li>
+<li>생산 상태와 이미지 목록: 중복 생산을 방지하고 미완성 작업을 이어서 처리하는 데 사용합니다.</li>
+<li>OAuth 클라이언트 인증정보와 갱신 토큰: 운영자의 동의를 받아 Google Drive API에 접속하는 데 사용합니다.</li>
+</ul>
+<p>현재 요청하는 <code>https://www.googleapis.com/auth/drive</code> 권한은 계정 전체 Drive에 접근할 수 있는 권한입니다. 코드의 파일 작업은 확인된 전용 폴더와 관리 태그가 있는 파일로 제한하며, 이 기능을 위해 관계없는 개인 문서의 본문을 수집하거나 분석하지 않습니다.</p>
+<h2>3. 사용 목적과 공개 범위</h2>
+<p>정보는 일기도의 생성·저장·검증·표출·오래된 관리 파일 삭제에 사용합니다. 운영자가 공개 표출용으로 생성한 일기도 이미지와 모델·초기시각·예측시간·이미지 URL은 인터넷에 공개됩니다. 연결 계정 이메일과 OAuth 토큰, 내부 생산 상태는 공개 이미지 목록에 포함하지 않습니다.</p>
+<p>Google 사용자 데이터를 판매하거나 광고에 사용하지 않으며, 범용 AI 모델 학습에 사용하지 않습니다. Google API에서 받은 정보의 사용 및 전송에는 <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>와 해당 Limited Use 요건을 적용합니다.</p>
+<h2>4. 보관과 삭제</h2>
+<p>일기도 이미지는 모델별 보관 cycle 수와 저장 용량 상한에 따라 순환 삭제합니다. 공개 목록 갱신과 안전한 정리를 위한 유예 중에는 만료 파일이 잠시 더 보관될 수 있습니다. 내부 생산 상태 파일은 운영을 유지하는 동안 보관·갱신합니다.</p>
+<p>OAuth 인증정보는 운영자가 지정한 GitHub Actions Secrets에 저장하고, 작업 실행 시 런타임에서 사용합니다. 로컬 인증 도구는 갱신 토큰을 콘솔이나 별도 토큰 파일로 출력·저장하지 않습니다. 운영자는 계정 연결을 해제하고 해당 Secrets를 삭제하여 사용을 중지할 수 있습니다.</p>
+<h2>5. 외부 서비스와 보호 조치</h2>
+<p>Google Drive는 이미지와 내부 상태를 저장하고, GitHub Actions 또는 운영자 러너는 생산·업로드 작업을 실행합니다. GitHub 저장소에는 공개 이미지 목록을 게시합니다. 통신에는 HTTPS를 사용하고, 계정·폴더 소유자·관리 태그를 검사한 뒤 파일을 변경합니다.</p>
+<p>사이트와 공개 이미지를 요청할 때 GitHub·Google 등 제공자는 서비스 운영을 위한 접속 정보를 처리할 수 있습니다. 각 제공자의 개인정보처리방침도 함께 적용됩니다.</p>
+<h2>6. 연결 해제와 요청</h2>
+<p><a href="https://myaccount.google.com/connections">Google 계정의 서드 파티 연결 관리</a>에서 CDS-CHART의 접근 권한을 철회할 수 있습니다. 권한 철회만으로 이미 공개한 이미지가 자동 삭제되지는 않습니다. 공개 중단이나 관리 파일 삭제가 필요하면 운영자에게 요청해야 합니다.</p>
+<p>문의·삭제 요청: <a href="https://github.com/SSalKim/CDS/issues">CDS GitHub 문의 게시판</a>. 공개 게시판에는 토큰, OAuth JSON 내용, 민감한 개인정보를 첨부하지 마세요.</p>
+<h2>7. 방침 변경</h2>
+<p>처리 목적이나 공개 범위가 변경되면 이 페이지를 갱신합니다. Google 사용자 데이터의 새로운 이용에 동의가 필요한 경우에는 변경된 이용 전에 다시 동의를 받습니다.</p>
+</main>
+<footer><a href="oauth.html">CDS-CHART 앱 안내</a> · 운영자 WooJin Kim</footer>
+</body>
+</html>

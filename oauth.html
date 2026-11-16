@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="CDS-CHART 일기도 자동 생산 및 Google Drive 보관 기능 안내">
+<title>CDS-CHART | 앱 안내</title>
+<link rel="stylesheet" href="oauth.css?v=1">
+</head>
+<body>
+<header><nav aria-label="주 메뉴"><strong>CDS-CHART</strong><div><a href="./">CDS</a><a href="privacy.html">개인정보처리방침</a></div></nav></header>
+<main>
+<h1>CDS-CHART</h1>
+<p>CDS-CHART는 WooJin Kim이 운영하는 수치일기도 자동 생산·보관 도구입니다. 공개 예측모델 자료로 일기도를 만들고, 운영자가 연결한 Google Drive에 이미지를 보관하여 <a href="./">CDS 수치일기도표출시스템</a>에서 제공합니다.</p>
+<h2>Google 계정 연결 대상</h2>
+<p>Google OAuth 연결은 일기도 저장공간을 제공하는 운영자 계정에만 사용합니다. 일반 CDS 방문자에게 Google 로그인이나 개인 Drive 연결을 요구하지 않습니다.</p>
+<h2>Google Drive 권한 사용</h2>
+<p>현재 도구는 Google Drive API의 <code>https://www.googleapis.com/auth/drive</code> 권한을 요청합니다. 이 권한은 계정 전체 Drive에 대한 넓은 접근 권한이므로 동의 화면에서 범위를 확인해야 합니다.</p>
+<p>도구의 실제 파일 작업은 연결한 계정이 소유한 전용 폴더와 관리 태그가 있는 파일로 제한합니다. 일기도 이미지를 업로드하고, CDS에서 볼 수 있도록 공개 링크를 설정하며, 생산 상태와 이미지 목록을 저장하고, 보관 정책에 따라 오래된 관리 이미지를 삭제합니다.</p>
+<h2>공개되는 정보</h2>
+<p>생산된 일기도 이미지와 모델명·초기시각·예측시간·이미지 URL 등이 공개됩니다. Google 계정 이메일과 OAuth 토큰은 공개 이미지 목록에 포함하지 않습니다. 전용 폴더 자체와 내부 생산 상태 파일도 도구에서 공개하지 않습니다.</p>
+<h2>데이터 관리와 연결 해제</h2>
+<p>처리 항목, 보관, 공개 범위와 연결 해제 방법은 <a href="privacy.html">개인정보처리방침</a>에서 확인할 수 있습니다.</p>
+<p>문의: <a href="https://github.com/SSalKim/CDS/issues">CDS GitHub 문의 게시판</a>. 인증 파일이나 토큰 등 민감정보는 게시하지 마세요.</p>
+</main>
+<footer>CDS-CHART · 운영자 WooJin Kim</footer>
+</body>
+</html>
