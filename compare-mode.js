@@ -1849,7 +1849,10 @@ let refreshToken=compareImageRefreshTokens.get(getCompareAvailabilityKey(modelId
 if(refreshToken) urls=addImageRefreshTokenToUrls(urls,refreshToken);
 
 if(!urls.length){
-item.appendChild(renderComparePlaceholder(`${getModelDisplayLabel(modelId)}\n이미지 URL을 생성하지 못했습니다.`));
+let message=typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.isModel(modelId)
+?makeCompareExpectedButMissingMessage(modelId,product,fh)
+:`${getModelDisplayLabel(modelId)}\n이미지 URL을 생성하지 못했습니다.`;
+item.appendChild(renderComparePlaceholder(message));
 return item;
 }
 
