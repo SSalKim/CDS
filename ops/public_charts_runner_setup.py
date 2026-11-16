@@ -8,6 +8,7 @@ import subprocess
 import tarfile
 import tempfile
 import shlex
+import traceback
 from urllib.request import urlopen
 
 REPOSITORY = "https://github.com/SSalKim/CDS-Public-Charts"
@@ -38,7 +39,7 @@ def install():
         clean["RUNNER_ALLOW_RUNASROOT"] = "1"
     settings = root / ".runner"
     if settings.exists():
-        if json.loads(settings.read_text())["gitHubUrl"].rstrip("/") != REPOSITORY:
+        if json.loads(settings.read_text(encoding="utf-8-sig"))["gitHubUrl"].rstrip("/").casefold() != REPOSITORY.casefold():
             raise RuntimeError("Existing runner belongs to a different repository")
     else:
         with tempfile.TemporaryFile() as archive:
@@ -73,7 +74,7 @@ def install():
                                        start_new_session=True)
         (root / "runner.pid").write_text(str(process.pid), encoding="ascii")
     environment = root / ".env"
-    lines = environment.read_text(encoding="utf-8").splitlines() if environment.exists() else []
+    lines = environment.read_text(encoding="utf-8-sig").splitlines() if environment.exists() else []
     lines = [line for line in lines if not line.startswith("CDS_VTG_RUNNER_ROOT=")]
     lines.append("CDS_VTG_RUNNER_ROOT=" + str(old_root))
     environment.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -100,5 +101,7 @@ def install():
 if __name__ == "__main__":
     try:
         install()
-    except Exception:
+    except Exception as error:
+        frame = traceback.extract_tb(error.__traceback__)[-1]
+        print(json.dumps({"error_type": type(error).__name__, "function": frame.name, "line": frame.lineno}))
         raise SystemExit("Runner setup failed; no credential or command output was printed.") from None
