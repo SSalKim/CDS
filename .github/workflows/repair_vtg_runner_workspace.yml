@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 3
     steps:
       - name: Preserve old CI checkout and create an empty workspace
-        shell: python
+        shell: python3 {0}
         run: |
           import os
           from pathlib import Path
