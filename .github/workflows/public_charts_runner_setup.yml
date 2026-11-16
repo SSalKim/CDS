@@ -1,0 +1,44 @@
+name: Register separate public charts laptop runner
+on:
+  workflow_dispatch:
+    inputs:
+      migration_public_key:
+        type: string
+        required: true
+      migration_key_id:
+        type: string
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: vtg-image-generation
+  cancel-in-progress: false
+jobs:
+  register:
+    runs-on: [self-hosted, linux, cds-vtg]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+          sparse-checkout: ops/public_charts_runner_setup.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.15'
+      - name: Install sealed-box encryption runtime
+        run: python -m pip install PyNaCl==1.6.2
+      - name: Register and start separate runner
+        env:
+          PUBLIC_CHARTS_RUNNER_BOOTSTRAP_TOKEN: ${{ secrets.PUBLIC_CHARTS_RUNNER_BOOTSTRAP_TOKEN }}
+          RUNNER_STATUS_TOKEN: ${{ secrets.RUNNER_STATUS_TOKEN }}
+          MIGRATION_PUBLIC_KEY: ${{ inputs.migration_public_key }}
+          MIGRATION_KEY_ID: ${{ inputs.migration_key_id }}
+        run: python ops/public_charts_runner_setup.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: public-charts-runner-status-sealed
+          path: ${{ runner.temp }}/public-charts-runner-status-sealed.json
+          retention-days: 1
+          if-no-files-found: error
