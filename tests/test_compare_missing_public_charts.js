@@ -3,8 +3,8 @@ const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
 
-const publicModels=['aifs','gfs','aigfs','cmc'];
-const labels={aifs:'AIFS',gfs:'GFS',aigfs:'AIGFS',cmc:'CMC',kim_gdps:'KIM_GDAPS'};
+const publicModels=['aifs','gfs','aigfs','cmc','icon'];
+const labels={aifs:'AIFS',gfs:'GFS',aigfs:'AIGFS',cmc:'CMC',icon:'ICON',kim_gdps:'KIM_GDAPS'};
 const urls=new Map();
 const blocked=new Map();
 function element(){
@@ -41,7 +41,7 @@ context.scheduleCompareImageItemHeightSync=()=>{};
 
 async function main(){
   await context.renderCompareImages();
-  assert.equal(viewer.children.length,4);
+  assert.equal(viewer.children.length,publicModels.length);
   for(let index=0;index<publicModels.length;index++){
     const message=viewer.children[index].children[0].textContent;
     assert(message.startsWith(labels[publicModels[index]]+'\n'));
@@ -66,6 +66,6 @@ async function main(){
   await context.renderCompareImages();
   assert(viewer.children[1].children[0].textContent.includes('이미지 URL을 생성하지 못했습니다.'),
     'Legacy URL configuration errors are not reclassified');
-  console.log('Comparison missing images: all four public models, details, blocked combinations and legacy behavior passed');
+  console.log('Comparison missing images: all five public models, details, blocked combinations and legacy behavior passed');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

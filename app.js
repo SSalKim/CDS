@@ -1347,7 +1347,7 @@ modelStatus.textContent='';
 modelStatus.classList.add('hidden');
 
 if(!urls || urls.length===0){
-showViewerMessage('표출할 이미지 URL이 없습니다.');
+showViewerMessage(isPublicChartModel() ? makeExpectedButMissingMessage() : '표출할 이미지 URL이 없습니다.');
 return;
 }
 
@@ -1764,7 +1764,7 @@ showViewerMessage(makeExpectedButMissingMessage());
 return;
 }
 
-showViewerMessage('표출할 이미지 URL이 없습니다.');
+showViewerMessage(isPublicChartModel() ? makeExpectedButMissingMessage() : '표출할 이미지 URL이 없습니다.');
 
 }
 
