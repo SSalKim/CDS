@@ -99,7 +99,7 @@ async function main(){
   context.document={getElementById:id=>id==='publicChartNotice'?notice:null};
   assert(fs.readFileSync(path.join(root,'index.html'),'utf8').includes('System 3.6'));
   assert(fs.readFileSync(path.join(root,'index.html'),'utf8').includes(
-    '※ 시험운영 외부 예측모델(AIFS, GFS, AIGFS, CMC)은 과거 예측자료 조회를 지원하지 않으며, 최근 48시간 이내 생산자료만 제공됩니다.'));
+    '※ 시험운영 외부 예측모델(AIFS, GFS, AIGFS, CMC, ECMWF 06/18Z)은 과거 예측자료 조회를 지원하지 않으며, 최근 48시간 이내 생산자료만 제공됩니다.'));
   for(const model of ['aifs','gfs','aigfs','cmc','kim_gdps']){
     context.currentModel=model;
     context.modelCompareMode=false;
