@@ -1,14 +1,17 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
-import {readFileSync} from 'node:fs';
-import {cleanEvent,filters,insert,statistics,history,csv} from '../src/data.js';
+import {readFileSync,readdirSync} from 'node:fs';
+import {cleanEvent,filters,insert,statistics,history,users,csv} from '../src/data.js';
+import {captureConnection,revealConnections} from '../src/connection.js';
 import {administrator,fingerprint} from '../src/auth.js';
 import worker from '../src/worker.js';
 import {generateKeyPair,exportJWK,SignJWT} from 'jose';
 
 function database(){
- const sqlite=new DatabaseSync(':memory:');sqlite.exec(readFileSync(new URL('../migrations/0001_events.sql',import.meta.url),'utf8'));
+ const sqlite=new DatabaseSync(':memory:');
+ for(const file of readdirSync(new URL('../migrations/',import.meta.url)).filter(name=>name.endsWith('.sql')).sort())
+  sqlite.exec(readFileSync(new URL('../migrations/'+file,import.meta.url),'utf8'));
  const db={prepare(sql){let args=[];return {bind(...values){args=values;return this;},async all(){return {results:sqlite.prepare(sql).all(...args)};},async run(){return sqlite.prepare(sql).run(...args);}};},async batch(items){const rows=[];for(const item of items)rows.push(await item.all());return rows;}};
  return db;
 }
@@ -71,4 +74,41 @@ test('retention deletes only records older than the configured limit',async()=>{
  await insert(db,{...event(),occurred_at:Date.now()-91*86400000,visitor_key:'a',session_key:'b',series_key:'c'}).run();
  await worker.scheduled({}, {DB:db,RETENTION_DAYS:'90'});
  const rows=await db.prepare('SELECT COUNT(*) AS total FROM events').all();assert.equal(rows.results[0].total,1);
+});
+test('collector ignores supplied IP/city and stores encrypted edge metadata; only authenticated APIs reveal it',async()=>{
+ const db=database(),stamp=Date.now();
+ const env={DB:db,HMAC_SECRET:'test-secret-long-enough-for-collector-only',COLLECT_LIMITER:{limit:async()=>({success:true})},
+  ALLOWED_ORIGINS:'https://ssalkim.github.io',COLLECT_CONNECTION_INFO:'true',CONNECTION_DATA_KEY:btoa('12345678901234567890123456789012'),LOCAL_PREVIEW:'true'};
+ const request=new Request('https://test/collect',{method:'POST',headers:{Origin:'https://ssalkim.github.io','Content-Type':'application/json','CF-Connecting-IP':'198.51.100.23','X-Forwarded-For':'203.0.113.99'},
+  body:JSON.stringify({version:1,client_id:'123.456',session_id:'789',ip_address:'203.0.113.99',city:'Spoofed',
+    events:[{...event(),occurred_at:stamp,ip_address:'203.0.113.99',city:'Spoofed'}]})});
+ Object.defineProperty(request,'cf',{value:{city:'Seoul',country:'KR',latitude:'ignored',longitude:'ignored'}});
+ assert.equal((await worker.fetch(request,env)).status,202);
+ const stored=(await db.prepare('SELECT * FROM events').all()).results[0];
+ assert(stored.connection_ciphertext.startsWith('v1.'));
+ assert(!JSON.stringify(stored).includes('198.51.100.23'));assert(!JSON.stringify(stored).includes('Seoul'));
+ for(const endpoint of ['history','users']){
+  const response=await worker.fetch(new Request('http://127.0.0.1/admin/api/'+endpoint),env);
+  assert.equal(response.status,200);
+  const data=await response.json();assert.equal(data.rows[0].ip_address,'198.51.100.23');assert.equal(data.rows[0].city,'Seoul');
+  assert.equal(data.rows[0].country,'KR');assert.equal(data.rows[0].connection_ciphertext,undefined);
+  assert.equal(data.rows[0].latitude,undefined);
+  assert.equal((await worker.fetch(new Request('https://public.example/admin/api/'+endpoint),env)).status,403);
+ }
+ const csvResponse=await worker.fetch(new Request('http://127.0.0.1/admin/api/export.csv'),env);
+ assert.match(await csvResponse.text(),/198\.51\.100\.23/);
+ const scope=filters(new URL('https://test/'),stamp);
+ assert.equal((await users(db,scope))[0].views,1);
+});
+test('expired connection details are hidden immediately and pruned without deleting retained chart history',async()=>{
+ const db=database(),stamp=Date.now();
+ const env={DB:db,CONNECTION_RETENTION_DAYS:'30',CONNECTION_DATA_KEY:btoa('12345678901234567890123456789012'),COLLECT_CONNECTION_INFO:'true'};
+ const cipher=await captureConnection(new Request('https://test',{headers:{'CF-Connecting-IP':'2001:db8::23'}}),env);
+ const expired={...event(),occurred_at:stamp-31*86400000,received_at:stamp-31*86400000,
+   visitor_key:'a',session_key:'b',series_key:'c',connection_ciphertext:cipher};
+ await insert(db,expired).run();
+ assert.equal((await revealConnections([expired],env,stamp))[0].ip_address,'');
+ await worker.scheduled({},env);
+ const rows=(await db.prepare('SELECT * FROM events').all()).results;
+ assert.equal(rows.length,1);assert.equal(rows[0].connection_ciphertext,null);
 });

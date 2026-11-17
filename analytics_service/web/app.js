@@ -1,10 +1,11 @@
 const $=id=>document.getElementById(id);
 const form=$('filters');
 let tab='overview',visitor='',cursor=null,busy=false;
+let recentUsers=[];
 const number=value=>Number(value||0).toLocaleString('ko-KR');
 const region=value=>({asia:'아시아',hkor:'한반도'}[value]||value);
-const date=(value,zone='Asia/Seoul')=>new Intl.DateTimeFormat('sv-SE',{
-  timeZone:zone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'
+const date=(value,zone='Asia/Seoul',seconds=false)=>new Intl.DateTimeFormat('sv-SE',{
+  timeZone:zone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',...(seconds?{second:'2-digit'}:{})
 }).format(new Date(value));
 const today=()=>new Date(Date.now()+9*3600000).toISOString().slice(0,10);
 function params(){const p=new URLSearchParams(new FormData(form));for(const [key,value] of [...p]) if(!value)p.delete(key);return p;}
@@ -32,8 +33,27 @@ function showStats(data){
   const select=form.elements.model_id;
   for(const item of data.distribution){if([...select.options].some(x=>x.value===item.model_id))continue;const opt=document.createElement('option');opt.value=item.model_id;opt.textContent=item.model_label||item.model_id;select.append(opt);}
 }
-function showUsers(data){const body=$('userRows');body.replaceChildren();for(const item of data.rows){const tr=document.createElement('tr');userButton(tr,item.visitor_key);[number(item.views),number(item.series_views),number(item.sessions),date(item.last_seen)].forEach(v=>cell(tr,v));body.append(tr);}if(!data.rows.length)empty(body,5);}
-function showHistory(data,append){const body=$('historyRows');if(!append)body.replaceChildren();for(const item of data.rows){const tr=document.createElement('tr');cell(tr,date(item.occurred_at));userButton(tr,item.visitor_key);cell(tr,item.model_label||item.model_id);const product=cell(tr,item.product_label||item.product_id);const sub=document.createElement('span');sub.className='secondary';sub.textContent=region(item.region)+(item.view_context==='compare'?' · 비교':' · 단일');product.append(sub);cell(tr,date(item.run_utc,'UTC'));cell(tr,item.forecast_hour===null?'-':`+${String(item.forecast_hour).padStart(3,'0')}h`);cell(tr,date(item.valid_utc));cell(tr,item.outcome==='view'?'조회':'미표출');body.append(tr);}if(!body.children.length)empty(body,8);cursor=data.next;$('more').hidden=!cursor;}
+function locationLabel(item){return item.city || item.country ? [item.city||'도시 미확인',item.country].filter(Boolean).join(' · ') : '기록 없음';}
+function renderUsers(){
+  const term=$('userSearch').value.trim().toLowerCase();
+  const rows=recentUsers.filter(item=>[item.visitor_key,item.ip_address,item.city,item.country].some(value=>String(value||'').toLowerCase().includes(term)));
+  const body=$('userRows');body.replaceChildren();
+  for(const item of rows){const tr=document.createElement('tr');userButton(tr,item.visitor_key);
+    cell(tr,item.ip_address||'기록 없음','ip-address');cell(tr,locationLabel(item));
+    [number(item.views),number(item.series_views),number(item.sessions),date(item.first_seen,'Asia/Seoul',true),date(item.last_seen,'Asia/Seoul',true)].forEach(value=>cell(tr,value));body.append(tr);}
+  if(!rows.length)empty(body,8);
+}
+function showUsers(data){recentUsers=data.rows;renderUsers();}
+function showHistory(data,append){
+  const body=$('historyRows');if(!append)body.replaceChildren();
+  for(const item of data.rows){const tr=document.createElement('tr');cell(tr,date(item.occurred_at,'Asia/Seoul',true));userButton(tr,item.visitor_key);
+    cell(tr,item.ip_address||'기록 없음','ip-address');cell(tr,locationLabel(item));cell(tr,item.model_label||item.model_id);
+    const product=cell(tr,item.product_label||item.product_id);const sub=document.createElement('span');sub.className='secondary';
+    sub.textContent=region(item.region)+(item.view_context==='compare'?' · 비교':' · 단일');product.append(sub);
+    cell(tr,date(item.run_utc,'UTC'));cell(tr,item.forecast_hour===null?'-':`+${String(item.forecast_hour).padStart(3,'0')}h`);
+    cell(tr,date(item.valid_utc));cell(tr,item.outcome==='view'?'조회':'미표출');body.append(tr);}
+  if(!body.children.length)empty(body,10);cursor=data.next;$('more').hidden=!cursor;
+}
 async function refresh(append=false){
   if(busy)return;busy=true;$('error').hidden=true;$('status').textContent='불러오는 중';
   for(const button of form.querySelectorAll('button'))button.disabled=true;
@@ -43,7 +63,7 @@ async function refresh(append=false){
     if(tab==='users')showUsers(await api('users',p));
     if(tab==='history')showHistory(await api('history',p),append);
     const exp=params();if(visitor&&tab==='history')exp.set('visitor_key',visitor);$('export').href='/admin/api/export.csv?'+exp;
-    $('historyTitle').textContent=visitor?'브라우저 '+visitor.slice(0,10)+' 조회 이력':'전체 조회 이력';$('clearUser').hidden=!visitor;
+    $('historyTitle').textContent=visitor?'사용자 '+visitor.slice(0,10)+' 조회 이력':'전체 조회 이력';$('clearUser').hidden=!visitor;
     $('status').textContent='갱신 '+date(Date.now())+' KST';
   }catch(error){$('error').textContent=error.message;$('error').hidden=false;$('status').textContent='조회 실패';}
   finally{busy=false;for(const button of form.querySelectorAll('button'))button.disabled=false;}
@@ -54,6 +74,7 @@ form.onchange=event=>{if(event.target.type==='date')document.querySelectorAll('[
 document.querySelectorAll('[data-days]').forEach(button=>button.onclick=()=>{preset(Number(button.dataset.days));void refresh();});
 document.querySelectorAll('[data-tab]').forEach(button=>button.onclick=()=>{setTab(button.dataset.tab);void refresh();});
 $('more').onclick=()=>void refresh(true);$('clearUser').onclick=()=>{visitor='';void refresh();};
+$('userSearch').oninput=renderUsers;
 setInterval(()=>{if($('auto').checked&&document.visibilityState==='visible')void refresh();},30000);
 preset(1);form.elements.start.max=today();form.elements.end.max=today();
 api('whoami').then(owner=>{$('owner').textContent=owner.email;const min=new Date(Date.parse(today()+'T00:00:00Z')-(owner.retention_days-1)*86400000).toISOString().slice(0,10);form.elements.start.min=min;form.elements.end.min=min;return refresh();}).catch(error=>{$('error').textContent=error.message;$('error').hidden=false;$('status').textContent='인증 필요';});

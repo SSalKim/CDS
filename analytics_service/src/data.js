@@ -61,7 +61,7 @@ export function filters(url,now=Date.now(),retention=RETENTION_DAYS){
 
 const columns=['event_id','occurred_at','received_at','visitor_key','session_key','series_key','outcome','menu',
   'region','product_id','product_label','model_id','model_label','run_utc','forecast_hour','valid_utc','detail_token',
-  'view_context','image_source','loaded_count','expected_count','load_ms','device_class'];
+  'view_context','image_source','loaded_count','expected_count','load_ms','device_class','connection_ciphertext'];
 
 export function insert(db,event){
   return db.prepare(`INSERT INTO events (${columns.join(',')}) VALUES (${columns.map(()=>'?').join(',')})
@@ -96,10 +96,14 @@ export async function statistics(db,scope){
 }
 
 export async function users(db,scope){
-  const result=await db.prepare(`SELECT visitor_key,COUNT(*) AS events,
+  const result=await db.prepare(`WITH ranked AS (
+    SELECT *,ROW_NUMBER() OVER (PARTITION BY visitor_key ORDER BY occurred_at DESC,event_id DESC) AS rn
+    FROM events WHERE ${scope.where}) SELECT visitor_key,COUNT(*) AS events,
     COUNT(CASE WHEN outcome='view' THEN 1 END) AS views,COUNT(DISTINCT session_key) AS sessions,
     COUNT(DISTINCT CASE WHEN outcome='view' THEN series_key END) AS series_views,
-    MIN(occurred_at) AS first_seen,MAX(occurred_at) AS last_seen FROM events WHERE ${scope.where}
+    MIN(occurred_at) AS first_seen,MAX(occurred_at) AS last_seen,
+    MAX(CASE WHEN rn=1 THEN connection_ciphertext END) AS connection_ciphertext,
+    MAX(CASE WHEN rn=1 THEN received_at END) AS received_at FROM ranked
     GROUP BY visitor_key ORDER BY last_seen DESC,visitor_key LIMIT 100`).bind(...scope.args).all();
   return result.results;
 }
@@ -113,7 +117,7 @@ export async function history(db,scope,cursor,limit=100){
     clause+=' AND (occurred_at < ? OR (occurred_at = ? AND event_id < ?))';
     args.push(Number(match[1]),Number(match[1]),match[2]);
   }
-  const result=await db.prepare(`SELECT event_id,occurred_at,visitor_key,outcome,menu,region,product_id,product_label,
+  const result=await db.prepare(`SELECT event_id,occurred_at,received_at,connection_ciphertext,visitor_key,outcome,menu,region,product_id,product_label,
     model_id,model_label,run_utc,forecast_hour,valid_utc,detail_token,view_context,image_source,load_ms,device_class
     FROM events WHERE ${clause} ORDER BY occurred_at DESC,event_id DESC LIMIT ?`).bind(...args,limit+1).all();
   const rows=result.results.slice(0,limit);
@@ -122,12 +126,13 @@ export async function history(db,scope,cursor,limit=100){
 }
 
 export function csv(rows){
-  const names=['occurred_at','visitor_key','outcome','menu','region','model_id','product_id','product_label',
+  const names=['occurred_at','received_at','visitor_key','ip_address','city','country','outcome','menu','region','model_id','product_id','product_label',
     'run_utc','forecast_hour','valid_utc','view_context','load_ms'];
   const cell=value=>{
     let str=String(value ?? '');
     if(/^[\s]*[=+@-]/.test(str)) str="'"+str;
     return '"'+str.replaceAll('"','""')+'"';
   };
-  return '\ufeff'+[names.map(cell).join(','),...rows.map(row=>names.map(name=>cell(row[name])).join(','))].join('\r\n');
+  const value=(row,name)=>['occurred_at','received_at'].includes(name) && Number.isFinite(row[name]) ? new Date(row[name]).toISOString() : row[name];
+  return '\ufeff'+[names.map(cell).join(','),...rows.map(row=>names.map(name=>cell(value(row,name))).join(','))].join('\r\n');
 }

@@ -1,5 +1,6 @@
 import {administrator,fingerprint} from './auth.js';
 import {cleanEvent,filters,insert,statistics,users,history,csv,RETENTION_DAYS} from './data.js';
+import {captureConnection,revealConnections,connectionRetention} from './connection.js';
 
 const security={
   'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',
@@ -20,7 +21,7 @@ async function collect(request,env){
   if(request.method!=='POST') return json({error:'Method not allowed'},405,cors);
   if(!env.DB || !env.COLLECT_LIMITER || String(env.HMAC_SECRET||'').length<32) return json({error:'Collector unavailable'},503,cors);
   if(!request.headers.get('Content-Type')?.startsWith('application/json')) return json({error:'JSON required'},415,cors);
-  // The transient rate-limit key is an HMAC; neither IP nor raw client ID enters D1 or logs.
+  // Keep the transient rate-limit key separate from encrypted administrator-only metadata.
   const key=await fingerprint(env.HMAC_SECRET,'rate:'+request.headers.get('CF-Connecting-IP'));
   if(!(await env.COLLECT_LIMITER.limit({key})).success) return json({error:'Rate limited'},429,{...cors,'Retry-After':'60'});
   const reader=request.body?.getReader();
@@ -45,11 +46,12 @@ async function collect(request,env){
   }catch{return json({error:'Invalid event batch'},400,cors);}
   const visitor=await fingerprint(env.HMAC_SECRET,'browser:'+payload.client_id);
   const session=await fingerprint(env.HMAC_SECRET,'session:'+payload.client_id+':'+payload.session_id);
+  const connection=await captureConnection(request,env);
   const statements=[];
   for(const event of events){
     const series=await fingerprint(env.HMAC_SECRET,JSON.stringify([event.menu,event.region,event.model_id,
       event.product_id,event.run_utc,event.detail_token]));
-    statements.push(insert(env.DB,{...event,visitor_key:visitor,session_key:session,series_key:series}));
+    statements.push(insert(env.DB,{...event,visitor_key:visitor,session_key:session,series_key:series,connection_ciphertext:connection}));
   }
   await env.DB.batch(statements);
   return json({accepted:events.length},202,cors);
@@ -61,21 +63,22 @@ async function admin(request,env){
   const url=new URL(request.url);
   if(request.method!=='GET') return json({error:'Method not allowed'},405);
   const route=url.pathname;
-  if(route==='/admin/api/whoami') return json({email:owner.email,retention_days:retention(env)});
+  if(route==='/admin/api/whoami') return json({email:owner.email,retention_days:retention(env),connection_retention_days:connectionRetention(env)});
   if(route.startsWith('/admin/api/')){
     if(!env.DB) return json({error:'Database unavailable'},503);
     let scope;
     try{scope=filters(url,Date.now(),retention(env));}
     catch{return json({error:'Invalid date range or filter'},400);}
     if(route==='/admin/api/stats') return json(await statistics(env.DB,scope));
-    if(route==='/admin/api/users') return json({rows:await users(env.DB,scope)});
+    if(route==='/admin/api/users') return json({rows:await revealConnections(await users(env.DB,scope),env)});
     if(route==='/admin/api/history'){
-      try{return json(await history(env.DB,scope,url.searchParams.get('cursor')));}
+      try{const data=await history(env.DB,scope,url.searchParams.get('cursor'));
+        return json({...data,rows:await revealConnections(data.rows,env)});}
       catch{return json({error:'History unavailable or invalid cursor'},400);}
     }
     if(route==='/admin/api/export.csv'){
       const data=await history(env.DB,scope,null,5000);
-      return new Response(csv(data.rows),{headers:{...security,'Content-Type':'text/csv; charset=utf-8',
+      return new Response(csv(await revealConnections(data.rows,env)),{headers:{...security,'Content-Type':'text/csv; charset=utf-8',
         'Content-Disposition':'attachment; filename="cds-usage.csv"','X-Export-Truncated':data.next?'true':'false'}});
     }
     return json({error:'Not found'},404);
@@ -95,12 +98,14 @@ export default {
     try{
       const url=new URL(request.url);
       if(url.pathname==='/collect') return await collect(request,env);
-      if(url.pathname==='/health') return json({service:'cds-usage-analytics',version:1});
+      if(url.pathname==='/health') return json({service:'cds-usage-analytics',version:2});
       if(url.pathname==='/admin' || url.pathname.startsWith('/admin/')) return await admin(request,env);
       return json({error:'Not found'},404);
     }catch{return json({error:'Service temporarily unavailable'},503);}
   },
   async scheduled(controller,env){
+    await env.DB.prepare('UPDATE events SET connection_ciphertext = NULL WHERE received_at < ? AND connection_ciphertext IS NOT NULL')
+      .bind(Date.now()-connectionRetention(env)*86400000).run();
     await env.DB.prepare('DELETE FROM events WHERE occurred_at < ?')
       .bind(Date.now()-retention(env)*86400000).run();
   }

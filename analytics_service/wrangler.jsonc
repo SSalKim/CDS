@@ -8,7 +8,9 @@
   "assets":{"directory":"./web","binding":"ASSETS","run_worker_first":true},
   "vars":{
     "ALLOWED_ORIGINS":"https://ssalkim.github.io",
-    "RETENTION_DAYS":"90"
+    "RETENTION_DAYS":"90",
+    "CONNECTION_RETENTION_DAYS":"30",
+    "COLLECT_CONNECTION_INFO":"true"
   },
   "triggers":{"crons":["17 19 * * *"]},
   "observability":{"enabled":false}
