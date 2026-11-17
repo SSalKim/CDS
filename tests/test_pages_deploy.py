@@ -10,6 +10,13 @@ import pages_deploy as pages
 
 
 class PagesDeploymentTests(unittest.TestCase):
+    def test_private_analytics_service_is_not_a_public_pages_asset(self):
+        for path in ("analytics_service/src/worker.js", "analytics_service/web/index.html",
+                     "analytics_service/wrangler.jsonc", "analytics_service/.dev.vars"):
+            self.assertFalse(pages.is_public(path), path)
+        for path in ("cds-usage.js", "cds-usage-config.js", "selection-navigation.js"):
+            self.assertTrue(pages.is_public(path), path)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)

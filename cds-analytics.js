@@ -5,6 +5,7 @@ var DEFAULT_DEDUPE_MS=30000;
 var STRING_LIMIT=100;
 var lastEventAt=new Map();
 var lastDistinctViewKey=new Map();
+var lastProductContext='';
 var PRODUCT_GROUP_LABELS={
 edit:'편집일기도',
 analysis:'분석장',
@@ -169,6 +170,9 @@ return false;
 }
 
 function track(eventName,params,options){
+if(window.CDSUsage && !window.CDSUsage.isAllowed()){
+return;
+}
 let name=String(eventName || '').trim();
 if(!name){
 return;
@@ -187,6 +191,9 @@ let cleaned=cleanParams(params || {});
 try{
 window.gtag('event',name,cleaned);
 }
+catch(error){}
+
+try{window.CDSUsage?.record?.(name,cleaned);}
 catch(error){}
 
 if(window.CDS_ANALYTICS_DEBUG && window.console){
@@ -247,19 +254,36 @@ out.product_name=[group,label,variant].filter(Boolean).join('-');
 return out;
 }
 
-window.CDSAnalytics={
-track,
-trackProductView(params,options){
+function trackProduct(eventName,params,options){
+if(typeof document!=='undefined' && document.visibilityState==='hidden') return;
 let enriched=withProductHierarchy(params,'product');
-let compare=enriched.view_context==='compare';
+let context=enriched.view_context==='compare' ? 'compare' : 'single';
+if(lastProductContext!==context){
+lastDistinctViewKey.forEach((value,group)=>{
+if(group.startsWith('cds_product_')) lastDistinctViewKey.delete(group);
+});
+lastProductContext=context;
+}
+let group=[eventName,context,context==='compare' ? enriched.model_id || '' : ''].join('|');
 let key=[
 enriched.menu || '',
 enriched.category || '',
 enriched.product_id || '',
-compare ? 'compare' : (enriched.model_id || ''),
-enriched.detail_token || ''
+enriched.model_id || '',
+enriched.detail_token || '',
+enriched.run_utc || '',
+enriched.forecast_hour ?? ''
 ].join('|');
-trackDistinctView('cds_product_view',enriched,options,'cds_product_view',key);
+trackDistinctView(eventName,enriched,options,group,key);
+}
+
+window.CDSAnalytics={
+track,
+trackProductView(params,options){
+trackProduct('cds_product_view',params,options);
+},
+trackProductMissing(params,options){
+trackProduct('cds_product_missing',params,options);
 },
 trackRadarView(params,options){
 let enriched=withProductHierarchy(params,'radar');

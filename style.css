@@ -1313,6 +1313,57 @@ option.group-header{
   align-items:flex-start !important;
 }
 
+.compare-image-item.has-winter-product-notice,
+.single-image-item.has-winter-product-notice{
+  flex-direction:column;
+  justify-content:flex-start;
+}
+
+.selection-confirmation{
+  position:fixed;
+  inset:auto;
+  margin:0;
+  transform:translate(-50%,-50%);
+  box-sizing:border-box;
+  width:min(420px,calc(100% - 32px));
+  max-height:calc(100% - 32px);
+  height:fit-content;
+  padding:24px;
+  border:1px solid #d7e2ee;
+  border-radius:8px;
+  color:#172033;
+  background:#fff;
+  box-shadow:0 12px 36px rgba(33,56,83,.16),0 2px 6px rgba(33,56,83,.06);
+}
+.selection-confirmation::backdrop{
+  background:transparent;
+}
+.viewer-wrap.selection-blurred > *{filter:blur(3px);opacity:.65;pointer-events:none;}
+.selection-confirmation h2{margin:0 0 16px;padding-left:10px;border-left:3px solid #4a8bdc;font-size:16px;font-weight:650;color:#24528c;}
+.selection-confirmation p{margin:0;white-space:pre-line;font-size:13px;line-height:1.9;overflow-wrap:anywhere;color:#46556a;}
+.selection-confirmation-actions{display:flex;justify-content:flex-end;gap:10px;margin:22px -24px -24px;padding:16px 24px;background:#f6f9fc;border-top:1px solid #eaf0f6;}
+.selection-confirmation-actions button{min-width:84px;min-height:38px;padding:7px 20px;border:1px solid #d5dfeb;border-radius:6px;background:#fff;color:#51647b;cursor:pointer;font:inherit;font-size:13px;}
+.selection-confirmation-actions .selection-confirmation-accept{background:#3479d2;border-color:#3479d2;color:white;box-shadow:0 2px 5px #3479d229;}
+.selection-confirmation-actions button:hover{border-color:#7aabdf;background:#f1f6fc;}
+.selection-confirmation-actions .selection-confirmation-accept:hover{background:#266ac1;color:white;}
+.selection-confirmation-actions button:focus-visible{outline:2px solid #1767d2;outline-offset:3px;}
+
+.winter-product-notice{
+  align-self:stretch;
+  box-sizing:border-box;
+  max-width:100%;
+  margin:14px 8px 8px;
+  padding:7px 10px;
+  color:#805c24;
+  background:#fff9eb;
+  border:1px solid #ebdfc4;
+  border-radius:4px;
+  font-size:12px;
+  line-height:1.6;
+  text-align:center;
+  overflow-wrap:anywhere;
+}
+
 .compare-placeholder{
   width:100%;
   min-height:180px;

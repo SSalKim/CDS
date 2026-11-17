@@ -1,0 +1,15 @@
+{
+  "$schema":"node_modules/wrangler/config-schema.json",
+  "name":"cds-usage-analytics",
+  "main":"src/worker.js",
+  "compatibility_date":"2026-11-01",
+  "d1_databases":[{"binding":"DB","database_name":"cds-usage-analytics","database_id":"a40594a6-1911-4495-bc4b-b262f7af3bca"}],
+  "ratelimits":[{"name":"COLLECT_LIMITER","namespace_id":"209417","simple":{"limit":120,"period":60}}],
+  "assets":{"directory":"./web","binding":"ASSETS","run_worker_first":true},
+  "vars":{
+    "ALLOWED_ORIGINS":"https://ssalkim.github.io",
+    "RETENTION_DAYS":"90"
+  },
+  "triggers":{"crons":["17 19 * * *"]},
+  "observability":{"enabled":false}
+}

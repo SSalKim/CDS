@@ -246,10 +246,19 @@ currentModel=fallback;
 
 }
 
-function applyModelButtonVisualState(button,{selected=false,available=false,compareSelected=false}={}){
+function applyModelButtonVisualState(button,{selected=false,available=false,compareSelected=false,cycleUnsupported=false}={}){
 button.style.opacity='';
 button.style.cursor='pointer';
 button.style.pointerEvents='auto';
+
+if(cycleUnsupported){
+button.style.color='#626873';
+button.style.background='#e5e7eb';
+button.style.borderColor='#b7bdc6';
+button.style.boxShadow='none';
+button.style.fontWeight=selected || compareSelected ? '700' : '500';
+return;
+}
 
 if(selected || compareSelected){
 button.style.color='#ffffff';
@@ -306,7 +315,7 @@ if(!isCategoryAllowedByModelRestriction(targetCategory,modelId)){
 continue;
 }
 
-let product=getProductsInCategory(targetCategory).find(p=>
+let product=getProductsInCategory(targetCategory).sort((a,b)=>Number(b.id==='gph500')-Number(a.id==='gph500')).find(p=>
 productSupportsModel(p,modelId)
 );
 
@@ -396,6 +405,7 @@ group.models.forEach(m=>{
 let modelId=m[0];
 let label=m[1];
 let modelAllowed=getModelButtonAllowed(modelId);
+let cycleUnsupported=modelRunIsUnsupported(modelId);
 let compareSelected=modelCompareMode && compareModels.includes(modelId);
 let modelSelected=!modelCompareMode && modelId===currentModel;
 
@@ -405,61 +415,26 @@ btn.className=
 'model-cell'+
 (modelSelected ? ' active' : '')+
 (compareSelected ? ' compare-selected' : '')+
-(modelAllowed ? ' available' : ' unsupported-clickable');
+(modelAllowed ? ' available' : ' unsupported-clickable')+
+(cycleUnsupported ? ' cycle-unsupported' : '');
 
 btn.disabled=false;
 btn.setAttribute('aria-disabled','false');
-btn.title=modelAllowed
+btn.title=cycleUnsupported
+?'선택한 자료시각에는 생산되지 않는 모델입니다. 클릭하여 최근 자료로 이동할 수 있습니다.'
+:modelAllowed
 ?'현재 산출물을 지원하는 모델입니다.'
-:'현재 산출물은 이 모델을 지원하지 않습니다. 클릭하면 지원 산출물로 자동 전환합니다.';
+:'현재 산출물을 지원하지 않습니다. 클릭하여 지원 산출물로 이동할 수 있습니다.';
 btn.textContent=label;
 
 applyModelButtonVisualState(btn,{
 selected:modelSelected,
 available:modelAllowed,
-compareSelected
+compareSelected,
+cycleUnsupported
 });
 
-btn.onclick=()=>{
-
-if(modelCompareMode){
-if(!modelAllowed){
-showViewerNotice('현재 산출물은 이 모델을 지원하지 않습니다.');
-return;
-}
-toggleCompareModel(modelId);
-return;
-}
-
-let previousForecastHour=getSelectedForecastHour();
-let needsProductSwitch=!modelAllowed;
-
-invalidateSelectionAsyncWork();
-currentModel=modelId;
-
-if(needsProductSwitch){
-let switched=switchSelectionToModelSupportedProduct(modelId);
-if(switched && typeof showSelectionToast==='function'){
-showSelectionToast('현재 산출물은 이 모델을 지원하지 않습니다. 지원하는 산출물로 자동 전환합니다.');
-}
-else if(!switched){
-showViewerNotice('이 모델에서 지원하는 산출물을 찾지 못했습니다.');
-}
-}
-else{
-applyCategoryRedirectForCurrentModel();
-}
-
-refreshViewAfterSelectionChange({
-updateCategories:true,
-updateProducts:true,
-updateHours:true,
-resetSlider:true,
-preserveForecastHour:previousForecastHour,
-updateChartAfter:true
-});
-
-};
+btn.onclick=()=>requestModelSelection(modelId);
 
 buttons.appendChild(btn);
 

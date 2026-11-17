@@ -63,7 +63,7 @@ function includeAppFunction(name){
 }
 for(const name of ['getOrderedChartUrlCandidates','isPublicChartModel','updatePublicChartNotice','dismissPublicChartNotice','refreshPublicChartManifestView','makeChartImageUrls',
   'getCycleSupportStatus','getForecastHoursForProductAtRun','buildImageUrlsForCurrentSelectionAtRun',
-  'getRecentRunCandidates','selectionIsDisplayable','shouldJumpOlderAvailableRunForMissingSelection',
+  'getRecentRunCandidates','selectionIsDisplayable','trackCurrentForecastMissingAnalytics','shouldJumpOlderAvailableRunForMissingSelection',
   'displayCurrentForecastImage','rebuildForecastAxis','updateChart','jumpLatestAvailableForCurrentSelection',
   'jumpOlderAvailableRunForMissingSelection','getLatestSearchLookbackHours',
   'getLatestSearchMaxCandidates','getDefaultLatestSearchBaseDate','isSeaSurfaceTemperatureDailySelection']) includeAppFunction(name);

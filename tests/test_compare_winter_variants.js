@@ -45,6 +45,25 @@ assert.equal(usesVariant('2020-10-01T00:00:00Z'),false);
 assert.equal(usesVariant('2020-12-28T18:00:00Z'),false);
 assert.equal(usesVariant('2020-12-29T00:00:00Z'),true);
 
+function winterNotice(date,modelId='ukmo',productId='acptot',category='hkor'){
+  context.product={category,id:productId};
+  return evaluate(`getWinterPrecipitationUnsupportedNotice(${JSON.stringify(modelId)},product,new Date(${JSON.stringify(date)}))`);
+}
+for(let month=1;month<=12;month++){
+  for(const model of ['ukmo','aigfs']){
+    for(const product of ['acptot','acrain']){
+      assert.equal(!!winterNotice(`2026-${String(month).padStart(2,'0')}-01T00:00:00Z`,model,product),month>=10 || month<=4);
+    }
+  }
+}
+assert.equal(winterNotice('2026-11-17T00:00:00Z'),'겨울철 산출물(강설량/적설) 미지원 모델 입니다.');
+for(const model of ['kim_gdps','aifs','gfs','cmc','icon','ecmwf','um_ldps']){
+  assert.equal(winterNotice('2026-11-17T00:00:00Z',model),'');
+}
+assert.equal(winterNotice('2026-11-17T00:00:00Z','ukmo','acptot','asia'),'');
+assert.equal(winterNotice('2026-11-17T00:00:00Z','ukmo','gph500'),'');
+assert.equal(winterNotice('invalid'),'');
+
 context.compareModels=['kim_gdps','ukmo','ecmwf'];
 context.getCompareProductForModel=()=>context.product;
 function topAligned(date,modelId='ukmo',productId='acptot',category='hkor'){

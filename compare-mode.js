@@ -361,6 +361,25 @@ shouldUseWinterCompareVariant(otherModelId,getCompareProductForModel(otherModelI
 
 }
 
+function getWinterPrecipitationUnsupportedNotice(modelId,product,runUTC){
+if(!['ukmo','aigfs'].includes(modelId) || product?.category!=='hkor' ||
+!['acptot','acrain'].includes(product?.id) || !isWinterSeasonRunDate(runUTC)){
+return '';
+}
+return '겨울철 산출물(강설량/적설) 미지원 모델 입니다.';
+}
+
+function appendWinterPrecipitationNotice(item,modelId,product,runUTC){
+if(typeof currentMainMenu==='string' && currentMainMenu!=='forecast') return;
+let message=getWinterPrecipitationUnsupportedNotice(modelId,product,runUTC);
+if(!message) return;
+let notice=document.createElement('p');
+notice.className='winter-product-notice';
+notice.textContent=message;
+item.classList.add('has-winter-product-notice');
+item.appendChild(notice);
+}
+
 function getWinterCompareVariantPattern(pattern,productId){
 
 if(typeof pattern!=='string'){
@@ -1783,7 +1802,9 @@ modelId,
 detailToken
 ].filter(Boolean).join('|');
 
-window.CDSAnalytics.trackProductView({
+let track=payload.missing ? window.CDSAnalytics.trackProductMissing : window.CDSAnalytics.trackProductView;
+if(!track) return;
+track({
 analytics_key:[productKey,forecastHour,'compare'].filter(value=>value!=='' && value!==undefined).join('|'),
 product_key:productKey,
 menu:currentMainMenu || '',
@@ -1793,6 +1814,11 @@ product_name:product?.label || productId,
 model_id:modelId,
 model_name:typeof getModelDisplayLabel==='function' ? getModelDisplayLabel(modelId) : modelId,
 forecast_hour:Number(forecastHour),
+run_utc:payload.runUTC instanceof Date && !Number.isNaN(payload.runUTC.getTime()) ? payload.runUTC.toISOString() : '',
+valid_utc:payload.runUTC instanceof Date && !Number.isNaN(payload.runUTC.getTime())
+?new Date(payload.runUTC.getTime()+Number(forecastHour || 0)*3600000).toISOString():'',
+analytics_version:4,
+load_ms:payload.loadMs,
 detail_token:detailToken,
 view_context:'compare',
 image_source:window.CDSAnalytics.sourceFromUrl(payload.urls?.[0] || ''),
@@ -1831,6 +1857,7 @@ return;
 }
 
 let itemPromises=compareModels.map(async modelId=>{
+let startedAt=Date.now();
 
 let item=document.createElement('div');
 item.className='compare-image-item';
@@ -1844,6 +1871,7 @@ return item;
 }
 
 let product=getCompareProductForModel(modelId);
+let runUTC=getSelectedUTCDate();
 let urls=buildCompareImageUrlsForModel(modelId,fh);
 let refreshToken=compareImageRefreshTokens.get(getCompareAvailabilityKey(modelId,fh));
 if(refreshToken) urls=addImageRefreshTokenToUrls(urls,refreshToken);
@@ -1853,6 +1881,9 @@ let message=typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(m
 ?makeCompareExpectedButMissingMessage(modelId,product,fh)
 :`${getModelDisplayLabel(modelId)}\n이미지 URL을 생성하지 못했습니다.`;
 item.appendChild(renderComparePlaceholder(message));
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,runUTC)){
+item._cdsAnalyticsPayload={modelId,product,runUTC,forecastHour:fh,urls,loadedCount:0,missing:true};
+}
 return item;
 }
 
@@ -1871,6 +1902,7 @@ stack.appendChild(img);
 
 if(!loadedImages.length){
 item.appendChild(renderComparePlaceholder(makeCompareExpectedButMissingMessage(modelId,product,fh)));
+item._cdsAnalyticsPayload={modelId,product,runUTC,forecastHour:fh,urls,loadedCount:0,missing:true,loadMs:Date.now()-startedAt};
 return item;
 }
 
@@ -1885,9 +1917,11 @@ item.appendChild(stack);
 item._cdsAnalyticsPayload={
 modelId,
 product,
+runUTC,
 forecastHour:fh,
 urls,
-loadedCount:loadedImages.length
+loadedCount:loadedImages.length,
+loadMs:Date.now()-startedAt
 };
 return item;
 
@@ -1898,6 +1932,10 @@ let items=await Promise.all(itemPromises);
 if(requestId!==forecastDisplayRequest){
 return;
 }
+
+items.forEach((item,index)=>appendWinterPrecipitationNotice(
+item,compareModels[index],getCompareProductForModel(compareModels[index]),getSelectedUTCDate()
+));
 
 let mobileColumns=getMobileCompareImageColumns(items);
 if(mobileColumns){
