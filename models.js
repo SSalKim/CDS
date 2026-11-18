@@ -152,7 +152,8 @@ stepSchemeByCycleGroup:{
 },
 
 ukmo:{
-name:"UKUM",
+name:"UKMO (UM N1280 L70)",
+timelineName:"UKUM",
 folder:"GDPS",
 archiveStart:"2025-11-30",
 cycles:[0,12],

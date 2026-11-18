@@ -2,12 +2,25 @@
 'use strict';
 
 const MODEL_IDS=new Set(['aifs','gfs','aigfs','cmc','icon']);
-const SOURCE_MODEL_IDS=new Set([...MODEL_IDS,'ecmwf']);
+const SOURCE_MODEL_IDS=new Set([...MODEL_IDS,'ecmwf','ukmo']);
 const COMMON_PRODUCTS=new Set(['gph200','gph500','gph700','ept850','ept925','wnd850','wnd925']);
 const ROW_PRODUCTS=new Set([...COMMON_PRODUCTS,'gph300','surfce','acptot','acptot1','acrain','acrain1']);
 const DRIVE_HOSTS=new Set(['drive.google.com','drive.usercontent.google.com','lh3.googleusercontent.com']);
 const REMOTE_MANIFEST='https://raw.githubusercontent.com/SSalKim/CDS-Public-Charts/main/data/public_charts_manifest.json';
 const ZERO_ACRAIN_CUTOVER='2026111612';
+const UKMO_WINTER_CUTOVER='2026111800';
+
+function isReplacementProduct(modelId,product){
+return modelId==='ukmo' && product?.category==='hkor' && ['acptot','acrain'].includes(product.id);
+}
+
+function supportsReplacement(modelId,product,runUTC,nowMs=Date.now()){
+const month=runUTC?.getUTCMonth?.()+1;
+const age=nowMs-runUTC?.getTime?.();
+return isReplacementProduct(modelId,product) &&
+cycleFromDate(runUTC)>=UKMO_WINTER_CUTOVER && age>=0 && age<=48*3600000 &&
+(month>=10 || month<=4) && [0,12].includes(runUTC?.getUTCHours?.());
+}
 
 function isModel(modelId){
 return MODEL_IDS.has(modelId);
@@ -19,6 +32,7 @@ Number.isFinite(runUTC?.getTime?.()) && [6,18].includes(runUTC.getUTCHours()));
 }
 
 function supportsProduct(modelId,product){
+if(modelId==='ukmo') return product?.category==='hkor' && ['acptot','acrain'].includes(product.id);
 if(!SOURCE_MODEL_IDS.has(modelId) || !['asia','hkor'].includes(product?.category)) return false;
 return COMMON_PRODUCTS.has(product.id) ||
 (product.category==='asia' ? product.id==='surfce' : ['surfce','acptot','acrain'].includes(product.id));
@@ -42,7 +56,7 @@ return cycleFromDate(runUTC)>=ZERO_ACRAIN_CUTOVER;
 }
 
 function validHour(model,hour,runUTC){
-const maximum=model==='ecmwf'?144:model==='icon'?([6,18].includes(runUTC?.getUTCHours?.())?120:180):240;
+const maximum=['ecmwf','ukmo'].includes(model)?144:model==='icon'?([6,18].includes(runUTC?.getUTCHours?.())?120:180):240;
 if(!Number.isInteger(hour) || hour<0 || hour>maximum) return false;
 if(hour<=84) return hour%(['aifs','aigfs'].includes(model)?6:3)===0;
 return hour===90 || hour===96 || (hour>=108 && hour%12===0);
@@ -89,6 +103,28 @@ let timer=null;
 let lastPollAt=0;
 const listeners=new Set();
 
+function notifyChange(){
+revision++;
+for(const listener of listeners){
+try{Promise.resolve(listener()).catch(()=>{});}catch(error){}
+}
+}
+
+function expireReplacements(){
+let changed=false;
+for(const [key,row] of entries){
+if(row.model!=='ukmo' || supportsReplacement(row.model,{category:row.domain,id:row.product.replace(/1$/,'')},parseCycle(row.cycle))) continue;
+entries.delete(key);
+byRun.delete(row.model+'/'+row.cycle);
+changed=true;
+}
+if(changed){
+signature=JSON.stringify([...entries].sort(([a],[b])=>a.localeCompare(b)));
+notifyChange();
+}
+return changed;
+}
+
 function replaceManifest(manifest){
 const next=new Map();
 const conflicts=new Set();
@@ -98,9 +134,11 @@ if(!row || !SOURCE_MODEL_IDS.has(row.model) || published?.[row.model]?.published
 !validHour(row.model,row.hour,parseCycle(row.cycle)) || !ROW_PRODUCTS.has(row.product) ||
 !['asia','hkor'].includes(row.domain) || !validUrl(row.url)) continue;
 const run=parseCycle(row.cycle);
-if(!run || !(row.model==='cmc'?[0,12]:[0,6,12,18]).includes(run.getUTCHours())) continue;
+if(!run || !(['cmc','ukmo'].includes(row.model)?[0,12]:[0,6,12,18]).includes(run.getUTCHours())) continue;
 if(row.model==='ecmwf' && (!usesSource(row.model,run) || row.cycle<'2026111606')) continue;
 if(row.model==='icon' && row.cycle<'2026111612') continue;
+if(row.model==='ukmo' && (!supportsReplacement('ukmo',{category:row.domain,id:row.product.replace(/1$/,'')},run) ||
+!Number.isFinite(Date.parse(row.kma_confirmed_at)))) continue;
 if(row.domain==='asia' && ['acptot','acptot1','acrain','acrain1'].includes(row.product)) continue;
 if(row.model==='aigfs' && ['acptot1','acrain1'].includes(row.product)) continue;
 if(row.hour===0 && ['acrain','acrain1'].includes(row.product) && !supportsZeroAccumulation(run)) continue;
@@ -122,12 +160,7 @@ const key=entry.model+'/'+entry.cycle;
 if(!byRun.has(key)) byRun.set(key,[]);
 byRun.get(key).push(entry);
 }
-revision++;
-for(const listener of listeners){
-try{
-Promise.resolve(listener()).catch(()=>{});
-}catch(error){}
-}
+notifyChange();
 return true;
 }
 
@@ -148,7 +181,7 @@ return [product.id];
 
 function resolveUrls(selection){
 const {modelId,product,runUTC,forecastHour=0}=selection;
-if(!usesSource(modelId,runUTC) || !validHour(modelId,forecastHour,runUTC)) return [];
+if((!usesSource(modelId,runUTC) && !supportsReplacement(modelId,product,runUTC)) || !validHour(modelId,forecastHour,runUTC)) return [];
 const cycle=cycleFromDate(runUTC);
 if(!parseCycle(cycle) || runUTC.getUTCMinutes() || runUTC.getUTCSeconds() || runUTC.getUTCMilliseconds()) return [];
 for(const productId of productIds(selection)){
@@ -156,6 +189,16 @@ const entry=entries.get([modelId,cycle,forecastHour,product.category,productId].
 if(entry) return [entry.url];
 }
 return [];
+}
+
+function replacementFallbacks(value){
+let id;
+try{id=new URL(value).searchParams.get('id');}catch(error){return [];}
+if(!id) return [];
+const row=[...entries.values()].find(row=>row.model==='ukmo' && new URL(row.url).searchParams.get('id')===id);
+if(!row) return [];
+const product=row.product.replace(/1$/,'');
+return [`https://data.kma.go.kr/CHT/GDPS/${row.cycle.slice(0,6)}/${row.cycle.slice(6,8)}/ukum_erly_hkor_${product}_s${String(row.hour).padStart(3,'0')}_${row.cycle}.png`];
 }
 
 function readyHours(selection){
@@ -179,6 +222,7 @@ return readyCycles(modelId).length>0;
 }
 
 async function load(){
+expireReplacements();
 if(pending) return pending;
 pending=(async()=>{
 const controller=typeof global.AbortController==='function'?new global.AbortController():null;
@@ -225,7 +269,7 @@ return load();
 return load();
 }
 
-return {isModel,usesSource,supportsProduct,supportsZeroAccumulation,hasPublishedCharts,resolveUrls,readyHours,readyCycles,
+return {isModel,usesSource,isReplacementProduct,supportsReplacement,supportsProduct,supportsZeroAccumulation,hasPublishedCharts,resolveUrls,replacementFallbacks,readyHours,readyCycles,
 load,startPolling,stopPolling,getRevision:()=>revision};
 }
 

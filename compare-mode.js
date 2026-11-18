@@ -338,7 +338,8 @@ if(usesMobileCompareLayout()){
 return false;
 }
 
-if(COMPARE_WINTER_VARIANT_UNSUPPORTED_MODELS.has(modelId)){
+if(COMPARE_WINTER_VARIANT_UNSUPPORTED_MODELS.has(modelId) &&
+!(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.supportsReplacement?.(modelId,baseProduct,runUTC))){
 return false;
 }
 
@@ -362,6 +363,10 @@ shouldUseWinterCompareVariant(otherModelId,getCompareProductForModel(otherModelI
 }
 
 function getWinterPrecipitationUnsupportedNotice(modelId,product,runUTC){
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.supportsReplacement?.(modelId,product,runUTC)){
+let hour=typeof currentForecastList!=='undefined'?Number(currentForecastList[Number(slider.value || 0)] || 0):0;
+return CDSPublicCharts.resolveUrls({modelId,product,runUTC,forecastHour:hour}).length?'':'겨울철 산출물 준비 중입니다.';
+}
 if(!['ukmo','aigfs'].includes(modelId) || product?.category!=='hkor' ||
 !['acptot','acrain'].includes(product?.id) || !isWinterSeasonRunDate(runUTC)){
 return '';
@@ -1177,7 +1182,8 @@ return [];
 let runUTC=getSelectedUTCDate();
 let detailToken=getCurrentAuxToken();
 let useWinterVariant=shouldUseWinterCompareVariant(modelId,baseProduct,runUTC);
-let patterns=useWinterVariant && !(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,runUTC))
+let patterns=useWinterVariant && !(typeof CDSPublicCharts!=='undefined' && (CDSPublicCharts.usesSource(modelId,runUTC) ||
+CDSPublicCharts.supportsReplacement?.(modelId,baseProduct,runUTC)))
 ?getWinterCompareVariantPatterns(product,modelId)
 :null;
 

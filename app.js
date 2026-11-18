@@ -81,6 +81,12 @@ candidates=typeof CDSChartUtils.getChartUrlCandidates==='function'
 ?CDSChartUtils.getChartUrlCandidates(url):[url];
 }
 let preferred=chartResolvedUrlCache.get(url);
+let fallbacks=typeof CDSPublicCharts!=='undefined'?CDSPublicCharts.replacementFallbacks?.(url) || []:[];
+if(fallbacks.length){
+let native=fallbacks.flatMap(value=>CDSChartUtils.getChartUrlCandidates?.(value) || [value]);
+candidates=[...new Set([...candidates,...native])];
+if(native.includes(preferred)) preferred=null;
+}
 
 if(preferred && candidates.includes(preferred)){
 return [preferred,...candidates.filter(candidate=>candidate!==preferred)];
@@ -338,7 +344,9 @@ updatePublicChartNotice();
 }
 
 function refreshPublicChartManifestView(){
-let affected=isPublicChartModel() || (modelCompareMode && compareModels.some(modelId=>isPublicChartModel(modelId)));
+let affected=isPublicChartModel() || (modelCompareMode && compareModels.some(modelId=>isPublicChartModel(modelId))) ||
+(typeof CDSPublicCharts!=='undefined' && (CDSPublicCharts.isReplacementProduct?.(currentModel,getCurrentProduct()) ||
+modelCompareMode && compareModels.some(modelId=>CDSPublicCharts.isReplacementProduct?.(modelId,getCompareProductForModel(modelId)))));
 if(!affected){
 renderModels();
 return;
@@ -374,7 +382,9 @@ bindEvents();
 
 if(typeof CDSPublicCharts!=='undefined'){
 CDSPublicCharts.startPolling(refreshPublicChartManifestView,{
-isActive:()=>isPublicChartModel() || (modelCompareMode && compareModels.some(modelId=>isPublicChartModel(modelId)))
+isActive:()=>isPublicChartModel() || (modelCompareMode && compareModels.some(modelId=>isPublicChartModel(modelId))) ||
+CDSPublicCharts.supportsReplacement?.(currentModel,getCurrentProduct(),getSelectedUTCDate()) ||
+modelCompareMode && compareModels.some(modelId=>CDSPublicCharts.supportsReplacement?.(modelId,getCompareProductForModel(modelId),getSelectedUTCDate()))
 });
 }
 
@@ -614,6 +624,11 @@ variant='normal'
 
 if(isPublicChartModel(modelId,runUTC)){
 return CDSPublicCharts.resolveUrls({modelId,product,runUTC,forecastHour,variant});
+}
+
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.supportsReplacement?.(modelId,product,runUTC)){
+let replacement=CDSPublicCharts.resolveUrls({modelId,product,runUTC,forecastHour,variant});
+if(replacement.length) return replacement;
 }
 
 let resolvedPatterns=patterns ?? CDSChartUtils.getProductPatternsForDetail(
