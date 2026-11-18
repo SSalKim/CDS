@@ -1356,15 +1356,17 @@ option.group-header{
 .capture-preview{overflow:auto;min-height:0;max-height:65dvh;margin-top:12px;background:#edf2f6;text-align:center;}
 .capture-preview:empty{display:none;}
 .capture-preview img{display:block;width:auto;height:auto;max-width:100%;max-height:60dvh;object-fit:contain;margin:auto;}
-.viewer-fit-control{position:relative;display:flex;align-items:stretch;}
-.viewer-fit-control .compare-fit-toggle{border-radius:6px 0 0 6px;}
-.viewer-fit-direction{display:flex;align-items:center;justify-content:center;width:24px;padding:0;border:1px solid #c9d8eb;border-left:0;border-radius:0 6px 6px 0;background:#fff;color:#426183;cursor:pointer;}
+.viewer-fit-control{position:relative;display:flex;align-items:stretch;height:32px;border:1px solid var(--line-soft);border-radius:9px;background:#fff;}
+.viewer-fit-control:hover{background:#f3f8ff;}
+.timeline-top-controls .viewer-fit-control .compare-fit-toggle{height:30px !important;min-height:30px !important;border:0 !important;border-radius:8px 0 0 8px !important;background:transparent !important;padding-right:3px !important;}
+.viewer-fit-control .viewer-fit-direction{display:flex;align-items:center;justify-content:center;width:24px;padding:0;border:0;border-radius:0 8px 8px 0;background:transparent;color:#426183;cursor:pointer;}
 .viewer-fit-direction svg{width:14px;height:14px;}
 .fit-direction-menu{position:absolute;right:0;top:calc(100% + 5px);z-index:80;min-width:112px;padding:6px;border:1px solid #c9d8eb;border-radius:6px;background:#fff;box-shadow:0 4px 14px #203c5920;}
 .fit-direction-menu[hidden]{display:none;}
 .fit-direction-menu label{display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer;white-space:nowrap;font-size:12px;}
 .fit-direction-menu label:hover{background:#edf5ff;}
 .fit-direction-menu input{width:14px;height:14px;min-height:0;margin:0;accent-color:#2875d2;}
+@media(max-width:700px) and (orientation:portrait){.app-shell .timeline-top-controls .viewer-fit-control{height:27px;}}
 .chart-capture-dialog .selection-confirmation-actions{flex:none;}
 .chart-capture-dialog .selection-confirmation-actions button{min-width:40px;padding:8px;}
 

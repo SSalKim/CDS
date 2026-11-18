@@ -32,6 +32,8 @@ return route.abort();
 });
 await page.goto('http://127.0.0.1:8992/',{waitUntil:'domcontentloaded'});
 await page.waitForFunction(()=>typeof showViewerNotice==='function'&&typeof CDSChartCapture==='object');
+const fitBorders=await page.locator('.viewer-fit-control').evaluate(control=>[control,...control.querySelectorAll('.compare-fit-toggle,.viewer-fit-direction')].map(el=>getComputedStyle(el).borderLeftWidth));
+assert.deepEqual(fitBorders,['1px','0px','0px'],'Fit toggle and arrow share one outer button border');
 await page.evaluate(()=>{if(selectionConfirmation)selectionConfirmation(false);showViewerNotice('모델 비교는 최대 10개까지 선택할 수 있습니다.');});
 await page.locator('dialog[open]').waitFor();assert.match(await page.locator('dialog p').textContent(),/최대 10개/);
 assert.equal(await page.locator('dialog button').count(),1);
