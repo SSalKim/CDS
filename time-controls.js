@@ -241,6 +241,9 @@ Math.abs(Number(cycle)-numericValue)<1e-6
 
 
 function getCyclesForSelection(modelId,product,date){
+if(modelId==='ukmo' && (typeof CDSPublicCharts==='undefined' || !CDSPublicCharts.supportsProduct(modelId,product))){
+return [0,12];
+}
 
 let productCycles=
 product?.cyclesByModel?.[modelId] ||
@@ -248,7 +251,8 @@ product?.cycles ||
 null;
 
 if(productCycles){
-return productCycles;
+return modelId==='ukmo' && typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.supportsProduct(modelId,product)
+?getAvailableCycles(modelId,date) || []:productCycles;
 }
 
 return getAvailableCycles(

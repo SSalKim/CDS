@@ -64,7 +64,7 @@ refresh:refreshMissingForecastFrames,
 canRefresh:canRefreshForecastAvailability
 });
 const COMPARE_PLAY_INTERVAL_MS=500;
-const COMPARE_MAX_MODELS=6;
+const COMPARE_MAX_MODELS=10;
 const IMAGE_DECODE_TIMEOUT_MS=20000;
 const chartImageLoader=CDSChartUtils.createImageLoader({
 decodeTimeoutMs:IMAGE_DECODE_TIMEOUT_MS,
@@ -325,8 +325,8 @@ updateForecastSegmentState(index);
 const AUTO_NOW_ON_STARTUP=true;
 
 
-function isPublicChartModel(modelId=currentModel,runUTC=getSelectedUTCDate()){
-return typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,runUTC);
+function isPublicChartModel(modelId=currentModel,runUTC=getSelectedUTCDate(),forecastHour=0){
+return typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,runUTC,forecastHour);
 }
 
 function updatePublicChartNotice(){
@@ -344,7 +344,9 @@ updatePublicChartNotice();
 }
 
 function refreshPublicChartManifestView(){
-let affected=isPublicChartModel() || (modelCompareMode && compareModels.some(modelId=>isPublicChartModel(modelId))) ||
+let selectedHour=getSelectedTimelineHourForPreserve();
+let affected=isPublicChartModel(currentModel,getSelectedUTCDate(),selectedHour) ||
+(modelCompareMode && compareModels.some(modelId=>isPublicChartModel(modelId,getSelectedUTCDate(),selectedHour))) ||
 (typeof CDSPublicCharts!=='undefined' && (CDSPublicCharts.isReplacementProduct?.(currentModel,getCurrentProduct()) ||
 modelCompareMode && compareModels.some(modelId=>CDSPublicCharts.isReplacementProduct?.(modelId,getCompareProductForModel(modelId)))));
 if(!affected){
@@ -382,7 +384,8 @@ bindEvents();
 
 if(typeof CDSPublicCharts!=='undefined'){
 CDSPublicCharts.startPolling(refreshPublicChartManifestView,{
-isActive:()=>isPublicChartModel() || (modelCompareMode && compareModels.some(modelId=>isPublicChartModel(modelId))) ||
+isActive:()=>isPublicChartModel(currentModel,getSelectedUTCDate(),getSelectedTimelineHourForPreserve()) ||
+(modelCompareMode && compareModels.some(modelId=>isPublicChartModel(modelId,getSelectedUTCDate(),getSelectedTimelineHourForPreserve()))) ||
 CDSPublicCharts.supportsReplacement?.(currentModel,getCurrentProduct(),getSelectedUTCDate()) ||
 modelCompareMode && compareModels.some(modelId=>CDSPublicCharts.supportsReplacement?.(modelId,getCompareProductForModel(modelId),getSelectedUTCDate()))
 });
@@ -622,7 +625,7 @@ checkAvailability=false,
 variant='normal'
 }={}){
 
-if(isPublicChartModel(modelId,runUTC)){
+if(isPublicChartModel(modelId,runUTC,forecastHour)){
 return CDSPublicCharts.resolveUrls({modelId,product,runUTC,forecastHour,variant});
 }
 
@@ -1384,7 +1387,7 @@ modelStatus.textContent='';
 modelStatus.classList.add('hidden');
 
 if(!urls || urls.length===0){
-showViewerMessage(isPublicChartModel() ? makeExpectedButMissingMessage() : '표출할 이미지 URL이 없습니다.');
+showViewerMessage(isPublicChartModel() || currentModel==='ukmo' ? makeExpectedButMissingMessage() : '표출할 이미지 URL이 없습니다.');
 return;
 }
 
@@ -1741,7 +1744,7 @@ return;
 성공 캐시만 신뢰한다.
 실패 캐시는 네트워크 지연/timeout일 수 있으므로 현재 선택 이미지는 다시 직접 시도한다.
 */
-let cachedUrlsAreCurrent=!isPublicChartModel() ||
+let cachedUrlsAreCurrent=(!isPublicChartModel() && currentModel!=='ukmo') ||
 JSON.stringify(cached?.baseUrls || cached?.urls)===JSON.stringify(buildImageUrlsForForecastIndex(index));
 if(cached?.ok===true && cached?.urls?.length && cachedUrlsAreCurrent){
 let urls=await resolveAnalysisResolutionUrls(
@@ -1803,7 +1806,7 @@ showViewerMessage(makeExpectedButMissingMessage());
 return;
 }
 
-showViewerMessage(isPublicChartModel() ? makeExpectedButMissingMessage() : '표출할 이미지 URL이 없습니다.');
+showViewerMessage(isPublicChartModel() || currentModel==='ukmo' ? makeExpectedButMissingMessage() : '표출할 이미지 URL이 없습니다.');
 
 }
 
@@ -2393,6 +2396,9 @@ modelId,
 runDateOnly,
 cycleHour
 ) || [0];
+if(modelId==='ukmo' && (typeof CDSPublicCharts==='undefined' || !CDSPublicCharts.supportsProduct(modelId,product))){
+modelHours=modelHours.filter(hour=>hour<=144);
+}
 
 let productScheme=
 product?.forecastStepByModel?.[modelId];

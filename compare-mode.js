@@ -339,7 +339,8 @@ return false;
 }
 
 if(COMPARE_WINTER_VARIANT_UNSUPPORTED_MODELS.has(modelId) &&
-!(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.supportsReplacement?.(modelId,baseProduct,runUTC))){
+!(typeof CDSPublicCharts!=='undefined' && (CDSPublicCharts.supportsReplacement?.(modelId,baseProduct,runUTC) ||
+modelId==='ukmo' && CDSPublicCharts.usesSource(modelId,runUTC)))){
 return false;
 }
 
@@ -363,6 +364,7 @@ shouldUseWinterCompareVariant(otherModelId,getCompareProductForModel(otherModelI
 }
 
 function getWinterPrecipitationUnsupportedNotice(modelId,product,runUTC){
+if(modelId==='ukmo' && typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,runUTC)) return '';
 if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.supportsReplacement?.(modelId,product,runUTC)){
 let hour=typeof currentForecastList!=='undefined'?Number(currentForecastList[Number(slider.value || 0)] || 0):0;
 return CDSPublicCharts.resolveUrls({modelId,product,runUTC,forecastHour:hour}).length?'':'겨울철 산출물 준비 중입니다.';
@@ -650,6 +652,9 @@ modelId,
 parseDateOnly(runDate.value),
 utcHour
 ) || [0];
+if(modelId==='ukmo' && (typeof CDSPublicCharts==='undefined' || !CDSPublicCharts.supportsProduct(modelId,product))){
+modelHours=modelHours.filter(hour=>hour<=144);
+}
 
 let productScheme=product?.forecastStepByModel?.[modelId];
 
@@ -1883,11 +1888,11 @@ let refreshToken=compareImageRefreshTokens.get(getCompareAvailabilityKey(modelId
 if(refreshToken) urls=addImageRefreshTokenToUrls(urls,refreshToken);
 
 if(!urls.length){
-let message=typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,getSelectedUTCDate())
+let message=typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,getSelectedUTCDate(),fh)
 ?makeCompareExpectedButMissingMessage(modelId,product,fh)
 :`${getModelDisplayLabel(modelId)}\n이미지 URL을 생성하지 못했습니다.`;
 item.appendChild(renderComparePlaceholder(message));
-if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,runUTC)){
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.usesSource(modelId,runUTC,fh)){
 item._cdsAnalyticsPayload={modelId,product,runUTC,forecastHour:fh,urls,loadedCount:0,missing:true};
 }
 return item;

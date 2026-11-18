@@ -22,17 +22,27 @@ cycleFromDate(runUTC)>=UKMO_WINTER_CUTOVER && age>=0 && age<=48*3600000 &&
 (month>=10 || month<=4) && [0,12].includes(runUTC?.getUTCHours?.());
 }
 
+function ukmoCurrent(runUTC,nowMs=Date.now()){
+const age=nowMs-runUTC?.getTime?.();
+return cycleFromDate(runUTC)>=UKMO_WINTER_CUTOVER && age>=0 && age<=48*3600000;
+}
+
+function ukmoFullCatalog(runUTC,forecastHour=0){
+return cycleFromDate(runUTC)>=UKMO_WINTER_CUTOVER &&
+([6,18].includes(runUTC?.getUTCHours?.()) || forecastHour>144);
+}
+
 function isModel(modelId){
 return MODEL_IDS.has(modelId);
 }
 
-function usesSource(modelId,runUTC){
+function usesSource(modelId,runUTC,forecastHour=0){
 return isModel(modelId) || (modelId==='ecmwf' &&
-Number.isFinite(runUTC?.getTime?.()) && [6,18].includes(runUTC.getUTCHours()));
+Number.isFinite(runUTC?.getTime?.()) && [6,18].includes(runUTC.getUTCHours())) ||
+(modelId==='ukmo' && ukmoFullCatalog(runUTC,forecastHour));
 }
 
 function supportsProduct(modelId,product){
-if(modelId==='ukmo') return product?.category==='hkor' && ['acptot','acrain'].includes(product.id);
 if(!SOURCE_MODEL_IDS.has(modelId) || !['asia','hkor'].includes(product?.category)) return false;
 return COMMON_PRODUCTS.has(product.id) ||
 (product.category==='asia' ? product.id==='surfce' : ['surfce','acptot','acrain'].includes(product.id));
@@ -56,7 +66,7 @@ return cycleFromDate(runUTC)>=ZERO_ACRAIN_CUTOVER;
 }
 
 function validHour(model,hour,runUTC){
-const maximum=['ecmwf','ukmo'].includes(model)?144:model==='icon'?([6,18].includes(runUTC?.getUTCHours?.())?120:180):240;
+const maximum=model==='ukmo'?([6,18].includes(runUTC?.getUTCHours?.())?69:168):model==='ecmwf'?144:model==='icon'?([6,18].includes(runUTC?.getUTCHours?.())?120:180):240;
 if(!Number.isInteger(hour) || hour<0 || hour>maximum) return false;
 if(hour<=84) return hour%(['aifs','aigfs'].includes(model)?6:3)===0;
 return hour===90 || hour===96 || (hour>=108 && hour%12===0);
@@ -113,7 +123,7 @@ try{Promise.resolve(listener()).catch(()=>{});}catch(error){}
 function expireReplacements(){
 let changed=false;
 for(const [key,row] of entries){
-if(row.model!=='ukmo' || supportsReplacement(row.model,{category:row.domain,id:row.product.replace(/1$/,'')},parseCycle(row.cycle))) continue;
+if(row.model!=='ukmo' || ukmoCurrent(parseCycle(row.cycle))) continue;
 entries.delete(key);
 byRun.delete(row.model+'/'+row.cycle);
 changed=true;
@@ -134,11 +144,15 @@ if(!row || !SOURCE_MODEL_IDS.has(row.model) || published?.[row.model]?.published
 !validHour(row.model,row.hour,parseCycle(row.cycle)) || !ROW_PRODUCTS.has(row.product) ||
 !['asia','hkor'].includes(row.domain) || !validUrl(row.url)) continue;
 const run=parseCycle(row.cycle);
-if(!run || !(['cmc','ukmo'].includes(row.model)?[0,12]:[0,6,12,18]).includes(run.getUTCHours())) continue;
+if(!run || !(row.model==='cmc'?[0,12]:[0,6,12,18]).includes(run.getUTCHours())) continue;
 if(row.model==='ecmwf' && (!usesSource(row.model,run) || row.cycle<'2026111606')) continue;
 if(row.model==='icon' && row.cycle<'2026111612') continue;
-if(row.model==='ukmo' && (!supportsReplacement('ukmo',{category:row.domain,id:row.product.replace(/1$/,'')},run) ||
-!Number.isFinite(Date.parse(row.kma_confirmed_at)))) continue;
+if(row.model==='ukmo'){
+if(!ukmoCurrent(run) || !supportsProduct('ukmo',{category:row.domain,id:row.product==='gph300'?'gph200':row.product.replace(/1$/,'')})) continue;
+if(!ukmoFullCatalog(run,row.hour) && !supportsReplacement('ukmo',{category:row.domain,id:row.product.replace(/1$/,'')},run)) continue;
+if([0,12].includes(run.getUTCHours()) && (!Number.isFinite(Date.parse(row.kma_confirmed_at)) ||
+row.hour>144 && row.kma_reference_hour!==144)) continue;
+}
 if(row.domain==='asia' && ['acptot','acptot1','acrain','acrain1'].includes(row.product)) continue;
 if(row.model==='aigfs' && ['acptot1','acrain1'].includes(row.product)) continue;
 if(row.hour===0 && ['acrain','acrain1'].includes(row.product) && !supportsZeroAccumulation(run)) continue;
@@ -181,7 +195,8 @@ return [product.id];
 
 function resolveUrls(selection){
 const {modelId,product,runUTC,forecastHour=0}=selection;
-if((!usesSource(modelId,runUTC) && !supportsReplacement(modelId,product,runUTC)) || !validHour(modelId,forecastHour,runUTC)) return [];
+if((!usesSource(modelId,runUTC,forecastHour) && !supportsReplacement(modelId,product,runUTC)) || !validHour(modelId,forecastHour,runUTC) ||
+modelId==='ukmo' && !ukmoCurrent(runUTC)) return [];
 const cycle=cycleFromDate(runUTC);
 if(!parseCycle(cycle) || runUTC.getUTCMinutes() || runUTC.getUTCSeconds() || runUTC.getUTCMilliseconds()) return [];
 for(const productId of productIds(selection)){
@@ -195,7 +210,7 @@ function replacementFallbacks(value){
 let id;
 try{id=new URL(value).searchParams.get('id');}catch(error){return [];}
 if(!id) return [];
-const row=[...entries.values()].find(row=>row.model==='ukmo' && new URL(row.url).searchParams.get('id')===id);
+const row=[...entries.values()].find(row=>row.model==='ukmo' && !ukmoFullCatalog(parseCycle(row.cycle),row.hour) && new URL(row.url).searchParams.get('id')===id);
 if(!row) return [];
 const product=row.product.replace(/1$/,'');
 return [`https://data.kma.go.kr/CHT/GDPS/${row.cycle.slice(0,6)}/${row.cycle.slice(6,8)}/ukum_erly_hkor_${product}_s${String(row.hour).padStart(3,'0')}_${row.cycle}.png`];
@@ -269,7 +284,7 @@ return load();
 return load();
 }
 
-return {isModel,usesSource,isReplacementProduct,supportsReplacement,supportsProduct,supportsZeroAccumulation,hasPublishedCharts,resolveUrls,replacementFallbacks,readyHours,readyCycles,
+return {isModel,usesSource,ukmoFullCatalog,ukmoCurrent,isReplacementProduct,supportsReplacement,supportsProduct,supportsZeroAccumulation,hasPublishedCharts,resolveUrls,replacementFallbacks,readyHours,readyCycles,
 load,startPolling,stopPolling,getRevision:()=>revision};
 }
 

@@ -157,15 +157,22 @@ timelineName:"UKUM",
 folder:"GDPS",
 archiveStart:"2025-11-30",
 cycles:[0,12],
+cycleAvailability:[
+{until:"2026-11-17",cycles:[0,12]},
+{from:"2026-11-18",cycles:[0,6,12,18]}
+],
 forecastRules:[
-{cycles:[0,12],max:144}
+{cycles:[0,12],from:"2026-11-18",max:168},
+{cycles:[6,18],from:"2026-11-18",max:69},
+{cycles:[0,12],until:"2026-11-17",max:144}
 ],
 stepSchemeByCycleGroup:{
 "0,12":[
 {start:0,end:84,step:3},
 {start:90,end:96,step:6},
-{start:108,end:144,step:12}
+{start:108,end:168,step:12}
 ],
+"6,18":[{start:0,end:69,step:3}]
 }
 },
 
