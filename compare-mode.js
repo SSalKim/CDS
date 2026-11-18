@@ -357,9 +357,18 @@ hasWinterVariantCompareArchiveStarted(runUTC);
 
 }
 
-function shouldTopAlignCompareImage(modelId,runUTC){
+function shouldTopAlignCompareImage(modelId,runUTC,loadedImages=null){
 
 if(!['ukmo','aigfs'].includes(modelId)){
+return false;
+}
+
+// UKMO can fall back to a single KMA panel even when a winter composite is supported.
+if(loadedImages && (loadedImages.length!==1 || loadedImages.some(img=>{
+let width=Number(img.naturalWidth || img.width || 0);
+let height=Number(img.naturalHeight || img.height || 0);
+return width>0 && height>width*2;
+}))){
 return false;
 }
 
@@ -1881,7 +1890,6 @@ let startedAt=Date.now();
 
 let item=document.createElement('div');
 item.className='compare-image-item';
-item.classList.toggle('compare-top-aligned',shouldTopAlignCompareImage(modelId,getSelectedUTCDate()));
 
 let blockedMessage=getCompareBlockedMessage(modelId,fh);
 
@@ -1925,6 +1933,8 @@ item.appendChild(renderComparePlaceholder(makeCompareExpectedButMissingMessage(m
 item._cdsAnalyticsPayload={modelId,product,runUTC,forecastHour:fh,urls,loadedCount:0,missing:true,loadMs:Date.now()-startedAt};
 return item;
 }
+
+item.classList.toggle('compare-top-aligned',shouldTopAlignCompareImage(modelId,runUTC,loadedImages));
 
 if(loadedImages.length<urls.length){
 let warn=document.createElement('div');

@@ -74,17 +74,32 @@ assert.equal(winterNotice('invalid'),'');
 
 context.compareModels=['kim_gdps','ukmo','ecmwf'];
 context.getCompareProductForModel=()=>context.product;
-function topAligned(date,modelId='ukmo',productId='acptot',category='hkor'){
+function topAligned(date,modelId='ukmo',productId='acptot',category='hkor',loadedImages=null){
   context.product={category,id:productId};
-  return evaluate(`shouldTopAlignCompareImage(${JSON.stringify(modelId)},new Date(${JSON.stringify(date)}))`);
+  context.loadedImages=loadedImages;
+  return evaluate(`shouldTopAlignCompareImage(${JSON.stringify(modelId)},new Date(${JSON.stringify(date)}),loadedImages)`);
 }
 for(const productId of ['acptot','acrain','tmerge']){
   assert.equal(topAligned('2026-10-09T00:00:00Z','ukmo',productId),true);
 }
 assert.equal(topAligned('2026-10-09T00:00:00Z','kim_gdps'),false);
 assert.equal(topAligned('2026-10-09T00:00:00Z','ecmwf'),false);
+const singlePanel=[{naturalWidth:584,naturalHeight:666}];
+const winterComposite=[{naturalWidth:600,naturalHeight:2000}];
+for(const productId of ['acptot','acrain']){
+  assert.equal(topAligned('2026-11-18T00:00:00Z','ukmo',productId,'hkor',singlePanel),true);
+  assert.equal(topAligned('2026-11-18T00:00:00Z','ukmo',productId,'hkor',winterComposite),false);
+  assert.equal(topAligned('2026-11-18T00:00:00Z','ukmo',productId,'hkor',[...singlePanel,...singlePanel,...singlePanel]),false);
+}
+context.CDSPublicCharts={supportsReplacement:()=>true,usesSource:()=>false};
+assert.equal(topAligned('2026-11-18T00:00:00Z','ukmo','acptot','hkor',singlePanel),true,'KMA fallback stays top aligned');
+assert.equal(topAligned('2026-11-18T00:00:00Z','ukmo','acptot','hkor',winterComposite),false);
+context.CDSPublicCharts.usesSource=()=>true;
+assert.equal(topAligned('2026-11-18T06:00:00Z','ukmo','acrain','hkor',winterComposite),false);
+delete context.CDSPublicCharts;
 context.compareModels=['aigfs','ecmwf'];
 assert.equal(topAligned('2026-10-09T00:00:00Z','aigfs'),true);
+assert.equal(topAligned('2026-11-18T00:00:00Z','aigfs','acptot','hkor',singlePanel),true);
 context.compareModels=['aigfs','ukmo'];
 assert.equal(topAligned('2026-10-09T00:00:00Z','aigfs'),false);
 context.compareModels=['kim_gdps','ukmo','ecmwf'];
