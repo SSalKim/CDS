@@ -431,6 +431,7 @@ if(!Number.isFinite(delta) || delta===0){
 return;
 }
 
+let cancelSelection=typeof createSelectionCancelHandler==='function'?createSelectionCancelHandler():null;
 invalidateSelectionAsyncWork();
 stopCompareAnimation();
 
@@ -450,7 +451,8 @@ updateProducts:true,
 updateHours:false,
 resetSlider:true,
 preserveForecastHour,
-updateChartAfter:true
+updateChartAfter:true,
+cancelSelection
 });
 
 }
@@ -485,6 +487,7 @@ refreshForecastTimelineLabels();
 function handleRunDateChanged(){
 
 let previousRunUTC=getRememberedRunUTC();
+let cancelSelection=typeof createSelectionCancelHandler==='function'?createSelectionCancelHandler({runUTC:previousRunUTC}):null;
 normalizeRunDateYearInput();
 
 invalidateSelectionAsyncWork();
@@ -498,7 +501,8 @@ refreshViewAfterSelectionChange({
   updateHours:false,
   resetSlider:true,
   preserveForecastHour,
-  updateChartAfter:true
+  updateChartAfter:true,
+  cancelSelection
 });
 
 }
@@ -506,6 +510,7 @@ refreshViewAfterSelectionChange({
 function handleRunHourChanged(){
 
 let previousRunUTC=getRememberedRunUTC();
+let cancelSelection=typeof createSelectionCancelHandler==='function'?createSelectionCancelHandler({runUTC:previousRunUTC}):null;
 invalidateSelectionAsyncWork();
 let nextRunUTC=getSelectedUTCDate();
 let preserveForecastHour=getForecastHourForRunChange(previousRunUTC,nextRunUTC);
@@ -516,7 +521,8 @@ refreshViewAfterSelectionChange({
   updateHours:false,
   resetSlider:true,
   preserveForecastHour,
-  updateChartAfter:true
+  updateChartAfter:true,
+  cancelSelection
 });
 
 }

@@ -1,6 +1,42 @@
 /* User-initiated selection changes are committed only after confirmation. */
 let selectionConfirmation=null;
 
+function createSelectionCancelHandler({runUTC=getSelectedUTCDate()}={}){
+let previous={
+model:currentModel,product:currentProduct,category:getCurrentCategory(),aux:currentAuxValue,
+runUTC:new Date(runUTC.getTime()),forecastHour:getSelectedTimelineHourForPreserve(),
+hours:[...currentForecastList],states:[...forecastLoadStates],cache:new Map(forecastImageCache),
+slider:{value:slider.value,min:slider.min,max:slider.max,step:slider.step,disabled:slider.disabled},
+nodes:[...chartImages.childNodes],className:chartImages.className,style:chartImages.getAttribute('style'),
+status:modelStatus.textContent,statusClass:modelStatus.className,
+scrollLeft:viewerWrap?.scrollLeft || 0,scrollTop:viewerWrap?.scrollTop || 0
+};
+return async()=>{
+invalidateSelectionAsyncWork();
+currentModel=previous.model;currentProduct=previous.product;currentAuxValue=previous.aux;
+productCategory.value=previous.category;
+setRunControlsToUTCAllowUnsupported(previous.runUTC);
+let key=getSelectionNavigationKey();
+await refreshView({updateCategories:true,updateProducts:true,updateHours:false,
+resetSlider:true,preserveForecastHour:previous.forecastHour,updateChartAfter:false});
+if(key!==getSelectionNavigationKey()) return;
+setCurrentForecastList(previous.hours);
+setForecastLoadStates(previous.states);
+resetForecastImageCache();
+for(let [index,value] of previous.cache) setForecastImageCacheEntry(index,value);
+Object.assign(slider,previous.slider);
+updateForecastLabel();
+renderForecastTimeline();
+chartImages.replaceChildren(...previous.nodes);
+chartImages.className=previous.className;
+if(previous.style===null) chartImages.removeAttribute('style');
+else chartImages.setAttribute('style',previous.style);
+modelStatus.textContent=previous.status;modelStatus.className=previous.statusClass;
+setViewerLoading(false);
+if(viewerWrap){viewerWrap.scrollLeft=previous.scrollLeft;viewerWrap.scrollTop=previous.scrollTop;}
+};
+}
+
 function openViewerDialog(dialog,{maxWidth=420,onClose=()=>{}}={}){
 if(selectionConfirmation) selectionConfirmation(false);
 stopCompareAnimation();
@@ -139,6 +175,7 @@ if(modelCompareMode && compareModels.length>=COMPARE_MAX_MODELS){
 showViewerNotice(`모델 비교는 최대 ${COMPARE_MAX_MODELS}개까지 선택할 수 있습니다.`);return;
 }
 let previousForecastHour=getSelectedTimelineHourForPreserve();
+let cancelSelection=createSelectionCancelHandler();
 invalidateSelectionAsyncWork();
 currentModel=modelId;
 if(fallback){productCategory.value=fallback.categoryId;currentProduct=fallback.productId;}
@@ -146,7 +183,7 @@ else applyCategoryRedirectForCurrentModel();
 if(modelCompareMode){compareModels.push(modelId);normalizeCompareModels();}
 if(targetRun) setRunControlsToUTCAllowUnsupported(targetRun);
 refreshViewAfterSelectionChange({updateCategories:true,updateProducts:true,updateHours:!targetRun,
-resetSlider:true,preserveForecastHour:previousForecastHour,updateChartAfter:true});
+resetSlider:true,preserveForecastHour:previousForecastHour,updateChartAfter:true,cancelSelection});
 }
 
 async function confirmProductModelSwitch(product){

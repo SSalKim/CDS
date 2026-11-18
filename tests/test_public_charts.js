@@ -391,6 +391,15 @@ async function main(){
   await evaluate('updateChart({preserveForecastHour:24})');
   assert.equal(evaluate('getUTCStamp()'),'2026111600','Cancellation must keep the selected cycle');
   assert.equal(fallbackRefresh,null);
+  context.cancelledSelections=0;
+  const displayable=context.selectionIsDisplayable;
+  context.selectionIsDisplayable=()=>{throw new Error('Cancellation must stop missing-image rendering');};
+  context.missingRunPromptKey='';
+  await evaluate('updateChart({cancelSelection:async()=>{cancelledSelections++;}})');
+  assert.equal(context.cancelledSelections,1,'A declined prompt invokes exactly one rollback');
+  assert.equal(context.missingRunPromptKey,'','A later intentional retry must be allowed to ask again');
+  context.selectionIsDisplayable=displayable;
+  assert.equal(fallbackRefresh,null);
   context.confirmSelectionChange=async()=>true;context.missingRunPromptKey='';
   for(const model of ['aifs','gfs','aigfs','cmc']){
     context.currentModel=model;

@@ -429,7 +429,8 @@ updateHours=true,
 resetSlider=true,
 preserveForecastHour=null,
 imageRefreshToken='',
-updateChartAfter=true
+updateChartAfter=true,
+cancelSelection=null
 }={}){
 
 if(updateCategories){
@@ -489,7 +490,7 @@ return;
 }
 
 if(updateChartAfter){
-updateChart({imageRefreshToken,preserveForecastHour});
+updateChart({imageRefreshToken,preserveForecastHour,cancelSelection});
 }
 
 }
@@ -1920,7 +1921,8 @@ baseUrls
 
 
 async function jumpOlderAvailableRunForMissingSelection({
-preserveForecastHour=getSelectedTimelineHourForPreserve()
+preserveForecastHour=getSelectedTimelineHourForPreserve(),
+cancelSelection=null
 }={}){
 
 if(latestSearchInProgress || modelCompareMode){
@@ -1937,7 +1939,12 @@ if(missingRunPromptKey===key) return false;
 missingRunPromptKey=key;
 setViewerLoading(false);
 let accepted=await confirmSelectionChange('선택된 시각의 해당 모델 예측자료가 아직 존재하지 않습니다.\n가장 최근 자료시각으로 이동할까요?');
-if(!accepted || key!==getSelectionNavigationKey()) return false;
+if(key!==getSelectionNavigationKey()) return true;
+if(!accepted){
+await cancelSelection?.();
+if(cancelSelection) missingRunPromptKey='';
+return true;
+}
 
 await jumpLatestAvailableForCurrentSelection({
 silent:false,
@@ -2045,7 +2052,8 @@ return (
 
 
 async function preloadAllForecastImages({
-imageRefreshToken=''
+imageRefreshToken='',
+cancelSelection=null
 }={}){
 
 let seq=++imagePreloadSeq;
@@ -2115,7 +2123,7 @@ return;
 
 if(
 availableCount===0 &&
-await jumpOlderAvailableRunForMissingSelection()
+await jumpOlderAvailableRunForMissingSelection({cancelSelection})
 ){
 return;
 }
@@ -2276,7 +2284,8 @@ return true;
 
 async function updateChart({
 imageRefreshToken='',
-preserveForecastHour=getSelectedTimelineHourForPreserve()
+preserveForecastHour=getSelectedTimelineHourForPreserve(),
+cancelSelection=null
 }={}){
 
 invalidateImagePreload();
@@ -2294,7 +2303,8 @@ if(isPublicChartModel() &&
 CDSPublicCharts.supportsProduct(currentModel,getCurrentProduct()) &&
 !CDSPublicCharts.readyHours({modelId:currentModel,product:getCurrentProduct(),runUTC:getSelectedUTCDate()}).length &&
 await jumpOlderAvailableRunForMissingSelection({
-preserveForecastHour:preserveForecastHour ?? getSelectedTimelineHourForPreserve()
+preserveForecastHour:preserveForecastHour ?? getSelectedTimelineHourForPreserve(),
+cancelSelection
 })){
 return;
 }
@@ -2310,7 +2320,7 @@ return;
 
 }
 
-preloadAllForecastImages({imageRefreshToken});
+preloadAllForecastImages({imageRefreshToken,cancelSelection});
 
 }
 
@@ -2820,6 +2830,7 @@ if(!product) return;
 let key=getSelectionNavigationKey();
 let decision=await confirmProductModelSwitch(product);
 if(!decision.accepted || key!==getSelectionNavigationKey()) return;
+let cancelSelection=createSelectionCancelHandler();
 invalidateSelectionAsyncWork();
 productCategory.value=cat;
 currentProduct=requestedProduct;
@@ -2834,7 +2845,8 @@ updateProducts:true,
 updateHours:true,
 resetSlider:true,
 preserveForecastHour:previousForecastHour,
-updateChartAfter:true
+updateChartAfter:true,
+cancelSelection
 });
 
 }
@@ -2856,6 +2868,7 @@ if(!product) return;
 let key=getSelectionNavigationKey();
 let decision=await confirmProductModelSwitch(product);
 if(!decision.accepted || key!==getSelectionNavigationKey()) return;
+let cancelSelection=createSelectionCancelHandler();
 currentProduct=requested;
 currentModel=decision.modelId;
 
@@ -2873,7 +2886,8 @@ updateProducts:true,
 updateHours:true,
 resetSlider:true,
 preserveForecastHour:previousForecastHour,
-updateChartAfter:true
+updateChartAfter:true,
+cancelSelection
 });
 
 }
