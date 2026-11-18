@@ -20,6 +20,9 @@ const params={menu:'forecast',category:'asia',model_id:'gfs',model_name:'GFS',pr
  assert.equal(active.calls.length,1);assert.equal(active.calls[0].body.events[0].forecast_hour,24);
  assert.equal(active.calls[0].body.events[0].email,undefined);assert.equal(active.calls[0].body.events[0].image_url,undefined);
  assert.equal(active.calls[0].credentials,'omit');
+ for(const [agent,expected] of [['Mozilla/5.0 (iPhone) Mobile','mobile'],['Mozilla/5.0 (Android) Mobile','mobile'],['Mozilla/5.0 (iPad)','tablet'],['Mozilla/5.0 (Windows NT 10.0)','desktop']]){
+ const state=environment();state.context.navigator.userAgent=agent;state.context.CDSUsage.record('cds_product_view',params);await state.context.CDSUsage.flush();assert.equal(state.calls[0].body.events[0].device_class,expected);
+ }
  for(const options of [{allowed:false},{tag:false},{hidden:true}]){const state=environment(options);state.context.CDSUsage.record('cds_product_view',params);await state.context.CDSUsage.flush();assert.equal(state.calls.length,0);}
  const gpc=environment();gpc.context.navigator.globalPrivacyControl=true;gpc.context.CDSUsage.record('cds_product_view',params);await gpc.context.CDSUsage.flush();assert.equal(gpc.calls.length,0);
  const disabled=environment();disabled.context.CDS_USAGE_CONFIG.enabled=false;disabled.context.CDSUsage.record('cds_product_view',params);await disabled.context.CDSUsage.flush();assert.equal(disabled.calls.length,0);

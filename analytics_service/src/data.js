@@ -103,7 +103,9 @@ export async function users(db,scope){
     COUNT(DISTINCT CASE WHEN outcome='view' THEN series_key END) AS series_views,
     MIN(occurred_at) AS first_seen,MAX(occurred_at) AS last_seen,
     MAX(CASE WHEN rn=1 THEN connection_ciphertext END) AS connection_ciphertext,
-    MAX(CASE WHEN rn=1 THEN received_at END) AS received_at FROM ranked
+    MAX(CASE WHEN rn=1 THEN received_at END) AS received_at,
+    MAX(CASE WHEN rn=1 THEN device_class END) AS device_class,
+    (SELECT nickname FROM visitor_aliases WHERE visitor_key=ranked.visitor_key) AS nickname FROM ranked
     GROUP BY visitor_key ORDER BY last_seen DESC,visitor_key LIMIT 100`).bind(...scope.args).all();
   return result.results;
 }
@@ -118,16 +120,62 @@ export async function history(db,scope,cursor,limit=100){
     args.push(Number(match[1]),Number(match[1]),match[2]);
   }
   const result=await db.prepare(`SELECT event_id,occurred_at,received_at,connection_ciphertext,visitor_key,outcome,menu,region,product_id,product_label,
-    model_id,model_label,run_utc,forecast_hour,valid_utc,detail_token,view_context,image_source,load_ms,device_class
+    model_id,model_label,run_utc,forecast_hour,valid_utc,detail_token,view_context,image_source,load_ms,device_class,
+    (SELECT nickname FROM visitor_aliases WHERE visitor_key=events.visitor_key) AS nickname
     FROM events WHERE ${clause} ORDER BY occurred_at DESC,event_id DESC LIMIT ?`).bind(...args,limit+1).all();
   const rows=result.results.slice(0,limit);
   const last=rows.at(-1);
   return {rows,next:result.results.length>limit && last ? `${last.occurred_at}:${last.event_id}` : null};
 }
 
+export async function saveNickname(db,key,value){
+  if(!/^[0-9a-f]{64}$/.test(key) || typeof value!=='string' || value.trim().length>40 || /[\u0000-\u001f\u007f]/.test(value)) throw new Error('Invalid nickname');
+  const nickname=value.trim();
+  if(nickname) await db.prepare(`INSERT INTO visitor_aliases (visitor_key,nickname,updated_at) VALUES (?,?,?)
+    ON CONFLICT(visitor_key) DO UPDATE SET nickname=excluded.nickname,updated_at=excluded.updated_at`).bind(key,nickname,Date.now()).run();
+  else await db.prepare('DELETE FROM visitor_aliases WHERE visitor_key=?').bind(key).run();
+  return {visitor_key:key,nickname};
+}
+
+export async function groupedHistory(db,scope,cursor,limit=100){
+  const partition='visitor_key,series_key,outcome,view_context,image_source,device_class';
+  const cte=`WITH filtered AS (SELECT * FROM events WHERE ${scope.where}), ranked AS
+    (SELECT *,ROW_NUMBER() OVER (PARTITION BY ${partition} ORDER BY occurred_at DESC,event_id DESC) AS rn,
+    COUNT(*) OVER (PARTITION BY ${partition}) AS view_count,
+    MIN(occurred_at) OVER (PARTITION BY ${partition}) AS first_seen FROM filtered)`;
+  const args=[...scope.args];let after='';
+  if(cursor){
+    const match=/^(\d{13}):([0-9a-f-]{36})$/.exec(cursor);if(!match)throw new Error('Invalid cursor');
+    after=' AND (occurred_at < ? OR (occurred_at = ? AND event_id < ?))';args.push(Number(match[1]),Number(match[1]),match[2]);
+  }
+  const result=await db.prepare(`${cte} SELECT *,
+    (SELECT nickname FROM visitor_aliases WHERE visitor_key=ranked.visitor_key) AS nickname
+    FROM ranked WHERE rn=1 ${after} ORDER BY occurred_at DESC,event_id DESC LIMIT ?`).bind(...args,limit+1).all();
+  const rows=result.results.slice(0,limit);
+  // Fetch complete ordered lead lists for the page, never split a group at a raw-event boundary.
+  if(rows.length){
+    const keys=partition.split(',');
+    const queries=[];
+    for(let index=0;index<rows.length;index+=10){
+      const batch=rows.slice(index,index+10);
+      const conditions=batch.map(()=>'(visitor_key=? AND series_key=? AND outcome=? AND view_context=? AND image_source=? AND device_class=?)');
+      queries.push(db.prepare(`SELECT ${partition},forecast_hour,valid_utc,occurred_at FROM events
+        WHERE ${scope.where} AND (${conditions.join(' OR ')}) ORDER BY occurred_at,event_id`)
+        .bind(...scope.args,...batch.flatMap(row=>keys.map(key=>row[key]))));
+    }
+    const details=await db.batch(queries);
+    const identity=row=>JSON.stringify(keys.map(key=>row[key]));
+    const groups=new Map(rows.map(row=>[identity(row),row]));
+    rows.forEach(row=>{row.forecasts=[];delete row.rn;});
+    for(const detail of details)for(const item of detail.results) groups.get(identity(item)).forecasts.push({hour:item.forecast_hour,valid_utc:item.valid_utc,occurred_at:item.occurred_at});
+  }
+  const last=rows.at(-1);
+  return {rows,next:result.results.length>limit && last?`${last.occurred_at}:${last.event_id}`:null};
+}
+
 export function csv(rows){
   const names=['occurred_at','received_at','visitor_key','ip_address','city','country','outcome','menu','region','model_id','product_id','product_label',
-    'run_utc','forecast_hour','valid_utc','view_context','load_ms'];
+    'run_utc','forecast_hour','valid_utc','view_context','load_ms','nickname','device_class'];
   const cell=value=>{
     let str=String(value ?? '');
     if(/^[\s]*[=+@-]/.test(str)) str="'"+str;

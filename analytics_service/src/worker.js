@@ -1,6 +1,7 @@
 import {administrator,fingerprint} from './auth.js';
-import {cleanEvent,filters,insert,statistics,users,history,csv,RETENTION_DAYS} from './data.js';
+import {cleanEvent,filters,insert,statistics,users,history,groupedHistory,saveNickname,csv,RETENTION_DAYS} from './data.js';
 import {captureConnection,revealConnections,connectionRetention} from './connection.js';
+import {chartImage} from './chart-image.js';
 
 const security={
   'Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'no-referrer',
@@ -61,8 +62,17 @@ async function admin(request,env){
   const owner=await administrator(request,env);
   if(!owner) return json({error:'Administrator authentication required'},403);
   const url=new URL(request.url);
-  if(request.method!=='GET') return json({error:'Method not allowed'},405);
   const route=url.pathname;
+  if(route==='/admin/api/nickname' && request.method==='PUT'){
+    if(request.headers.get('Origin')!==url.origin) return json({error:'Origin not allowed'},403);
+    if(!env.DB) return json({error:'Database unavailable'},503);
+    if(!request.headers.get('Content-Type')?.startsWith('application/json')) return json({error:'JSON required'},415);
+    try{
+      const body=await request.text();if(body.length>1000) return json({error:'Request too large'},413);
+      const value=JSON.parse(body);return json(await saveNickname(env.DB,value.visitor_key,value.nickname));
+    }catch{return json({error:'Invalid nickname'},400);}
+  }
+  if(request.method!=='GET') return json({error:'Method not allowed'},405);
   if(route==='/admin/api/whoami') return json({email:owner.email,retention_days:retention(env),connection_retention_days:connectionRetention(env)});
   if(route.startsWith('/admin/api/')){
     if(!env.DB) return json({error:'Database unavailable'},503);
@@ -72,7 +82,8 @@ async function admin(request,env){
     if(route==='/admin/api/stats') return json(await statistics(env.DB,scope));
     if(route==='/admin/api/users') return json({rows:await revealConnections(await users(env.DB,scope),env)});
     if(route==='/admin/api/history'){
-      try{const data=await history(env.DB,scope,url.searchParams.get('cursor'));
+      try{const read=url.searchParams.get('group')==='series'?groupedHistory:history;
+        const data=await read(env.DB,scope,url.searchParams.get('cursor'));
         return json({...data,rows:await revealConnections(data.rows,env)});}
       catch{return json({error:'History unavailable or invalid cursor'},400);}
     }
@@ -98,7 +109,8 @@ export default {
     try{
       const url=new URL(request.url);
       if(url.pathname==='/collect') return await collect(request,env);
-      if(url.pathname==='/health') return json({service:'cds-usage-analytics',version:2});
+      if(url.pathname==='/chart-image') return await chartImage(request,env);
+      if(url.pathname==='/health') return json({service:'cds-usage-analytics',version:3});
       if(url.pathname==='/admin' || url.pathname.startsWith('/admin/')) return await admin(request,env);
       return json({error:'Not found'},404);
     }catch{return json({error:'Service temporarily unavailable'},503);}

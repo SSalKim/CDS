@@ -1,0 +1,14 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const context={window:{}};vm.createContext(context);vm.runInContext(fs.readFileSync('chart-capture.js','utf8'),context);
+const {packRows,rowsFor}=context.window.CDSChartCapture;
+const rows=rowsFor([{left:0,width:600,height:2000},{left:300,width:640,height:730},{left:0,width:910,height:660}]);
+const layout=packRows(rows);
+assert.equal(rows.length,2);assert.equal(layout.width,1553);assert.equal(layout.height,2663);
+assert.equal(layout.placements[1].width,640,'No source image may be resized');
+assert.equal(layout.placements[2].y,2003);
+const aligned=packRows([[{width:601,height:2001},{width:640,height:730,align:'top'}]]);
+assert.equal(aligned.placements[1].y,0,'Winter unsupported panels must remain top aligned');
+assert(aligned.placements.every(item=>Number.isInteger(item.x)&&Number.isInteger(item.y)),'Do not blur originals with fractional-pixel offsets');
+console.log('Chart capture: natural-resolution packing, wrapping, mixed sizes and rows passed');

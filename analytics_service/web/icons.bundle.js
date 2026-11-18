@@ -137,6 +137,9 @@
     ["path", { d: "M8 14.656V21" }]
   ];
 
+  // node_modules/.pnpm/lucide@1.73.0/node_modules/lucide/dist/esm/icons/check.mjs
+  var Check = [["path", { d: "M20 6 9 17l-5-5" }]];
+
   // node_modules/.pnpm/lucide@1.73.0/node_modules/lucide/dist/esm/icons/download.mjs
   var Download = [
     ["path", { d: "M12 15V3" }],
@@ -151,12 +154,29 @@
     ["path", { d: "M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" }]
   ];
 
+  // node_modules/.pnpm/lucide@1.73.0/node_modules/lucide/dist/esm/icons/pencil.mjs
+  var Pencil = [
+    [
+      "path",
+      {
+        d: "M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"
+      }
+    ],
+    ["path", { d: "m15 5 4 4" }]
+  ];
+
   // node_modules/.pnpm/lucide@1.73.0/node_modules/lucide/dist/esm/icons/refresh-cw.mjs
   var RefreshCw = [
     ["path", { d: "M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" }],
     ["path", { d: "M21 3v5h-5" }],
     ["path", { d: "M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" }],
     ["path", { d: "M8 16H3v5" }]
+  ];
+
+  // node_modules/.pnpm/lucide@1.73.0/node_modules/lucide/dist/esm/icons/x.mjs
+  var X = [
+    ["path", { d: "M18 6 6 18" }],
+    ["path", { d: "m6 6 12 12" }]
   ];
 
   // node_modules/.pnpm/lucide@1.73.0/node_modules/lucide/dist/esm/lucide.mjs
@@ -204,6 +224,7 @@
 
   // web/icons.js
   createIcons({ icons: { ChartNoAxesCombined, LogOut, RefreshCw, Download } });
+  window.CDSAdminIcon = (name) => createElement({ Pencil, Check, X }[name], { "aria-hidden": "true", width: 15, height: 15 });
 })();
 /*! Bundled license information:
 
@@ -215,9 +236,12 @@ lucide/dist/esm/shared/src/utils/toCamelCase.mjs:
 lucide/dist/esm/shared/src/utils/toPascalCase.mjs:
 lucide/dist/esm/replaceElement.mjs:
 lucide/dist/esm/icons/chart-no-axes-combined.mjs:
+lucide/dist/esm/icons/check.mjs:
 lucide/dist/esm/icons/download.mjs:
 lucide/dist/esm/icons/log-out.mjs:
+lucide/dist/esm/icons/pencil.mjs:
 lucide/dist/esm/icons/refresh-cw.mjs:
+lucide/dist/esm/icons/x.mjs:
 lucide/dist/esm/lucide.mjs:
   (**
    * @license lucide v1.73.0 - ISC

@@ -27,6 +27,14 @@ assert.equal(usesVariant('2026-04-30T23:59:59Z'),true);
 assert.equal(usesVariant('2026-05-01T00:00:00Z'),false);
 assert.equal(evaluate('isWinterSeasonRunDate(new Date(NaN))'),false);
 assert.equal(evaluate('isWinterSeasonRunDate(null)'),false);
+context.compareModels=['kim_gdps','ecmwf','gfs','cmc','icon'];
+context.getCurrentProduct=()=>({id:'acptot',category:'hkor'});
+context.getSelectedUTCDate=()=>evaluate("new Date('2026-11-18T00:00:00Z')");
+assert.equal(evaluate('getAutoCompareColumns()'),5,'Winter portrait charts default to n by 1');
+mobile=true;assert.equal(evaluate('getAutoCompareColumns()'),5);mobile=false;
+context.getCurrentProduct=()=>({id:'gph500',category:'asia'});
+assert.equal(evaluate('getAutoCompareColumns()'),3,'Other automatic layouts are unchanged');
+delete context.getCurrentProduct;delete context.getSelectedUTCDate;
 
 for(const [productId,token] of [['acptot','acptot'],['acrain','acrain'],['tmerge','merg']]){
   const pattern=`kim_gdps_erly_hkor_${token}_s{fh}_{run}.png`;

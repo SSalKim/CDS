@@ -128,6 +128,7 @@ let latestSearchInProgress=false;
 let autoCheckTimer=null;
 let selectionToastTimer=null;
 let publicChartNoticeDismissed=false;
+let missingRunPromptKey='';
 
 function showSelectionToast(message){
 
@@ -933,10 +934,7 @@ modelStatus.classList.remove('hidden');
 
 
 function showViewerNotice(message){
-
-modelStatus.textContent=message;
-modelStatus.classList.remove('hidden');
-
+void confirmSelectionChange(message,{notice:true});
 }
 
 function makeAnalysisLowResolutionUrls(urls){
@@ -1149,6 +1147,7 @@ return;
 
 chartImages.classList.toggle('fit-screen',singleFitToScreen);
 chartImages.classList.toggle('fixed-size',!singleFitToScreen);
+CDSViewerFit.schedule();
 
 }
 
@@ -1933,6 +1932,12 @@ return false;
 }
 
 let baseRunUTC=getSelectedUTCDate();
+let key=getSelectionNavigationKey();
+if(missingRunPromptKey===key) return false;
+missingRunPromptKey=key;
+setViewerLoading(false);
+let accepted=await confirmSelectionChange('선택된 시각의 해당 모델 예측자료가 아직 존재하지 않습니다.\n가장 최근 자료시각으로 이동할까요?');
+if(!accepted || key!==getSelectionNavigationKey()) return false;
 
 await jumpLatestAvailableForCurrentSelection({
 silent:false,

@@ -37,6 +37,9 @@ const context={
   getCurrentAuxToken:()=>null,
   getCurrentCategory:()=>context.productCategory.value
 };
+context.missingRunPromptKey='';
+context.getSelectionNavigationKey=()=>JSON.stringify([context.currentModel,context.currentProduct,context.runDate.value,context.runHour.value]);
+context.confirmSelectionChange=async()=>true;
 context.window=context;
 vm.createContext(context);
 for(const file of ['models.js','public-charts.js','products.js','catalog-config.js','catalog-core.js',
@@ -383,6 +386,12 @@ async function main(){
   context.preloadAllForecastImages=()=>{preloads++;};
   context.updateCompareChart=()=>{compareUpdates++;};
   context.currentProduct='gph500';
+  context.currentModel='gfs';context.runDate.value='2026-11-16';context.runHour.value='00:00';
+  context.confirmSelectionChange=async message=>{assert.match(message,/선택된 시각/);return false;};
+  await evaluate('updateChart({preserveForecastHour:24})');
+  assert.equal(evaluate('getUTCStamp()'),'2026111600','Cancellation must keep the selected cycle');
+  assert.equal(fallbackRefresh,null);
+  context.confirmSelectionChange=async()=>true;context.missingRunPromptKey='';
   for(const model of ['aifs','gfs','aigfs','cmc']){
     context.currentModel=model;
     context.runDate.value='2026-11-16';

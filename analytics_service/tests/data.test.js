@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
 import {readFileSync,readdirSync} from 'node:fs';
-import {cleanEvent,filters,insert,statistics,history,users,csv} from '../src/data.js';
+import {cleanEvent,filters,insert,statistics,history,groupedHistory,saveNickname,users,csv} from '../src/data.js';
 import {captureConnection,revealConnections} from '../src/connection.js';
 import {administrator,fingerprint} from '../src/auth.js';
 import worker from '../src/worker.js';
@@ -36,6 +36,33 @@ test('server whitelists fields, rejects invalid timestamps, injection and dates;
  assert.throws(()=>filters(new URL('https://test/?model_id=%27%20OR%201=1'),now));
  assert.throws(()=>filters(new URL('https://test/?start=2026-01-01'),now));
  assert.match(csv([{product_label:'=danger'}]),/'=danger/);
+});
+
+test('grouped history retains chronological leads, full pagination groups, devices and nicknames',async()=>{
+ const db=database(),key='a'.repeat(64);
+ for(const [index,hour] of [0,3,12,120,240,84].entries())await insert(db,{...event({forecast_hour:hour,occurred_at:now+index}),visitor_key:key,session_key:'one',series_key:'same'}).run();
+ await insert(db,{...event({forecast_hour:6,device_class:'mobile',occurred_at:now+7}),visitor_key:key,session_key:'two',series_key:'same'}).run();
+ await insert(db,{...event({region:'hkor',occurred_at:now+8}),visitor_key:key,session_key:'two',series_key:'korea'}).run();
+ await saveNickname(db,key,'관측 사용자');
+ const scope=filters(new URL('https://test/?start=2026-11-17&end=2026-11-17'),now);
+ const first=await groupedHistory(db,scope,null,2),second=await groupedHistory(db,scope,first.next,2);
+ assert.equal(first.rows.length,2);assert.equal(second.rows.length,1);assert.equal(second.next,null);
+ assert.deepEqual(second.rows[0].forecasts.map(row=>row.hour),[0,3,12,120,240,84]);
+ assert.equal(second.rows[0].view_count,6);assert.equal(second.rows[0].nickname,'관측 사용자');
+ assert.equal((await users(db,scope))[0].nickname,'관측 사용자');
+ assert.equal(first.rows.find(row=>row.device_class==='mobile').view_count,1);
+ assert.equal((await history(db,scope,null,20)).rows.length,8,'CSV/raw events must remain intact');
+ await saveNickname(db,key,'');assert.equal((await users(db,scope))[0].nickname,null);
+ await assert.rejects(saveNickname(db,key,'a'.repeat(41)));await assert.rejects(saveNickname(db,'bad','nickname'));
+});
+
+test('nickname updates require administrator authentication and same-origin requests',async()=>{
+ const env={DB:database(),LOCAL_PREVIEW:'true'};
+ const request=(origin='http://127.0.0.1',host='http://127.0.0.1')=>new Request(host+'/admin/api/nickname',{
+ method:'PUT',headers:{Origin:origin,'Content-Type':'application/json'},body:JSON.stringify({visitor_key:'a'.repeat(64),nickname:'Test'})});
+ assert.equal((await worker.fetch(request(),env)).status,200);
+ assert.equal((await worker.fetch(request('https://evil.example'),env)).status,403);
+ assert.equal((await worker.fetch(request('https://public.example','https://public.example'),env)).status,403);
 });
 test('owner authentication fails closed, rejects forged JWT and local-preview on a public host',async()=>{
  assert.equal(await administrator(new Request('https://public.example/admin'),{}),null);

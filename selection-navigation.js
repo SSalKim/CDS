@@ -1,28 +1,10 @@
 /* User-initiated selection changes are committed only after confirmation. */
 let selectionConfirmation=null;
 
-function confirmSelectionChange(message){
+function openViewerDialog(dialog,{maxWidth=420,onClose=()=>{}}={}){
 if(selectionConfirmation) selectionConfirmation(false);
 stopCompareAnimation();
-let dialog=document.createElement('dialog');
-dialog.className='selection-confirmation';
-dialog.setAttribute('aria-label','자료 전환 확인');
-dialog.setAttribute('aria-describedby','selectionConfirmationMessage');
-let body=document.createElement('p');
-body.id='selectionConfirmationMessage';
-body.textContent=message;
-let actions=document.createElement('div');
-actions.className='selection-confirmation-actions';
-let cancel=document.createElement('button');
-cancel.type='button';
-cancel.textContent='취소';
-cancel.autofocus=true;
-let confirm=document.createElement('button');
-confirm.type='button';
-confirm.className='selection-confirmation-accept';
-confirm.textContent='확인';
-actions.append(cancel,confirm);
-dialog.append(body,actions);
+let previousFocus=document.activeElement;
 document.body.appendChild(dialog);
 let viewer=document.querySelector('.viewer-wrap');
 viewer?.classList.add('selection-blurred');
@@ -33,14 +15,13 @@ let left=Math.max(12,bounds?.left || 0);
 let right=Math.min(width-12,bounds?.right || width);
 let top=Math.max(12,bounds?.top || 0);
 let bottom=Math.min(innerHeight-12,bounds?.bottom || innerHeight);
-dialog.style.width=Math.min(420,width-32,Math.max(240,right-left-16))+'px';
+dialog.style.width=Math.min(maxWidth,width-32,Math.max(240,right-left-16))+'px';
 let height=dialog.getBoundingClientRect().height;
 let x=Math.min(width-dialog.offsetWidth/2-12,Math.max(dialog.offsetWidth/2+12,(left+right)/2));
 let y=Math.min(innerHeight-height/2-12,Math.max(height/2+12,(top+bottom)/2));
 dialog.style.left=x+'px';
 dialog.style.top=y+'px';
 };
-return new Promise(resolve=>{
 let done=false;
 let finish=accepted=>{
 if(done) return;
@@ -51,16 +32,40 @@ window.removeEventListener('resize',position);
 document.removeEventListener('scroll',position,true);
 dialog.close();
 dialog.remove();
-resolve(accepted);
+previousFocus?.focus?.({preventScroll:true});
+onClose(accepted);
 };
 selectionConfirmation=finish;
-cancel.onclick=()=>finish(false);
-confirm.onclick=()=>finish(true);
 dialog.addEventListener('cancel',event=>{event.preventDefault();finish(false);});
 dialog.showModal();
 position();
 window.addEventListener('resize',position);
 document.addEventListener('scroll',position,true);
+return {close:finish,position};
+}
+
+function confirmSelectionChange(message,{notice=false}={}){
+let dialog=document.createElement('dialog');
+dialog.className='selection-confirmation';
+dialog.setAttribute('aria-label',notice?'안내':'자료 전환 확인');
+dialog.setAttribute('aria-describedby','selectionConfirmationMessage');
+let body=document.createElement('p');
+body.id='selectionConfirmationMessage';body.textContent=message;
+let actions=document.createElement('div');
+actions.className='selection-confirmation-actions';
+let confirm=document.createElement('button');
+confirm.type='button';confirm.className='selection-confirmation-accept';confirm.textContent='확인';
+dialog.append(body,actions);
+return new Promise(resolve=>{
+let modal=openViewerDialog(dialog,{onClose:resolve});
+if(!notice){
+let cancel=document.createElement('button');
+cancel.type='button';cancel.textContent='취소';cancel.onclick=()=>modal.close(false);
+actions.append(cancel);cancel.focus();
+}
+actions.append(confirm);confirm.onclick=()=>modal.close(true);
+if(notice) confirm.focus();
+modal.position();
 });
 }
 
@@ -108,6 +113,7 @@ return null;
 }
 
 async function requestModelSelection(modelId){
+if(typeof missingRunPromptKey!=='undefined') missingRunPromptKey='';
 if(modelCompareMode && compareModels.includes(modelId)){
 toggleCompareModel(modelId);
 return;

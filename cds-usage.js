@@ -71,7 +71,10 @@ return identityPending;
 }
 
 function deviceClass(){
-return window.matchMedia?.('(pointer: coarse)').matches ? (window.innerWidth<768 ? 'mobile' : 'tablet') : 'desktop';
+const agent=navigator.userAgent||'';
+if(/iPad|Tablet/i.test(agent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1))return 'tablet';
+if(navigator.userAgentData?.mobile || /Mobi|iPhone|Android/i.test(agent))return /Android/i.test(agent)&&!/Mobi/i.test(agent)?'tablet':'mobile';
+return 'desktop';
 }
 
 function schedule(){

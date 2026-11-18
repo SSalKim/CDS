@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev --local --ip 127.0.0.1 --port 8791",
-    "build": "esbuild web/icons.js --bundle --format=iife --outfile=web/icons.bundle.js",
+    "build": "esbuild web/icons.js --bundle --format=iife --outfile=web/icons.bundle.js && esbuild web/viewer-icons.js --bundle --format=iife --outfile=../viewer-icons.bundle.js",
     "test": "node --test tests/*.test.js",
     "deploy": "wrangler deploy"
   },

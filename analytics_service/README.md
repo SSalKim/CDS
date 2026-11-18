@@ -1,7 +1,7 @@
 # CDS Private Usage Analytics
 
 Dedicated Worker and D1; independent of chart production, Drive and VTG.
-Only `/collect` and `/health` are public. `/admin` and every `/admin/*` API/asset
+Only `/collect`, `/health` and the restricted `/chart-image` export proxy are public. `/admin` and every `/admin/*` API/asset
 require a verified Cloudflare Access JWT with the configured audience, issuer
 and exact administrator email. Missing configuration denies access.
 
@@ -44,6 +44,18 @@ browsers can share an IP. The user list takes connection metadata from its most
 recent matching event, while detailed history retains each event's metadata.
 CSV exports include administrator-only connection data, are limited to 5,000
 filtered rows, and escape spreadsheet formulas. Export timestamps use UTC ISO.
+
+Administrator nicknames are stored separately in `visitor_aliases` (migration
+0003), are never returned by public endpoints, and can be removed by saving an
+empty nickname. Grouped dashboard history merges the same browser/series/outcome/
+view context/source/device within the selected range and includes every lead in
+actual viewing order. Raw CSV remains event-level. Device classes are browser
+estimates, not verified hardware identities.
+
+The chart-image endpoint accepts only allowlisted public KMA chart paths and
+Drive image IDs, checks every redirect, image MIME, byte limit and request rate.
+It does not log, collect usage events, use administrator credentials or access
+private Drive content. Browser exports stay on the user's device.
 
 ## Local Verification
 

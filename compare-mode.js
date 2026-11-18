@@ -133,6 +133,7 @@ compareManualLayout=options[0] || {cols:1,rows:1,label:'1×1'};
 
 function getAutoCompareColumns(){
 
+if(usesWinterPortraitLayout())return Math.max(1,compareModels.length);
 if(usesMobileCompareLayout()){
 return 1;
 }
@@ -142,8 +143,14 @@ return Math.min(n,3);
 
 }
 
+function usesWinterPortraitLayout(){
+return typeof getCurrentProduct==='function' && typeof getSelectedUTCDate==='function' &&
+isHkorWinterVariantProduct(getCurrentProduct()) && isWinterSeasonRunDate(getSelectedUTCDate());
+}
+
 function getMobileCompareImageColumns(items){
 
+if(usesWinterPortraitLayout())return Math.max(1,compareModels.length);
 if(!usesMobileCompareLayout()){
 return null;
 }
@@ -1397,7 +1404,7 @@ let fitText=document.createElement('span');
 fitText.textContent='화면에 맞춤';
 fitLabel.appendChild(fitCheckbox);
 fitLabel.appendChild(fitText);
-return fitLabel;
+return CDSViewerFit.control(fitLabel,{onChange:checked=>{fitCheckbox.checked=checked;onChange(checked);}});
 
 }
 
@@ -1418,6 +1425,7 @@ let layoutControl=renderCompareLayoutControl();
 
 let playback=renderTimelinePlaybackControls();
 
+controls.appendChild(CDSChartCapture.button());
 controls.appendChild(fitLabel);
 controls.appendChild(layoutControl);
 controls.appendChild(playback);
@@ -1430,6 +1438,7 @@ function renderSingleTimelineControls(){
 
 let controls=document.createElement('div');
 controls.className='compare-controls single-controls';
+controls.appendChild(CDSChartCapture.button());
 
 if(typeof renderAnalysisResolutionToggle==='function'){
 let resolutionToggle=renderAnalysisResolutionToggle();
