@@ -17,6 +17,9 @@ CONTROL_PATHS = {"pages_deploy.py", ".github/workflows/pages.yml"}
 REQUIRED_PATHS = {"index.html", "radar.html", "typhoon.html", "style.css",
                   "data/manifest.json", "data/status.json"}
 MAX_SITE_BYTES = 1_000_000_000
+# Local script and stylesheet references in staged HTML get ?v=<content hash>, so a changed
+# file always busts browser caches and hand-maintained version strings cannot drift.
+ASSET_REFERENCE = re.compile(r'(?P<attr>\b(?:src|href))="(?P<path>[A-Za-z0-9_./-]+\.(?:js|css))(?:\?v=[^"#]*)?"')
 
 
 def git(root, *args, **kwargs):
@@ -91,11 +94,40 @@ def prepare(root, destination, report, public, materialize=False):
         target = destination / path
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(source, target)
+    version_assets(destination, {path for path, _, _ in public})
     (destination / ".nojekyll").touch()
     (destination / "deployment.json").write_text(json.dumps({
         "commit": report["commit"], "site_revision": report["revision"],
     }, indent=2) + "\n", encoding="utf-8")
     return total
+
+
+def version_assets(destination, public_paths):
+    """Rewrite ?v= on local .js/.css references in staged HTML to the referenced file's hash."""
+    hashes = {}
+
+    def version(path):
+        if path not in hashes:
+            hashes[path] = hashlib.sha256((destination / path).read_bytes()).hexdigest()[:12]
+        return hashes[path]
+
+    for html in sorted(path for path in public_paths if path.endswith(".html")):
+        target = destination / html
+        base = PurePosixPath(html).parent
+
+        def replace(match):
+            reference = match["path"]
+            if reference.startswith(("/", "//")) or ".." in PurePosixPath(reference).parts:
+                return match[0]
+            resolved = str(base / reference) if str(base) != "." else reference
+            if resolved not in public_paths:
+                return match[0]
+            return f'{match["attr"]}="{reference}?v={version(resolved)}"'
+
+        text = target.read_text(encoding="utf-8")
+        updated = ASSET_REFERENCE.sub(replace, text)
+        if updated != text:
+            target.write_text(updated, encoding="utf-8", newline="")
 
 
 def main():

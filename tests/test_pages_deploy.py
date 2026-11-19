@@ -88,6 +88,27 @@ class PagesDeploymentTests(unittest.TestCase):
                          hashlib.sha256((destination / image).read_bytes()).digest())
         self.assertEqual(report["commit"], json.loads((destination / "deployment.json").read_text())["commit"])
 
+    def test_staged_html_versions_local_assets_by_content_hash(self):
+        self.write("app.js", "console.log(1)")
+        self.write("style.css", "body{}")
+        self.write("index.html", '<link href="style.css?v=3.3-exp21"><script src="app.js?v=3.6.15"></script>'
+                                 '<script src="new.js"></script><script src="https://cdn.example/x.js?v=9"></script>'
+                                 '<script src="missing.js?v=1"></script>')
+        self.write("new.js", "x")
+        self.commit()
+        report, public = pages.plan(self.root)
+        destination = Path(self.temp.name) / "site"
+        pages.prepare(self.root, destination, report, public)
+        html = (destination / "index.html").read_text(encoding="utf-8")
+        digest = lambda path: hashlib.sha256((self.root / path).read_bytes()).hexdigest()[:12]
+        self.assertIn(f'href="style.css?v={digest("style.css")}"', html)
+        self.assertIn(f'src="app.js?v={digest("app.js")}"', html)
+        self.assertIn(f'src="new.js?v={digest("new.js")}"', html, "Unversioned local assets get a version")
+        self.assertIn('src="https://cdn.example/x.js?v=9"', html, "External URLs are untouched")
+        self.assertIn('src="missing.js?v=1"', html, "References to unpublished files are untouched")
+        self.assertIn("v=3.6.15", (self.root / "index.html").read_text(encoding="utf-8"), "The checkout is not modified")
+        self.assertEqual((destination / "app.js").read_bytes(), (self.root / "app.js").read_bytes())
+
     def test_missing_entrypoints_and_unsafe_destinations_fail_closed(self):
         report, public = pages.plan(self.root)
         with self.assertRaisesRegex(ValueError, "outside"):
