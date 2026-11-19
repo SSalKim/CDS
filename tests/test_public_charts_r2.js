@@ -56,7 +56,7 @@ async function main(){
   const api=load(now);
 
   // Base resolution: off by default, explicit https origins only.
-  assert.equal(api.getR2Base(),'');
+  assert.equal(api.getR2Base(),'https://cds4.uzo1o1.party/','Production reads the R2 custom domain');
   const local={hostname:'localhost'};
   assert.equal(api.createStore({location:local}).getR2Base(),'','Local development keeps the bundled manifest');
   assert.equal(api.createStore({location:local,r2Base:'http://localhost:8123'}).getR2Base(),'http://localhost:8123/');
@@ -155,6 +155,14 @@ async function main(){
   const correctApi=load(correct);
   await correctApi.createStore({fetchImpl:ukmo.fetch,r2Base:BASE}).load();
   assert.equal(correctApi.clockNow(),correct.value,'A clock within the index freshness window is trusted');
+  const quiet={value:Date.parse('2026-11-19T12:50:00Z')};
+  const quietApi=load(quiet);
+  await quietApi.createStore({fetchImpl:ukmo.fetch,r2Base:BASE}).load();
+  assert.equal(quietApi.clockNow(),quiet.value,'An index left untouched between runs must not pull a correct clock back');
+  const ahead={value:Date.parse('2026-11-19T16:00:00Z')};
+  const aheadApi=load(ahead);
+  await aheadApi.createStore({fetchImpl:ukmo.fetch,r2Base:BASE}).load();
+  assert(Math.abs(aheadApi.clockNow()-Date.parse('2026-11-19T12:00:00Z'))<1000,'A clock hours ahead is corrected');
 
   // UKMO confirmation fields survive the compact fragment encoding.
   const gated=server();

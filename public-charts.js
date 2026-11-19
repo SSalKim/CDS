@@ -9,7 +9,7 @@ const DRIVE_HOSTS=new Set(['drive.google.com','drive.usercontent.google.com','lh
 const REMOTE_MANIFEST='https://raw.githubusercontent.com/SSalKim/CDS-Public-Charts/main/data/public_charts_manifest.json';
 // R2 custom-domain origin with a trailing slash, e.g. 'https://charts.example.com/'.
 // Empty keeps the Git manifest as the only source.
-const R2_BASE='';
+const R2_BASE='https://cds4.uzo1o1.party/';
 const R2_SCHEMA=2;
 const R2_FETCH_CONCURRENCY=6;
 const R2_RUN=/^(aifs|gfs|aigfs|cmc|ecmwf|icon|ukmo)\/(\d{10})$/;
@@ -29,9 +29,10 @@ function calibrateClock(generatedAt){
 const reference=Date.parse(generatedAt);
 if(!Number.isFinite(reference)) return;
 const local=Date.now();
-// The index is rewritten at least every five minutes and cached for 15 seconds, so a correct
-// clock reads between one minute behind and fifteen minutes ahead of generated_at.
-clockOffsetMs=local<reference-60000 || local>reference+15*60000 ? reference-local : 0;
+// generated_at is always in the past, so a clock behind it is wrong. Between production runs
+// the index can be tens of minutes old, so only a clock more than two hours ahead is treated
+// as wrong; smaller offsets cannot matter for the 48-hour windows this clock decides.
+clockOffsetMs=local<reference-60000 || local>reference+2*3600000 ? reference-local : 0;
 }
 
 function driveUrl(fileId){
