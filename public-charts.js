@@ -7,14 +7,63 @@ const COMMON_PRODUCTS=new Set(['gph200','gph500','gph700','ept850','ept925','wnd
 const ROW_PRODUCTS=new Set([...COMMON_PRODUCTS,'gph300','surfce','acptot','acptot1','acrain','acrain1']);
 const DRIVE_HOSTS=new Set(['drive.google.com','drive.usercontent.google.com','lh3.googleusercontent.com']);
 const REMOTE_MANIFEST='https://raw.githubusercontent.com/SSalKim/CDS-Public-Charts/main/data/public_charts_manifest.json';
+// R2 custom-domain origin with a trailing slash, e.g. 'https://charts.example.com/'.
+// Empty keeps the Git manifest as the only source.
+const R2_BASE='';
+const R2_SCHEMA=2;
+const R2_FETCH_CONCURRENCY=6;
+const R2_RUN=/^(aifs|gfs|aigfs|cmc|ecmwf|icon|ukmo)\/(\d{10})$/;
+const R2_EXTRA_FIELDS=['kma_confirmed_at','kma_reference_hour'];
+const DRIVE_FILE_ID=/^[A-Za-z0-9_-]{1,200}$/;
 const ZERO_ACRAIN_CUTOVER='2026111612';
 const UKMO_WINTER_CUTOVER='2026111800';
+
+// Offset applied to Date.now() when the R2 index shows the device clock is clearly wrong.
+let clockOffsetMs=0;
+
+function clockNow(){
+return Date.now()+clockOffsetMs;
+}
+
+function calibrateClock(generatedAt){
+const reference=Date.parse(generatedAt);
+if(!Number.isFinite(reference)) return;
+const local=Date.now();
+// The index is rewritten at least every five minutes and cached for 15 seconds, so a correct
+// clock reads between one minute behind and fifteen minutes ahead of generated_at.
+clockOffsetMs=local<reference-60000 || local>reference+15*60000 ? reference-local : 0;
+}
+
+function driveUrl(fileId){
+return `https://drive.usercontent.google.com/download?id=${fileId}&export=view&authuser=0`;
+}
+
+function r2BaseFor(location,explicit){
+const value=explicit!==undefined ? explicit :
+(typeof global.CDS_PUBLIC_CHARTS_R2_BASE==='string' ? global.CDS_PUBLIC_CHARTS_R2_BASE :
+(isLocalHost(location) ? '' : R2_BASE));
+if(!value) return '';
+try{
+const url=new URL(value);
+const local=['localhost','127.0.0.1','[::1]'].includes(url.hostname);
+if(url.protocol!=='https:' && !(local && url.protocol==='http:') || url.search || url.hash ||
+url.username || url.password) return '';
+return url.href.endsWith('/') ? url.href : url.href+'/';
+}catch(error){
+return '';
+}
+}
+
+function isLocalHost(location){
+const host=location?.hostname || '';
+return ['localhost','127.0.0.1','[::1]','::1'].includes(host) || host.endsWith('.localhost');
+}
 
 function isReplacementProduct(modelId,product){
 return modelId==='ukmo' && product?.category==='hkor' && ['acptot','acrain'].includes(product.id);
 }
 
-function supportsReplacement(modelId,product,runUTC,nowMs=Date.now()){
+function supportsReplacement(modelId,product,runUTC,nowMs=clockNow()){
 const month=runUTC?.getUTCMonth?.()+1;
 const age=nowMs-runUTC?.getTime?.();
 return isReplacementProduct(modelId,product) &&
@@ -22,7 +71,7 @@ cycleFromDate(runUTC)>=UKMO_WINTER_CUTOVER && age>=0 && age<=48*3600000 &&
 (month>=10 || month<=4) && [0,12].includes(runUTC?.getUTCHours?.());
 }
 
-function ukmoCurrent(runUTC,nowMs=Date.now()){
+function ukmoCurrent(runUTC,nowMs=clockNow()){
 const age=nowMs-runUTC?.getTime?.();
 return cycleFromDate(runUTC)>=UKMO_WINTER_CUTOVER && age>=0 && age<=48*3600000;
 }
@@ -98,14 +147,17 @@ value,
 }
 
 function manifestUrl(location=global.location){
-const host=location?.hostname || '';
-return ['localhost','127.0.0.1','[::1]','::1'].includes(host) || host.endsWith('.localhost')
-?'data/public_charts_manifest.json':REMOTE_MANIFEST;
+return isLocalHost(location)?'data/public_charts_manifest.json':REMOTE_MANIFEST;
 }
 
-function createStore({fetchImpl=(...args)=>global.fetch(...args),location=global.location}={}){
+function createStore({fetchImpl=(...args)=>global.fetch(...args),location=global.location,r2Base}={}){
+const r2Origin=r2BaseFor(location,r2Base);
 let entries=new Map();
 let byRun=new Map();
+let leadsByRun=new Map();
+let fragments=new Map();
+let r2Key='';
+let source='';
 let signature='';
 let revision=0;
 let pending=null;
@@ -135,13 +187,23 @@ notifyChange();
 return changed;
 }
 
+// R2 fragments carry the producer's lead list; the Git manifest falls back to local rules.
+function hourAllowed(model,hour,runUTC,leads=leadsByRun){
+const runLeads=leads.get(model+'/'+cycleFromDate(runUTC));
+return runLeads ? Number.isInteger(hour) && runLeads.has(hour) : validHour(model,hour,runUTC);
+}
+
 function replaceManifest(manifest){
 const next=new Map();
 const conflicts=new Set();
 const published=manifest?.models;
+const nextLeads=new Map();
+for(const [run,leads] of Object.entries(manifest?.leads || {})){
+if(R2_RUN.test(run) && Array.isArray(leads)) nextLeads.set(run,new Set(leads.filter(Number.isInteger)));
+}
 for(const row of Array.isArray(manifest?.charts)?manifest.charts:[]){
 if(!row || !SOURCE_MODEL_IDS.has(row.model) || published?.[row.model]?.published!==true ||
-!validHour(row.model,row.hour,parseCycle(row.cycle)) || !ROW_PRODUCTS.has(row.product) ||
+!hourAllowed(row.model,row.hour,parseCycle(row.cycle),nextLeads) || !ROW_PRODUCTS.has(row.product) ||
 !['asia','hkor'].includes(row.domain) || !validUrl(row.url)) continue;
 const run=parseCycle(row.cycle);
 if(!run || !(row.model==='cmc'?[0,12]:[0,6,12,18]).includes(run.getUTCHours())) continue;
@@ -157,13 +219,15 @@ if(row.domain==='asia' && ['acptot','acptot1','acrain','acrain1'].includes(row.p
 if(row.model==='aigfs' && ['acptot1','acrain1'].includes(row.product)) continue;
 if(row.hour===0 && ['acrain','acrain1'].includes(row.product) && !supportsZeroAccumulation(run)) continue;
 const key=[row.model,row.cycle,row.hour,row.domain,row.product].join('/');
+// Only fields the viewer uses, so the Git and R2 sources produce identical snapshots.
 const entry={model:row.model,cycle:row.cycle,hour:row.hour,domain:row.domain,
-product:row.product,url:row.url,sha256:row.sha256 || '',size:row.size || 0};
+product:row.product,url:row.url};
 // A conflicting key must not silently select whichever upload was listed last.
 if(next.has(key) && JSON.stringify(next.get(key))!==JSON.stringify(entry)) conflicts.add(key);
 next.set(key,entry);
 }
 for(const key of conflicts) next.delete(key);
+leadsByRun=nextLeads;
 const nextSignature=JSON.stringify([...next].sort(([a],[b])=>a.localeCompare(b)));
 if(nextSignature===signature) return false;
 signature=nextSignature;
@@ -195,7 +259,7 @@ return [product.id];
 
 function resolveUrls(selection){
 const {modelId,product,runUTC,forecastHour=0}=selection;
-if((!usesSource(modelId,runUTC,forecastHour) && !supportsReplacement(modelId,product,runUTC)) || !validHour(modelId,forecastHour,runUTC) ||
+if((!usesSource(modelId,runUTC,forecastHour) && !supportsReplacement(modelId,product,runUTC)) || !hourAllowed(modelId,forecastHour,runUTC) ||
 modelId==='ukmo' && !ukmoCurrent(runUTC)) return [];
 const cycle=cycleFromDate(runUTC);
 if(!parseCycle(cycle) || runUTC.getUTCMinutes() || runUTC.getUTCSeconds() || runUTC.getUTCMilliseconds()) return [];
@@ -236,30 +300,105 @@ function hasPublishedCharts(modelId){
 return readyCycles(modelId).length>0;
 }
 
+function withTimeout(ms,task){
+const controller=typeof global.AbortController==='function'?new global.AbortController():null;
+const timeout=controller?global.setTimeout(()=>controller.abort(),ms):null;
+return task(controller?{signal:controller.signal}:{}).finally(()=>{
+if(timeout!==null) global.clearTimeout(timeout);
+});
+}
+
+async function fetchJson(url,options){
+const response=await fetchImpl(url,{credentials:'omit',...options});
+if(!response.ok) throw new Error('HTTP '+response.status);
+return response.json();
+}
+
+function fragmentRows(model,cycle,fragment){
+return fragment.charts.map(item=>{
+if(!Array.isArray(item) || item.length<4 || item.length>5 || !DRIVE_FILE_ID.test(String(item[3]))) return null;
+const row={model,cycle,hour:item[0],domain:item[1],product:item[2],url:driveUrl(item[3])};
+const extra=item[4];
+if(extra && typeof extra==='object'){
+for(const name of R2_EXTRA_FIELDS) if(name in extra) row[name]=extra[name];
+}
+return row;
+});
+}
+
+// Poll the small index; download only fragments whose revision changed. Throws on any
+// inconsistency so the caller can fall back to the Git manifest for this poll.
+async function loadR2(options){
+const index=await fetchJson(r2Origin+'manifest/index.json',{cache:'no-cache',...options});
+if(index?.schema!==R2_SCHEMA || index.images!=='drive' || !index.runs || typeof index.runs!=='object' ||
+Array.isArray(index.runs) || !index.models || typeof index.models!=='object') throw new Error('Unsupported R2 index');
+const runs=Object.entries(index.runs).filter(([run,item])=>R2_RUN.test(run) &&
+/^[a-f0-9]{16}$/.test(String(item?.rev)) && Number.isInteger(item?.count));
+const fetched=new Map();
+const missing=runs.filter(([run,item])=>fragments.get(run)?.rev!==item.rev);
+for(let start=0;start<missing.length;start+=R2_FETCH_CONCURRENCY){
+await Promise.all(missing.slice(start,start+R2_FETCH_CONCURRENCY).map(async([run,item])=>{
+const [,model,cycle]=run.match(R2_RUN);
+const fragment=await fetchJson(`${r2Origin}manifest/runs/${model}/${cycle}.${item.rev}.json`,options);
+if(fragment?.schema!==R2_SCHEMA || fragment.model!==model || fragment.cycle!==cycle ||
+fragment.images!=='drive' || !Array.isArray(fragment.leads) || !Array.isArray(fragment.charts) ||
+fragment.charts.length!==item.count) throw new Error('Invalid R2 fragment');
+fetched.set(run,{rev:item.rev,rows:fragmentRows(model,cycle,fragment),leads:fragment.leads});
+}));
+}
+calibrateClock(index.generated_at);
+const key=JSON.stringify([index.models,runs.map(([run,item])=>[run,item.rev])]);
+// Commit fragments only after every download succeeded.
+for(const [run,value] of fetched) fragments.set(run,value);
+const live=new Set(runs.map(([run])=>run));
+for(const run of [...fragments.keys()]) if(!live.has(run)) fragments.delete(run);
+if(key===r2Key && source==='r2') return false;
+r2Key=key;
+const charts=[];
+const leads={};
+for(const [run] of runs){
+const value=fragments.get(run);
+charts.push(...value.rows.filter(Boolean));
+leads[run]=value.leads;
+}
+return replaceManifest({models:index.models,charts,leads});
+}
+
+async function loadGit(){
+return withTimeout(12000,async options=>{
+try{
+const baseUrl=manifestUrl(location);
+const requestUrl=baseUrl===REMOTE_MANIFEST?`${baseUrl}?t=${Math.floor(Date.now()/15000)}`:baseUrl;
+const response=await fetchImpl(requestUrl,{cache:'no-store',credentials:'omit',...options});
+if(!response.ok){
+return {ok:false,changed:response.status===404?replaceManifest(null):false,source:'git'};
+}
+let manifest;
+try{ manifest=await response.json(); }
+catch(error){ return {ok:false,changed:replaceManifest(null),source:'git'}; }
+source='git';
+r2Key='';
+return {ok:true,changed:replaceManifest(manifest),source:'git'};
+}catch(error){
+return {ok:false,changed:false,source:'git'};
+}
+});
+}
+
 async function load(){
 expireReplacements();
 if(pending) return pending;
 pending=(async()=>{
-const controller=typeof global.AbortController==='function'?new global.AbortController():null;
-const timeout=controller?global.setTimeout(()=>controller.abort(),12000):null;
+if(r2Origin){
 try{
-const baseUrl=manifestUrl(location);
-const requestUrl=baseUrl===REMOTE_MANIFEST?`${baseUrl}?t=${Math.floor(Date.now()/15000)}`:baseUrl;
-const response=await fetchImpl(requestUrl,{
-cache:'no-store',credentials:'omit',...(controller?{signal:controller.signal}:{})
-});
-if(!response.ok){
-return {ok:false,changed:response.status===404?replaceManifest(null):false};
-}
-let manifest;
-try{ manifest=await response.json(); }
-catch(error){ return {ok:false,changed:replaceManifest(null)}; }
-return {ok:true,changed:replaceManifest(manifest)};
+const changed=await withTimeout(30000,options=>loadR2(options));
+source='r2';
+return {ok:true,changed,source:'r2'};
 }catch(error){
-return {ok:false,changed:false};
-}finally{
-if(timeout!==null) global.clearTimeout(timeout);
+// Any R2 problem falls back to the Git manifest for this poll; R2 is retried next poll.
 }
+}
+return loadGit();
 })();
 try{ return await pending; }
 finally{ pending=null; }
@@ -285,8 +424,8 @@ return load();
 }
 
 return {isModel,usesSource,ukmoFullCatalog,ukmoCurrent,isReplacementProduct,supportsReplacement,supportsProduct,supportsZeroAccumulation,hasPublishedCharts,resolveUrls,replacementFallbacks,readyHours,readyCycles,
-load,startPolling,stopPolling,getRevision:()=>revision};
+load,startPolling,stopPolling,getRevision:()=>revision,getSource:()=>source,getR2Base:()=>r2Origin};
 }
 
-global.CDSPublicCharts=Object.assign(createStore(),{createStore,manifestUrl,browserImageCandidates});
+global.CDSPublicCharts=Object.assign(createStore(),{createStore,manifestUrl,browserImageCandidates,clockNow});
 })(typeof window!=='undefined'?window:globalThis);
