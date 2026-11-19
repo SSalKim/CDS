@@ -5630,3 +5630,9 @@ select option.unsupported-option{
   max-width:none !important;max-height:none !important;object-fit:contain;
 }
 .app-shell #chartImages.fit-height .compare-placeholder{height:var(--fit-cell-height);width:320px;}
+
+/* Chart magnifier */
+.chart-magnifier-button.active{background:#dbeafe;border-color:#3b82f6;color:#1d4ed8;}
+.chart-magnifier-lens{position:fixed;z-index:60;border-radius:50%;border:2px solid #315882;box-shadow:0 4px 16px rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,255,255,.7);background-color:#fff;background-repeat:no-repeat;pointer-events:none;}
+.chart-magnifier-lens[hidden]{display:none;}
+.magnifier-active #chartImages img{cursor:crosshair;touch-action:none;}

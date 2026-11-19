@@ -68,8 +68,16 @@
     ["path", { d: "m6 6 12 12" }]
   ];
 
+  // node_modules/.pnpm/lucide@1.73.0/node_modules/lucide/dist/esm/icons/zoom-in.mjs
+  var ZoomIn = [
+    ["circle", { cx: "11", cy: "11", r: "8" }],
+    ["line", { x1: "21", x2: "16.65", y1: "21", y2: "16.65" }],
+    ["line", { x1: "11", x2: "11", y1: "8", y2: "14" }],
+    ["line", { x1: "8", x2: "14", y1: "11", y2: "11" }]
+  ];
+
   // web/viewer-icons.js
-  window.CDSViewerIcons = (name) => createElement({ Camera, Copy, Download, X, ChevronDown }[name], { "aria-hidden": "true", width: 18, height: 18 });
+  window.CDSViewerIcons = (name) => createElement({ Camera, Copy, Download, X, ChevronDown, ZoomIn }[name], { "aria-hidden": "true", width: 18, height: 18 });
 })();
 /*! Bundled license information:
 
@@ -80,6 +88,7 @@ lucide/dist/esm/icons/chevron-down.mjs:
 lucide/dist/esm/icons/copy.mjs:
 lucide/dist/esm/icons/download.mjs:
 lucide/dist/esm/icons/x.mjs:
+lucide/dist/esm/icons/zoom-in.mjs:
 lucide/dist/esm/lucide.mjs:
   (**
    * @license lucide v1.73.0 - ISC

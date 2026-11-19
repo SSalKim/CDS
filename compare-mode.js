@@ -1434,6 +1434,7 @@ let layoutControl=renderCompareLayoutControl();
 
 let playback=renderTimelinePlaybackControls();
 
+controls.appendChild(CDSChartMagnifier.button());
 controls.appendChild(CDSChartCapture.button());
 controls.appendChild(fitLabel);
 controls.appendChild(layoutControl);
@@ -1447,6 +1448,7 @@ function renderSingleTimelineControls(){
 
 let controls=document.createElement('div');
 controls.className='compare-controls single-controls';
+controls.appendChild(CDSChartMagnifier.button());
 controls.appendChild(CDSChartCapture.button());
 
 if(typeof renderAnalysisResolutionToggle==='function'){
