@@ -205,7 +205,12 @@ jobs:
           if [ "$RUNNER_KIND" = "self-hosted" ]; then
             mkdir -p "$HOME/.cache/cds-render"
             exec 9>"$HOME/.cache/cds-render/owner.lock"
-            flock -x 9
+            # The chart helper may hold this lock for most of an hour; never block until the
+            # 30-minute job timeout. A failed run is retried by the next 10-minute schedule.
+            if ! flock -x -w 120 9; then
+              echo "::error::Shared laptop render lock stayed busy for 120 s; failing fast."
+              exit 75
+            fi
           fi
           run_with_retry() {
             local attempt=1
