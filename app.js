@@ -59,6 +59,11 @@ let auxAvailabilityLoading=false;
 const AUX_AVAILABILITY_CONCURRENCY=6;
 
 const IMAGE_PRELOAD_CONCURRENCY=4;
+// Data saver or a 2G/3G connection: fewer parallel chart downloads so the visible frame wins.
+function getImagePreloadConcurrency(connection=globalThis.navigator?.connection){
+return connection && (connection.saveData || ['slow-2g','2g','3g'].includes(connection.effectiveType))
+? 2 : IMAGE_PRELOAD_CONCURRENCY;
+}
 const forecastAvailabilityRefresh=CDSForecastRefresh.createRefresher({
 refresh:refreshMissingForecastFrames,
 canRefresh:canRefreshForecastAvailability
@@ -1980,12 +1985,14 @@ return selectedAgeHours>=0 && selectedAgeHours<=lookbackHours;
 }
 
 
-function getForecastPreloadOrder(count){
+function getForecastPreloadOrder(count,centerIndex=Number(slider.value || 0)){
 let safeCount=Math.max(0,Number(count) || 0);
 let defaultOrder=Array.from({length:safeCount},(_,index)=>index);
 
 if(currentMainMenu!=='analysis' || !isRunTimeSliderMode()){
-return defaultOrder;
+// Frames next to the one on screen first: stepping forward or back is ready soonest.
+let center=Math.max(0,Math.min(safeCount-1,Number(centerIndex) || 0));
+return defaultOrder.sort((a,b)=>Math.abs(a-center)-Math.abs(b-center) || b-a);
 }
 
 let zeroIndex=currentForecastList.findIndex(value=>Number(value)===0);
@@ -2059,7 +2066,7 @@ cancelSelection=null
 let seq=++imagePreloadSeq;
 let count=currentForecastList.length || 1;
 let priorityIndex=forecastTimelineState.clampIndex(Number(slider.value || 0));
-let preloadOrder=getForecastPreloadOrder(count).filter(index=>index!==priorityIndex);
+let preloadOrder=getForecastPreloadOrder(count,priorityIndex).filter(index=>index!==priorityIndex);
 let availableCount=0;
 resetForecastImageCache();
 setAllForecastLoadStates(count,'loading');
@@ -2101,7 +2108,7 @@ await displayCurrentForecastImage();
 
 await CDSImagePipeline.runConcurrentRange({
 count:preloadOrder.length,
-concurrency:IMAGE_PRELOAD_CONCURRENCY,
+concurrency:getImagePreloadConcurrency(),
 isCancelled:()=>seq!==imagePreloadSeq,
 task:async orderIndex=>{
 let i=preloadOrder[orderIndex];
