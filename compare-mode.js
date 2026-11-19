@@ -834,7 +834,7 @@ return;
 let changedCurrent=false;
 await CDSImagePipeline.runConcurrentRange({
 count:jobs.length,
-concurrency:IMAGE_PRELOAD_CONCURRENCY,
+concurrency:typeof getImagePreloadConcurrency==='function'?getImagePreloadConcurrency():IMAGE_PRELOAD_CONCURRENCY,
 isCancelled:()=>seq!==compareImageAvailabilitySeq || (retryMissing && document.visibilityState==='hidden'),
 task:async index=>{
 let job=jobs[index];

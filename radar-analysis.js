@@ -1678,6 +1678,11 @@ return [...seen];
 }
 
 function refreshRadarCacheInBackground(){
+// A hidden tab does not need fresh frames; syncRadarAfterResume refreshes on return.
+if(globalThis.document?.visibilityState==='hidden'){
+return;
+}
+
 let urls=getRefreshableRadarCacheUrls();
 
 if(!urls.length){
@@ -2178,7 +2183,14 @@ updateRadarAutoRefreshButton();
 function startRadarAutoRefresh(){
 stopRadarAutoRefresh();
 radarState.autoRefreshEnabled=true;
-radarState.autoRefreshTimer=setInterval(setRadarNow,5*60*1000);
+radarState.autoRefreshMissed=false;
+radarState.autoRefreshTimer=setInterval(()=>{
+if(globalThis.document?.visibilityState==='hidden'){
+radarState.autoRefreshMissed=true;
+return;
+}
+setRadarNow();
+},5*60*1000);
 updateRadarAutoRefreshButton();
 }
 
@@ -2194,6 +2206,11 @@ startRadarAutoRefresh();
 function syncRadarAfterResume(){
 if(!radarState.root){
 return;
+}
+
+if(radarState.autoRefreshEnabled && radarState.autoRefreshMissed && globalThis.document?.visibilityState!=='hidden'){
+radarState.autoRefreshMissed=false;
+setRadarNow();
 }
 
 updateRadarTimelineActiveState();
