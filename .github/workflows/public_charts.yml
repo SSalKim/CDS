@@ -43,7 +43,10 @@ concurrency:
 
 jobs:
   route:
-    if: vars.PUBLIC_CHARTS_ENABLED == 'true'
+    # Hard-disabled: this rollback copy shares the production Drive state with
+    # SSalKim/CDS-Public-Charts, and concurrency groups do not span repositories.
+    # Restore `vars.PUBLIC_CHARTS_ENABLED == 'true'` only for a deliberate rollback.
+    if: false
     runs-on: ubuntu-24.04
     timeout-minutes: 3
     outputs:
