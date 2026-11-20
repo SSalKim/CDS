@@ -14,6 +14,8 @@ const R2_SCHEMA=2;
 const R2_FETCH_CONCURRENCY=6;
 const R2_RUN=/^(aifs|gfs|aigfs|cmc|ecmwf|icon|ukmo)\/(\d{10})$/;
 const R2_EXTRA_FIELDS=['kma_confirmed_at','kma_reference_hour'];
+// Producer object name under charts/{model}/{cycle}/; an alias row names the image it reuses.
+const R2_IMAGE=/^(aifs|gfs|aigfs|cmc|ecmwf|icon|ukmo)_(asia|hkor)_([a-z0-9]+)_s(\d{3})_(\d{10})_([a-f0-9]{16})\.webp$/;
 const DRIVE_FILE_ID=/^[A-Za-z0-9_-]{1,200}$/;
 const ZERO_ACRAIN_CUTOVER='2026111612';
 const UKMO_WINTER_CUTOVER='2026111800';
@@ -205,7 +207,7 @@ if(R2_RUN.test(run) && Array.isArray(leads)) nextLeads.set(run,new Set(leads.fil
 for(const row of Array.isArray(manifest?.charts)?manifest.charts:[]){
 if(!row || !SOURCE_MODEL_IDS.has(row.model) || published?.[row.model]?.published!==true ||
 !hourAllowed(row.model,row.hour,parseCycle(row.cycle),nextLeads) || !ROW_PRODUCTS.has(row.product) ||
-!['asia','hkor'].includes(row.domain) || !validUrl(row.url)) continue;
+!['asia','hkor'].includes(row.domain) || !(validUrl(row.url) || isR2ImageUrl(row.url))) continue;
 const run=parseCycle(row.cycle);
 if(!run || !(row.model==='cmc'?[0,12]:[0,6,12,18]).includes(run.getUTCHours())) continue;
 if(row.model==='ecmwf' && (!usesSource(row.model,run) || row.cycle<'2026111606')) continue;
@@ -222,7 +224,7 @@ if(row.hour===0 && ['acrain','acrain1'].includes(row.product) && !supportsZeroAc
 const key=[row.model,row.cycle,row.hour,row.domain,row.product].join('/');
 // Only fields the viewer uses, so the Git and R2 sources produce identical snapshots.
 const entry={model:row.model,cycle:row.cycle,hour:row.hour,domain:row.domain,
-product:row.product,url:row.url};
+product:row.product,url:row.url,...(validUrl(row.fallback)?{fallback:row.fallback}:{})};
 // A conflicting key must not silently select whichever upload was listed last.
 if(next.has(key) && JSON.stringify(next.get(key))!==JSON.stringify(entry)) conflicts.add(key);
 next.set(key,entry);
@@ -274,11 +276,17 @@ return [];
 function replacementFallbacks(value){
 let id;
 try{id=new URL(value).searchParams.get('id');}catch(error){return [];}
-if(!id) return [];
-const row=[...entries.values()].find(row=>row.model==='ukmo' && !ukmoFullCatalog(parseCycle(row.cycle),row.hour) && new URL(row.url).searchParams.get('id')===id);
+const row=[...entries.values()].find(row=>row.url===value) ||
+(id ? [...entries.values()].find(row=>{try{return new URL(row.url).searchParams.get('id')===id;}catch(error){return false;}}) : null);
 if(!row) return [];
+const result=[];
+// An R2 copy that fails to load falls back to the same image on Drive.
+if(row.fallback) result.push(...(browserImageCandidates(row.fallback).length?browserImageCandidates(row.fallback):[row.fallback]));
+if(row.model==='ukmo' && !ukmoFullCatalog(parseCycle(row.cycle),row.hour)){
 const product=row.product.replace(/1$/,'');
-return [`https://data.kma.go.kr/CHT/GDPS/${row.cycle.slice(0,6)}/${row.cycle.slice(6,8)}/ukum_erly_hkor_${product}_s${String(row.hour).padStart(3,'0')}_${row.cycle}.png`];
+result.push(`https://data.kma.go.kr/CHT/GDPS/${row.cycle.slice(0,6)}/${row.cycle.slice(6,8)}/ukum_erly_hkor_${product}_s${String(row.hour).padStart(3,'0')}_${row.cycle}.png`);
+}
+return result;
 }
 
 function readyHours(selection){
@@ -315,6 +323,18 @@ if(!response.ok) throw new Error('HTTP '+response.status);
 return response.json();
 }
 
+function r2ImageUrl(model,cycle,name){
+const match=R2_IMAGE.exec(typeof name==='string'?name:'');
+if(!r2Origin || !match || match[1]!==model || match[5]!==cycle) return '';
+return `${r2Origin}charts/${model}/${cycle}/${name}`;
+}
+
+function isR2ImageUrl(value){
+if(!r2Origin || typeof value!=='string' || !value.startsWith(r2Origin+'charts/')) return false;
+const parts=value.slice(r2Origin.length+7).split('/');
+return parts.length===3 && R2_RUN.test(parts[0]+'/'+parts[1]) && !!r2ImageUrl(parts[0],parts[1],parts[2]);
+}
+
 function fragmentRows(model,cycle,fragment){
 return fragment.charts.map(item=>{
 if(!Array.isArray(item) || item.length<4 || item.length>5 || !DRIVE_FILE_ID.test(String(item[3]))) return null;
@@ -322,6 +342,10 @@ const row={model,cycle,hour:item[0],domain:item[1],product:item[2],url:driveUrl(
 const extra=item[4];
 if(extra && typeof extra==='object'){
 for(const name of R2_EXTRA_FIELDS) if(name in extra) row[name]=extra[name];
+// Images copied to R2 load from the custom domain; Drive stays the fallback.
+const r2Url=r2ImageUrl(model,cycle,extra.r2);
+if(r2Url){row.fallback=row.url; row.url=r2Url;}
+delete row.r2;
 }
 return row;
 });

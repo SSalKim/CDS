@@ -175,7 +175,41 @@ async function main(){
   assert.deepEqual([...gatedStore.readyHours({modelId:'ukmo',product:{id:'acptot',category:'hkor'},runUTC:date('2026111900')})],[24],
     'Unconfirmed UKMO KMA-gated charts stay hidden');
 
-  console.log('Public charts R2: index polling, revision fragments, Git fallback, producer leads and clock calibration passed');
+  // Images copied to R2 load from the custom domain, with the Drive file as the fallback.
+  const sha='0123456789abcdef';
+  const own=`gfs_hkor_acptot_s024_2026111900_${sha}.webp`;
+  const images=server();
+  images.put(`manifest/runs/gfs/2026111900.${REV_A}.json`,fragment('gfs','2026111900',[
+    [24,'hkor','acptot','FileR',{r2:own}],
+    [24,'hkor','surfce','FileR',{r2:own}],
+    [24,'hkor','gph500','FileS'],
+    [24,'asia','gph500','FileT',{r2:`icon_asia_gph500_s024_2026111900_${sha}.webp`}],
+    [24,'asia','surfce','FileV',{r2:'../../secret.webp'}]]));
+  images.index({'gfs/2026111900':{rev:REV_A,count:5}});
+  const imageStore=api.createStore({fetchImpl:images.fetch,r2Base:BASE});
+  await imageStore.load();
+  const r2Url=`${BASE}charts/gfs/2026111900/${own}`;
+  assert.deepEqual([...imageStore.resolveUrls(selection('gfs','2026111900',24,'acptot','hkor'))],[r2Url]);
+  assert.deepEqual([...imageStore.resolveUrls(selection('gfs','2026111900',24,'surfce','hkor'))],[r2Url],
+    'An alias row loads the R2 object it reuses');
+  assert.deepEqual([...imageStore.resolveUrls(selection('gfs','2026111900',24,'gph500','hkor'))],[drive('FileS')],
+    'Rows without an R2 copy keep their Drive URL');
+  assert.deepEqual([...imageStore.resolveUrls(selection('gfs','2026111900',24,'gph500','asia'))],[drive('FileT')],
+    'An R2 name from another model is ignored');
+  assert.deepEqual([...imageStore.resolveUrls(selection('gfs','2026111900',24,'surfce','asia'))],[drive('FileV')],
+    'A malformed R2 name never becomes a URL');
+  assert(imageStore.replacementFallbacks(r2Url).includes(drive('FileR')),'A failed R2 load falls back to Drive');
+  assert.deepEqual([...imageStore.replacementFallbacks(drive('FileS'))],[],'Drive-only rows have no extra fallback');
+  const noBase=api.createStore({fetchImpl:images.fetch,r2Base:BASE});
+  images.git={models:{gfs:{published:true}},charts:[{model:'gfs',cycle:'2026111900',hour:24,domain:'hkor',
+    product:'acptot',url:drive('FileR'),r2:own}]};
+  images.put('manifest/index.json',503);
+  await noBase.load();
+  assert.equal(noBase.getSource(),'git');
+  assert.deepEqual([...noBase.resolveUrls(selection('gfs','2026111900',24,'acptot','hkor'))],[drive('FileR')],
+    'The Git fallback, used when R2 is unreachable, loads images from Drive');
+
+  console.log('Public charts R2: index polling, revision fragments, Git fallback, producer leads, R2 images and clock calibration passed');
 }
 
 main().catch(error=>{console.error(error);process.exitCode=1;});
