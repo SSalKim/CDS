@@ -104,14 +104,15 @@ async function main(){
   assert.deepEqual([...store.resolveUrls(selection('gfs','2026111900',24))],[]);
   assert.deepEqual([...store.readyCycles('gfs')],['2026111906']);
 
-  // Any R2 inconsistency falls back to Git for that poll, and R2 is retried next poll.
-  r2.git={models:{gfs:{published:true}},charts:[{model:'gfs',cycle:'2026111906',hour:24,domain:'hkor',product:'gph500',url:drive('FileB')}]};
+  // Any R2 inconsistency keeps the last snapshot for that poll (Git is no longer published), and R2 is
+  // retried next poll.
   r2.put(`manifest/runs/gfs/2026111912.${REV_A}.json`,fragment('gfs','2026111912',[[24,'hkor','gph500','FileD']]));
   r2.index({'gfs/2026111906':{rev:REV_C,count:2},'gfs/2026111912':{rev:REV_A,count:5}});
+  const before=[...store.resolveUrls(selection('gfs','2026111906',24,'gph500','asia'))];
   result=await store.load();
-  assert.equal(result.source,'git','A fragment whose count disagrees with the index is rejected');
-  assert.equal(store.getSource(),'git');
-  assert.deepEqual([...store.resolveUrls(selection('gfs','2026111906',24))],[drive('FileB')]);
+  assert.deepEqual({...result},{ok:false,changed:false,source:'r2'},'A fragment whose count disagrees with the index is rejected');
+  assert.deepEqual([...store.resolveUrls(selection('gfs','2026111906',24,'gph500','asia'))],before,'The last snapshot is kept');
+  assert(!r2.requests.some(request=>request.url.includes('raw.githubusercontent')),'Git is never read while R2 is configured');
   r2.index({'gfs/2026111906':{rev:REV_C,count:2},'gfs/2026111912':{rev:REV_A,count:1}});
   result=await store.load();
   assert.equal(result.source,'r2');
@@ -119,26 +120,18 @@ async function main(){
   for(const failure of [503,new Error('offline'),{schema:1,runs:{}}]){
     r2.objects.set('manifest/index.json',failure);
     result=await store.load();
-    assert.equal(result.source,'git',`Index failure ${failure} falls back to Git`);
-    assert.equal(result.ok,true);
+    assert.deepEqual({...result},{ok:false,changed:false,source:'r2'},`Index failure ${failure} keeps the snapshot`);
+    assert.deepEqual([...store.resolveUrls(selection('gfs','2026111912',24))],[drive('FileD')]);
   }
-  r2.gitStatus=503;
-  result=await store.load();
-  assert.equal(result.ok,false,'When both sources fail the last snapshot is kept');
-  assert.deepEqual([...store.resolveUrls(selection('gfs','2026111906',24))],[drive('FileB')]);
+  assert(!r2.requests.some(request=>request.url.includes('raw.githubusercontent')));
 
-  // Switching sources with identical content must not notify listeners.
-  const same=server();
-  same.git={models:{gfs:{published:true}},charts:[{model:'gfs',cycle:'2026111906',hour:24,domain:'hkor',product:'gph500',
-    url:drive('FileB'),size:9,sha256:'f'.repeat(64)}]};
-  same.put(`manifest/runs/gfs/2026111906.${REV_B}.json`,fragment('gfs','2026111906',[[24,'hkor','gph500','FileB']]));
-  same.index({'gfs/2026111906':{rev:REV_B,count:1}});
-  const switching=api.createStore({fetchImpl:same.fetch,r2Base:BASE});
-  assert.equal((await switching.load()).changed,true);
-  same.objects.set('manifest/index.json',503);
-  const fallback=await switching.load();
-  assert.equal(fallback.source,'git');
-  assert.equal(fallback.changed,false,'Git and R2 snapshots of the same charts are identical');
+  // Without an R2 origin (local development) the bundled Git manifest is still the source.
+  const plain=server();
+  plain.git={models:{gfs:{published:true}},charts:[{model:'gfs',cycle:'2026111906',hour:24,domain:'hkor',product:'gph500',url:drive('FileB')}]};
+  const gitOnlyStore=api.createStore({fetchImpl:plain.fetch,r2Base:''});
+  result=await gitOnlyStore.load();
+  assert.equal(result.source,'git');
+  assert.deepEqual([...gitOnlyStore.resolveUrls(selection('gfs','2026111906',24))],[drive('FileB')]);
 
   // generated_at corrects a device clock that is days off; a correct clock is left alone.
   const ukmo=server();
@@ -200,14 +193,6 @@ async function main(){
     'A malformed R2 name never becomes a URL');
   assert(imageStore.replacementFallbacks(r2Url).includes(drive('FileR')),'A failed R2 load falls back to Drive');
   assert.deepEqual([...imageStore.replacementFallbacks(drive('FileS'))],[],'Drive-only rows have no extra fallback');
-  const noBase=api.createStore({fetchImpl:images.fetch,r2Base:BASE});
-  images.git={models:{gfs:{published:true}},charts:[{model:'gfs',cycle:'2026111900',hour:24,domain:'hkor',
-    product:'acptot',url:drive('FileR'),r2:own}]};
-  images.put('manifest/index.json',503);
-  await noBase.load();
-  assert.equal(noBase.getSource(),'git');
-  assert.deepEqual([...noBase.resolveUrls(selection('gfs','2026111900',24,'acptot','hkor'))],[drive('FileR')],
-    'The Git fallback, used when R2 is unreachable, loads images from Drive');
 
   // Images stored in R2 alone ("r2_" ids) load from R2 and never fall back to a Drive URL.
   const onlyName=`gfs_hkor_gph500_s024_2026111900_${sha}.webp`;
@@ -223,12 +208,10 @@ async function main(){
   assert.deepEqual([...onlyStore.replacementFallbacks(onlyUrl)],[],'An R2-only image has no Drive fallback');
   assert.deepEqual([...onlyStore.resolveUrls(selection('gfs','2026111900',24,'gph500','asia'))],[],
     'An R2-only id without its object name is dropped');
-  const gitOnly=api.createStore({fetchImpl:only.fetch,r2Base:BASE});
-  only.git={models:{gfs:{published:true}},charts:[{model:'gfs',cycle:'2026111900',hour:24,domain:'hkor',product:'gph500',url:onlyUrl}]};
   only.put('manifest/index.json',503);
-  await gitOnly.load();
-  assert.deepEqual([...gitOnly.resolveUrls(selection('gfs','2026111900',24,'gph500','hkor'))],[onlyUrl],
-    'The Git fallback keeps R2-only rows, whose URL is the R2 address');
+  assert.equal((await onlyStore.load()).ok,false);
+  assert.deepEqual([...onlyStore.resolveUrls(selection('gfs','2026111900',24,'gph500','hkor'))],[onlyUrl],
+    'An unreachable index keeps the R2-only images already shown');
 
   console.log('Public charts R2: index polling, revision fragments, Git fallback, producer leads, R2 images and clock calibration passed');
 }

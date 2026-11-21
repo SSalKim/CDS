@@ -422,9 +422,12 @@ const changed=await withTimeout(30000,options=>loadR2(options));
 source='r2';
 return {ok:true,changed,source:'r2'};
 }catch(error){
-// Any R2 problem falls back to the Git manifest for this poll; R2 is retried next poll.
+// Images live in R2 alone and the Git manifest is no longer published, so an R2 problem keeps
+// the last snapshot; R2 is retried at the next poll.
+return {ok:false,changed:false,source:'r2'};
 }
 }
+// Without an R2 origin (local development) the bundled Git manifest is the source.
 return loadGit();
 })();
 try{ return await pending; }
