@@ -338,16 +338,18 @@ return parts.length===3 && R2_RUN.test(parts[0]+'/'+parts[1]) && !!r2ImageUrl(pa
 function fragmentRows(model,cycle,fragment){
 return fragment.charts.map(item=>{
 if(!Array.isArray(item) || item.length<4 || item.length>5 || !DRIVE_FILE_ID.test(String(item[3]))) return null;
-const row={model,cycle,hour:item[0],domain:item[1],product:item[2],url:driveUrl(item[3])};
+// "r2_..." identifies an image stored in R2 alone: it has no Drive file to fall back to.
+const r2Only=String(item[3]).startsWith('r2_');
+const row={model,cycle,hour:item[0],domain:item[1],product:item[2],url:r2Only?'':driveUrl(item[3])};
 const extra=item[4];
 if(extra && typeof extra==='object'){
 for(const name of R2_EXTRA_FIELDS) if(name in extra) row[name]=extra[name];
-// Images copied to R2 load from the custom domain; Drive stays the fallback.
+// Images copied to R2 load from the custom domain; Drive stays the fallback when it has a copy.
 const r2Url=r2ImageUrl(model,cycle,extra.r2);
-if(r2Url){row.fallback=row.url; row.url=r2Url;}
+if(r2Url){if(!r2Only) row.fallback=row.url; row.url=r2Url;}
 delete row.r2;
 }
-return row;
+return r2Only && !row.url ? null : row;
 });
 }
 
