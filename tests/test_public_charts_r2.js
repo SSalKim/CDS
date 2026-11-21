@@ -209,6 +209,27 @@ async function main(){
   assert.deepEqual([...noBase.resolveUrls(selection('gfs','2026111900',24,'acptot','hkor'))],[drive('FileR')],
     'The Git fallback, used when R2 is unreachable, loads images from Drive');
 
+  // Images stored in R2 alone ("r2_" ids) load from R2 and never fall back to a Drive URL.
+  const onlyName=`gfs_hkor_gph500_s024_2026111900_${sha}.webp`;
+  const only=server();
+  only.put(`manifest/runs/gfs/2026111900.${REV_A}.json`,fragment('gfs','2026111900',[
+    [24,'hkor','gph500',`r2_${onlyName.slice(0,-5)}`,{r2:onlyName}],
+    [24,'asia','gph500','r2_missing_name']]));
+  only.index({'gfs/2026111900':{rev:REV_A,count:2}});
+  const onlyStore=api.createStore({fetchImpl:only.fetch,r2Base:BASE});
+  await onlyStore.load();
+  const onlyUrl=`${BASE}charts/gfs/2026111900/${onlyName}`;
+  assert.deepEqual([...onlyStore.resolveUrls(selection('gfs','2026111900',24,'gph500','hkor'))],[onlyUrl]);
+  assert.deepEqual([...onlyStore.replacementFallbacks(onlyUrl)],[],'An R2-only image has no Drive fallback');
+  assert.deepEqual([...onlyStore.resolveUrls(selection('gfs','2026111900',24,'gph500','asia'))],[],
+    'An R2-only id without its object name is dropped');
+  const gitOnly=api.createStore({fetchImpl:only.fetch,r2Base:BASE});
+  only.git={models:{gfs:{published:true}},charts:[{model:'gfs',cycle:'2026111900',hour:24,domain:'hkor',product:'gph500',url:onlyUrl}]};
+  only.put('manifest/index.json',503);
+  await gitOnly.load();
+  assert.deepEqual([...gitOnly.resolveUrls(selection('gfs','2026111900',24,'gph500','hkor'))],[onlyUrl],
+    'The Git fallback keeps R2-only rows, whose URL is the R2 address');
+
   console.log('Public charts R2: index polling, revision fragments, Git fallback, producer leads, R2 images and clock calibration passed');
 }
 
