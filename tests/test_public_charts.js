@@ -132,13 +132,14 @@ async function main(){
   assert.equal(api.manifestUrl({hostname:'ssalkim.github.io'}),
     'https://raw.githubusercontent.com/SSalKim/CDS-Public-Charts/main/data/public_charts_manifest.json');
   assert(!visible().some(api.isModel));
-  let remoteRequest='';
+  const remoteRequests=[];
   const remoteStore=api.createStore({location:{hostname:'ssalkim.github.io'},fetchImpl:async url=>{
-    remoteRequest=url;
+    remoteRequests.push(url);
     return {ok:true,json:async()=>manifest([])};
   }});
   await remoteStore.load();
-  assert.match(remoteRequest,/public_charts_manifest\.json\?t=\d+$/);
+  assert.deepEqual(remoteRequests,['https://cds4.uzo1o1.party/manifest/index.json'],
+    'The published site reads only the R2 index; the Git manifest is no longer a fallback');
   payload=manifest([]);
   await api.load();
   assert(!visible().some(api.isModel),'A published flag alone must not reveal empty models');
