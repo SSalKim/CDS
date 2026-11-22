@@ -240,7 +240,16 @@ Math.abs(Number(cycle)-numericValue)<1e-6
 }
 
 
+// UKMO and ECMWF 06/18Z exist only as public charts, which leave after 48 h; KMA has no such cycles.
 function getCyclesForSelection(modelId,product,date){
+let cycles=getCyclesForSelectionInWindow(modelId,product,date);
+if(!['ukmo','ecmwf'].includes(modelId) || typeof CDSPublicCharts==='undefined' || !date?.getTime) return cycles;
+let day=Date.UTC(date.getUTCFullYear(),date.getUTCMonth(),date.getUTCDate());
+return cycles.filter(cycle=>![6,18].includes(Number(cycle)) ||
+!CDSPublicCharts.publicWindowExpired(modelId,new Date(day+Number(cycle)*3600000)));
+}
+
+function getCyclesForSelectionInWindow(modelId,product,date){
 if(modelId==='ukmo' && (typeof CDSPublicCharts==='undefined' || !CDSPublicCharts.supportsProduct(modelId,product))){
 return [0,12];
 }

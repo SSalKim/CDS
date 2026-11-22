@@ -53,5 +53,25 @@ const row=(model,run,hour,product='surfce',domain='asia')=>({model,cycle:run,hou
   assert.deepEqual(resolve('gfs','2026112212',360),[row('gfs','2026112212',360).url]);
   assert.deepEqual(resolve('gfs','2026112206',252),[],'Pre-cutover GFS leads stop at 240 h');
   assert.deepEqual(Array.from(api.readyHours({modelId:'ecmwf',product,runUTC:cycle('2026112212')})),[252,360]);
-  console.log('360 h extension: cycle cutover, ECMWF KMA/public split, KMA-only limits and lead validation passed');
+
+  // 48 h after the cycle the UKMO/ECMWF public charts leave and the slider returns to KMA's last lead.
+  const surface={category:'asia',id:'surfce'};
+  assert.equal(context.getKmaOnlyLeadLimit('ecmwf',surface,cycle('2026112212')),Infinity);
+  assert.equal(context.getKmaOnlyLeadLimit('ukmo',surface,cycle('2026112212')),Infinity);
+  assert.deepEqual(Array.from(context.getCyclesForSelection('ecmwf',surface,day('2026-11-22'))),[0,6,12,18]);
+  now=Date.UTC(2026,10,24,12,0,1);
+  await api.load();
+  assert.deepEqual(resolve('ecmwf','2026112212',252),[],'Expired ECMWF extension frames are gone');
+  assert.deepEqual(resolve('gfs','2026112212',360),[row('gfs','2026112212',360).url],'GFS has no 48 h window');
+  assert.equal(context.getKmaOnlyLeadLimit('ecmwf',surface,cycle('2026112212')),240);
+  assert.equal(context.getKmaOnlyLeadLimit('ukmo',surface,cycle('2026112212')),144);
+  assert.equal(context.getKmaOnlyLeadLimit('ecmwf',surface,cycle('2026112218')),Infinity,'A cycle inside the window keeps 360 h');
+  assert.deepEqual(Array.from(context.getCyclesForSelection('ecmwf',surface,day('2026-11-22'))),[0,12,18],
+    'An expired 06Z leaves the cycle list; 00/12Z stay for KMA images');
+  assert.deepEqual(Array.from(context.getCyclesForSelection('ukmo',surface,day('2026-11-22'))),[0,12,18]);
+  assert.deepEqual(Array.from(context.getCyclesForSelection('ecmwf',surface,day('2026-11-23'))),[0,6,12,18]);
+  payload.charts=[row('ecmwf','2026112212',252)];
+  await api.load();
+  assert.deepEqual(resolve('ecmwf','2026112212',252),[],'A stale manifest row cannot bring an expired frame back');
+  console.log('360 h extension: cycle cutover, ECMWF KMA/public split, KMA-only limits, lead validation and the 48 h window passed');
 })().catch(error=>{console.error(error);process.exitCode=1;});

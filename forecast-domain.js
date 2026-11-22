@@ -309,7 +309,7 @@ utcHour
 ) || [0];
 
 let maxLead=Math.max(...modelHours);
-maxLead=Math.min(maxLead,getKmaOnlyLeadLimit(currentModel,p));
+maxLead=Math.min(maxLead,getKmaOnlyLeadLimit(currentModel,p,getSelectedUTCDate()));
 return expandProductSteps(productScheme,maxLead);
 
 }
@@ -319,7 +319,7 @@ currentModel,
 parseDateOnly(runDate.value),
 utcHour
 ) || [0];
-let kmaLimit=getKmaOnlyLeadLimit(currentModel,p);
+let kmaLimit=getKmaOnlyLeadLimit(currentModel,p,getSelectedUTCDate());
 return hours.filter(hour=>hour<=kmaLimit);
 
 }

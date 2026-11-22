@@ -76,9 +76,24 @@ cycleFromDate(runUTC)>=UKMO_WINTER_CUTOVER && age>=0 && age<=48*3600000 &&
 (month>=10 || month<=4) && [0,12].includes(runUTC?.getUTCHours?.());
 }
 
-function ukmoCurrent(runUTC,nowMs=clockNow()){
+// UKMO and ECMWF public charts (06/18Z, UKMO +156/168 h, ECMWF 00/12Z +252-360 h) are kept for 48 h after
+// the cycle. After that only KMA's own images remain: UKMO to +144 h and ECMWF 00/12Z to +240 h.
+const PUBLIC_WINDOW_MODELS=new Set(['ukmo','ecmwf']);
+const PUBLIC_WINDOW_MS=48*3600000;
+
+function publicWindowCurrent(modelId,runUTC,nowMs=clockNow()){
+if(!PUBLIC_WINDOW_MODELS.has(modelId)) return true;
 const age=nowMs-runUTC?.getTime?.();
-return cycleFromDate(runUTC)>=UKMO_WINTER_CUTOVER && age>=0 && age<=48*3600000;
+return Number.isFinite(age) && age>=0 && age<=PUBLIC_WINDOW_MS &&
+(modelId!=='ukmo' || cycleFromDate(runUTC)>=UKMO_WINTER_CUTOVER);
+}
+
+function publicWindowExpired(modelId,runUTC,nowMs=clockNow()){
+return PUBLIC_WINDOW_MODELS.has(modelId) && nowMs-runUTC?.getTime?.()>PUBLIC_WINDOW_MS;
+}
+
+function ukmoCurrent(runUTC,nowMs=clockNow()){
+return publicWindowCurrent('ukmo',runUTC,nowMs);
 }
 
 function ukmoFullCatalog(runUTC,forecastHour=0){
@@ -189,7 +204,7 @@ try{Promise.resolve(listener()).catch(()=>{});}catch(error){}
 function expireReplacements(){
 let changed=false;
 for(const [key,row] of entries){
-if(row.model!=='ukmo' || ukmoCurrent(parseCycle(row.cycle))) continue;
+if(publicWindowCurrent(row.model,parseCycle(row.cycle))) continue;
 entries.delete(key);
 byRun.delete(row.model+'/'+row.cycle);
 changed=true;
@@ -221,7 +236,7 @@ if(!row || !SOURCE_MODEL_IDS.has(row.model) || published?.[row.model]?.published
 !['asia','hkor'].includes(row.domain) || !(validUrl(row.url) || isR2ImageUrl(row.url))) continue;
 const run=parseCycle(row.cycle);
 if(!run || !(row.model==='cmc'?[0,12]:[0,6,12,18]).includes(run.getUTCHours())) continue;
-if(row.model==='ecmwf' && (!usesSource(row.model,run,row.hour) || row.cycle<'2026111606')) continue;
+if(row.model==='ecmwf' && (!usesSource(row.model,run,row.hour) || row.cycle<'2026111606' || !publicWindowCurrent('ecmwf',run))) continue;
 if(row.model==='icon' && row.cycle<'2026111612') continue;
 if(row.model==='ukmo'){
 if(!ukmoCurrent(run) || !supportsProduct('ukmo',{category:row.domain,id:row.product==='gph300'?'gph200':row.product.replace(/1$/,'')})) continue;
@@ -274,7 +289,7 @@ return [product.id];
 function resolveUrls(selection){
 const {modelId,product,runUTC,forecastHour=0}=selection;
 if((!usesSource(modelId,runUTC,forecastHour) && !supportsReplacement(modelId,product,runUTC)) || !hourAllowed(modelId,forecastHour,runUTC) ||
-modelId==='ukmo' && !ukmoCurrent(runUTC)) return [];
+!publicWindowCurrent(modelId,runUTC)) return [];
 const cycle=cycleFromDate(runUTC);
 if(!parseCycle(cycle) || runUTC.getUTCMinutes() || runUTC.getUTCSeconds() || runUTC.getUTCMilliseconds()) return [];
 for(const productId of productIds(selection)){
@@ -464,7 +479,7 @@ return load();
 return load();
 }
 
-return {isModel,usesSource,ukmoFullCatalog,ukmoCurrent,isReplacementProduct,supportsReplacement,supportsProduct,supportsZeroAccumulation,hasPublishedCharts,resolveUrls,replacementFallbacks,readyHours,readyCycles,
+return {isModel,usesSource,ukmoFullCatalog,ukmoCurrent,publicWindowCurrent,publicWindowExpired,isReplacementProduct,supportsReplacement,supportsProduct,supportsZeroAccumulation,hasPublishedCharts,resolveUrls,replacementFallbacks,readyHours,readyCycles,
 load,startPolling,stopPolling,getRevision:()=>revision,getSource:()=>source,getR2Base:()=>r2Origin};
 }
 
