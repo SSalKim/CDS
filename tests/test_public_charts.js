@@ -471,8 +471,10 @@ async function main(){
     ['https://data.kma.go.kr/CHT/ECMW/202611/15/ecmw_lc40_asia_gph500_s024_2026111500.gif']);
   assert.deepEqual(snapshot("getForecastHours('kim_gdps',new Date('2026-11-15T00:00:00Z'),6)"),
     Array.from({length:29},(_,i)=>i*3));
-  assert.equal(evaluate("getForecastHours('aifs',new Date(),0).length"),29);
-  assert.equal(evaluate("getForecastHours('gfs',new Date(),0).length"),43);
+  assert.equal(evaluate("getForecastHours('aifs',new Date('2026-11-22T00:00:00Z'),6).length"),29);
+  assert.equal(evaluate("getForecastHours('gfs',new Date('2026-11-22T00:00:00Z'),6).length"),43);
+  assert.equal(evaluate("getForecastHours('aifs',new Date('2026-11-22T00:00:00Z'),12).length"),39);
+  assert.equal(evaluate("getForecastHours('gfs',new Date('2026-11-22T00:00:00Z'),12).length"),53);
   assert.equal(evaluate("getAvailableCycles('cmc',new Date()).join(',')"),'0,12');
 
   const beforeHybrid={model:context.currentModel,product:context.currentProduct,

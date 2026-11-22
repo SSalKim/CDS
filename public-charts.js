@@ -19,6 +19,8 @@ const R2_IMAGE=/^(aifs|gfs|aigfs|cmc|ecmwf|icon|ukmo)_(asia|hkor)_([a-z0-9]+)_s(
 const DRIVE_FILE_ID=/^[A-Za-z0-9_-]{1,200}$/;
 const ZERO_ACRAIN_CUTOVER='2026111612';
 const UKMO_WINTER_CUTOVER='2026111800';
+// From this cycle GFS/AIFS/AIGFS run to 360 h and ECMWF 00/12Z continues KMA's images (to 240 h) to 360 h.
+const EXTENSION_CUTOVER='2026112212';
 
 // Offset applied to Date.now() when the R2 index shows the device clock is clearly wrong.
 let clockOffsetMs=0;
@@ -88,9 +90,14 @@ function isModel(modelId){
 return MODEL_IDS.has(modelId);
 }
 
+function ecmwfExtension(runUTC,forecastHour){
+return Number.isFinite(runUTC?.getTime?.()) && [0,12].includes(runUTC.getUTCHours()) &&
+cycleFromDate(runUTC)>=EXTENSION_CUTOVER && forecastHour>240;
+}
+
 function usesSource(modelId,runUTC,forecastHour=0){
 return isModel(modelId) || (modelId==='ecmwf' &&
-Number.isFinite(runUTC?.getTime?.()) && [6,18].includes(runUTC.getUTCHours())) ||
+Number.isFinite(runUTC?.getTime?.()) && ([6,18].includes(runUTC.getUTCHours()) || ecmwfExtension(runUTC,forecastHour))) ||
 (modelId==='ukmo' && ukmoFullCatalog(runUTC,forecastHour));
 }
 
@@ -118,7 +125,11 @@ return cycleFromDate(runUTC)>=ZERO_ACRAIN_CUTOVER;
 }
 
 function validHour(model,hour,runUTC){
-const maximum=model==='ukmo'?([6,18].includes(runUTC?.getUTCHours?.())?69:168):model==='ecmwf'?144:model==='icon'?([6,18].includes(runUTC?.getUTCHours?.())?120:180):240;
+const extended=cycleFromDate(runUTC)>=EXTENSION_CUTOVER;
+const maximum=model==='ukmo'?([6,18].includes(runUTC?.getUTCHours?.())?69:168):
+model==='ecmwf'?([0,12].includes(runUTC?.getUTCHours?.())&&extended?360:144):
+model==='icon'?([6,18].includes(runUTC?.getUTCHours?.())?120:180):
+['gfs','aifs','aigfs'].includes(model)&&extended?360:240;
 if(!Number.isInteger(hour) || hour<0 || hour>maximum) return false;
 if(hour<=84) return hour%(['aifs','aigfs'].includes(model)?6:3)===0;
 return hour===90 || hour===96 || (hour>=108 && hour%12===0);
@@ -210,7 +221,7 @@ if(!row || !SOURCE_MODEL_IDS.has(row.model) || published?.[row.model]?.published
 !['asia','hkor'].includes(row.domain) || !(validUrl(row.url) || isR2ImageUrl(row.url))) continue;
 const run=parseCycle(row.cycle);
 if(!run || !(row.model==='cmc'?[0,12]:[0,6,12,18]).includes(run.getUTCHours())) continue;
-if(row.model==='ecmwf' && (!usesSource(row.model,run) || row.cycle<'2026111606')) continue;
+if(row.model==='ecmwf' && (!usesSource(row.model,run,row.hour) || row.cycle<'2026111606')) continue;
 if(row.model==='icon' && row.cycle<'2026111612') continue;
 if(row.model==='ukmo'){
 if(!ukmoCurrent(run) || !supportsProduct('ukmo',{category:row.domain,id:row.product==='gph300'?'gph200':row.product.replace(/1$/,'')})) continue;
