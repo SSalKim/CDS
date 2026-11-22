@@ -2418,9 +2418,8 @@ modelId,
 runDateOnly,
 cycleHour
 ) || [0];
-if(modelId==='ukmo' && (typeof CDSPublicCharts==='undefined' || !CDSPublicCharts.supportsProduct(modelId,product))){
-modelHours=modelHours.filter(hour=>hour<=144);
-}
+let kmaLimit=getKmaOnlyLeadLimit(modelId,product);
+modelHours=modelHours.filter(hour=>hour<=kmaLimit);
 
 let productScheme=
 product?.forecastStepByModel?.[modelId];

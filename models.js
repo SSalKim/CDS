@@ -17,9 +17,9 @@ name:"ECMWF AIFS-Single (N320)",
 timelineName:"AIFS",
 source:"public_charts",
 cycles:[0,6,12,18],
-forecastRules:[{cycles:[0,6,12,18],max:240}],
+forecastRules:[{cycles:[0,6,12,18],from:"2026-11-22T12:00:00Z",max:360},{cycles:[0,6,12,18],max:240}],
 stepSchemeByCycleGroup:{"0,6,12,18":[
-{start:0,end:96,step:6},{start:108,end:240,step:12}
+{start:0,end:96,step:6},{start:108,end:360,step:12}
 ]}
 },
 
@@ -28,9 +28,9 @@ name:"NCEP GFS (C768 L127)",
 timelineName:"GFS",
 source:"public_charts",
 cycles:[0,6,12,18],
-forecastRules:[{cycles:[0,6,12,18],max:240}],
+forecastRules:[{cycles:[0,6,12,18],from:"2026-11-22T12:00:00Z",max:360},{cycles:[0,6,12,18],max:240}],
 stepSchemeByCycleGroup:{"0,6,12,18":[
-{start:0,end:84,step:3},{start:90,end:96,step:6},{start:108,end:240,step:12}
+{start:0,end:84,step:3},{start:90,end:96,step:6},{start:108,end:360,step:12}
 ]}
 },
 
@@ -39,9 +39,9 @@ name:"NCEP AIGFS (0.25\u00b0)",
 timelineName:"AIGFS",
 source:"public_charts",
 cycles:[0,6,12,18],
-forecastRules:[{cycles:[0,6,12,18],max:240}],
+forecastRules:[{cycles:[0,6,12,18],from:"2026-11-22T12:00:00Z",max:360},{cycles:[0,6,12,18],max:240}],
 stepSchemeByCycleGroup:{"0,6,12,18":[
-{start:0,end:96,step:6},{start:108,end:240,step:12}
+{start:0,end:96,step:6},{start:108,end:360,step:12}
 ]}
 },
 
@@ -134,6 +134,8 @@ cycleAvailability:[
 {from:"2026-11-16",cycles:[0,6,12,18]}
 ],
 forecastRules:[
+// From 11-22 12Z the public charts extend KMA's 00/12Z images (to 240 h) with 252-360 h.
+{cycles:[0,12],from:"2026-11-22T12:00:00Z",max:360},
 {cycles:[0,12],max:240},
 {from:"2026-11-16",cycles:[6,18],max:144}
 ],
@@ -141,7 +143,7 @@ stepSchemeByCycleGroup:{
 "0,12":[
 {start:0,end:84,step:3},
 {start:90,end:96,step:6},
-{start:108,end:240,step:12}
+{start:108,end:360,step:12}
 ],
 "6,18":[
 {start:0,end:84,step:3},
@@ -532,7 +534,9 @@ return [0];
 }
 for(let rule of m.forecastRules){
 if(!rule.cycles.includes(cycleHour)) continue;
-if(rule.from && runDate<new Date(rule.from)) continue;
+// Callers pass the run date at 00 UTC, so a date-time "from" is compared with the cycle itself.
+let runTime=rule.from?.includes('T') ? new Date(runDate.getTime()+cycleHour*3600000) : runDate;
+if(rule.from && runTime<new Date(rule.from)) continue;
 if(rule.until && runDate>new Date(rule.until)) continue;
 return expandSteps(
 getCycleScheme(modelId,cycleHour,rule),
@@ -540,6 +544,13 @@ rule.max
 );
 }
 return [0];
+}
+
+// KMA images stop at UKMO +144 h and ECMWF +240 h; later leads exist only for public-chart products.
+function getKmaOnlyLeadLimit(modelId,product){
+if(!['ukmo','ecmwf'].includes(modelId)) return Infinity;
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.supportsProduct(modelId,product)) return Infinity;
+return modelId==='ukmo' ? 144 : 240;
 }
 
 function getAvailableCycles(modelId,date){

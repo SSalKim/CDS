@@ -309,7 +309,7 @@ utcHour
 ) || [0];
 
 let maxLead=Math.max(...modelHours);
-if(currentModel==='ukmo' && (typeof CDSPublicCharts==='undefined' || !CDSPublicCharts.supportsProduct(currentModel,p))) maxLead=Math.min(maxLead,144);
+maxLead=Math.min(maxLead,getKmaOnlyLeadLimit(currentModel,p));
 return expandProductSteps(productScheme,maxLead);
 
 }
@@ -319,8 +319,8 @@ currentModel,
 parseDateOnly(runDate.value),
 utcHour
 ) || [0];
-return currentModel==='ukmo' && (typeof CDSPublicCharts==='undefined' || !CDSPublicCharts.supportsProduct(currentModel,p))
-?hours.filter(hour=>hour<=144):hours;
+let kmaLimit=getKmaOnlyLeadLimit(currentModel,p);
+return hours.filter(hour=>hour<=kmaLimit);
 
 }
 
