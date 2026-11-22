@@ -546,10 +546,12 @@ rule.max
 return [0];
 }
 
-// KMA images stop at UKMO +144 h and ECMWF +240 h; later leads exist only for public-chart products.
-function getKmaOnlyLeadLimit(modelId,product){
+// KMA images stop at UKMO +144 h and ECMWF +240 h; later leads exist only for public-chart products and only
+// while the cycle is within the 48 h public window.
+function getKmaOnlyLeadLimit(modelId,product,runUTC){
 if(!['ukmo','ecmwf'].includes(modelId)) return Infinity;
-if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.supportsProduct(modelId,product)) return Infinity;
+if(typeof CDSPublicCharts!=='undefined' && CDSPublicCharts.supportsProduct(modelId,product) &&
+!(runUTC && CDSPublicCharts.publicWindowExpired(modelId,runUTC))) return Infinity;
 return modelId==='ukmo' ? 144 : 240;
 }
 

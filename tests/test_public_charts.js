@@ -13,6 +13,8 @@ let intervalCallback=null;
 let intervalCalls=0;
 let clearCalls=0;
 const requests=[];
+// ECMWF fixture cycles are from 11-16, so checks of them pin Date.now inside the 48 h public window.
+const realNow=Date.now;
 const context={
   console,Date,URL,URLSearchParams,
   location:{hostname:'localhost'},
@@ -171,6 +173,7 @@ async function main(){
     if(model!=='aigfs') rows.push(row(model,cycle,0,'acrain1'));
   }
   payload=manifest(rows);
+  Date.now=()=>Date.UTC(2026,10,17,12);
   await api.load();
   assert.equal(requests.at(-1).options.credentials,'omit');
   assert.equal(requests.at(-1).options.cache,'no-store');
@@ -241,6 +244,7 @@ async function main(){
     const compare=model==='aigfs'?'acrain':'acrain1';
     assert.deepEqual(urls('acrain',model,cycle,0,'hkor','compare'),[row(model,cycle,0,compare).url]);
   }
+  Date.now=realNow;
   assert.deepEqual(Array.from(api.resolveUrls({...selection(),runUTC:new Date('2026-11-15T00:30:00Z')})),[]);
 
   const rejected=[
@@ -483,6 +487,7 @@ async function main(){
     row('ecmwf','2026111618',0,'gph500','asia'),row('ecmwf','2026111606',24,'acptot1'),
     row('ecmwf','2026111606',144,'gph500','asia'),
     row('ecmwf','2026111600',24,'gph500','asia'),row('ecmwf','2026111606',156,'gph500','asia')]);
+  Date.now=()=>Date.UTC(2026,10,17,12);
   await api.load();
   context.currentModel='ecmwf';context.currentProduct='gph500';context.productCategory.value='asia';
   context.runDate.value='2026-11-16';context.runHour.value='06:00';context.timeMode='UTC';
@@ -512,6 +517,7 @@ async function main(){
   context.currentModel=beforeHybrid.model;context.currentProduct=beforeHybrid.product;
   context.productCategory.value=beforeHybrid.category;context.runDate.value=beforeHybrid.date;
   context.runHour.value=beforeHybrid.hour;context.timeMode=beforeHybrid.time;
+  Date.now=realNow;
   payload=manifest(rows);await api.load();
 
   let changes=0;

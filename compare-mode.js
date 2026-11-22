@@ -668,7 +668,7 @@ modelId,
 parseDateOnly(runDate.value),
 utcHour
 ) || [0];
-let kmaLimit=getKmaOnlyLeadLimit(modelId,product);
+let kmaLimit=getKmaOnlyLeadLimit(modelId,product,getSelectedUTCDate());
 modelHours=modelHours.filter(hour=>hour<=kmaLimit);
 
 let productScheme=product?.forecastStepByModel?.[modelId];

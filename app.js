@@ -2418,7 +2418,7 @@ modelId,
 runDateOnly,
 cycleHour
 ) || [0];
-let kmaLimit=getKmaOnlyLeadLimit(modelId,product);
+let kmaLimit=getKmaOnlyLeadLimit(modelId,product,runUTC);
 modelHours=modelHours.filter(hour=>hour<=kmaLimit);
 
 let productScheme=
