@@ -249,28 +249,39 @@ return Promise.all(runs.map(run=>resolveRun(run,now,ctx,deep.has(run.key))
 }
 
 // ---------- Board selection ----------
-const ACTIVE_ORDER={late:0,live:1,next:2};
-function boardRows(states,{model,cycle,showDone}){
+const STATE_ORDER={late:0,live:1,done:2,next:3};
+function boardRows(states,{model,cycle,showDone},now=nowMs()){
 const pool=states.filter(run=>cycle===null||run.cycle===cycle);
 const latestDone=list=>list.filter(run=>run.state==='done').sort((a,b)=>b.showEnd-a.showEnd)[0];
 if(model){
+// Counted in cycles, not streams: a cycle that ECMWF publishes from both KMA (000-240 h) and
+// self-production (252-360 h) shows both rows, for the latest completed cycle and those ahead.
 const mine=pool.filter(run=>run.model===model);
-const streams=new Set(mine.map(run=>run.cycle+'|'+run.leads)).size;
-const ahead=mine.filter(run=>run.state!=='done').sort((a,b)=>a.showStart-b.showStart).slice(0,Math.max(1,streams-1));
-return [latestDone(mine),...ahead].filter(Boolean);
+const cycles=new Set(mine.map(run=>run.cycle)).size;
+const last=latestDone(mine);
+const done=last?mine.filter(run=>run.cycleMs===last.cycleMs&&run.state==='done'):[];
+const ahead=[...new Set(mine.filter(run=>run.state!=='done').map(run=>run.cycleMs))]
+.sort((a,b)=>a-b).slice(0,Math.max(1,cycles-1));
+const byStart=(a,b)=>a.showStart-b.showStart;
+return [...done.sort(byStart),...mine.filter(run=>run.state!=='done'&&ahead.includes(run.cycleMs)).sort(byStart)];
 }
-const active=[],done=[];
+// One row per model: a late or producing run, otherwise whichever of its latest completion and
+// its next start is nearer in time. Rows then group by state so the order stays predictable.
+const picked=[],extra=[];
 for(const name of MODELS){
 const mine=pool.filter(run=>run.model===name);
-const pick=mine.filter(run=>run.state==='late').sort((a,b)=>b.showEnd-a.showEnd)[0]
-||mine.filter(run=>run.state==='live').sort((a,b)=>a.showStart-b.showStart)[0]
-||mine.filter(run=>run.state==='next').sort((a,b)=>a.showStart-b.showStart)[0];
-if(pick) active.push(pick);
-if(showDone){const last=latestDone(mine);if(last) done.push(last);}
+const last=latestDone(mine);
+const next=mine.filter(run=>run.state==='next').sort((a,b)=>a.showStart-b.showStart)[0];
+let pick=mine.filter(run=>run.state==='late').sort((a,b)=>b.showEnd-a.showEnd)[0]
+||mine.filter(run=>run.state==='live').sort((a,b)=>a.showStart-b.showStart)[0];
+if(!pick && last && next) pick=now-last.showEnd<=Math.max(0,next.showStart-now)?last:next;
+pick=pick||next||last;
+if(pick) picked.push(pick);
+if(showDone && last && last!==pick) extra.push(last);
 }
-active.sort((a,b)=>ACTIVE_ORDER[a.state]-ACTIVE_ORDER[b.state]||a.showStart-b.showStart);
-done.sort((a,b)=>b.showEnd-a.showEnd);
-return [...active,...done];
+const order=(a,b)=>STATE_ORDER[a.state]-STATE_ORDER[b.state]
+||(a.state==='done'?b.showEnd-a.showEnd:a.state==='late'?a.showEnd-b.showEnd:a.showStart-b.showStart);
+return [...picked.sort(order),...extra.sort((a,b)=>b.showEnd-a.showEnd)];
 }
 
 // ---------- Rendering ----------
@@ -304,9 +315,12 @@ container.replaceChildren();
 const table=element('table','schedule-board');
 const body=element('tbody');
 if(!states){
-const tr=element('tr','is-loading');
-tr.append(element('td','schedule-board-empty','실제 자료를 확인하고 있습니다…'));
-body.append(tr);
+// Holds the board's full ten-row height so the dialog does not grow once the data arrives.
+const loading=element('div','schedule-board-loading');
+loading.setAttribute('role','status');
+loading.append(element('span','schedule-spinner'),element('span','','실제 자료를 확인하고 있습니다'));
+container.append(loading);
+return;
 }else{
 const rows=boardRows(states,filters);
 if(!rows.length){
