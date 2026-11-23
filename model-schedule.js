@@ -254,10 +254,16 @@ function boardRows(states,{model,cycle,showDone}){
 const pool=states.filter(run=>cycle===null||run.cycle===cycle);
 const latestDone=list=>list.filter(run=>run.state==='done').sort((a,b)=>b.showEnd-a.showEnd)[0];
 if(model){
+// Counted in cycles, not streams: a cycle that ECMWF publishes from both KMA (000-240 h) and
+// self-production (252-360 h) shows both rows, for the latest completed cycle and those ahead.
 const mine=pool.filter(run=>run.model===model);
-const streams=new Set(mine.map(run=>run.cycle+'|'+run.leads)).size;
-const ahead=mine.filter(run=>run.state!=='done').sort((a,b)=>a.showStart-b.showStart).slice(0,Math.max(1,streams-1));
-return [latestDone(mine),...ahead].filter(Boolean);
+const cycles=new Set(mine.map(run=>run.cycle)).size;
+const last=latestDone(mine);
+const done=last?mine.filter(run=>run.cycleMs===last.cycleMs&&run.state==='done'):[];
+const ahead=[...new Set(mine.filter(run=>run.state!=='done').map(run=>run.cycleMs))]
+.sort((a,b)=>a-b).slice(0,Math.max(1,cycles-1));
+const byStart=(a,b)=>a.showStart-b.showStart;
+return [...done.sort(byStart),...mine.filter(run=>run.state!=='done'&&ahead.includes(run.cycleMs)).sort(byStart)];
 }
 const active=[],done=[];
 for(const name of MODELS){
