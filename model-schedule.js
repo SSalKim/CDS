@@ -43,6 +43,9 @@ const HOUR_MS=3600000;
 // A run that has not finished this long after its usual end is no longer reported as late.
 const LATE_WINDOW=6*60;
 const TAB_STORE='cds.schedule.tab';
+// The 24 h timeline runs 23:00-23:00 so ICON 12Z (23:40 KST) is not split at midnight.
+const AXIS_START=23*60;
+const axisMinute=value=>((value-AXIS_START)%DAY+DAY)%DAY;
 
 const minutes=text=>{const [h,m]=text.split(':').map(Number);return h*60+m;};
 const pad=value=>String(value).padStart(2,'0');
@@ -209,9 +212,9 @@ const offset=offsetFor(mode);
 const axis=element('div','schedule-axis');
 axis.append(element('span'));
 const ticks=element('div','schedule-axis-track');
-for(let hour=0;hour<=24;hour+=3){
+for(let hour=0;hour<24;hour+=3){
 const tick=element('span','schedule-axis-tick',pad(hour));
-tick.style.left=(hour/24*100)+'%';
+tick.style.left=(axisMinute(hour*60)/DAY*100)+'%';
 ticks.append(tick);
 }
 axis.append(ticks);
@@ -222,7 +225,7 @@ const lane=element('div','schedule-lane');
 lane.append(element('span','schedule-lane-name',entry.model));
 const track=element('div','schedule-lane-track');
 for(const row of all.filter(item=>item.model===entry.model)){
-const start=((row.start+offset)%DAY+DAY)%DAY;
+const start=axisMinute(row.start+offset);
 const length=Math.max(row.end-row.start,row.hourly?2:5);
 const parts=start+length>DAY?[[start,DAY-start],[0,start+length-DAY]]:[[start,length]];
 parts.forEach(([from,width],index)=>{
@@ -246,7 +249,7 @@ container.append(lane);
 }
 const nowLine=element('div','schedule-now');
 const nowMinutes=now.getUTCHours()*60+now.getUTCMinutes();
-nowLine.style.setProperty('--now',String(((nowMinutes+offset)%DAY)/DAY));
+nowLine.style.setProperty('--now',String(axisMinute(nowMinutes+offset)/DAY));
 nowLine.append(element('span','schedule-now-label',clock(nowMinutes+offset)));
 container.append(nowLine);
 }
