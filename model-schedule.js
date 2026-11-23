@@ -310,9 +310,12 @@ container.replaceChildren();
 const table=element('table','schedule-board');
 const body=element('tbody');
 if(!states){
-const tr=element('tr','is-loading');
-tr.append(element('td','schedule-board-empty','실제 자료를 확인하고 있습니다…'));
-body.append(tr);
+// Holds the board's full ten-row height so the dialog does not grow once the data arrives.
+const loading=element('div','schedule-board-loading');
+loading.setAttribute('role','status');
+loading.append(element('span','schedule-spinner'),element('span','','실제 자료를 확인하고 있습니다'));
+container.append(loading);
+return;
 }else{
 const rows=boardRows(states,filters);
 if(!rows.length){
