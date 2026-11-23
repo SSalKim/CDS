@@ -5730,11 +5730,20 @@ select option.unsupported-option{
 .viewer-icon-button.schedule-button{
   width:auto;
   gap:4px;
-  padding:0 9px 0 7px;
-  color:#1f4f86;
+  padding:0 10px 0 8px;
+  border-color:#1f4f86;
+  background:#1f4f86;
+  color:#ffffff;
   font-size:12px;
   font-weight:800;
   white-space:nowrap;
+}
+
+.viewer-icon-button.schedule-button:hover,
+.viewer-icon-button.schedule-button:focus-visible{
+  border-color:#163b66;
+  background:#163b66;
+  color:#ffffff;
 }
 
 .schedule-button svg{
