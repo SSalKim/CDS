@@ -187,13 +187,14 @@ for(const row of boardRows(now,late)){
 const tr=element('tr','is-'+row.state);
 const status=element('td','schedule-board-state');
 status.append(element('span','schedule-state is-'+row.state,STATE_LABEL[row.state]));
-const time=element('td','schedule-board-time');
-time.append(element('mark','schedule-mark c'+pad(row.cycle),`${clock(row.start+offset)}–${clock(row.end+offset)}`));
+const time=element('td','schedule-board-time',`${clock(row.start+offset)}–${clock(row.end+offset)}`);
+const cycle=element('td','schedule-board-cycle');
+cycle.append(element('mark','schedule-mark c'+pad(row.cycle),pad(row.cycle)+'Z'));
 const remain=row.state==='live'?duration(row.left)+' 남음':row.state==='late'?duration(row.late)+' 지연':duration(row.wait)+' 후';
 tr.append(status,time,
 element('td','schedule-board-source',SOURCE_LABEL[row.source]),
 element('td','schedule-board-model',row.model),
-element('td','schedule-board-cycle',pad(row.cycle)+'Z'),
+cycle,
 element('td','schedule-board-leads','+'+row.leads+'h'),
 element('td','schedule-board-remain',remain));
 body.append(tr);
@@ -300,10 +301,11 @@ const name=element('th','schedule-table-model',entry.model);
 name.scope='row';name.rowSpan=runs.length;
 tr.append(name);
 }
-const time=element('td','schedule-table-time');
-time.append(run.cycle===null?document.createTextNode(run.time):element('mark','schedule-mark c'+pad(run.cycle),run.time));
+const time=element('td','schedule-table-time',run.time);
+const cycle=element('td','schedule-table-cycle');
+cycle.append(run.cycle===null?document.createTextNode(run.label):element('mark','schedule-mark c'+pad(run.cycle),run.label));
 if(state) time.append(element('span','schedule-state is-'+state,STATE_LABEL[state]));
-tr.append(element('td','schedule-table-cycle',run.label),element('td','schedule-table-leads',run.leads),
+tr.append(cycle,element('td','schedule-table-leads',run.leads),
 element('td','schedule-table-source',SOURCE_LABEL[run.source]),time);
 body.append(tr);
 });

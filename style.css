@@ -6121,8 +6121,9 @@ select option.unsupported-option{
 .schedule-table-leads,
 .schedule-table-time,
 .schedule-mark{
-  font-family:"IBM Plex Mono",Consolas,"D2Coding",monospace;
+  font-family:"Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
   font-variant-numeric:tabular-nums;
+  letter-spacing:0;
 }
 
 .schedule-header{
@@ -6242,7 +6243,12 @@ select option.unsupported-option{
 
 .schedule-board-time{
   font-size:15px;
-  font-weight:600;
+  font-weight:700;
+}
+
+.schedule-board-cycle .schedule-mark,
+.schedule-table-cycle .schedule-mark{
+  font-weight:700;
 }
 
 .schedule-mark{
