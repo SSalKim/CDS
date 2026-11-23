@@ -249,8 +249,8 @@ return Promise.all(runs.map(run=>resolveRun(run,now,ctx,deep.has(run.key))
 }
 
 // ---------- Board selection ----------
-const ACTIVE_ORDER={late:0,live:1,next:2};
-function boardRows(states,{model,cycle,showDone}){
+const STATE_ORDER={late:0,live:1,done:2,next:3};
+function boardRows(states,{model,cycle,showDone},now=nowMs()){
 const pool=states.filter(run=>cycle===null||run.cycle===cycle);
 const latestDone=list=>list.filter(run=>run.state==='done').sort((a,b)=>b.showEnd-a.showEnd)[0];
 if(model){
@@ -265,18 +265,23 @@ const ahead=[...new Set(mine.filter(run=>run.state!=='done').map(run=>run.cycleM
 const byStart=(a,b)=>a.showStart-b.showStart;
 return [...done.sort(byStart),...mine.filter(run=>run.state!=='done'&&ahead.includes(run.cycleMs)).sort(byStart)];
 }
-const active=[],done=[];
+// One row per model: a late or producing run, otherwise whichever of its latest completion and
+// its next start is nearer in time. Rows then group by state so the order stays predictable.
+const picked=[],extra=[];
 for(const name of MODELS){
 const mine=pool.filter(run=>run.model===name);
-const pick=mine.filter(run=>run.state==='late').sort((a,b)=>b.showEnd-a.showEnd)[0]
-||mine.filter(run=>run.state==='live').sort((a,b)=>a.showStart-b.showStart)[0]
-||mine.filter(run=>run.state==='next').sort((a,b)=>a.showStart-b.showStart)[0];
-if(pick) active.push(pick);
-if(showDone){const last=latestDone(mine);if(last) done.push(last);}
+const last=latestDone(mine);
+const next=mine.filter(run=>run.state==='next').sort((a,b)=>a.showStart-b.showStart)[0];
+let pick=mine.filter(run=>run.state==='late').sort((a,b)=>b.showEnd-a.showEnd)[0]
+||mine.filter(run=>run.state==='live').sort((a,b)=>a.showStart-b.showStart)[0];
+if(!pick && last && next) pick=now-last.showEnd<=Math.max(0,next.showStart-now)?last:next;
+pick=pick||next||last;
+if(pick) picked.push(pick);
+if(showDone && last && last!==pick) extra.push(last);
 }
-active.sort((a,b)=>ACTIVE_ORDER[a.state]-ACTIVE_ORDER[b.state]||a.showStart-b.showStart);
-done.sort((a,b)=>b.showEnd-a.showEnd);
-return [...active,...done];
+const order=(a,b)=>STATE_ORDER[a.state]-STATE_ORDER[b.state]
+||(a.state==='done'?b.showEnd-a.showEnd:a.state==='late'?a.showEnd-b.showEnd:a.showStart-b.showStart);
+return [...picked.sort(order),...extra.sort((a,b)=>b.showEnd-a.showEnd)];
 }
 
 // ---------- Rendering ----------
