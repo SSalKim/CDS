@@ -6651,3 +6651,140 @@ select option.unsupported-option{
     margin-left:0;
   }
 }
+
+/* Timetable filters, live board rows */
+.schedule-filters{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px 14px;
+  padding:9px 18px;
+  border-bottom:1px solid var(--rule);
+  font-size:12px;
+}
+
+.schedule-check{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  font-weight:700;
+  cursor:pointer;
+  user-select:none;
+}
+
+.schedule-check input{
+  width:14px;
+  height:14px;
+  margin:0;
+  accent-color:var(--ink);
+}
+
+.schedule-check.is-disabled{
+  color:#aaaaaa;
+  cursor:default;
+}
+
+.schedule-select select{
+  height:26px;
+  padding:0 24px 0 8px;
+  border:1px solid var(--ink);
+  border-radius:0;
+  background:#ffffff;
+  color:var(--ink);
+  font-size:12px;
+  font-weight:700;
+}
+
+.schedule-cycles{
+  display:flex;
+  border:1px solid var(--ink);
+}
+
+.schedule-cycles button{
+  height:24px;
+  padding:0 9px;
+  border:0;
+  border-left:1px solid var(--ink);
+  background:#ffffff;
+  color:var(--ink);
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.schedule-cycles button:first-child{border-left:0;}
+.schedule-cycles button.c00{--mark:var(--c00);}
+.schedule-cycles button.c06{--mark:var(--c06);}
+.schedule-cycles button.c12{--mark:var(--c12);}
+.schedule-cycles button.c18{--mark:var(--c18);}
+
+.schedule-cycles button[aria-pressed="true"]{
+  background:var(--mark,var(--ink));
+  color:var(--ink);
+}
+
+.schedule-cycles button:not([class])[aria-pressed="true"]{
+  color:#ffffff;
+}
+
+/* Ten rows show; the rest scroll. */
+.schedule-board-wrap{
+  max-height:351px;
+  overflow-y:auto;
+  scrollbar-width:auto;
+}
+
+.schedule-board td{
+  height:35px;
+}
+
+.schedule-board-empty{
+  padding:12px 18px !important;
+  color:var(--muted);
+  font-size:12px !important;
+}
+
+.schedule-board-time .is-est,
+.schedule-legend .is-est{
+  color:#9a9a9a;
+  font-weight:500;
+}
+
+.schedule-state.is-done{
+  border-color:var(--ink);
+  background:#ffffff;
+  color:var(--ink);
+}
+
+.schedule-board tr.is-done{
+  color:#555555;
+}
+
+.schedule-bar.is-dim,
+.schedule-bar-tag.is-dim{
+  opacity:.18;
+}
+
+.schedule-lane.is-dim .schedule-lane-name{
+  color:#bbbbbb;
+}
+
+@media (max-width: 700px){
+  .schedule-filters{
+    gap:8px 10px;
+    padding:8px 12px;
+  }
+
+  .schedule-select select{
+    height:30px;
+  }
+
+  .schedule-cycles button{
+    height:28px;
+    padding:0 8px;
+  }
+
+  .schedule-board-wrap{
+    max-height:351px;
+  }
+}
