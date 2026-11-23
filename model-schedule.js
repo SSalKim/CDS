@@ -1,57 +1,67 @@
 (function(global){
 'use strict';
 
-// Approximate publication windows in UTC, measured from image timestamps on KMA and R2
-// (2026-11-20..23). "start" is when the first lead appears, "end" when the last lead does.
-// "check" says how to tell whether a run has finished: from the R2 snapshot the viewer
-// already holds (public), or by loading the last lead's KMA image (kma: folder and file).
+// Estimated publication windows in UTC from image timestamps on KMA and R2 (2026-11-20..23):
+// start = median time of the first lead, end = latest time of the last lead, both rounded up
+// to 5 minutes so an estimate errs late rather than early.
+// Each run is checked against real data: R2 runs through the snapshot the viewer holds (and
+// their upload times through HEAD requests), KMA runs by loading the first or last lead image.
 const KMA_BASE='https://data.kma.go.kr/CHT';
 const SCHEDULE=[
 {model:'KIM_GDAPS',kma:['KIMG','kim_gdps_erly_asia_gph500_ft06_pa4_s{fh}_{run}.png'],runs:[
-[0,'000~288','kma','03:15','05:50'],[6,'000~084','kma','09:15','10:00'],
-[12,'000~288','kma','15:15','17:50'],[18,'000~084','kma','21:15','22:00']]},
-{model:'UKUM',id:'ukmo',runs:[
-[0,'000~168','kma','09:35','09:50','public'],[6,'000~069','self','11:30','12:05'],
-[12,'000~168','kma','22:35','22:50','public'],[18,'000~069','self','23:30','00:10']]},
+[0,'000~288','kma','03:20','05:50'],[6,'000~084','kma','09:20','10:05'],
+[12,'000~288','kma','15:20','17:50'],[18,'000~084','kma','21:20','22:00']]},
+// UKUM 00/12Z: 000-144 h come from KMA, 156/168 h from R2 once KMA has released 144 h.
+{model:'UKUM',id:'ukmo',kma:['GDPS','ukum_erly_asia_gph500_s{fh}_{run}.png'],runs:[
+[0,'000~168','kma','09:40','09:55',{last:'public'}],[6,'000~069','self','11:35','12:05'],
+[12,'000~168','kma','22:35','22:55',{last:'public'}],[18,'000~069','self','23:35','00:10']]},
 {model:'ECMWF',id:'ecmwf',kma:['ECMW','ecmw_lc40_asia_gph500_s{fh}_{run}.gif'],runs:[
-[0,'000~240','kma','05:50','07:00'],[0,'252~360','self','07:35','07:45'],[6,'000~144','self','12:25','12:40'],
-[12,'000~240','kma','17:50','19:00'],[12,'252~360','self','19:35','19:45'],[18,'000~144','self','00:25','00:40']]},
+[0,'000~240','kma','05:55','07:00'],[0,'252~360','self','07:40','07:45'],[6,'000~144','self','12:30','12:40'],
+[12,'000~240','kma','17:55','19:00'],[12,'252~360','self','19:40','19:45'],[18,'000~144','self','00:30','00:40']]},
 {model:'AIFS',id:'aifs',runs:[
-[0,'000~360','self','05:20','05:35'],[6,'000~360','self','11:20','11:35'],
-[12,'000~360','self','17:20','17:35'],[18,'000~360','self','23:25','23:35']]},
+[0,'000~360','self','05:30','05:35'],[6,'000~360','self','11:25','11:35'],
+[12,'000~360','self','17:25','17:35'],[18,'000~360','self','23:30','23:35']]},
 {model:'GFS',id:'gfs',runs:[
-[0,'000~360','self','03:30','05:10'],[6,'000~360','self','09:30','11:10'],
-[12,'000~360','self','15:30','17:10'],[18,'000~360','self','21:30','23:10']]},
+[0,'000~360','self','03:35','05:10'],[6,'000~360','self','09:35','11:15'],
+[12,'000~360','self','15:35','17:10'],[18,'000~360','self','21:40','23:15']]},
 {model:'AIGFS',id:'aigfs',runs:[
-[0,'000~360','self','03:40','04:20'],[6,'000~360','self','09:35','10:20'],
-[12,'000~360','self','15:40','16:25'],[18,'000~360','self','21:40','22:25']]},
-{model:'CMC',id:'cmc',runs:[[0,'000~240','self','03:50','04:55'],[12,'000~240','self','15:50','16:55']]},
+[0,'000~360','self','03:45','04:20'],[6,'000~360','self','09:45','10:50'],
+[12,'000~360','self','15:45','16:25'],[18,'000~360','self','21:45','22:50']]},
+{model:'CMC',id:'cmc',runs:[[0,'000~240','self','04:05','04:50'],[12,'000~240','self','15:55','17:00']]},
 {model:'ICON',id:'icon',runs:[
-[0,'000~180','self','02:35','03:30'],[6,'000~120','self','08:40','09:20'],
-[12,'000~180','self','14:40','15:35'],[18,'000~120','self','20:40','21:15']]},
+[0,'000~180','self','02:45','03:30'],[6,'000~120','self','08:45','09:20'],
+[12,'000~180','self','14:45','15:35'],[18,'000~120','self','20:45','21:20']]},
 {model:'KIM_RDAPS',kma:['KIMR1','kim_rdps_erly_asia_gph500_s{fh}_{run}.png'],runs:[
-[0,'000~120','kma','03:50','05:30'],[6,'000~072','kma','09:40','10:45'],
-[12,'000~120','kma','15:50','17:25'],[18,'000~072','kma','21:40','22:45']]},
+[0,'000~120','kma','03:55','05:30'],[6,'000~072','kma','09:45','10:50'],
+[12,'000~120','kma','15:55','17:25'],[18,'000~072','kma','21:45','22:45']]},
 {model:'KIM_LDAPS',kma:['KIML','kim_ldps_erly_hkor_gph500_s{fh}_{run}.png'],runs:[
-[0,'000~048','kma','03:50','04:55'],[6,'000~048','kma','09:40','10:35'],
-[12,'000~048','kma','15:50','16:55'],[18,'000~048','kma','21:40','22:40']]},
-{model:'KIM_KLAPS',hourly:{leads:'000~012',source:'kma',start:13,end:20}}
+[0,'000~048','kma','04:00','04:55'],[6,'000~048','kma','09:45','10:40'],
+[12,'000~048','kma','15:55','16:55'],[18,'000~048','kma','21:45','22:40']]},
+{model:'KIM_KLAPS',hourly:{leads:'000~012',source:'kma',start:15,end:20}}
 ];
+const MODELS=SCHEDULE.filter(entry=>!entry.hourly).map(entry=>entry.model);
 const SOURCE_LABEL={kma:'기상청',self:'자체생산'};
+const STATE_LABEL={done:'완료',live:'생산중',next:'예정',late:'지연'};
 const DAY=1440;
+const MINUTE=60000;
 const HOUR_MS=3600000;
-// A run that has not finished this long after its usual end is no longer reported as late.
-const LATE_WINDOW=6*60;
+// Runs whose estimated end is older than this are taken as finished and not checked;
+// KMA checks load a whole chart image (0.2-0.6 MB), so the window stays short.
+const LATE_WINDOW=3*60;
 const TAB_STORE='cds.schedule.tab';
+const DONE_STORE='cds.schedule.show-done';
 // The 24 h timeline runs 23:00-23:00 so ICON 12Z (23:40 KST) is not split at midnight.
 const AXIS_START=23*60;
-const axisMinute=value=>((value-AXIS_START)%DAY+DAY)%DAY;
+const PRODUCT={category:'asia',id:'gph500'};
 
 const minutes=text=>{const [h,m]=text.split(':').map(Number);return h*60+m;};
 const pad=value=>String(value).padStart(2,'0');
 const clock=value=>{const m=((value%DAY)+DAY)%DAY;return pad(Math.floor(m/60))+':'+pad(m%60);};
 const offsetFor=mode=>mode==='UTC'?0:540;
-const lastLead=leads=>Number(leads.split('~')[1]);
+const axisMinute=value=>((value-AXIS_START)%DAY+DAY)%DAY;
+const leadRange=leads=>leads.split('~').map(Number);
+const dayMinute=ms=>Math.floor((ms%86400000)/MINUTE);
+const nowMs=()=>global.CDSPublicCharts?.clockNow?.()??Date.now();
 
 function windows(){
 const rows=[];
@@ -61,53 +71,42 @@ for(let hour=0;hour<24;hour++) rows.push({model:entry.model,cycle:hour,leads:ent
 start:hour*60+entry.hourly.start,end:hour*60+entry.hourly.end,hourly:true});
 continue;
 }
-for(const [cycle,leads,source,start,end,check] of entry.runs){
+for(const [cycle,leads,source,start,end,checks={}] of entry.runs){
 let from=minutes(start),to=minutes(end);
 if(to<from) to+=DAY;
+const kind=source==='self'?'public':'kma';
 rows.push({model:entry.model,id:entry.id,kma:entry.kma,cycle,leads,source,start:from,end:to,
-check:check||(source==='self'?'public':'kma')});
+firstCheck:checks.first||kind,lastCheck:checks.last||kind});
 }
 }
 return rows;
 }
 
-// Each window's latest occurrence that has started, and its next one, as absolute times.
-function occurrences(nowMs){
-const midnight=Math.floor(nowMs/86400000)*86400000;
+// Every occurrence of every window from two days back to one day ahead, as absolute times.
+function occurrences(now){
+const midnight=Math.floor(now/86400000)*86400000;
 const result=[];
 for(const row of windows()){
 if(row.hourly) continue;
 const lag=((row.start-row.cycle*60)%DAY+DAY)%DAY;
-for(const day of [-1,0,1]){
-const startMs=midnight+(day*DAY+row.start)*60000;
-const endMs=midnight+(day*DAY+row.end)*60000;
-const cycleMs=Math.round((startMs-lag*60000)/HOUR_MS)*HOUR_MS;
-result.push({...row,startMs,endMs,cycleMs});
+for(const day of [-2,-1,0,1]){
+const startMs=midnight+(day*DAY+row.start)*MINUTE;
+const endMs=midnight+(day*DAY+row.end)*MINUTE;
+const cycleMs=Math.round((startMs-lag*MINUTE)/HOUR_MS)*HOUR_MS;
+result.push({...row,startMs,endMs,cycleMs,key:`${row.model}|${row.cycle}|${row.leads}|${cycleMs}`});
 }
 }
 return result;
 }
 
-function upcoming(nowUTC,limit=5){
-const now=nowUTC.getTime();
-const all=occurrences(now);
-const live=all.filter(row=>row.startMs<=now&&row.endMs>now)
-.map(row=>({...row,state:'live',left:Math.round((row.endMs-now)/60000)}))
-.sort((a,b)=>a.left-b.left);
-const next=all.filter(row=>row.startMs>now)
-.map(row=>({...row,state:'next',wait:Math.round((row.startMs-now)/60000)}))
-.sort((a,b)=>a.wait-b.wait);
-return [...live,...next].slice(0,limit);
-}
-
-// ---------- Completion checks ----------
+// ---------- Real data ----------
 const probeCache=new Map();
 function kmaImageLoads(url){
 const cached=probeCache.get(url);
 if(cached && (cached.ok || Date.now()-cached.at<120000)) return cached.promise;
 const promise=new Promise(resolve=>{
 const image=new Image();
-const timer=setTimeout(()=>resolve(null),15000);
+const timer=setTimeout(()=>resolve(null),10000);
 image.onload=()=>{clearTimeout(timer);resolve(image.naturalWidth>0);};
 image.onerror=()=>{clearTimeout(timer);resolve(false);};
 image.referrerPolicy='no-referrer';
@@ -119,41 +118,125 @@ probeCache.set(url,entry);
 return promise;
 }
 
+const timeCache=new Map();
+function uploadTime(url){
+if(!timeCache.has(url)){
+const promise=fetch(url,{method:'HEAD',credentials:'omit'})
+.then(response=>{
+const value=response.ok?Date.parse(response.headers.get('Last-Modified')||''):NaN;
+if(!Number.isFinite(value)) timeCache.delete(url);
+return Number.isFinite(value)?value:null;
+})
+.catch(()=>{timeCache.delete(url);return null;});
+timeCache.set(url,promise);
+}
+return timeCache.get(url);
+}
+
 function cycleText(ms){
 const d=new Date(ms);
 return d.getUTCFullYear()+pad(d.getUTCMonth()+1)+pad(d.getUTCDate())+pad(d.getUTCHours());
 }
 
-// true when finished, false when not, null when it cannot be told.
-async function finished(row,publicFresh){
-const hour=lastLead(row.leads);
-if(row.check==='public'){
+// true / false, or null when it cannot be told (no fresh R2 snapshot, KMA not answering).
+function leadExists(run,hour,kind,publicFresh){
+if(kind==='public'){
 const store=global.CDSPublicCharts;
-// A stale or missing R2 snapshot cannot tell a late run from one it has not seen yet.
-if(!publicFresh || !store?.readyHours || !row.id) return null;
-const hours=store.readyHours({modelId:row.id,product:{category:'asia',id:'gph500'},runUTC:new Date(row.cycleMs)});
-return hours.some(value=>value>=hour);
+if(!publicFresh || !store?.readyHours || !run.id) return Promise.resolve(null);
+const hours=store.readyHours({modelId:run.id,product:PRODUCT,runUTC:new Date(run.cycleMs)});
+return Promise.resolve(hours.includes(hour));
 }
-if(!row.kma) return null;
-const run=cycleText(row.cycleMs);
-const [folder,template]=row.kma;
-const name=template.replace('{fh}',String(hour).padStart(3,'0')).replace('{run}',run);
-return kmaImageLoads(`${KMA_BASE}/${folder}/${run.slice(0,6)}/${run.slice(6,8)}/${name}`);
+if(!run.kma) return Promise.resolve(null);
+const text=cycleText(run.cycleMs);
+const [folder,template]=run.kma;
+const name=template.replace('{fh}',String(hour).padStart(3,'0')).replace('{run}',text);
+return kmaImageLoads(`${KMA_BASE}/${folder}/${text.slice(0,6)}/${text.slice(6,8)}/${name}`);
 }
 
-async function lateRuns(nowMs){
+// When a self-produced lead appeared on R2. KMA image times are not readable from the browser,
+// and UKUM 00/12Z 156/168 h are shown only after KMA's release, not at upload.
+function leadTime(run,hour,publicFresh){
+const store=global.CDSPublicCharts;
+const origin=store?.getR2Base?.();
+if(run.source!=='self' || !publicFresh || !origin || !store?.resolveUrls) return Promise.resolve(null);
+const url=store.resolveUrls({modelId:run.id,product:PRODUCT,runUTC:new Date(run.cycleMs),forecastHour:hour})[0];
+return url&&url.startsWith(origin)?uploadTime(url):Promise.resolve(null);
+}
+
+async function resolveRun(run,now,publicFresh,deep){
+const duration=run.endMs-run.startMs;
+const estimate={...run,showStart:run.startMs,showEnd:run.endMs,realStart:false,realEnd:false};
+if(run.cycleMs>now) return {...estimate,state:'next'};
+// Old runs and runs far from starting are not checked.
+const recent=run.endMs>=now-LATE_WINDOW*MINUTE;
+if(!recent && !deep) return {...estimate,state:'done'};
+if(now<run.startMs-HOUR_MS) return {...estimate,state:'next'};
+const [first,last]=leadRange(run.leads);
+const finished=await leadExists(run,last,run.lastCheck,publicFresh);
+if(finished===true){
+const [start,end]=await Promise.all([leadTime(run,first,publicFresh),leadTime(run,last,publicFresh)]);
+return {...estimate,state:'done',showStart:start??run.startMs,showEnd:end??run.endMs,realStart:!!start,realEnd:!!end};
+}
+const started=await leadExists(run,first,run.firstCheck,publicFresh);
+if(started===true){
+const start=await leadTime(run,first,publicFresh);
+const showStart=start??run.startMs;
+const showEnd=showStart+duration;
+return {...estimate,state:now>showEnd&&recent?'late':now>showEnd?'done':'live',showStart,showEnd,realStart:!!start};
+}
+if(finished===false && started===false){
+return {...estimate,state:now>run.endMs?(recent?'late':'done'):'next'};
+}
+// Unknown: fall back to the estimate alone, which never claims a delay.
+return {...estimate,state:now<run.startMs?'next':now<run.endMs?'live':'done'};
+}
+
+async function resolveStates(now){
 const store=global.CDSPublicCharts;
 let publicFresh=false;
 try{publicFresh=(await store?.load?.())?.ok===true && store.getSource?.()==='r2';}catch{}
-const overdue=occurrences(nowMs).filter(row=>row.endMs<=nowMs && nowMs-row.endMs<=LATE_WINDOW*60000);
-const results=await Promise.all(overdue.map(row=>finished(row,publicFresh).catch(()=>null)));
-return overdue.filter((row,index)=>results[index]===false)
-.map(row=>({...row,state:'late',late:Math.round((nowMs-row.endMs)/60000)}))
-.sort((a,b)=>a.late-b.late);
+const runs=occurrences(now);
+// Self-produced upload times are cheap to read, so each stream's latest older run gets its
+// real times too (it is what "최근 완료" shows).
+const older=new Map();
+for(const run of runs){
+if(run.source!=='self' || run.endMs>=now-LATE_WINDOW*MINUTE) continue;
+const stream=`${run.model}|${run.cycle}|${run.leads}`;
+if(!older.has(stream) || older.get(stream).cycleMs<run.cycleMs) older.set(stream,run);
+}
+const deep=new Set([...older.values()].map(run=>run.key));
+return Promise.all(runs.map(run=>resolveRun(run,now,publicFresh,deep.has(run.key))
+.catch(()=>({...run,showStart:run.startMs,showEnd:run.endMs,state:run.endMs<now?'done':'next'}))));
+}
+
+// ---------- Board selection ----------
+const ACTIVE_ORDER={late:0,live:1,next:2};
+function boardRows(states,{model,cycle,showDone}){
+const pool=states.filter(run=>cycle===null||run.cycle===cycle);
+const latestDone=list=>list.filter(run=>run.state==='done').sort((a,b)=>b.showEnd-a.showEnd)[0];
+if(model){
+const mine=pool.filter(run=>run.model===model);
+const streams=new Set(mine.map(run=>run.cycle+'|'+run.leads)).size;
+const ahead=mine.filter(run=>run.state!=='done').sort((a,b)=>a.showStart-b.showStart).slice(0,Math.max(1,streams-1));
+return [latestDone(mine),...ahead].filter(Boolean);
+}
+const active=[],done=[];
+for(const name of MODELS){
+const mine=pool.filter(run=>run.model===name);
+const pick=mine.filter(run=>run.state==='late').sort((a,b)=>b.showEnd-a.showEnd)[0]
+||mine.filter(run=>run.state==='live').sort((a,b)=>a.showStart-b.showStart)[0]
+||mine.filter(run=>run.state==='next').sort((a,b)=>a.showStart-b.showStart)[0];
+if(pick) active.push(pick);
+if(showDone){const last=latestDone(mine);if(last) done.push(last);}
+}
+active.sort((a,b)=>ACTIVE_ORDER[a.state]-ACTIVE_ORDER[b.state]||a.showStart-b.showStart);
+done.sort((a,b)=>b.showEnd-a.showEnd);
+return [...active,...done];
 }
 
 // ---------- Rendering ----------
 function duration(value){
+value=Math.max(0,Math.round(value));
 if(value<60) return value+'분';
 const h=Math.floor(value/60),m=value%60;
 return m?`${h}시간 ${m}분`:`${h}시간`;
@@ -170,43 +253,53 @@ function currentMode(){
 try{return typeof timeMode==='string'&&timeMode==='UTC'?'UTC':'KST';}catch{return 'KST';}
 }
 
-const STATE_LABEL={live:'생산중',next:'예정',late:'지연'};
-
-function boardRows(now,late){
-const lateKeys=new Set(late.map(row=>row.model+row.cycle+row.leads+row.cycleMs));
-const list=upcoming(now,99).filter(row=>!lateKeys.has(row.model+row.cycle+row.leads+row.cycleMs));
-const live=list.filter(row=>row.state==='live').slice(0,3);
-const next=list.filter(row=>row.state==='next');
-const shown=[...late.slice(0,3),...live];
-return [...shown,...next.slice(0,Math.max(3,7-shown.length))];
+function remainText(run,now){
+if(run.state==='done') return duration((now-run.showEnd)/MINUTE)+' 전 완료';
+if(run.state==='live') return duration((run.showEnd-now)/MINUTE)+' 남음';
+if(run.state==='late') return duration((now-run.showEnd)/MINUTE)+' 지연';
+return run.showStart>now?duration((run.showStart-now)/MINUTE)+' 후':'시작 대기';
 }
 
-function renderBoard(container,mode,now,late){
+function renderBoard(container,mode,now,states,filters){
 container.replaceChildren();
-const offset=offsetFor(mode);
 const table=element('table','schedule-board');
 const body=element('tbody');
-for(const row of boardRows(now,late)){
-const tr=element('tr','is-'+row.state);
-const status=element('td','schedule-board-state');
-status.append(element('span','schedule-state is-'+row.state,STATE_LABEL[row.state]));
-const time=element('td','schedule-board-time',`${clock(row.start+offset)}–${clock(row.end+offset)}`);
-const cycle=element('td','schedule-board-cycle');
-cycle.append(element('mark','schedule-mark c'+pad(row.cycle),pad(row.cycle)+'Z'));
-const remain=row.state==='live'?duration(row.left)+' 남음':row.state==='late'?duration(row.late)+' 지연':duration(row.wait)+' 후';
-tr.append(status,time,
-element('td','schedule-board-source',SOURCE_LABEL[row.source]),
-element('td','schedule-board-model',row.model),
-cycle,
-element('td','schedule-board-leads','+'+row.leads+'h'),
-element('td','schedule-board-remain',remain));
+if(!states){
+const tr=element('tr','is-loading');
+tr.append(element('td','schedule-board-empty','실제 자료를 확인하고 있습니다…'));
 body.append(tr);
+}else{
+const rows=boardRows(states,filters);
+if(!rows.length){
+const tr=element('tr','is-loading');
+tr.append(element('td','schedule-board-empty','조건에 맞는 자료가 없습니다.'));
+body.append(tr);
+}
+const offset=offsetFor(mode)*MINUTE;
+for(const run of rows){
+const tr=element('tr','is-'+run.state);
+const status=element('td','schedule-board-state');
+status.append(element('span','schedule-state is-'+run.state,STATE_LABEL[run.state]));
+const time=element('td','schedule-board-time');
+time.append(element('span',run.realStart?'':'is-est',clock(dayMinute(run.showStart+offset))),
+document.createTextNode('–'),
+element('span',run.realEnd?'':'is-est',clock(dayMinute(run.showEnd+offset))));
+const cycle=element('td','schedule-board-cycle');
+cycle.append(element('mark','schedule-mark c'+pad(run.cycle),pad(run.cycle)+'Z'));
+tr.append(status,time,
+element('td','schedule-board-source',SOURCE_LABEL[run.source]),
+element('td','schedule-board-model',run.model),
+cycle,
+element('td','schedule-board-leads','+'+run.leads+'h'),
+element('td','schedule-board-remain',remainText(run,now)));
+body.append(tr);
+}
 }
 table.append(body);
 container.append(table);
 }
 
-function renderTimeline(container,mode,now,onSelect){
+function renderTimeline(container,mode,now,filters,onSelect){
 container.replaceChildren();
 const offset=offsetFor(mode);
 const axis=element('div','schedule-axis');
@@ -221,15 +314,17 @@ axis.append(ticks);
 container.append(axis);
 const all=windows();
 for(const entry of SCHEDULE){
-const lane=element('div','schedule-lane');
+const laneDim=filters.model&&filters.model!==entry.model;
+const lane=element('div','schedule-lane'+(laneDim?' is-dim':''));
 lane.append(element('span','schedule-lane-name',entry.model));
 const track=element('div','schedule-lane-track');
 for(const row of all.filter(item=>item.model===entry.model)){
+const dim=laneDim||(filters.cycle!==null&&(row.hourly||row.cycle!==filters.cycle));
 const start=axisMinute(row.start+offset);
 const length=Math.max(row.end-row.start,row.hourly?2:5);
 const parts=start+length>DAY?[[start,DAY-start],[0,start+length-DAY]]:[[start,length]];
 parts.forEach(([from,width],index)=>{
-const bar=element('button',`schedule-bar is-${row.source}${row.hourly?' is-hourly':' c'+pad(row.cycle)}`);
+const bar=element('button',`schedule-bar is-${row.source}${row.hourly?' is-hourly':' c'+pad(row.cycle)}${dim?' is-dim':''}`);
 bar.type='button';
 bar.style.left=(from/DAY*100)+'%';
 bar.style.width=(width/DAY*100)+'%';
@@ -238,7 +333,7 @@ bar.title=text;bar.setAttribute('aria-label',text);
 bar.addEventListener('click',()=>onSelect(row,bar));
 track.append(bar);
 if(!row.hourly && index===0){
-const tag=element('span','schedule-bar-tag c'+pad(row.cycle),pad(row.cycle)+'Z');
+const tag=element('span',`schedule-bar-tag c${pad(row.cycle)}${dim?' is-dim':''}`,pad(row.cycle)+'Z');
 tag.style.left=(from/DAY*100)+'%';
 track.append(tag);
 }
@@ -248,7 +343,7 @@ lane.append(track);
 container.append(lane);
 }
 const nowLine=element('div','schedule-now');
-const nowMinutes=now.getUTCHours()*60+now.getUTCMinutes();
+const nowMinutes=dayMinute(now);
 nowLine.style.setProperty('--now',String(axisMinute(nowMinutes+offset)/DAY));
 nowLine.append(element('span','schedule-now-label',clock(nowMinutes+offset)));
 container.append(nowLine);
@@ -279,12 +374,15 @@ if(label && box.right>label.left-2 && box.left<label.right+2) tick.style.visibil
 }
 }
 
-function renderTable(container,mode,now,late){
+function renderTable(container,mode,states){
 container.replaceChildren();
 const offset=offsetFor(mode);
-const states=new Map();
-for(const row of upcoming(now,99).filter(item=>item.state==='live')) states.set(row.model+row.cycle+row.leads,'live');
-for(const row of late) states.set(row.model+row.cycle+row.leads,'late');
+const badges=new Map();
+for(const run of states||[]){
+const stream=run.model+run.cycle+run.leads;
+if(run.state==='late') badges.set(stream,'late');
+else if(run.state==='live' && badges.get(stream)!=='late') badges.set(stream,'live');
+}
 const table=element('table','schedule-table');
 const head=element('thead');
 const headRow=element('tr');
@@ -297,7 +395,7 @@ const runs=entry.hourly
 :entry.runs.map(([cycle,leads,source,start,end])=>({cycle,label:pad(cycle)+'Z',leads,source,
 time:`${clock(minutes(start)+offset)}–${clock(minutes(end)+offset)}`}));
 runs.forEach((run,index)=>{
-const state=run.cycle===null?'':states.get(entry.model+run.cycle+run.leads)||'';
+const state=run.cycle===null?'':badges.get(entry.model+run.cycle+run.leads)||'';
 const tr=element('tr',state?'is-'+state:'');
 if(index===0){
 const name=element('th','schedule-table-model',entry.model);
@@ -338,7 +436,9 @@ dialog.setAttribute('aria-labelledby','scheduleTitle');
 let mode=currentMode();
 let tab='timeline';
 try{if(localStorage.getItem(TAB_STORE)==='table') tab='table';}catch{}
-let late=[];
+const filters={model:null,cycle:null,showDone:false};
+try{filters.showDone=localStorage.getItem(DONE_STORE)==='1';}catch{}
+let states=null;
 
 const header=element('header','schedule-header');
 const title=element('h2','schedule-title','모델 표출 시간표');
@@ -354,6 +454,28 @@ const close=element('button','schedule-close','×');
 close.type='button';close.setAttribute('aria-label','시간표 닫기');close.title='닫기';
 close.onclick=()=>dialog.close();
 header.append(title,modes,close);
+
+// Filters: recent completions, one model, one cycle.
+const filterBar=element('div','schedule-filters');
+const doneLabel=element('label','schedule-check');
+const doneBox=element('input');doneBox.type='checkbox';doneBox.checked=filters.showDone;
+doneBox.onchange=()=>{filters.showDone=doneBox.checked;try{localStorage.setItem(DONE_STORE,doneBox.checked?'1':'0');}catch{}render();};
+doneLabel.append(doneBox,document.createTextNode('최근 완료된 모델도 표시'));
+const modelLabel=element('label','schedule-select');
+const modelSelect=element('select');
+modelSelect.setAttribute('aria-label','모델 필터');
+modelSelect.append(new Option('모델 전체',''));
+for(const name of MODELS) modelSelect.append(new Option(name,name));
+modelSelect.onchange=()=>{filters.model=modelSelect.value||null;render();};
+modelLabel.append(modelSelect);
+const cycleGroup=element('div','schedule-cycles');
+cycleGroup.setAttribute('role','group');cycleGroup.setAttribute('aria-label','시간대 필터');
+const cycleButtons=[[null,'전체'],[0,'00Z'],[6,'06Z'],[12,'12Z'],[18,'18Z']].map(([value,text])=>{
+const button=element('button',value===null?'':'c'+pad(value),text);button.type='button';
+button.onclick=()=>{filters.cycle=value;render();};
+cycleGroup.append(button);return {value,button};
+});
+filterBar.append(doneLabel,modelLabel,cycleGroup);
 
 const boardWrap=element('div','schedule-scroll-wrap');
 const board=element('div','schedule-scroll schedule-board-wrap');
@@ -385,9 +507,11 @@ sources.append(element('i','schedule-key is-kma'),document.createTextNode('기�
 element('i','schedule-key is-self'),document.createTextNode('자체생산'));
 const cycles=element('span','schedule-legend-group');
 for(const cycle of [0,6,12,18]) cycles.append(element('mark','schedule-mark c'+pad(cycle),pad(cycle)+'Z'));
-legend.append(sources,cycles,element('span','schedule-legend-note','최근 4일 실측 기준'));
+const times=element('span','schedule-legend-group');
+times.append(element('b','','검은 시각'),document.createTextNode(' 실제 · '),element('span','is-est','회색 시각'),document.createTextNode(' 추정'));
+legend.append(sources,cycles,times,element('span','schedule-legend-note','최근 4일 실측 기준'));
 
-dialog.append(header,boardWrap,tabs,timelinePanel,tableWrap,legend);
+dialog.append(header,filterBar,boardWrap,tabs,timelinePanel,tableWrap,legend);
 
 let selected=null;
 const select=(row,bar)=>{
@@ -397,19 +521,22 @@ bar?.classList.add('is-selected');
 const offset=offsetFor(mode);
 detail.textContent=row.hourly
 ?`${row.model} 매시 · +${row.leads}h · ${SOURCE_LABEL[row.source]} · 정시+${row.start%60}~${row.end%60}분`
-:`${row.model} ${pad(row.cycle)}Z · +${row.leads}h · ${SOURCE_LABEL[row.source]} · ${clock(row.start+offset)} 시작 → ${clock(row.end+offset)} 완료 (${mode})`;
+:`${row.model} ${pad(row.cycle)}Z · +${row.leads}h · ${SOURCE_LABEL[row.source]} · 추정 ${clock(row.start+offset)} 시작 → ${clock(row.end+offset)} 완료 (${mode})`;
 };
 
 function render(){
-const now=new Date(global.CDSPublicCharts?.clockNow?.()??Date.now());
+const now=nowMs();
 modeButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.textContent===mode)));
 for(const [value,button] of Object.entries(tabButtons)) button.setAttribute('aria-selected',String(value===tab));
+cycleButtons.forEach(({value,button})=>button.setAttribute('aria-pressed',String(value===filters.cycle)));
+doneBox.disabled=!!filters.model;
+doneLabel.classList.toggle('is-disabled',!!filters.model);
 timelinePanel.hidden=tab!=='timeline';
 tableWrap.hidden=tab!=='table';
-renderBoard(board,mode,now,late);
-renderTimeline(timeline,mode,now,select);
-renderTable(tablePanel,mode,now,late);
-const first=selected||boardRows(now,late)[0];
+renderBoard(board,mode,now,states,filters);
+renderTimeline(timeline,mode,now,filters,select);
+renderTable(tablePanel,mode,states);
+const first=selected||(states&&boardRows(states,filters)[0]);
 if(first){
 const match=[...timeline.querySelectorAll('.schedule-bar')]
 .find(bar=>bar.getAttribute('aria-label').startsWith(`${first.model} ${pad(first.cycle)}Z ${first.leads}h`));
@@ -419,23 +546,23 @@ requestAnimationFrame(()=>{hideCrowdedTags(timeline);updateBoardHint();updateTab
 }
 
 let checking=false;
-async function refreshLate(){
+async function refresh(){
 if(checking) return;
 checking=true;
-try{late=await lateRuns(global.CDSPublicCharts?.clockNow?.()??Date.now());}
+try{states=await resolveStates(nowMs());}
 finally{checking=false;}
 if(dialog.open) render();
 }
 
 const resize=()=>{hideCrowdedTags(timeline);updateBoardHint();updateTableHint();};
-const timer=setInterval(()=>{if(dialog.open){render();refreshLate();}},60000);
+const timer=setInterval(()=>{if(dialog.open){render();refresh();}},60000);
 dialog.addEventListener('close',()=>{clearInterval(timer);global.removeEventListener('resize',resize);dialog.remove();});
 dialog.addEventListener('click',event=>{if(event.target===dialog) dialog.close();});
 global.addEventListener('resize',resize);
 document.body.append(dialog);
 render();
 dialog.showModal();
-refreshLate();
+refresh();
 }
 
 function button(){
@@ -447,5 +574,5 @@ node.onclick=open;
 return node;
 }
 
-global.CDSModelSchedule={button,open,upcoming,windows,occurrences,lateRuns,SCHEDULE};
+global.CDSModelSchedule={button,open,windows,occurrences,resolveStates,boardRows,SCHEDULE};
 })(window);
