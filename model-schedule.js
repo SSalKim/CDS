@@ -8,14 +8,14 @@
 // their upload times through HEAD requests), KMA runs by loading the first or last lead image.
 const KMA_BASE='https://data.kma.go.kr/CHT';
 const SCHEDULE=[
-{model:'KIM_GDAPS',kma:['KIMG','kim_gdps_erly_asia_gph500_ft06_pa4_s{fh}_{run}.png'],runs:[
+{model:'KIM_GDAPS',status:'kim_gdps',kma:['KIMG','kim_gdps_erly_asia_gph500_ft06_pa4_s{fh}_{run}.png'],runs:[
 [0,'000~288','kma','03:20','05:50'],[6,'000~084','kma','09:20','10:05'],
 [12,'000~288','kma','15:20','17:50'],[18,'000~084','kma','21:20','22:00']]},
 // UKUM 00/12Z: 000-144 h come from KMA, 156/168 h from R2 once KMA has released 144 h.
-{model:'UKUM',id:'ukmo',kma:['GDPS','ukum_erly_asia_gph500_s{fh}_{run}.png'],runs:[
+{model:'UKUM',id:'ukmo',status:'ukmo',kma:['GDPS','ukum_erly_asia_gph500_s{fh}_{run}.png'],runs:[
 [0,'000~168','kma','09:40','09:55',{last:'public'}],[6,'000~069','self','11:35','12:05'],
 [12,'000~168','kma','22:35','22:55',{last:'public'}],[18,'000~069','self','23:35','00:10']]},
-{model:'ECMWF',id:'ecmwf',kma:['ECMW','ecmw_lc40_asia_gph500_s{fh}_{run}.gif'],runs:[
+{model:'ECMWF',id:'ecmwf',status:'ecmwf',kma:['ECMW','ecmw_lc40_asia_gph500_s{fh}_{run}.gif'],runs:[
 [0,'000~240','kma','05:55','07:00'],[0,'252~360','self','07:40','07:45'],[6,'000~144','self','12:30','12:40'],
 [12,'000~240','kma','17:55','19:00'],[12,'252~360','self','19:40','19:45'],[18,'000~144','self','00:30','00:40']]},
 {model:'AIFS',id:'aifs',runs:[
@@ -31,10 +31,10 @@ const SCHEDULE=[
 {model:'ICON',id:'icon',runs:[
 [0,'000~180','self','02:45','03:30'],[6,'000~120','self','08:45','09:20'],
 [12,'000~180','self','14:45','15:35'],[18,'000~120','self','20:45','21:20']]},
-{model:'KIM_RDAPS',kma:['KIMR1','kim_rdps_erly_asia_gph500_s{fh}_{run}.png'],runs:[
+{model:'KIM_RDAPS',status:'kim_rdps',kma:['KIMR1','kim_rdps_erly_asia_gph500_s{fh}_{run}.png'],runs:[
 [0,'000~120','kma','03:55','05:30'],[6,'000~072','kma','09:45','10:50'],
 [12,'000~120','kma','15:55','17:25'],[18,'000~072','kma','21:45','22:45']]},
-{model:'KIM_LDAPS',kma:['KIML','kim_ldps_erly_hkor_gph500_s{fh}_{run}.png'],runs:[
+{model:'KIM_LDAPS',status:'kim_ldps',kma:['KIML','kim_ldps_erly_hkor_gph500_s{fh}_{run}.png'],runs:[
 [0,'000~048','kma','04:00','04:55'],[6,'000~048','kma','09:45','10:40'],
 [12,'000~048','kma','15:55','16:55'],[18,'000~048','kma','21:45','22:40']]},
 {model:'KIM_KLAPS',hourly:{leads:'000~012',source:'kma',start:15,end:20}}
@@ -48,6 +48,7 @@ const HOUR_MS=3600000;
 // Runs whose estimated end is older than this are taken as finished and not checked;
 // KMA checks load a whole chart image (0.2-0.6 MB), so the window stays short.
 const LATE_WINDOW=3*60;
+const LONG_LATE_WINDOW=6*60;
 const TAB_STORE='cds.schedule.tab';
 const DONE_STORE='cds.schedule.show-done';
 // The 24 h timeline runs 23:00-23:00 so ICON 12Z (23:40 KST) is not split at midnight.
@@ -75,7 +76,7 @@ for(const [cycle,leads,source,start,end,checks={}] of entry.runs){
 let from=minutes(start),to=minutes(end);
 if(to<from) to+=DAY;
 const kind=source==='self'?'public':'kma';
-rows.push({model:entry.model,id:entry.id,kma:entry.kma,cycle,leads,source,start:from,end:to,
+rows.push({model:entry.model,id:entry.id,kma:entry.kma,status:source==='kma'?entry.status:undefined,cycle,leads,source,start:from,end:to,
 firstCheck:checks.first||kind,lastCheck:checks.last||kind});
 }
 }
@@ -138,13 +139,41 @@ const d=new Date(ms);
 return d.getUTCFullYear()+pad(d.getUTCMonth()+1)+pad(d.getUTCDate())+pad(d.getUTCHours());
 }
 
+// KMA release times published by the producer (status/releases.json on R2). The browser cannot
+// read KMA response headers, so this is where KMA runs get real times; it also spares the
+// viewer from loading whole chart images to see whether a run is out.
+const RELEASE_KEY='status/releases.json';
+const RELEASE_STALE=20*MINUTE;
+async function loadReleases(now){
+const origin=global.CDSPublicCharts?.getR2Base?.();
+if(!origin) return null;
+try{
+const response=await fetch(origin+RELEASE_KEY,{cache:'no-store',credentials:'omit'});
+if(!response.ok) return null;
+const status=await response.json();
+const at=Date.parse(status?.generated_at);
+if(status?.schema!==1 || !Number.isFinite(at) || now-at>RELEASE_STALE || typeof status.runs!=='object') return null;
+return status.runs;
+}catch{return null;}
+}
+
+function releaseEntry(run,ctx){
+if(!ctx.releases || !run.status) return undefined;
+return ctx.releases[`${run.status}/${cycleText(run.cycleMs)}`]||null;
+}
+
 // true / false, or null when it cannot be told (no fresh R2 snapshot, KMA not answering).
-function leadExists(run,hour,kind,publicFresh){
+function leadExists(run,hour,kind,ctx){
 if(kind==='public'){
 const store=global.CDSPublicCharts;
-if(!publicFresh || !store?.readyHours || !run.id) return Promise.resolve(null);
+if(!ctx.publicFresh || !store?.readyHours || !run.id) return Promise.resolve(null);
 const hours=store.readyHours({modelId:run.id,product:PRODUCT,runUTC:new Date(run.cycleMs)});
 return Promise.resolve(hours.includes(hour));
+}
+const entry=releaseEntry(run,ctx);
+if(entry!==undefined){
+if(!entry) return Promise.resolve(false);
+return Promise.resolve(Boolean(hour===entry.leads?.[0]?entry.first:entry.last));
 }
 if(!run.kma) return Promise.resolve(null);
 const text=cycleText(run.cycleMs);
@@ -153,33 +182,38 @@ const name=template.replace('{fh}',String(hour).padStart(3,'0')).replace('{run}'
 return kmaImageLoads(`${KMA_BASE}/${folder}/${text.slice(0,6)}/${text.slice(6,8)}/${name}`);
 }
 
-// When a self-produced lead appeared on R2. KMA image times are not readable from the browser,
-// and UKUM 00/12Z 156/168 h are shown only after KMA's release, not at upload.
-function leadTime(run,hour,publicFresh){
+// When a lead appeared: R2 upload time for self-produced runs, the producer's record of KMA's
+// release for KMA runs (UKUM 00/12Z ends when KMA's 144 h is out, as 156/168 h wait for it).
+function leadTime(run,hour,ctx){
+if(run.source!=='self'){
+const entry=releaseEntry(run,ctx);
+const value=entry?Date.parse(hour===leadRange(run.leads)[0]?entry.first:entry.last):NaN;
+return Promise.resolve(Number.isFinite(value)?value:null);
+}
 const store=global.CDSPublicCharts;
 const origin=store?.getR2Base?.();
-if(run.source!=='self' || !publicFresh || !origin || !store?.resolveUrls) return Promise.resolve(null);
+if(!ctx.publicFresh || !origin || !store?.resolveUrls) return Promise.resolve(null);
 const url=store.resolveUrls({modelId:run.id,product:PRODUCT,runUTC:new Date(run.cycleMs),forecastHour:hour})[0];
 return url&&url.startsWith(origin)?uploadTime(url):Promise.resolve(null);
 }
 
-async function resolveRun(run,now,publicFresh,deep){
+async function resolveRun(run,now,ctx,deep){
 const duration=run.endMs-run.startMs;
 const estimate={...run,showStart:run.startMs,showEnd:run.endMs,realStart:false,realEnd:false};
 if(run.cycleMs>now) return {...estimate,state:'next'};
 // Old runs and runs far from starting are not checked.
-const recent=run.endMs>=now-LATE_WINDOW*MINUTE;
+const recent=run.endMs>=now-ctx.window*MINUTE;
 if(!recent && !deep) return {...estimate,state:'done'};
 if(now<run.startMs-HOUR_MS) return {...estimate,state:'next'};
 const [first,last]=leadRange(run.leads);
-const finished=await leadExists(run,last,run.lastCheck,publicFresh);
+const finished=await leadExists(run,last,run.lastCheck,ctx);
 if(finished===true){
-const [start,end]=await Promise.all([leadTime(run,first,publicFresh),leadTime(run,last,publicFresh)]);
+const [start,end]=await Promise.all([leadTime(run,first,ctx),leadTime(run,last,ctx)]);
 return {...estimate,state:'done',showStart:start??run.startMs,showEnd:end??run.endMs,realStart:!!start,realEnd:!!end};
 }
-const started=await leadExists(run,first,run.firstCheck,publicFresh);
+const started=await leadExists(run,first,run.firstCheck,ctx);
 if(started===true){
-const start=await leadTime(run,first,publicFresh);
+const start=await leadTime(run,first,ctx);
 const showStart=start??run.startMs;
 const showEnd=showStart+duration;
 return {...estimate,state:now>showEnd&&recent?'late':now>showEnd?'done':'live',showStart,showEnd,realStart:!!start};
@@ -193,19 +227,23 @@ return {...estimate,state:now<run.startMs?'next':now<run.endMs?'live':'done'};
 
 async function resolveStates(now){
 const store=global.CDSPublicCharts;
-let publicFresh=false;
-try{publicFresh=(await store?.load?.())?.ok===true && store.getSource?.()==='r2';}catch{}
+const ctx={publicFresh:false,releases:null,window:LATE_WINDOW};
+const [loaded,releases]=await Promise.all([Promise.resolve(store?.load?.()).catch(()=>null),loadReleases(now)]);
+ctx.publicFresh=loaded?.ok===true && store.getSource?.()==='r2';
+ctx.releases=releases;
+// With the producer's record no KMA image has to be loaded, so lateness is watched longer.
+if(releases) ctx.window=LONG_LATE_WINDOW;
 const runs=occurrences(now);
-// Self-produced upload times are cheap to read, so each stream's latest older run gets its
-// real times too (it is what "최근 완료" shows).
+// Each stream's latest older run gets its real times too (it is what "최근 완료" shows) when
+// they are cheap to read: R2 upload times, or KMA times from the producer's record.
 const older=new Map();
 for(const run of runs){
-if(run.source!=='self' || run.endMs>=now-LATE_WINDOW*MINUTE) continue;
+if(run.endMs>=now-ctx.window*MINUTE || run.source!=='self' && !releases) continue;
 const stream=`${run.model}|${run.cycle}|${run.leads}`;
 if(!older.has(stream) || older.get(stream).cycleMs<run.cycleMs) older.set(stream,run);
 }
 const deep=new Set([...older.values()].map(run=>run.key));
-return Promise.all(runs.map(run=>resolveRun(run,now,publicFresh,deep.has(run.key))
+return Promise.all(runs.map(run=>resolveRun(run,now,ctx,deep.has(run.key))
 .catch(()=>({...run,showStart:run.startMs,showEnd:run.endMs,state:run.endMs<now?'done':'next'}))));
 }
 
