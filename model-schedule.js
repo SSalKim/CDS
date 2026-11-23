@@ -13,14 +13,14 @@ const SCHEDULE=[
 [12,'000~288','kma','15:20','17:50'],[18,'000~084','kma','21:20','22:00']]},
 // UKUM 00/12Z: 000-144 h come from KMA, 156/168 h from R2 once KMA has released 144 h.
 {model:'UKUM',id:'ukmo',status:'ukmo',kma:['GDPS','ukum_erly_asia_gph500_s{fh}_{run}.png'],runs:[
-[0,'000~168','kma','09:40','09:55',{last:'public'}],[6,'000~069','self','11:35','12:05'],
-[12,'000~168','kma','22:35','22:55',{last:'public'}],[18,'000~069','self','23:35','00:10']]},
+[0,'000~168','kma','09:40','09:55',{last:'public'}],[6,'000~069','self','11:35','12:10'],
+[12,'000~168','kma','22:35','22:55',{last:'public'}],[18,'000~069','self','23:35','00:15']]},
 {model:'ECMWF',id:'ecmwf',status:'ecmwf',kma:['ECMW','ecmw_lc40_asia_gph500_s{fh}_{run}.gif'],runs:[
-[0,'000~240','kma','05:55','07:00'],[0,'252~360','self','07:40','07:45'],[6,'000~144','self','12:30','12:40'],
-[12,'000~240','kma','17:55','19:00'],[12,'252~360','self','19:40','19:45'],[18,'000~144','self','00:30','00:40']]},
+[0,'000~240','kma','05:55','07:00'],[0,'252~360','self','07:40','07:45'],[6,'000~144','self','12:30','12:45'],
+[12,'000~240','kma','17:55','19:00'],[12,'252~360','self','19:40','19:45'],[18,'000~144','self','00:30','00:45']]},
 {model:'AIFS',id:'aifs',runs:[
-[0,'000~360','self','05:30','05:35'],[6,'000~360','self','11:25','11:35'],
-[12,'000~360','self','17:25','17:35'],[18,'000~360','self','23:30','23:35']]},
+[0,'000~360','self','05:30','05:35'],[6,'000~360','self','11:25','11:40'],
+[12,'000~360','self','17:25','17:35'],[18,'000~360','self','23:30','23:40']]},
 {model:'GFS',id:'gfs',runs:[
 [0,'000~360','self','03:35','05:10'],[6,'000~360','self','09:35','11:15'],
 [12,'000~360','self','15:35','17:10'],[18,'000~360','self','21:40','23:15']]},
@@ -215,7 +215,8 @@ const started=await leadExists(run,first,run.firstCheck,ctx);
 if(started===true){
 const start=await leadTime(run,first,ctx);
 const showStart=start??run.startMs;
-const showEnd=showStart+duration;
+// A late start pushes the end back; an early one does not pull it before the estimate.
+const showEnd=Math.max(run.endMs,showStart+duration);
 return {...estimate,state:now>showEnd&&recent?'late':now>showEnd?'done':'live',showStart,showEnd,realStart:!!start};
 }
 if(finished===false && started===false){
