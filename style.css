@@ -5636,3 +5636,1020 @@ select option.unsupported-option{
 .chart-magnifier-lens{position:fixed;z-index:60;border-radius:50%;border:2px solid #315882;box-shadow:0 4px 16px rgba(0,0,0,.35),inset 0 0 0 1px rgba(255,255,255,.7);background-color:#fff;background-repeat:no-repeat;pointer-events:none;}
 .chart-magnifier-lens[hidden]{display:none;}
 .magnifier-active #chartImages img{cursor:crosshair;touch-action:none;}
+
+/* ===== v3.7: responsive toolbar rows, scroll hints, model timetable ===== */
+
+/* Desktop and tablet: the time row and the product row are real rows. One line while both
+   fit (responsive-layout.js measures it); otherwise the product row takes its own line. */
+@media not all and (max-width: 700px) and (orientation: portrait){
+  .app-shell .toolbar-left{
+    display:flex !important;
+    flex-wrap:nowrap !important;
+    align-items:center !important;
+    gap:8px 10px !important;
+  }
+
+  .app-shell .toolbar-time-row,
+  .app-shell .toolbar-product-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-width:0;
+  }
+
+  .app-shell .toolbar-time-row{
+    flex:0 0 auto;
+    flex-wrap:wrap;
+  }
+
+  .app-shell .toolbar-product-row{
+    flex:1 1 auto;
+    flex-wrap:nowrap;
+  }
+
+  .app-shell .toolbar-product-row #productCategory{
+    flex:1 1 120px;
+    width:auto;
+    min-width:0;
+    max-width:170px;
+  }
+
+  .app-shell .toolbar-product-row #productSelect{
+    flex:1 1 150px;
+    width:auto;
+    min-width:0;
+    max-width:230px;
+  }
+
+  .app-shell .toolbar-product-row .timeline-top-controls{
+    flex:0 0 auto !important;
+    width:auto !important;
+    margin-left:auto !important;
+  }
+
+  .app-shell .toolbar-left.is-stacked{
+    flex-wrap:wrap !important;
+  }
+
+  .app-shell .toolbar-left.is-stacked .toolbar-product-row{
+    flex:1 1 100%;
+    flex-wrap:wrap;
+    row-gap:8px;
+  }
+
+  .app-shell .toolbar-left.is-tight .toolbar-product-row #productCategory{
+    flex:1 1 40%;
+    max-width:none;
+  }
+
+  .app-shell .toolbar-left.is-tight .toolbar-product-row #productSelect{
+    flex:1 1 55%;
+    max-width:none;
+  }
+
+  .app-shell .toolbar-left.is-tight .toolbar-product-row .timeline-top-controls{
+    flex:1 1 100% !important;
+  }
+
+  .app-shell .toolbar-left.is-tight .timeline-top-controls .compare-controls{
+    width:100%;
+  }
+
+  .app-shell .toolbar-left.is-tight .timeline-top-controls .timeline-playback-controls,
+  .app-shell .toolbar-left.is-tight .timeline-top-controls .compare-playback-controls{
+    margin-left:auto;
+  }
+
+  /* Scroll hint for the desktop sidebar; the mobile dock hint is unused here. */
+  .app-shell .scroll-hint-dock{
+    display:none;
+  }
+}
+
+/* Timetable button */
+.viewer-icon-button.schedule-button{
+  width:auto;
+  gap:4px;
+  padding:0 9px 0 7px;
+  color:#1f4f86;
+  font-size:12px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.schedule-button svg{
+  width:16px;
+  height:16px;
+}
+
+/* ---------- Scroll hints ---------- */
+.scroll-hint{
+  position:sticky;
+  bottom:0;
+  z-index:3;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  width:100%;
+  height:34px;
+  margin-top:-44px;
+  padding:0 0 4px;
+  border:0;
+  background:linear-gradient(to bottom,rgba(255,255,255,0),var(--hint-bg,#ffffff) 70%);
+  cursor:pointer;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .18s ease,visibility .18s;
+}
+
+.has-more-below > .scroll-hint{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+}
+
+.scroll-hint-arrow{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:26px;
+  height:20px;
+  border:1px solid #c9d8eb;
+  border-radius:999px;
+  background:#ffffff;
+  color:#2b5d99;
+  font-size:10px;
+  line-height:1;
+  box-shadow:0 2px 6px rgba(32,60,89,.18);
+  animation:scroll-hint-nudge 1.6s ease-in-out 3;
+}
+
+.scroll-hint:hover .scroll-hint-arrow,
+.scroll-hint:focus-visible .scroll-hint-arrow{
+  background:#edf5ff;
+  border-color:#8aaddb;
+}
+
+.scroll-hint:focus-visible{
+  outline:none;
+}
+
+.scroll-hint-sidebar{
+  --hint-bg:var(--bg-panel);
+  flex-shrink:0;
+  margin-left:-10px;
+  margin-right:-10px;
+  width:calc(100% + 20px);
+  margin-bottom:-10px;
+}
+
+@keyframes scroll-hint-nudge{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(3px);}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .scroll-hint-arrow{animation:none;}
+}
+
+/* ---------- Mobile portrait: product controls move above the model picker ---------- */
+@media (max-width: 700px) and (orientation: portrait){
+  .app-shell{
+    grid-template-rows:auto auto auto auto minmax(120px,1fr) auto auto;
+  }
+
+  .app-shell > .sidebar > .scroll-hint-sidebar{
+    display:none;
+  }
+
+  .app-shell .toolbar,
+  .app-shell .toolbar-left{
+    display:contents !important;
+  }
+
+  .app-shell .menu-btn{
+    height:34px;
+    font-size:12px;
+  }
+
+  /* Time row: two lines with full-size targets instead of one cramped line. */
+  .app-shell .toolbar-time-row{
+    grid-column:2;
+    grid-row:2;
+    display:grid;
+    grid-template-columns:46px minmax(0,1.35fr) minmax(0,1fr) 40px;
+    grid-template-rows:32px 32px;
+    gap:4px;
+    padding:4px;
+    border-bottom:1px solid var(--line);
+    background:#ffffff;
+  }
+
+  .app-shell #nowBtn,
+  .app-shell #runDate,
+  .app-shell #runHour,
+  .app-shell .time-toggle-stack,
+  .app-shell .run-shift-group,
+  .app-shell .run-shift-group button{
+    height:32px !important;
+    min-height:32px !important;
+  }
+
+  .app-shell #nowBtn{
+    font-size:12px;
+  }
+
+  .app-shell #runDate,
+  .app-shell #runHour{
+    padding:3px 6px;
+    font-size:13px;
+  }
+
+  .app-shell .time-mode{
+    font-size:10px;
+  }
+
+  .app-shell .run-shift-group{
+    grid-column:1 / -1;
+    grid-row:2;
+  }
+
+  .app-shell .run-shift-group button,
+  .app-shell .run-shift-group button::after{
+    font-size:12px !important;
+  }
+
+  .app-shell .run-shift-group button[data-shift-hours]{
+    font-size:0 !important;
+  }
+
+  .app-shell .run-shift-group button[data-shift-hours]::after{
+    content:attr(data-shift-hours) "h";
+  }
+
+  .app-shell .run-shift-group button[data-shift-hours="6"]::after,
+  .app-shell .run-shift-group button[data-shift-hours="12"]::after,
+  .app-shell .run-shift-group button[data-shift-hours="24"]::after{
+    content:"+" attr(data-shift-hours) "h";
+  }
+
+  /* Product dock: selects on one line, tools on the next, right above the models. */
+  .app-shell .toolbar-product-row{
+    grid-column:1 / -1;
+    grid-row:6;
+    display:grid;
+    grid-template-columns:minmax(96px,var(--product-category-width,40%)) minmax(0,1fr);
+    grid-template-rows:38px 38px;
+    gap:6px;
+    padding:6px 8px;
+    border-top:1px solid var(--line);
+    background:#f6f9fc;
+  }
+
+  .app-shell #productCategory,
+  .app-shell #productSelect{
+    grid-row:1;
+    height:38px !important;
+    min-height:38px !important;
+    padding:4px 8px;
+    border-radius:8px;
+    font-size:13px;
+  }
+
+  .app-shell #productCategory{grid-column:1;}
+  .app-shell #productSelect{grid-column:2;}
+
+  .app-shell .toolbar-product-row .timeline-top-controls{
+    grid-column:1 / -1;
+    grid-row:2;
+    display:flex;
+    width:100% !important;
+    height:38px !important;
+    min-height:38px !important;
+    margin:0 !important;
+  }
+
+  .app-shell .toolbar-product-row .timeline-top-controls .compare-controls{
+    display:flex !important;
+    width:100%;
+    height:38px !important;
+    min-height:38px !important;
+    gap:6px !important;
+    align-items:stretch !important;
+  }
+
+  .app-shell .toolbar-product-row .viewer-icon-button{
+    width:40px;
+    height:38px;
+    border-radius:8px;
+  }
+
+  .app-shell .toolbar-product-row .viewer-icon-button svg{
+    width:19px;
+    height:19px;
+  }
+
+  .app-shell .toolbar-product-row .viewer-icon-button.schedule-button{
+    width:auto;
+    padding:0 10px 0 8px;
+    font-size:13px;
+  }
+
+  .app-shell .toolbar-product-row .viewer-icon-button.schedule-button svg{
+    width:17px;
+    height:17px;
+  }
+
+  /* The fit toggle shows with a short label; the menu opens upward from the dock. */
+  .app-shell .toolbar-product-row .viewer-fit-control{
+    display:inline-flex;
+    height:38px !important;
+    border-radius:8px;
+  }
+
+  .app-shell .toolbar-product-row .viewer-fit-control .compare-fit-toggle{
+    display:inline-flex !important;
+    height:36px !important;
+    min-height:36px !important;
+    padding:0 2px 0 8px !important;
+    gap:5px;
+    font-size:0 !important;
+  }
+
+  .app-shell .toolbar-product-row .viewer-fit-control .compare-fit-toggle input{
+    width:16px !important;
+    height:16px !important;
+  }
+
+  .app-shell .toolbar-product-row .viewer-fit-control .compare-fit-toggle span::after{
+    content:"맞춤";
+    font-size:12px;
+    font-weight:800;
+  }
+
+  .app-shell .toolbar-product-row .viewer-fit-direction{
+    width:26px;
+    height:36px;
+  }
+
+  .app-shell .toolbar-product-row .fit-direction-menu{
+    top:auto;
+    bottom:calc(100% + 6px);
+  }
+
+  .app-shell .toolbar-product-row .timeline-playback-controls,
+  .app-shell .toolbar-product-row .compare-playback-controls{
+    display:grid !important;
+    grid-template-columns:repeat(3,38px) !important;
+    margin-left:auto;
+  }
+
+  .app-shell .toolbar-product-row .timeline-playback-controls button,
+  .app-shell .toolbar-product-row .compare-playback-controls button{
+    width:38px !important;
+    min-width:38px !important;
+    height:38px !important;
+    min-height:38px !important;
+    font-size:13px !important;
+  }
+
+  .app-shell .model-box{
+    grid-row:7;
+    position:relative;
+  }
+
+  .app-shell .model-cell{
+    min-height:30px;
+    font-size:10px;
+  }
+
+  .app-shell .scroll-hint-dock{
+    --hint-bg:#ffffff;
+    grid-column:1 / -1;
+    height:30px;
+    margin-top:-30px;
+  }
+}
+
+@media (max-width: 400px) and (orientation: portrait){
+  .app-shell .toolbar-time-row{
+    grid-template-columns:42px minmax(0,1.35fr) minmax(0,1fr) 36px;
+  }
+
+  .app-shell #runDate,
+  .app-shell #runHour{
+    padding:3px 4px !important;
+    font-size:12px;
+  }
+
+  .app-shell #productCategory,
+  .app-shell #productSelect{
+    padding:4px 6px !important;
+    font-size:12px;
+  }
+
+  .app-shell .toolbar-product-row .viewer-icon-button{
+    width:36px;
+  }
+
+  .app-shell .toolbar-product-row .timeline-playback-controls,
+  .app-shell .toolbar-product-row .compare-playback-controls{
+    grid-template-columns:repeat(3,36px) !important;
+  }
+
+  .app-shell .toolbar-product-row .timeline-playback-controls button,
+  .app-shell .toolbar-product-row .compare-playback-controls button{
+    width:36px !important;
+    min-width:36px !important;
+  }
+
+  .app-shell .model-cell{
+    font-size:9px;
+    letter-spacing:-.4px;
+  }
+}
+
+@media (max-width: 374px) and (orientation: portrait){
+  .app-shell .toolbar-product-row .viewer-icon-button.schedule-button .schedule-button-text{
+    display:none;
+  }
+
+  .app-shell .toolbar-product-row .viewer-icon-button.schedule-button{
+    width:36px;
+    padding:0;
+  }
+}
+
+/* ---------- Model timetable dialog (board style) ---------- */
+.schedule-dialog{
+  --ink:#111111;
+  --muted:#777777;
+  --rule:#dddddd;
+  --c00:#ffe98a;--c00-bar:#d9ad00;--c00-ink:#7a6000;
+  --c06:#d3f2bd;--c06-bar:#5c9e38;--c06-ink:#3a6d20;
+  --c12:#cfe5ff;--c12-bar:#3b7fcc;--c12-ink:#1d5799;
+  --c18:#ffd7e5;--c18-bar:#cf5a84;--c18-ink:#9b2f55;
+  position:fixed;
+  inset:0;
+  margin:auto;
+  width:min(900px,calc(100% - 24px));
+  max-height:calc(100dvh - 24px);
+  padding:0;
+  overflow-x:hidden;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  border:1px solid var(--ink);
+  border-radius:0;
+  color:var(--ink);
+  background:#ffffff;
+  box-shadow:0 10px 30px rgba(0,0,0,.18);
+}
+
+.schedule-dialog::backdrop{
+  background:rgba(17,17,17,.35);
+}
+
+.schedule-dialog .mono,
+.schedule-board-time,
+.schedule-board-cycle,
+.schedule-board-leads,
+.schedule-axis-tick,
+.schedule-bar-tag,
+.schedule-now-label,
+.schedule-table-cycle,
+.schedule-table-leads,
+.schedule-table-time,
+.schedule-mark{
+  font-family:"Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:0;
+}
+
+.schedule-header{
+  position:sticky;
+  top:0;
+  z-index:5;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:14px 14px 11px 18px;
+  border-bottom:3px solid var(--ink);
+  background:#ffffff;
+}
+
+.schedule-title{
+  margin-right:auto;
+  font-size:18px;
+  font-weight:900;
+  letter-spacing:-.5px;
+}
+
+.schedule-mode{
+  display:flex;
+  border:1px solid var(--ink);
+}
+
+.schedule-mode button{
+  height:26px;
+  padding:0 10px;
+  border:0;
+  background:#ffffff;
+  color:var(--ink);
+  font-size:11px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.schedule-mode button[aria-pressed="true"]{
+  background:var(--ink);
+  color:#ffffff;
+}
+
+.schedule-close{
+  width:30px;
+  height:30px;
+  border:0;
+  background:transparent;
+  color:var(--ink);
+  font-size:24px;
+  font-weight:300;
+  line-height:1;
+  cursor:pointer;
+}
+
+.schedule-close:hover{
+  color:#555555;
+}
+
+/* Board */
+.schedule-scroll-wrap{
+  position:relative;
+}
+
+.schedule-scroll{
+  overflow-x:auto;
+  scrollbar-width:thin;
+}
+
+.schedule-scroll-more{
+  display:none;
+}
+
+.schedule-board{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.schedule-board td{
+  padding:7px 10px;
+  border-bottom:1px dotted #bbbbbb;
+  font-size:13px;
+  white-space:nowrap;
+}
+
+.schedule-board td:first-child{
+  padding-left:18px;
+}
+
+.schedule-board-state{
+  width:64px;
+}
+
+.schedule-state{
+  display:inline-block;
+  padding:1px 6px;
+  border:1px solid transparent;
+  font-size:11px;
+  font-weight:700;
+  font-style:normal;
+  line-height:1.4;
+}
+
+.schedule-state.is-live{
+  background:#f2c200;
+  color:var(--ink);
+}
+
+.schedule-state.is-next{
+  border-color:#bbbbbb;
+  color:var(--muted);
+}
+
+.schedule-state.is-late{
+  background:#c8261b;
+  color:#ffffff;
+}
+
+.schedule-board-time{
+  font-size:15px;
+  font-weight:700;
+}
+
+.schedule-board-cycle .schedule-mark,
+.schedule-table-cycle .schedule-mark{
+  font-weight:700;
+}
+
+.schedule-mark{
+  padding:0 3px;
+  color:inherit;
+  background:linear-gradient(transparent 38%,var(--mark) 38%,var(--mark) 92%,transparent 92%);
+}
+
+.schedule-mark.c00{--mark:var(--c00);}
+.schedule-mark.c06{--mark:var(--c06);}
+.schedule-mark.c12{--mark:var(--c12);}
+.schedule-mark.c18{--mark:var(--c18);}
+
+.schedule-board-source,
+.schedule-board-leads,
+.schedule-table-source{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.schedule-board-model{
+  font-weight:900;
+}
+
+.schedule-board-remain{
+  width:100%;
+  padding-right:18px !important;
+  text-align:right;
+  color:#555555;
+  font-size:12px;
+}
+
+.schedule-board tr.is-late .schedule-board-remain{
+  color:#c8261b;
+  font-weight:700;
+}
+
+/* Tabs */
+.schedule-tabs{
+  display:flex;
+  gap:18px;
+  padding:14px 18px 0;
+}
+
+.schedule-tabs button{
+  padding:0 0 4px;
+  border:0;
+  border-bottom:2px solid transparent;
+  background:transparent;
+  color:#999999;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.schedule-tabs button[aria-selected="true"]{
+  border-bottom-color:var(--ink);
+  color:var(--ink);
+}
+
+.schedule-panel{
+  padding:12px 18px 4px;
+}
+
+.schedule-panel[hidden]{
+  display:none;
+}
+
+/* Timeline */
+.schedule-timeline{
+  --label:86px;
+  position:relative;
+}
+
+.schedule-axis,
+.schedule-lane{
+  display:grid;
+  grid-template-columns:var(--label) minmax(0,1fr);
+  align-items:center;
+}
+
+.schedule-axis{
+  height:16px;
+}
+
+.schedule-axis-track,
+.schedule-lane-track{
+  position:relative;
+  height:100%;
+}
+
+.schedule-axis-tick{
+  position:absolute;
+  top:0;
+  transform:translateX(-50%);
+  color:var(--muted);
+  font-size:10px;
+}
+
+.schedule-axis-tick:first-child{transform:none;}
+.schedule-axis-tick:last-child{transform:translateX(-100%);}
+
+.schedule-lane{
+  height:27px;
+}
+
+.schedule-lane-name{
+  overflow:hidden;
+  font-size:11px;
+  font-weight:700;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.schedule-lane-track{
+  border-bottom:1px solid #eeeeee;
+}
+
+.schedule-bar{
+  position:absolute;
+  top:14px;
+  height:8px;
+  min-width:3px;
+  padding:0;
+  border:1.5px solid var(--bar,#111111);
+  border-radius:0;
+  background:var(--bar,#111111);
+  cursor:pointer;
+}
+
+.schedule-bar.is-self{
+  background:var(--tint,#ffffff);
+}
+
+.schedule-bar.c00{--bar:var(--c00-bar);--tint:var(--c00);}
+.schedule-bar.c06{--bar:var(--c06-bar);--tint:var(--c06);}
+.schedule-bar.c12{--bar:var(--c12-bar);--tint:var(--c12);}
+.schedule-bar.c18{--bar:var(--c18-bar);--tint:var(--c18);}
+
+.schedule-bar.is-hourly{
+  top:15px;
+  width:2px !important;
+  min-width:2px;
+  height:6px;
+  border:0;
+  background:#999999;
+}
+
+.schedule-bar:hover,
+.schedule-bar:focus-visible,
+.schedule-bar.is-selected{
+  outline:2px solid var(--ink);
+  outline-offset:1px;
+  z-index:2;
+}
+
+.schedule-bar-tag{
+  position:absolute;
+  top:2px;
+  font-size:9px;
+  font-weight:600;
+  line-height:1;
+  white-space:nowrap;
+  pointer-events:none;
+}
+
+.schedule-bar-tag.c00{color:var(--c00-ink);}
+.schedule-bar-tag.c06{color:var(--c06-ink);}
+.schedule-bar-tag.c12{color:var(--c12-ink);}
+.schedule-bar-tag.c18{color:var(--c18-ink);}
+
+.schedule-bar-tag[hidden]{
+  display:none;
+}
+
+.schedule-now{
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:calc(var(--label) + (100% - var(--label)) * var(--now,0));
+  width:0;
+  border-left:1px solid #d00000;
+  pointer-events:none;
+  z-index:3;
+}
+
+.schedule-now-label{
+  position:absolute;
+  top:-1px;
+  left:4px;
+  padding:0 2px;
+  background:#ffffff;
+  color:#d00000;
+  font-size:10px;
+  font-weight:600;
+}
+
+.schedule-detail{
+  min-height:18px;
+  margin-top:10px;
+  font-size:12px;
+  font-weight:700;
+}
+
+/* Table */
+.schedule-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+
+.schedule-table th,
+.schedule-table td{
+  padding:6px 10px;
+  border-bottom:1px dotted #bbbbbb;
+  text-align:left;
+  white-space:nowrap;
+}
+
+.schedule-table thead th{
+  border-bottom:1px solid var(--ink);
+  color:var(--muted);
+  font-size:11px;
+  font-weight:700;
+}
+
+.schedule-table-model{
+  vertical-align:top;
+  font-weight:900;
+}
+
+.schedule-table-time .schedule-state{
+  margin-left:8px;
+  font-family:"Noto Sans KR",sans-serif;
+}
+
+/* Legend */
+.schedule-legend{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px 18px;
+  margin-top:8px;
+  padding:10px 18px 14px;
+  border-top:1px solid var(--rule);
+  color:#555555;
+  font-size:11px;
+}
+
+.schedule-legend-group{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+}
+
+.schedule-legend-group .schedule-mark{
+  margin-right:3px;
+  font-size:11px;
+}
+
+.schedule-key{
+  display:inline-block;
+  width:16px;
+  height:7px;
+  margin-left:6px;
+  border:1.5px solid var(--ink);
+  background:var(--ink);
+}
+
+.schedule-key:first-child{margin-left:0;}
+.schedule-key.is-self{background:#ffffff;}
+
+.schedule-legend-note{
+  margin-left:auto;
+}
+
+@media (max-width: 700px){
+  .schedule-dialog{
+    width:calc(100% - 12px);
+    max-height:calc(100dvh - 12px);
+  }
+
+  .schedule-header{
+    gap:10px;
+    padding:10px 8px 9px 12px;
+  }
+
+  .schedule-title{
+    font-size:16px;
+  }
+
+  .schedule-mode button{
+    height:28px;
+    padding:0 9px;
+  }
+
+  .schedule-board td{
+    padding:7px 6px;
+    font-size:12px;
+  }
+
+  .schedule-board td:first-child{
+    padding-left:12px;
+  }
+
+  .schedule-board-state{
+    width:auto;
+  }
+
+  .schedule-board-time{
+    font-size:13px !important;
+  }
+
+  .schedule-board-remain{
+    padding-right:12px !important;
+  }
+
+  /* Content wider than the screen scrolls sideways; a fade and ▶ say there is more. */
+  .schedule-scroll-wrap.has-more-right::after{
+    content:"";
+    position:absolute;
+    top:0;
+    right:0;
+    bottom:0;
+    width:36px;
+    background:linear-gradient(to right,rgba(255,255,255,0),#ffffff 85%);
+    pointer-events:none;
+  }
+
+  .schedule-scroll-wrap.has-more-right > .schedule-scroll-more{
+    position:absolute;
+    top:50%;
+    right:3px;
+    z-index:2;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:22px;
+    height:22px;
+    padding:0;
+    border:1px solid var(--ink);
+    background:#ffffff;
+    color:var(--ink);
+    font-size:9px;
+    transform:translateY(-50%);
+    cursor:pointer;
+  }
+
+  .schedule-tabs{
+    padding:12px 12px 0;
+  }
+
+  .schedule-panel{
+    padding:10px 12px 4px;
+  }
+
+  .schedule-panel.schedule-scroll-wrap{
+    padding:10px 0 4px 12px;
+  }
+
+  .schedule-timeline{
+    --label:68px;
+  }
+
+  .schedule-lane-name{
+    font-size:10px;
+  }
+
+  .schedule-table{
+    font-size:11px;
+  }
+
+  .schedule-table th,
+  .schedule-table td{
+    padding:6px 4px;
+  }
+
+  .schedule-table thead th{
+    font-size:10px;
+  }
+
+  .schedule-table-source{
+    font-size:10px !important;
+  }
+
+  .schedule-table-time .schedule-state{
+    margin-left:4px;
+    padding:0 3px;
+    font-size:9px;
+  }
+
+  .schedule-table-wrap ~ .schedule-scroll-more{
+    top:30px !important;
+  }
+
+  .schedule-legend{
+    gap:6px 12px;
+    padding:10px 12px 12px;
+  }
+
+  .schedule-legend-note{
+    margin-left:0;
+  }
+}

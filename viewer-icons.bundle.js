@@ -49,6 +49,12 @@
   // node_modules/.pnpm/lucide@1.73.0/node_modules/lucide/dist/esm/icons/chevron-down.mjs
   var ChevronDown = [["path", { d: "m6 9 6 6 6-6" }]];
 
+  // node_modules/.pnpm/lucide@1.73.0/node_modules/lucide/dist/esm/icons/clock.mjs
+  var Clock = [
+    ["circle", { cx: "12", cy: "12", r: "10" }],
+    ["path", { d: "M12 6v6l4 2" }]
+  ];
+
   // node_modules/.pnpm/lucide@1.73.0/node_modules/lucide/dist/esm/icons/copy.mjs
   var Copy = [
     ["rect", { width: "14", height: "14", x: "8", y: "8", rx: "2", ry: "2" }],
@@ -77,7 +83,7 @@
   ];
 
   // web/viewer-icons.js
-  window.CDSViewerIcons = (name) => createElement({ Camera, Copy, Download, X, ChevronDown, ZoomIn }[name], { "aria-hidden": "true", width: 18, height: 18 });
+  window.CDSViewerIcons = (name) => createElement({ Camera, Clock, Copy, Download, X, ChevronDown, ZoomIn }[name], { "aria-hidden": "true", width: 18, height: 18 });
 })();
 /*! Bundled license information:
 
@@ -85,6 +91,7 @@ lucide/dist/esm/defaultAttributes.mjs:
 lucide/dist/esm/createElement.mjs:
 lucide/dist/esm/icons/camera.mjs:
 lucide/dist/esm/icons/chevron-down.mjs:
+lucide/dist/esm/icons/clock.mjs:
 lucide/dist/esm/icons/copy.mjs:
 lucide/dist/esm/icons/download.mjs:
 lucide/dist/esm/icons/x.mjs:
