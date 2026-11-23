@@ -545,9 +545,7 @@ sources.append(element('i','schedule-key is-kma'),document.createTextNode('기�
 element('i','schedule-key is-self'),document.createTextNode('자체생산'));
 const cycles=element('span','schedule-legend-group');
 for(const cycle of [0,6,12,18]) cycles.append(element('mark','schedule-mark c'+pad(cycle),pad(cycle)+'Z'));
-const times=element('span','schedule-legend-group');
-times.append(element('b','','검은 시각'),document.createTextNode(' 실제 · '),element('span','is-est','회색 시각'),document.createTextNode(' 추정'));
-legend.append(sources,cycles,times,element('span','schedule-legend-note','최근 4일 실측 기준'));
+legend.append(sources,cycles,element('span','schedule-legend-note','최근 4일 실측 기준'));
 
 dialog.append(header,filterBar,boardWrap,tabs,timelinePanel,tableWrap,legend);
 
