@@ -51,15 +51,15 @@ const LATE_WINDOW=3*60;
 const LONG_LATE_WINDOW=6*60;
 const TAB_STORE='cds.schedule.tab';
 const DONE_STORE='cds.schedule.show-done';
-// The 24 h timeline runs 23:00-23:00 so ICON 12Z (23:40 KST) is not split at midnight.
-const AXIS_START=23*60;
+// The 24 h timeline starts at 02:00 UTC (11:00 KST) so each day reads 00Z, 06Z, 12Z, 18Z.
+const AXIS_START_UTC=2*60;
 const PRODUCT={category:'asia',id:'gph500'};
 
 const minutes=text=>{const [h,m]=text.split(':').map(Number);return h*60+m;};
 const pad=value=>String(value).padStart(2,'0');
 const clock=value=>{const m=((value%DAY)+DAY)%DAY;return pad(Math.floor(m/60))+':'+pad(m%60);};
 const offsetFor=mode=>mode==='UTC'?0:540;
-const axisMinute=value=>((value-AXIS_START)%DAY+DAY)%DAY;
+const axisMinute=(value,offset)=>((value-AXIS_START_UTC-offset)%DAY+DAY)%DAY;
 const leadRange=leads=>leads.split('~').map(Number);
 const dayMinute=ms=>Math.floor((ms%86400000)/MINUTE);
 const nowMs=()=>global.CDSPublicCharts?.clockNow?.()??Date.now();
@@ -345,7 +345,7 @@ axis.append(element('span'));
 const ticks=element('div','schedule-axis-track');
 for(let hour=0;hour<24;hour+=3){
 const tick=element('span','schedule-axis-tick',pad(hour));
-tick.style.left=(axisMinute(hour*60)/DAY*100)+'%';
+tick.style.left=(axisMinute(hour*60,offset)/DAY*100)+'%';
 ticks.append(tick);
 }
 axis.append(ticks);
@@ -358,7 +358,7 @@ lane.append(element('span','schedule-lane-name',entry.model));
 const track=element('div','schedule-lane-track');
 for(const row of all.filter(item=>item.model===entry.model)){
 const dim=laneDim||(filters.cycle!==null&&(row.hourly||row.cycle!==filters.cycle));
-const start=axisMinute(row.start+offset);
+const start=axisMinute(row.start+offset,offset);
 const length=Math.max(row.end-row.start,row.hourly?2:5);
 const parts=start+length>DAY?[[start,DAY-start],[0,start+length-DAY]]:[[start,length]];
 parts.forEach(([from,width],index)=>{
@@ -382,7 +382,7 @@ container.append(lane);
 }
 const nowLine=element('div','schedule-now');
 const nowMinutes=dayMinute(now);
-nowLine.style.setProperty('--now',String(axisMinute(nowMinutes+offset)/DAY));
+nowLine.style.setProperty('--now',String(axisMinute(nowMinutes+offset,offset)/DAY));
 nowLine.append(element('span','schedule-now-label',clock(nowMinutes+offset)));
 container.append(nowLine);
 }
