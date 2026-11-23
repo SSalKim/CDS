@@ -50,7 +50,6 @@ const HOUR_MS=3600000;
 const LATE_WINDOW=3*60;
 const LONG_LATE_WINDOW=6*60;
 const TAB_STORE='cds.schedule.tab';
-const DONE_STORE='cds.schedule.show-done';
 // The 24 h timeline starts at 02:00 UTC (11:00 KST) so each day reads 00Z, 06Z, 12Z, 18Z.
 const AXIS_START_UTC=2*60;
 const PRODUCT={category:'asia',id:'gph500'};
@@ -250,7 +249,7 @@ return Promise.all(runs.map(run=>resolveRun(run,now,ctx,deep.has(run.key))
 
 // ---------- Board selection ----------
 const STATE_ORDER={late:0,live:1,done:2,next:3};
-function boardRows(states,{model,cycle,showDone},now=nowMs()){
+function boardRows(states,{model,cycle},now=nowMs()){
 const pool=states.filter(run=>cycle===null||run.cycle===cycle);
 const latestDone=list=>list.filter(run=>run.state==='done').sort((a,b)=>b.showEnd-a.showEnd)[0];
 if(model){
@@ -267,7 +266,7 @@ return [...done.sort(byStart),...mine.filter(run=>run.state!=='done'&&ahead.incl
 }
 // One row per model: a late or producing run, otherwise whichever of its latest completion and
 // its next start is nearer in time. Rows then group by state so the order stays predictable.
-const picked=[],extra=[];
+const picked=[];
 for(const name of MODELS){
 const mine=pool.filter(run=>run.model===name);
 const last=latestDone(mine);
@@ -277,11 +276,10 @@ let pick=mine.filter(run=>run.state==='late').sort((a,b)=>b.showEnd-a.showEnd)[0
 if(!pick && last && next) pick=now-last.showEnd<=Math.max(0,next.showStart-now)?last:next;
 pick=pick||next||last;
 if(pick) picked.push(pick);
-if(showDone && last && last!==pick) extra.push(last);
 }
 const order=(a,b)=>STATE_ORDER[a.state]-STATE_ORDER[b.state]
 ||(a.state==='done'?b.showEnd-a.showEnd:a.state==='late'?a.showEnd-b.showEnd:a.showStart-b.showStart);
-return [...picked.sort(order),...extra.sort((a,b)=>b.showEnd-a.showEnd)];
+return picked.sort(order);
 }
 
 // ---------- Rendering ----------
@@ -489,8 +487,7 @@ dialog.setAttribute('aria-labelledby','scheduleTitle');
 let mode=currentMode();
 let tab='timeline';
 try{if(localStorage.getItem(TAB_STORE)==='table') tab='table';}catch{}
-const filters={model:null,cycle:null,showDone:false};
-try{filters.showDone=localStorage.getItem(DONE_STORE)==='1';}catch{}
+const filters={model:null,cycle:null};
 let states=null;
 
 const header=element('header','schedule-header');
@@ -508,12 +505,8 @@ close.type='button';close.setAttribute('aria-label','시간표 닫기');close.ti
 close.onclick=()=>dialog.close();
 header.append(title,modes,close);
 
-// Filters: recent completions, one model, one cycle.
+// Filters: one model, one cycle.
 const filterBar=element('div','schedule-filters');
-const doneLabel=element('label','schedule-check');
-const doneBox=element('input');doneBox.type='checkbox';doneBox.checked=filters.showDone;
-doneBox.onchange=()=>{filters.showDone=doneBox.checked;try{localStorage.setItem(DONE_STORE,doneBox.checked?'1':'0');}catch{}render();};
-doneLabel.append(doneBox,document.createTextNode('최근 완료된 모델도 표시'));
 const modelLabel=element('label','schedule-select');
 const modelSelect=element('select');
 modelSelect.setAttribute('aria-label','모델 필터');
@@ -528,7 +521,7 @@ const button=element('button',value===null?'':'c'+pad(value),text);button.type='
 button.onclick=()=>{filters.cycle=value;render();};
 cycleGroup.append(button);return {value,button};
 });
-filterBar.append(doneLabel,modelLabel,cycleGroup);
+filterBar.append(modelLabel,cycleGroup);
 
 const boardWrap=element('div','schedule-scroll-wrap');
 const board=element('div','schedule-scroll schedule-board-wrap');
@@ -580,8 +573,6 @@ const now=nowMs();
 modeButtons.forEach(button=>button.setAttribute('aria-pressed',String(button.textContent===mode)));
 for(const [value,button] of Object.entries(tabButtons)) button.setAttribute('aria-selected',String(value===tab));
 cycleButtons.forEach(({value,button})=>button.setAttribute('aria-pressed',String(value===filters.cycle)));
-doneBox.disabled=!!filters.model;
-doneLabel.classList.toggle('is-disabled',!!filters.model);
 timelinePanel.hidden=tab!=='timeline';
 tableWrap.hidden=tab!=='table';
 renderBoard(board,mode,now,states,filters);

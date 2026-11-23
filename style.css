@@ -6672,27 +6672,6 @@ select option.unsupported-option{
   font-size:12px;
 }
 
-.schedule-check{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  font-weight:700;
-  cursor:pointer;
-  user-select:none;
-}
-
-.schedule-check input{
-  width:14px;
-  height:14px;
-  margin:0;
-  accent-color:var(--ink);
-}
-
-.schedule-check.is-disabled{
-  color:#aaaaaa;
-  cursor:default;
-}
-
 .schedule-select select{
   height:26px;
   padding:0 24px 0 8px;
@@ -6786,8 +6765,23 @@ select option.unsupported-option{
     padding:8px 12px;
   }
 
+  .schedule-filters{
+    flex-wrap:nowrap;
+  }
+
+  /* The model select takes what the cycle buttons leave, so both fit on one line. */
+  .schedule-select{
+    flex:1 1 0;
+    min-width:0;
+  }
+
   .schedule-select select{
+    width:100%;
     height:30px;
+  }
+
+  .schedule-cycles{
+    flex:none;
   }
 
   .schedule-cycles button{
