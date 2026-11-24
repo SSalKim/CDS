@@ -204,6 +204,22 @@ const gate=Date.parse(ctx.releases?.[`${run.after}/${cycleText(run.cycleMs)}`]?.
 return uploaded.then(value=>value===null?null:Number.isFinite(gate)?Math.max(value,gate):value);
 }
 
+// How far a running run has got: the furthest lead out on R2 for self-produced runs, or the
+// producer's record of KMA's furthest lead (checked every 12 h of lead, 6 h for KIM LDAPS).
+function leadProgress(run,ctx){
+const [first,last]=leadRange(run.leads);
+if(run.source==='self'){
+const store=global.CDSPublicCharts;
+if(!ctx.publicFresh || !store?.readyHours || !run.id) return null;
+const hours=store.readyHours({modelId:run.id,product:PRODUCT,runUTC:new Date(run.cycleMs)})
+.filter(hour=>hour>=first && hour<=last);
+return hours.length?Math.max(...hours):null;
+}
+const entry=releaseEntry(run,ctx);
+if(!entry?.first || !Number.isFinite(entry.latest)) return null;
+return Math.min(Math.max(entry.latest,first),last);
+}
+
 async function resolveRun(run,now,ctx,deep){
 const duration=run.endMs-run.startMs;
 const estimate={...run,showStart:run.startMs,showEnd:run.endMs,realStart:false,realEnd:false};
@@ -224,7 +240,8 @@ const start=await leadTime(run,first,ctx);
 const showStart=start??run.startMs;
 // A late start pushes the end back; an early one does not pull it before the estimate.
 const showEnd=Math.max(run.endMs,showStart+duration);
-return {...estimate,state:now>showEnd&&recent?'late':now>showEnd?'done':'live',showStart,showEnd,realStart:!!start};
+return {...estimate,state:now>showEnd&&recent?'late':now>showEnd?'done':'live',showStart,showEnd,realStart:!!start,
+progress:leadProgress(run,ctx)};
 }
 if(finished===false && started===false){
 return {...estimate,state:now>run.endMs?(recent?'late':'done'):'next'};
@@ -311,9 +328,21 @@ try{return typeof timeMode==='string'&&timeMode==='UTC'?'UTC':'KST';}catch{retur
 
 function remainText(run,now){
 if(run.state==='done') return duration((now-run.showEnd)/MINUTE)+' 전 완료';
-if(run.state==='live') return duration((run.showEnd-now)/MINUTE)+' 남음';
+// The end is an estimate, so the time left is rounded up to five minutes.
+if(run.state==='live') return '약 '+duration(Math.ceil((run.showEnd-now)/MINUTE/5)*5)+' 남음';
 if(run.state==='late') return duration((now-run.showEnd)/MINUTE)+' 지연';
 return run.showStart>now?duration((run.showStart-now)/MINUTE)+' 후':'시작 대기';
+}
+
+// A producing or late run shows how far it has got, "+168/360h"; others show their lead range.
+function leadsCell(run){
+const last=leadRange(run.leads)[1];
+if((run.state==='live' || run.state==='late') && Number.isFinite(run.progress)){
+const cell=element('td','schedule-board-leads is-progress','+'+String(run.progress).padStart(3,'0')+'/'+String(last).padStart(3,'0')+'h');
+cell.title=`+${run.progress}h까지 표출됨 (전체 +${last}h)`;
+return cell;
+}
+return element('td','schedule-board-leads','+'+run.leads+'h');
 }
 
 function renderBoard(container,mode,now,states,filters){
@@ -349,7 +378,7 @@ tr.append(status,time,
 element('td','schedule-board-source',SOURCE_LABEL[run.source]),
 element('td','schedule-board-model',run.model),
 cycle,
-element('td','schedule-board-leads','+'+run.leads+'h'),
+leadsCell(run),
 element('td','schedule-board-remain',remainText(run,now)));
 body.append(tr);
 }
