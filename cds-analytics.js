@@ -114,6 +114,10 @@ if(host.includes('nmsc.kma.go.kr')){
 return 'kma_satellite';
 }
 
+if(host.includes('dmdw.kma.go.kr')){
+return 'kma_dmdw';
+}
+
 if(host.includes('data.kma.go.kr')){
 return 'kma_data';
 }

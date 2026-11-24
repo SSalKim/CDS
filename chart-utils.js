@@ -1,11 +1,15 @@
 (function(global){
 
+// Chart URLs are built on data.kma.go.kr, but images load from dmdw first: it serves the same
+// files in about 0.15 s and answers a missing chart with a 404, while data.kma.go.kr takes
+// seconds for a chart nobody fetched recently. data.kma.go.kr stays as the backup.
 const DEFAULT_CHART_BASE_URL='https://data.kma.go.kr/CHT';
+const DEFAULT_CHART_PRIMARY_BASE_URL='https://dmdw.kma.go.kr/map/data/CHT';
 const DEFAULT_CHART_BACKUP_BASE_URLS=[
-'https://dmdw.kma.go.kr/map/data/CHT'
+DEFAULT_CHART_BASE_URL
 ];
 const DEFAULT_CHART_BASE_URLS=[
-DEFAULT_CHART_BASE_URL,
+DEFAULT_CHART_PRIMARY_BASE_URL,
 ...DEFAULT_CHART_BACKUP_BASE_URLS
 ];
 
@@ -510,6 +514,7 @@ resetCacheIfLarge
 
 global.CDSChartUtils={
 DEFAULT_CHART_BASE_URL,
+DEFAULT_CHART_PRIMARY_BASE_URL,
 DEFAULT_CHART_BACKUP_BASE_URLS,
 getChartBaseUrls,
 getChartUrlCandidates,
