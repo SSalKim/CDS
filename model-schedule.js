@@ -11,10 +11,14 @@ const SCHEDULE=[
 {model:'KIM_GDAPS',status:'kim_gdps',kma:['KIMG','kim_gdps_erly_asia_gph500_ft06_pa4_s{fh}_{run}.png'],runs:[
 [0,'000~288','kma','03:20','05:50'],[6,'000~084','kma','09:20','10:05'],
 [12,'000~288','kma','15:20','17:50'],[18,'000~084','kma','21:20','22:00']]},
-// UKUM 00/12Z: 000-144 h come from KMA, 156/168 h from R2 once KMA has released 144 h.
+// UKUM 00/12Z: 000-144 h come from KMA; the self-produced 156/168 h are shown only once KMA has
+// released 144 h ({after:'kma'}). KMA rewrites its UKUM files about 3-4 h after release, which
+// resets Last-Modified, so these windows come from the producer's KMA confirmations (11-22..23).
 {model:'UKUM',id:'ukmo',status:'ukmo',kma:['GDPS','ukum_erly_asia_gph500_s{fh}_{run}.png'],runs:[
-[0,'000~168','kma','09:40','09:55',{last:'public'}],[6,'000~069','self','11:35','12:10'],
-[12,'000~168','kma','22:35','22:55',{last:'public'}],[18,'000~069','self','23:35','00:15']]},
+[0,'000~144','kma','06:50','08:50'],[0,'156~168','self','08:50','08:55',{after:'kma'}],
+[6,'000~069','self','11:35','12:10'],
+[12,'000~144','kma','18:05','18:50'],[12,'156~168','self','18:50','18:55',{after:'kma'}],
+[18,'000~069','self','23:35','00:15']]},
 {model:'ECMWF',id:'ecmwf',status:'ecmwf',kma:['ECMW','ecmw_lc40_asia_gph500_s{fh}_{run}.gif'],runs:[
 [0,'000~240','kma','05:55','07:00'],[0,'252~360','self','07:40','07:45'],[6,'000~144','self','12:30','12:45'],
 [12,'000~240','kma','17:55','19:00'],[12,'252~360','self','19:40','19:45'],[18,'000~144','self','00:30','00:45']]},
@@ -76,7 +80,7 @@ let from=minutes(start),to=minutes(end);
 if(to<from) to+=DAY;
 const kind=source==='self'?'public':'kma';
 rows.push({model:entry.model,id:entry.id,kma:entry.kma,status:source==='kma'?entry.status:undefined,cycle,leads,source,start:from,end:to,
-firstCheck:checks.first||kind,lastCheck:checks.last||kind});
+firstCheck:checks.first||kind,lastCheck:checks.last||kind,after:checks.after==='kma'?entry.status:undefined});
 }
 }
 return rows;
@@ -182,7 +186,8 @@ return kmaImageLoads(`${KMA_BASE}/${folder}/${text.slice(0,6)}/${text.slice(6,8)
 }
 
 // When a lead appeared: R2 upload time for self-produced runs, the producer's record of KMA's
-// release for KMA runs (UKUM 00/12Z ends when KMA's 144 h is out, as 156/168 h wait for it).
+// release for KMA runs. Charts shown only after KMA's run (UKUM 156/168 h) count from whichever
+// came later, their upload or KMA's last lead.
 function leadTime(run,hour,ctx){
 if(run.source!=='self'){
 const entry=releaseEntry(run,ctx);
@@ -193,7 +198,10 @@ const store=global.CDSPublicCharts;
 const origin=store?.getR2Base?.();
 if(!ctx.publicFresh || !origin || !store?.resolveUrls) return Promise.resolve(null);
 const url=store.resolveUrls({modelId:run.id,product:PRODUCT,runUTC:new Date(run.cycleMs),forecastHour:hour})[0];
-return url&&url.startsWith(origin)?uploadTime(url):Promise.resolve(null);
+const uploaded=url&&url.startsWith(origin)?uploadTime(url):Promise.resolve(null);
+if(!run.after) return uploaded;
+const gate=Date.parse(ctx.releases?.[`${run.after}/${cycleText(run.cycleMs)}`]?.last||'');
+return uploaded.then(value=>value===null?null:Number.isFinite(gate)?Math.max(value,gate):value);
 }
 
 async function resolveRun(run,now,ctx,deep){
