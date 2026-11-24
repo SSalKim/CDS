@@ -98,8 +98,8 @@ async function main(){
   assert.deepEqual(Array.from(api.browserImageCandidates('https://example.invalid/image.webp')),[]);
   assert.equal(evaluate(`getOrderedChartUrlCandidates(${JSON.stringify(original)})[0]`),`https://lh3.googleusercontent.com/d/${id}=s0`);
   assert.equal(evaluate('currentModel'),'kim_gdps','Drive candidates must also work in mixed-model comparison');
-  assert.equal(evaluate("getOrderedChartUrlCandidates('https://data.kma.go.kr/CHT/KIMG/chart.png')[0]"),
-    'https://data.kma.go.kr/CHT/KIMG/chart.png');
+  assert.deepEqual(Array.from(evaluate("getOrderedChartUrlCandidates('https://data.kma.go.kr/CHT/KIMG/chart.png')")),
+    ['https://dmdw.kma.go.kr/map/data/CHT/KIMG/chart.png','https://data.kma.go.kr/CHT/KIMG/chart.png']);
   const notice={hidden:true};
   context.document={getElementById:id=>id==='publicChartNotice'?notice:null};
   assert(fs.readFileSync(path.join(root,'index.html'),'utf8').includes('System 3.6'));

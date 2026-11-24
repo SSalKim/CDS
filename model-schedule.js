@@ -6,7 +6,7 @@
 // to 5 minutes so an estimate errs late rather than early.
 // Each run is checked against real data: R2 runs through the snapshot the viewer holds (and
 // their upload times through HEAD requests), KMA runs by loading the first or last lead image.
-const KMA_BASE='https://data.kma.go.kr/CHT';
+const KMA_BASE='https://dmdw.kma.go.kr/map/data/CHT';
 const SCHEDULE=[
 {model:'KIM_GDAPS',status:'kim_gdps',kma:['KIMG','kim_gdps_erly_asia_gph500_ft06_pa4_s{fh}_{run}.png'],runs:[
 [0,'000~288','kma','03:20','05:50'],[6,'000~084','kma','09:20','10:05'],
