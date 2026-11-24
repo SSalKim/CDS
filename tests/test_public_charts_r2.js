@@ -104,14 +104,15 @@ async function main(){
   assert.deepEqual([...store.resolveUrls(selection('gfs','2026111900',24))],[]);
   assert.deepEqual([...store.readyCycles('gfs')],['2026111906']);
 
-  // Any R2 inconsistency keeps the last snapshot for that poll (Git is no longer published), and R2 is
-  // retried next poll.
+  // A fragment that disagrees with the index costs only its own run (Git is no longer published),
+  // and it is read again at the next poll.
   r2.put(`manifest/runs/gfs/2026111912.${REV_A}.json`,fragment('gfs','2026111912',[[24,'hkor','gph500','FileD']]));
   r2.index({'gfs/2026111906':{rev:REV_C,count:2},'gfs/2026111912':{rev:REV_A,count:5}});
   const before=[...store.resolveUrls(selection('gfs','2026111906',24,'gph500','asia'))];
   result=await store.load();
-  assert.deepEqual({...result},{ok:false,changed:false,source:'r2'},'A fragment whose count disagrees with the index is rejected');
-  assert.deepEqual([...store.resolveUrls(selection('gfs','2026111906',24,'gph500','asia'))],before,'The last snapshot is kept');
+  assert.deepEqual({...result},{ok:true,changed:false,source:'r2'},'A fragment whose count disagrees with the index is skipped');
+  assert.deepEqual([...store.resolveUrls(selection('gfs','2026111906',24,'gph500','asia'))],before,'The other runs stay');
+  assert.deepEqual([...store.resolveUrls(selection('gfs','2026111912',24))],[],'The bad run stays hidden');
   assert(!r2.requests.some(request=>request.url.includes('raw.githubusercontent')),'Git is never read while R2 is configured');
   r2.index({'gfs/2026111906':{rev:REV_C,count:2},'gfs/2026111912':{rev:REV_A,count:1}});
   result=await store.load();
@@ -212,6 +213,24 @@ async function main(){
   assert.equal((await onlyStore.load()).ok,false);
   assert.deepEqual([...onlyStore.resolveUrls(selection('gfs','2026111900',24,'gph500','hkor'))],[onlyUrl],
     'An unreachable index keeps the R2-only images already shown');
+
+  // A fragment the bucket has already expired hides only its own run, even on a fresh page.
+  const expired=server();
+  expired.put(`manifest/runs/gfs/2026111900.${REV_A}.json`,fragment('gfs','2026111900',[[24,'hkor','gph500','FileA']]));
+  expired.index({'gfs/2026111900':{rev:REV_A,count:1},'gfs/2026111906':{rev:REV_B,count:3}});
+  const expiredStore=api.createStore({fetchImpl:expired.fetch,r2Base:BASE});
+  assert.deepEqual({...await expiredStore.load()},{ok:true,changed:true,source:'r2'});
+  assert.deepEqual([...expiredStore.resolveUrls(selection('gfs','2026111900',24))],[drive('FileA')]);
+  assert.deepEqual([...expiredStore.readyCycles('gfs')],['2026111900']);
+  // Once the producer uploads it again, the next poll shows that run too.
+  expired.put(`manifest/runs/gfs/2026111906.${REV_B}.json`,fragment('gfs','2026111906',
+    [[24,'hkor','gph500','FileB'],[24,'asia','gph500','FileC'],[48,'hkor','gph500','FileE']]));
+  assert.deepEqual({...await expiredStore.load()},{ok:true,changed:true,source:'r2'});
+  assert.deepEqual([...expiredStore.readyCycles('gfs')],['2026111906','2026111900']);
+  // When nothing at all can be read, the load fails and is retried.
+  const empty=server();
+  empty.index({'gfs/2026111900':{rev:REV_A,count:1}});
+  assert.equal((await api.createStore({fetchImpl:empty.fetch,r2Base:BASE}).load()).ok,false);
 
   console.log('Public charts R2: index polling, revision fragments, Git fallback, producer leads, R2 images and clock calibration passed');
 }
