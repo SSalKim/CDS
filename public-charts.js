@@ -379,8 +379,10 @@ return r2Only && !row.url ? null : row;
 });
 }
 
-// Poll the small index; download only fragments whose revision changed. Throws on any
-// inconsistency so the caller can fall back to the Git manifest for this poll.
+// Poll the small index; download only fragments whose revision changed. A fragment that cannot be
+// read or does not match the index costs only its own run: the run keeps the copy already loaded,
+// or stays hidden until a later poll reads it. Throws only when no run is usable at all, so the
+// caller keeps the last snapshot for this poll.
 async function loadR2(options){
 const index=await fetchJson(r2Origin+'manifest/index.json',{cache:'no-cache',...options});
 if(index?.schema!==R2_SCHEMA || index.images!=='drive' || !index.runs || typeof index.runs!=='object' ||
@@ -392,24 +394,30 @@ const missing=runs.filter(([run,item])=>fragments.get(run)?.rev!==item.rev);
 for(let start=0;start<missing.length;start+=R2_FETCH_CONCURRENCY){
 await Promise.all(missing.slice(start,start+R2_FETCH_CONCURRENCY).map(async([run,item])=>{
 const [,model,cycle]=run.match(R2_RUN);
+try{
 const fragment=await fetchJson(`${r2Origin}manifest/runs/${model}/${cycle}.${item.rev}.json`,options);
 if(fragment?.schema!==R2_SCHEMA || fragment.model!==model || fragment.cycle!==cycle ||
 fragment.images!=='drive' || !Array.isArray(fragment.leads) || !Array.isArray(fragment.charts) ||
 fragment.charts.length!==item.count) throw new Error('Invalid R2 fragment');
 fetched.set(run,{rev:item.rev,rows:fragmentRows(model,cycle,fragment),leads:fragment.leads});
+}catch(error){
+// This run keeps its earlier copy, if any, and is read again at the next poll.
+}
 }));
 }
+if(runs.length && runs.every(([run])=>!fetched.has(run) && !fragments.has(run)))
+throw new Error('No R2 fragment could be read');
 calibrateClock(index.generated_at);
-const key=JSON.stringify([index.models,runs.map(([run,item])=>[run,item.rev])]);
-// Commit fragments only after every download succeeded.
 for(const [run,value] of fetched) fragments.set(run,value);
 const live=new Set(runs.map(([run])=>run));
 for(const run of [...fragments.keys()]) if(!live.has(run)) fragments.delete(run);
+const usable=runs.filter(([run])=>fragments.has(run));
+const key=JSON.stringify([index.models,usable.map(([run])=>[run,fragments.get(run).rev])]);
 if(key===r2Key && source==='r2') return false;
 r2Key=key;
 const charts=[];
 const leads={};
-for(const [run] of runs){
+for(const [run] of usable){
 const value=fragments.get(run);
 charts.push(...value.rows.filter(Boolean));
 leads[run]=value.leads;

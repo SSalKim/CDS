@@ -13,9 +13,10 @@ const SCHEDULE=[
 [12,'000~288','kma','15:20','17:50'],[18,'000~084','kma','21:20','22:00']]},
 // UKUM 00/12Z: 000-144 h come from KMA; the self-produced 156/168 h are shown only once KMA has
 // released 144 h ({after:'kma'}). KMA rewrites its UKUM files about 3-4 h after release, which
-// resets Last-Modified, so these windows come from the producer's KMA confirmations (11-22..23).
+// resets Last-Modified, so 12Z comes from the producer's KMA confirmations (11-22..23) and 00Z
+// from the status file's live record of 11-24 (06:02-07:19), which replaced a slower 11-23 sample.
 {model:'UKUM',id:'ukmo',status:'ukmo',kma:['GDPS','ukum_erly_asia_gph500_s{fh}_{run}.png'],runs:[
-[0,'000~144','kma','06:50','08:50'],[0,'156~168','self','08:50','08:55',{after:'kma'}],
+[0,'000~144','kma','06:05','07:20'],[0,'156~168','self','07:20','07:25',{after:'kma'}],
 [6,'000~069','self','11:35','12:10'],
 [12,'000~144','kma','18:05','18:50'],[12,'156~168','self','18:50','18:55',{after:'kma'}],
 [18,'000~069','self','23:35','00:15']]},
@@ -31,7 +32,7 @@ const SCHEDULE=[
 {model:'AIGFS',id:'aigfs',runs:[
 [0,'000~360','self','03:45','04:20'],[6,'000~360','self','09:45','10:50'],
 [12,'000~360','self','15:45','16:25'],[18,'000~360','self','21:45','22:50']]},
-{model:'CMC',id:'cmc',runs:[[0,'000~240','self','04:05','04:50'],[12,'000~240','self','15:55','17:00']]},
+{model:'CMC',id:'cmc',runs:[[0,'000~240','self','04:05','05:00'],[12,'000~240','self','15:55','17:00']]},
 {model:'ICON',id:'icon',runs:[
 [0,'000~180','self','02:45','03:30'],[6,'000~120','self','08:45','09:20'],
 [12,'000~180','self','14:45','15:35'],[18,'000~120','self','20:45','21:20']]},
