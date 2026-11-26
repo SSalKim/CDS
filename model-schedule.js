@@ -54,6 +54,9 @@ const HOUR_MS=3600000;
 // KMA checks load a whole chart image (0.2-0.6 MB), so the window stays short.
 const LATE_WINDOW=3*60;
 const LONG_LATE_WINDOW=6*60;
+// A producing run past its estimated end stays 생산중 while its leads keep arriving; it is late
+// only once nothing new has appeared for this long.
+const STALL_MS=10*MINUTE;
 const TAB_STORE='cds.schedule.tab';
 // The 24 h timeline starts at 02:00 UTC (11:00 KST) so each day reads 00Z, 06Z, 12Z, 18Z.
 const AXIS_START_UTC=2*60;
@@ -221,6 +224,14 @@ if(!entry?.first || !Number.isFinite(entry.latest)) return null;
 return Math.min(Math.max(entry.latest,first),last);
 }
 
+// When the furthest lead out appeared: its R2 upload for self-produced runs, or the producer's
+// record of KMA's Last-Modified for it.
+function progressTime(run,progress,ctx){
+if(run.source==='self') return leadTime(run,progress,ctx);
+const value=Date.parse(releaseEntry(run,ctx)?.latest_at||'');
+return Promise.resolve(Number.isFinite(value)?value:null);
+}
+
 async function resolveRun(run,now,ctx,deep){
 const duration=run.endMs-run.startMs;
 const estimate={...run,showStart:run.startMs,showEnd:run.endMs,realStart:false,realEnd:false};
@@ -240,9 +251,20 @@ if(started===true){
 const start=await leadTime(run,first,ctx);
 const showStart=start??run.startMs;
 // A late start pushes the end back; an early one does not pull it before the estimate.
-const showEnd=Math.max(run.endMs,showStart+duration);
-return {...estimate,state:now>showEnd&&recent?'late':now>showEnd?'done':'live',showStart,showEnd,realStart:!!start,
-progress:leadProgress(run,ctx)};
+let showEnd=Math.max(run.endMs,showStart+duration);
+let state=now>showEnd&&recent?'late':now>showEnd?'done':'live';
+const progress=leadProgress(run,ctx);
+if(state==='late' && Number.isFinite(progress) && progress>first){
+const advanced=await progressTime(run,progress,ctx);
+if(advanced!==null && now-advanced<STALL_MS){
+// Still advancing: project the end from the pace so far. Pacing by lead hours errs late, as
+// later leads are spaced further apart than early ones.
+const pace=(advanced-showStart)/(progress-first);
+showEnd=Math.max(now+5*MINUTE,showStart+pace*(last-first));
+state='live';
+}
+}
+return {...estimate,state,showStart,showEnd,realStart:!!start,progress};
 }
 if(finished===false && started===false){
 return {...estimate,state:now>run.endMs?(recent?'late':'done'):'next'};
